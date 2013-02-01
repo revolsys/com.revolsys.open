@@ -13,8 +13,8 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.style.Marker;
-import com.revolsys.swing.map.style.Style;
+import com.revolsys.swing.map.layer.dataobject.style.Marker;
+import com.revolsys.swing.map.layer.dataobject.style.Style;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -47,7 +47,7 @@ public class GeometryRendererUtil {
     Geometry geometry) {
     BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
-      if (viewExtent.isNull()) {
+      if (!viewExtent.isNull()) {
         BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           GeometryFactory geometryFactory = viewport.getGeometryFactory();
@@ -58,6 +58,22 @@ public class GeometryRendererUtil {
     return EMPTY_GEOMETRY;
   }
 
+  private static Shape getShape(Viewport2D viewport, Style style,
+    Geometry geometry) {
+    BoundingBox viewExtent = viewport.getBoundingBox();
+    if (geometry != null) {
+      if (!viewExtent.isNull()) {
+        BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        if (geometryExtent.intersects(viewExtent)) {
+          GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          Geometry convertedGeometry = geometryFactory.createGeometry(geometry);
+          // TODO clipping
+          return GeometryShapeUtil.toShape(viewport, convertedGeometry);
+        }
+      }
+    }
+    return null;
+  }
   public static final void renderOutline(Viewport2D viewport,
     Graphics2D graphics, Geometry geometry, Style style) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
@@ -105,13 +121,12 @@ public class GeometryRendererUtil {
 
   public static final void renderPolygon(Viewport2D viewport,
     Graphics2D graphics, Polygon polygon, Style style) {
-    Geometry geometry = getGeometry(viewport, style, polygon);
-    if (!geometry.isEmpty()) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+   Shape shape = getShape(viewport, style, polygon);
+   if (shape != null) {
+     final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
       viewport.setUseModelCoordinates(true, graphics);
       Paint paint = graphics.getPaint();
       try {
-        Shape shape = GeometryShapeUtil.toShape(viewport, geometry);
         style.setFillStyle(viewport, graphics);
         graphics.fill(shape);
         style.setLineStyle(viewport, graphics);
@@ -125,14 +140,12 @@ public class GeometryRendererUtil {
 
   public static final void renderLineString(Viewport2D viewport,
     Graphics2D graphics, LineString lineString, Style style) {
-    Geometry geometry = getGeometry(viewport, style, lineString);
-    if (!geometry.isEmpty()) {
+    Shape shape = getShape(viewport, style, lineString);
+    if (shape != null) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
       viewport.setUseModelCoordinates(true, graphics);
       Paint paint = graphics.getPaint();
       try {
-        Shape shape = GeometryShapeUtil.toShape(viewport, lineString);
-
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
 

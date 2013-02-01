@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.symbolizer.Symbolizer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
@@ -26,8 +26,6 @@ public interface DataObjectLayer extends Layer {
   void selectObjects(List<DataObject> objects);
 
   void selectObjects(DataObject... objects);
-
-  void setSymbolizers(Symbolizer... symbolizers);
 
   void deleteObjects(DataObject... object);
 
@@ -51,4 +49,6 @@ public interface DataObjectLayer extends Layer {
   Set<DataObject> getHiddenObjects();
 
   void setHiddenObjects(DataObject... hiddenObjects);
+
+  List<DataObject> getDataObjects(BoundingBox boundingBox);
 }

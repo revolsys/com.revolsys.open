@@ -1,5 +1,6 @@
 package com.revolsys.gis.data.model.types;
 
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -120,7 +121,9 @@ public final class DataTypes {
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
 
-  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);;
+  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
+
+  public static final DataType COLOR = new SimpleDataType("color", Color.class);
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();

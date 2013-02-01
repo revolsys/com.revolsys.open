@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.style;
+package com.revolsys.swing.map.layer.dataobject.style;
 
 import java.awt.Color;
 import java.util.Collections;
@@ -54,7 +54,25 @@ public class RuleSet {
       return defaultValue;
     }
   }
-
+  public double getDouble(CartoCssProperty property) {
+    return getDouble(property, 1);
+  }
+  public double getDouble(CartoCssProperty property, double defaultValue) {
+    String value = declarations.get(property);
+    if (StringUtils.hasText(value)) {
+      try {
+        return Double.parseDouble(value);
+      } catch (Throwable t) {
+        throw new RuntimeException("Not a valid float " + property + "="
+          + value);
+      }
+    } else {
+      return defaultValue;
+    }
+  }
+  public Color getColor(CartoCssProperty property) {
+    return getColor(property,null);
+  }
   public Color getColor(CartoCssProperty property, Color defaultColor) {
     String value = declarations.get(property);
     if (StringUtils.hasText(value)) {
@@ -66,8 +84,8 @@ public class RuleSet {
           int red = Integer.valueOf(values[0]);
           int green = Integer.valueOf(values[1]);
           int blue = Integer.valueOf(values[2]);
-          Color color = new Color(red, green, blue);
-          return color;
+          Color color = new Color(red, green, blue,255);
+            return color;
         } catch (Throwable e) {
           throw new IllegalArgumentException("Not a valid CSS color " + value,
             e);

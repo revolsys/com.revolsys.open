@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.style;
+package com.revolsys.swing.map.layer.dataobject.style;
 
 public class IdSelector implements Selector {
 

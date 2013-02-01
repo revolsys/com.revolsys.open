@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -14,26 +15,15 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.symbolizer.LineSymbolizer;
-import com.revolsys.swing.map.symbolizer.PointSymbolizer;
-import com.revolsys.swing.map.symbolizer.PolygonSymbolizer;
-import com.revolsys.swing.map.symbolizer.Symbolizer;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.StyleRenderer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer {
-  private static final DataObjectLayerRenderer RENDERER = new DataObjectLayerRenderer();
-
-  private static List<Symbolizer> createDefaultStyles() {
-    final List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
-    symbolizers.add(new PointSymbolizer());
-    symbolizers.add(new LineSymbolizer());
-    symbolizers.add(new PolygonSymbolizer());
-    return symbolizers;
-  }
-
-  private List<Symbolizer> symbolizers = Collections.emptyList();
-
+ 
   private DataObjectMetaData metaData;
 
   private Set<DataObject> selectedObjects = new LinkedHashSet<DataObject>();
@@ -43,9 +33,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
   public AbstractDataObjectLayer() {
-    setSymbolizers(createDefaultStyles());
     setGeometryFactory(GeometryFactory.getFactory(4326));
-    setRenderer(RENDERER);
+    setRenderer(new StyleRenderer());
   }
 
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
@@ -58,8 +47,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
-    setSymbolizers(createDefaultStyles());
-    setRenderer(RENDERER);
+    setRenderer(new StyleRenderer());
   }
 
   public AbstractDataObjectLayer(final String name,
@@ -68,12 +56,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setGeometryFactory(geometryFactory);
   }
 
-  public void addSymbolizer(final Symbolizer symbolizer) {
-    if (symbolizer != null) {
-      symbolizers.add(symbolizer);
-    }
-
-  }
 
   @Override
   public void clearEditingObjects() {
@@ -104,6 +86,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getGeometryFactory().getCoordinateSystem();
   }
 
+  @Override
   public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
     return Collections.emptyList();
   }
@@ -149,14 +132,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new ArrayList<DataObject>(selectedObjects);
   }
 
-  public List<Symbolizer> getSymbolizers() {
-    return symbolizers;
-  }
-
-  public List<Symbolizer> getSymbolizers(final DataObject dataObject) {
-    return symbolizers;
-  }
-
   @Override
   public void selectObjects(final DataObject... objects) {
     selectObjects(Arrays.asList(objects));
@@ -190,6 +165,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
+    super.setRenderer(renderer);
+  }
+
+  @Override
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
     final List<DataObject> objects = getObjects(geometry, distance);
@@ -200,24 +180,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
     return objects.size();
   }
-
-  public void setSymbolizers(final List<Symbolizer> symbolizers) {
-    final List<Symbolizer> oldValue = this.symbolizers;
-    for (final Symbolizer symbolizer : oldValue) {
-      symbolizer.removePropertyChangeListener(this);
-    }
-    this.symbolizers = new ArrayList<Symbolizer>();
-    for (final Symbolizer symbolizer : symbolizers) {
-      symbolizer.addPropertyChangeListener(this);
-      this.symbolizers.add(symbolizer);
-    }
-    getPropertyChangeSupport().firePropertyChange("symbolizers", oldValue,
-      this.symbolizers);
-  }
-
+  
   @Override
-  public void setSymbolizers(final Symbolizer... symbolizers) {
-    setSymbolizers(Arrays.asList(symbolizers));
+  public void setProperty(String name, Object value) {
+   if ("style".equals(name)) {
+     if (value instanceof Map) {
+      @SuppressWarnings("unchecked")
+      Map<String,Object> style = (Map<String,Object>)value;
+      LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(style); 
+      if (renderer != null) {
+        setRenderer(renderer);
+      }
+    }
+   } else {
+    super.setProperty(name, value);
+   }
   }
-
 }

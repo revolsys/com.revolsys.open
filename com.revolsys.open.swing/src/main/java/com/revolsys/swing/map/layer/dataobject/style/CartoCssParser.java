@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.style;
+package com.revolsys.swing.map.layer.dataobject.style;
 
 import java.io.BufferedReader;
 import java.io.File;

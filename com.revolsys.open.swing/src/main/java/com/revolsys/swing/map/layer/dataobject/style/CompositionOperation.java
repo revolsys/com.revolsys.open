@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.style;
+package com.revolsys.swing.map.layer.dataobject.style;
 
 /**
  * Composite operation. This defines how this symbolizer should behave relative

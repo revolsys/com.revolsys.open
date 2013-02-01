@@ -1,16 +1,38 @@
-package com.revolsys.swing.map.style;
+package com.revolsys.swing.map.layer.dataobject.style;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.JavaBeanUtil;
 
 public class Style {
+
+  public Style() {
+  }
+
+  public Style(Map<String, Object> style) {
+    for (Entry<String, Object> entry : style.entrySet()) {
+      String label = entry.getKey();
+      Object value = entry.getValue();
+      CartoCssProperty property = CartoCssProperty.getProperty(label);
+      if (property != null) {
+        DataType dataType = property.getDataType();
+        String propertyName = property.getPropertyName();
+        value = StringConverterRegistry.toObject(dataType, value);
+        JavaBeanUtil.setProperty(this, propertyName, value);
+      }
+    }
+  }
 
   public static Style line(final Color color) {
     final Style style = new Style();
@@ -34,14 +56,14 @@ public class Style {
     style.setMarkerDeltaX(-markerSize / 2);
     style.setMarkerDeltaY(-markerSize / 2);
     style.setLineColor(lineColor);
-    style.setPolygonFillColor(fillColor);
+    style.setPolygonFill(fillColor);
     return style;
   }
 
   public static Style polygon(final Color lineColor, final Color fillColor) {
     final Style style = new Style();
     style.setLineColor(lineColor);
-    style.setPolygonFillColor(fillColor);
+    style.setPolygonFill(fillColor);
     return style;
   }
 
@@ -50,7 +72,7 @@ public class Style {
     final Style style = new Style();
     style.setLineColor(lineColor);
     style.setLineWidth(lineWidth);
-    style.setPolygonFillColor(fillColor);
+    style.setPolygonFill(fillColor);
     return style;
   }
 
@@ -84,7 +106,7 @@ public class Style {
 
   private CompositionOperation polygonCompositionOperation = CompositionOperation.src_over;
 
-  private Color polygonFillColor = new Color(128, 128, 128, 255);
+  private Color polygonFill = new Color(128, 128, 128, 255);
 
   private int lineOpacity = 255;
 
@@ -164,8 +186,8 @@ public class Style {
     return polygonCompositionOperation;
   }
 
-  public Color getPolygonFillColor() {
-    return polygonFillColor;
+  public Color getPolygonFill() {
+    return polygonFill;
   }
 
   public int getPolygonFillOpacity() {
@@ -193,7 +215,7 @@ public class Style {
   }
 
   public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    graphics.setPaint(polygonFillColor);
+    graphics.setPaint(polygonFill);
     // final Graphic fillPattern = fill.getPattern();
     // if (fillPattern != null) {
     // TODO fillPattern
@@ -389,11 +411,11 @@ public class Style {
     this.polygonCompositionOperation = polygonCompositionOperation;
   }
 
-  public void setPolygonFillColor(final Color fill) {
+  public void setPolygonFill(final Color fill) {
     if (fill == null) {
-      this.polygonFillColor = new Color(128, 128, 128, polygonFillOpacity);
+      this.polygonFill = new Color(128, 128, 128, polygonFillOpacity);
     } else {
-      this.polygonFillColor = fill;
+      this.polygonFill = fill;
       this.polygonFillOpacity = fill.getAlpha();
     }
   }
@@ -404,8 +426,8 @@ public class Style {
         "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFillColor = new Color(polygonFillColor.getRed(),
-        polygonFillColor.getGreen(), polygonFillColor.getBlue(),
+      this.polygonFill = new Color(polygonFill.getRed(),
+        polygonFill.getGreen(), polygonFill.getBlue(),
         this.polygonFillOpacity);
     }
   }
@@ -415,8 +437,8 @@ public class Style {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFillColor = new Color(polygonFillColor.getRed(),
-        polygonFillColor.getGreen(), polygonFillColor.getBlue(),
+      this.polygonFill = new Color(polygonFill.getRed(),
+        polygonFill.getGreen(), polygonFill.getBlue(),
         this.polygonFillOpacity);
     }
   }

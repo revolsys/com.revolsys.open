@@ -107,7 +107,9 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
-    if (boundingBox.isNull() || boundingBox.getWidth() == 0 || boundingBox.getHeight() == 0) {
+    double width = boundingBox.getWidth();
+    double height = boundingBox.getHeight();
+    if (boundingBox.isNull() || width == 0 || height == 0) {
       return Collections.emptyList();
     } else {
       GeometryFactory geometryFactory = getGeometryFactory();

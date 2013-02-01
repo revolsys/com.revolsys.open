@@ -118,6 +118,7 @@ public class StringConverterRegistry {
     addConverter(MultiLineString.class, geometryConverter);
     addConverter(MultiPolygon.class, geometryConverter);
     addConverter(new ListStringConverter());
+    addConverter(new ColorStringConverter());
   }
 
   public void addConverter(final Class<?> clazz,

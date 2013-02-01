@@ -6,6 +6,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -291,7 +293,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         propertyChangeSupport.firePropertyChange(event);
 
         super.setProperty(name, value);
+        try {
         JavaBeanUtil.setProperty(this , name, value);
+        } catch (Throwable e) {
+          LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name,e);
+        }
       }
     }
   }
