@@ -12,7 +12,6 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.util.CollectionUtil;
 
 public class SwingWorkerManager {
@@ -89,7 +88,7 @@ public class SwingWorkerManager {
     return worker;
   }
 
-  public static void execute(final SwingWorker<?, ?> worker) {
+  public static void execute(final SwingWorker<? extends Object, ? extends Object> worker) {
     synchronized (WORKERS) {
       List<SwingWorker<?, ?>> oldWorkers = getWorkers();
       if (!CollectionUtil.containsReference(WORKERS, worker)) {
