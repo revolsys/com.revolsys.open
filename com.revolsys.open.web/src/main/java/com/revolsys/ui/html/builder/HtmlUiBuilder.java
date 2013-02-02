@@ -121,7 +121,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public static boolean isDataTableCallback() {
-    return HttpServletUtils.getParameter("_") != null;
+    return HttpServletUtils.getParameter("_") != null && HttpServletUtils.getParameter("callback") == null;
   }
 
   public static boolean isHtmlPage(final HttpServletRequest request) {

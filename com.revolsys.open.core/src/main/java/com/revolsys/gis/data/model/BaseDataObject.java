@@ -448,12 +448,17 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
    */
   @Override
   public void setIdValue(final Object id) {
-    if (state != DataObjectState.New) {
-      throw new IllegalStateException(
-        "Cannot change the ID on a persisted object");
-    }
     final int index = metaData.getIdAttributeIndex();
-    setValue(index, id);
+    if (state == DataObjectState.New) {
+      setValue(index, id);
+
+    } else {
+      Object oldId = getValue(index);
+      if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
+        throw new IllegalStateException(
+          "Cannot change the ID on a persisted object");
+      }
+    }
   }
 
   @Override
