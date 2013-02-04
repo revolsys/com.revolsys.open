@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;

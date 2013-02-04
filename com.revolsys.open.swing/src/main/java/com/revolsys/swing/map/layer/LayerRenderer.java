@@ -1,11 +1,12 @@
 package com.revolsys.swing.map.layer;
 
 import java.awt.Graphics2D;
+import java.beans.PropertyChangeListener;
 import java.util.Map;
 
 import com.revolsys.swing.map.Viewport2D;
 
-public interface LayerRenderer<T extends Layer> {
+public interface LayerRenderer<T extends Layer> extends PropertyChangeListener {
 
   void render(Viewport2D viewport, Graphics2D graphics);
 

@@ -281,7 +281,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setProperty(final String name, final Object value) {
     // TODO see if we can get the JavaBeanUtil set property to work with
     // conversions
-    if (name.equals("minimumScale")) {
+    if (name.equals("type")) {}else  if (name.equals("minimumScale")) {
       setMinimumScale(((Number)value).longValue());
     } else if (name.equals("maximumScale")) {
       setMaximumScale(((Number)value).longValue());

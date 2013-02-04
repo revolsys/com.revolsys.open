@@ -59,6 +59,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
     this.parent = parent;
+    getPropertyChangeSupport().addPropertyChangeListener(parent);
     @SuppressWarnings("unchecked")
     final Map<String, Object> styleDefaults = (Map<String, Object>)style.get("defaults");
     setDefaults(styleDefaults);

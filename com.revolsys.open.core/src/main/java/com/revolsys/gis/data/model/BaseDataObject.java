@@ -362,7 +362,8 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          throw new IllegalArgumentException("Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
+          return null;
         }
       }
     }

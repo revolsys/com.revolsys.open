@@ -9,7 +9,8 @@ import java.util.Map.Entry;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
+
+import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
@@ -22,7 +23,8 @@ public class TextStyle {
     return new TextStyle();
   }
 
-  private double textOrientation = 90;
+  /** The orientation of the text in a clockwise direction from the east axis. */
+  private double textOrientation = 0;
 
   private Color textFill = new Color(0, 0, 0);
 
@@ -30,11 +32,67 @@ public class TextStyle {
 
   private int textOpacity = 255;
 
-  private final Measure<Length> textHaloRadius = GeometryStyle.ZERO_PIXEL;
+  private Measure<Length> textHaloRadiusMeasure = GeometryStyle.ZERO_PIXEL;
+
+  private String textName = "";
+
+  public String getTextName() {
+    return textName;
+  }
+
+  public void setTextName(String textName) {
+    if (textName == null) {
+      this.textName = "";
+    } else {
+      this.textName = textName;
+    }
+  }
 
   private String textFaceName = Font.SANS_SERIF;
 
   private Measure<Length> textSize = GeometryStyle.TEN_PIXELS;
+
+  private String textAlign = "auto";
+
+  private String textVerticalAlignment = "auto";
+
+  private String textPlacementType = "dummy";
+
+  private Measure<Length> textDx = GeometryStyle.ZERO_PIXEL;
+
+  private Measure<Length> textDy = GeometryStyle.ZERO_PIXEL;
+
+  public Measure<Length> getTextDeltaX() {
+    return textDx;
+  }
+
+  public Measure<Length> getTextDeltaY() {
+    return textDy;
+  }
+
+  public void setTextHaloRadius(double textHaloRadius) {
+    setTextHaloRadiusMeasure(Measure.valueOf(textHaloRadius, NonSI.PIXEL));
+  }
+
+  public void setTextHaloRadiusMeasure(Measure<Length> textHaloRadius) {
+    this.textHaloRadiusMeasure = textHaloRadius;
+  }
+
+  public void setTextDx(final double textDx) {
+    setTextDeltaX(Measure.valueOf(textDx, NonSI.PIXEL));
+  }
+
+  public void setTextDy(final double textDy) {
+    setTextDeltY(Measure.valueOf(textDy, NonSI.PIXEL));
+  }
+
+  public void setTextDeltaX(final Measure<Length> textDx) {
+    this.textDx = GeometryStyle.getWithDefault(textDx, GeometryStyle.ZERO_PIXEL);
+  }
+
+  public void setTextDeltY(final Measure<Length> textDy) {
+    this.textDy = GeometryStyle.getWithDefault(textDy, GeometryStyle.ZERO_PIXEL);
+  }
 
   public TextStyle() {
   }
@@ -43,7 +101,7 @@ public class TextStyle {
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String label = entry.getKey();
       Object value = entry.getValue();
-      final CartoCssProperty property = CartoCssProperty.getProperty(label);
+      final TextStyleProperty property = TextStyleProperty.getProperty(label);
       if (property != null) {
         final DataType dataType = property.getDataType();
         final String propertyName = property.getPropertyName();
@@ -51,6 +109,10 @@ public class TextStyle {
         JavaBeanUtil.setProperty(this, propertyName, value);
       }
     }
+  }
+
+  public String getTextAlign() {
+    return textAlign;
   }
 
   public String getTextFaceName() {
@@ -65,8 +127,8 @@ public class TextStyle {
     return textHaloFill;
   }
 
-  public Measure<Length> getTextHaloRadius() {
-    return textHaloRadius;
+  public Measure<Length> getTextHaloRadiusMeasure() {
+    return textHaloRadiusMeasure;
   }
 
   public int getTextOpacity() {
@@ -77,8 +139,24 @@ public class TextStyle {
     return textOrientation;
   }
 
+  public String getTextPlacementType() {
+    return textPlacementType;
+  }
+
   public Measure<Length> getTextSize() {
     return textSize;
+  }
+
+  public String getTextVerticalAlignment() {
+    return textVerticalAlignment;
+  }
+
+  public void setTextAlign(final String textAlign) {
+    if (StringUtils.hasText(textAlign)) {
+      this.textAlign = textAlign;
+    } else {
+      this.textAlign = "auto";
+    }
   }
 
   public void setTextFaceName(final String textFaceName) {
@@ -118,6 +196,14 @@ public class TextStyle {
     this.textOrientation = textOrientation;
   }
 
+  public void setTextPlacementType(final String textPlacementType) {
+    if (StringUtils.hasText(textPlacementType)) {
+      this.textPlacementType = textPlacementType;
+    } else {
+      this.textPlacementType = "dummy";
+    }
+  }
+
   public void setTextSize(final double textSize) {
     setTextSize(Measure.valueOf(textSize, NonSI.PIXEL));
   }
@@ -135,10 +221,17 @@ public class TextStyle {
     // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
     // style += Font.ITALIC;
     // }
-    final double fontSize = textSize.doubleValue(SI.METRE);
-    final Font font = new Font(textFaceName, style, (int)fontSize);
+    final double fontSize = viewport.toDisplayValue(textSize);
+    final Font font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
     graphics.setFont(font);
-    graphics.setColor(getTextFill());
+  }
+
+  public void setTextVerticalAlignment(final String textVerticalAlignment) {
+    if (StringUtils.hasText(textVerticalAlignment)) {
+      this.textVerticalAlignment = textVerticalAlignment;
+    } else {
+      this.textVerticalAlignment = "auto";
+    }
   }
 
 }

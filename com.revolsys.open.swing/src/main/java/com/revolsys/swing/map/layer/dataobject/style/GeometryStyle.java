@@ -58,8 +58,8 @@ public class GeometryStyle {
     style.setMarker(new ShapeMarker(markerName));
     style.setMarkerWidth(markerSize);
     style.setMarkerHeight(markerSize);
-    style.setMarkerDeltaX(-markerSize / 2);
-    style.setMarkerDeltaY(-markerSize / 2);
+    style.setMarkerDy(-markerSize / 2);
+    style.setMarkerDy(-markerSize / 2);
     style.setLineColor(lineColor);
     style.setPolygonFill(fillColor);
     return style;
@@ -135,7 +135,7 @@ public class GeometryStyle {
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String label = entry.getKey();
       Object value = entry.getValue();
-      final CartoCssProperty property = CartoCssProperty.getProperty(label);
+      final GeometryStyleProperty property = GeometryStyleProperty.getProperty(label);
       if (property != null) {
         final DataType dataType = property.getDataType();
         final String propertyName = property.getPropertyName();
@@ -371,20 +371,20 @@ public class GeometryStyle {
     this.marker = marker;
   }
 
-  public void setMarkerDeltaX(final double markerDx) {
-    setMarkerDx(Measure.valueOf(markerDx, NonSI.PIXEL));
+  public void setMarkerDx(final double markerDx) {
+    setMarkerDeltaX(Measure.valueOf(markerDx, NonSI.PIXEL));
   }
 
-  public void setMarkerDeltaY(final double markerDy) {
-    setMarkerDy(Measure.valueOf(markerDy, NonSI.PIXEL));
+  public void setMarkerDy(final double markerDy) {
+    setMarkerDeltaY(Measure.valueOf(markerDy, NonSI.PIXEL));
   }
 
-  public void setMarkerDx(final Measure<Length> markerDx) {
+  public void setMarkerDeltaX(final Measure<Length> markerDx) {
     this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
   }
 
-  public void setMarkerDy(final Measure<Length> markerDy) {
-    this.markerDy = getWithDefault(markerDx, ZERO_PIXEL);
+  public void setMarkerDeltaY(final Measure<Length> markerDy) {
+    this.markerDy = getWithDefault(markerDy, ZERO_PIXEL);
   }
 
   public void setMarkerHeight(final double markerHeight) {

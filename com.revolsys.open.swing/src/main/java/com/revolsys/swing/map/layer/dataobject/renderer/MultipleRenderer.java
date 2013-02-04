@@ -15,25 +15,26 @@ import com.revolsys.swing.map.layer.geometry.GeometryRendererUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Use all the specified renderers to render the layer. All features are rendered using the first
- * renderer, then the second etc.
+ * Use all the specified renderers to render the layer. All features are
+ * rendered using the first renderer, then the second etc.
  */
 public class MultipleRenderer extends AbstractMultipleRenderer {
 
   public MultipleRenderer(final DataObjectLayer layer, LayerRenderer<?> parent,
     final Map<String, Object> multipleStyle) {
-    super("multipleStyle", layer,parent, multipleStyle);
+    super("multipleStyle", layer, parent, multipleStyle);
     @SuppressWarnings("unchecked")
     final List<Map<String, Object>> styles = (List<Map<String, Object>>)multipleStyle.get("styles");
     for (final Map<String, Object> style : styles) {
       final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
-        layer,this, style);
+        layer, this, style);
       addRenderer(renderer);
     }
   }
 
   public void addStyle(final GeometryStyle style) {
-    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(getLayer(),this,style);
+    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(
+      getLayer(), this, style);
     addRenderer(renderer);
   }
 
@@ -50,14 +51,17 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     final Graphics2D graphics, final DataObjectLayer layer,
     final List<DataObject> dataObjects) {
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-      renderer.renderObjects(viewport, graphics, layer, dataObjects);
+      long scale = (long)viewport.getScale();
+      if (renderer.isVisible(scale)) {
+        renderer.renderObjects(viewport, graphics, layer, dataObjects);
+      }
     }
   }
 
   public void setStyles(final List<GeometryStyle> styles) {
-    List<AbstractDataObjectLayerRenderer> renderers= new ArrayList<AbstractDataObjectLayerRenderer>();
+    List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
     for (final GeometryStyle style : styles) {
-      renderers.add(new GeometryStyleRenderer(getLayer(), this,style));
+      renderers.add(new GeometryStyleRenderer(getLayer(), this, style));
     }
     setRenderers(renderers);
   }
