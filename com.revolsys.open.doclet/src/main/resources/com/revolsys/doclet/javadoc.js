@@ -26,6 +26,14 @@ function createAccordion(selector) {
 }
 
 $(document).ready(function() {
+  $('div.htmlExample').each(function() {
+    var text = String($(this).html());
+    var pre = $('<pre class="prettyprint language-html"/>').text(text);
+    $(this).before('<p>The following code fragment shows an example of using the API.</p>');
+    $(this).before(pre);
+    $(this).before('<p>Use the following buttons to run the example.</p>');
+  });
+
   $('div.simpleDataTable table').dataTable({
     "bInfo" : false,
     "bJQueryUI" : true,
@@ -40,4 +48,5 @@ $(document).ready(function() {
   createAccordion('div.javaMethod');
   prettyPrint();
   $(':button').button();
+ 
 });

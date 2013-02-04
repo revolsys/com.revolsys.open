@@ -157,3 +157,9 @@ div.javaMethod table tbody td.type {
 pre.prettyprint {
   background-color: white;
 }
+
+div.htmlExample {
+  border: 1px solid #888888;
+  background-color: white;
+  padding: 5px;
+}
