@@ -18,14 +18,12 @@ public class LayerGroupTreeNodeModel extends
   public LayerGroupTreeNodeModel() {
     setSupportedClasses(LayerGroup.class);
     setSupportedChildClasses(AbstractLayer.class, LayerGroup.class, Layer.class);
-    setObjectTreeNodeModels(this, new BaseLayerTreeNodeModel("WmsLayer"));
+    setObjectTreeNodeModels(this, new BaseLayerTreeNodeModel("Layer"));
     setRenderer(new LayerGroupTreeCellRenderer());
   }
 
   @Override
-  public int addChild(
-    final LayerGroup parent,
-    final int index,
+  public int addChild(final LayerGroup parent, final int index,
     final Layer layer) {
     parent.add(index, layer);
     return index;

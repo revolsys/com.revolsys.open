@@ -21,15 +21,15 @@ import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 @SuppressWarnings("serial")
 public class SwingWorkerTableModel extends AbstractTableModel {
   public static JPanel createPanel() {
-    JPanel taskPanel = new JPanel(new BorderLayout());
-    JXTable table = SwingWorkerTableModel.createTable();
-    JScrollPane scrollPane = new JScrollPane(table);
+    final JPanel taskPanel = new JPanel(new BorderLayout());
+    final JXTable table = SwingWorkerTableModel.createTable();
+    final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
   public static JXTable createTable() {
-    SwingWorkerTableModel model = new SwingWorkerTableModel();
+    final SwingWorkerTableModel model = new SwingWorkerTableModel();
     final JXTable table = new JXTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);
@@ -54,12 +54,12 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   private final List<String> columnTitles = Arrays.asList("Description",
     "Status");
 
-  private InvokeMethodPropertyChangeListener listener;
+  private final InvokeMethodPropertyChangeListener listener;
 
   public SwingWorkerTableModel() {
-    listener = new InvokeMethodPropertyChangeListener( this,
+    listener = new InvokeMethodPropertyChangeListener(this,
       "fireTableDataChanged");
-    PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
+    final PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(listener);
   }
 

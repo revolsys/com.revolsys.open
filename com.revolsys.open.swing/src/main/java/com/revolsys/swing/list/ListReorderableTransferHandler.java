@@ -20,27 +20,16 @@ public class ListReorderableTransferHandler extends TransferHandler {
   private final DataFlavor localObjectFlavor = new DataFlavor(int[].class,
     "Integer[]");
 
-  private String mimeType = localObjectFlavor.getMimeType();
+  private final String mimeType = localObjectFlavor.getMimeType();
 
-  private JList list;
+  private final JList list;
 
-  public ListReorderableTransferHandler(JList list) {
+  public ListReorderableTransferHandler(final JList list) {
     this.list = list;
   }
 
   @Override
-  protected Transferable createTransferable(JComponent c) {
-    assert (c == list);
-    int[] selectedRows = list.getSelectedIndices();
-    if (c == list) {
-      return new DataHandler(selectedRows, mimeType);
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public boolean canImport(TransferHandler.TransferSupport info) {
+  public boolean canImport(final TransferHandler.TransferSupport info) {
     if (info.getComponent() == list) {
       if (info.isDrop()) {
         if (info.isDataFlavorSupported(localObjectFlavor)) {
@@ -54,26 +43,45 @@ public class ListReorderableTransferHandler extends TransferHandler {
   }
 
   @Override
-  public int getSourceActions(JComponent c) {
+  protected Transferable createTransferable(final JComponent c) {
+    assert (c == list);
+    final int[] selectedRows = list.getSelectedIndices();
+    if (c == list) {
+      return new DataHandler(selectedRows, mimeType);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  protected void exportDone(final JComponent c, final Transferable t,
+    final int action) {
+    if (action == TransferHandler.MOVE) {
+      list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+  }
+
+  @Override
+  public int getSourceActions(final JComponent c) {
     return TransferHandler.COPY_OR_MOVE;
   }
 
   @Override
-  public boolean importData(TransferHandler.TransferSupport info) {
-    JList target = (JList)info.getComponent();
-    JList.DropLocation dropLocation = (JList.DropLocation)info.getDropLocation();
+  public boolean importData(final TransferHandler.TransferSupport info) {
+    final JList target = (JList)info.getComponent();
+    final JList.DropLocation dropLocation = (JList.DropLocation)info.getDropLocation();
     int dropIndex = dropLocation.getIndex();
-    ListModel model = list.getModel();
-    int max = model.getSize();
+    final ListModel model = list.getModel();
+    final int max = model.getSize();
     if (dropIndex < 0 || dropIndex > max) {
       dropIndex = max;
     }
     target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     try {
-      Transferable transferable = info.getTransferable();
-      int[] indices = (int[])transferable.getTransferData(localObjectFlavor);
+      final Transferable transferable = info.getTransferable();
+      final int[] indices = (int[])transferable.getTransferData(localObjectFlavor);
       if (indices.length > 0) {
-        Reorderable reorderable = (Reorderable)model;
+        final Reorderable reorderable = (Reorderable)model;
         int currentIndex = dropIndex;
         int count = 0;
         for (int index : indices) {
@@ -92,23 +100,16 @@ public class ListReorderableTransferHandler extends TransferHandler {
             }
           }
         }
-        ListSelectionModel selectionModel = target.getSelectionModel();
+        final ListSelectionModel selectionModel = target.getSelectionModel();
         selectionModel.clearSelection();
         selectionModel.addSelectionInterval(currentIndex - indices.length,
           currentIndex - 1);
         return true;
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return false;
-  }
-
-  @Override
-  protected void exportDone(JComponent c, Transferable t, int action) {
-    if (action == TransferHandler.MOVE) {
-      list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-    }
   }
 
 }

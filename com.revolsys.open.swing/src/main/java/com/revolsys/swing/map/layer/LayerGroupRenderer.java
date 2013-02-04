@@ -9,12 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.map.Viewport2D;
 
-public class LayerGroupRenderer implements LayerRenderer<LayerGroup> {
-  public LayerGroupRenderer() {
+public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
+  public LayerGroupRenderer(LayerGroup layer) {
+    super("group", layer);
   }
 
   @Override
-  public void render(final Viewport2D viewport, Graphics2D graphics, final LayerGroup layer) {
+  public void render(final Viewport2D viewport, final Graphics2D graphics,
+    final LayerGroup layer) {
     if (layer.isVisible(viewport.getScale())) {
       viewport.setUseModelCoordinates(false, graphics);
       final List<Layer> layers = new ArrayList<Layer>(layer.getLayers());
@@ -25,7 +27,7 @@ public class LayerGroupRenderer implements LayerRenderer<LayerGroup> {
           try {
             final LayerRenderer<Layer> renderer = childLayer.getRenderer();
             if (renderer != null) {
-              renderer.render(viewport, graphics, childLayer);
+              renderer.render(viewport, graphics);
             }
           } catch (final Throwable e) {
             LoggerFactory.getLogger(getClass()).error(

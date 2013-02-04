@@ -11,17 +11,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class EnableComponentListener implements ItemListener,
-  ListSelectionListener,PropertyChangeListener {
-  private Component component;
+  ListSelectionListener, PropertyChangeListener {
+  private final Component component;
 
-  public EnableComponentListener(Component component) {
+  public EnableComponentListener(final Component component) {
     this.component = component;
   }
 
   @Override
-  public void itemStateChanged(ItemEvent e) {
-    ItemSelectable itemSelectable = e.getItemSelectable();
-    Object[] selectedObjects = itemSelectable.getSelectedObjects();
+  public void itemStateChanged(final ItemEvent e) {
+    final ItemSelectable itemSelectable = e.getItemSelectable();
+    final Object[] selectedObjects = itemSelectable.getSelectedObjects();
     if (selectedObjects == null) {
       component.setEnabled(false);
     } else {
@@ -30,19 +30,20 @@ public class EnableComponentListener implements ItemListener,
   }
 
   @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    Object newValue = event.getNewValue();
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object newValue = event.getNewValue();
     if (newValue instanceof Boolean) {
-      Boolean enabled = (Boolean)newValue;
+      final Boolean enabled = (Boolean)newValue;
       component.setEnabled(enabled);
-      
+
     }
   }
+
   @Override
-  public void valueChanged(ListSelectionEvent e) {
+  public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
 
-      int firstIndex = e.getFirstIndex();
+      final int firstIndex = e.getFirstIndex();
       if (firstIndex == -1) {
         component.setEnabled(false);
       } else {

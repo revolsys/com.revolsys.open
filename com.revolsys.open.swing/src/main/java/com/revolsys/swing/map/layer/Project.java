@@ -13,6 +13,7 @@ public class Project extends LayerGroup {
     super(name);
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
@@ -22,6 +23,7 @@ public class Project extends LayerGroup {
     return this;
   }
 
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != this.geometryFactory) {
       final GeometryFactory old = this.geometryFactory;

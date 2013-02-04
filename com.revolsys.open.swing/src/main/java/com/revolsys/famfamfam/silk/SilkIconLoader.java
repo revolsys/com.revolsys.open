@@ -15,40 +15,42 @@ public class SilkIconLoader {
   private static final String RESOURCE_FOLDER = "/"
     + SilkIconLoader.class.getPackage().getName().replace(".", "/") + "/icons/";
 
+  public static Cursor getCursor(final String imageName) {
+    final Image image = getImage(imageName);
+    final Toolkit toolkit = Toolkit.getDefaultToolkit();
+    return toolkit.createCustomCursor(image, new Point(16, 16), imageName);
+  }
+
   public static ImageIcon getIcon(final String imageName) {
-    Image image = getImage(imageName);
+    final Image image = getImage(imageName);
     if (image == null) {
       return null;
     } else {
-      ImageIcon icon = new ImageIcon(image);
+      final ImageIcon icon = new ImageIcon(image);
       return icon;
     }
   }
 
-  public static Cursor getCursor(final String imageName) {
-    Image image = getImage(imageName);
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    return toolkit.createCustomCursor(image, new Point(16, 16), imageName);
-  }
-
-  public static BufferedImage getImage(final String imageName) {
-    Class<?> clazz = SilkIconLoader.class;
-    String resourceName = RESOURCE_FOLDER + imageName + ".png";
-    InputStream in = clazz.getResourceAsStream(resourceName);
-    if (in == null) {
-      in = Thread.currentThread().getContextClassLoader().getResourceAsStream("images/" + imageName + ".png");
-    }
-    return getImage(in);
-  }
-
-  protected static BufferedImage getImage(InputStream in) {
+  protected static BufferedImage getImage(final InputStream in) {
     if (in != null) {
       try {
         return ImageIO.read(in);
-      } catch (IOException e) {
+      } catch (final IOException e) {
       }
     }
     return null;
 
+  }
+
+  public static BufferedImage getImage(final String imageName) {
+    final Class<?> clazz = SilkIconLoader.class;
+    final String resourceName = RESOURCE_FOLDER + imageName + ".png";
+    InputStream in = clazz.getResourceAsStream(resourceName);
+    if (in == null) {
+      in = Thread.currentThread()
+        .getContextClassLoader()
+        .getResourceAsStream("images/" + imageName + ".png");
+    }
+    return getImage(in);
   }
 }

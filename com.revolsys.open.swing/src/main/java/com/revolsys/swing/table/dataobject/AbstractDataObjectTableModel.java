@@ -143,7 +143,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
         if (rowIndex == metaData.getIdAttributeIndex()) {
           return false;
         } else {
-          String attributeName = getAttributeName(rowIndex);
+          final String attributeName = getAttributeName(rowIndex);
           return !readOnlyFieldNames.contains(attributeName);
         }
       } else {

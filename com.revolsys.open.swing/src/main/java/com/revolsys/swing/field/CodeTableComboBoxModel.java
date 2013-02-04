@@ -15,34 +15,36 @@ import com.revolsys.util.CollectionUtil;
 public class CodeTableComboBoxModel extends AbstractListModel implements
   ComboBoxModel {
 
+  public static final Object NULL = new Object();
+
   public static JComboBox create(final CodeTable codeTable) {
     return create(codeTable, true);
   }
 
-  public static JComboBox create(final CodeTable codeTable, boolean allowNull) {
-    CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
+  public static JComboBox create(final CodeTable codeTable,
+    final boolean allowNull) {
+    final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
       allowNull);
-    JComboBox comboBox = new JComboBox(model);
-    CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
+    final JComboBox comboBox = new JComboBox(model);
+    final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
       codeTable);
     comboBox.setRenderer(renderer);
     comboBox.setEditable(false);
     return comboBox;
   }
 
-  public static final Object NULL = new Object();
-
   private Object selectedItem;
 
   private final CodeTable codeTable;
 
-  private boolean allowNull;
+  private final boolean allowNull;
 
   public CodeTableComboBoxModel(final CodeTable codeTable) {
     this(codeTable, true);
   }
 
-  public CodeTableComboBoxModel(CodeTable codeTable, boolean allowNull) {
+  public CodeTableComboBoxModel(final CodeTable codeTable,
+    final boolean allowNull) {
     this.codeTable = codeTable;
     this.allowNull = allowNull;
   }
@@ -57,7 +59,7 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
     }
     if (index < getSize()) {
       final Map<Object, List<Object>> codes = codeTable.getCodes();
-      Set<Object> keys = codes.keySet();
+      final Set<Object> keys = codes.keySet();
       return CollectionUtil.get(keys, index);
     } else {
       return null;

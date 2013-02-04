@@ -38,17 +38,15 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
-  private static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(
-    PropertyChangeEvent.class
-  );
+  private static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(PropertyChangeEvent.class);
 
   private Runnable runnable;
 
   private final boolean invokeLater;
 
-  private Object object;
+  private final Object object;
 
-  private String methodName;
+  private final String methodName;
 
   public InvokeMethodPropertyChangeListener(final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
@@ -67,7 +65,7 @@ public class InvokeMethodPropertyChangeListener implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent evt) {
-    Runnable runnable= this.runnable;
+    Runnable runnable = this.runnable;
     if (runnable == null) {
       runnable = new InvokeMethodRunnable(object, methodName, evt);
     }

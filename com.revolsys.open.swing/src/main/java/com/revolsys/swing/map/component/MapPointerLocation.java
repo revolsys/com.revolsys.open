@@ -17,14 +17,16 @@ import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
 public class MapPointerLocation extends JLabel implements MouseMotionListener {
-  private static final NumberFormat FORMAT = new DecimalFormat("############.############");
-   private final Viewport2D viewport;
+  private static final NumberFormat FORMAT = new DecimalFormat(
+    "############.############");
+
+  private final Viewport2D viewport;
 
   private final GeometryFactory geometryFactory;
 
-  private String title;
+  private final String title;
 
-  public MapPointerLocation(final Viewport2D viewport, String title,
+  public MapPointerLocation(final Viewport2D viewport, final String title,
     final GeometryFactory geometryFactory) {
     this.viewport = viewport;
     this.title = title;
@@ -42,17 +44,19 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
   public void mouseMoved(final MouseEvent e) {
     final int screenX = e.getX();
     final int screenY = e.getY();
-   
-    final Point mapPoint =  viewport.toModelPoint(screenX, screenY);
+
+    final Point mapPoint = viewport.toModelPoint(screenX, screenY);
     if (!mapPoint.isEmpty()) {
       final Point projectedPoint = geometryFactory.copy(mapPoint);
       if (!projectedPoint.isEmpty()) {
-        double projectedX = projectedPoint.getX();
-        double projectedY = projectedPoint.getY();
+        final double projectedX = projectedPoint.getX();
+        final double projectedY = projectedPoint.getY();
         if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          setText(title + ": " + FORMAT.format(projectedY) + ", " + FORMAT.format(projectedX));
+          setText(title + ": " + FORMAT.format(projectedY) + ", "
+            + FORMAT.format(projectedX));
         } else {
-          setText(title + ": " + FORMAT.format(projectedX) + ", " + FORMAT.format(projectedY));
+          setText(title + ": " + FORMAT.format(projectedX) + ", "
+            + FORMAT.format(projectedY));
         }
       }
     }

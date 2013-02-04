@@ -12,17 +12,12 @@ public class ResultPagerListModel<T> extends AbstractListModel {
   public ResultPagerListModel() {
   }
 
-  public ResultPagerListModel(ResultPager<T> pager) {
+  public ResultPagerListModel(final ResultPager<T> pager) {
     setPager(pager);
   }
 
   @Override
-  public int getSize() {
-    return pager.getNumResults();
-  }
-
-  @Override
-  public Object getElementAt(int index) {
+  public Object getElementAt(final int index) {
     pager.setPageNumber(index + 1);
     return pager.getList().get(0);
   }
@@ -31,7 +26,12 @@ public class ResultPagerListModel<T> extends AbstractListModel {
     return pager;
   }
 
-  public void setPager(ResultPager<T> pager) {
+  @Override
+  public int getSize() {
+    return pager.getNumResults();
+  }
+
+  public void setPager(final ResultPager<T> pager) {
     this.pager = pager;
     pager.setPageSize(1);
   }

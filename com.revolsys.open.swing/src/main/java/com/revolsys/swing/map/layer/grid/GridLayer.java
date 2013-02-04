@@ -6,8 +6,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 
 public class GridLayer extends AbstractLayer {
 
-  private static final GridLayerRenderer RENDERER = new GridLayerRenderer();
-
   private final RectangularMapGrid grid;
 
   public GridLayer(final RectangularMapGrid grid) {
@@ -19,9 +17,10 @@ public class GridLayer extends AbstractLayer {
     this.grid = grid;
     setReadOnly(true);
     setSelectSupported(false);
-    setRenderer(RENDERER);
+    setRenderer(new GridLayerRenderer(this));
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return grid.getGeometryFactory();
   }

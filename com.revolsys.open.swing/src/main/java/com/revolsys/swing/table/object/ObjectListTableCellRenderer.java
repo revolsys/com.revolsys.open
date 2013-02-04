@@ -25,7 +25,6 @@ public class ObjectListTableCellRenderer implements TableCellRenderer {
     final int row, final int column) {
     Component component = null;
 
-  
     if (component == null) {
       String text;
       if (value == null) {

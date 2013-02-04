@@ -15,21 +15,21 @@ import com.revolsys.swing.list.ResultPagerListCellRenderer;
 public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
   ComboBoxModel {
 
+  public static final Object NULL = new Object();
+
   public static <T> JComboBox create(final ResultPager<T> codeTable,
-    boolean allowNull, String... attributeNames) {
-    ResultPagerComboBoxModel<T> model = new ResultPagerComboBoxModel<T>(
+    final boolean allowNull, final String... attributeNames) {
+    final ResultPagerComboBoxModel<T> model = new ResultPagerComboBoxModel<T>(
       codeTable, allowNull);
-    JComboBox comboBox = new JComboBox(model);
-    ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
+    final JComboBox comboBox = new JComboBox(model);
+    final ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
       attributeNames);
     comboBox.setRenderer(renderer);
     comboBox.setEditable(false);
     return comboBox;
   }
 
-  public static final Object NULL = new Object();
-
-  private Map<Integer, T> cache = new LruMap<Integer, T>(200);
+  private final Map<Integer, T> cache = new LruMap<Integer, T>(200);
 
   private Object selectedItem;
 
@@ -45,23 +45,10 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
     this(pager, true);
   }
 
-  public ResultPagerComboBoxModel(ResultPager<T> pager, boolean allowNull) {
+  public ResultPagerComboBoxModel(final ResultPager<T> pager,
+    final boolean allowNull) {
     setPager(pager);
     this.allowNull = allowNull;
-  }
-
-  public void setPager(final ResultPager<T> pager) {
-    if (this.pager != pager) {
-      if (this.pager != null) {
-        this.pager.close();
-      }
-      cache.clear();
-      this.pager = pager;
-      if (pager != null) {
-        pager.setPageSize(100);
-      }
-    }
-    fireContentsChanged(this, -1, -1);
   }
 
   @Override
@@ -78,9 +65,9 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
         T value = cache.get(index);
         if (value == null) {
           pager.setPageNumber((int)Math.floor(index / 100.0) + 1);
-          List<T> values = pager.getList();
+          final List<T> values = pager.getList();
           int i = index;
-          for (T result : values) {
+          for (final T result : values) {
             cache.put(i, result);
             i++;
           }
@@ -113,6 +100,20 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
       size++;
     }
     return size;
+  }
+
+  public void setPager(final ResultPager<T> pager) {
+    if (this.pager != pager) {
+      if (this.pager != null) {
+        this.pager.close();
+      }
+      cache.clear();
+      this.pager = pager;
+      if (pager != null) {
+        pager.setPageSize(100);
+      }
+    }
+    fireContentsChanged(this, -1, -1);
   }
 
   @Override

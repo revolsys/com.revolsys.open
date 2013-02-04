@@ -49,7 +49,7 @@ public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
     if (uiBuilder != null) {
       return uiBuilder.getEditorComponent(value);
     } else {
-      String fieldName = metaData.getAttributeName(column);
+      final String fieldName = metaData.getAttributeName(column);
       return SwingUtil.createField(metaData, fieldName, true);
     }
   }

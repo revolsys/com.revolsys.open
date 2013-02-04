@@ -26,8 +26,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 
 public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
   implements UIResource {
-  private static final long serialVersionUID = 1L;
-
   private class EmptyIcon implements Icon, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,39 +39,46 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
       height = 0;
     }
 
+    @Override
     public int getIconHeight() {
       return height;
     }
 
+    @Override
     public int getIconWidth() {
       return width;
     }
 
-    public void paintIcon(Component component, Graphics g, int i, int j) {
+    @Override
+    public void paintIcon(final Component component, final Graphics g,
+      final int i, final int j) {
     }
 
   }
 
-  public static SortOrder getColumnSortOrder(JTable table, int column) {
+  private static final long serialVersionUID = 1L;
+
+  public static SortOrder getColumnSortOrder(final JTable table,
+    final int column) {
     if (table != null) {
-      RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
+      final RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
       if (rowSorter != null) {
-        List<? extends SortKey> list = rowSorter.getSortKeys();
+        final List<? extends SortKey> list = rowSorter.getSortKeys();
         if (list.size() > 0) {
-          SortKey sortKey = list.get(0);
+          final SortKey sortKey = list.get(0);
           if (sortKey.getColumn() == table.convertColumnIndexToModel(column)) {
             return list.get(0).getSortOrder();
           }
         }
       } else if (table.getModel() instanceof SortableTableModel) {
-        SortableTableModel sortableModel = (SortableTableModel)table.getModel();
+        final SortableTableModel sortableModel = (SortableTableModel)table.getModel();
         return sortableModel.getSortOrder(column);
       }
     }
     return null;
   }
 
-  private EmptyIcon emptyIcon;
+  private final EmptyIcon emptyIcon;
 
   private boolean horizontalTextPositionSet;
 
@@ -84,12 +89,12 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     setHorizontalAlignment(0);
   }
 
-  private Point computeIconPosition(Graphics g) {
-    java.awt.FontMetrics fontmetrics = g.getFontMetrics();
-    Rectangle rectangle = new Rectangle();
-    Rectangle rectangle1 = new Rectangle();
-    Rectangle rectangle2 = new Rectangle();
-    Insets insets = getInsets();
+  private Point computeIconPosition(final Graphics g) {
+    final java.awt.FontMetrics fontmetrics = g.getFontMetrics();
+    final Rectangle rectangle = new Rectangle();
+    final Rectangle rectangle1 = new Rectangle();
+    final Rectangle rectangle2 = new Rectangle();
+    final Insets insets = getInsets();
     rectangle.x = insets.left;
     rectangle.y = insets.top;
     rectangle.width = getWidth() - (insets.left + insets.right);
@@ -98,17 +103,19 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
       getVerticalAlignment(), getHorizontalAlignment(),
       getVerticalTextPosition(), getHorizontalTextPosition(), rectangle,
       rectangle2, rectangle1, getIconTextGap());
-    int i = getWidth() - insets.right - sortArrow.getIconWidth();
-    int j = rectangle2.y;
+    final int i = getWidth() - insets.right - sortArrow.getIconWidth();
+    final int j = rectangle2.y;
     return new Point(i, j);
   }
 
-  public Component getTableCellRendererComponent(JTable table, Object value,
-    boolean isSelected, boolean hasFocus, int row, int column) {
+  @Override
+  public Component getTableCellRendererComponent(final JTable table,
+    final Object value, final boolean isSelected, final boolean hasFocus,
+    final int row, final int column) {
     Icon icon = (Icon)UIManager.get("Table.naturalSortIcon");
     boolean isPrint = false;
     if (table != null) {
-      JTableHeader header = table.getTableHeader();
+      final JTableHeader header = table.getTableHeader();
       if (header != null) {
         Color foreground = null;
         Color background = null;
@@ -131,10 +138,10 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
         if (!horizontalTextPositionSet) {
           setHorizontalTextPosition(10);
         }
-        SortOrder sortorder = getColumnSortOrder(table, column);
+        final SortOrder sortorder = getColumnSortOrder(table, column);
 
         if (sortorder != null) {
-         switch (sortorder) {
+          switch (sortorder) {
             case ASCENDING:
               icon = (Icon)UIManager.get("Table.ascendingSortIcon");
             break;
@@ -150,7 +157,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
         }
       }
     }
-    String text = StringConverterRegistry.toString(value);
+    final String text = StringConverterRegistry.toString(value);
     setText(text);
     setIcon(icon);
     sortArrow = icon;
@@ -165,21 +172,23 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     return this;
   }
 
-  public void paintComponent(Graphics g) {
-    boolean flag = UIManager.get("TableHeader.rightAlignSortArrow") == Boolean.TRUE;
+  @Override
+  public void paintComponent(final Graphics g) {
+    final boolean flag = UIManager.get("TableHeader.rightAlignSortArrow") == Boolean.TRUE;
     if (flag && sortArrow != null) {
       emptyIcon.width = sortArrow.getIconWidth();
       emptyIcon.height = sortArrow.getIconHeight();
       setIcon(emptyIcon);
       super.paintComponent(g);
-      Point point = computeIconPosition(g);
+      final Point point = computeIconPosition(g);
       sortArrow.paintIcon(this, g, point.x, point.y);
     } else {
       super.paintComponent(g);
     }
   }
 
-  public void setHorizontalTextPosition(int i) {
+  @Override
+  public void setHorizontalTextPosition(final int i) {
     horizontalTextPositionSet = true;
     super.setHorizontalTextPosition(i);
   }

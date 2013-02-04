@@ -6,6 +6,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -37,11 +38,6 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     return attributeName;
   }
 
-  public void setUiBuilderRegistry(
-    DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
-    this.uiBuilderRegistry = uiBuilderRegistry;
-  }
-
   @Override
   public Object getCellEditorValue() {
     if (uiBuilder != null) {
@@ -65,8 +61,8 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       } else {
         editorComponent = SwingUtil.createField(metaData, attributeName, true);
         if (editorComponent instanceof JTextField) {
-          JTextField textField = (JTextField)editorComponent;
-          textField.setHorizontalAlignment(JTextField.LEFT);
+          final JTextField textField = (JTextField)editorComponent;
+          textField.setHorizontalAlignment(SwingConstants.LEFT);
         }
         SwingUtil.setFieldValue(editorComponent, attributeName, value);
       }
@@ -74,5 +70,10 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       editorComponent = null;
     }
     return editorComponent;
+  }
+
+  public void setUiBuilderRegistry(
+    final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
+    this.uiBuilderRegistry = uiBuilderRegistry;
   }
 }

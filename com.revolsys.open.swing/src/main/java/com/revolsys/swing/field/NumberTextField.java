@@ -89,8 +89,8 @@ public class NumberTextField extends JTextField implements DocumentListener,
     }
   }
 
-  private static int getLength(final DataType dataType, int length, int scale,
-    BigDecimal minimumValue) {
+  private static int getLength(final DataType dataType, int length,
+    final int scale, final BigDecimal minimumValue) {
     if (length == 0) {
       final Class<?> javaClass = dataType.getJavaClass();
       if (javaClass == Byte.class) {
@@ -134,6 +134,10 @@ public class NumberTextField extends JTextField implements DocumentListener,
 
   private boolean fieldValid = true;
 
+  public NumberTextField(final DataType dataType, final int length) {
+    this(dataType, length, 0);
+  }
+
   public NumberTextField(final DataType dataType, final int length,
     final int scale) {
     this(dataType, length, scale, null, createMaximumValue(dataType, length,
@@ -141,7 +145,7 @@ public class NumberTextField extends JTextField implements DocumentListener,
   }
 
   public NumberTextField(final DataType dataType, final int length,
-    final int scale, Number minimumValue, Number maximumValue) {
+    final int scale, final Number minimumValue, final Number maximumValue) {
     this.dataType = dataType;
     this.length = length;
     this.scale = scale;
@@ -153,13 +157,18 @@ public class NumberTextField extends JTextField implements DocumentListener,
     addFocusListener(this);
   }
 
-  public NumberTextField(DataType dataType, int length) {
-    this(dataType, length, 0);
-  }
-
   @Override
   public void changedUpdate(final DocumentEvent e) {
     validateField();
+  }
+
+  @Override
+  public void focusGained(final FocusEvent e) {
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
+    updateText();
   }
 
   @Override
@@ -202,6 +211,12 @@ public class NumberTextField extends JTextField implements DocumentListener,
     validateField();
   }
 
+  public void setFieldValue(final Number value) {
+    setText(StringConverterRegistry.toString(value));
+    validateField();
+    updateText();
+  }
+
   public void setMaximumValue(final Number maximumValue) {
     if (maximumValue == null) {
       this.maximumValue = null;
@@ -218,10 +233,22 @@ public class NumberTextField extends JTextField implements DocumentListener,
     }
   }
 
+  private void updateText() {
+    if (isFieldValid() && fieldValue != null) {
+      final String text = getText();
+      BigDecimal number = new BigDecimal(text);
+      number = number.setScale(scale);
+      final String newText = number.toPlainString();
+      if (!newText.equals(text)) {
+        setText(newText);
+      }
+    }
+  }
+
   private void validateField() {
-    Number oldValue = fieldValue;
+    final Number oldValue = fieldValue;
     Number value = null;
-    boolean oldValid = fieldValid;
+    final boolean oldValid = fieldValid;
     boolean valid = true;
     final String text = getText();
     if (StringUtils.hasText(text)) {
@@ -258,33 +285,6 @@ public class NumberTextField extends JTextField implements DocumentListener,
       if (!EqualsRegistry.equal(oldValue, value)) {
         fieldValue = value;
         firePropertyChange("fieldValid", oldValue, fieldValue);
-      }
-    }
-  }
-
-  public void setFieldValue(Number value) {
-    setText(StringConverterRegistry.toString(value));
-    validateField();
-    updateText();
-  }
-
-  @Override
-  public void focusGained(FocusEvent e) {
-  }
-
-  @Override
-  public void focusLost(FocusEvent e) {
-    updateText();
-  }
-
-  private void updateText() {
-    if (isFieldValid() && fieldValue != null) {
-      String text = getText();
-      BigDecimal number = new BigDecimal(text);
-      number = number.setScale(scale);
-      String newText = number.toPlainString();
-      if (!newText.equals(text)) {
-        setText(newText);
       }
     }
   }

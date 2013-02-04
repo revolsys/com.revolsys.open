@@ -29,11 +29,11 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {
   private static final long serialVersionUID = 1L;
 
-  public static JPanel createPanel(DataObjectMetaData metaData,
+  public static JPanel createPanel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
-    JTable table = createTable(metaData, objects);
+    final JTable table = createTable(metaData, objects);
     final JScrollPane scrollPane = new JScrollPane(table);
-    JPanel panel = new JPanel(new BorderLayout());
+    final JPanel panel = new JPanel(new BorderLayout());
     panel.add(scrollPane, BorderLayout.CENTER);
     return panel;
   }
@@ -55,10 +55,22 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
-    List<String> columnNames, final List<DataObject> objects) {
+    final List<String> columnNames, final List<DataObject> objects) {
     super(metaData, columnNames);
     this.objects.addAll(objects);
     setEditable(true);
+  }
+
+  public void add(final DataObject... objects) {
+    for (final DataObject object : objects) {
+      this.objects.add(object);
+      fireTableRowsInserted(this.objects.size() - 1, this.objects.size());
+    }
+  }
+
+  public void add(final int index, final DataObject object) {
+    objects.add(index, object);
+    fireTableRowsInserted(index, index + 1);
   }
 
   public void addAll(final Collection<DataObject> objects) {
@@ -71,6 +83,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     this.propertyChangeListeners.add(propertyChangeListener);
   }
 
+  @Override
   @PreDestroy
   public void dispose() {
     super.dispose();
@@ -86,6 +99,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     }
   }
 
+  @Override
   public DataObject getObject(final int index) {
     return objects.get(index);
   }
@@ -109,9 +123,9 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      String columnName = getColumnName(columnIndex);
-      DataObjectMetaData metaData = getMetaData();
-      DataType dataType = metaData.getAttributeType(columnName);
+      final String columnName = getColumnName(columnIndex);
+      final DataObjectMetaData metaData = getMetaData();
+      final DataType dataType = metaData.getAttributeType(columnName);
       if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
         return false;
       } else {
@@ -122,8 +136,9 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     }
   }
 
-  public void removeAll(DataObject... removedFeatures) {
-    removeAll(Arrays.asList(removedFeatures));
+  public void remove(final int... rows) {
+    final List<DataObject> rowsToRemove = getObjects(rows);
+    removeAll(rowsToRemove);
   }
 
   public void removeAll(final Collection<DataObject> objects) {
@@ -136,9 +151,24 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     }
   }
 
+  public void removeAll(final DataObject... removedFeatures) {
+    removeAll(Arrays.asList(removedFeatures));
+  }
+
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeListeners.remove(propertyChangeListener);
+  }
+
+  @Override
+  public void reorder(final int fromIndex, int toIndex) {
+    if (fromIndex < toIndex) {
+      toIndex--;
+    }
+    final DataObject object = getObject(fromIndex);
+    removeAll(object);
+    add(toIndex, object);
+    clearSortedColumns();
   }
 
   /**
@@ -153,6 +183,17 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   @Override
+  public SortOrder setSortOrder(final int column) {
+    final SortOrder sortOrder = super.setSortOrder(column);
+    final String attributeName = getAttributeName(column);
+    final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
+      sortOrder == SortOrder.ASCENDING, attributeName);
+    Collections.sort(objects, comparitor);
+    fireTableDataChanged();
+    return sortOrder;
+  }
+
+  @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
     final DataObject object = getObject(rowIndex);
@@ -162,45 +203,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       object.setValue(name, value);
       firePropertyChange(object, name, oldValue, value);
     }
-  }
-
-  @Override
-  public SortOrder setSortOrder(int column) {
-    SortOrder sortOrder = super.setSortOrder(column);
-    final String attributeName = getAttributeName(column);
-    final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
-      sortOrder == SortOrder.ASCENDING, attributeName);
-    Collections.sort(objects, comparitor);
-    fireTableDataChanged();
-    return sortOrder;
-  }
-
-  public void add(DataObject... objects) {
-    for (DataObject object : objects) {
-      this.objects.add(object);
-      fireTableRowsInserted(this.objects.size() - 1, this.objects.size());
-    }
-  }
-
-  public void remove(int... rows) {
-    List<DataObject> rowsToRemove = getObjects(rows);
-    removeAll(rowsToRemove);
-  }
-
-  @Override
-  public void reorder(int fromIndex, int toIndex) {
-    if (fromIndex < toIndex) {
-      toIndex--;
-    }
-    DataObject object = getObject(fromIndex);
-    removeAll(object);
-    add(toIndex, object);
-    clearSortedColumns();
-  }
-
-  public void add(int index, DataObject object) {
-    objects.add(index, object);
-    fireTableRowsInserted(index, index + 1);
   }
 
 }

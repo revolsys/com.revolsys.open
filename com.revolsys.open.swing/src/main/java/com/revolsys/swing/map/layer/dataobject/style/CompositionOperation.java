@@ -18,7 +18,7 @@ public enum CompositionOperation {
 
   private String label;
 
-  private CompositionOperation(String label) {
+  private CompositionOperation(final String label) {
     this.label = label;
   }
 

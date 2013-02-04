@@ -10,13 +10,12 @@ import java.util.ListIterator;
 import com.revolsys.gis.cs.BoundingBox;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
-  private static final LayerGroupRenderer RENDERER = new LayerGroupRenderer();
-  
+ 
   private List<Layer> layers = new ArrayList<Layer>();
 
   public LayerGroup(final String name) {
     super(name);
-    setRenderer(RENDERER);
+    setRenderer(new LayerGroupRenderer(this));
   }
 
   @Override
@@ -184,20 +183,19 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return layerGroups;
   }
 
+  public List<Layer> getLayers() {
+    return this;
+  }
 
   @SuppressWarnings("unchecked")
-  public <V extends Layer> List<V> getLayers(Class<V> layerClass) {
-    List<V> layers = new ArrayList<V>();
-    for (Layer layer : this.layers) {
+  public <V extends Layer> List<V> getLayers(final Class<V> layerClass) {
+    final List<V> layers = new ArrayList<V>();
+    for (final Layer layer : this.layers) {
       if (layerClass.isAssignableFrom(layer.getClass())) {
         layers.add((V)layer);
       }
     }
     return layers;
-  }
-
-  public List<Layer> getLayers() {
-    return this;
   }
 
   public int indexOf(final Layer layer) {

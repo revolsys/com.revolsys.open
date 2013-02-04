@@ -100,8 +100,8 @@ public class Viewport2D {
     this.geometryFactory = project.getGeometryFactory();
   }
 
-  public Viewport2D(Project project, int width, int height,
-    BoundingBox boundingBox) {
+  public Viewport2D(final Project project, final int width, final int height,
+    final BoundingBox boundingBox) {
     this(project);
     this.width = width;
     this.height = height;
@@ -142,10 +142,6 @@ public class Viewport2D {
     return geometryFactory;
   }
 
-  public Project getProject() {
-    return project;
-  }
-
   public double getModelHeight() {
     final double height = boundingBox.getHeight();
     return height;
@@ -172,6 +168,10 @@ public class Viewport2D {
     return boundingBox.getWidthLength();
   }
 
+  public Project getProject() {
+    return project;
+  }
+
   /**
    * Get the property change support, used to fire property change
    * notifications. Returns null if no listeners are registered.
@@ -183,8 +183,8 @@ public class Viewport2D {
   }
 
   public double getScale() {
-    Measurable<Length> viewWidth = getViewWidthLength();
-    Measurable<Length> modelWidth = getModelWidthLength();
+    final Measurable<Length> viewWidth = getViewWidthLength();
+    final Measurable<Length> modelWidth = getModelWidthLength();
     return getScale(viewWidth, modelWidth);
   }
 
@@ -210,16 +210,16 @@ public class Viewport2D {
     return Measure.valueOf(width, getScreenUnit());
   }
 
+  public int getViewHeightPixels() {
+    return height;
+  }
+
   public Measurable<Length> getViewWidthLength() {
     double width = getViewWidthPixels();
     if (width < 0) {
       width = 0;
     }
     return Measure.valueOf(width, getScreenUnit());
-  }
-
-  public int getViewHeightPixels() {
-    return height;
   }
 
   public int getViewWidthPixels() {
@@ -250,12 +250,12 @@ public class Viewport2D {
     propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
 
-  public void setBoundingBox(BoundingBox boundingBox) {
+  public void setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
-      BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+      final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
       if (!convertedBoundingBox.isNull()) {
         final BoundingBox oldBoundingBox = this.boundingBox;
-        double oldScale = getScale();
+        final double oldScale = getScale();
         this.boundingBox = convertedBoundingBox;
 
         final double viewWidth = getViewWidthPixels();
@@ -265,16 +265,12 @@ public class Viewport2D {
         screenToModelTransform = createScreenToModelTransform(
           convertedBoundingBox, viewWidth, viewHeight);
 
-        double newScale = getScale();
+        final double newScale = getScale();
         propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
           convertedBoundingBox);
         propertyChangeSupport.firePropertyChange("scale", oldScale, newScale);
       }
     }
-  }
-
-  public void setScale(double scale) {
-    propertyChangeSupport.firePropertyChange("scale", getScale(), scale);
   }
 
   /**
@@ -289,8 +285,12 @@ public class Viewport2D {
       oldGeometryFactory, geometryFactory);
   }
 
+  public void setScale(final double scale) {
+    propertyChangeSupport.firePropertyChange("scale", getScale(), scale);
+  }
+
   public void setUseModelCoordinates(final boolean useModelCoordinates,
-    Graphics2D graphics) {
+    final Graphics2D graphics) {
     if (savedTransform != null) {
       graphics.setTransform(savedTransform);
     }
@@ -306,7 +306,7 @@ public class Viewport2D {
   public double toDisplayValue(final Measure<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
-    double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
+    final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
     if (unit.equals(NonSI.PIXEL)) {
       convertedValue = value.doubleValue(NonSI.PIXEL);
       if (isUseModelCoordinates()) {
@@ -339,6 +339,22 @@ public class Viewport2D {
     }
   }
 
+  public Point toModelPoint(final double... viewCoordinates) {
+    if (geometryFactory == null) {
+      return GeometryFactory.getFactory().createPoint();
+    } else {
+      final double[] coordinates = toModelCoordinates(viewCoordinates);
+      return geometryFactory.createPoint(coordinates);
+    }
+  }
+
+  public Point toModelPoint(final GeometryFactory geometryFactory,
+    final double... viewCoordinates) {
+    final double[] coordinates = toModelCoordinates(viewCoordinates);
+    final Point point = this.geometryFactory.createPoint(coordinates);
+    return (Point)geometryFactory.createGeometry(point);
+  }
+
   public double[] toViewCoordinates(final double... modelCoordinates) {
     final double[] ordinates = new double[2];
     final AffineTransform transform = getModelToScreenTransform();
@@ -352,27 +368,11 @@ public class Viewport2D {
 
   public Point2D toViewPoint(Point point) {
     point = (Point)geometryFactory.createGeometry(point);
-    double x = point.getX();
-    double y = point.getY();
-    double[] coordinates = toViewCoordinates(x, y);
-    double viewX = coordinates[0];
-    double viewY = coordinates[1];
+    final double x = point.getX();
+    final double y = point.getY();
+    final double[] coordinates = toViewCoordinates(x, y);
+    final double viewX = coordinates[0];
+    final double viewY = coordinates[1];
     return new Point2D.Double(viewX, viewY);
-  }
-
-  public Point toModelPoint(double... viewCoordinates) {
-    if (geometryFactory == null) {
-      return GeometryFactory.getFactory().createPoint();
-    } else {
-      double[] coordinates = toModelCoordinates(viewCoordinates);
-      return geometryFactory.createPoint(coordinates);
-    }
-  }
-
-  public Point toModelPoint(GeometryFactory geometryFactory,
-    double... viewCoordinates) {
-    double[] coordinates = toModelCoordinates(viewCoordinates);
-    Point point = this.geometryFactory.createPoint(coordinates);
-    return (Point)geometryFactory.createGeometry(point);
   }
 }

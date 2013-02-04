@@ -22,18 +22,19 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
   public ResultPagerListCellRenderer() {
   }
 
-  public ResultPagerListCellRenderer(List<String> attributeNames) {
+  public ResultPagerListCellRenderer(final List<String> attributeNames) {
     this.attributeNames = attributeNames;
   }
 
-  public ResultPagerListCellRenderer(String... attributeNames) {
+  public ResultPagerListCellRenderer(final String... attributeNames) {
     this(Arrays.asList(attributeNames));
   }
 
   @Override
-  public Component getListCellRendererComponent(JList list, Object value,
-    int index, boolean isSelected, boolean cellHasFocus) {
-    Component component = super.getListCellRendererComponent(list, value,
+  public Component getListCellRendererComponent(final JList list,
+    final Object value, final int index, final boolean isSelected,
+    final boolean cellHasFocus) {
+    final Component component = super.getListCellRendererComponent(list, value,
       index, isSelected, cellHasFocus);
     String label;
     if (value == ResultPagerComboBoxModel.NULL || value == null) {
@@ -41,9 +42,9 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     } else if (attributeNames.isEmpty()) {
       label = StringConverterRegistry.toString(value);
     } else {
-      List<String> values = new ArrayList<String>();
-      for (String attributeName : attributeNames) {
-        String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
+      final List<String> values = new ArrayList<String>();
+      for (final String attributeName : attributeNames) {
+        final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
           value, attributeName));
         values.add(text);
       }

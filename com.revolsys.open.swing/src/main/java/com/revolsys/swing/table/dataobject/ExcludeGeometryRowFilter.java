@@ -9,13 +9,14 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {
 
   @Override
-  public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-    TableModel model = entry.getModel();
+  public boolean include(
+    final Entry<? extends TableModel, ? extends Integer> entry) {
+    final TableModel model = entry.getModel();
     if (model instanceof AbstractDataObjectTableModel) {
-      AbstractDataObjectTableModel dataObjectModel = (AbstractDataObjectTableModel)entry.getModel();
-      Integer identifier = entry.getIdentifier();
-      DataObjectMetaData metaData= dataObjectModel.getMetaData();
-      Class<?> clazz = metaData.getAttributeClass(identifier);
+      final AbstractDataObjectTableModel dataObjectModel = (AbstractDataObjectTableModel)entry.getModel();
+      final Integer identifier = entry.getIdentifier();
+      final DataObjectMetaData metaData = dataObjectModel.getMetaData();
+      final Class<?> clazz = metaData.getAttributeClass(identifier);
       if (Geometry.class.isAssignableFrom(clazz)) {
         return false;
       }

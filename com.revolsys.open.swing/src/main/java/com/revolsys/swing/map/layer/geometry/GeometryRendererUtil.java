@@ -35,35 +35,192 @@ public class GeometryRendererUtil {
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
     .createEmptyGeometry();
 
-  public static final void renderGeometry(Viewport2D viewport,
-    Graphics2D graphics, Geometry geometry, GeometryStyle style) {
+  private static Geometry getGeometry(final Viewport2D viewport,
+    final GeometryStyle style, final Geometry geometry) {
+    final BoundingBox viewExtent = viewport.getBoundingBox();
+    if (geometry != null) {
+      if (!viewExtent.isNull()) {
+        final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        if (geometryExtent.intersects(viewExtent)) {
+          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          return geometryFactory.createGeometry(geometry);
+        }
+      }
+    }
+    return EMPTY_GEOMETRY;
+  }
+
+  private static Shape getShape(final Viewport2D viewport,
+    final GeometryStyle style, final Geometry geometry) {
+    final BoundingBox viewExtent = viewport.getBoundingBox();
+    if (geometry != null) {
+      if (!viewExtent.isNull()) {
+        final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        if (geometryExtent.intersects(viewExtent)) {
+          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          final Geometry convertedGeometry = geometryFactory.createGeometry(geometry);
+          // TODO clipping
+          return GeometryShapeUtil.toShape(viewport, convertedGeometry);
+        }
+      }
+    }
+    return null;
+  }
+
+  public static final void renderGeometry(final Viewport2D viewport,
+    final Graphics2D graphics, final Geometry geometry,
+    final GeometryStyle style) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      Geometry part = geometry.getGeometryN(i);
+      final Geometry part = geometry.getGeometryN(i);
       if (geometry instanceof Point) {
-        Point point = (Point)geometry;
+        final Point point = (Point)geometry;
         renderPoint(viewport, graphics, point, style);
       } else if (part instanceof LineString) {
-        LineString lineString = (LineString)part;
+        final LineString lineString = (LineString)part;
         renderLineString(viewport, graphics, lineString, style);
       } else if (part instanceof Polygon) {
-        Polygon polygon = (Polygon)part;
+        final Polygon polygon = (Polygon)part;
         renderPolygon(viewport, graphics, polygon, style);
       }
     }
   }
 
-  public static final void renderText(Viewport2D viewport, Graphics2D graphics,
-    DataObject object, Geometry geometry, TextStyle style) {
-    GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    if (geometryFactory != null) {
-      Coordinates point = CoordinatesUtil.get(geometryFactory.project(geometry));
+  public static final void renderLineString(final Viewport2D viewport,
+    final Graphics2D graphics, final LineString lineString,
+    final GeometryStyle style) {
+    final Shape shape = getShape(viewport, style, lineString);
+    if (shape != null) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      Paint paint = graphics.getPaint();
-      viewport.setUseModelCoordinates(false, graphics);  
-          graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD,10));
-          graphics.drawString("Hello" , 100, 100);
-  viewport.setUseModelCoordinates(true, graphics);
-  style.setTextStyle(viewport, graphics);
+      viewport.setUseModelCoordinates(true, graphics);
+      final Paint paint = graphics.getPaint();
+      try {
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
+
+        style.setLineStyle(viewport, graphics);
+        graphics.draw(shape);
+      } finally {
+        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+        graphics.setPaint(paint);
+      }
+    }
+  }
+
+  public static final void renderOutline(final Viewport2D viewport,
+    final Graphics2D graphics, final Geometry geometry,
+    final GeometryStyle style) {
+    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      final Geometry part = geometry.getGeometryN(i);
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        renderPoint(viewport, graphics, point, style);
+      } else if (part instanceof LineString) {
+        final LineString lineString = (LineString)part;
+        renderLineString(viewport, graphics, lineString, style);
+      } else if (part instanceof Polygon) {
+        final Polygon polygon = (Polygon)part;
+        renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
+        for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
+          final LineString ring = polygon.getInteriorRingN(j);
+          renderLineString(viewport, graphics, ring, style);
+        }
+      }
+    }
+  }
+
+  /**
+   * Coordinates must be in the same geometry factory as the view.
+   * 
+   * @param viewport
+   * @param graphics
+   * @param style
+   * @param point
+   */
+  public static void renderPoint(final Viewport2D viewport,
+    final Graphics2D graphics, final GeometryStyle style,
+    final Coordinates point) {
+    final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+    viewport.setUseModelCoordinates(true, graphics);
+    final Paint paint = graphics.getPaint();
+    try {
+      final Marker marker = style.getMarker();
+      final double x = point.getX();
+      final double y = point.getY();
+      marker.render(viewport, graphics, style, x, y);
+    } finally {
+      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+      graphics.setPaint(paint);
+    }
+  }
+
+  public static final void renderPoint(final Viewport2D viewport,
+    final Graphics2D graphics, final Point point, final GeometryStyle style) {
+    final Geometry geometry = getGeometry(viewport, style, point);
+    if (!geometry.isEmpty()) {
+      final Coordinates coordinates = CoordinatesUtil.get(geometry);
+      renderPoint(viewport, graphics, style, coordinates);
+    }
+  }
+
+  /**
+   * Coordinates must be in the same geometry factory as the view.
+   * 
+   * @param viewport
+   * @param graphics
+   * @param style
+   * @param point
+   */
+  public static void renderPoints(final Viewport2D viewport,
+    final Graphics2D graphics, final GeometryStyle style,
+    final CoordinatesList points) {
+    final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+    viewport.setUseModelCoordinates(true, graphics);
+    final Paint paint = graphics.getPaint();
+    try {
+      final Marker marker = style.getMarker();
+      for (int i = 0; i < points.size(); i++) {
+        final double x = points.getX(i);
+        final double y = points.getY(i);
+        marker.render(viewport, graphics, style, x, y);
+      }
+    } finally {
+      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+      graphics.setPaint(paint);
+    }
+  }
+
+  public static final void renderPolygon(final Viewport2D viewport,
+    final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
+    final Shape shape = getShape(viewport, style, polygon);
+    if (shape != null) {
+      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+      viewport.setUseModelCoordinates(true, graphics);
+      final Paint paint = graphics.getPaint();
+      try {
+        style.setFillStyle(viewport, graphics);
+        graphics.fill(shape);
+        style.setLineStyle(viewport, graphics);
+        graphics.draw(shape);
+      } finally {
+        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+        graphics.setPaint(paint);
+      }
+    }
+  }
+
+  public static final void renderText(final Viewport2D viewport,
+    final Graphics2D graphics, final DataObject object,
+    final Geometry geometry, final TextStyle style) {
+    final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+    if (geometryFactory != null) {
+      final Coordinates point = CoordinatesUtil.get(geometryFactory.project(geometry));
+      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+      final Paint paint = graphics.getPaint();
+      viewport.setUseModelCoordinates(false, graphics);
+      graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
+      graphics.drawString("Hello", 100, 100);
+      viewport.setUseModelCoordinates(true, graphics);
+      style.setTextStyle(viewport, graphics);
       try {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
@@ -88,7 +245,7 @@ public class GeometryRendererUtil {
             graphics.rotate(Math.toRadians(-rotation), 0, 0);
           }
 
-          FontMetrics fontMetrics = graphics.getFontMetrics();
+          final FontMetrics fontMetrics = graphics.getFontMetrics();
           final double width = fontMetrics.stringWidth(label);
           final double height = fontMetrics.getAscent();
           // graphics.translate(-width * symbolizer.getAnchorX().doubleValue(),
@@ -108,14 +265,14 @@ public class GeometryRendererUtil {
 
             graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
               RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            Font font = graphics.getFont();
-            FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-            final TextLayout textLayout = new TextLayout(label,
-              font, fontRenderContext);
+            final Font font = graphics.getFont();
+            final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+            final TextLayout textLayout = new TextLayout(label, font,
+              fontRenderContext);
 
-            AffineTransform outlineTransform = AffineTransform.getTranslateInstance(
+            final AffineTransform outlineTransform = AffineTransform.getTranslateInstance(
               0, 0);
-            Shape outlineShape = textLayout.getOutline(outlineTransform);
+            final Shape outlineShape = textLayout.getOutline(outlineTransform);
             graphics.draw(outlineShape);
             graphics.setStroke(savedStroke);
           }
@@ -131,178 +288,27 @@ public class GeometryRendererUtil {
     }
   }
 
-  private static Geometry getGeometry(Viewport2D viewport, GeometryStyle style,
-    Geometry geometry) {
-    BoundingBox viewExtent = viewport.getBoundingBox();
-    if (geometry != null) {
-      if (!viewExtent.isNull()) {
-        BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
-        if (geometryExtent.intersects(viewExtent)) {
-          GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          return geometryFactory.createGeometry(geometry);
-        }
-      }
-    }
-    return EMPTY_GEOMETRY;
-  }
-
-  private static Shape getShape(Viewport2D viewport, GeometryStyle style,
-    Geometry geometry) {
-    BoundingBox viewExtent = viewport.getBoundingBox();
-    if (geometry != null) {
-      if (!viewExtent.isNull()) {
-        BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
-        if (geometryExtent.intersects(viewExtent)) {
-          GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          Geometry convertedGeometry = geometryFactory.createGeometry(geometry);
-          // TODO clipping
-          return GeometryShapeUtil.toShape(viewport, convertedGeometry);
-        }
-      }
-    }
-    return null;
-  }
-
-  public static final void renderOutline(Viewport2D viewport,
-    Graphics2D graphics, Geometry geometry, GeometryStyle style) {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      Geometry part = geometry.getGeometryN(i);
-      if (geometry instanceof Point) {
-        Point point = (Point)geometry;
-        renderPoint(viewport, graphics, point, style);
-      } else if (part instanceof LineString) {
-        LineString lineString = (LineString)part;
-        renderLineString(viewport, graphics, lineString, style);
-      } else if (part instanceof Polygon) {
-        Polygon polygon = (Polygon)part;
-        renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
-        for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-          LineString ring = polygon.getInteriorRingN(j);
-          renderLineString(viewport, graphics, ring, style);
-        }
-      }
-    }
-  }
-
-  public static final void renderVertices(Viewport2D viewport,
-    Graphics2D graphics, Geometry geometry, GeometryStyle style) {
+  public static final void renderVertices(final Viewport2D viewport,
+    final Graphics2D graphics, Geometry geometry, final GeometryStyle style) {
     geometry = getGeometry(viewport, style, geometry);
     if (!geometry.isEmpty()) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometryN(i);
         if (geometry instanceof Point) {
-          Point point = (Point)geometry;
+          final Point point = (Point)geometry;
           renderPoint(viewport, graphics, point, style);
         } else if (part instanceof LineString) {
-          LineString lineString = (LineString)part;
-          CoordinatesList points = CoordinatesListUtil.get(lineString);
+          final LineString lineString = (LineString)part;
+          final CoordinatesList points = CoordinatesListUtil.get(lineString);
           renderPoints(viewport, graphics, style, points);
         } else if (part instanceof Polygon) {
-          Polygon polygon = (Polygon)part;
-          List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
-          for (CoordinatesList points : pointsList) {
+          final Polygon polygon = (Polygon)part;
+          final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
+          for (final CoordinatesList points : pointsList) {
             renderPoints(viewport, graphics, style, points);
           }
         }
       }
-    }
-  }
-
-  public static final void renderPolygon(Viewport2D viewport,
-    Graphics2D graphics, Polygon polygon, GeometryStyle style) {
-    Shape shape = getShape(viewport, style, polygon);
-    if (shape != null) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(true, graphics);
-      Paint paint = graphics.getPaint();
-      try {
-        style.setFillStyle(viewport, graphics);
-        graphics.fill(shape);
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(shape);
-      } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-        graphics.setPaint(paint);
-      }
-    }
-  }
-
-  public static final void renderLineString(Viewport2D viewport,
-    Graphics2D graphics, LineString lineString, GeometryStyle style) {
-    Shape shape = getShape(viewport, style, lineString);
-    if (shape != null) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(true, graphics);
-      Paint paint = graphics.getPaint();
-      try {
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_ON);
-
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(shape);
-      } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-        graphics.setPaint(paint);
-      }
-    }
-  }
-
-  public static final void renderPoint(Viewport2D viewport,
-    Graphics2D graphics, Point point, GeometryStyle style) {
-    Geometry geometry = getGeometry(viewport, style, point);
-    if (!geometry.isEmpty()) {
-      Coordinates coordinates = CoordinatesUtil.get((Point)geometry);
-      renderPoint(viewport, graphics, style, coordinates);
-    }
-  }
-
-  /**
-   * Coordinates must be in the same geometry factory as the view.
-   * 
-   * @param viewport
-   * @param graphics
-   * @param style
-   * @param point
-   */
-  public static void renderPoint(Viewport2D viewport, Graphics2D graphics,
-    GeometryStyle style, Coordinates point) {
-    final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-    viewport.setUseModelCoordinates(true, graphics);
-    Paint paint = graphics.getPaint();
-    try {
-      Marker marker = style.getMarker();
-      double x = point.getX();
-      double y = point.getY();
-      marker.render(viewport, graphics, style, x, y);
-    } finally {
-      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-      graphics.setPaint(paint);
-    }
-  }
-
-  /**
-   * Coordinates must be in the same geometry factory as the view.
-   * 
-   * @param viewport
-   * @param graphics
-   * @param style
-   * @param point
-   */
-  public static void renderPoints(Viewport2D viewport, Graphics2D graphics,
-    GeometryStyle style, CoordinatesList points) {
-    final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-    viewport.setUseModelCoordinates(true, graphics);
-    Paint paint = graphics.getPaint();
-    try {
-      Marker marker = style.getMarker();
-      for (int i = 0; i < points.size(); i++) {
-        double x = points.getX(i);
-        double y = points.getY(i);
-        marker.render(viewport, graphics, style, x, y);
-      }
-    } finally {
-      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-      graphics.setPaint(paint);
     }
   }
 }

@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Reorderable;
 
@@ -22,9 +21,9 @@ public class ObjectListTableModel extends AbstractTableModel implements
 
   private static final long serialVersionUID = 1L;
 
-  private List<String> columnNames = new ArrayList<String>();
+  private final List<String> columnNames = new ArrayList<String>();
 
-  private List<String> columnTitles = new ArrayList<String>();
+  private final List<String> columnTitles = new ArrayList<String>();
 
   private boolean editable;
 
@@ -37,11 +36,6 @@ public class ObjectListTableModel extends AbstractTableModel implements
     this(objects, columnNames, columnNames);
   }
 
-  public ObjectListTableModel(final List<String> columnNames,
-    final List<String> columnTiList) {
-    this(Collections.emptyList(), columnNames, columnTiList);
-  }
-
   public ObjectListTableModel(final Collection<? extends Object> objects,
     final List<String> columnNames, final List<String> columnTitles) {
     this.objects.addAll(objects);
@@ -50,21 +44,15 @@ public class ObjectListTableModel extends AbstractTableModel implements
     setEditable(true);
   }
 
-  public ObjectListTableModel(String... columnNames) {
+  public ObjectListTableModel(final List<String> columnNames,
+    final List<String> columnTiList) {
+    this(Collections.emptyList(), columnNames, columnTiList);
+  }
+
+  public ObjectListTableModel(final String... columnNames) {
     this(Collections.emptyList(), Arrays.asList(columnNames),
       Arrays.asList(columnNames));
     setEditable(false);
-  }
-
-  public void add(final Object... objects) {
-    if (objects.length > 0) {
-      int startIndex = this.objects.size();
-      for (final Object object : objects) {
-        this.objects.add(object);
-      }
-      int endIndex = this.objects.size() - 1;
-      fireTableRowsInserted(startIndex, endIndex);
-    }
   }
 
   public void add(final int index, final Object object) {
@@ -72,11 +60,22 @@ public class ObjectListTableModel extends AbstractTableModel implements
     fireTableRowsInserted(index, index);
   }
 
+  public void add(final Object... objects) {
+    if (objects.length > 0) {
+      final int startIndex = this.objects.size();
+      for (final Object object : objects) {
+        this.objects.add(object);
+      }
+      final int endIndex = this.objects.size() - 1;
+      fireTableRowsInserted(startIndex, endIndex);
+    }
+  }
+
   public void addAll(final Collection<Object> objects) {
     if (objects.size() > 0) {
-      int startIndex = this.objects.size();
+      final int startIndex = this.objects.size();
       this.objects.addAll(objects);
-      int endIndex = this.objects.size() - 1;
+      final int endIndex = this.objects.size() - 1;
       fireTableRowsInserted(startIndex, endIndex);
     }
   }
@@ -84,6 +83,11 @@ public class ObjectListTableModel extends AbstractTableModel implements
   public void addPropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeListeners.add(propertyChangeListener);
+  }
+
+  public void clear() {
+    objects.clear();
+    fireTableDataChanged();
   }
 
   @PreDestroy
@@ -208,6 +212,12 @@ public class ObjectListTableModel extends AbstractTableModel implements
     add(toIndex, object);
   }
 
+  public void setAll(final List<? extends Object> objects) {
+    this.objects.clear();
+    this.objects.addAll(objects);
+    fireTableDataChanged();
+  }
+
   public void setEditable(final boolean editable) {
     this.editable = editable;
   }
@@ -233,16 +243,5 @@ public class ObjectListTableModel extends AbstractTableModel implements
       JavaBeanUtil.setProperty(object, name, value);
       firePropertyChange(object, name, oldValue, value);
     }
-  }
-
-  public void clear() {
-    objects.clear();
-    fireTableDataChanged();
-  }
-
-  public void setAll(List<? extends Object> objects) {
-    this.objects.clear();
-    this.objects.addAll(objects);
-    fireTableDataChanged();
   }
 }

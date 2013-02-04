@@ -34,6 +34,11 @@ import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 @SuppressWarnings("serial")
 public class ObjectTree extends JTree implements PropertyChangeListener {
 
+  @SuppressWarnings("unchecked")
+  public static <V> V getMouseClickItem() {
+    return (V)mouseClickItem;
+  }
+
   private ObjectTreeModel model;
 
   private DragSource dragSource;
@@ -121,7 +126,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
               if (menu != null && menu.getSubElements().length > 0) {
                 mouseClickItem = node;
                 menu.show(ObjectTree.this, x, y);
-                //TODO add listener to set item=null
+                // TODO add listener to set item=null
               }
             }
           }
@@ -347,10 +352,5 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <V> V getMouseClickItem() {
-    return (V)mouseClickItem;
   }
 }

@@ -12,13 +12,13 @@ import com.revolsys.swing.SwingUtil;
 public class DefaultValueUiBuilder implements ValueUiBuilder {
   private final JLabel defaultRenderer;
 
+  private JComponent component;
+
   public DefaultValueUiBuilder() {
     defaultRenderer = new JLabel();
     defaultRenderer.setBorder(new EmptyBorder(1, 2, 1, 2));
     defaultRenderer.setOpaque(true);
   }
-
-  private JComponent component;
 
   @Override
   public Object getCellEditorValue() {
@@ -26,7 +26,7 @@ public class DefaultValueUiBuilder implements ValueUiBuilder {
   }
 
   @Override
-  public Component getEditorComponent(Object value) {
+  public Component getEditorComponent(final Object value) {
     return SwingUtil.getValue(component);
   }
 

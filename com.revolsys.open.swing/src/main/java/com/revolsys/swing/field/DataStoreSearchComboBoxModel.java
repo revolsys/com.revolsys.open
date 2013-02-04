@@ -13,32 +13,22 @@ public class DataStoreSearchComboBoxModel extends
 
   private String whereClause = "UPPER(FULL_NAME) LIKE ?";
 
-  private DataObjectStore dataStore;
+  private final DataObjectStore dataStore;
 
-  public DataStoreSearchComboBoxModel(DataObjectStore dataStore,
-    String tableName, String whereClause) {
+  private String searchText;
+
+  private final String tableName;
+
+  public DataStoreSearchComboBoxModel(final DataObjectStore dataStore,
+    final String tableName, final String whereClause) {
     super(null, false);
     this.dataStore = dataStore;
     this.tableName = tableName;
     this.whereClause = whereClause;
   }
 
-  private String searchText;
-
-  private String tableName;
-
-  public void updateModel(String text) {
-    if (!StringUtils.hasText(text)) {
-      setPager(null);
-    } else if (searchText == null || !searchText.equalsIgnoreCase(text)) {
-      searchText = text;
-      ResultPager<DataObject> pager = getNameResultPager(text);
-      setPager(pager);
-    }
-  }
-
-  public ResultPager<DataObject> getNameResultPager(String text) {
-    Query query = new Query(tableName);
+  public ResultPager<DataObject> getNameResultPager(final String text) {
+    final Query query = new Query(tableName);
     if (StringUtils.hasText(text)) {
       query.setWhereClause(whereClause);
       int index = 0;
@@ -50,8 +40,18 @@ public class DataStoreSearchComboBoxModel extends
         }
       } while (index != -1);
     }
-    ResultPager<DataObject> pager = dataStore.page(query);
+    final ResultPager<DataObject> pager = dataStore.page(query);
     return pager;
+  }
+
+  public void updateModel(final String text) {
+    if (!StringUtils.hasText(text)) {
+      setPager(null);
+    } else if (searchText == null || !searchText.equalsIgnoreCase(text)) {
+      searchText = text;
+      final ResultPager<DataObject> pager = getNameResultPager(text);
+      setPager(pager);
+    }
   }
 
 }

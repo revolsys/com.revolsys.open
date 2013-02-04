@@ -62,16 +62,8 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     }
   }
 
-  public String getDirectoryPath() {
-    return directoryName.getText();
-  }
-
-  public void setDirectoryPath(final String directoryPath) {
-    directoryName.setText(directoryPath);
-  }
-
   public File getDirectoryFile() {
-    String directoryPath = getDirectoryPath();
+    final String directoryPath = getDirectoryPath();
     if (StringUtils.hasText(directoryPath)) {
       return new File(directoryPath);
     } else {
@@ -79,10 +71,26 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     }
   }
 
+  public String getDirectoryPath() {
+    return directoryName.getText();
+  }
+
+  @Override
+  public String getFieldValidationMessage() {
+    final File directory = getDirectoryFile();
+    if (directory == null) {
+      return "No directory specified";
+    } else if (directory.exists()) {
+      return null;
+    } else {
+      return "Directory does not exist";
+    }
+  }
+
   @Override
   public boolean isFieldValid() {
 
-    File directory = getDirectoryFile();
+    final File directory = getDirectoryFile();
     if (directory == null || !directory.exists()) {
       directoryName.setForeground(Color.RED);
       directoryName.setSelectedTextColor(Color.RED);
@@ -96,15 +104,7 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     }
   }
 
-  @Override
-  public String getFieldValidationMessage() {
-    File directory = getDirectoryFile();
-    if (directory == null) {
-      return "No directory specified";
-    } else if (directory.exists()) {
-      return null;
-    } else {
-      return "Directory does not exist";
-    }
+  public void setDirectoryPath(final String directoryPath) {
+    directoryName.setText(directoryPath);
   }
 }

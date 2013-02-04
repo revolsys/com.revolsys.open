@@ -2,14 +2,12 @@ package com.revolsys.swing.map;
 
 import java.awt.Component;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.measure.Measurable;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
-import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -155,8 +153,8 @@ public class ComponentViewport2D extends Viewport2D {
    */
   public Rectangle getRectangle(final int x1, final int y1, final int x2,
     final int y2) {
-    final int x3 = (int)Math.min(getViewWidthPixels() - 1, Math.max(0, x2));
-    final int y3 = (int)Math.min(getViewHeightPixels() - 1, Math.max(0, y2));
+    final int x3 = Math.min(getViewWidthPixels() - 1, Math.max(0, x2));
+    final int y3 = Math.min(getViewHeightPixels() - 1, Math.max(0, y2));
 
     final int x = Math.min(x1, x3);
     final int y = Math.min(y1, y3);
@@ -178,7 +176,6 @@ public class ComponentViewport2D extends Viewport2D {
     final double modelWidth = getModelWidth();
     return modelUnit.times(modelWidth).divide(viewWidth);
   }
-
 
   public BoundingBox getValidBoundingBox(final BoundingBox boundingBox) {
     BoundingBox validBoundingBox = boundingBox;
@@ -257,7 +254,7 @@ public class ComponentViewport2D extends Viewport2D {
       maxDecimalDigits = 15 - maxIntegerDigits;
       getPropertyChangeSupport().firePropertyChange("geometryFactory",
         oldGeometryFactory, geometryFactory);
-      BoundingBox boundingBox = getBoundingBox();
+      final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox != null) {
         final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
         final BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
@@ -288,9 +285,9 @@ public class ComponentViewport2D extends Viewport2D {
         setGeometryFactory(geometryFactory);
 
       }
-      BoundingBox boundingBox = getBoundingBox();
-      double viewAspectRatio = getViewAspectRatio();
-      double aspectRatio = boundingBox.getAspectRatio();
+      final BoundingBox boundingBox = getBoundingBox();
+      final double viewAspectRatio = getViewAspectRatio();
+      final double aspectRatio = boundingBox.getAspectRatio();
       if (boundingBox != null && viewAspectRatio != aspectRatio) {
         setBoundingBox(this.getBoundingBox());
       }

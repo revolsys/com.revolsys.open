@@ -12,13 +12,14 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 public class InvokeMethodStringConverter extends ObjectToStringConverter
   implements ListCellRenderer {
 
-  private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
+  private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
-  private Object object;
+  private final Object object;
 
-  private String methodName;
+  private final String methodName;
 
-  public InvokeMethodStringConverter(Object object, String methodName) {
+  public InvokeMethodStringConverter(final Object object,
+    final String methodName) {
     if (object == null) {
       throw new IllegalArgumentException("Object cannot be null " + this);
     }
@@ -27,7 +28,18 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
   }
 
   @Override
-  public String getPreferredStringForItem(Object item) {
+  public Component getListCellRendererComponent(final JList list,
+    final Object value, final int index, final boolean isSelected,
+    final boolean cellHasFocus) {
+    renderer.getListCellRendererComponent(list, value, index, isSelected,
+      cellHasFocus);
+    final String text = getPreferredStringForItem(value);
+    renderer.setText(text);
+    return renderer;
+  }
+
+  @Override
+  public String getPreferredStringForItem(final Object item) {
     if (item == null) {
       return "";
     } else {
@@ -48,15 +60,5 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
         throw new RuntimeException("Unable to invoke " + this, e);
       }
     }
-  }
-
-  @Override
-  public Component getListCellRendererComponent(JList list, Object value,
-    int index, boolean isSelected, boolean cellHasFocus) {
-    renderer.getListCellRendererComponent(list, value, index, isSelected,
-      cellHasFocus);
-    String text = getPreferredStringForItem(value);
-    renderer.setText(text);
-    return renderer;
   }
 }

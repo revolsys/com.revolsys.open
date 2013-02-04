@@ -43,6 +43,16 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
     invokeMethod();
   }
 
+  @Override
+  public void changedUpdate(final DocumentEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void insertUpdate(final DocumentEvent e) {
+    invokeMethod();
+  }
+
   protected void invokeMethod() {
     if (invokeLater) {
       SwingUtilities.invokeLater(this);
@@ -52,22 +62,12 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
   }
 
   @Override
-  public void insertUpdate(DocumentEvent e) {
+  public void removeUpdate(final DocumentEvent e) {
     invokeMethod();
   }
 
   @Override
-  public void removeUpdate(DocumentEvent e) {
-    invokeMethod();
-  }
-
-  @Override
-  public void changedUpdate(DocumentEvent e) {
-    invokeMethod();
-  }
-
-  @Override
-  public void valueChanged(ListSelectionEvent e) {
+  public void valueChanged(final ListSelectionEvent e) {
     invokeMethod();
   }
 }

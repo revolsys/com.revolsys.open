@@ -45,7 +45,7 @@ public class ObjectTreePanel extends JPanel {
 
       listeners.add(model);
       final InvokeMethodPropertyChangeListener repaintListener = new InvokeMethodPropertyChangeListener(
-         tree, "repaint");
+        tree, "repaint");
       listeners.add(repaintListener);
 
       for (final PropertyChangeListener listener : listeners) {

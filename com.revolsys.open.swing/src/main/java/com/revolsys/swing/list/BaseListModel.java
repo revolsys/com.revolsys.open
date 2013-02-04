@@ -17,34 +17,51 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   protected EventListenerList listenerList = new EventListenerList();
 
   @Override
-  public void add(int index, Object element) {
+  public void add(final int index, final Object element) {
     add(index, element);
     fireIntervalAdded(this, index, index);
   }
 
   @Override
-  public boolean add(T e) {
-    int index = size();
-    boolean result = super.add(e);
+  public boolean add(final T e) {
+    final int index = size();
+    final boolean result = super.add(e);
     fireIntervalAdded(this, index, index);
     return result;
   }
 
-  public void addListDataListener(ListDataListener l) {
+  @Override
+  public boolean addAll(final Collection<? extends T> c) {
+    final int index = size();
+    final boolean result = super.addAll(c);
+    fireIntervalAdded(this, index, index + c.size());
+    return result;
+  }
+
+  @Override
+  public boolean addAll(final int index, final Collection<? extends T> c) {
+    final boolean result = super.addAll(index, c);
+    fireIntervalAdded(this, index, index + c.size());
+    return result;
+  }
+
+  @Override
+  public void addListDataListener(final ListDataListener l) {
     listenerList.add(ListDataListener.class, l);
   }
 
   @Override
   public void clear() {
-    int index1 = size() - 1;
+    final int index1 = size() - 1;
     super.clear();
     if (index1 >= 0) {
       fireIntervalRemoved(this, 0, index1);
     }
   }
 
-  protected void fireContentsChanged(Object source, int index0, int index1) {
-    Object[] listeners = listenerList.getListenerList();
+  protected void fireContentsChanged(final Object source, final int index0,
+    final int index1) {
+    final Object[] listeners = listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -58,8 +75,9 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
     }
   }
 
-  protected void fireIntervalAdded(Object source, int index0, int index1) {
-    Object[] listeners = listenerList.getListenerList();
+  protected void fireIntervalAdded(final Object source, final int index0,
+    final int index1) {
+    final Object[] listeners = listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -73,8 +91,9 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
     }
   }
 
-  protected void fireIntervalRemoved(Object source, int index0, int index1) {
-    Object[] listeners = listenerList.getListenerList();
+  protected void fireIntervalRemoved(final Object source, final int index0,
+    final int index1) {
+    final Object[] listeners = listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -89,15 +108,15 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   @Override
-  public T getElementAt(int index) {
+  public T getElementAt(final int index) {
     return super.get(index);
   }
 
   public ListDataListener[] getListDataListeners() {
-    return (ListDataListener[])listenerList.getListeners(ListDataListener.class);
+    return listenerList.getListeners(ListDataListener.class);
   }
 
-  public <V extends EventListener> V[] getListeners(Class<V> listenerType) {
+  public <V extends EventListener> V[] getListeners(final Class<V> listenerType) {
     return listenerList.getListeners(listenerType);
   }
 
@@ -107,32 +126,17 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   @Override
-  public boolean addAll(int index, Collection<? extends T> c) {
-    boolean result = super.addAll(index, c);
-    fireIntervalAdded(this, index, index + c.size());
-    return result;
-  }
-
-  @Override
-  public boolean addAll(Collection<? extends T> c) {
-    int index = size();
-    boolean result = super.addAll(c);
-    fireIntervalAdded(this, index, index + c.size());
-    return result;
-  }
-
-  @Override
-  public T remove(int index) {
-    T oldValue = get(index);
+  public T remove(final int index) {
+    final T oldValue = get(index);
     super.remove(index);
     fireIntervalRemoved(this, index, index);
     return oldValue;
   }
 
   @Override
-  public boolean remove(Object obj) {
-    int index = indexOf(obj);
-    boolean rv = super.remove(obj);
+  public boolean remove(final Object obj) {
+    final int index = indexOf(obj);
+    final boolean rv = super.remove(obj);
     if (index >= 0) {
       fireIntervalRemoved(this, index, index);
     }
@@ -140,20 +144,21 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   @Override
-  public boolean removeAll(Collection<?> c) {
+  public boolean removeAll(final Collection<?> c) {
     boolean removed = false;
-    for (Object object : c) {
+    for (final Object object : c) {
       removed |= remove(object);
     }
     return removed;
   }
 
-  public void removeListDataListener(ListDataListener l) {
+  @Override
+  public void removeListDataListener(final ListDataListener l) {
     listenerList.remove(ListDataListener.class, l);
   }
 
   @Override
-  public void removeRange(int fromIndex, int toIndex) {
+  public void removeRange(final int fromIndex, final int toIndex) {
     if (fromIndex > toIndex) {
       throw new IllegalArgumentException("fromIndex must be <= toIndex");
     }
@@ -162,8 +167,8 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   @Override
-  public T set(int index, T element) {
-    T oldValue = get(index);
+  public T set(final int index, final T element) {
+    final T oldValue = get(index);
     set(index, element);
     fireContentsChanged(this, index, index);
     return oldValue;

@@ -47,7 +47,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     final int row, final int column) {
     int attributeIndex;
     if (table instanceof JXTable) {
-      JXTable jxTable = (JXTable)table;
+      final JXTable jxTable = (JXTable)table;
       attributeIndex = jxTable.convertRowIndexToModel(row);
     } else {
       attributeIndex = row;
@@ -57,7 +57,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     final boolean required = metaData.isAttributeRequired(attributeIndex);
 
     Component component = null;
-    String name = metaData.getAttributeName(attributeIndex);
+    final String name = metaData.getAttributeName(attributeIndex);
     if (column == 0) {
       valueComponent.setText(String.valueOf(attributeIndex));
       component = valueComponent;
@@ -81,7 +81,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
           if (codeTable == null) {
             text = StringConverterRegistry.toString(value);
           } else {
-            List<Object> values = codeTable.getValues(value);
+            final List<Object> values = codeTable.getValues(value);
             if (values == null || values.isEmpty()) {
               text = "-";
             } else {
@@ -117,7 +117,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
   }
 
   public void setUiBuilderRegistry(
-    DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
+    final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
   }
 }

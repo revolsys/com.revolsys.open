@@ -11,7 +11,21 @@ import com.revolsys.swing.map.layer.Layer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
+  void clearEditingObjects();
+
+  void clearHiddenObjects();
+
   void clearSelection();
+
+  void deleteObjects(DataObject... object);
+
+  void deleteObjects(List<DataObject> objects);
+
+  List<DataObject> getDataObjects(BoundingBox boundingBox);
+
+  Set<DataObject> getEditingObjects();
+
+  Set<DataObject> getHiddenObjects();
 
   DataObjectMetaData getMetaData();
 
@@ -19,36 +33,22 @@ public interface DataObjectLayer extends Layer {
 
   List<DataObject> getObjects();
 
+  List<DataObject> getObjects(Geometry geometry, double distance);
+
   int getRowCount();
 
   List<DataObject> getSelectedObjects();
 
-  void selectObjects(List<DataObject> objects);
-
   void selectObjects(DataObject... objects);
 
-  void deleteObjects(DataObject... object);
-
-  void deleteObjects(List<DataObject> objects);
-
-  List<DataObject> getObjects(Geometry geometry, double distance);
-
-  int setSelectedWithinDistance(boolean selected, Geometry geometry,
-    int distance);
+  void selectObjects(List<DataObject> objects);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 
-  void clearEditingObjects();
-
-  Set<DataObject> getEditingObjects();
-
   void setHiddenObjects(Collection<? extends DataObject> hiddenObjects);
-
-  void clearHiddenObjects();
-
-  Set<DataObject> getHiddenObjects();
 
   void setHiddenObjects(DataObject... hiddenObjects);
 
-  List<DataObject> getDataObjects(BoundingBox boundingBox);
+  int setSelectedWithinDistance(boolean selected, Geometry geometry,
+    int distance);
 }

@@ -22,43 +22,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
-  private final DataObjectStore store;
-
-  private final Object sync = new Object();
-
-  private final String typePath;
-
-  private DataObjectQuadTree index = new DataObjectQuadTree();
-
-  private BoundingBox boundingBox = new BoundingBox();
-
-  public DataObjectStoreLayer(final DataObjectStore store, final String typePath) {
-    super(PathUtil.getName(typePath), store.getMetaData(typePath)
-      .getGeometryFactory());
-    this.store = store;
-    this.typePath = typePath;
-  }
-
-  public DataObjectStoreLayer(final String name, final DataObjectStore store,
-    final String typePath, final GeometryFactory geometryFactory) {
-    super(name, geometryFactory);
-    this.store = store;
-    this.typePath = typePath;
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return getCoordinateSystem().getAreaBoundingBox();
-  }
-
-  private BoundingBox loadingBoundingBox = new BoundingBox();
-
-  private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
-
   private class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
-    private BoundingBox viewportBoundingBox;
+    private final BoundingBox viewportBoundingBox;
 
-    private LoadingWorker(BoundingBox viewportBoundingBox) {
+    private LoadingWorker(final BoundingBox viewportBoundingBox) {
       super();
       this.viewportBoundingBox = viewportBoundingBox;
     }
@@ -66,9 +33,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     @Override
     protected DataObjectQuadTree doInBackground() throws Exception {
       final DataObjectQuadTree index = new DataObjectQuadTree();
-      GeometryFactory geometryFactory = getGeometryFactory();
-      BoundingBox queryBoundingBox = viewportBoundingBox.convert(geometryFactory);
-      Reader<DataObject> reader = store.query(typePath, queryBoundingBox);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox queryBoundingBox = viewportBoundingBox.convert(geometryFactory);
+      final Reader<DataObject> reader = store.query(typePath, queryBoundingBox);
       try {
         for (final DataObject object : reader) {
           if (isCancelled()) {
@@ -90,10 +57,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           if (!isCancelled()) {
             index = get();
             final DataObjectStoreLayer layer = DataObjectStoreLayer.this;
-            PropertyChangeSupport propertyChangeSupport = layer.getPropertyChangeSupport();
+            final PropertyChangeSupport propertyChangeSupport = layer.getPropertyChangeSupport();
             propertyChangeSupport.firePropertyChange("loaded", false, true);
           }
-        } catch (CancellationException e) {
+        } catch (final CancellationException e) {
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).error(
             "Unable to load " + typePath, t);
@@ -105,13 +72,47 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
 
+    @Override
     public String toString() {
       return "Loading: " + typePath;
     }
   }
 
+  private final DataObjectStore store;
+
+  private final Object sync = new Object();
+
+  private final String typePath;
+
+  private DataObjectQuadTree index = new DataObjectQuadTree();
+
+  private BoundingBox boundingBox = new BoundingBox();
+
+  private BoundingBox loadingBoundingBox = new BoundingBox();
+
+  private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
+
+  public DataObjectStoreLayer(final DataObjectStore store, final String typePath) {
+    super(PathUtil.getName(typePath), store.getMetaData(typePath)
+      .getGeometryFactory());
+    this.store = store;
+    this.typePath = typePath;
+  }
+
+  public DataObjectStoreLayer(final String name, final DataObjectStore store,
+    final String typePath, final GeometryFactory geometryFactory) {
+    super(name, geometryFactory);
+    this.store = store;
+    this.typePath = typePath;
+  }
+
   @Override
-  public List<DataObject> getDataObjects( BoundingBox boundingBox) {
+  public BoundingBox getBoundingBox() {
+    return getCoordinateSystem().getAreaBoundingBox();
+  }
+
+  @Override
+  public List<DataObject> getDataObjects(BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
@@ -136,6 +137,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return store.getMetaData(typePath);
   }

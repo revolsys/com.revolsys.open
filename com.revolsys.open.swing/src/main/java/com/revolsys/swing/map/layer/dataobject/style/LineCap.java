@@ -8,7 +8,7 @@ public enum LineCap {
 
   private int awtValue;
 
-  private LineCap(int awtValue) {
+  private LineCap(final int awtValue) {
     this.awtValue = awtValue;
   }
 

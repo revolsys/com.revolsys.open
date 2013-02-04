@@ -2,7 +2,6 @@ package com.revolsys.swing.map.tree;
 
 import java.util.List;
 
-
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.tree.renderer.LayerGroupTreeCellRenderer;

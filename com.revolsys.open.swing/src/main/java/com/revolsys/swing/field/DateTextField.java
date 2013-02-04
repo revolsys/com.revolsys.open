@@ -35,19 +35,49 @@ public class DateTextField extends JFormattedTextField implements
     addFocusListener(this);
   }
 
-  public void setFieldValid(boolean fieldValid) {
-    this.fieldValid = fieldValid;
+  @Override
+  public void changedUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  @Override
+  public void focusGained(final FocusEvent e) {
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
+    updateText();
+  }
+
+  @Override
+  public String getFieldValidationMessage() {
+    return fieldValidationMessage;
   }
 
   public Date getFieldValue() {
     return fieldValue;
   }
 
+  @Override
+  public void insertUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  @Override
   public boolean isFieldValid() {
     return fieldValid;
   }
 
-  public void setFieldValue(Date fieldValue) {
+  @Override
+  public void removeUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  public void setFieldValid(final boolean fieldValid) {
+    this.fieldValid = fieldValid;
+  }
+
+  public void setFieldValue(final Date fieldValue) {
     this.fieldValue = fieldValue;
 
     String text;
@@ -60,10 +90,23 @@ public class DateTextField extends JFormattedTextField implements
     validateField();
   }
 
+  private void updateText() {
+    final String oldText = getText();
+    String text;
+    if (fieldValue == null) {
+      text = "";
+    } else {
+      text = FORMAT.format(fieldValue);
+    }
+    if (!oldText.equals(text)) {
+      setText(text);
+    }
+  }
+
   private void validateField() {
-    Date oldValue = fieldValue;
+    final Date oldValue = fieldValue;
     Date value = null;
-    boolean oldValid = fieldValid;
+    final boolean oldValid = fieldValid;
     boolean valid = true;
     final String text = getText();
     if (StringUtils.hasText(text)) {
@@ -89,47 +132,6 @@ public class DateTextField extends JFormattedTextField implements
         fieldValue = value;
         firePropertyChange("fieldValid", oldValue, fieldValue);
       }
-    }
-  }
-
-  public String getFieldValidationMessage() {
-    return fieldValidationMessage;
-  }
-
-  @Override
-  public void insertUpdate(DocumentEvent e) {
-    validateField();
-  }
-
-  @Override
-  public void removeUpdate(DocumentEvent e) {
-    validateField();
-  }
-
-  @Override
-  public void changedUpdate(DocumentEvent e) {
-    validateField();
-  }
-
-  @Override
-  public void focusGained(FocusEvent e) {
-  }
-
-  @Override
-  public void focusLost(FocusEvent e) {
-    updateText();
-  }
-
-  private void updateText() {
-    String oldText = getText();
-    String text;
-    if (fieldValue == null) {
-      text = "";
-    } else {
-      text = FORMAT.format(fieldValue);
-    }
-    if (!oldText.equals(text)) {
-      setText(text);    
     }
   }
 }

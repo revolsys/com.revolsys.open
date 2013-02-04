@@ -22,38 +22,28 @@ public class DataStoreSearchComboBox extends JComboBox implements ItemListener,
 
   private int textPosition;
 
-  private ComboBoxEditor comboBoxEditor;
+  private final ComboBoxEditor comboBoxEditor;
 
-  private String displayAttributeName;
+  private final String displayAttributeName;
 
-  public DataStoreSearchComboBox(DataObjectStore dataStore, String tableName,
-    String whereClause, String displayAttributeName) {
+  public DataStoreSearchComboBox(final DataObjectStore dataStore,
+    final String tableName, final String whereClause,
+    final String displayAttributeName) {
     super(new DataStoreSearchComboBoxModel(dataStore, tableName, whereClause));
     this.displayAttributeName = displayAttributeName;
-    ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
+    final ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
       displayAttributeName);
     setRenderer(renderer);
 
     setEditable(true);
     addItemListener(this);
     comboBoxEditor = getEditor();
-    Component editorComponent = editor.getEditorComponent();
+    final Component editorComponent = editor.getEditorComponent();
     editorComponent.addKeyListener(this);
 
-    AutoCompleteComboBoxEditor wrappedEditor = new AutoCompleteComboBoxEditor(
+    final AutoCompleteComboBoxEditor wrappedEditor = new AutoCompleteComboBoxEditor(
       editor, new DataObjectToStringConverter(displayAttributeName));
     setEditor(wrappedEditor);
-  }
-
-  public void keyTyped(KeyEvent e) {
-  }
-
-  public void keyPressed(KeyEvent e) {
-  }
-
-  @Override
-  public DataObject getSelectedItem() {
-    return (DataObject)super.getSelectedItem();
   }
 
   @Override
@@ -61,9 +51,39 @@ public class DataStoreSearchComboBox extends JComboBox implements ItemListener,
     return (DataStoreSearchComboBoxModel)super.getModel();
   }
 
-  public void keyReleased(KeyEvent e) {
-    String str = comboBoxEditor.getItem().toString();
-    JTextField textField = (JTextField)comboBoxEditor.getEditorComponent();
+  @Override
+  public DataObject getSelectedItem() {
+    return (DataObject)super.getSelectedItem();
+  }
+
+  public String getText() {
+    return (String)comboBoxEditor.getItem();
+  }
+
+  @Override
+  public void itemStateChanged(final ItemEvent e) {
+    if (e.getStateChange() == ItemEvent.SELECTED) {
+      final Object item = e.getItem();
+      if (item instanceof DataObject) {
+        final DataObject object = (DataObject)item;
+        final Object name = object.getValue(displayAttributeName);
+        comboBoxEditor.setItem(name);
+        setSelectedItem(item);
+      } else {
+        comboBoxEditor.setItem(item.toString());
+        setSelectedItem(item);
+      }
+    }
+  }
+
+  @Override
+  public void keyPressed(final KeyEvent e) {
+  }
+
+  @Override
+  public void keyReleased(final KeyEvent e) {
+    final String str = comboBoxEditor.getItem().toString();
+    final JTextField textField = (JTextField)comboBoxEditor.getEditorComponent();
     textPosition = textField.getCaretPosition();
 
     if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
@@ -74,7 +94,7 @@ public class DataStoreSearchComboBox extends JComboBox implements ItemListener,
     } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
       setSelectedIndex(getSelectedIndex());
     } else {
-      DataStoreSearchComboBoxModel model = getModel();
+      final DataStoreSearchComboBoxModel model = getModel();
       model.updateModel(comboBoxEditor.getItem().toString());
       hidePopup();
       showPopup();
@@ -83,22 +103,7 @@ public class DataStoreSearchComboBox extends JComboBox implements ItemListener,
     }
   }
 
-  public void itemStateChanged(ItemEvent e) {
-    if (e.getStateChange() == ItemEvent.SELECTED) {
-      Object item = e.getItem();
-      if (item instanceof DataObject) {
-        DataObject object = (DataObject)item;
-        Object name = object.getValue(displayAttributeName);
-        comboBoxEditor.setItem(name);
-        setSelectedItem(item);
-      } else {
-        comboBoxEditor.setItem(item.toString());
-        setSelectedItem(item);
-      }
-    }
-  }
-
-  public String getText() {
-    return (String)comboBoxEditor.getItem();
+  @Override
+  public void keyTyped(final KeyEvent e) {
   }
 }

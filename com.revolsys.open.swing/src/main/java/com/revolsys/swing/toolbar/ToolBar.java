@@ -80,6 +80,13 @@ public class ToolBar extends JToolBar {
     return components;
   }
 
+  public void setGroupEnabled(final String groupName, final boolean enabled) {
+    final List<Component> components = getGroup(groupName);
+    for (final Component component : components) {
+      component.setEnabled(enabled);
+    }
+  }
+
   private void updateComponents() {
     removeAll();
     boolean first = true;
@@ -94,13 +101,6 @@ public class ToolBar extends JToolBar {
           super.add(component);
         }
       }
-    }
-  }
-
-  public void setGroupEnabled(String groupName, boolean enabled) {
-    List<Component> components = getGroup(groupName);
-    for (Component component : components) {
-      component.setEnabled(enabled);
     }
   }
 }

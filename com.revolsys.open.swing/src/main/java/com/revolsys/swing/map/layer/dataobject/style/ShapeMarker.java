@@ -105,46 +105,47 @@ public class ShapeMarker implements Marker {
 
   private Shape shape;
 
-  public ShapeMarker(Shape shape) {
+  public ShapeMarker(final Shape shape) {
     this.shape = shape;
     if (shape != null) {
-      Rectangle bounds = shape.getBounds();
-      double width = bounds.width;
-      double height = bounds.height;
+      final Rectangle bounds = shape.getBounds();
+      final double width = bounds.width;
+      final double height = bounds.height;
       double scale;
       if (width > height) {
         scale = 1 / width;
       } else {
         scale = 1 / height;
       }
-      AffineTransform transform = AffineTransform.getTranslateInstance(
+      final AffineTransform transform = AffineTransform.getTranslateInstance(
         -bounds.x, -bounds.y);
       transform.concatenate(AffineTransform.getScaleInstance(scale, scale));
       this.shape = new GeneralPath(shape).createTransformedShape(transform);
     }
   }
 
-  public ShapeMarker(String name) {
+  public ShapeMarker(final String name) {
     this(SHAPES.get(name));
     if (shape == null) {
       throw new IllegalArgumentException("Unknown shape " + name);
     }
   }
 
+  @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final GeometryStyle style, final double modelX, double modelY) {
+    final GeometryStyle style, final double modelX, final double modelY) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
     final AffineTransform savedTransform = graphics.getTransform();
-    Measure<Length> markerWidth = style.getMarkerWidth();
-    double mapWidth = viewport.toDisplayValue(markerWidth);
-    Measure<Length> markerHeight = style.getMarkerHeight();
-    double mapHeight = viewport.toDisplayValue(markerHeight);
+    final Measure<Length> markerWidth = style.getMarkerWidth();
+    final double mapWidth = viewport.toDisplayValue(markerWidth);
+    final Measure<Length> markerHeight = style.getMarkerHeight();
+    final double mapHeight = viewport.toDisplayValue(markerHeight);
     double x = modelX;
     double y = modelY;
-    Measure<Length> deltaX = style.getMarkerDx();
+    final Measure<Length> deltaX = style.getMarkerDx();
     x += viewport.toDisplayValue(deltaX);
-    Measure<Length> deltaY = style.getMarkerDx();
+    final Measure<Length> deltaY = style.getMarkerDx();
     y += viewport.toDisplayValue(deltaY);
     // final double rotation = graphic.getRotation().doubleValue(SI.RADIAN);
     // if (rotation != 0) {

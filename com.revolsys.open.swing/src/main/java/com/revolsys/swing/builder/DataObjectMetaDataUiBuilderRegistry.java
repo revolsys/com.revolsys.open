@@ -32,6 +32,12 @@ public class DataObjectMetaDataUiBuilderRegistry {
     builders.set(index, builder);
   }
 
+  public void addValueUiBuilder(final DataObjectMetaData metaData,
+    final String fieldName, final ValueUiBuilder builder) {
+    final int attributeIndex = metaData.getAttributeIndex(fieldName);
+    addValueUiBuilder(metaData, attributeIndex, builder);
+  }
+
   private List<ValueUiBuilder> getUiBuilders(final DataObjectMetaData schema) {
     List<ValueUiBuilder> builders = uiBuilders.get(schema);
     if (builders == null) {
@@ -60,11 +66,5 @@ public class DataObjectMetaDataUiBuilderRegistry {
     final String attributeName) {
     return getValueUiBuilder(schema, schema.getAttributeIndex(attributeName));
 
-  }
-
-  public void addValueUiBuilder(DataObjectMetaData metaData, String fieldName,
-    ValueUiBuilder builder) {
-    int attributeIndex = metaData.getAttributeIndex(fieldName);
-    addValueUiBuilder(metaData, attributeIndex, builder);
   }
 }

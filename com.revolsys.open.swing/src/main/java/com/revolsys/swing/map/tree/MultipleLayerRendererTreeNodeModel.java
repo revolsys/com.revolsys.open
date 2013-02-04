@@ -17,15 +17,17 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.tree.renderer.LayerTreeCellRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.tree.renderer.LayerRendererTreeCellRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
-public class BaseLayerTreeNodeModel extends
-  AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
-  MouseListener {
+public class MultipleLayerRendererTreeNodeModel
+  extends
+  AbstractObjectTreeNodeModel<AbstractMultipleRenderer, AbstractDataObjectLayerRenderer>
+  implements MouseListener {
 
   private final static Map<Class<?>, JPopupMenu> MENUS = new HashMap<Class<?>, JPopupMenu>();
 
@@ -38,29 +40,14 @@ public class BaseLayerTreeNodeModel extends
   }
 
   public static void addMenuItem(
-    final Class<? extends AbstractLayer> layerClass, final JMenuItem menuItem) {
+    final Class<? extends AbstractDataObjectLayerRenderer> layerClass,
+    final JMenuItem menuItem) {
     final JPopupMenu menu = getMenu(layerClass);
     menu.add(menuItem);
   }
 
-  public static BaseLayerTreeNodeModel create(final String name,
-    final Class<? extends AbstractLayer> layerClass) {
-    final BaseLayerTreeNodeModel model = new BaseLayerTreeNodeModel(name,
-      layerClass);
-    return model;
-  }
-
-  @Override
-  protected List<LayerRenderer<Layer>> getChildren(AbstractLayer node) {
-    LayerRenderer<Layer> renderer = node.getRenderer();
-    if (renderer == null) {
-      return Collections.emptyList();
-    } else {
-    return Collections.singletonList(renderer);
-    }
-  }
   public static JPopupMenu getMenu(
-    final Class<? extends AbstractLayer> layerClass) {
+    final Class<? extends AbstractDataObjectLayerRenderer> layerClass) {
     synchronized (MENUS) {
       JPopupMenu menu = MENUS.get(layerClass);
       if (menu == null) {
@@ -71,33 +58,45 @@ public class BaseLayerTreeNodeModel extends
     }
   }
 
-  private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(LayerRenderer.class);
+  private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(AbstractDataObjectLayerRenderer.class);
 
-  private final String name;
+  public MultipleLayerRendererTreeNodeModel() {
+    setSupportedClasses(AbstractMultipleRenderer.class);
 
-  public BaseLayerTreeNodeModel(final String name,
-    final Class<?>... supportedClasses) {
-    this.name = name;
-    if (supportedClasses.length == 0) {
-      setSupportedClasses(AbstractLayer.class);
-    } else {
-      setSupportedClasses(supportedClasses);
-    }
-
-   // setLeaf(true);
     setSupportedChildClasses(SUPPORTED_CHILD_CLASSES);
-    setObjectTreeNodeModels(new MultipleLayerRendererTreeNodeModel(), new BaseLayerRendererTreeNodeModel());
-    setRenderer(new LayerTreeCellRenderer());
+    setRenderer(new LayerRendererTreeCellRenderer());
+    setObjectTreeNodeModels(this, new BaseLayerRendererTreeNodeModel());
     setMouseListener(this);
   }
 
   @Override
-  public JPopupMenu getMenu(final AbstractLayer layer) {
-    if (layer == null) {
+  public int addChild(final AbstractMultipleRenderer node,
+    final AbstractDataObjectLayerRenderer renderer) {
+    return node.addRenderer(renderer);
+  }
+
+  @Override
+  public int addChild(final AbstractMultipleRenderer node, final int index,
+    final AbstractDataObjectLayerRenderer renderer) {
+    return node.addRenderer(index, renderer);
+  }
+
+  @Override
+  protected List<AbstractDataObjectLayerRenderer> getChildren(
+    final AbstractMultipleRenderer node) {
+    return node.getRenderers();
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  @Override
+  public JPopupMenu getMenu(final AbstractMultipleRenderer renderer) {
+    if (renderer == null) {
       return null;
     } else {
       synchronized (MENUS) {
-        final Class<? extends AbstractLayer> layerClass = layer.getClass();
+        final Class layerClass = renderer.getClass();
         return getMenu(layerClass);
       }
     }
@@ -115,38 +114,17 @@ public class BaseLayerTreeNodeModel extends
         final TreePath path = tree.getPathForLocation(x, y);
         if (path != null) {
           final Object node = path.getLastPathComponent();
-          if (node instanceof Layer) {
-            final Layer layer = (Layer)node;
+          if (node instanceof LayerRenderer) {
+            final LayerRenderer<?> renderer = (LayerRenderer<?>)node;
             final TreeUI ui = tree.getUI();
             final Rectangle bounds = ui.getPathBounds(tree, path);
             final int cX = x - bounds.x;
             final int index = cX / 21;
             int offset = 0;
             if (index == offset) {
-              layer.setVisible(!layer.isVisible());
+              renderer.setVisible(!renderer.isVisible());
             }
             offset++;
-            // if (layer.isQuerySupported()) {
-            // if (index == offset) {
-            // layer.setQueryable(!layer.isQueryable());
-            // }
-            // offset++;
-            // }
-
-            if (layer.isSelectSupported()) {
-              if (index == offset) {
-                layer.setSelectable(!layer.isSelectable());
-              }
-              offset++;
-            }
-
-            if (!layer.isReadOnly()) {
-              if (index == offset) {
-                layer.setEditable(!layer.isEditable());
-              }
-              offset++;
-            }
-
             tree.repaint();
           }
         }
@@ -171,8 +149,10 @@ public class BaseLayerTreeNodeModel extends
   }
 
   @Override
-  public String toString() {
-    return name;
+  public boolean removeChild(final AbstractMultipleRenderer node,
+    final AbstractDataObjectLayerRenderer renderer) {
+    node.removeRenderer(renderer);
+    return true;
   }
 
 }

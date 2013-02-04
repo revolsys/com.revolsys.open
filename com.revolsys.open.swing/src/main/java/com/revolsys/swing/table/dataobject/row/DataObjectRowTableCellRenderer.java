@@ -30,11 +30,6 @@ public class DataObjectRowTableCellRenderer implements TableCellRenderer {
     valueComponent.setOpaque(true);
   }
 
-  public void setUiBuilderRegistry(
-    DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
-    this.uiBuilderRegistry = uiBuilderRegistry;
-  }
-
   @Override
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
@@ -83,5 +78,10 @@ public class DataObjectRowTableCellRenderer implements TableCellRenderer {
       component.setForeground(table.getForeground());
     }
     return component;
+  }
+
+  public void setUiBuilderRegistry(
+    final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
+    this.uiBuilderRegistry = uiBuilderRegistry;
   }
 }

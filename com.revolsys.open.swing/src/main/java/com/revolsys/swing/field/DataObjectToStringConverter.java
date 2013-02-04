@@ -13,26 +13,26 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class DataObjectToStringConverter extends ObjectToStringConverter {
 
-  private List<String> attributeNames;
+  private final List<String> attributeNames;
 
-  public DataObjectToStringConverter(List<String> attributeNames) {
+  public DataObjectToStringConverter(final List<String> attributeNames) {
     super();
     this.attributeNames = attributeNames;
   }
 
-  public DataObjectToStringConverter(String... attributeNames) {
+  public DataObjectToStringConverter(final String... attributeNames) {
     this(Arrays.asList(attributeNames));
   }
 
   @Override
-  public String getPreferredStringForItem(Object value) {
+  public String getPreferredStringForItem(final Object value) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return "";
     } else if (value instanceof DataObject) {
-      DataObject object = (DataObject)value;
-      List<String> values = new ArrayList<String>();
-      for (String attributeName : attributeNames) {
-        String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
+      final DataObject object = (DataObject)value;
+      final List<String> values = new ArrayList<String>();
+      for (final String attributeName : attributeNames) {
+        final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
           object, attributeName));
         values.add(text);
       }

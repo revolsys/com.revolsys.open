@@ -29,41 +29,27 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     this(null);
   }
 
-  public GeometryCoordinatesTableModel(Geometry geometry) {
+  public GeometryCoordinatesTableModel(final Geometry geometry) {
     setGeometry(geometry);
   }
 
   @Override
-  public Class<?> getColumnClass(int columnIndex) {
+  public Class<?> getColumnClass(final int columnIndex) {
     return Double.class;
   }
 
   @Override
-  public String getColumnName(int column) {
+  public int getColumnCount() {
+    return geometryFactory.getNumAxis();
+  }
+
+  @Override
+  public String getColumnName(final int column) {
     return AXIS_NAMES[column];
   }
 
-  public void setGeometry(Geometry geometry) {
-    this.geometry = geometry;
-    coordinatesList = new ArrayList<Coordinates>();
-    if (geometry == null) {
-      this.geometryFactory = GeometryFactory.getFactory();
-    } else {
-      this.geometryFactory = GeometryFactory.getFactory(geometry);
-      List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(geometry);
-      boolean first = true;
-      for (CoordinatesList points : pointsList) {
-        if (first) {
-          first = false;
-        } else {
-          coordinatesList.add(null);
-        }
-        for (Coordinates point : points) {
-          coordinatesList.add(point);
-        }
-      }
-    }
-    fireTableStructureChanged();
+  private Coordinates getCoordinates(final int rowIndex) {
+    return coordinatesList.get(rowIndex);
   }
 
   public Geometry getGeometry() {
@@ -76,13 +62,8 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   @Override
-  public int getColumnCount() {
-    return geometryFactory.getNumAxis();
-  }
-
-  @Override
-  public Object getValueAt(int rowIndex, int columnIndex) {
-    Coordinates coordinates = getCoordinates(rowIndex);
+  public Object getValueAt(final int rowIndex, final int columnIndex) {
+    final Coordinates coordinates = getCoordinates(rowIndex);
     if (coordinates == null) {
       return "-";
     } else {
@@ -90,8 +71,27 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     }
   }
 
-  private Coordinates getCoordinates(int rowIndex) {
-    return coordinatesList.get(rowIndex);
+  public void setGeometry(final Geometry geometry) {
+    this.geometry = geometry;
+    coordinatesList = new ArrayList<Coordinates>();
+    if (geometry == null) {
+      this.geometryFactory = GeometryFactory.getFactory();
+    } else {
+      this.geometryFactory = GeometryFactory.getFactory(geometry);
+      final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(geometry);
+      boolean first = true;
+      for (final CoordinatesList points : pointsList) {
+        if (first) {
+          first = false;
+        } else {
+          coordinatesList.add(null);
+        }
+        for (final Coordinates point : points) {
+          coordinatesList.add(point);
+        }
+      }
+    }
+    fireTableStructureChanged();
   }
 
 }

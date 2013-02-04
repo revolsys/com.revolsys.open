@@ -46,7 +46,7 @@ public class ResultPagerTableModel<T> extends AbstractTableModel {
     attributeNames = null;
     pager = null;
   }
- 
+
   @Override
   public int getColumnCount() {
     return attributeNames.size();

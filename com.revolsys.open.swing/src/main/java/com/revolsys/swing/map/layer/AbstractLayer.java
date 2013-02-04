@@ -36,9 +36,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean selectSupported = true;
 
-  private double maximumScale = 0;
+  private long maximumScale = Long.MAX_VALUE;
 
-  private double minimumScale = Double.MAX_VALUE;
+  private long minimumScale = 0;
 
   private boolean visible = true;
 
@@ -104,12 +104,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public double getMaximumScale() {
+  public long getMaximumScale() {
     return maximumScale;
   }
 
   @Override
-  public double getMinimumScale() {
+  public long getMinimumScale() {
     return minimumScale;
   }
 
@@ -190,10 +190,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isVisible(final double scale) {
     if (isVisible()) {
-      if ((long)scale <= getMinimumScale()) {
-        if ((long)scale >= getMaximumScale()) {
-          return true;
-        }
+      long longScale = (long)scale;
+      if (getMinimumScale() <= longScale && longScale <= getMaximumScale()) {
+        return true;
       }
     }
     return false;
@@ -252,12 +251,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setMaximumScale(final double maxScale) {
+  public void setMaximumScale(final long maxScale) {
     this.maximumScale = maxScale;
   }
 
   @Override
-  public void setMinimumScale(final double minScale) {
+  public void setMinimumScale(final long minScale) {
     this.minimumScale = minScale;
   }
 
@@ -280,11 +279,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setProperty(final String name, final Object value) {
-    //TODO see if we can get the JavaBeanUtil set property to work with conversions
+    // TODO see if we can get the JavaBeanUtil set property to work with
+    // conversions
     if (name.equals("minimumScale")) {
-      setMinimumScale(((Number)value).doubleValue());
+      setMinimumScale(((Number)value).longValue());
     } else if (name.equals("maximumScale")) {
-      setMaximumScale(((Number)value).doubleValue());
+      setMaximumScale(((Number)value).longValue());
     } else {
       final Object oldValue = getProperty(name);
       if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
@@ -294,9 +294,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
         super.setProperty(name, value);
         try {
-        JavaBeanUtil.setProperty(this , name, value);
-        } catch (Throwable e) {
-          LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name,e);
+          JavaBeanUtil.setProperty(this, name, value);
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Unable to set property:" + name, e);
         }
       }
     }

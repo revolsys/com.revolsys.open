@@ -11,18 +11,19 @@ import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
 public class CodeTableListCellRenderer extends DefaultListCellRenderer {
-  private CodeTable codeTable;
+  private final CodeTable codeTable;
 
-  public CodeTableListCellRenderer(CodeTable codeTable) {
+  public CodeTableListCellRenderer(final CodeTable codeTable) {
     this.codeTable = codeTable;
   }
 
-  public Component getListCellRendererComponent(JList list, Object value,
-    int index, boolean isSelected, boolean cellHasFocus) {
+  @Override
+  public Component getListCellRendererComponent(final JList list, Object value,
+    final int index, final boolean isSelected, final boolean cellHasFocus) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else {
-      List<Object> values = codeTable.getValues(value);
+      final List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {

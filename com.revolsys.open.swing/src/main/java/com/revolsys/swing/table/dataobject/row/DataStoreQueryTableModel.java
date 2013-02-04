@@ -27,10 +27,10 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
   SortableTableModel {
   private static final long serialVersionUID = 1L;
 
-  public static JPanel createPanel(DataObjectMetaData metaData) {
-    JTable table = createTable(metaData);
+  public static JPanel createPanel(final DataObjectMetaData metaData) {
+    final JTable table = createTable(metaData);
     final JScrollPane scrollPane = new JScrollPane(table);
-    JPanel panel = new JPanel(new BorderLayout());
+    final JPanel panel = new JPanel(new BorderLayout());
     panel.add(scrollPane, BorderLayout.CENTER);
     return panel;
   }
@@ -51,7 +51,12 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   private SwingWorker<?, ?> rowCountWorker;
 
-  private Map<Integer, DataObject> cache = new LruMap<Integer, DataObject>(100);
+  private final Map<Integer, DataObject> cache = new LruMap<Integer, DataObject>(
+    100);
+
+  private Integer rowCount;
+
+  private final Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
 
   public DataStoreQueryTableModel(final DataObjectMetaData metaData) {
     this(metaData.getDataObjectStore(), metaData);
@@ -64,89 +69,46 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     setEditable(false);
   }
 
+  public void createPager() {
+    final DataObjectMetaData metaData = getMetaData();
+    final Query query = new Query(metaData);
+    for (final Entry<Integer, SortOrder> entry : getSortedColumns().entrySet()) {
+      final Integer column = entry.getKey();
+      final String name = getAttributeName(column);
+      final SortOrder sortOrder = entry.getValue();
+      if (sortOrder == SortOrder.ASCENDING) {
+        query.addOrderBy(name, true);
+      } else if (sortOrder == SortOrder.DESCENDING) {
+        query.addOrderBy(name, false);
+      }
+    }
+    final ResultPager<DataObject> pager = dataStore.page(query);
+    pager.setPageSize(100);
+    synchronized (cache) {
+      if (this.pager != null) {
+        this.pager.close();
+      }
+      this.pager = pager;
+      cache.clear();
+      pagerWorker = null;
+    }
+    fireTableDataChanged();
+  }
+
+  private void createPagerWorker() {
+    pagerWorker = SwingWorkerManager.execute("Initialize Query "
+      + getTypeName(), this, "createPager");
+    rowCount = null;
+  }
+
   public DataObjectStore getDataStore() {
     return dataStore;
   }
 
-  private Integer rowCount;
-
   @Override
-  public int getRowCount() {
-    synchronized (cache) {
-      final ResultPager<DataObject> pager = getPager();
-      if (pager == null) {
-        return 0;
-      } else {
-        if (rowCount == null) {
-          if (rowCountWorker == null) {
-            rowCountWorker = SwingWorkerManager.execute("Load row count "
-              + getTypeName(), this, "loadRowCount");
-          }
-          return 0;
-        } else {
-          return rowCount;
-        }
-      }
-    }
-  }
-
-  public void loadRowCount() {
-    ResultPager<DataObject> pager = getPager();
-    if (pager != null) {
-      rowCount = pager.getNumResults();
-      rowCountWorker = null;
-      fireTableDataChanged();
-    }
-  }
-
-  public void loadRows() {
-    if (pager != null) {
-      while (!loadingRowIndexes.isEmpty()) {
-        int row = CollectionUtil.get(loadingRowIndexes,0);
-        if (row < getRowCount()) {
-          int pageNumber = (int)Math.ceil((row + 1) / (double)100);
-          if (pageNumber <= 0) {
-            pageNumber = 1;
-          }
-          pager.setPageNumber(pageNumber);
-          List<DataObject> list = pager.getList();
-          int i = pager.getStartIndex()-1;
-          synchronized (cache) {
-            for (DataObject result : list) {
-              cache.put(i, result);
-              loadingRowIndexes.remove(i);
-              fireTableRowsUpdated(i, i);
-              i++;
-            }
-          }
-        }
-      }
-    }
-    loadObjectsWorker = null;
-  }
-
-  @Override
-  public SortOrder setSortOrder(int column) {
-    synchronized (cache) {
-      if (pagerWorker != null) {
-        pagerWorker.cancel(true);
-        pagerWorker = null;
-      }
-      if (rowCountWorker != null) {
-        rowCountWorker.cancel(true);
-        rowCountWorker = null;
-      }
-    }
-    SortOrder sortOrder = super.setSortOrder(column);
-    createPagerWorker();
-    return sortOrder;
-  }
-
-  private Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
-
   public DataObject getObject(final int row) {
     synchronized (cache) {
-      DataObject object = cache.get(row);
+      final DataObject object = cache.get(row);
       if (object == null) {
         loadingRowIndexes.add(row);
         if (loadObjectsWorker == null) {
@@ -169,40 +131,80 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     }
   }
 
-  private void createPagerWorker() {
-    pagerWorker = SwingWorkerManager.execute("Initialize Query "
-      + getTypeName(), this, "createPager");
-    rowCount = null;
+  @Override
+  public int getRowCount() {
+    synchronized (cache) {
+      final ResultPager<DataObject> pager = getPager();
+      if (pager == null) {
+        return 0;
+      } else {
+        if (rowCount == null) {
+          if (rowCountWorker == null) {
+            rowCountWorker = SwingWorkerManager.execute("Load row count "
+              + getTypeName(), this, "loadRowCount");
+          }
+          return 0;
+        } else {
+          return rowCount;
+        }
+      }
+    }
   }
 
   public String getTypeName() {
     return getMetaData().getPath();
   }
 
-  public void createPager() {
-    DataObjectMetaData metaData = getMetaData();
-    final Query query = new Query(metaData);
-    for (Entry<Integer, SortOrder> entry : getSortedColumns().entrySet()) {
-      Integer column = entry.getKey();
-      String name = getAttributeName(column);
-      SortOrder sortOrder = entry.getValue();
-      if (sortOrder == SortOrder.ASCENDING) {
-        query.addOrderBy(name, true);
-      } else if (sortOrder == SortOrder.DESCENDING) {
-        query.addOrderBy(name, false);
+  public void loadRowCount() {
+    final ResultPager<DataObject> pager = getPager();
+    if (pager != null) {
+      rowCount = pager.getNumResults();
+      rowCountWorker = null;
+      fireTableDataChanged();
+    }
+  }
+
+  public void loadRows() {
+    if (pager != null) {
+      while (!loadingRowIndexes.isEmpty()) {
+        final int row = CollectionUtil.get(loadingRowIndexes, 0);
+        if (row < getRowCount()) {
+          int pageNumber = (int)Math.ceil((row + 1) / (double)100);
+          if (pageNumber <= 0) {
+            pageNumber = 1;
+          }
+          pager.setPageNumber(pageNumber);
+          final List<DataObject> list = pager.getList();
+          int i = pager.getStartIndex() - 1;
+          synchronized (cache) {
+            for (final DataObject result : list) {
+              cache.put(i, result);
+              loadingRowIndexes.remove(i);
+              fireTableRowsUpdated(i, i);
+              i++;
+            }
+          }
+        }
       }
     }
-    ResultPager<DataObject> pager = dataStore.page(query);
-    pager.setPageSize(100);
+    loadObjectsWorker = null;
+  }
+
+  @Override
+  public SortOrder setSortOrder(final int column) {
     synchronized (cache) {
-      if (this.pager != null) {
-        this.pager.close();
+      if (pagerWorker != null) {
+        pagerWorker.cancel(true);
+        pagerWorker = null;
       }
-      this.pager = pager;
-      cache.clear();
-      pagerWorker = null;
+      if (rowCountWorker != null) {
+        rowCountWorker.cancel(true);
+        rowCountWorker = null;
+      }
     }
-    fireTableDataChanged();
+    final SortOrder sortOrder = super.setSortOrder(column);
+    createPagerWorker();
+    return sortOrder;
   }
 
 }

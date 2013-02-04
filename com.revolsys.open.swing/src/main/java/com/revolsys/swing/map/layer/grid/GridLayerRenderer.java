@@ -16,19 +16,20 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class GridLayerRenderer implements LayerRenderer<GridLayer> {
+public class GridLayerRenderer extends  AbstractLayerRenderer<GridLayer> {
 
-  public GridLayerRenderer() {
+  public GridLayerRenderer(GridLayer layer) {
+    super("grid", layer);
   }
 
   @Override
-  public void render(final Viewport2D viewport, Graphics2D graphics,
+  public void render(final Viewport2D viewport, final Graphics2D graphics,
     final GridLayer layer) {
     final double scale = viewport.getScale();
     if (layer.isVisible(scale)) {
@@ -39,11 +40,12 @@ public class GridLayerRenderer implements LayerRenderer<GridLayer> {
       final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
       final Font font = graphics.getFont();
       for (final RectangularMapTile tile : tiles) {
-        Polygon polygon = tile.getPolygon(viewport.getGeometryFactory(), 50);
+        final Polygon polygon = tile.getPolygon(viewport.getGeometryFactory(),
+          50);
         graphics.setColor(Color.LIGHT_GRAY);
         graphics.setStroke(new BasicStroke(
           (float)viewport.getModelUnitsPerViewUnit()));
-        Shape shape = GeometryShapeUtil.toShape(viewport, polygon);
+        final Shape shape = GeometryShapeUtil.toShape(viewport, polygon);
         graphics.draw(shape);
 
         final Point centroid = polygon.getCentroid();

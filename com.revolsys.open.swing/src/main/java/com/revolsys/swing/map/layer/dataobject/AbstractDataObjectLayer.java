@@ -33,8 +33,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
   public AbstractDataObjectLayer() {
-    setGeometryFactory(GeometryFactory.getFactory(4326));
-    setRenderer(new GeometryStyleRenderer());
+    this("");
   }
 
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
@@ -43,16 +42,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public AbstractDataObjectLayer(final String name) {
-    super(name);
-    setReadOnly(false);
+    this(name,GeometryFactory.getFactory(4326));
+     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
-    setRenderer(new GeometryStyleRenderer());
+    setRenderer(new GeometryStyleRenderer(this));
   }
 
   public AbstractDataObjectLayer(final String name,
     final GeometryFactory geometryFactory) {
-    this(name);
+    super(name);
     setGeometryFactory(geometryFactory);
   }
 
@@ -164,6 +163,22 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public void setProperty(final String name, final Object value) {
+    if ("style".equals(name)) {
+      if (value instanceof Map) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> style = (Map<String, Object>)value;
+        final LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(this,style);
+        if (renderer != null) {
+          setRenderer(renderer);
+        }
+      }
+    } else {
+      super.setProperty(name, value);
+    }
+  }
+
+  @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
     super.setRenderer(renderer);
   }
@@ -178,21 +193,5 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       selectedObjects.removeAll(objects);
     }
     return objects.size();
-  }
-
-  @Override
-  public void setProperty(String name, Object value) {
-    if ("style".equals(name)) {
-      if (value instanceof Map) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> style = (Map<String, Object>)value;
-        LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(style);
-        if (renderer != null) {
-          setRenderer(renderer);
-        }
-      }
-    } else {
-      super.setProperty(name, value);
-    }
   }
 }

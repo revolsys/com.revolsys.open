@@ -37,7 +37,7 @@ public class DataObjectRowTable extends JTable implements MouseListener {
     tableHeader.setReorderingAllowed(false);
     tableHeader.setDefaultRenderer(headerRenderer);
 
-    List<TableColumn> removeColumns = new ArrayList<TableColumn>();
+    final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
     for (int i = 0; i < model.getColumnCount(); i++) {
       final TableColumn column = columnModel.getColumn(i);
@@ -65,11 +65,16 @@ public class DataObjectRowTable extends JTable implements MouseListener {
         column.setCellRenderer(cellRenderer);
       }
     }
-    for (TableColumn column : removeColumns) {
+    for (final TableColumn column : removeColumns) {
       removeColumn(column);
     }
     tableHeader.addMouseListener(this);
     model.addTableModelListener(this);
+  }
+
+  public DataObjectMetaData getMetaData() {
+    final DataObjectRowTableModel model = getModel();
+    return model.getMetaData();
   }
 
   @Override
@@ -77,15 +82,10 @@ public class DataObjectRowTable extends JTable implements MouseListener {
     return (DataObjectRowTableModel)super.getModel();
   }
 
-  public DataObjectMetaData getMetaData() {
-    DataObjectRowTableModel model = getModel();
-    return model.getMetaData();
-  }
-
   @Override
-  public void mouseClicked(MouseEvent e) {
+  public void mouseClicked(final MouseEvent e) {
     if (e.getSource() == getTableHeader()) {
-      DataObjectRowTableModel model = getModel();
+      final DataObjectRowTableModel model = getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());
       if (SwingUtilities.isLeftMouseButton(e)) {
@@ -98,23 +98,23 @@ public class DataObjectRowTable extends JTable implements MouseListener {
   }
 
   @Override
-  public void mousePressed(MouseEvent e) {
+  public void mouseEntered(final MouseEvent e) {
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) {
+  public void mouseExited(final MouseEvent e) {
   }
 
   @Override
-  public void mouseEntered(MouseEvent e) {
+  public void mousePressed(final MouseEvent e) {
   }
 
   @Override
-  public void mouseExited(MouseEvent e) {
+  public void mouseReleased(final MouseEvent e) {
   }
 
   @Override
-  public void tableChanged(TableModelEvent e) {
+  public void tableChanged(final TableModelEvent e) {
     super.tableChanged(e);
     if (tableHeader != null) {
       tableHeader.resizeAndRepaint();

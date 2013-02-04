@@ -21,6 +21,14 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
   List<DataObject> {
 
+  public static DataObjectMetaDataImpl createMetaData(final String name,
+    final GeometryFactory geometryFactory, final DataType geometryType) {
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
+    metaData.addAttribute("GEOMETRY", geometryType, true);
+    metaData.setGeometryFactory(geometryFactory);
+    return metaData;
+  }
+
   private DataObjectQuadTree index = new DataObjectQuadTree();
 
   private List<DataObject> objects = new ArrayList<DataObject>();
@@ -30,14 +38,14 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   public DataObjectListLayer(final DataObjectMetaData metaData,
-    final List<DataObject> objects) {
-    this(metaData);
-    addAllObjects(objects);
+    final DataObject... objects) {
+    this(metaData, Arrays.asList(objects));
   }
 
   public DataObjectListLayer(final DataObjectMetaData metaData,
-    final DataObject... objects) {
-    this(metaData, Arrays.asList(objects));
+    final List<DataObject> objects) {
+    this(metaData);
+    addAllObjects(objects);
   }
 
   public DataObjectListLayer(final String name,
@@ -48,25 +56,29 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     setMetaData(metaData);
   }
 
-  public static DataObjectMetaDataImpl createMetaData(final String name,
-    final GeometryFactory geometryFactory, final DataType geometryType) {
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
-    metaData.addAttribute("GEOMETRY", geometryType, true);
-    metaData.setGeometryFactory(geometryFactory);
-    return metaData;
+  @Override
+  public boolean add(final DataObject object) {
+    addObject(object);
+    return true;
   }
 
   @Override
-  public List<DataObject> getObjects(Geometry geometry, double distance) {
-    geometry = getGeometryFactory().createGeometry(geometry);
-    return index.queryDistance(geometry, distance);
+  public void add(final int index, final DataObject element) {
+    // TODO events
+    objects.add(index, element);
   }
 
-  public void addAllObjects(final Collection<? extends DataObject> objects) {
-    List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
-    addAllInternal(objects);
-    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
-      new ArrayList<DataObject>(this.objects));
+  @Override
+  public boolean addAll(final Collection<? extends DataObject> objects) {
+    addAllObjects(objects);
+    return true;
+  }
+
+  @Override
+  public boolean addAll(final int index,
+    final Collection<? extends DataObject> c) {
+    // TODO events
+    return objects.addAll(index, c);
   }
 
   private void addAllInternal(final Collection<? extends DataObject> objects) {
@@ -74,8 +86,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     index.insert(objects);
   }
 
+  public void addAllObjects(final Collection<? extends DataObject> objects) {
+    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+    addAllInternal(objects);
+    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
+      new ArrayList<DataObject>(this.objects));
+  }
+
   public void addObject(final DataObject object) {
-    List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
     addObjectInternal(object);
     getPropertyChangeSupport().firePropertyChange("objects", oldValue,
       new ArrayList<DataObject>(this.objects));
@@ -89,12 +108,18 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public void deleteObjects(List<DataObject> objects) {
-    List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
-    this.objects.removeAll(objects);
-    this.index.remove(objects);
-    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
-      new ArrayList<DataObject>(this.objects));
+  public void clear() {
+    deleteAll();
+  }
+
+  @Override
+  public boolean contains(final Object o) {
+    return objects.contains(o);
+  }
+
+  @Override
+  public boolean containsAll(final Collection<?> c) {
+    return objects.containsAll(c);
   }
 
   public void deleteAll() {
@@ -106,21 +131,123 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
+  public void deleteObjects(final List<DataObject> objects) {
+    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+    this.objects.removeAll(objects);
+    this.index.remove(objects);
+    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
+      new ArrayList<DataObject>(this.objects));
+  }
+
+  @Override
+  public DataObject get(final int index) {
+    return objects.get(index);
+  }
+
+  @Override
   public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
-    double width = boundingBox.getWidth();
-    double height = boundingBox.getHeight();
+    final double width = boundingBox.getWidth();
+    final double height = boundingBox.getHeight();
     if (boundingBox.isNull() || width == 0 || height == 0) {
       return Collections.emptyList();
     } else {
-      GeometryFactory geometryFactory = getGeometryFactory();
-      BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
       final List<DataObject> objects = index.query(convertedBoundingBox);
       return objects;
     }
   }
 
+  @Override
+  public DataObject getObject(final int index) {
+    return objects.get(index);
+  }
+
+  @Override
   public List<DataObject> getObjects() {
     return new ArrayList<DataObject>(objects);
+  }
+
+  @Override
+  public List<DataObject> getObjects(Geometry geometry, final double distance) {
+    geometry = getGeometryFactory().createGeometry(geometry);
+    return index.queryDistance(geometry, distance);
+  }
+
+  @Override
+  public int getRowCount() {
+    return objects.size();
+  }
+
+  @Override
+  public int indexOf(final Object o) {
+    return objects.indexOf(o);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return objects.isEmpty();
+  }
+
+  @Override
+  public Iterator<DataObject> iterator() {
+    return objects.iterator();
+  }
+
+  @Override
+  public int lastIndexOf(final Object o) {
+    return objects.lastIndexOf(o);
+  }
+
+  @Override
+  public ListIterator<DataObject> listIterator() {
+    return objects.listIterator();
+  }
+
+  @Override
+  public ListIterator<DataObject> listIterator(final int index) {
+    return objects.listIterator(index);
+  }
+
+  @Override
+  public DataObject remove(final int index) {
+    // TODO events
+    return objects.remove(index);
+  }
+
+  @Override
+  public boolean remove(final Object o) {
+    if (o instanceof DataObject) {
+      final DataObject object = (DataObject)o;
+      deleteObjects(object);
+    }
+    return true;
+  }
+
+  @Override
+  public boolean removeAll(final Collection<?> objects) {
+    final List<DataObject> dataObjects = new ArrayList<DataObject>();
+    for (final Object object : objects) {
+      if (object instanceof DataObject) {
+        final DataObject dataObject = (DataObject)object;
+        dataObjects.add(dataObject);
+      }
+
+    }
+    deleteObjects(dataObjects);
+    return true;
+  }
+
+  @Override
+  public boolean retainAll(final Collection<?> c) {
+    // TODO events
+    return objects.retainAll(c);
+  }
+
+  @Override
+  public DataObject set(final int index, final DataObject element) {
+    // TODO events
+    return objects.set(index, element);
   }
 
   public void setObjects(final Collection<DataObject> newObjects) {
@@ -136,32 +263,14 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     setObjects(Arrays.asList(objects));
   }
 
-  public int getRowCount() {
-    return objects.size();
-  }
-
-  public DataObject getObject(int index) {
-    return objects.get(index);
-  }
-
   @Override
   public int size() {
     return objects.size();
   }
 
   @Override
-  public boolean isEmpty() {
-    return objects.isEmpty();
-  }
-
-  @Override
-  public boolean contains(Object o) {
-    return objects.contains(o);
-  }
-
-  @Override
-  public Iterator<DataObject> iterator() {
-    return objects.iterator();
+  public List<DataObject> subList(final int fromIndex, final int toIndex) {
+    return objects.subList(fromIndex, toIndex);
   }
 
   @Override
@@ -170,112 +279,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public <T> T[] toArray(T[] a) {
+  public <T> T[] toArray(final T[] a) {
     return objects.toArray(a);
-  }
-
-  @Override
-  public boolean add(DataObject object) {
-    addObject(object);
-    return true;
-  }
-
-  @Override
-  public boolean remove(Object o) {
-    if (o instanceof DataObject) {
-      DataObject object = (DataObject)o;
-      deleteObjects(object);
-    }
-    return true;
-  }
-
-  @Override
-  public boolean containsAll(Collection<?> c) {
-    return objects.containsAll(c);
-  }
-
-  @Override
-  public boolean addAll(Collection<? extends DataObject> objects) {
-    addAllObjects(objects);
-    return true;
-  }
-
-  @Override
-  public boolean addAll(int index, Collection<? extends DataObject> c) {
-    // TODO events
-    return objects.addAll(index, c);
-  }
-
-  @Override
-  public boolean removeAll(Collection<?> objects) {
-    List<DataObject> dataObjects = new ArrayList<DataObject>();
-    for (Object object : objects) {
-      if (object instanceof DataObject) {
-        DataObject dataObject = (DataObject)object;
-        dataObjects.add(dataObject);
-      }
-
-    }
-    deleteObjects(dataObjects);
-    return true;
-  }
-
-  @Override
-  public boolean retainAll(Collection<?> c) {
-    // TODO events
-    return objects.retainAll(c);
-  }
-
-  @Override
-  public void clear() {
-    deleteAll();
-  }
-
-  @Override
-  public DataObject get(int index) {
-    return objects.get(index);
-  }
-
-  @Override
-  public DataObject set(int index, DataObject element) {
-    // TODO events
-    return objects.set(index, element);
-  }
-
-  @Override
-  public void add(int index, DataObject element) {
-    // TODO events
-    objects.add(index, element);
-  }
-
-  @Override
-  public DataObject remove(int index) {
-    // TODO events
-    return objects.remove(index);
-  }
-
-  @Override
-  public int indexOf(Object o) {
-    return objects.indexOf(o);
-  }
-
-  @Override
-  public int lastIndexOf(Object o) {
-    return objects.lastIndexOf(o);
-  }
-
-  @Override
-  public ListIterator<DataObject> listIterator() {
-    return objects.listIterator();
-  }
-
-  @Override
-  public ListIterator<DataObject> listIterator(int index) {
-    return objects.listIterator(index);
-  }
-
-  @Override
-  public List<DataObject> subList(int fromIndex, int toIndex) {
-    return objects.subList(fromIndex, toIndex);
   }
 }

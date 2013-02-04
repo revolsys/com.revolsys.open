@@ -2,39 +2,42 @@ package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
-public class ScaleMultipleRenderer extends AbstractDataObjectLayerRenderer {
+/**
+ * Use the first renderer which is visible at the current scale, ignore all others. Changes when the
+ * scale changes.
+ */
+public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
-  private final List<ScaleAndRenderer> scaleRenderers = new ArrayList<ScaleAndRenderer>();
-
-  private double lastScale = 0;
+  private long lastScale = 0;
 
   private AbstractDataObjectLayerRenderer renderer;
 
   @SuppressWarnings("unchecked")
-  public ScaleMultipleRenderer(Map<String, Object> defaults,
+  public ScaleMultipleRenderer(final DataObjectLayer layer, LayerRenderer<?> parent,
     final Map<String, Object> style) {
-    super(defaults, style);
-    List<Map<String, Object>> scales = (List<Map<String, Object>>)style.get("scales");
-    for (Map<String, Object> scaleStyle : scales) {
-      ScaleAndRenderer scaleAndRenderer = new ScaleAndRenderer(getDefaults(),
+    super("scaleStyle", layer, parent, style);
+    List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
+    final List<Map<String, Object>> scales = (List<Map<String, Object>>)style.get("scales");
+    for (final Map<String, Object> scaleStyle : scales) {
+      final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(layer,this,
         scaleStyle);
-      scaleRenderers.add(scaleAndRenderer);
+      renderers.add(renderer);
     }
+    setRenderers(renderers);
   }
 
-  private AbstractDataObjectLayerRenderer getRenderer(final double scale) {
+  private AbstractDataObjectLayerRenderer getRenderer(final long scale) {
     lastScale = scale;
-    for (final ScaleAndRenderer scaleAndRenderer : scaleRenderers) {
-      if (scaleAndRenderer.isVisible(scale)) {
-        System.out.println(scaleAndRenderer);
-        return scaleAndRenderer.getRenderer();
+    for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      if (renderer.isVisible(scale)) {
+        return renderer;
       }
     }
     return null;
@@ -43,28 +46,13 @@ public class ScaleMultipleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final DataObjectLayer layer) {
-    final double scale = viewport.getScale();
-    if (layer.isVisible(scale)) {
+    final long scale = (long)viewport.getScale();
       if (scale != lastScale) {
         renderer = getRenderer(scale);
       }
-      if (renderer != null) {
+      if (renderer != null && renderer.isVisible(scale)) {
         renderer.render(viewport, graphics, layer);
       }
-    }
   }
 
-  @Override
-  public Map<String, Object> toMap() {
-    Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("type", "scaleStyle");
-    Map<String, Object> defaults = getDefaults();
-    if (!defaults.isEmpty()) {
-      map.put("defaults", defaults);
-    }
-    if (!scaleRenderers.isEmpty()) {
-      map.put("scales"  , scaleRenderers);
-    }
-    return map;
-  }
 }

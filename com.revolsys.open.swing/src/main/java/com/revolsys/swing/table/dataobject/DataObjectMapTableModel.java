@@ -27,7 +27,7 @@ public class DataObjectMapTableModel extends AbstractDataObjectTableModel {
   @Override
   protected Object getValue(final int rowIndex) {
     final String name = getAttributeName(rowIndex);
-     return values.get(name);
+    return values.get(name);
   }
 
   public Map<String, ? extends Object> getValues() {

@@ -8,7 +8,7 @@ public enum LineJoin {
 
   private int awtValue;
 
-  private LineJoin(int awtValue) {
+  private LineJoin(final int awtValue) {
     this.awtValue = awtValue;
   }
 

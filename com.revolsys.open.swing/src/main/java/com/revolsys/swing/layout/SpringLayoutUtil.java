@@ -259,34 +259,6 @@ public class SpringLayoutUtil {
         lastCons.getConstraint(SpringLayout.EAST)));
   }
 
-  public static void singleColumn(final Container container,
-    final int initialY, final int yPad) {
-    Spring height = Spring.constant(initialY + yPad
-      * container.getComponentCount());
-    Spring width = Spring.constant(0);
-
-    final SpringLayout layout = (SpringLayout)container.getLayout();
-    Component previous = container;
-    for (Component component : container.getComponents()) {
-      Constraints constraints = layout.getConstraints(component);
-      width = Spring.max(width, constraints.getWidth());
-      height = Spring.sum(height, constraints.getHeight());
-      if (previous == container) {
-        layout.putConstraint(SpringLayout.NORTH, previous, initialY,
-          SpringLayout.NORTH, component);
-      } else {
-        layout.putConstraint(SpringLayout.SOUTH, previous, yPad,
-          SpringLayout.NORTH, component);
-      }
-
-      previous = component;
-    }
-
-    final Constraints containerConstraints = layout.getConstraints(container);
-    containerConstraints.setConstraint(SpringLayout.SOUTH, height);
-    containerConstraints.setConstraint(SpringLayout.EAST, width);
-  }
-
   public static void makeRows(final Container container, final int initialX,
     final int initialY, final int xPad, final int yPad,
     final int... componentsPerRow) {
@@ -332,6 +304,34 @@ public class SpringLayoutUtil {
     final Constraints containerConstraints = layout.getConstraints(container);
     containerConstraints.setWidth(Spring.sum(initialXSpring, width));
     containerConstraints.setHeight(Spring.sum(initialYSpring, y));
+  }
+
+  public static void singleColumn(final Container container,
+    final int initialY, final int yPad) {
+    Spring height = Spring.constant(initialY + yPad
+      * container.getComponentCount());
+    Spring width = Spring.constant(0);
+
+    final SpringLayout layout = (SpringLayout)container.getLayout();
+    Component previous = container;
+    for (final Component component : container.getComponents()) {
+      final Constraints constraints = layout.getConstraints(component);
+      width = Spring.max(width, constraints.getWidth());
+      height = Spring.sum(height, constraints.getHeight());
+      if (previous == container) {
+        layout.putConstraint(SpringLayout.NORTH, previous, initialY,
+          SpringLayout.NORTH, component);
+      } else {
+        layout.putConstraint(SpringLayout.SOUTH, previous, yPad,
+          SpringLayout.NORTH, component);
+      }
+
+      previous = component;
+    }
+
+    final Constraints containerConstraints = layout.getConstraints(container);
+    containerConstraints.setConstraint(SpringLayout.SOUTH, height);
+    containerConstraints.setConstraint(SpringLayout.EAST, width);
   }
 
 }

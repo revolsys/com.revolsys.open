@@ -22,7 +22,8 @@ public class InvokeMethodSelectedItemListener implements ItemListener {
     this.invokeLater = invokeLater;
   }
 
-  public InvokeMethodSelectedItemListener(final Object object, final String methodName) {
+  public InvokeMethodSelectedItemListener(final Object object,
+    final String methodName) {
     this(true, object, methodName);
   }
 

@@ -7,7 +7,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
 
-public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties {
+public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties, PropertyChangeListener {
   void addPropertyChangeListener(final PropertyChangeListener listener);
 
   void addPropertyChangeListener(final String propertyName,
@@ -23,9 +23,9 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
 
   LayerGroup getLayerGroup();
 
-  double getMaximumScale();
+  long getMaximumScale();
 
-  double getMinimumScale();
+  long getMinimumScale();
 
   String getName();
 
@@ -47,6 +47,8 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
 
   boolean isVisible();
 
+  boolean isVisible(double scale);
+
   void refresh();
 
   void remove();
@@ -66,15 +68,15 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
    * is inverse from the logical definition of maximum. If scale < maximumScale
    * it will not be shown.
    */
-  void setMaximumScale(double maximumScale);
+  void setMaximumScale(long maximumScale);
 
   /**
-  * Set the minimum scale. This is the scale that if you zoom out to a less
+   * Set the minimum scale. This is the scale that if you zoom out to a less
    * detailed scale than the minimum scale the layer will not be visible. This
    * is inverse from the logical definition of minimum. If scale > minimumScale
    * it will not be shown.
    */
-  void setMinimumScale(double minimumScale);
+  void setMinimumScale(long minimumScale);
 
   void setName(String name);
 
@@ -85,6 +87,4 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);
-
-  boolean isVisible(double scale);
 }

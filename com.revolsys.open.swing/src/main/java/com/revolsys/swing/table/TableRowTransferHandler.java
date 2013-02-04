@@ -19,28 +19,16 @@ public class TableRowTransferHandler extends TransferHandler {
   private final DataFlavor localObjectFlavor = new DataFlavor(Integer.class,
     "Integer Row Index");
 
- private  String mimeType = localObjectFlavor.getMimeType();
+  private final String mimeType = localObjectFlavor.getMimeType();
 
-  private JTable table;
+  private final JTable table;
 
-  public TableRowTransferHandler(JTable table) {
+  public TableRowTransferHandler(final JTable table) {
     this.table = table;
   }
 
   @Override
-  protected Transferable createTransferable(JComponent c) {
-    assert (c == table);
-    int selectedRow = table.getSelectedRow();
-    if (c == table) {
-
-      return new DataHandler(selectedRow, mimeType);
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public boolean canImport(TransferHandler.TransferSupport info) {
+  public boolean canImport(final TransferHandler.TransferSupport info) {
     if (info.getComponent() == table) {
       if (info.isDrop()) {
         if (info.isDataFlavorSupported(localObjectFlavor)) {
@@ -54,24 +42,44 @@ public class TableRowTransferHandler extends TransferHandler {
   }
 
   @Override
-  public int getSourceActions(JComponent c) {
+  protected Transferable createTransferable(final JComponent c) {
+    assert (c == table);
+    final int selectedRow = table.getSelectedRow();
+    if (c == table) {
+
+      return new DataHandler(selectedRow, mimeType);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  protected void exportDone(final JComponent c, final Transferable t,
+    final int action) {
+    if (action == TransferHandler.MOVE) {
+      table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+  }
+
+  @Override
+  public int getSourceActions(final JComponent c) {
     return TransferHandler.COPY_OR_MOVE;
   }
 
   @Override
-  public boolean importData(TransferHandler.TransferSupport info) {
-    JTable target = (JTable)info.getComponent();
-    JTable.DropLocation dropLocation = (JTable.DropLocation)info.getDropLocation();
+  public boolean importData(final TransferHandler.TransferSupport info) {
+    final JTable target = (JTable)info.getComponent();
+    final JTable.DropLocation dropLocation = (JTable.DropLocation)info.getDropLocation();
     int index = dropLocation.getRow();
-    TableModel model = table.getModel();
-    int max = model.getRowCount();
+    final TableModel model = table.getModel();
+    final int max = model.getRowCount();
     if (index < 0 || index > max) {
       index = max;
     }
     target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     try {
-      Transferable transferable = info.getTransferable();
-      Integer rowFrom = (Integer)transferable.getTransferData(localObjectFlavor);
+      final Transferable transferable = info.getTransferable();
+      final Integer rowFrom = (Integer)transferable.getTransferData(localObjectFlavor);
       if (rowFrom != -1 && rowFrom != index) {
         ((Reorderable)model).reorder(rowFrom, index);
         if (index > rowFrom) {
@@ -80,17 +88,10 @@ public class TableRowTransferHandler extends TransferHandler {
         target.getSelectionModel().addSelectionInterval(index, index);
         return true;
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return false;
-  }
-
-  @Override
-  protected void exportDone(JComponent c, Transferable t, int action) {
-    if (action == TransferHandler.MOVE) {
-      table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-    }
   }
 
 }

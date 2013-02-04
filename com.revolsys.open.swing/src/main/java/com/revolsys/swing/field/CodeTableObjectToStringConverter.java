@@ -9,18 +9,18 @@ import com.revolsys.util.CollectionUtil;
 
 public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
 
-  private CodeTable codeTable;
+  private final CodeTable codeTable;
 
-  public CodeTableObjectToStringConverter(CodeTable codeTable) {
+  public CodeTableObjectToStringConverter(final CodeTable codeTable) {
     this.codeTable = codeTable;
   }
 
   @Override
-  public String getPreferredStringForItem(Object value) {
+  public String getPreferredStringForItem(final Object value) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return null;
     } else {
-      List<Object> values = codeTable.getValues(value);
+      final List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         return null;
       } else {
