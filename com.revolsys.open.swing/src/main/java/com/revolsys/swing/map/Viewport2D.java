@@ -375,4 +375,11 @@ public class Viewport2D {
     final double viewY = coordinates[1];
     return new Point2D.Double(viewX, viewY);
   }
+
+  public Point2D toViewPoint(double x, double y) {
+    final double[] coordinates = toViewCoordinates(x, y);
+    final double viewX = coordinates[0];
+    final double viewY = coordinates[1];
+    return new Point2D.Double(viewX, viewY);
+  }
 }
