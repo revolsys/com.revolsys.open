@@ -103,6 +103,8 @@ public class MarkerStyle {
         final String propertyName = markerStyleProperty.getPropertyName();
         value = StringConverterRegistry.toObject(dataType, value);
         JavaBeanUtil.setProperty(this, propertyName, value);
+      } else if (label.startsWith("marker")){
+        System.out.println(label);
       }
     }
   }

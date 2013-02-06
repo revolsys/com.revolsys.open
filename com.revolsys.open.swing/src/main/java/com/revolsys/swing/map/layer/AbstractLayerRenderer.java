@@ -71,6 +71,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     if (maximumScale != null) {
       this.maximumScale = maximumScale.doubleValue();
     }
+    final Boolean visible = getValue(style, "visible");
+    if (visible != null) {
+      this.visible = visible;
+    }
     setName((String)style.get("name"));
   }
 

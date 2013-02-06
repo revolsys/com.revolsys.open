@@ -26,6 +26,15 @@ public abstract class AbstractMultipleRenderer extends
     final DataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     super(type, layer, parent, style);
+    @SuppressWarnings("unchecked")
+    final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
+    List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
+     for (final Map<String, Object> childStyle : styles) {
+      final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
+        layer, this, childStyle);
+      renderers.add(renderer);
+    }
+     setRenderers(renderers);
   }
 
   public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {

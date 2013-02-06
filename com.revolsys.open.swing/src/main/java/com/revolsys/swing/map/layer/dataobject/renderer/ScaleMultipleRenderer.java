@@ -1,10 +1,10 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -20,51 +20,57 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   private AbstractDataObjectLayerRenderer renderer;
 
-  @SuppressWarnings("unchecked")
   public ScaleMultipleRenderer(final DataObjectLayer layer,
     LayerRenderer<?> parent, final Map<String, Object> style) {
     super("scaleStyle", layer, parent, style);
-    List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
-    final List<Map<String, Object>> scales = (List<Map<String, Object>>)style.get("scales");
-    for (final Map<String, Object> scaleStyle : scales) {
-      final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
-        layer, this, scaleStyle);
-      renderers.add(renderer);
-    }
-    setRenderers(renderers);
   }
 
-  private AbstractDataObjectLayerRenderer getRenderer(final long scale) {
-    lastScale = scale;
-    for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+  private AbstractDataObjectLayerRenderer getRenderer(Viewport2D viewport) {
+    final long scale = (long)viewport.getScale();
+    if (scale == lastScale) {
       if (renderer.isVisible(scale)) {
         return renderer;
+      } else {
+        return null;
       }
+    } else {
+      lastScale = scale;
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        if (renderer.isVisible(scale)) {
+          return renderer;
+        }
+      }
+      return null;
     }
-    return null;
   }
 
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final DataObjectLayer layer) {
-    final long scale = (long)viewport.getScale();
-    if (scale != lastScale) {
-      renderer = getRenderer(scale);
-    }
-    if (renderer != null && renderer.isVisible(scale)) {
+    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    if (renderer != null) {
       renderer.render(viewport, graphics, layer);
     }
   }
 
   @Override
+  // NOTE: Needed for multiple styles
   protected void renderObjects(Viewport2D viewport, Graphics2D graphics,
     DataObjectLayer layer, List<DataObject> dataObjects) {
-    final long scale = (long)viewport.getScale();
-    if (scale != lastScale) {
-      renderer = getRenderer(scale);
-    }
-    if (renderer != null && renderer.isVisible(scale)) {
+    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    if (renderer != null) {
       renderer.renderObjects(viewport, graphics, layer, dataObjects);
+    }
+  }
+
+ 
+  @Override
+  // NOTE: Needed for filter styles
+  protected void renderObject(Viewport2D viewport, Graphics2D graphics,
+    BoundingBox visibleArea, DataObjectLayer layer, DataObject dataObject) {
+    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    if (renderer != null) {
+      super.renderObject(viewport, graphics, visibleArea, layer, dataObject);
     }
   }
 }

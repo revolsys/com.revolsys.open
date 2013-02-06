@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.dataobject.style;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -29,6 +28,34 @@ public class ShapeMarker implements Marker {
     SHAPES.put("cross", cross(1));
     SHAPES.put("x", x(1));
     SHAPES.put("arrow", arrow(1));
+    SHAPES.put("solidArrow", solidArrow(1));
+  }
+
+  /**
+   * Get an arrow shape pointing right for the size of the graphic.
+   * 
+   * @return The shape.
+   */
+  public static Shape arrow(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, size);
+    path.lineTo(size, size * .5);
+    path.lineTo(0, 0);
+    return path;
+  }
+
+  /**
+   * Get a solid arrow shape pointing right for the size of the graphic.
+   * 
+   * @return The shape.
+   */
+  public static Shape solidArrow(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, size);
+    path.lineTo(size, size * .5);
+    path.lineTo(0, 0);
+    path.closePath();
+    return path;
   }
 
   public static Shape circle(final double size) {
@@ -105,19 +132,6 @@ public class ShapeMarker implements Marker {
     return path;
   }
 
-  /**
-   * Get an arrow shape pointing right for the size of the graphic.
-   * 
-   * @return The shape.
-   */
-  public static Shape arrow(final double size) {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(0, size);
-    path.lineTo(size, size * .5);
-    path.lineTo(0, 0);
-    return path;
-  }
-
   private Shape shape;
 
   public ShapeMarker(final Shape shape) {
@@ -149,9 +163,8 @@ public class ShapeMarker implements Marker {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY,
-    double orientation) {
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-      RenderingHints.VALUE_ANTIALIAS_ON);
+    final double orientation) {
+
     final AffineTransform savedTransform = graphics.getTransform();
     final Measure<Length> markerWidth = style.getMarkerWidth();
     final double mapWidth = viewport.toDisplayValue(markerWidth);
@@ -165,24 +178,26 @@ public class ShapeMarker implements Marker {
 
     final Measure<Length> deltaX = style.getMarkerDeltaX();
     final Measure<Length> deltaY = style.getMarkerDeltaY();
-    graphics.translate(viewport.toDisplayValue(deltaX),
-      viewport.toDisplayValue(deltaY));
+    double dx = viewport.toDisplayValue(deltaX);
+    double dy = viewport.toDisplayValue(deltaY);
 
     final String verticalAlignment = style.getMarkerVerticalAlignment();
     if ("top".equals(verticalAlignment)) {
-      graphics.translate(0, -mapHeight);
+      dy -= mapHeight;
     } else if ("middle".equals(verticalAlignment)) {
-      graphics.translate(0, -mapHeight / 2);
+      dy -= mapHeight / 2;
     }
     final String horizontalAlignment = style.getMarkerHorizontalAlignment();
     if ("right".equals(horizontalAlignment)) {
-      graphics.translate(-mapWidth, 0);
+      dx -= mapWidth;
     } else if ("center".equals(horizontalAlignment)) {
-      graphics.translate(-mapWidth / 2, 0);
+      dx -= mapWidth/2;
     }
 
-    AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth,
-      mapHeight);
+    graphics.translate(dx, dy);
+
+    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
+      mapWidth, mapHeight);
     final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
     if (style.setMarkerFillStyle(viewport, graphics)) {
       graphics.fill(newShape);
