@@ -23,10 +23,12 @@ public class ShapeMarker implements Marker {
   static {
     SHAPES.put("square", square(1));
     SHAPES.put("circle", circle(1));
+    SHAPES.put("ellipse", circle(1));
     SHAPES.put("triangle", triangle(1));
     SHAPES.put("star", star(1));
     SHAPES.put("cross", cross(1));
     SHAPES.put("x", x(1));
+    SHAPES.put("arrow", arrow(1));
   }
 
   public static Shape circle(final double size) {
@@ -103,6 +105,19 @@ public class ShapeMarker implements Marker {
     return path;
   }
 
+  /**
+   * Get an arrow shape pointing right for the size of the graphic.
+   * 
+   * @return The shape.
+   */
+  public static Shape arrow(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, size);
+    path.lineTo(size, size * .5);
+    path.lineTo(0, 0);
+    return path;
+  }
+
   private Shape shape;
 
   public ShapeMarker(final Shape shape) {
@@ -133,7 +148,8 @@ public class ShapeMarker implements Marker {
 
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final GeometryStyle style, final double modelX, final double modelY) {
+    final MarkerStyle style, final double modelX, final double modelY,
+    double orientation) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
     final AffineTransform savedTransform = graphics.getTransform();
@@ -141,24 +157,39 @@ public class ShapeMarker implements Marker {
     final double mapWidth = viewport.toDisplayValue(markerWidth);
     final Measure<Length> markerHeight = style.getMarkerHeight();
     final double mapHeight = viewport.toDisplayValue(markerHeight);
-    double x = modelX;
-    double y = modelY;
-    final Measure<Length> deltaX = style.getMarkerDx();
-    x += viewport.toDisplayValue(deltaX);
-    final Measure<Length> deltaY = style.getMarkerDx();
-    y += viewport.toDisplayValue(deltaY);
-    // final double rotation = graphic.getRotation().doubleValue(SI.RADIAN);
-    // if (rotation != 0) {
-    // graphics.rotate(rotation, x, y);
-    // }
-    graphics.translate(x, y);
-    final Shape newShape = new GeneralPath(shape).createTransformedShape(AffineTransform.getScaleInstance(
-      mapWidth, mapHeight));
-    style.setFillStyle(viewport, graphics);
-    graphics.fill(newShape);
-    style.setLineStyle(viewport, graphics);
-    graphics.draw(newShape);
+
+    graphics.translate(modelX, modelY);
+    if (orientation != 0) {
+      graphics.rotate(Math.toRadians(orientation));
+    }
+
+    final Measure<Length> deltaX = style.getMarkerDeltaX();
+    final Measure<Length> deltaY = style.getMarkerDeltaY();
+    graphics.translate(viewport.toDisplayValue(deltaX),
+      viewport.toDisplayValue(deltaY));
+
+    final String verticalAlignment = style.getMarkerVerticalAlignment();
+    if ("top".equals(verticalAlignment)) {
+      graphics.translate(0, -mapHeight);
+    } else if ("middle".equals(verticalAlignment)) {
+      graphics.translate(0, -mapHeight / 2);
+    }
+    final String horizontalAlignment = style.getMarkerHorizontalAlignment();
+    if ("right".equals(horizontalAlignment)) {
+      graphics.translate(-mapWidth, 0);
+    } else if ("center".equals(horizontalAlignment)) {
+      graphics.translate(-mapWidth / 2, 0);
+    }
+
+    AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth,
+      mapHeight);
+    final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
+    if (style.setMarkerFillStyle(viewport, graphics)) {
+      graphics.fill(newShape);
+    }
+    if (style.setMarkerLineStyle(viewport, graphics)) {
+      graphics.draw(newShape);
+    }
     graphics.setTransform(savedTransform);
   }
-
 }

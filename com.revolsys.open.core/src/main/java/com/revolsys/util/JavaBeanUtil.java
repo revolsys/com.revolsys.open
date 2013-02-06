@@ -30,6 +30,7 @@ import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
@@ -354,7 +355,7 @@ public final class JavaBeanUtil {
     final String propertyName, final Object value) {
     if (object != null) {
       try {
-        PropertyUtils.setProperty(object, propertyName, value);
+        BeanUtils.setProperty(object, propertyName, value);
       } catch (final IllegalAccessException e) {
         throw new RuntimeException("Unable to set property " + propertyName, e);
       } catch (final InvocationTargetException e) {
@@ -367,9 +368,6 @@ public final class JavaBeanUtil {
           throw new RuntimeException("Unable to set property " + propertyName,
             e);
         }
-      } catch (final NoSuchMethodException e) {
-        LOG.debug("Property " + propertyName + " does not exist on "
-          + object.getClass().getName(), e);
       }
     }
   }

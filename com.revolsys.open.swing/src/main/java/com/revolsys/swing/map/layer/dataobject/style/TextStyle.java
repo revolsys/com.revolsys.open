@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -48,9 +50,9 @@ public class TextStyle {
     }
   }
 
-  private String textFaceName = Font.SANS_SERIF;
+  private String textFaceName = "Arial";
 
-  private Measure<Length> textSize = GeometryStyle.TEN_PIXELS;
+  private Measure<Length> textSizeMeasure = GeometryStyle.TEN_PIXELS;
 
   private String textAlign = "auto";
 
@@ -143,8 +145,8 @@ public class TextStyle {
     return textPlacementType;
   }
 
-  public Measure<Length> getTextSize() {
-    return textSize;
+  public Measure<Length> getTextSizeMeasure() {
+    return textSizeMeasure;
   }
 
   public String getTextVerticalAlignment() {
@@ -205,24 +207,32 @@ public class TextStyle {
   }
 
   public void setTextSize(final double textSize) {
-    setTextSize(Measure.valueOf(textSize, NonSI.PIXEL));
+    setTextSizeMeasure(Measure.valueOf(textSize, NonSI.PIXEL));
   }
 
-  public void setTextSize(final Measure<Length> textSize) {
-    this.textSize = GeometryStyle.getWithDefault(textSize,
+  public void setTextSizeMeasure(final Measure<Length> textSize) {
+    this.textSizeMeasure = GeometryStyle.getWithDefault(textSize,
       GeometryStyle.TEN_PIXELS);
   }
 
-  public void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    final int style = 0;
-    // if (textStyle.getFontWeight() == FontWeight.BOLD) {
-    // style += Font.BOLD;
-    // }
-    // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
-    // style += Font.ITALIC;
-    // }
-    final double fontSize = viewport.toDisplayValue(textSize);
-    final Font font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
+  private long lastScale = 0;
+
+  private Font font;
+
+  public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
+    long scale = (long)viewport.getScale();
+    if (font == null || lastScale != scale) {
+      lastScale = scale;
+      final int style = 0;
+      // if (textStyle.getFontWeight() == FontWeight.BOLD) {
+      // style += Font.BOLD;
+      // }
+      // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
+      // style += Font.ITALIC;
+      // }
+      final double fontSize = viewport.toDisplayValue(textSizeMeasure);
+      font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
+    }
     graphics.setFont(font);
   }
 

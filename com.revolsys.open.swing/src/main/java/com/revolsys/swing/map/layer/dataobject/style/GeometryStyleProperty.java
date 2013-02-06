@@ -72,46 +72,7 @@ public enum GeometryStyleProperty {
   line_rasterizer("line-rasterizer"),
   /** */
   line_comp_op("line-comp-op"),
-  /** */
-  markers("markers"),
-  /** */
-  marker_file("marker-file"),
-  /** */
-  marker_opacity("marker-opacity"),
-  /** */
-  marker_fill_opacity("marker-fill-opacity"),
-  /** */
-  marker_line_color("marker-line-color", DataTypes.COLOR),
-  /** */
-  marker_line_width("marker-line-width", DataTypes.DOUBLE),
-  /** */
-  marker_line_opacity("marker-line-opacity"),
-  /** */
-  marker_placement("marker-placement"),
-  /** */
-  marker_type("marker-type"),
-  /** */
-  marker_width("marker-width", DataTypes.DOUBLE),
-  /** */
-  marker_height("marker-height", DataTypes.DOUBLE),
-  /** */
-  marker_fill("marker-fill", DataTypes.COLOR),
-  /** */
-  marker_allow_overlap("marker-allow-overlap"),
-  /** */
-  marker_ignore_placement("marker-ignore-placement"),
-  /** */
-  marker_spacing("marker-spacing"),
-  /** */
-  marker_max_error("marker-max-error"),
-  /** */
-  marker_transform("marker-transform"),
-  /** */
-  marker_clip("marker-clip"),
-  /** */
-  marker_smooth("marker-smooth"),
-  /** */
-  marker_comp_op("marker-comp-op"),
+
   /** */
   shield("shield"),
   /** */

@@ -27,6 +27,8 @@ public abstract class AbstractDataObjectLayerRenderer extends  AbstractLayerRend
       return new GeometryStyleRenderer(layer,parent, style);
     } else if ("textStyle".equals(type)) {
       return new TextStyleRenderer(layer,parent, style);
+    } else if ("markerStyle".equals(type)) {
+      return new MarkerStyleRenderer(layer,parent, style);
     } else if ("multipleStyle".equals(type)) {
       return new MultipleRenderer(layer,parent, style);
     } else if ("scaleStyle".equals(type)) {

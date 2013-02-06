@@ -15,28 +15,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
-public class GeometryStyle {
-
-  public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10,
-    NonSI.PIXEL);
-
-  public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0,
-    NonSI.PIXEL);
-
-  public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1,
-    NonSI.PIXEL);
-
-  public static Color getColorWithOpacity(final Color color, final int opacity) {
-    return new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
-  }
-
-  public static <T> T getWithDefault(final T value, final T defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return value;
-    }
-  }
+public class GeometryStyle extends MarkerStyle {
 
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();
@@ -48,20 +27,6 @@ public class GeometryStyle {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
     style.setLineWidth(width);
-    return style;
-  }
-
-  public static GeometryStyle marker(final String markerName,
-    final int markerSize, final Color lineColor, final int lineWidth,
-    final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setMarker(new ShapeMarker(markerName));
-    style.setMarkerWidth(markerSize);
-    style.setMarkerHeight(markerSize);
-    style.setMarkerDy(-markerSize / 2);
-    style.setMarkerDy(-markerSize / 2);
-    style.setLineColor(lineColor);
-    style.setPolygonFill(fillColor);
     return style;
   }
 
@@ -82,63 +47,54 @@ public class GeometryStyle {
     return style;
   }
 
-  private Measure<Length> markerWidth = TEN_PIXELS;
-
-  private Measure<Length> markerHeight = TEN_PIXELS;
-
-  private Measure<Length> markerDx = ZERO_PIXEL;
-
-  private Measure<Length> markerDy = ZERO_PIXEL;
-
-  private Marker marker = new ShapeMarker("square");
+  private LineCap lineCap = LineCap.BUTT;
 
   private boolean lineClip = true;
 
-  private double lineSmooth;
+  private Color lineColor = new Color(128, 128, 128, 255);
+
+  private CompositionOperation lineCompositionOperation = CompositionOperation.src_over;
 
   private double lineGamma = 1.0;
 
   private GammaMethod lineGammaMethod = GammaMethod.power;
 
-  private CompositionOperation lineCompositionOperation = CompositionOperation.src_over;
+  private LineJoin lineJoin = LineJoin.MITER;
+
+  private float lineMiterlimit = 4;
+
+  private int lineOpacity = 255;
+
+  private double lineSmooth;
+
+  private Measure<Length> lineWidth = ONE_PIXEL;
 
   private boolean polygonClip = true;
-
-  private double polygonSmooth;
-
-  private double polygonGamma = 1.0;
-
-  private GammaMethod polygonGammaMethod = GammaMethod.power;
 
   private CompositionOperation polygonCompositionOperation = CompositionOperation.src_over;
 
   private Color polygonFill = new Color(128, 128, 128, 255);
 
-  private int lineOpacity = 255;
-
-  private Color lineColor = new Color(128, 128, 128, 255);
-
   private int polygonFillOpacity = 255;
 
-  private Measure<Length> lineWidth = ONE_PIXEL;
+  private double polygonGamma = 1.0;
 
-  private float lineMiterlimit = 4;
+  private GammaMethod polygonGammaMethod = GammaMethod.power;
 
-  private LineCap lineCap = LineCap.BUTT;
-
-  private LineJoin lineJoin = LineJoin.MITER;
+  private double polygonSmooth;
 
   public GeometryStyle() {
   }
 
   public GeometryStyle(final Map<String, Object> style) {
+    super(style);
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String label = entry.getKey();
       Object value = entry.getValue();
-      final GeometryStyleProperty property = GeometryStyleProperty.getProperty(label);
-      if (property != null) {
-        final DataType dataType = property.getDataType();
-        final String propertyName = property.getPropertyName();
+      final GeometryStyleProperty geometryStyleProperty = GeometryStyleProperty.getProperty(label);
+      if (geometryStyleProperty != null) {
+        final DataType dataType = geometryStyleProperty.getDataType();
+        final String propertyName = geometryStyleProperty.getPropertyName();
         value = StringConverterRegistry.toObject(dataType, value);
         JavaBeanUtil.setProperty(this, propertyName, value);
       }
@@ -183,26 +139,6 @@ public class GeometryStyle {
 
   public double getLineWidth() {
     return lineWidth.doubleValue(NonSI.PIXEL);
-  }
-
-  public Marker getMarker() {
-    return marker;
-  }
-
-  public Measure<Length> getMarkerDx() {
-    return markerDx;
-  }
-
-  public Measure<Length> getMarkerDy() {
-    return markerDy;
-  }
-
-  public Measure<Length> getMarkerHeight() {
-    return markerHeight;
-  }
-
-  public Measure<Length> getMarkerWidth() {
-    return markerWidth;
   }
 
   public CompositionOperation getPolygonCompositionOperation() {
@@ -365,42 +301,6 @@ public class GeometryStyle {
 
   public void setLineWidth(final Measure<Length> lineWidth) {
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
-  }
-
-  public void setMarker(final Marker marker) {
-    this.marker = marker;
-  }
-
-  public void setMarkerDx(final double markerDx) {
-    setMarkerDeltaX(Measure.valueOf(markerDx, NonSI.PIXEL));
-  }
-
-  public void setMarkerDy(final double markerDy) {
-    setMarkerDeltaY(Measure.valueOf(markerDy, NonSI.PIXEL));
-  }
-
-  public void setMarkerDeltaX(final Measure<Length> markerDx) {
-    this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
-  }
-
-  public void setMarkerDeltaY(final Measure<Length> markerDy) {
-    this.markerDy = getWithDefault(markerDy, ZERO_PIXEL);
-  }
-
-  public void setMarkerHeight(final double markerHeight) {
-    setMarkerHeight(Measure.valueOf(markerHeight, NonSI.PIXEL));
-  }
-
-  public void setMarkerHeight(final Measure<Length> markerHeight) {
-    this.markerHeight = getWithDefault(markerHeight, TEN_PIXELS);
-  }
-
-  public void setMarkerWidth(final double markerWidth) {
-    setMarkerWidth(Measure.valueOf(markerWidth, NonSI.PIXEL));
-  }
-
-  public void setMarkerWidth(final Measure<Length> markerWidth) {
-    this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
   }
 
   public void setPolygonClip(final boolean polygonClip) {
