@@ -39,6 +39,8 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
@@ -135,8 +137,15 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
               currentLength += segmentLength;
             }
           }
-        } else {
-          point = ProjectionFactory.convert(CoordinatesUtil.get(geometry),
+        } else {  
+         if (geometry instanceof Point) {
+          point = CoordinatesUtil.get((Point)geometry);
+         } else if (geometry instanceof LineString) {
+           point = CoordinatesUtil.get((LineString)geometry);
+         } else if (geometry instanceof Polygon) {
+           point = CoordinatesUtil.get(geometry.getCentroid());
+        }
+          point = ProjectionFactory.convert(point,
             geometryFactory, viewportGeometryFactory);
         }
 

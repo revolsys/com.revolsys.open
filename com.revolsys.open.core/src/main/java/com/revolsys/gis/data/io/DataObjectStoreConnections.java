@@ -79,7 +79,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
           LOG.error("No URL set for " + connectionName);
           preferences.removeNode();
         } else {
-          dataStore = DelegatingDataObjectStore.create(connectionName, config);
+          dataStore = DelegatingDataObjectStoreHandler.create(connectionName, config);
           dataStores.put(connectionName, dataStore);
         }
       } catch (final Throwable t) {

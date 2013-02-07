@@ -56,10 +56,15 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   // NOTE: Needed for multiple styles
   protected void renderObjects(Viewport2D viewport, Graphics2D graphics,
-    DataObjectLayer layer, List<DataObject> dataObjects) {
-    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    DataObjectLayer layer, List<DataObject> objects) {
+    BoundingBox visibleArea = viewport.getBoundingBox();
+        AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      renderer.renderObjects(viewport, graphics, layer, dataObjects);
+      for (DataObject object : objects) {
+        if (isVisible(object)) {
+          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+        }
+      }
     }
   }
 
@@ -67,10 +72,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   // NOTE: Needed for filter styles
   protected void renderObject(Viewport2D viewport, Graphics2D graphics,
-    BoundingBox visibleArea, DataObjectLayer layer, DataObject dataObject) {
+    BoundingBox visibleArea, DataObjectLayer layer, DataObject object) {
     AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      super.renderObject(viewport, graphics, visibleArea, layer, dataObject);
+      if (isVisible(object)) {
+        renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+      }
     }
   }
 }

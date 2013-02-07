@@ -77,8 +77,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   @Override
-  public CodeTableProperty cloneCoordinates() {
+  public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
+    clone.metaData = null;
     clone.attributeAliases = new ArrayList<String>(attributeAliases);
     clone.valueAttributeNames = new ArrayList<String>(valueAttributeNames);
     return clone;

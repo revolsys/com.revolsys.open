@@ -36,7 +36,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     this.factory = factory;
     this.in = new BufferedReader(new InputStreamReader(
       resource.getInputStream()));
-    this.metaData = DataObjectUtil.GEOMETRY_META_DATA.cloneCoordinates();
+    this.metaData = DataObjectUtil.GEOMETRY_META_DATA.clone();
   }
 
   @Override

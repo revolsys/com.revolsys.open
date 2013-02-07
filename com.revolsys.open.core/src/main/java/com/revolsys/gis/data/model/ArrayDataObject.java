@@ -20,8 +20,8 @@ public class ArrayDataObject extends BaseDataObject {
 
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
-   * Objects can only be cloned if they have a publically accessible
-   * {@link #cloneCoordinates()} method.
+   * Objects can only be cloned if they have a publicly accessible
+   * {@link #clone()} method.
    * 
    * @param object The object to clone.
    */

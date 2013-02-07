@@ -198,7 +198,7 @@ public class Viewport2D {
     return NonSI.INCH.divide(screenResolution);
   }
 
-  public double getViewAspectRatio() {
+   public double getViewAspectRatio() {
     return getViewWidthPixels() / getViewHeightPixels();
   }
 
@@ -250,6 +250,9 @@ public class Viewport2D {
     propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
 
+  /** Multiplier to convert a value to be 1 pixel size at 72DPI.*/
+  private double standardPixelScaleFactor;
+  
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
       final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
@@ -260,6 +263,10 @@ public class Viewport2D {
 
         final double viewWidth = getViewWidthPixels();
         final double viewHeight = getViewHeightPixels();
+        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+        int screenResolution = defaultToolkit.getScreenResolution();
+        standardPixelScaleFactor = screenResolution /72.0;
+        
         modelToScreenTransform = createModelToScreenTransform(
           convertedBoundingBox, viewWidth, viewHeight);
         screenToModelTransform = createScreenToModelTransform(
@@ -312,6 +319,7 @@ public class Viewport2D {
       if (isUseModelCoordinates()) {
         convertedValue = convertedValue * modelUnitsPerViewUnit;
       }
+      convertedValue *= standardPixelScaleFactor;
     } else {
       convertedValue = value.doubleValue(SI.METRE);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

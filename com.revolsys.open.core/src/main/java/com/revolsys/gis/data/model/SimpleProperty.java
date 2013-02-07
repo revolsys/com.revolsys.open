@@ -14,7 +14,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   @Override
-  public SimpleProperty cloneCoordinates() {
+  public SimpleProperty clone() {
     return new SimpleProperty(propertyName, value);
   }
 

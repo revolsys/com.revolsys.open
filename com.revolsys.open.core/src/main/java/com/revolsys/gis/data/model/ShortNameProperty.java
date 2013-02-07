@@ -42,7 +42,7 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   @Override
-  public ShortNameProperty cloneCoordinates() {
+  public ShortNameProperty clone() {
     return new ShortNameProperty(shortName);
   }
 

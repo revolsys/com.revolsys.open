@@ -21,16 +21,18 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   protected void renderObject(Viewport2D viewport, Graphics2D graphics,
-    BoundingBox visibleArea, DataObjectLayer layer, DataObject dataObject) {
-    double scale = viewport.getScale();
-    for (AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-      if (renderer.isVisible(dataObject)) {
-        if (renderer.isVisible(scale)) {
-          renderer.renderObject(viewport, graphics, visibleArea, layer,
-            dataObject);
+    BoundingBox visibleArea, DataObjectLayer layer, DataObject object) {
+    if (isVisible(object)) {
+      double scale = viewport.getScale();
+      for (AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        if (renderer.isVisible(object)) {
+          if (renderer.isVisible(scale)) {
+            renderer.renderObject(viewport, graphics, visibleArea, layer,
+              object);
+          }
+          // Only render using the first match
+          return;
         }
-        // Only render using the first match
-        return;
       }
     }
   }

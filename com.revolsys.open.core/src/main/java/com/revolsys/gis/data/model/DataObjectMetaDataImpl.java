@@ -221,7 +221,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
-  public DataObjectMetaDataImpl cloneCoordinates() {
+  public DataObjectMetaDataImpl clone() {
     final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(path,
       getProperties(), attributes);
     clone.setIdAttributeIndex(idAttributeIndex);
@@ -235,7 +235,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
         final String propertyName = property.getKey();
         if (property instanceof DataObjectMetaDataProperty) {
           DataObjectMetaDataProperty metaDataProperty = (DataObjectMetaDataProperty)property;
-          metaDataProperty = metaDataProperty.cloneCoordinates();
+          metaDataProperty = metaDataProperty.clone();
           metaDataProperty.setMetaData(this);
           setProperty(propertyName, metaDataProperty);
         } else {
@@ -632,7 +632,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
         final Object value = entry.getValue();
         if (value instanceof DataObjectMetaDataProperty) {
           final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
-          final DataObjectMetaDataProperty clonedProperty = property.cloneCoordinates();
+          final DataObjectMetaDataProperty clonedProperty = property.clone();
           clonedProperty.setMetaData(this);
         } else {
           setProperty(key, value);

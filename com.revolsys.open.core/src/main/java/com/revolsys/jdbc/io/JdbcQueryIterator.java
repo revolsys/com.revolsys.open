@@ -211,7 +211,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
       final String typePath = query.getTypeNameAlias();
       if (typePath != null) {
-        final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).cloneCoordinates();
+        final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
         newMetaData.setName(typePath);
         this.metaData = newMetaData;
       }

@@ -2,6 +2,7 @@ package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -82,13 +83,17 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
       }
       if (boundingBox != null) {
         query.setBoundingBox(boundingBox);
-      } 
-      
+      }
+
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
         query, getProperties());
-       return iterator;
+      return iterator;
     }
     throw new NoSuchElementException();
+  }
+
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
   }
 
   public AbstractDataObjectStore getDataStore() {
@@ -141,7 +146,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   /**
    * @param queries the queries to set
    */
-  public void setQueries(final List<Query> queries) {
+  public void setQueries(final Collection<Query> queries) {
     this.queries.clear();
     for (final Query query : queries) {
       addQuery(query);

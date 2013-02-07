@@ -26,8 +26,8 @@ public class GlobalIdProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   @Override
-  public GlobalIdProperty cloneCoordinates() {
-    return (GlobalIdProperty)super.cloneCoordinates();
+  public GlobalIdProperty clone() {
+    return (GlobalIdProperty)super.clone();
   }
 
   public String getAttributeName() {

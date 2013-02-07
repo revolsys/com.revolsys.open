@@ -32,27 +32,33 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     addRenderer(renderer);
   }
 
-
   @Override
   protected void renderObjects(final Viewport2D viewport,
     final Graphics2D graphics, final DataObjectLayer layer,
     final List<DataObject> objects) {
+    BoundingBox visibleArea = viewport.getBoundingBox();
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
       long scale = (long)viewport.getScale();
       if (renderer.isVisible(scale)) {
-        renderer.renderObjects(viewport, graphics, layer, objects);
+        for (DataObject object : objects) {
+          if (isVisible(object)) {
+            renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+          }
+        }
       }
     }
   }
-  
+
   @Override
   // Needed for filter styles
   protected void renderObject(Viewport2D viewport, Graphics2D graphics,
     BoundingBox visibleArea, DataObjectLayer layer, DataObject object) {
-    for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-      long scale = (long)viewport.getScale();
-      if (renderer.isVisible(scale)) {
-        renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+    if (isVisible(object)) {
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        long scale = (long)viewport.getScale();
+        if (renderer.isVisible(scale)) {
+          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+        }
       }
     }
   }

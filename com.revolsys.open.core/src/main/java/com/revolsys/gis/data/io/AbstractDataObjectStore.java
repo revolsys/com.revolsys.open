@@ -107,7 +107,7 @@ public abstract class AbstractDataObjectStore extends
   protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     final String typePath = metaData.getPath();
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.cloneCoordinates();
+      final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
     final Map<String, Object> properties = typeMetaDataProperties.get(typePath);
@@ -182,7 +182,7 @@ public abstract class AbstractDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
-  protected AbstractIterator<DataObject> createIterator(final Query query,
+  public AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     throw new UnsupportedOperationException();
   }

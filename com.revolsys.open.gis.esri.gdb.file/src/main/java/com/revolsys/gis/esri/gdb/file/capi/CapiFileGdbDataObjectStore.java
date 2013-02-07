@@ -284,7 +284,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   // TODO add bounding box
   @Override
-  protected synchronized AbstractIterator<DataObject> createIterator(
+  public synchronized AbstractIterator<DataObject> createIterator(
     final Query query, final Map<String, Object> properties) {
     String typePath = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
@@ -702,12 +702,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       initialized = true;
       super.initialize();
       final File file = new File(fileName);
-      if (file.exists() && new File(fileName, "gdb").exists()) {
+      if (file.exists()) {
         if (file.isDirectory()) {
-          geodatabase = EsriFileGdb.openGeodatabase(fileName);
+          if (new File(fileName, "gdb").exists()) {
+            geodatabase = EsriFileGdb.openGeodatabase(fileName);
+          } else {
+            throw new IllegalArgumentException(
+              FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
+          }
         } else {
-          throw new IllegalArgumentException(
-            "ESRI File Geodatabase must be a directory");
+          throw new IllegalArgumentException(FileUtil.getCanonicalPath(file) + 
+            " ESRI File Geodatabase must be a directory");
         }
       } else if (createMissingDataStore) {
         if (template == null) {

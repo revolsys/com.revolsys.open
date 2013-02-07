@@ -12,6 +12,8 @@ public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates>, Serializable {
   boolean contains(Coordinates point);
 
+  CoordinatesList clone();
+  
   void copy(int sourceIndex, CoordinatesList target, int targetIndex,
     int numAxis, int count);
 

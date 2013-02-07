@@ -29,7 +29,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   private boolean useAuditColumns;
 
   @Override
-  public JdbcCodeTableProperty cloneCoordinates() {
+  public JdbcCodeTableProperty clone() {
     return this;
   }
 

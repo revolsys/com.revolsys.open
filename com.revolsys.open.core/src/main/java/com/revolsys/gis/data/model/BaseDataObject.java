@@ -64,8 +64,8 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
-   * Objects can only be cloned if they have a publically accessible
-   * {@link #cloneCoordinates()} method.
+   * Objects can only be cloned if they have a publicly accessible
+   * {@link #clone()} method.
    * 
    * @param object The object to clone.
    */
@@ -362,7 +362,8 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error(
+            "Path does not exist " + path, e);
           return null;
         }
       }
@@ -554,13 +555,18 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     } else {
       Object targetValue;
       if (codeTableValueName == null) {
-        targetValue = codeTable.getId(value);
+        if (value instanceof List) {
+          List list = (List)value;
+          targetValue = codeTable.getId(list.toArray());
+        } else {
+          targetValue = codeTable.getId(value);
+        }
       } else {
         targetValue = codeTable.getId(Collections.singletonMap(
           codeTableValueName, value));
       }
       if (targetValue == null) {
-        throw new IllegalArgumentException("Cannot get code table for "
+        throw new IllegalArgumentException("Cannot get code for "
           + metaData.getPath() + "." + name + "=" + value);
       } else {
         setValue(codeTableAttributeName, targetValue);

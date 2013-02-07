@@ -448,7 +448,7 @@ public class SaifSchemaReader {
 
   private void setMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.cloneCoordinates();
+      final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
   }
