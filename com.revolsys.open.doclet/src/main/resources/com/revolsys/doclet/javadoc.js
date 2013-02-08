@@ -31,7 +31,10 @@ $(document).ready(function() {
     var pre = $('<pre class="prettyprint language-html"/>').text(text);
     $(this).before('<p>The following code fragment shows an example of using the API.</p>');
     $(this).before(pre);
-    $(this).before('<p>Use the following buttons to run the example.</p>');
+    $('*', this).wrapAll('<div>');
+    $('> div', this).prepend('<p>Use the buttons below to run the example.</p>');
+    $(this).prepend('<div class="title"><a name="example">Example</a></div>');
+    $(this).addClass('open');
   });
 
   $('div.simpleDataTable table').dataTable({
@@ -46,6 +49,7 @@ $(document).ready(function() {
   createAccordion('div.javaPackage');
   createAccordion('div.javaClass');
   createAccordion('div.javaMethod');
+  createAccordion('div.htmlExample');
   prettyPrint();
   $(':button').button();
  
