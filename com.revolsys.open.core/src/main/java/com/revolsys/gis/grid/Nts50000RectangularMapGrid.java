@@ -8,11 +8,12 @@ public class Nts50000RectangularMapGrid extends Nts250000RectangularMapGrid {
     + NtsConstants.REGEX_50000 + ".*");
 
   public Nts50000RectangularMapGrid() {
-    super(NtsConstants.WIDTH_50000, NtsConstants.HEIGHT_50000);
+    this(NtsConstants.WIDTH_50000, NtsConstants.HEIGHT_50000);
   }
 
   protected Nts50000RectangularMapGrid(final double width, final double height) {
     super(width, height);
+    setName("NTS 1:50 000");
   }
 
   public String getCellNumber(final String tileName) {

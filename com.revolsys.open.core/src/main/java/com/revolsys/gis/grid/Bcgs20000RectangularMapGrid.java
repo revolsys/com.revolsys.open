@@ -30,6 +30,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
   protected Bcgs20000RectangularMapGrid(final double width, final double height) {
     super(width, height);
     setPrecisionModel(new PrecisionModel(10));
+    setName("BCGS 1:20 000");
   }
 
   @Override

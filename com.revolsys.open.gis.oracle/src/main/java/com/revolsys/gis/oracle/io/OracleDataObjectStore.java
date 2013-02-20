@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -51,11 +52,17 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
   }
 
+  @Override
+  public AbstractIterator<DataObject> createIterator(Query query,
+    Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(this, query, properties);
+  }
+
   public OracleDataObjectStore(OracleDatabaseFactory databaseFactory,
     Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
     setExcludeTablePatterns(".*\\$");
-      DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
@@ -64,7 +71,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   public OracleDataObjectStore(DataSource dataSource) {
     super(dataSource);
     setExcludeTablePatterns(".*\\$");
-     setSqlPrefix("BEGIN ");
+    setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
   }
 

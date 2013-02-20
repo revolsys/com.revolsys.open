@@ -17,6 +17,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.vividsolutions.jts.geom.Geometry;
@@ -56,7 +57,11 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     }
     super.close();
   }
-
+  @Override
+  public int getRowCount(Query query) {
+    throw new UnsupportedOperationException();
+  }
+ 
   @Override
   public Writer<DataObject> createWriter() {
     return new DirectoryDataObjectStoreWriter(this);

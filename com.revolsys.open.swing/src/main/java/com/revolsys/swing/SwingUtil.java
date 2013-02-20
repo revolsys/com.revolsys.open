@@ -5,16 +5,22 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.MenuContainer;
+import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.io.File;
 import java.util.Date;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
@@ -29,10 +35,12 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.FileUtil;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
+import com.revolsys.util.PreferencesUtil;
 
 public class SwingUtil {
 
@@ -41,6 +49,26 @@ public class SwingUtil {
     label.setFont(label.getFont().deriveFont(Font.BOLD));
     container.add(label);
     return label;
+  }
+
+  public static JFileChooser createFileChooser(Class<?> preferencesClass,
+    String preferenceName) {
+    final JFileChooser fileChooser = new JFileChooser();
+    String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
+    if (StringUtils.hasText(currentDirectoryName)) {
+      File directory = new File(currentDirectoryName);
+      if (directory.exists() && directory.canRead()) {
+        fileChooser.setCurrentDirectory(directory);
+      }
+    }
+    return fileChooser;
+  }
+
+  public static void saveFileChooserDirectory(Class<?> preferencesClass,
+    String preferenceName, JFileChooser fileChooser) {
+    File currentDirectory = fileChooser.getCurrentDirectory();
+    String path = FileUtil.getCanonicalPath(currentDirectory);
+    PreferencesUtil.setString(preferencesClass, preferenceName, path);
   }
 
   @SuppressWarnings("unchecked")
@@ -217,5 +245,24 @@ public class SwingUtil {
     frame.setSize(size);
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
+  }
+
+  public static Component getInvoker(final JMenuItem menuItem) {
+    MenuContainer menuContainer = menuItem.getParent();
+    while (menuContainer != null && !(menuContainer instanceof JPopupMenu)) {
+      if (menuContainer instanceof MenuItem) {
+        menuContainer = ((MenuItem)menuContainer).getParent();
+      } else {
+        menuContainer = null;
+      }
+    }
+    if (menuContainer != null) {
+      final JPopupMenu menu = (JPopupMenu)menuContainer;
+      final Component invoker = menu.getInvoker();
+      return invoker;
+    } else {
+      return null;
+    }
+  
   }
 }

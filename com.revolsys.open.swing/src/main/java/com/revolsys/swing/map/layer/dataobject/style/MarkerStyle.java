@@ -41,16 +41,16 @@ public class MarkerStyle {
   }
 
   public static GeometryStyle marker(final String markerName,
-    final int markerSize, final Color lineColor, final int lineWidth,
+    final double markerSize, final Color lineColor, final double lineWidth,
     final Color fillColor) {
     final GeometryStyle style = new GeometryStyle();
     style.setMarker(new ShapeMarker(markerName));
     style.setMarkerWidth(markerSize);
     style.setMarkerHeight(markerSize);
-    style.setMarkerDy(-markerSize / 2);
-    style.setMarkerDy(-markerSize / 2);
-    style.setLineColor(lineColor);
-    style.setPolygonFill(fillColor);
+    style.setMarkerLineColor(lineColor);
+    style.setMarkerHorizontalAlignment("center");
+    style.setMarkerVerticalAlignment("middle");
+    style.setMarkerFill(fillColor);
     return style;
   }
 
@@ -103,7 +103,7 @@ public class MarkerStyle {
         final String propertyName = markerStyleProperty.getPropertyName();
         value = StringConverterRegistry.toObject(dataType, value);
         JavaBeanUtil.setProperty(this, propertyName, value);
-      } else if (label.startsWith("marker")){
+      } else if (label.startsWith("marker")) {
         System.out.println(label);
       }
     }

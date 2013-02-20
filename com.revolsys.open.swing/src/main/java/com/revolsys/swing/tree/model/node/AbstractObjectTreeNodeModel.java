@@ -4,10 +4,14 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -15,11 +19,11 @@ import javax.swing.tree.TreeCellRenderer;
 import org.springframework.util.CollectionUtils;
 
 import com.revolsys.beans.ClassUtil;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD extends Object>
   implements ObjectTreeNodeModel<NODE, CHILD> {
-  private JPopupMenu menu = new JPopupMenu();
 
   private boolean lazyLoad = false;
 
@@ -57,6 +61,11 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   protected void addObjectTreeNodeModels(
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     this.objectTreeNodeModels.addAll(Arrays.asList(objectTreeNodeModels));
+    if (objectTreeModel != null) {
+      for (ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
+        nodeModel.setObjectTreeModel(objectTreeModel);
+      }
+    }
   }
 
   @Override
@@ -100,13 +109,13 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     return children.indexOf(child);
   }
 
-  protected JPopupMenu getMenu() {
-    return menu;
-  }
-
   @Override
-  public JPopupMenu getMenu(final NODE node) {
-    return menu;
+  public PopupMenu getMenu(final NODE node) {
+    if (node == null) {
+      return null;
+    } else {
+      return objectTreeModel.getMenu(node);
+    }
   }
 
   @Override
@@ -182,17 +191,18 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     this.leaf = leaf;
   }
 
-  protected void setMenu(final JPopupMenu menu) {
-    this.menu = menu;
-  }
-
   protected void setMouseListener(final MouseListener mouseListener) {
     this.mouseListener = mouseListener;
   }
 
   @Override
   public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
-    this.objectTreeModel = objectTreeModel;
+    if (this.objectTreeModel != objectTreeModel) {
+      this.objectTreeModel = objectTreeModel;
+      for (ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
+        nodeModel.setObjectTreeModel(objectTreeModel);
+      }
+    }
   }
 
   protected void setObjectTreeNodeModels(

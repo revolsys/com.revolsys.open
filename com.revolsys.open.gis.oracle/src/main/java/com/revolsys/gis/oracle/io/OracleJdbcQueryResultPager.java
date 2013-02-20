@@ -41,7 +41,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
         if (pageNumber != -1) {
           String sql = getSql();
 
-          final int startRowNum = ((pageNumber -1 ) * pageSize) +1;
+          final int startRowNum = ((pageNumber - 1) * pageSize) + 1;
           final int endRowNum = startRowNum + pageSize - 1;
           sql = "SELECT * FROM ( " + getSql() + ") WHERE ROWNUM BETWEEN "
             + startRowNum + " AND " + endRowNum;
@@ -96,41 +96,9 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   public int getNumResults() {
     if (numResults == null) {
-      final Query query = getQuery().clone();
-      query.setSql(null);
-      query.setAttributeNames("count(*)");
-      final String sql = JdbcUtils.getSelectSql(query);
-      final DataSource dataSource = getDataSource();
-      Connection connection = getConnection();
-      if (dataSource != null) {
-        connection = JdbcUtils.getConnection(dataSource);
-      }
-      try {
-        final PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-          JdbcUtils.setPreparedStatementFilterParameters(statement, query);
-          final ResultSet resultSet = statement.executeQuery();
-          try {
-            if (resultSet.next()) {
-              numResults = resultSet.getInt(1);
-            } else {
-              throw new IllegalArgumentException("Value not found");
-            }
-          } finally {
-            JdbcUtils.close(resultSet);
-          }
-
-        } finally {
-          JdbcUtils.close(statement);
-        }
-      } catch (final SQLException e) {
-        throw JdbcUtils.getException(dataSource, connection, "selectInt", sql,
-          e);
-      } finally {
-        if (dataSource != null) {
-          JdbcUtils.release(connection, dataSource);
-        }
-      }
+      JdbcDataObjectStore dataStore = getDataStore();
+      Query query = getQuery();
+      numResults = dataStore.getRowCount(query);
     }
     return numResults;
   }

@@ -90,6 +90,44 @@ public abstract class AbstractJdbcDataObjectStore extends
     super(dataObjectFactory);
   }
 
+  @Override
+  public int getRowCount(Query query) {
+    query = query.clone();
+    query.setSql(null);
+    query.setAttributeNames("count(*)");
+    final String sql = JdbcUtils.getSelectSql(query);
+    final DataSource dataSource = getDataSource();
+    Connection connection = getConnection();
+    if (dataSource != null) {
+      connection = JdbcUtils.getConnection(dataSource);
+    }
+    try {
+      final PreparedStatement statement = connection.prepareStatement(sql);
+      try {
+        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+        final ResultSet resultSet = statement.executeQuery();
+        try {
+          if (resultSet.next()) {
+            return resultSet.getInt(1);
+          } else {
+            return 0;
+          }
+        } finally {
+          JdbcUtils.close(resultSet);
+        }
+
+      } finally {
+        JdbcUtils.close(statement);
+      }
+    } catch (final SQLException e) {
+      throw JdbcUtils.getException(dataSource, connection, "selectInt", sql, e);
+    } finally {
+      if (dataSource != null) {
+        JdbcUtils.release(connection, dataSource);
+      }
+    }
+  }
+
   public AbstractJdbcDataObjectStore(final DataSource dataSource) {
     setDataSource(dataSource);
   }
@@ -565,7 +603,7 @@ public abstract class AbstractJdbcDataObjectStore extends
           final String dbTableName = tablesRs.getString("TABLE_NAME");
           final String tableName = dbTableName.toUpperCase();
           final String tableType = tablesRs.getString("TABLE_TYPE");
-         boolean excluded = !tableTypes.contains(tableType);
+          boolean excluded = !tableTypes.contains(tableType);
           for (final String pattern : excludeTablePatterns) {
             if (dbTableName.matches(pattern) || tableName.matches(pattern)) {
               excluded = true;
@@ -747,7 +785,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public void setExcludeTablePatterns(final String... excludeTablePatterns) {
-    this.excludeTablePatterns = new ArrayList<String>(Arrays.asList(excludeTablePatterns));
+    this.excludeTablePatterns = new ArrayList<String>(
+      Arrays.asList(excludeTablePatterns));
   }
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {

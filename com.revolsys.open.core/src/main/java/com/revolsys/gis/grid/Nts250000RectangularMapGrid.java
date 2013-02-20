@@ -8,11 +8,12 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
     + NtsConstants.REGEX_250000 + ".*");
 
   public Nts250000RectangularMapGrid() {
-    super(NtsConstants.WIDTH_250000, NtsConstants.HEIGHT_250000);
+    this(NtsConstants.WIDTH_250000, NtsConstants.HEIGHT_250000);
   }
 
   protected Nts250000RectangularMapGrid(final double width, final double height) {
     super(width, height);
+    setName("NTS 1:250 000");
   }
 
   @Override

@@ -70,6 +70,10 @@ public class ObjectTreePanel extends JPanel {
     return tree;
   }
 
+  public ObjectTreeModel getTreeModel() {
+    return (ObjectTreeModel)tree.getModel();
+  }
+
   public void setSelectionMode(final int mode) {
     final TreeSelectionModel selectionModel = tree.getSelectionModel();
     selectionModel.setSelectionMode(mode);

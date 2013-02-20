@@ -7,10 +7,15 @@ import java.util.Set;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.Layer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
+  void addSelectedObjects(DataObject... objects);
+
+  void addSelectedObjects(Collection<? extends DataObject> objects);
+
   void clearEditingObjects();
 
   void clearHiddenObjects();
@@ -19,7 +24,7 @@ public interface DataObjectLayer extends Layer {
 
   void deleteObjects(DataObject... object);
 
-  void deleteObjects(List<DataObject> objects);
+  void deleteObjects(Collection<? extends DataObject> objects);
 
   List<DataObject> getDataObjects(BoundingBox boundingBox);
 
@@ -37,11 +42,19 @@ public interface DataObjectLayer extends Layer {
 
   int getRowCount();
 
+  int getRowCount(Query query);
+
   List<DataObject> getSelectedObjects();
 
-  void selectObjects(DataObject... objects);
+  int getSelectionCount();
 
-  void selectObjects(List<DataObject> objects);
+  boolean isSelected(DataObject object);
+
+  List<DataObject> query(Query query);
+
+  void removeSelectedObjects(DataObject... objects);
+
+  void removeSelectedObjects(Collection<? extends DataObject> objects);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 
@@ -49,6 +62,12 @@ public interface DataObjectLayer extends Layer {
 
   void setHiddenObjects(DataObject... hiddenObjects);
 
+  void setSelectedObjects(Collection<DataObject> objects);
+
+  void setSelectedObjects(DataObject... selectedObjects);
+
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
+
+  void setSelectedObjects(BoundingBox boundingBox);
 }

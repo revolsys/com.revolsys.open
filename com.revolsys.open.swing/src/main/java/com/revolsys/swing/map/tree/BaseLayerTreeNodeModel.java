@@ -1,46 +1,41 @@
 package com.revolsys.swing.map.tree;
 
 import java.awt.Rectangle;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.grid.ZoomToMapSheet;
+import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.tree.renderer.LayerTreeCellRenderer;
+import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.tree.ObjectTree;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class BaseLayerTreeNodeModel extends
   AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
   MouseListener {
 
-  private final static Map<Class<?>, JPopupMenu> MENUS = new HashMap<Class<?>, JPopupMenu>();
+  @Override
+  public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
+    super.setObjectTreeModel(objectTreeModel);
+    PopupMenu abstractLayerMenu = objectTreeModel.getMenu(AbstractLayer.class);
+    abstractLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(false));
+    abstractLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(true));
 
-  static {
-    // TODO for (Class<? extends AbstractLayer> layerClass : Arrays.asList(
-    // LocalFeatureLayer.class, ListDataObjectLayer.class)) {
-    // addMenuItem(layerClass, new SetLayerScaleMenu(false));
-    // addMenuItem(layerClass, new SetLayerScaleMenu(true));
-    // }
-  }
-
-  public static void addMenuItem(
-    final Class<? extends AbstractLayer> layerClass, final JMenuItem menuItem) {
-    final JPopupMenu menu = getMenu(layerClass);
-    menu.add(menuItem);
+    PopupMenu gridLayerMenu = objectTreeModel.getMenu(GridLayer.class);
+    gridLayerMenu.addMenuItem("zoom", new ZoomToMapSheet());
   }
 
   public static BaseLayerTreeNodeModel create(final String name,
@@ -56,18 +51,7 @@ public class BaseLayerTreeNodeModel extends
     if (renderer == null) {
       return Collections.emptyList();
     } else {
-    return Collections.singletonList(renderer);
-    }
-  }
-  public static JPopupMenu getMenu(
-    final Class<? extends AbstractLayer> layerClass) {
-    synchronized (MENUS) {
-      JPopupMenu menu = MENUS.get(layerClass);
-      if (menu == null) {
-        menu = new JPopupMenu();
-        MENUS.put(layerClass, menu);
-      }
-      return menu;
+      return Collections.singletonList(renderer);
     }
   }
 
@@ -84,32 +68,20 @@ public class BaseLayerTreeNodeModel extends
       setSupportedClasses(supportedClasses);
     }
 
-   // setLeaf(true);
     setSupportedChildClasses(SUPPORTED_CHILD_CLASSES);
-    setObjectTreeNodeModels(new MultipleLayerRendererTreeNodeModel(), new BaseLayerRendererTreeNodeModel());
+    setObjectTreeNodeModels(new MultipleLayerRendererTreeNodeModel(),
+      new BaseLayerRendererTreeNodeModel());
     setRenderer(new LayerTreeCellRenderer());
     setMouseListener(this);
   }
 
   @Override
-  public JPopupMenu getMenu(final AbstractLayer layer) {
-    if (layer == null) {
-      return null;
-    } else {
-      synchronized (MENUS) {
-        final Class<? extends AbstractLayer> layerClass = layer.getClass();
-        return getMenu(layerClass);
-      }
-    }
-  }
-
-  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
-    if (source instanceof JTree) {
-      final JTree tree = (JTree)source;
-      if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2
-        && e.getModifiers() == InputEvent.BUTTON1_MASK) {
+    if (source instanceof ObjectTree) {
+      final ObjectTree tree = (ObjectTree)source;
+      int clickCount = e.getClickCount();
+      if (clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
         final int x = e.getX();
         final int y = e.getY();
         final TreePath path = tree.getPathForLocation(x, y);

@@ -44,6 +44,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
+import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
 import com.revolsys.gis.esri.gdb.file.capi.type.BinaryAttribute;
@@ -111,6 +112,110 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         geometryFactory, wkt);
       return spatialReference;
     }
+  }
+
+  @Override
+  public int getRowCount(Query query) {
+    String typePath = query.getTypeName();
+    DataObjectMetaData metaData = query.getMetaData();
+    if (metaData == null) {
+      typePath = query.getTypeName();
+      metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Type name does not exist "
+          + typePath);
+      }
+    } else {
+      typePath = metaData.getPath();
+    }
+    final StringBuffer whereClause = getWhereClause(query);
+
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT OBJECTID FROM ");
+    sql.append(JdbcUtils.getTableName(typePath));
+    if (whereClause.length() > 0) {
+      sql.append(" WHERE ");
+      sql.append(whereClause);
+    }
+
+    EnumRows rows = getGeodatabase().query(sql.toString(), false);
+    try {
+      int count = 0;
+      for (Row row = rows.next(); row != null; row = rows.next()) {
+        count++;
+      }
+      return count;
+    } finally {
+      rows.Close();
+    }
+  }
+
+  protected StringBuffer getWhereClause(Query query) {
+    String where = query.getWhereClause();
+    if (where == null) {
+      where = "";
+    }
+    final List<Object> parameters = query.getParameters();
+
+    final StringBuffer whereClause = new StringBuffer();
+    if (parameters.isEmpty()) {
+      if (where.indexOf('?') > -1) {
+        throw new IllegalArgumentException(
+          "No arguments specified for a where clause with placeholders: "
+            + where);
+      } else {
+        whereClause.append(where);
+      }
+    } else {
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      int i = 0;
+      while (matcher.find()) {
+        if (i >= parameters.size()) {
+          throw new IllegalArgumentException(
+            "Not enough arguments for where clause with placeholders: " + where);
+        }
+        final Object argument = parameters.get(i);
+        matcher.appendReplacement(whereClause, "");
+        if (argument instanceof Number) {
+          whereClause.append(argument);
+        } else {
+          whereClause.append("'");
+          whereClause.append(StringConverterRegistry.toString(argument)
+            .replaceAll("'", "''"));
+          whereClause.append("'");
+        }
+        i++;
+      }
+      matcher.appendTail(whereClause);
+    }
+    Map<String, Object> filter = query.getFilter();
+    if (!filter.isEmpty()) {
+      if (whereClause.length() > 0) {
+        whereClause.insert(0, '(');
+        whereClause.append(')');
+      }
+      for (Entry<String, Object> entry : filter.entrySet()) {
+        if (whereClause.length() > 0) {
+          whereClause.append(" AND ");
+        }
+        whereClause.append(entry.getKey());
+        Object value = entry.getValue();
+        if (value == null) {
+          whereClause.append(" IS NULL");
+        } else {
+          whereClause.append(" = ");
+          if (value instanceof Number) {
+            whereClause.append(value);
+          } else {
+            whereClause.append("'");
+            whereClause.append(StringConverterRegistry.toString(value)
+              .replaceAll("'", "''"));
+            whereClause.append("'");
+          }
+        }
+      }
+    }
+    return whereClause;
   }
 
   private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
@@ -298,74 +403,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       typePath = metaData.getPath();
     }
-
-    String where = query.getWhereClause();
-    if (where == null) {
-      where = "";
-    }
-    final List<Object> parameters = query.getParameters();
-
     final BoundingBox boundingBox = query.getBoundingBox();
     Map<String, Boolean> orderBy = query.getOrderBy();
-    final StringBuffer whereClause = new StringBuffer();
-    if (parameters.isEmpty()) {
-      if (where.indexOf('?') > -1) {
-        throw new IllegalArgumentException(
-          "No arguments specified for a where clause with placeholders: "
-            + where);
-      } else {
-        whereClause.append(where);
-      }
-    } else {
-      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-      int i = 0;
-      while (matcher.find()) {
-        if (i >= parameters.size()) {
-          throw new IllegalArgumentException(
-            "Not enough arguments for where clause with placeholders: " + where);
-        }
-        final Object argument = parameters.get(i);
-        matcher.appendReplacement(whereClause, "");
-        if (argument instanceof Number) {
-          whereClause.append(argument);
-        } else {
-          whereClause.append("'");
-          whereClause.append(StringConverterRegistry.toString(argument)
-            .replaceAll("'", "''"));
-          whereClause.append("'");
-        }
-        i++;
-      }
-      matcher.appendTail(whereClause);
-    }
-    Map<String, Object> filter = query.getFilter();
-    if (!filter.isEmpty()) {
-      if (whereClause.length() > 0) {
-        whereClause.insert(0, '(');
-        whereClause.append(')');
-      }
-      for (Entry<String, Object> entry : filter.entrySet()) {
-        if (whereClause.length() > 0) {
-          whereClause.append(" AND ");
-        }
-        whereClause.append(entry.getKey());
-        Object value = entry.getValue();
-        if (value == null) {
-          whereClause.append(" IS NULL");
-        } else {
-          whereClause.append(" = ");
-          if (value instanceof Number) {
-            whereClause.append(value);
-          } else {
-            whereClause.append("'");
-            whereClause.append(StringConverterRegistry.toString(value)
-              .replaceAll("'", "''"));
-            whereClause.append("'");
-          }
-        }
-      }
-
-    }
+    final StringBuffer whereClause = getWhereClause(query);
     StringBuffer sql = new StringBuffer();
     if (orderBy.isEmpty()) {
       sql = whereClause;
@@ -404,7 +444,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
 
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, sql.toString(), boundingBox);
+      typePath, sql.toString(), boundingBox, query.getOffset(),
+      query.getLimit());
     return iterator;
   }
 
@@ -707,12 +748,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           if (new File(fileName, "gdb").exists()) {
             geodatabase = EsriFileGdb.openGeodatabase(fileName);
           } else {
-            throw new IllegalArgumentException(
-              FileUtil.getCanonicalPath(file) + " is not a valid ESRI File Geodatabase");
+            throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
+              + " is not a valid ESRI File Geodatabase");
           }
         } else {
-          throw new IllegalArgumentException(FileUtil.getCanonicalPath(file) + 
-            " ESRI File Geodatabase must be a directory");
+          throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
+            + " ESRI File Geodatabase must be a directory");
         }
       } else if (createMissingDataStore) {
         if (template == null) {
@@ -863,12 +904,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public synchronized Reader<DataObject> query(final String typePath,
-    final BoundingBox boundingBox) {
-    final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, boundingBox);
-    final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-      iterator);
-    return reader;
+    BoundingBox boundingBox) {
+    DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath);
+    } else {
+       final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+        typePath, boundingBox);
+      final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
+        iterator);
+      return reader;
+    }
   }
 
   @Override

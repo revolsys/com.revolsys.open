@@ -8,11 +8,12 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
     + MtoConstants.REGEX_MTO + ".*");
 
   public MtoRectangularMapGrid() {
-    super(MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER);
+    this(MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER);
   }
 
   protected MtoRectangularMapGrid(final double width, final double height) {
     super(width, height);
+    setName("MTO");
   }
 
   @Override

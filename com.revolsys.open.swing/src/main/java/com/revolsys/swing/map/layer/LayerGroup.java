@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -10,7 +11,7 @@ import java.util.ListIterator;
 import com.revolsys.gis.cs.BoundingBox;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
- 
+
   private List<Layer> layers = new ArrayList<Layer>();
 
   public LayerGroup(final String name) {
@@ -20,24 +21,28 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public void add(final int index, final Layer element) {
-    if (element != null && !layers.contains(element)) {
-      layers.add(index, element);
-      element.setLayerGroup(this);
-      element.addPropertyChangeListener(this);
-      final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-      propertyChangeSupport.fireIndexedPropertyChange("layers", index, null,
-        element);
+    synchronized (layers) {
+      if (element != null && !layers.contains(element)) {
+        layers.add(index, element);
+        element.setLayerGroup(this);
+        element.addPropertyChangeListener(this);
+        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.fireIndexedPropertyChange("layers", index, null,
+          element);
+      }
     }
   }
 
   @Override
   public boolean add(final Layer layer) {
-    if (layer == null || layers.contains(layer)) {
-      return false;
-    } else {
-      final int index = layers.size();
-      add(index, layer);
-      return true;
+    synchronized (layers) {
+      if (layer == null || layers.contains(layer)) {
+        return false;
+      } else {
+        final int index = layers.size();
+        add(index, layer);
+        return true;
+      }
     }
   }
 
@@ -66,22 +71,34 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   public LayerGroup addLayerGroup(final int index, final String name) {
-    final LayerGroup group = new LayerGroup(name);
-    add(index, group);
-    return group;
+    synchronized (layers) {
+      final Layer layer = getLayer(name);
+      if (layer == null) {
+        final LayerGroup group = new LayerGroup(name);
+        add(index, group);
+        return group;
+      }
+      if (layer instanceof LayerGroup) {
+        return (LayerGroup)layer;
+      } else {
+        throw new IllegalArgumentException("Layer exists with name " + name);
+      }
+    }
   }
 
   public LayerGroup addLayerGroup(final String name) {
-    final Layer layer = getLayer(name);
-    if (layer == null) {
-      final LayerGroup group = new LayerGroup(name);
-      add(group);
-      return group;
-    }
-    if (layer instanceof LayerGroup) {
-      return (LayerGroup)layer;
-    } else {
-      throw new IllegalArgumentException("WmsLayer exists with name " + name);
+    synchronized (layers) {
+      final Layer layer = getLayer(name);
+      if (layer == null) {
+        final LayerGroup group = new LayerGroup(name);
+        add(group);
+        return group;
+      }
+      if (layer instanceof LayerGroup) {
+        return (LayerGroup)layer;
+      } else {
+        throw new IllegalArgumentException("Layer exists with name " + name);
+      }
     }
   }
 
@@ -256,57 +273,67 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public void remove() {
-    int index = 0;
-    for (final Iterator<Layer> iterator = layers.iterator(); iterator.hasNext();) {
-      final Layer layer = iterator.next();
-      iterator.remove();
+    synchronized (layers) {
+      int index = 0;
+      for (final Iterator<Layer> iterator = layers.iterator(); iterator.hasNext();) {
+        final Layer layer = iterator.next();
+        iterator.remove();
+        layer.setLayerGroup(null);
+        layer.removePropertyChangeListener(this);
+        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
+          null);
+        layer.remove();
+        index++;
+      }
+      super.remove();
+    }
+  }
+
+  @Override
+  public Layer remove(final int index) {
+    synchronized (layers) {
+      final Layer layer = layers.remove(index);
       layer.setLayerGroup(null);
       layer.removePropertyChangeListener(this);
       final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
       propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
         null);
-      layer.remove();
-      index++;
+      return layer;
     }
-    super.remove();
-  }
-
-  @Override
-  public Layer remove(final int index) {
-    final Layer layer = layers.remove(index);
-    layer.setLayerGroup(null);
-    layer.removePropertyChangeListener(this);
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
-      null);
-    return layer;
   }
 
   @Override
   public boolean remove(final Object o) {
-    final int index = layers.indexOf(o);
-    if (index < 0) {
-      return false;
-    } else {
-      remove(index);
-      return true;
+    synchronized (layers) {
+      final int index = layers.indexOf(o);
+      if (index < 0) {
+        return false;
+      } else {
+        remove(index);
+        return true;
+      }
     }
   }
 
   @Override
   public boolean removeAll(final Collection<?> c) {
-    final boolean removed = false;
-    for (Object layer : c) {
-      if (remove(layer)) {
-        layer = true;
+    synchronized (layers) {
+      final boolean removed = false;
+      for (Object layer : c) {
+        if (remove(layer)) {
+          layer = true;
+        }
       }
+      return removed;
     }
-    return removed;
   }
 
   @Override
   public boolean retainAll(final Collection<?> c) {
-    return layers.retainAll(c);
+    synchronized (layers) {
+      return layers.retainAll(c);
+    }
   }
 
   @Override
@@ -333,5 +360,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public <T> T[] toArray(final T[] a) {
     return layers.toArray(a);
+  }
+
+  public void sort() {
+    synchronized (layers) {
+      Collections.sort(layers);
+    }
   }
 }

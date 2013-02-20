@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -42,8 +45,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public AbstractDataObjectLayer(final String name) {
-    this(name,GeometryFactory.getFactory(4326));
-     setReadOnly(false);
+    this(name, GeometryFactory.getFactory(4326));
+    setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
     setRenderer(new GeometryStyleRenderer(this));
@@ -53,6 +56,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final GeometryFactory geometryFactory) {
     super(name);
     setGeometryFactory(geometryFactory);
+  }
+
+  @Override
+  public void addSelectedObjects(final Collection<? extends DataObject> objects) {
+    selectedObjects.addAll(objects);
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  @Override
+  public void addSelectedObjects(final DataObject... objects) {
+    addSelectedObjects(Arrays.asList(objects));
   }
 
   @Override
@@ -68,16 +82,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearSelection() {
     selectedObjects = new LinkedHashSet<DataObject>();
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  @Override
+  public void deleteObjects(final Collection<? extends DataObject> objects) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void deleteObjects(final DataObject... objects) {
     deleteObjects(Arrays.asList(objects));
-  }
-
-  @Override
-  public void deleteObjects(final List<DataObject> objects) {
-    throw new UnsupportedOperationException();
   }
 
   public CoordinateSystem getCoordinateSystem() {
@@ -122,7 +137,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public int getRowCount() {
-    throw new UnsupportedOperationException();
+    final DataObjectMetaData metaData = getMetaData();
+    final Query query = new Query(metaData);
+    return getRowCount(query);
+  }
+
+  @Override
+  public int getRowCount(final Query query) {
+    LoggerFactory.getLogger(getClass()).error("Get row count not implemented");
+    return 0;
   }
 
   @Override
@@ -131,13 +154,34 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void selectObjects(final DataObject... objects) {
-    selectObjects(Arrays.asList(objects));
+  public int getSelectionCount() {
+    return selectedObjects.size();
   }
 
   @Override
-  public void selectObjects(final List<DataObject> objects) {
-    selectedObjects.addAll(objects);
+  public boolean isSelected(final DataObject object) {
+    if (object == null) {
+      return false;
+    } else {
+      return selectedObjects.contains(object);
+    }
+  }
+
+  @Override
+  public List<DataObject> query(final Query query) {
+    throw new UnsupportedOperationException("Query not currently supported");
+  }
+
+  @Override
+  public void removeSelectedObjects(
+    final Collection<? extends DataObject> objects) {
+    selectedObjects.removeAll(objects);
+  }
+
+  @Override
+  public void removeSelectedObjects(final DataObject... objects) {
+    removeSelectedObjects(Arrays.asList(objects));
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
   }
 
   @Override
@@ -168,7 +212,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(this,style);
+        final LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
+          this, style);
         if (renderer != null) {
           setRenderer(renderer);
         }
@@ -181,6 +226,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
     super.setRenderer(renderer);
+  }
+
+  @Override
+  public void setSelectedObjects(final Collection<DataObject> selectedObjects) {
+    this.selectedObjects = new LinkedHashSet<DataObject>(selectedObjects);
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  @Override
+  public void setSelectedObjects(final DataObject... selectedObjects) {
+    setSelectedObjects(Arrays.asList(selectedObjects));
+  }
+
+  @Override
+  public void setSelectedObjects(BoundingBox boundingBox) {
+    List<DataObject> objects = getDataObjects(boundingBox);
+    setSelectedObjects(objects);
   }
 
   @Override

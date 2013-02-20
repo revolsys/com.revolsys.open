@@ -35,6 +35,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public Nts1000000RectangularMapGrid(final double width, final double height) {
     this.tileWidth = width;
     this.tileHeight = height;
+    setName("NTS 1:1 000 000");
   }
 
   public int getBlock(final String sheet) {

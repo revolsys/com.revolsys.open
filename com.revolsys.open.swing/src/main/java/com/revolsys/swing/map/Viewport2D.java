@@ -22,6 +22,14 @@ import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Point;
 
 public class Viewport2D {
+  
+  public double toDisplayValue(Viewport2D viewport, Measure<Length> value ) {
+    if (viewport== null) {
+      return value.getValue().doubleValue();
+    } else {
+      return viewport.toDisplayValue(value);
+    }
+  }
   public static AffineTransform createModelToScreenTransform(
     final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {

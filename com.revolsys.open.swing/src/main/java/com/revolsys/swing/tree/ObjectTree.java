@@ -14,12 +14,17 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.swing.DropMode;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
@@ -27,6 +32,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
@@ -50,6 +56,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
   public ObjectTree(final ObjectTreeModel model) {
     super(model);
     this.model = model;
+    setToggleClickCount(0);
     final Object root = model.getRoot();
     if (root instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
@@ -111,19 +118,21 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
           final TreePath path = ObjectTree.this.getPathForLocation(x, y);
           if (path != null) {
 
-            final TreePath[] selectionPaths = ObjectTree.this.getSelectionPaths();
-            final Set<TreePath> paths = new LinkedHashSet<TreePath>();
-            paths.add(path);
-            if (selectionPaths != null) {
-              paths.addAll(Arrays.asList(selectionPaths));
+            TreePath[] selectionPaths = getSelectionPaths();
+            if (selectionPaths == null
+              || !Arrays.asList(selectionPaths).contains(path)) {
+              selectionPaths = new TreePath[] {
+                path
+              };
+              setSelectionPaths(selectionPaths);
             }
 
-            ObjectTree.this.setSelectionPaths(paths.toArray(new TreePath[0]));
             final Object node = path.getLastPathComponent();
             final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
             if (nodeModel != null) {
-              final JPopupMenu menu = nodeModel.getMenu(node);
-              if (menu != null && menu.getSubElements().length > 0) {
+              final PopupMenu menu = nodeModel.getMenu(node);
+              int numItems = menu.getSubElements().length;
+              if (menu != null && numItems > 0) {
                 mouseClickItem = node;
                 menu.show(ObjectTree.this, x, y);
                 // TODO add listener to set item=null

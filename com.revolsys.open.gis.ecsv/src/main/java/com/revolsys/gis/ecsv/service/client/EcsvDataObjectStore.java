@@ -30,6 +30,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
@@ -71,6 +72,10 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return new EcsvDataObjectStore(uri, username, password, factory);
   }
 
+  @Override
+  public int getRowCount(Query query) {
+    throw new UnsupportedOperationException();
+  }
   private final Map<String, String> namespacePaths = new HashMap<String, String>();
 
   private final String password;

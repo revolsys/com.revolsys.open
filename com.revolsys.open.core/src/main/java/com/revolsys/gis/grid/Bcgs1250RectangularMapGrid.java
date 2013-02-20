@@ -8,11 +8,12 @@ public class Bcgs1250RectangularMapGrid extends Bcgs2500RectangularMapGrid {
     + BcgsConstants.REGEX_1250 + ".*");
 
   public Bcgs1250RectangularMapGrid() {
-    super(BcgsConstants.WIDTH_1250, BcgsConstants.HEIGHT_1250);
+    this(BcgsConstants.WIDTH_1250, BcgsConstants.HEIGHT_1250);
   }
 
   protected Bcgs1250RectangularMapGrid(final double width, final double height) {
     super(width, height);
+    setName("BCGS 1:1 250");
   }
 
   @Override

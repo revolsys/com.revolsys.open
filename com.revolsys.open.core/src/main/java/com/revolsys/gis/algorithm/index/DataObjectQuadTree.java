@@ -182,7 +182,7 @@ public class DataObjectQuadTree extends Quadtree {
     return super.remove(envelope, object);
   }
 
-  public void remove(final List<DataObject> objects) {
+  public void remove(final Collection<? extends DataObject> objects) {
     for (final DataObject object : objects) {
       remove(object);
     }

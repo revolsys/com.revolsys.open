@@ -181,7 +181,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         query.setMetaData(metaData);
       }
     }
-    final String sql = JdbcUtils.getSelectSql(query);
+    final String sql = getSql(query);
     try {
       statement = connection.prepareStatement(sql);
       statement.setFetchSize(fetchSize);
@@ -220,6 +220,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       throw new RuntimeException("Error executing query:" + sql, e);
     }
     return resultSet;
+  }
+
+  protected String getSql(final Query query) {
+    return JdbcUtils.getSelectSql(query);
   }
 
 }

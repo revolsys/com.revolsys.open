@@ -141,6 +141,10 @@ public class GeometryStyle extends MarkerStyle {
     return lineWidth.doubleValue(NonSI.PIXEL);
   }
 
+  public Measure<Length> getLineWidthMeasure() {
+    return lineWidth;
+  }
+
   public CompositionOperation getPolygonCompositionOperation() {
     return polygonCompositionOperation;
   }

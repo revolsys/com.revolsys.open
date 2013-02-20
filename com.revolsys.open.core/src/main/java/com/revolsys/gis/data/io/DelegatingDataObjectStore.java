@@ -44,6 +44,11 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
+  public int getRowCount(Query query) {
+    return dataStore.getRowCount(query);
+  }
+
+  @Override
   public void addCodeTables(final Collection<CodeTable> codeTables) {
     dataStore.addCodeTables(codeTables);
   }

@@ -7,7 +7,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
 
-public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties, PropertyChangeListener {
+public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties, PropertyChangeListener,Comparable<Layer> {
   void addPropertyChangeListener(final PropertyChangeListener listener);
 
   void addPropertyChangeListener(final String propertyName,
@@ -20,6 +20,7 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
   GeometryFactory getGeometryFactory();
 
   long getId();
+
 
   LayerGroup getLayerGroup();
 

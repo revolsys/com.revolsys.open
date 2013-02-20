@@ -131,7 +131,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public void deleteObjects(final List<DataObject> objects) {
+  public void deleteObjects(final Collection<? extends DataObject> objects) {
     final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
     this.objects.removeAll(objects);
     this.index.remove(objects);

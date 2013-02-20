@@ -4,9 +4,9 @@ import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JPopupMenu;
 import javax.swing.tree.TreeCellRenderer;
 
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> {
@@ -23,7 +23,7 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   int getIndexOfChild(final NODE node, final CHILD child);
 
-  JPopupMenu getMenu(final NODE node);
+  PopupMenu getMenu(final NODE node);
 
   MouseListener getMouseListener(final NODE node);
 

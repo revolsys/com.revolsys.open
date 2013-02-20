@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.grid;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -14,6 +16,9 @@ public class GridLayer extends AbstractLayer {
 
   public GridLayer(final String name, final RectangularMapGrid grid) {
     super(name);
+    if (!StringUtils.hasText(name)) {
+      setName(grid.getName());
+    }
     this.grid = grid;
     setReadOnly(true);
     setSelectSupported(false);

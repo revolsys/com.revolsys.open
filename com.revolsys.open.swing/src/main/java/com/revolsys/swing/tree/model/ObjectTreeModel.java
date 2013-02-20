@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -20,6 +21,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.StringTreeNodeModel;
@@ -40,6 +42,57 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public ObjectTreeModel() {
     addNodeModel(new StringTreeNodeModel());
     addNodeModel(new ListObjectTreeNodeModel());
+  }
+
+  private final ClassRegistry<PopupMenu> classMenus = new ClassRegistry<PopupMenu>();
+
+  private final Map<Object, PopupMenu> objectMenus = new WeakHashMap<Object, PopupMenu>();
+
+  public PopupMenu getMenu(final Class<?> layerClass) {
+    synchronized (classMenus) {
+      PopupMenu menu = classMenus.get(layerClass);
+      if (menu == null) {
+        menu = new PopupMenu();
+        classMenus.put(layerClass, menu);
+      }
+      return menu;
+    }
+  }
+
+  public PopupMenu getMenu(final Object object) {
+    synchronized (objectMenus) {
+      PopupMenu popupMenu = objectMenus.get(object);
+      if (popupMenu != null) {
+        return popupMenu;
+      }
+    }
+    Class<?> clazz = object.getClass();
+    synchronized (classMenus) {
+      return classMenus.find(clazz);
+    }
+  }
+
+  public void addMenuItem(final Class<?> clazz, final JMenuItem menuItem) {
+    final PopupMenu menu = getMenu(clazz);
+    menu.addMenuItem(menuItem);
+  }
+
+  public void addMenuItem(final Class<?> clazz, final String groupName,
+    final JMenuItem menuItem) {
+    final PopupMenu menu = getMenu(clazz);
+    menu.addMenuItem(groupName, menuItem);
+  }
+
+  public PopupMenu getObjectMenu(final Object object) {
+    PopupMenu menu;
+    synchronized (objectMenus) {
+      menu = objectMenus.get(object);
+      if (menu == null) {
+        menu = new PopupMenu();
+        objectMenus.put(object, menu);
+      }
+    }
+    return menu;
   }
 
   public ObjectTreeModel(final Object root) {
@@ -346,4 +399,5 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     // final Object value = path.getLastPathComponent();
     // TODO
   }
+
 }

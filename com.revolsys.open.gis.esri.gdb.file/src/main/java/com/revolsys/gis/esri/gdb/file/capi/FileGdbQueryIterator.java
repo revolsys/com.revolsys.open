@@ -37,35 +37,39 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   private final String typePath;
 
+  private int offset;
+
+  private int limit;
+
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath) {
-    this(dataStore, typePath, "*", "", null);
+    this(dataStore, typePath, "*", "", null, 0, -1);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final BoundingBox boundingBox) {
-    this(dataStore, typePath, "*", "", boundingBox);
+    this(dataStore, typePath, "*", "", boundingBox, 0, -1);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String whereClause) {
-    this(dataStore, typePath, "*", whereClause, null);
+    this(dataStore, typePath, "*", whereClause, null, 0, -1);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String whereClause,
-    final BoundingBox boundingBox) {
-    this(dataStore, typePath, "*", whereClause, boundingBox);
+    final BoundingBox boundingBox, int offset, int limit) {
+    this(dataStore, typePath, "*", whereClause, boundingBox, offset, limit);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String fields, final String whereClause) {
-    this(dataStore, typePath, fields, whereClause, null);
+    this(dataStore, typePath, fields, whereClause, null, 0, -1);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String fields, final String whereClause,
-    final BoundingBox boundingBox) {
+    final BoundingBox boundingBox, int offset, int limit) {
     this.dataStore = dataStore;
     this.typePath = typePath;
     this.metaData = dataStore.getMetaData(typePath);
@@ -77,6 +81,8 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     this.whereClause = whereClause;
     setBoundingBox(boundingBox);
     this.dataObjectFactory = dataStore.getDataObjectFactory();
+    this.offset = offset;
+    this.limit = limit;
   }
 
   @Override
@@ -105,7 +111,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     synchronized (dataStore) {
       if (boundingBox == null) {
         if (whereClause.startsWith("SELECT *")) {
-           rows = dataStore.getGeodatabase().query(whereClause, false);
+          rows = dataStore.getGeodatabase().query(whereClause, false);
         } else {
           rows = dataStore.search(table, fields, whereClause, true);
         }
@@ -123,10 +129,21 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     return metaData;
   }
 
+  private int count;
+
   @Override
   protected DataObject getNext() throws NoSuchElementException {
     synchronized (dataStore) {
-      final Row row = rows.next();
+      Row row = null;
+      while (offset > 0 && count < offset) {
+        rows.next();
+        count++;
+      }
+      if (limit > -1 && count >= offset + limit) {
+        throw new NoSuchElementException();
+      }
+      row = rows.next();
+      count++;
       if (row == null) {
         throw new NoSuchElementException();
       } else {
@@ -158,7 +175,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
         }
       }
     }
-  }
+     }
 
   public void setWhereClause(final String whereClause) {
     this.whereClause = whereClause;

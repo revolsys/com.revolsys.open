@@ -53,6 +53,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public AbstractLayer() {
   }
 
+  @Override
+  public int compareTo(Layer layer) {
+    return getName().compareTo(layer.getName());
+  }
+
   public AbstractLayer(final String name) {
     this.name = name;
   }
@@ -174,7 +179,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isSelectable() {
-    return selectable;
+    return visible && selectable;
   }
 
   @Override
@@ -281,7 +286,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setProperty(final String name, final Object value) {
     // TODO see if we can get the JavaBeanUtil set property to work with
     // conversions
-    if (name.equals("type")) {}else  if (name.equals("minimumScale")) {
+    if (name.equals("type")) {
+    } else if (name.equals("minimumScale")) {
       setMinimumScale(((Number)value).longValue());
     } else if (name.equals("maximumScale")) {
       setMaximumScale(((Number)value).longValue());
@@ -323,7 +329,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setSelectable(final boolean selectable) {
+    final boolean oldValue = this.selectable;
     this.selectable = selectable;
+    propertyChangeSupport.firePropertyChange("selectable", oldValue, selectable);
   }
 
   public void setSelectSupported(final boolean selectSupported) {
