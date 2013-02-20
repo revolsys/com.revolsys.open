@@ -10,6 +10,7 @@ import org.postgresql.geometric.PGbox;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -55,13 +56,15 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   @Override
   public Query createBoundingBoxQuery(
     final Query query,
-    final BoundingBox boundingBox) {
+     BoundingBox boundingBox) {
     final Query boundingBoxQuery = query.clone();
     final String typePath = boundingBoxQuery.getTypeName();
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       throw new IllegalArgumentException("Unable to  find table " + typePath);
     } else {
+      GeometryFactory geometryFactory = metaData.getGeometryFactory();
+      boundingBox = boundingBox.convert(geometryFactory);
       final double x1 = boundingBox.getMinX();
       final double y1 = boundingBox.getMinY();
       final double x2 = boundingBox.getMaxX();

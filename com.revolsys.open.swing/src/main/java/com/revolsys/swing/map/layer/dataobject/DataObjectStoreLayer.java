@@ -57,17 +57,28 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.typePath = typePath;
   }
 
+  @Override
+  public void addSelectedObjects(final Collection<? extends DataObject> objects) {
+    for (final DataObject object : objects) {
+      if (object.getMetaData() == getMetaData()) {
+        final Object id = object.getIdValue();
+        synchronized (cachedObjects) {
+          if (!selectedObjectIds.contains(id)) {
+            selectedObjectIds.add(id);
+            cacheObject(id, object);
+          }
+        }
+      }
+    }
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
   private void cacheObject(final Object id, final DataObject object) {
     synchronized (cachedObjects) {
       if (!cachedObjects.containsKey(id)) {
         cachedObjects.put(id, object);
       }
     }
-  }
-
-  @Override
-  public int getSelectionCount() {
-    return selectedObjectIds.size();
   }
 
   /**
@@ -79,7 +90,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       ids.addAll(selectedObjectIds);
       ids.addAll(hiddenObjectIds);
       ids.addAll(editingObjectIds);
-      cachedObjects.keySet().retainAll(selectedObjectIds);
+      cachedObjects.keySet().retainAll(ids);
     }
   }
 
@@ -139,26 +150,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  @Override
-  public void setSelectedObjects(BoundingBox boundingBox) {
-    Polygon polygon = boundingBox.toPolygon();
-    List<DataObject> allObjects = new ArrayList<DataObject>();
-
-    Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
-    try {
-      List<DataObject> objects = reader.read();
-      for (DataObject object : objects) {
-        Geometry geometry = object.getGeometryValue();
-        if (geometry.intersects(polygon)) {
-          allObjects.add(object);
-        }
-      }
-    } finally {
-      reader.close();
-    }
-    setSelectedObjects(allObjects);
-  }
-
   public DataObjectStore getDataStore() {
     return dataStore;
   }
@@ -209,6 +200,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return objects;
   }
 
+  @Override
+  public int getSelectionCount() {
+    return selectedObjectIds.size();
+  }
+
   public String getTypePath() {
     return typePath;
   }
@@ -245,39 +241,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } finally {
       reader.close();
     }
-  }
-
-  @Override
-  public void addSelectedObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!selectedObjectIds.contains(id)) {
-            selectedObjectIds.add(id);
-            cacheObject(id, object);
-          }
-        }
-      }
-    }
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
-  }
-
-  @Override
-  public void setSelectedObjects(final Collection<DataObject> objects) {
-    selectedObjectIds.clear();
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!selectedObjectIds.contains(id)) {
-            selectedObjectIds.add(id);
-            cacheObject(id, object);
-          }
-        }
-      }
-    }
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
   }
 
   @Override
@@ -336,6 +299,43 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
     getPropertyChangeSupport().firePropertyChange("refresh", false, true);
+  }
+
+  @Override
+  public void setSelectedObjects(final BoundingBox boundingBox) {
+    final Polygon polygon = boundingBox.toPolygon();
+    final List<DataObject> allObjects = new ArrayList<DataObject>();
+
+    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
+    try {
+      final List<DataObject> objects = reader.read();
+      for (final DataObject object : objects) {
+        final Geometry geometry = object.getGeometryValue();
+        if (geometry.intersects(polygon)) {
+          allObjects.add(object);
+        }
+      }
+    } finally {
+      reader.close();
+    }
+    setSelectedObjects(allObjects);
+  }
+
+  @Override
+  public void setSelectedObjects(final Collection<DataObject> objects) {
+    selectedObjectIds.clear();
+    for (final DataObject object : objects) {
+      if (object.getMetaData() == getMetaData()) {
+        final Object id = object.getIdValue();
+        synchronized (cachedObjects) {
+          if (!selectedObjectIds.contains(id)) {
+            selectedObjectIds.add(id);
+            cacheObject(id, object);
+          }
+        }
+      }
+    }
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
   }
 
 }
