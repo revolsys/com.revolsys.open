@@ -303,22 +303,35 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
-    final Polygon polygon = boundingBox.toPolygon();
-    final List<DataObject> allObjects = new ArrayList<DataObject>();
+    BoundingBox loadedBoundingBox;
+    DataObjectQuadTree index;
+    synchronized (sync) {
+      loadedBoundingBox = this.boundingBox;
+      index = this.index;
+    }
+    List<DataObject> queryObjects;
+    if (loadedBoundingBox.contains(boundingBox)) {
+      queryObjects = index.query(boundingBox.convert(getGeometryFactory()));
+    } else {
 
-    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
-    try {
-      final List<DataObject> objects = reader.read();
-      for (final DataObject object : objects) {
+      final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
+      try {
+        queryObjects = reader.read();
+      } finally {
+        reader.close();
+      }
+    }
+    if (!queryObjects.isEmpty()) {
+      final Polygon polygon = boundingBox.toPolygon();
+      final List<DataObject> allObjects = new ArrayList<DataObject>();
+      for (final DataObject object : queryObjects) {
         final Geometry geometry = object.getGeometryValue();
         if (geometry.intersects(polygon)) {
           allObjects.add(object);
         }
       }
-    } finally {
-      reader.close();
+      setSelectedObjects(allObjects);
     }
-    setSelectedObjects(allObjects);
   }
 
   @Override
