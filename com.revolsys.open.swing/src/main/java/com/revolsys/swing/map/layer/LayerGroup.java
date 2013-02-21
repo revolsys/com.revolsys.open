@@ -32,6 +32,18 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
   }
+  
+  
+  public BoundingBox getSelectedBoundingBox() {
+    BoundingBox boundingBox = super.getSelectedBoundingBox();
+    if (isVisible()) {
+      for (Layer layer : this) {
+        BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
+        boundingBox.expandToInclude(layerBoundingBox);
+      }
+    }
+    return boundingBox;
+  }
 
   @Override
   public boolean add(final Layer layer) {

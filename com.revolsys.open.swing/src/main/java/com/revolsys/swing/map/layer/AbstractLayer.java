@@ -53,6 +53,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public AbstractLayer() {
   }
 
+  public BoundingBox getSelectedBoundingBox() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    return new BoundingBox(geometryFactory);
+  }
+
   @Override
   public int compareTo(Layer layer) {
     return getName().compareTo(layer.getName());
@@ -87,7 +92,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     if (visible || !visibleLayersOnly) {
-      return new BoundingBox();
+      GeometryFactory geometryFactory = getGeometryFactory();
+      return new BoundingBox(geometryFactory);
     } else {
       return getBoundingBox();
     }
@@ -95,7 +101,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    if (geometryFactory == null && layerGroup != null) {
+      return layerGroup.getGeometryFactory();
+    } else {
+      return geometryFactory;
+    }
   }
 
   @Override

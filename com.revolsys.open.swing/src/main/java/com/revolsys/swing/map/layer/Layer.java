@@ -88,4 +88,6 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);
+
+  BoundingBox getSelectedBoundingBox();
 }

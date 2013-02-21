@@ -376,7 +376,9 @@ public class BoundingBox extends Envelope {
   }
 
   public void expandToInclude(final BoundingBox other) {
-    super.expandToInclude(other.convert(geometryFactory));
+    if (!other.isNull()) {
+      super.expandToInclude(other.convert(geometryFactory));
+    }
   }
 
   public void expandToInclude(final Coordinates coordinates) {
@@ -386,8 +388,10 @@ public class BoundingBox extends Envelope {
   }
 
   public void expandToInclude(final Geometry geometry) {
-    final BoundingBox box = getBoundingBox(geometry);
-    expandToInclude(box);
+    if (geometry != null) {
+      final BoundingBox box = getBoundingBox(geometry);
+      expandToInclude(box);
+    }
   }
 
   /**
