@@ -9,9 +9,12 @@ import javax.sql.DataSource;
 import org.postgresql.geometric.PGbox;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
@@ -44,6 +47,12 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     super(dataSource);
   }
 
+  @Override
+  public AbstractIterator<DataObject> createIterator(Query query,
+    Map<String, Object> properties) {
+    return new PostgreSQLJdbcQueryIterator(this, query, properties);
+  }
+
   public PostgreSQLDataObjectStore(
     final PostgreSQLDatabaseFactory databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
@@ -54,9 +63,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public Query createBoundingBoxQuery(
-    final Query query,
-     BoundingBox boundingBox) {
+  public Query createBoundingBoxQuery(final Query query, BoundingBox boundingBox) {
     final Query boundingBoxQuery = query.clone();
     final String typePath = boundingBoxQuery.getTypeName();
     final DataObjectMetaData metaData = getMetaData(typePath);
@@ -82,6 +89,11 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       boundingBoxQuery.addParameter(box);
       return boundingBoxQuery;
     }
+  }
+
+  @Override
+  public ResultPager<DataObject> page(Query query) {
+    return new PostgreSQLJdbcQueryResultPager(this, getProperties(), query);
   }
 
   @Override

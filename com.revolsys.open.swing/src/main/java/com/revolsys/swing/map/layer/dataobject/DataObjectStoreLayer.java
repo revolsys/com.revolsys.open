@@ -301,8 +301,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     getPropertyChangeSupport().firePropertyChange("refresh", false, true);
   }
 
+  public BoundingBox getLoadingBoundingBox() {
+    return loadingBoundingBox;
+  }
+
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
+    final List<DataObject> objects = getObjects(boundingBox);
+    setSelectedObjects(objects);
+  }
+
+  protected List<DataObject> getObjects(BoundingBox boundingBox) {
+    BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
     BoundingBox loadedBoundingBox;
     DataObjectQuadTree index;
     synchronized (sync) {
@@ -311,27 +321,33 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
     List<DataObject> queryObjects;
     if (loadedBoundingBox.contains(boundingBox)) {
-      queryObjects = index.query(boundingBox.convert(getGeometryFactory()));
+      queryObjects = index.query(convertedBoundingBox);
     } else {
-
-      final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
-      try {
-        queryObjects = reader.read();
-      } finally {
-        reader.close();
-      }
+      queryObjects = getObjectsFromDataStore(convertedBoundingBox);
     }
+    final List<DataObject> allObjects = new ArrayList<DataObject>();
     if (!queryObjects.isEmpty()) {
-      final Polygon polygon = boundingBox.toPolygon();
-      final List<DataObject> allObjects = new ArrayList<DataObject>();
+      final Polygon polygon = convertedBoundingBox.toPolygon();
       for (final DataObject object : queryObjects) {
         final Geometry geometry = object.getGeometryValue();
         if (geometry.intersects(polygon)) {
           allObjects.add(object);
         }
       }
-      setSelectedObjects(allObjects);
     }
+    return allObjects;
+  }
+
+  protected List<DataObject> getObjectsFromDataStore(
+    final BoundingBox boundingBox) {
+    List<DataObject> queryObjects;
+    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
+    try {
+      queryObjects = reader.read();
+    } finally {
+      reader.close();
+    }
+    return queryObjects;
   }
 
   @Override
@@ -340,10 +356,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     for (final DataObject object : objects) {
       if (object.getMetaData() == getMetaData()) {
         final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!selectedObjectIds.contains(id)) {
-            selectedObjectIds.add(id);
-            cacheObject(id, object);
+        if (id != null) {
+          synchronized (cachedObjects) {
+            if (!selectedObjectIds.contains(id)) {
+              selectedObjectIds.add(id);
+              cacheObject(id, object);
+            }
           }
         }
       }

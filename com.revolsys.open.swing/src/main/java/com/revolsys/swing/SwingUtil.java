@@ -54,7 +54,8 @@ public class SwingUtil {
   public static JFileChooser createFileChooser(Class<?> preferencesClass,
     String preferenceName) {
     final JFileChooser fileChooser = new JFileChooser();
-    String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
+    String currentDirectoryName = PreferencesUtil.getString(preferencesClass,
+      preferenceName);
     if (StringUtils.hasText(currentDirectoryName)) {
       File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {
@@ -96,7 +97,9 @@ public class SwingUtil {
       } else if (codeTable != null) {
         final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
           !required);
-        comboBox.setSelectedIndex(0);
+        if (comboBox.getModel().getSize() > 0) {
+          comboBox.setSelectedIndex(0);
+        }
         final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
           codeTable);
         AutoCompleteDecorator.decorate(comboBox, stringConverter);
@@ -263,6 +266,6 @@ public class SwingUtil {
     } else {
       return null;
     }
-  
+
   }
 }
