@@ -111,7 +111,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public PopupMenu getMenu(final NODE node) {
-    if (node == null) {
+    if (node == null || objectTreeModel ==null) {
       return null;
     } else {
       return objectTreeModel.getMenu(node);

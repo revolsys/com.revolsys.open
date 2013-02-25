@@ -1,6 +1,6 @@
 package com.revolsys.swing.map;
 
-import java.awt.Component;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -9,6 +9,7 @@ import javax.measure.Measurable;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
+import javax.swing.JComponent;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -18,13 +19,13 @@ import com.revolsys.swing.map.layer.Project;
 
 public class ComponentViewport2D extends Viewport2D {
 
-  private final Component component;
+  private final JComponent component;
 
   private int maxIntegerDigits;
 
   private int maxDecimalDigits;
 
-  public ComponentViewport2D(final Project project, final Component component) {
+  public ComponentViewport2D(final Project project, final JComponent component) {
     super(project);
     this.component = component;
     project.getPropertyChangeSupport().addPropertyChangeListener(
@@ -214,16 +215,6 @@ public class ComponentViewport2D extends Viewport2D {
     return validBoundingBox;
   }
 
-  @Override
-  public int getViewHeightPixels() {
-    return component.getHeight();
-  }
-
-  @Override
-  public int getViewWidthPixels() {
-    return component.getWidth();
-  }
-
   public void repaint() {
     component.repaint();
   }
@@ -277,6 +268,11 @@ public class ComponentViewport2D extends Viewport2D {
 
   }
 
+  @Override
+  public void update() {
+    repaint();
+  }
+
   public void updateCachedFields() {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
@@ -285,12 +281,13 @@ public class ComponentViewport2D extends Viewport2D {
         setGeometryFactory(geometryFactory);
 
       }
-      final BoundingBox boundingBox = getBoundingBox();
-      final double viewAspectRatio = getViewAspectRatio();
-      final double aspectRatio = boundingBox.getAspectRatio();
-      if (boundingBox != null && viewAspectRatio != aspectRatio) {
-        setBoundingBox(this.getBoundingBox());
-      }
+
+      final Insets insets = component.getInsets();
+
+      setViewWidth(component.getWidth() - insets.left - insets.right);
+      setViewHeight(component.getHeight() - insets.top - insets.bottom);
+      setBoundingBox(getBoundingBox());
+
       component.repaint();
     }
   }

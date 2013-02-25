@@ -6,6 +6,7 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -26,7 +27,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Paul Austin
  */
-public class BoundingBox extends Envelope {
+public class BoundingBox extends Envelope implements Cloneable {
 
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
@@ -34,6 +35,15 @@ public class BoundingBox extends Envelope {
   public static BoundingBox getBoundingBox(final Geometry geometry) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
+  }
+
+  @Override
+  public BoundingBox clone()  {
+    try {
+      return (BoundingBox)super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -427,7 +437,7 @@ public class BoundingBox extends Envelope {
     return geometryFactory;
   }
 
-  public Measurable<Length> getHeightLength() {
+  public Measure<Length> getHeightLength() {
     final double height = getHeight();
     return Measure.valueOf(height, getCoordinateSystem().getLengthUnit());
   }
@@ -507,7 +517,7 @@ public class BoundingBox extends Envelope {
     }
   }
 
-  public Measurable<Length> getWidthLength() {
+  public Measure<Length> getWidthLength() {
     final double width = getWidth();
     return Measure.valueOf(width, getCoordinateSystem().getLengthUnit());
   }
@@ -689,13 +699,13 @@ public class BoundingBox extends Envelope {
       s.append(";");
     }
     s.append("BBOX(");
-    s.append((long)getMinX());
+    s.append(StringConverterRegistry.toString(getMinX()));
     s.append(',');
-    s.append((long)getMinY());
+    s.append(StringConverterRegistry.toString(getMinY()));
     s.append(' ');
-    s.append((long)getMaxX());
+    s.append(StringConverterRegistry.toString(getMaxX()));
     s.append(',');
-    s.append((long)getMaxY());
+    s.append(StringConverterRegistry.toString(getMaxY()));
     s.append(')');
     return s.toString();
   }

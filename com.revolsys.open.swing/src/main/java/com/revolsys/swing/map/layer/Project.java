@@ -4,7 +4,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 
 public class Project extends LayerGroup {
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory(3857);
 
   public Project() {
     super("Project");

@@ -10,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.measure.quantity.Quantity;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -22,14 +23,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Point;
 
 public class Viewport2D {
-  
-  public double toDisplayValue(Viewport2D viewport, Measure<Length> value ) {
-    if (viewport== null) {
-      return value.getValue().doubleValue();
-    } else {
-      return viewport.toDisplayValue(value);
-    }
-  }
+
   public static AffineTransform createModelToScreenTransform(
     final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
@@ -96,9 +90,14 @@ public class Viewport2D {
 
   private AffineTransform screenToModelTransform;
 
-  private int width;
+  private int viewWidth;
 
-  private int height;
+  private int viewHeight;
+
+  /** Multiplier to convert a value to be 1 pixel size at 72DPI.*/
+  private double standardPixelScaleFactor;
+
+  private double metresPerPixel;
 
   public Viewport2D() {
   }
@@ -111,8 +110,8 @@ public class Viewport2D {
   public Viewport2D(final Project project, final int width, final int height,
     final BoundingBox boundingBox) {
     this(project);
-    this.width = width;
-    this.height = height;
+    this.viewWidth = width;
+    this.viewHeight = height;
     setBoundingBox(boundingBox);
     setGeometryFactory(boundingBox.getGeometryFactory());
   }
@@ -148,6 +147,10 @@ public class Viewport2D {
    */
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
+  }
+
+  public double getMetresPerPixel() {
+    return metresPerPixel;
   }
 
   public double getModelHeight() {
@@ -206,8 +209,14 @@ public class Viewport2D {
     return NonSI.INCH.divide(screenResolution);
   }
 
-   public double getViewAspectRatio() {
-    return getViewWidthPixels() / getViewHeightPixels();
+  public double getViewAspectRatio() {
+    final int viewWidthPixels = getViewWidthPixels();
+    final int viewHeightPixels = getViewHeightPixels();
+    if (viewHeightPixels == 0) {
+      return 0;
+    } else {
+      return (double)viewWidthPixels / viewHeightPixels;
+    }
   }
 
   public Measurable<Length> getViewHeightLength() {
@@ -219,7 +228,13 @@ public class Viewport2D {
   }
 
   public int getViewHeightPixels() {
-    return height;
+    return viewHeight;
+  }
+
+  public <Q extends Quantity> Unit<Q> getViewToModelUnit(final Unit<Q> modelUnit) {
+    final double viewWidth = getViewWidthPixels();
+    final double modelWidth = getModelWidth();
+    return modelUnit.times(modelWidth).divide(viewWidth);
   }
 
   public Measurable<Length> getViewWidthLength() {
@@ -231,7 +246,7 @@ public class Viewport2D {
   }
 
   public int getViewWidthPixels() {
-    return width;
+    return viewWidth;
   }
 
   public boolean isUseModelCoordinates() {
@@ -258,9 +273,6 @@ public class Viewport2D {
     propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
 
-  /** Multiplier to convert a value to be 1 pixel size at 72DPI.*/
-  private double standardPixelScaleFactor;
-  
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
       final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
@@ -271,19 +283,45 @@ public class Viewport2D {
 
         final double viewWidth = getViewWidthPixels();
         final double viewHeight = getViewHeightPixels();
-        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-        int screenResolution = defaultToolkit.getScreenResolution();
-        standardPixelScaleFactor = screenResolution /72.0;
-        
-        modelToScreenTransform = createModelToScreenTransform(
-          convertedBoundingBox, viewWidth, viewHeight);
-        screenToModelTransform = createScreenToModelTransform(
-          convertedBoundingBox, viewWidth, viewHeight);
+        if (viewWidth > 0) {
+          final double viewAspectRatio = getViewAspectRatio();
+          final double aspectRatio = this.boundingBox.getAspectRatio();
+          if (viewAspectRatio != aspectRatio) {
+            if (aspectRatio < viewAspectRatio) {
+              final double width = boundingBox.getWidth();
+              final double height = boundingBox.getHeight();
+              final double newWidth = height * viewAspectRatio;
+              final double expandX = (newWidth - width) / 2;
+              this.boundingBox = this.boundingBox.clone();
+              this.boundingBox.expandBy(expandX, 0);
 
+            } else if (aspectRatio > viewAspectRatio) {
+              final double width = boundingBox.getWidth();
+              final double height = boundingBox.getHeight();
+              final double newHeight = width / viewAspectRatio;
+              final double expandY = (newHeight - height) / 2;
+              this.boundingBox = this.boundingBox.clone();
+              this.boundingBox.expandBy(0, expandY);
+
+            }
+          }
+
+          final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+          final int screenResolution = defaultToolkit.getScreenResolution();
+          standardPixelScaleFactor = screenResolution / 72.0;
+
+          modelToScreenTransform = createModelToScreenTransform(
+            this.boundingBox, viewWidth, viewHeight);
+          screenToModelTransform = createScreenToModelTransform(
+            this.boundingBox, viewWidth, viewHeight);
+          metresPerPixel = getModelHeightLength().doubleValue(SI.METRE)
+            / getViewHeightPixels();
+        }
         final double newScale = getScale();
         propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
           convertedBoundingBox);
         propertyChangeSupport.firePropertyChange("scale", oldScale, newScale);
+
       }
     }
   }
@@ -318,6 +356,14 @@ public class Viewport2D {
 
   }
 
+  protected void setViewHeight(final int height) {
+    this.viewHeight = height;
+  }
+
+  protected void setViewWidth(final int width) {
+    this.viewWidth = width;
+  }
+
   public double toDisplayValue(final Measure<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
@@ -342,6 +388,15 @@ public class Viewport2D {
       }
     }
     return convertedValue;
+  }
+
+  public double toDisplayValue(final Viewport2D viewport,
+    final Measure<Length> value) {
+    if (viewport == null) {
+      return value.getValue().doubleValue();
+    } else {
+      return viewport.toDisplayValue(value);
+    }
   }
 
   public double[] toModelCoordinates(final double... viewCoordinates) {
@@ -382,6 +437,13 @@ public class Viewport2D {
     }
   }
 
+  public Point2D toViewPoint(final double x, final double y) {
+    final double[] coordinates = toViewCoordinates(x, y);
+    final double viewX = coordinates[0];
+    final double viewY = coordinates[1];
+    return new Point2D.Double(viewX, viewY);
+  }
+
   public Point2D toViewPoint(Point point) {
     point = (Point)geometryFactory.createGeometry(point);
     final double x = point.getX();
@@ -392,10 +454,6 @@ public class Viewport2D {
     return new Point2D.Double(viewX, viewY);
   }
 
-  public Point2D toViewPoint(double x, double y) {
-    final double[] coordinates = toViewCoordinates(x, y);
-    final double viewX = coordinates[0];
-    final double viewY = coordinates[1];
-    return new Point2D.Double(viewX, viewY);
+  public void update() {
   }
 }
