@@ -23,7 +23,7 @@ public class LineStringGraphTest {
     }
   }
 
-  @Test
+
   public void testCleanupEndOfSegmentOverlap() {
     final LineString line = geometryFactory.createGeometry("LINESTRING(844000 1343000,844010 1343000,844020 1343000,844010 1343000)");
     final LineStringGraph graph = new LineStringGraph(line);
