@@ -33,7 +33,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
     this.geometryFactory = geometryFactory;
 
     setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-    setPreferredSize(new Dimension(200, 20));
+    setPreferredSize(new Dimension(250, 20));
   }
 
   @Override

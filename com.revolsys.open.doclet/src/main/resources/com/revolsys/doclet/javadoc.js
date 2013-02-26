@@ -26,15 +26,29 @@ function createAccordion(selector) {
 }
 
 $(document).ready(function() {
+  var exampleIndex = 0;
   $('div.htmlExample').each(function() {
+    exampleIndex++;
     var text = String($(this).html());
+    var id = $(this).attr('id');
+    if (!id) {
+      id = 'htmlExample' + exampleIndex;
+    }
+    $(this).removeAttr('id');
+    
+    $(this).wrap('<div id="' + id +'">');
+    var tabDiv = $(this).parent();
+    var exampleDiv = $(this).wrap('<div id="' + id +'-example">');
+    var ul = $('<ul>');
+    $(ul).append('<li><a href="#' + id + '-example">Example</a></li>');
+    $(ul).append('<li><a href="#' + id + '-source">View Source</a></li>');
+    $(tabDiv).prepend(ul);
+    
     var pre = $('<pre class="prettyprint language-html"/>').text(text);
-    $(this).before('<p>The following code fragment shows an example of using the API.</p>');
-    $(this).before(pre);
-    $('*', this).wrapAll('<div>');
-    $('> div', this).prepend('<p>Use the buttons below to run the example.</p>');
-    $(this).prepend('<div class="title"><a name="example">Example</a></div>');
-    $(this).addClass('open');
+    var source = $('<div id="' + id +'-source"/>');
+    source.append(pre);
+    $(tabDiv).append(source);
+    $(tabDiv).tabs();
   });
 
   $('div.simpleDataTable table').dataTable({
@@ -49,7 +63,6 @@ $(document).ready(function() {
   createAccordion('div.javaPackage');
   createAccordion('div.javaClass');
   createAccordion('div.javaMethod');
-  createAccordion('div.htmlExample');
   prettyPrint();
   $(':button').button();
  

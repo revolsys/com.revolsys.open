@@ -2,15 +2,18 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -31,6 +34,8 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
   private java.awt.Point zoomBoxFirstPoint;
 
+  private java.awt.Point panFirstPoint;
+
   private Rectangle2D zoomBox;
 
   private Cursor cursor;
@@ -38,6 +43,8 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   private boolean panning;
 
   private final Viewport2D viewport;
+
+  private BufferedImage panImage;
 
   public ZoomOverlay(final MapPanel map) {
     this.map = map;
@@ -137,31 +144,66 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   }
 
   public void panDrag(final MouseEvent event) {
-    // TODO super.mouseDragged(event);
+    java.awt.Point p = event.getPoint();
+    final int dx = (int)(p.getX() - panFirstPoint.getX());
+    final int dy = (int)(p.getY() - panFirstPoint.getY());
+
+    Container parent = getParent();
+    Graphics2D graphics = (Graphics2D)getGraphics();
+    int width = viewport.getViewWidthPixels();
+    int height = viewport.getViewHeightPixels();
+    graphics.setColor(Color.WHITE);
+    graphics.fillRect(0, 0, width, height);
+    graphics.drawImage(panImage, dx, dy, parent);
+    event.consume();
   }
 
   public void panFinish(final MouseEvent event) {
+    java.awt.Point point = event.getPoint();
+    final Point fromPoint = viewport.toModelPoint(panFirstPoint);
+    final Point toPoint = viewport.toModelPoint(point);
+
+    final double deltaX = fromPoint.getX() - toPoint.getX();
+    final double deltaY = fromPoint.getY() - toPoint.getY();
+    
+    final BoundingBox boundingBox = viewport.getBoundingBox().clone();
+    boundingBox.move(deltaX, deltaY);
+    viewport.setBoundingBox(boundingBox);
+
+    panFirstPoint = null;
     panning = false;
     restoreCursor();
-    // TODO super.mouseReleased(event);
+    panImage = null;
+    getParent().repaint();
+    event.consume();
   }
 
   public void panStart(final MouseEvent event) {
+    int width = viewport.getViewWidthPixels();
+    int height = viewport.getViewHeightPixels();
+    JComponent parent = (JComponent)getParent();
+    panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics = (Graphics2D)panImage.getGraphics();
+    Insets insets = parent.getInsets();
+    graphics.translate(-insets.left, -insets.top);
+    parent.paintComponents(graphics);
+    graphics.dispose();
     panning = true;
     saveCursor();
-    setCursor(new Cursor(Cursor.HAND_CURSOR));
-    // TODO super.mousePressed(event);
+    getParent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+    panFirstPoint = event.getPoint();
+    event.consume();
   }
 
   private void restoreCursor() {
     if (cursor != null) {
-      setCursor(cursor);
+      getParent().setCursor(cursor);
       cursor = null;
     }
   }
 
   private void saveCursor() {
-    cursor = getCursor();
+    cursor = getParent().getCursor();
   }
 
   public void zoomBoxDrag(final MouseEvent event) {
@@ -210,7 +252,7 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
   public void zoomBoxStart(final MouseEvent event) {
     saveCursor();
-    setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    getParent().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
     zoomBoxFirstPoint = event.getPoint();
     zoomBox = new Rectangle2D.Double();
     event.consume();

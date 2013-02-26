@@ -60,7 +60,7 @@ public class MapPanel extends JPanel {
 
   private final Project project = new Project();
 
-  private final JPanel statusBar;
+  private final JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
   private final ToolBar toolBar;
 
@@ -81,6 +81,8 @@ public class MapPanel extends JPanel {
   private boolean initialized;
 
   private final JLayeredPane layeredPane;
+
+  private MouseOverlay mouseOverlay;
 
   public MapPanel() {
     super(new BorderLayout());
@@ -117,21 +119,27 @@ public class MapPanel extends JPanel {
 
     initBaseMapLayers();
 
-    statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-    addPointerLocation("Albers", 3005, 1000.0);
-    addPointerLocation("Lat/Lon", 4269, 10000000.0);
-
-    statusBar.add(new MapScale(viewport));
-    add(statusBar, BorderLayout.SOUTH);
-
     addStandardButtons();
 
     setBoundingBox(BC_ENVELOPE);
 
+    addOverlays();
+
+    addStatusBar();
+  }
+
+  protected void addStatusBar() {
+    add(statusBar, BorderLayout.SOUTH);
+
+    addPointerLocation("Albers", 3005, 1000.0);
+    addPointerLocation("Lat/Lon", 4269, 10000000.0);
+    statusBar.add(new MapScale(viewport));
+  }
+
+  protected void addOverlays() {
     new ZoomOverlay(this);
     new SelectedOverlay(this);
-    new MouseOverlay(layeredPane);
+    this.mouseOverlay = new MouseOverlay(layeredPane);
     // new EditOverlay(this);
     // geometryEditOverlay = new GeometryEditOverlay(this);
   }
@@ -184,10 +192,10 @@ public class MapPanel extends JPanel {
 
   private void addPointerLocation(final String title, final int srid,
     final double scaleFactor) {
-    final MapPointerLocation albersLocation = new MapPointerLocation(viewport,
-      title, GeometryFactory.getFactory(srid, 2, scaleFactor, scaleFactor));
-    map.addMouseMotionListener(albersLocation);
-    statusBar.add(albersLocation);
+    final MapPointerLocation location = new MapPointerLocation(viewport, title,
+      GeometryFactory.getFactory(srid, 2, scaleFactor, scaleFactor));
+    mouseOverlay.addMouseMotionListener(location);
+    statusBar.add(location);
   }
 
   // public TiledMapServiceLayer addTiledBaseMap(final String name,
@@ -231,7 +239,7 @@ public class MapPanel extends JPanel {
     addPropertyChangeListener("zoomNextEnabled", new EnableComponentListener(
       zoomNextButton));
 
-    selectMapScale = new SelectMapScale(viewport);
+    selectMapScale = new SelectMapScale(this);
     toolBar.addComponent("zoom", selectMapScale);
   }
 
@@ -352,6 +360,7 @@ public class MapPanel extends JPanel {
       viewport.setScale(scale);
       this.scale = scale;
       firePropertyChange("scale", oldValue, scale);
+      repaint();
     }
   }
 

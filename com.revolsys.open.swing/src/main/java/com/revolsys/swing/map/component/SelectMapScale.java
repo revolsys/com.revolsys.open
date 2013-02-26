@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.revolsys.swing.field.InvokeMethodStringConverter;
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.MapPanel;
 
 @SuppressWarnings("serial")
 public class SelectMapScale extends JComboBox implements ItemListener,
@@ -22,33 +22,31 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     125000.0, 50000.0, 20000.0, 10000.0, 5000.0, 2500.0, 2000.0, 1000.0
   };
 
-  private final Viewport2D viewport;
+  private final MapPanel map;
 
-  public SelectMapScale(final Viewport2D viewport) {
+  public SelectMapScale(final MapPanel map) {
     super(SCALES);
-    this.viewport = viewport;
+    this.map = map;
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       MapScale.class, "formatScale");
     setRenderer(renderer);
     AutoCompleteDecorator.decorate(this, renderer);
     addItemListener(this);
-    viewport.addPropertyChangeListener("scale", this);
-    final Dimension size = new Dimension(100, 30);
+    map.addPropertyChangeListener("scale", this);
+    final Dimension size = new Dimension(120, 30);
     setMaximumSize(size);
   }
 
   @Override
   public void itemStateChanged(final ItemEvent e) {
     if (e.getStateChange() == ItemEvent.SELECTED) {
-      double scale = viewport.getScale();
+      double scale = map.getScale();
       final Object value = e.getItem();
       if (value instanceof Double) {
         scale = (Double)value;
       }
-      if (viewport.getScale() != scale) {
-        viewport.setScale(scale);
-      }
+      map.setScale(scale);
     }
   }
 
@@ -56,7 +54,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     if ("scale".equals(propertyName)) {
-      final double scale = viewport.getScale();
+      final double scale = map.getScale();
       setSelectedItem(scale);
     }
   }

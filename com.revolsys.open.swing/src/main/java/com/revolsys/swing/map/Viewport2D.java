@@ -339,7 +339,8 @@ public class Viewport2D {
   }
 
   public void setScale(final double scale) {
-    propertyChangeSupport.firePropertyChange("scale", getScale(), scale);
+    double oldValue = getScale();
+    propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
   }
 
   public void setUseModelCoordinates(final boolean useModelCoordinates,
@@ -455,5 +456,11 @@ public class Viewport2D {
   }
 
   public void update() {
+  }
+
+  public Point toModelPoint(java.awt.Point point) {
+    double x = point.getX();
+    double y = point.getY();
+    return toModelPoint(x, y);
   }
 }
