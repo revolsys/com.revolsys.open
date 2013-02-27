@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.vividsolutions.jts.geom.Point;
 
 public class ListCoordinatesList extends AbstractCoordinatesList {
 
@@ -96,5 +98,9 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   @Override
   public int size() {
     return coordinates.size();
+  }
+
+  public void add(Point point) {
+    add(CoordinatesUtil.get(point));
   }
 }

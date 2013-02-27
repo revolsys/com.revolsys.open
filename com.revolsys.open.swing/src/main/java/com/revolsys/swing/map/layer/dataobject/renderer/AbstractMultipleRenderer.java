@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
@@ -29,12 +30,24 @@ public abstract class AbstractMultipleRenderer extends
     @SuppressWarnings("unchecked")
     final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
     List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
-     for (final Map<String, Object> childStyle : styles) {
+    for (final Map<String, Object> childStyle : styles) {
       final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
         layer, this, childStyle);
       renderers.add(renderer);
     }
-     setRenderers(renderers);
+    setRenderers(renderers);
+  }
+
+  @Override
+  public boolean isVisible(DataObject object) {
+    if (super.isVisible(object)) {
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        if( renderer.isVisible(object)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {
@@ -77,7 +90,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public void removeRenderer(AbstractDataObjectLayerRenderer renderer) {
-   renderers.remove(renderer);
+    renderers.remove(renderer);
   }
 
 }

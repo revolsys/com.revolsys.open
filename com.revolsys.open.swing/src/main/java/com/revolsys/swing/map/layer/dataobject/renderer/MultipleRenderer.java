@@ -26,6 +26,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     super("multipleStyle", layer);
   }
 
+
   public void addStyle(final GeometryStyle style) {
     final GeometryStyleRenderer renderer = new GeometryStyleRenderer(
       getLayer(), this, style);

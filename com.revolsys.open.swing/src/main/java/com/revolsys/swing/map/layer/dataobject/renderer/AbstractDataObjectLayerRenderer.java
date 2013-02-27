@@ -95,7 +95,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     filter = getFilter(style);
   }
 
-  protected boolean isVisible(final DataObject object) {
+  public boolean isVisible(final DataObject object) {
     return filter.accept(object);
   }
 

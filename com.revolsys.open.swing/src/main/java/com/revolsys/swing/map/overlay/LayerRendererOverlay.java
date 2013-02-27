@@ -52,7 +52,9 @@ public class LayerRendererOverlay extends JComponent implements
       if (layer != null) {
         Graphics2D graphics2d = (Graphics2D)g;
         LayerRenderer<Layer> renderer = layer.getRenderer();
-        renderer.render(viewport, graphics2d);
+        if (renderer != null) {
+          renderer.render(viewport, graphics2d);
+        }
       }
     } catch (final Throwable t) {
       LoggerFactory.getLogger(getClass()).error("Unable to paint", t);

@@ -110,7 +110,7 @@ public class BingClient {
     for (int i = 0; i < METRES_PER_PIXEL.length; i++) {
       final double zoomLevelMetresPerPixel = METRES_PER_PIXEL[i];
       if (metresPerPixel > zoomLevelMetresPerPixel) {
-        return i + 1;
+        return Math.max(i, 1);
       }
     }
     return METRES_PER_PIXEL.length;

@@ -61,7 +61,7 @@ public class SelectedOverlay extends JComponent implements
   private static final GeometryStyle VERTEX_STYLE = GeometryStyle.marker(
     "ellipse", 6, new Color(0, 0, 0, 127), 1, new Color(0, 255, 0, 127));
 
-  private static final Color TRANS_BG = new Color(0, 255, 0, 30);
+  private static final Color TRANS_BG = new Color(0, 128, 0, 127);
 
   public SelectedOverlay(final MapPanel map) {
     this.map = map;
@@ -148,26 +148,26 @@ public class SelectedOverlay extends JComponent implements
     final Graphics2D graphics2d = (Graphics2D)graphics;
     for (final DataObjectLayer layer : selectableLayers) {
       for (final DataObject object : layer.getSelectedObjects()) {
-        final Geometry geometry = object.getGeometryValue();
-        GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
-          HIGHLIGHT_STYLE);
-        GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
-          OUTLINE_STYLE);
-        MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
-          geometry, VERTEX_STYLE);
-
+        if (layer.isVisible(object)) {
+          final Geometry geometry = object.getGeometryValue();
+          GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
+            HIGHLIGHT_STYLE);
+          GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
+            OUTLINE_STYLE);
+          MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
+            geometry, VERTEX_STYLE);
+        }
       }
     }
     if (selectBox != null) {
-      final Graphics2D g = (Graphics2D)graphics;
-      g.setColor(Color.GREEN);
-      g.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE,
+      graphics2d.setColor(new Color(0, 128, 0));
+      graphics2d.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE,
         BasicStroke.JOIN_MITER, 2, new float[] {
           6, 6
         }, 0f));
-      g.draw(selectBox);
-      g.setPaint(TRANS_BG);
-      g.fill(selectBox);
+      graphics2d.draw(selectBox);
+      graphics2d.setPaint(TRANS_BG);
+      graphics2d.fill(selectBox);
     }
   }
 
@@ -180,9 +180,8 @@ public class SelectedOverlay extends JComponent implements
       updateSelectableLayers();
     } else if ("visible".equals(propertyName)) {
       updateSelectableLayers();
-    } else if ("selected".equals(propertyName)) {
-      repaint();
     }
+    repaint();
   }
 
   private void restoreCursor() {
@@ -255,21 +254,21 @@ public class SelectedOverlay extends JComponent implements
   }
 
   private void updateSelectableLayers() {
-    final List<DataObjectLayer> SelectableLayers = new ArrayList<DataObjectLayer>();
-    updateSelectableLayers(project, SelectableLayers);
-    this.selectableLayers = SelectableLayers;
+    final List<DataObjectLayer> selectableLayers = new ArrayList<DataObjectLayer>();
+    updateSelectableLayers(project, selectableLayers);
+    this.selectableLayers = selectableLayers;
   }
 
   private void updateSelectableLayers(final LayerGroup group,
-    final List<DataObjectLayer> SelectableLayers) {
+    final List<DataObjectLayer> selectableLayers) {
     for (final Layer layer : group.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        updateSelectableLayers(childGroup, SelectableLayers);
+        updateSelectableLayers(childGroup, selectableLayers);
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         if (dataObjectLayer.isSelectable()) {
-          SelectableLayers.add(dataObjectLayer);
+          selectableLayers.add(dataObjectLayer);
         }
       }
     }

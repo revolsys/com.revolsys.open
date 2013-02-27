@@ -2,6 +2,7 @@ package com.revolsys.swing.map;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
@@ -33,6 +34,7 @@ import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.bing.BingLayer;
 import com.revolsys.swing.map.list.LayerGroupListModel;
+import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.SelectedOverlay;
@@ -41,7 +43,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
-public class MapPanel extends JPanel {
+public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public static final BoundingBox BC_ENVELOPE = //
   new BoundingBox(GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252,
@@ -84,6 +86,17 @@ public class MapPanel extends JPanel {
 
   private MouseOverlay mouseOverlay;
 
+  @Override
+  public void propertyChange(PropertyChangeEvent event) {
+    if (event.getSource() == viewport) {
+      if ("scale".equals(event.getPropertyName())) {
+        double scale = viewport.getScale();
+        setScale(scale);
+      }
+    }
+
+  }
+
   public MapPanel() {
     super(new BorderLayout());
     toolBar = new ToolBar();
@@ -98,6 +111,7 @@ public class MapPanel extends JPanel {
     add(layeredPane, BorderLayout.CENTER);
 
     this.viewport = new ComponentViewport2D(project, layeredPane);
+    viewport.addPropertyChangeListener(this);
 
     layeredPane.setBorder(new MapRulerBorder(viewport));
 
@@ -123,7 +137,7 @@ public class MapPanel extends JPanel {
 
     setBoundingBox(BC_ENVELOPE);
 
-    addOverlays();
+    addMapOverlays();
 
     addStatusBar();
   }
@@ -136,12 +150,31 @@ public class MapPanel extends JPanel {
     statusBar.add(new MapScale(viewport));
   }
 
-  protected void addOverlays() {
+  protected void addMapOverlays() {
     new ZoomOverlay(this);
     new SelectedOverlay(this);
+    new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(layeredPane);
     // new EditOverlay(this);
     // geometryEditOverlay = new GeometryEditOverlay(this);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends JComponent> T getMapOverlay(Class<T> overlayClass) {
+    for (Component component : layeredPane.getComponents()) {
+      if (overlayClass.isAssignableFrom(component.getClass())) {
+        return (T)component;
+      }
+    }
+    return null;
+  }
+
+  public void setMapOverlayEnabled(Class<? extends JComponent> overlayClass,
+    boolean enabled) {
+    JComponent component = getMapOverlay(overlayClass);
+    if (component != null) {
+      component.setEnabled(enabled);
+    }
   }
 
   public void addBaseMap(final Layer layer) {
@@ -180,12 +213,13 @@ public class MapPanel extends JPanel {
     toolBar.addComponent("layers", comboBox);
   }
 
-  // public void addMapOverlay(final MapOverlay overlay) {
-  // map.addMapOverlay(overlay);
-  // }
-
   public void addMapOverlay(final JComponent overlay) {
-    layeredPane.add(overlay, new Integer(1000 + (overlayIndex++)));
+    int zIndex = 1000 * overlayIndex++;
+    addMapOverlay(zIndex, overlay);
+  }
+
+  public void addMapOverlay(int zIndex, final JComponent overlay) {
+    layeredPane.add(overlay, new Integer(zIndex));
   }
 
   private int overlayIndex = 1;
@@ -198,18 +232,18 @@ public class MapPanel extends JPanel {
     statusBar.add(location);
   }
 
-  // public TiledMapServiceLayer addTiledBaseMap(final String name,
-  // final String url) {
-  // try {
-  // final TiledMapServiceLayer layer = new TiledMapServiceLayer(name, url);
-  // addBaseMap(layer);
-  // return layer;
-  // } catch (final Throwable e) {
-  // LoggerFactory.getLogger(getClass()).error(
-  // "Unable to create Tile layer " + name + "=" + url, e);
-  // return null;
-  // }
-  // }
+  public void addArcGisRestBaseMap(final String name,
+    final String url) {
+//    try {
+//      final TiledMapServiceLayer layer = new TiledMapServiceLayer(name, url);
+//      addBaseMap(layer);
+//      return layer;
+//    } catch (final Throwable e) {
+//      LoggerFactory.getLogger(getClass()).error(
+//        "Unable to create Tile layer " + name + "=" + url, e);
+//      return null;
+//    }
+  }
 
   private void addStandardButtons() {
     addZoomButtons();
@@ -257,17 +291,9 @@ public class MapPanel extends JPanel {
     return baseMapOverlay.getLayer();
   }
 
-  // public GeometryEditOverlay getGeometryEditOverlay() {
-  // return geometryEditOverlay;
-  // }
-
   public LayerGroup getBaseMapLayers() {
     return baseMapLayers;
   }
-
-  // public List<MapOverlay> getMapOverlays() {
-  // return map.getMapOverlays();
-  // }
 
   public BoundingBox getBoundingBox() {
     return viewport.getBoundingBox();
@@ -298,25 +324,24 @@ public class MapPanel extends JPanel {
   }
 
   private void initBaseMapLayers() {
-    // addTiledBaseMap(
-    // "ESRI Open Street Map",
-    // "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
-    //
     addBingBaseMap(ImagerySet.Road);
     addBingBaseMap(ImagerySet.AerialWithLabels);
     addBingBaseMap(ImagerySet.Aerial);
-    //
-    // addTiledBaseMap(
-    // "GeoBC Hillshade",
-    // "http://maps.gov.bc.ca/arcserver/rest/services/Province/web_mercator_cache/MapServer");
-    //
-    // addTiledBaseMap(
-    // "ESRI World Topographic",
-    // "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
-    //
-    // addTiledBaseMap(
-    // "ESRI World Terrain",
-    // "http://services.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer");
+    addArcGisRestBaseMap(
+      "ESRI Open Street Map",
+      "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+
+    addArcGisRestBaseMap(
+      "GeoBC Hillshade",
+      "http://maps.gov.bc.ca/arcserver/rest/services/Province/web_mercator_cache/MapServer");
+
+    addArcGisRestBaseMap(
+      "ESRI World Topographic",
+      "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
+
+    addArcGisRestBaseMap(
+      "ESRI World Terrain",
+      "http://services.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer");
   }
 
   public boolean isInitialized() {
@@ -351,6 +376,7 @@ public class MapPanel extends JPanel {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     viewport.setBoundingBox(boundingBox);
+    setScale(viewport.getScale());
     repaint();
   }
 
@@ -406,6 +432,7 @@ public class MapPanel extends JPanel {
       this.zoomHistoryIndex = zoomHistoryIndex;
       final BoundingBox boundingBox = zoomHistory.get(zoomHistoryIndex);
       viewport.setBoundingBox(boundingBox);
+
       project.setViewBoundingBox(boundingBox);
       firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
         isZoomPreviousEnabled());
@@ -475,7 +502,9 @@ public class MapPanel extends JPanel {
 
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+      Geometry convertedGeometry = getGeometryFactory().copy(geometry);
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
+        convertedGeometry).clone();
       boundingBox.expandBy(boundingBox.getWidth() * 0.05,
         boundingBox.getHeight() * 0.05);
       setBoundingBox(boundingBox);
@@ -484,8 +513,9 @@ public class MapPanel extends JPanel {
 
   public void zoomTo(final Layer layer) {
     if (layer != null && layer.isVisible()) {
-      final BoundingBox boundingBox = new BoundingBox(
-        layer.getBoundingBox(true));
+      final BoundingBox boundingBox = layer.getBoundingBox(true)
+        .clone()
+        .convert(getGeometryFactory());
       final double width = boundingBox.getWidth();
       final double height = boundingBox.getHeight();
       boundingBox.expandBy(width * 0.05, height * 0.05);

@@ -168,7 +168,7 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     
     final BoundingBox boundingBox = viewport.getBoundingBox().clone();
     boundingBox.move(deltaX, deltaY);
-    viewport.setBoundingBox(boundingBox);
+    map.setBoundingBox(boundingBox);
 
     panFirstPoint = null;
     panning = false;
@@ -186,6 +186,8 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     Graphics2D graphics = (Graphics2D)panImage.getGraphics();
     Insets insets = parent.getInsets();
     graphics.translate(-insets.left, -insets.top);
+    graphics.setColor(Color.WHITE);
+    graphics.fillRect(insets.left, insets.top, width, height);
     parent.paintComponents(graphics);
     graphics.dispose();
     panning = true;

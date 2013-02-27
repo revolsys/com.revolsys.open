@@ -45,6 +45,16 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
+  public boolean isVisible(DataObject object) {
+    if (super.isVisible(object)) {
+      if (renderer != null) {
+        return renderer.isVisible(object);
+      }
+    }
+    return false;
+  }
+
+  @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final DataObjectLayer layer) {
     AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
@@ -58,7 +68,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   protected void renderObjects(Viewport2D viewport, Graphics2D graphics,
     DataObjectLayer layer, List<DataObject> objects) {
     BoundingBox visibleArea = viewport.getBoundingBox();
-        AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       for (DataObject object : objects) {
         if (isVisible(object)) {
@@ -68,7 +78,6 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     }
   }
 
- 
   @Override
   // NOTE: Needed for filter styles
   protected void renderObject(Viewport2D viewport, Graphics2D graphics,

@@ -282,4 +282,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public <T> T[] toArray(final T[] a) {
     return objects.toArray(a);
   }
+
+  public void setEditingObjects(DataObject... objects) {
+    setEditingObjects(Arrays.asList(objects));
+  }
 }

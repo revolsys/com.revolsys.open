@@ -50,6 +50,8 @@ public interface DataObjectLayer extends Layer {
 
   boolean isSelected(DataObject object);
 
+  boolean isVisible(DataObject object);
+
   List<DataObject> query(Query query);
 
   void removeSelectedObjects(DataObject... objects);
@@ -70,4 +72,6 @@ public interface DataObjectLayer extends Layer {
     int distance);
 
   void setSelectedObjects(BoundingBox boundingBox);
+
+  void setSelectedObjectsById(Object sessionId);
 }

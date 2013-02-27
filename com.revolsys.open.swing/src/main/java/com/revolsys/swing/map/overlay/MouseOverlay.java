@@ -30,7 +30,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
     if (parent instanceof JLayeredPane) {
       JLayeredPane layeredPane = (JLayeredPane)parent;
       for (Component component : layeredPane.getComponents()) {
-        if (!(component instanceof MouseOverlay)) {
+        if (component.isEnabled() && !(component instanceof MouseOverlay)) {
           overlays.add(component);
         }
       }

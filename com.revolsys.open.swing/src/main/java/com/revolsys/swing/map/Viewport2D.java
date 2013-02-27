@@ -99,6 +99,8 @@ public class Viewport2D {
 
   private double metresPerPixel;
 
+  private double scale;
+
   public Viewport2D() {
   }
 
@@ -194,9 +196,7 @@ public class Viewport2D {
   }
 
   public double getScale() {
-    final Measurable<Length> viewWidth = getViewWidthLength();
-    final Measurable<Length> modelWidth = getModelWidthLength();
-    return getScale(viewWidth, modelWidth);
+    return scale;
   }
 
   public AffineTransform getScreenToModelTransform() {
@@ -317,10 +317,11 @@ public class Viewport2D {
           metresPerPixel = getModelHeightLength().doubleValue(SI.METRE)
             / getViewHeightPixels();
         }
-        final double newScale = getScale();
+        final Measurable<Length> modelWidth = getModelWidthLength();
+        scale = getScale(getViewHeightLength(), modelWidth);
         propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
           convertedBoundingBox);
-        propertyChangeSupport.firePropertyChange("scale", oldScale, newScale);
+        propertyChangeSupport.firePropertyChange("scale", oldScale, scale);
 
       }
     }
