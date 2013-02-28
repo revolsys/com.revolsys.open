@@ -2,6 +2,8 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,13 +17,15 @@ import javax.swing.JLayeredPane;
 
 @SuppressWarnings("serial")
 public class MouseOverlay extends JComponent implements MouseListener,
-  MouseMotionListener, MouseWheelListener {
+  MouseMotionListener, MouseWheelListener, KeyListener {
 
   public MouseOverlay(JLayeredPane pane) {
+    setFocusable(true);
     pane.add(this, new Integer(Integer.MAX_VALUE));
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
+    addKeyListener(this);
   }
 
   private List<Component> getOverlays() {
@@ -53,7 +57,8 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseDragged(MouseEvent e) {
-    for (Component overlay : getOverlays()) {
+    requestFocusInWindow(true);
+   for (Component overlay : getOverlays()) {
       if (overlay instanceof MouseMotionListener) {
         MouseMotionListener listener = (MouseMotionListener)overlay;
         listener.mouseDragged(e);
@@ -79,6 +84,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseClicked(MouseEvent e) {
+    requestFocusInWindow(true);
     for (Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         MouseListener listener = (MouseListener)overlay;
@@ -92,6 +98,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mousePressed(MouseEvent e) {
+    requestFocusInWindow(true);
     for (Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         MouseListener listener = (MouseListener)overlay;
@@ -135,6 +142,45 @@ public class MouseOverlay extends JComponent implements MouseListener,
       if (overlay instanceof MouseListener) {
         MouseListener listener = (MouseListener)overlay;
         listener.mouseExited(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void keyTyped(KeyEvent e) {
+    for (Component overlay : getOverlays()) {
+      if (overlay instanceof KeyListener) {
+        KeyListener listener = (KeyListener)overlay;
+        listener.keyTyped(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void keyPressed(KeyEvent e) {
+    for (Component overlay : getOverlays()) {
+      if (overlay instanceof KeyListener) {
+        KeyListener listener = (KeyListener)overlay;
+        listener.keyPressed(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void keyReleased(KeyEvent e) {
+    for (Component overlay : getOverlays()) {
+      if (overlay instanceof KeyListener) {
+        KeyListener listener = (KeyListener)overlay;
+        listener.keyReleased(e);
         if (e.isConsumed()) {
           return;
         }

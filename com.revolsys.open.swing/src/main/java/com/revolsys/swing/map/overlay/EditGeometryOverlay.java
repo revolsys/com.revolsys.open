@@ -96,8 +96,6 @@ public class EditGeometryOverlay extends JComponent implements
     project.addPropertyChangeListener(this);
 
     map.addMapOverlay(this);
-    addMouseListener(this);
-    addMouseMotionListener(this);
     updateEditableLayers();
     setEnabled(false);
   }

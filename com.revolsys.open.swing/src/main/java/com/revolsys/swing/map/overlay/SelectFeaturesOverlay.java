@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -35,8 +37,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
-public class SelectedOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener {
+public class SelectFeaturesOverlay extends JComponent implements
+  PropertyChangeListener, MouseListener, MouseMotionListener,KeyListener {
 
   private List<DataObjectLayer> selectableLayers = new ArrayList<DataObjectLayer>();
 
@@ -63,7 +65,7 @@ public class SelectedOverlay extends JComponent implements
 
   private static final Color TRANS_BG = new Color(0, 128, 0, 127);
 
-  public SelectedOverlay(final MapPanel map) {
+  public SelectFeaturesOverlay(final MapPanel map) {
     this.map = map;
     this.viewport = map.getViewport();
     this.project = map.getProject();
@@ -72,10 +74,26 @@ public class SelectedOverlay extends JComponent implements
 
     map.addMapOverlay(this);
     updateSelectableLayers();
-    addMouseListener(this);
-    addMouseMotionListener(this);
   }
 
+
+  @Override
+  public void keyPressed(KeyEvent e) {
+    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      restoreCursor();
+      selectBox = null;
+      selectBoxFirstPoint = null;
+      repaint();
+    }
+  }
+
+  @Override
+  public void keyReleased(KeyEvent e) {
+  }
+
+  @Override
+  public void keyTyped(KeyEvent e) {
+  }
   public boolean hasSelectableLayers() {
     return !this.selectableLayers.isEmpty();
   }

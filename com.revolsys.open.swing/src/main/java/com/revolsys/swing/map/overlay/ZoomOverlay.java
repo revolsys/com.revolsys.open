@@ -7,6 +7,8 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -26,7 +28,7 @@ import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
 public class ZoomOverlay extends JComponent implements MouseListener,
-  MouseMotionListener, MouseWheelListener {
+  MouseMotionListener, MouseWheelListener, KeyListener {
 
   private final MapPanel map;
 
@@ -50,9 +52,6 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     this.map = map;
     this.viewport = map.getViewport();
     map.addMapOverlay(this);
-    addMouseListener(this);
-    addMouseMotionListener(this);
-    addMouseWheelListener(this);
   }
 
   @Override
@@ -165,7 +164,7 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
     final double deltaX = fromPoint.getX() - toPoint.getX();
     final double deltaY = fromPoint.getY() - toPoint.getY();
-    
+
     final BoundingBox boundingBox = viewport.getBoundingBox().clone();
     boundingBox.move(deltaX, deltaY);
     map.setBoundingBox(boundingBox);
@@ -258,5 +257,26 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     zoomBoxFirstPoint = event.getPoint();
     zoomBox = new Rectangle2D.Double();
     event.consume();
+  }
+
+  @Override
+  public void keyPressed(KeyEvent e) {
+    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      restoreCursor();
+      panning = false;
+      panFirstPoint = null;
+      panImage = null;
+      zoomBox = null;
+      zoomBoxFirstPoint = null;
+      repaint();
+    }
+  }
+
+  @Override
+  public void keyReleased(KeyEvent e) {
+  }
+
+  @Override
+  public void keyTyped(KeyEvent e) {
   }
 }

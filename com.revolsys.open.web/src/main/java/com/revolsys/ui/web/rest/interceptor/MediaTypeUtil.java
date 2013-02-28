@@ -226,6 +226,32 @@ public class MediaTypeUtil {
     }
   }
 
+  public static boolean isHtmlPage() {
+    HttpServletRequest request = HttpServletUtils.getRequest();
+    String format = request.getParameter("format");
+    if (StringUtils.hasText(format)) {
+      return false;
+    }
+    final String requestUri = URL_PATH_HELPER.getRequestUri(request);
+    final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+    final String extension = StringUtils.getFilenameExtension(filename);
+    if (StringUtils.hasText(extension)) {
+      return false;
+    }
+
+    final String acceptHeader = request.getHeader(ACCEPT_HEADER);
+    if (StringUtils.hasText(acceptHeader)) {
+      for (MediaType mediaType : MediaType.parseMediaTypes(acceptHeader)) {
+        if (mediaType.includes(MediaType.TEXT_HTML)) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public static boolean isContentType(final MediaType contentType) {
     return contentType.equals(getContentType());
   }
@@ -236,12 +262,16 @@ public class MediaTypeUtil {
     if (mediaTypes.isEmpty()) {
       return true;
     } else {
-      final MediaType firstMediaType = mediaTypes.get(0);
-      if (firstMediaType.includes(mediaType)) {
-        return true;
-      } else {
-        return false;
+      for (MediaType acceptedMediaType : mediaTypes) {
+        if (acceptedMediaType.includes(mediaType)) {
+          return true;
+        } else if (!acceptedMediaType.isWildcardType()
+          && !acceptedMediaType.isWildcardSubtype()) {
+          return false;
+        }
       }
+      return false;
+
     }
   }
 }

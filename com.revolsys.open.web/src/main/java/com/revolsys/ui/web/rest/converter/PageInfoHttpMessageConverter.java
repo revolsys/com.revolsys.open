@@ -210,7 +210,7 @@ public class PageInfoHttpMessageConverter extends
         final String childPath = childPage.getKey();
         final PageInfo childPageInfo = childPage.getValue();
         String childUri;
-        if (childPath.startsWith("/")) {
+        if (childPath.startsWith("/") || childPath.startsWith("http")) {
           childUri = childPath;
         } else if (url.charAt(url.length() - 1) != '/') {
           childUri = url + "/" + childPath;
