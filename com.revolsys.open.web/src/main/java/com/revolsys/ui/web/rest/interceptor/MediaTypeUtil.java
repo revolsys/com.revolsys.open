@@ -219,7 +219,7 @@ public class MediaTypeUtil {
       if (baseUrl.endsWith(extension)) {
         baseUrl = baseUrl.substring(0, baseUrl.length() - extension.length());
       }
-      if (!baseUrl.endsWith("/")) {
+      if (!path.startsWith("/") && !baseUrl.endsWith("/")) {
         baseUrl += '/';
       }
       return baseUrl + path;

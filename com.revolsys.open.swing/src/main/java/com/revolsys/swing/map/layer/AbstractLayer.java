@@ -163,7 +163,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @SuppressWarnings("unchecked")
   @Override
-  public <L extends LayerRenderer<Layer>> L getRenderer() {
+  public <L extends LayerRenderer<? extends Layer>> L getRenderer() {
     return (L)renderer;
   }
 

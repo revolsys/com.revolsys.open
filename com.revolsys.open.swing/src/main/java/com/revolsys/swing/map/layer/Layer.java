@@ -7,7 +7,8 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
 
-public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties, PropertyChangeListener,Comparable<Layer> {
+public interface Layer extends PropertyChangeSupportProxy,
+  ObjectWithProperties, PropertyChangeListener, Comparable<Layer> {
   void addPropertyChangeListener(final PropertyChangeListener listener);
 
   void addPropertyChangeListener(final String propertyName,
@@ -21,7 +22,6 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   long getId();
 
-
   LayerGroup getLayerGroup();
 
   long getMaximumScale();
@@ -32,7 +32,9 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   Project getProject();
 
-  <L extends LayerRenderer<Layer>> L getRenderer();
+  <L extends LayerRenderer<? extends Layer>> L getRenderer();
+
+  BoundingBox getSelectedBoundingBox();
 
   boolean isEditable();
 
@@ -88,6 +90,4 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);
-
-  BoundingBox getSelectedBoundingBox();
 }
