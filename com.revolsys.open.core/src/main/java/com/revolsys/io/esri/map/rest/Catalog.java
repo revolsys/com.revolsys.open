@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.measure.unit.BaseUnit;
+
 import com.revolsys.util.UrlUtil;
 
 public class Catalog extends ArcGisResponse {
@@ -74,6 +76,43 @@ public class Catalog extends ArcGisResponse {
       }
     }
     return services;
+  }
+
+  public Service getService(String serviceName) {
+    for (Service service : getServices()) {
+      if (service.getServiceName().equals(serviceName)) {
+        return service;
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Service> T getService(String name,
+    Class<T> serviceClass) {
+    for (Service service : getServices()) {
+      String serviceName = service.getServiceName();
+      if (serviceName.equals(name)) {
+        if (serviceClass.isAssignableFrom(service.getClass())) {
+          return (T)service;
+        } else {
+          throw new IllegalArgumentException("ArcGIS REST service is not a "
+            + serviceClass.getName() + ": " + name);
+        }
+      }
+    }
+    for (Service service : getServices()) {
+      String serviceName = service.getServiceName();
+      if (serviceName.endsWith(name)) {
+        if (serviceClass.isAssignableFrom(service.getClass())) {
+          return (T)service;
+        } else {
+          throw new IllegalArgumentException("ArcGIS REST service is not a "
+            + serviceClass.getName() + ": " + name);
+        }
+      }
+    }
+    return null;
   }
 
 }

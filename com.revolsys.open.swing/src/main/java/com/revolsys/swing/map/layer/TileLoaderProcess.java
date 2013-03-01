@@ -5,11 +5,13 @@ import java.util.concurrent.CancellationException;
 
 import javax.swing.SwingWorker;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.Viewport2D;
 
-public abstract class TileLoaderProcess extends SwingWorker<Image, Void> {
+public  class TileLoaderProcess extends SwingWorker<Image, Void> {
   private Viewport2D viewport;
 
   private TiledImageLayerRenderer renderer;
@@ -57,5 +59,22 @@ public abstract class TileLoaderProcess extends SwingWorker<Image, Void> {
 
   public Viewport2D getViewport() {
     return viewport;
+  }
+  
+
+  @Override
+  protected Image doInBackground() throws Exception {
+    MapTile mapTile = getMapTile();
+    try {
+      Image image = mapTile.loadImage();
+      return image;
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Unable to load " + mapTile, e);
+      return null;
+    }
+  }
+  @Override
+  public String toString() {
+    return "Loading map tile " + getMapTile();
   }
 }

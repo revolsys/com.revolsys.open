@@ -1,13 +1,37 @@
 package com.revolsys.swing.map.layer.grid;
 
+import java.util.Map;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
+import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
 
 public class GridLayer extends AbstractLayer {
 
+  public static GridLayer create(final Map<String, Object> properties) {
+    final String layerName = (String)properties.get("name");
+    final String gridName = (String)properties.get("gridName");
+    if (StringUtils.hasText(gridName)) {
+      final RectangularMapGrid grid = RectangularMapGridFactory.getGrid(gridName);
+      if (grid == null) {
+        LoggerFactory.getLogger(GridLayer.class).error(
+          properties + " cannot find gridName=" + gridName);
+      } else {
+        final GridLayer layer = new GridLayer(layerName, grid);
+        layer.setProperties(properties);
+        return layer;
+      }
+    } else {
+      LoggerFactory.getLogger(GridLayer.class).error(
+        properties + " does not contain a gridName property");
+    }
+    return null;
+  }
+  
   private final RectangularMapGrid grid;
 
   public GridLayer(final RectangularMapGrid grid) {

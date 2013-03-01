@@ -2,11 +2,11 @@ package com.revolsys.swing.map.layer;
 
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 public abstract class AbstractTiledImageLayer extends AbstractLayer {
 
   public AbstractTiledImageLayer() {
+    this(null, true, false, false);
   }
 
   public AbstractTiledImageLayer(final String name, final boolean readOnly,
@@ -15,11 +15,14 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
     setReadOnly(readOnly);
     setSelectSupported(selectSupported);
     setQuerySupported(querySupported);
+    setRenderer(new TiledImageLayerRenderer(this));
   }
 
   public abstract List<MapTile> getOverlappingEnvelopes(
     final Viewport2D viewport);
 
-  public abstract TileLoaderProcess getTileLoaderProcess();
+  public  TileLoaderProcess getTileLoaderProcess() {
+    return new TileLoaderProcess();
+  }
 
 }

@@ -112,7 +112,7 @@ public class PathAliasController implements Controller {
     if (path.startsWith(prefix)) {
       if (getOriginalPrefix().length() == 0) {
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        requestAttributes.setAttribute(PATH_PREFIX, prefix,
+        requestAttributes.setAttribute(PATH_PREFIX, prefix.replaceAll(aliasPrefix +"$", ""),
           RequestAttributes.SCOPE_REQUEST);
       }
       path = path.replaceFirst(prefix, aliasPrefix);

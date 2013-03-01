@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.bing.BingClient.ImagerySet;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.listener.EnableComponentListener;
@@ -32,6 +33,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
 import com.revolsys.swing.map.layer.bing.BingLayer;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
@@ -180,6 +182,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void addBaseMap(final Layer layer) {
     if (layer != null) {
       baseMapLayers.add(layer);
+      layer.setLayerGroup(project);
     }
     if (baseMapLayers.size() == 1) {
       setBaseMapLayer(layer);
@@ -193,7 +196,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       return layer;
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(
-        "Unable to create BING layer " + imagerySet, e);
+        "Unable to create Bing layer " + imagerySet, e);
       return null;
     }
   }
@@ -232,17 +235,17 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     statusBar.add(location);
   }
 
-  public void addArcGisRestBaseMap(final String name,
+  public ArcGisServerRestLayer addArcGisRestBaseMap(final String name,
     final String url) {
-//    try {
-//      final TiledMapServiceLayer layer = new TiledMapServiceLayer(name, url);
-//      addBaseMap(layer);
-//      return layer;
-//    } catch (final Throwable e) {
-//      LoggerFactory.getLogger(getClass()).error(
-//        "Unable to create Tile layer " + name + "=" + url, e);
-//      return null;
-//    }
+    try {
+      final ArcGisServerRestLayer layer = new ArcGisServerRestLayer(name, url);
+      addBaseMap(layer);
+      return layer;
+    } catch (RuntimeException e) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to load ArcGIS REST layer: " + url, e);
+      return null;
+    }
   }
 
   private void addStandardButtons() {
@@ -252,6 +255,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void addZoomButtons() {
+    toolBar.addButtonTitleIcon("zoom", "Zoom to World", "magnifier_zoom_world", this,
+      "zoomToWorld");
+
     toolBar.addButtonTitleIcon("zoom", "Zoom to British Columbia", "zoom_bc",
       this, "setBoundingBox", MapPanel.BC_ENVELOPE);
 
@@ -491,6 +497,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void zoomPrevious() {
     setZoomHistoryIndex(zoomHistoryIndex - 1);
+  }
+
+  public void zoomToWorld() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+    setBoundingBox(boundingBox);
   }
 
   public void zoomTo(final DataObject object) {

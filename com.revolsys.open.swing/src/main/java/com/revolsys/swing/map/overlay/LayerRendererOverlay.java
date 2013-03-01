@@ -49,7 +49,7 @@ public class LayerRendererOverlay extends JComponent implements
   public void paintComponent(final Graphics g) {
     try {
       Layer layer = getLayer();
-      if (layer != null) {
+      if (layer != null && layer.isVisible()) {
         Graphics2D graphics2d = (Graphics2D)g;
         LayerRenderer<Layer> renderer = layer.getRenderer();
         if (renderer != null) {

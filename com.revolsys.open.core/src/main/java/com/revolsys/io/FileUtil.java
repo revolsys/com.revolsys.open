@@ -772,6 +772,11 @@ public final class FileUtil {
     }
   }
 
+  public static File getUserHomeDirectory() {
+    final String userHome = System.getProperty("user.home");
+    return new File(userHome);
+  }
+
   public static Writer getWriter(final File file) {
     try {
       return new FileWriter(file);

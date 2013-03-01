@@ -30,7 +30,10 @@ public class AbstractMapWrapper {
       if (spatialReference == null) {
         geometryFactory = GeometryFactory.getFactory();
       } else {
-        final Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+        Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+        if (srid == 102100) {
+          srid = 3857;
+        }
         geometryFactory = GeometryFactory.getFactory(srid);
       }
       return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
@@ -94,7 +97,10 @@ public class AbstractMapWrapper {
     if (spatialReference == null) {
       return GeometryFactory.getFactory();
     } else {
-      final Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+      Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+      if (srid == 102100) {
+        srid = 3857;
+      }
       return GeometryFactory.getFactory(srid);
     }
   }

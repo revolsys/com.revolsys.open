@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,13 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   private BingClient client;
 
-  private final ImagerySet imagerySet;
+  private ImagerySet imagerySet;
 
   private MapLayer mapLayer;
+
+  public BingLayer() {
+    this(new BingClient(), ImagerySet.Road);
+  }
 
   public BingLayer(final BingClient client, final ImagerySet imagerySet) {
     this.client = client;
@@ -40,6 +45,22 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public BingLayer(final String bingMapKey, final ImagerySet imagerySet) {
     this(new BingClient(bingMapKey), imagerySet);
+  }
+
+  public void setImagerySet(ImagerySet imagerySet) {
+    this.imagerySet = imagerySet;
+  }
+
+  public void setMapLayer(MapLayer mapLayer) {
+    this.mapLayer = mapLayer;
+  }
+
+  public void setImagerySet(String imagerySet) {
+    this.imagerySet = ImagerySet.valueOf(imagerySet);
+  }
+
+  public void setMapLayer(String mapLayer) {
+    this.mapLayer = MapLayer.valueOf(mapLayer);
   }
 
   @Override
@@ -81,7 +102,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          tiles.add(new BingMapTile(zoomLevel, tileX, tileY));
+          tiles.add(new BingMapTile(this, zoomLevel, tileX, tileY));
         }
       }
 
@@ -92,19 +113,16 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public TileLoaderProcess getTileLoaderProcess() {
-    return new BingTileImageLoaderProcess(this);
-  }
-
-  @Override
   public boolean isVisible() {
     if (!super.isVisible()) {
       return false;
     } else {
       final Project project = getProject();
-      int srid = project.getGeometryFactory().getSRID();
-      if (srid == 102100 || srid == 3857) {
-        return true;
+      if (project != null) {
+        int srid = project.getGeometryFactory().getSRID();
+        if (srid == 102100 || srid == 3857) {
+          return true;
+        }
       }
       return false;
     }
@@ -114,6 +132,12 @@ public class BingLayer extends AbstractTiledImageLayer {
     this.client = client;
     ExecutorServiceFactory.getExecutorService().execute(
       new InvokeMethodRunnable(this, "init"));
+  }
+
+  public static BingLayer create(Map<String, Object> properties) {
+    BingLayer layer = new BingLayer();
+    layer.setProperties(properties);
+    return layer;
   }
 
 }

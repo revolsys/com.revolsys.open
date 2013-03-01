@@ -33,7 +33,11 @@ public class MapTile {
     }
     return false;
   }
-  
+
+  public Image loadImage() {
+    return image;
+  }
+
   @Override
   public int hashCode() {
     return boundingBox.hashCode();

@@ -243,7 +243,7 @@ public class MapRulerBorder extends AbstractBorder {
         line = boundingBox.getNorthLine();
       } else {
         g.translate(rulerSize, height - rulerSize);
-        textY = rulerSize - 2;
+        textY = rulerSize - 3;
         line = boundingBox.getSouthLine();
       }
       line = line.convert(rulerGeometryFactory);
@@ -311,97 +311,6 @@ public class MapRulerBorder extends AbstractBorder {
     }
   }
 
-  private <Q extends Quantity> void paintLeftRuler(final Graphics2D graphics,
-    final BoundingBox boundingBox,
-    final CoordinateSystem rulerCoordinateSystem, final Unit<Q> displayUnit,
-    final List<Unit<Q>> steps, final int x, final int y, final int height) {
-
-    final BoundingBox maxBoundingBox = rulerCoordinateSystem.getAreaBoundingBox();
-    final double mapSize = boundingBox.getHeight();
-    final double viewSize = viewport.getViewHeightPixels();
-    final Measurable<Q> origin = boundingBox.getMinimumY();
-    final Measurable<Q> maxOrigin = maxBoundingBox.getMinimumY();
-    final Measurable<Q> areaMaxValue = maxBoundingBox.getMaximumY();
-    Measurable<Q> maxValue = boundingBox.getMaximumY();
-    if (maxValue.compareTo(areaMaxValue) > 0) {
-      maxValue = areaMaxValue;
-    }
-
-    if (mapSize > 0) {
-      final Unit<Q> screenToModelUnit = viewport.getViewToModelUnit(baseUnit);
-      final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
-        screenToModelUnit);
-      final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
-      final Unit<Q> stepUnit = steps.get(stepLevel);
-      final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
-
-      final double pixelsPerUnit = viewSize / mapSize;
-
-      final long minIndex = (long)Math.floor(toBaseUnit(maxOrigin) / step);
-      final long maxIndex = (long)Math.floor(toBaseUnit(maxValue) / step);
-      long startIndex = (long)Math.floor(toBaseUnit(origin) / step);
-      if (startIndex < minIndex) {
-        startIndex = minIndex;
-      }
-      for (long index = startIndex; index < maxIndex; index++) {
-        final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
-        final double value = toBaseUnit(measureValue);
-        final double displayValue = measureValue.doubleValue(displayUnit);
-        int pixel = (int)((value - toBaseUnit(origin)) * pixelsPerUnit);
-        String label = null;
-        boolean found = false;
-        int barSize = 4;
-
-        Color color = Color.LIGHT_GRAY;
-        for (int i = 0; !found && i < stepLevel; i++) {
-          final Unit<Q> scaleUnit = steps.get(i);
-          final double stepValue = measureValue.doubleValue(scaleUnit);
-
-          if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
-            barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
-            found = true;
-            color = Color.BLACK;
-            DecimalFormat format;
-            if (displayValue - Math.floor(displayValue) == 0) {
-              format = new DecimalFormat("#,###,###,###");
-            } else {
-              final StringBuffer formatString = new StringBuffer(
-                "#,###,###,###.");
-              final double stepSize = Measure.valueOf(1, scaleUnit)
-                .doubleValue(displayUnit);
-              final int numZeros = (int)Math.abs(Math.round(Math.log10(stepSize % 1.0)));
-              for (int j = 0; j < numZeros; j++) {
-                formatString.append("0");
-              }
-              format = new DecimalFormat(formatString.toString());
-            }
-            label = String.valueOf(format.format(displayValue) + displayUnit);
-          }
-        }
-
-        pixel = x + height - 2 * rulerSize - pixel;
-
-        graphics.setColor(color);
-        graphics.drawLine(rulerSize - barSize - 1, pixel, rulerSize - 1, pixel);
-
-        graphics.setColor(Color.BLACK);
-        if (label != null) {
-          final AffineTransform transform = graphics.getTransform();
-          try {
-            graphics.translate(labelHeight, (pixel - 3));
-            // graphics.rotate(-Math.PI /2, labelHeight, (pixel - 3));
-            graphics.rotate(-Math.PI / 2);
-            graphics.drawString(label, 0, 0);
-            // graphics.rotate(Math.PI / 2);
-            // graphics.translate(-labelHeight, -(pixel - 3));
-          } finally {
-            graphics.setTransform(transform);
-          }
-        }
-      }
-    }
-  }
-
   private <Q extends Quantity> void paintRuler(final Graphics2D g,
     final BoundingBox boundingBox, final Unit<Q> displayUnit,
     final List<Unit<Q>> steps, final boolean horizontal, final int x,
@@ -411,123 +320,104 @@ public class MapRulerBorder extends AbstractBorder {
     paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width,
       height, false);
 
-    // paintLeftRuler(g, boundingBox, rulerCoordinateSystem, displayUnit, steps,
-    // x, y, height);
-    // paintVerticalRuler(g, boundingBox, rulerCoordinateSystem, displayUnit,
-    // steps, x, y, width, height, false);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width,
+      height, true);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width,
+      height, false);
 
   }
 
   private <Q extends Quantity> void paintVerticalRuler(final Graphics2D g,
-    final BoundingBox boundingBox,
-    final CoordinateSystem rulerCoordinateSystem, final Unit<Q> displayUnit,
+    final BoundingBox boundingBox, final Unit<Q> displayUnit,
     final List<Unit<Q>> steps, final int x, final int y, final int width,
     final int height, final boolean left) {
 
-    final int barHeight = height - 2 * rulerSize;
-    // final BoundingBox maxBoundingBox =
-    // rulerCoordinateSystem.getAreaBoundingBox();
-    // final double mapSize = boundingBox.getHeight();
-    // final double viewSize = viewport.getViewHeightPixels();
-    // final Measurable<Q> origin = boundingBox.getMinimumY();
-    // final Measurable<Q> maxOrigin = maxBoundingBox.getMinimumY();
-    // final Measurable<Q> areaMaxValue = maxBoundingBox.getMaximumY();
-    // Measurable<Q> maxValue = boundingBox.getMaximumY();
-    // if (maxValue.compareTo(areaMaxValue) > 0) {
-    // maxValue = areaMaxValue;
-    // }
-    //
-    // if (mapSize > 0) {
-    // g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-    // final Unit<Q> screenToModelUnit =
-    // viewport.getScreenToModelUnit(baseUnit);
-    // final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
-    // screenToModelUnit);
-    // final int stepLevel = getStepLevel(baseUnit, steps,
-    // modelUnitsPer6ViewUnits);
-    // final Unit<Q> stepUnit = steps.get(stepLevel);
-    // final double step = Measure.valueOf(1, stepUnit).doubleValue(baseUnit);
-    // final int labelHeight = g.getFontMetrics().getHeight();
-    //
-    // final double pixelsPerUnit = viewSize / mapSize;
-    //
-    // final long minIndex = (long)Math.floor(maxOrigin.doubleValue(baseUnit)
-    // / step);
-    // final long maxIndex = (long)Math.floor(maxValue.doubleValue(baseUnit)
-    // / step);
-    // long startIndex = (long)Math.floor(origin.doubleValue(baseUnit) / step);
-    // if (startIndex < minIndex) {
-    // startIndex = minIndex;
-    // }
-    // for (long index = startIndex; index < maxIndex; index++) {
-    // final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
-    // final double value = measureValue.doubleValue(baseUnit);
-    // final double displayValue = measureValue.doubleValue(displayUnit);
-    // int pixel = (int)((value - origin.doubleValue(baseUnit)) *
-    // pixelsPerUnit);
-    // String label = null;
-    // boolean found = false;
-    // int barSize = 4;
-    //
-    // Color color = Color.LIGHT_GRAY;
-    // for (int i = 0; !found && i < stepLevel; i++) {
-    // final Unit<Q> scaleUnit = steps.get(i);
-    // final double stepValue = measureValue.doubleValue(scaleUnit);
-    //
-    // if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
-    // barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) /
-    // stepLevel));
-    // found = true;
-    // color = Color.BLACK;
-    // DecimalFormat format;
-    // if (displayValue - Math.floor(displayValue) == 0) {
-    // format = new DecimalFormat("#,###,###,###");
-    // } else {
-    // final StringBuffer formatString = new StringBuffer(
-    // "#,###,###,###.");
-    // final double stepSize = Measure.valueOf(1, scaleUnit)
-    // .doubleValue(displayUnit);
-    // final int numZeros = (int)Math.abs(Math.round(Math.log10(stepSize %
-    // 1.0)));
-    // for (int j = 0; j < numZeros; j++) {
-    // formatString.append("0");
-    // }
-    // format = new DecimalFormat(formatString.toString());
-    // }
-    // label = String.valueOf(format.format(displayValue) + displayUnit);
-    // }
-    // }
-    //
-    // g.setColor(Color.BLACK);
-    // if (left) {
-    // pixel = height - pixel;
-    // if (label != null) {
-    // final Graphics2D g2 = (Graphics2D)g;
-    // g2.translate(labelHeight, (pixel - 3));
-    // g2.rotate(-Math.PI / 2);
-    // g.drawString(label, 0, 0);
-    // g2.rotate(Math.PI / 2);
-    // g2.translate(-labelHeight, -(pixel - 3));
-    // }
-    // g.setColor(color);
-    // g.drawLine(rulerSize - barSize - 1, pixel, rulerSize - 1, pixel);
-    // } else {
-    // pixel = height - pixel;
-    // if (label != null) {
-    // final Graphics2D g2 = (Graphics2D)g;
-    // g2.translate(rulerSize - 3, (pixel - 3));
-    // g2.rotate(-Math.PI / 2);
-    // g.drawString(label, 0, 0);
-    // g2.rotate(Math.PI / 2);
-    // g2.translate(-(rulerSize - 3), -(pixel - 3));
-    // }
-    // g.setColor(color);
-    // g.drawLine(0, pixel, barSize, pixel);
-    // }
-    // }
-    //
-    // }
+    final AffineTransform transform = g.getTransform();
+    final Shape clip = g.getClip();
+    try {
+      int textX;
+      LineSegment line;
+      if (left) {
+        g.translate(0, -rulerSize);
+        textX = labelHeight;
+        line = boundingBox.getWestLine();
+      } else {
+        g.translate(width-rulerSize, -rulerSize);
+        textX = rulerSize - 3;
+        line = boundingBox.getEastLine();
+      }
+      line = line.convert(rulerGeometryFactory);
+
+      g.setClip(0, rulerSize *2, rulerSize, height- 2*rulerSize);
+
+      final double mapSize = boundingBox.getHeight();
+      final double viewSize = viewport.getViewHeightPixels();
+      final double minY = line.getY(0);
+      double maxY = line.getY(1);
+      if (maxY > areaMaxY) {
+        maxY = areaMaxY;
+      }
+
+      if (mapSize > 0) {
+        final Unit<Q> screenToModelUnit = viewport.getViewToModelUnit(baseUnit);
+        final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
+          screenToModelUnit);
+        final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
+        final Unit<Q> stepUnit = steps.get(stepLevel);
+        final double step = toBaseUnit(Measure.valueOf(1, stepUnit));
+
+        final double pixelsPerUnit = viewSize / mapSize;
+
+        final long minIndex = (long)Math.ceil(areaMinY / step);
+        final long maxIndex = (long)Math.ceil(maxY / step);
+        long startIndex = (long)Math.floor(minY / step);
+        if (startIndex < minIndex) {
+          startIndex = minIndex;
+        }
+        for (long index = startIndex; index < maxIndex; index++) {
+          final Measure<Q> measureValue = Measure.valueOf(index, stepUnit);
+          final double value = toBaseUnit(measureValue);
+          final double displayValue = measureValue.doubleValue(displayUnit);
+          final int pixel = (int)((value - minY) * pixelsPerUnit);
+          boolean found = false;
+          int barSize = 4;
+
+          g.setColor(Color.LIGHT_GRAY);
+          for (int i = 0; !found && i < stepLevel; i++) {
+            final Unit<Q> scaleUnit = steps.get(i);
+            final double stepValue = measureValue.doubleValue(scaleUnit);
+
+            if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
+              barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
+              found = true;
+              AffineTransform transform2 = g.getTransform();
+              try {
+                g.translate(textX, height- pixel -3);
+                g.rotate(-Math.PI/2);
+              drawLabel(g, 0, 0, displayUnit, displayValue,
+                scaleUnit);
+              } finally {
+                g.setTransform(transform2);
+              }
+            }
+
+          }
+
+          if (left) {
+            g.drawLine(rulerSize - 1 - barSize, height-pixel, rulerSize - 1, height-pixel);
+          } else {
+            g.drawLine(0, height-pixel, barSize, height-pixel);
+          }
+
+        }
+
+      }
+    } finally {
+      g.setTransform(transform);
+      g.setClip(clip);
+    }
   }
+
 
   public void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
     this.rulerGeometryFactory = rulerGeometryFactory;

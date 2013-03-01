@@ -275,7 +275,8 @@ public class Viewport2D {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
-      final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+      GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
       if (!convertedBoundingBox.isNull()) {
         final BoundingBox oldBoundingBox = this.boundingBox;
         final double oldScale = getScale();
@@ -288,16 +289,16 @@ public class Viewport2D {
           final double aspectRatio = this.boundingBox.getAspectRatio();
           if (viewAspectRatio != aspectRatio) {
             if (aspectRatio < viewAspectRatio) {
-              final double width = boundingBox.getWidth();
-              final double height = boundingBox.getHeight();
+              final double width = convertedBoundingBox.getWidth();
+              final double height = convertedBoundingBox.getHeight();
               final double newWidth = height * viewAspectRatio;
               final double expandX = (newWidth - width) / 2;
               this.boundingBox = this.boundingBox.clone();
               this.boundingBox.expandBy(expandX, 0);
 
             } else if (aspectRatio > viewAspectRatio) {
-              final double width = boundingBox.getWidth();
-              final double height = boundingBox.getHeight();
+              final double width = convertedBoundingBox.getWidth();
+              final double height = convertedBoundingBox.getHeight();
               final double newHeight = width / viewAspectRatio;
               final double expandY = (newHeight - height) / 2;
               this.boundingBox = this.boundingBox.clone();
