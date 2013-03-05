@@ -163,16 +163,22 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       DataTypes.STRING);
     addAttributeAdder("varchar", stringAttributeAdder);
     addAttributeAdder("text", stringAttributeAdder);
+    addAttributeAdder("name", stringAttributeAdder);
+    addAttributeAdder("bpchar", stringAttributeAdder);
 
     final JdbcAttributeAdder longAttributeAdder = new JdbcAttributeAdder(
       DataTypes.LONG);
     addAttributeAdder("int8", longAttributeAdder);
     addAttributeAdder("bigint", longAttributeAdder);
+    addAttributeAdder("bigserial", longAttributeAdder);
+    addAttributeAdder("serial8", longAttributeAdder);
 
     final JdbcAttributeAdder intAttributeAdder = new JdbcAttributeAdder(
       DataTypes.INT);
     addAttributeAdder("int4", intAttributeAdder);
     addAttributeAdder("integer", intAttributeAdder);
+    addAttributeAdder("serial", intAttributeAdder);
+    addAttributeAdder("serial4", intAttributeAdder);
 
     final JdbcAttributeAdder shortAttributeAdder = new JdbcAttributeAdder(
       DataTypes.SHORT);

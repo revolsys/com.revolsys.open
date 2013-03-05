@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.gis.bing.BingClient;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.esri.map.rest.map.LayerDescription;
 import com.revolsys.io.esri.map.rest.map.LevelOfDetail;

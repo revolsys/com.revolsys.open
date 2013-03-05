@@ -585,7 +585,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  protected void loadSchemaDataObjectMetaData(
+  protected synchronized void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
     final Map<String, DataObjectMetaData> metaDataMap) {
     final String schemaName = schema.getPath();

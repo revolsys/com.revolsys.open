@@ -386,4 +386,14 @@ public final class CollectionUtil {
 
   private CollectionUtil() {
   }
+
+  public static boolean isNotNullAndNotZero(Map<String,Object> object,String name ) {
+    final Integer value = getInteger(object,
+      name);
+    if (value == null || value == 0) {
+      return false; 
+    } else {
+      return true;
+    }
+  }
 }

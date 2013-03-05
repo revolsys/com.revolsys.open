@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -60,7 +61,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
-      String type = "GEOMETRY";
+      String type = "geometry";
       int numAxis = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
