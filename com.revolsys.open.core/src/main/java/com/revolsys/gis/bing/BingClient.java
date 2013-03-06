@@ -25,14 +25,6 @@ import com.revolsys.util.UriTemplate;
 import com.revolsys.util.UrlUtil;
 
 public class BingClient {
-  public enum ImagerySet {
-    Aerial, AerialWithLabels, Road, OrdnanceSurvey, CollinsBart
-  }
-
-  public enum MapLayer {
-    TrafficFlow
-  }
-
   public static final GeometryFactory WORLD_MERCATOR = GeometryFactory.getFactory(3857);
 
   public static final GeometryFactory WGS84 = GeometryFactory.getFactory(4326);
@@ -118,7 +110,7 @@ public class BingClient {
 
   private final String bingMapsKey;
 
-  private final Map<ImagerySet, Map<String, Object>> metaDataCache = new HashMap<BingClient.ImagerySet, Map<String, Object>>();
+  private final Map<ImagerySet, Map<String, Object>> metaDataCache = new HashMap<ImagerySet, Map<String, Object>>();
 
   public BingClient() {
     this("ArIUlgTPb9o1ZxL_dqrMpjv3FYzgBdgVKua-8czp3OVpMjGjOIzwoZevIk_gSk4i");

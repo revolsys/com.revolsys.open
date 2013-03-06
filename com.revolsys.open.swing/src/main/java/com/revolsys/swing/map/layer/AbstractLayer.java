@@ -260,7 +260,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setLayerGroup(final LayerGroup layerGroup) {
     if (this.layerGroup != layerGroup) {
       final LayerGroup old = this.layerGroup;
+      if (old != null) {
+        removePropertyChangeListener(old);
+      }
       this.layerGroup = layerGroup;
+      addPropertyChangeListener(layerGroup);
       propertyChangeSupport.firePropertyChange("layerGroup", old, layerGroup);
     }
   }

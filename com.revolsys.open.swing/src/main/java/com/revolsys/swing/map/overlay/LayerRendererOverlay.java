@@ -62,8 +62,9 @@ public class LayerRendererOverlay extends JComponent implements
   }
 
   public void setLayer(Layer layer) {
-    if (this.layer != layer) {
-      if (this.layer != null) {
+    Layer old = this.layer;
+    if (old != layer) {
+      if (old != null) {
         layer.removePropertyChangeListener(this);
       }
       this.layer = layer;
@@ -71,6 +72,7 @@ public class LayerRendererOverlay extends JComponent implements
         layer.addPropertyChangeListener(this);
       }
       repaint();
+      firePropertyChange("layer", old, layer);
     }
   }
 

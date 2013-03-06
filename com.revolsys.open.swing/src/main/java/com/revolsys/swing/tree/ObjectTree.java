@@ -90,7 +90,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
                 mouseClickItem = node;
                 listener.mouseClicked(e);
               } finally {
-                mouseClickItem = null;
               }
             }
           }

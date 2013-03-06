@@ -9,8 +9,12 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
+import com.revolsys.swing.map.layer.LayerFactory;
 
 public class GridLayer extends AbstractLayer {
+  public static final LayerFactory<GridLayer> FACTORY = new InvokeMethodLayerFactory<GridLayer>(
+    "grid", "Grid", GridLayer.class, "create");
 
   public static GridLayer create(final Map<String, Object> properties) {
     final String layerName = (String)properties.get("name");
@@ -31,7 +35,7 @@ public class GridLayer extends AbstractLayer {
     }
     return null;
   }
-  
+
   private final RectangularMapGrid grid;
 
   public GridLayer(final RectangularMapGrid grid) {

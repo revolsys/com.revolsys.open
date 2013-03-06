@@ -6,12 +6,17 @@ import com.revolsys.gis.cs.GeometryFactory;
 public class Project extends LayerGroup {
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3857);
 
+  private final LayerGroup baseMapLayers = new LayerGroup("Base Maps");
+
+  private BoundingBox viewBoundingBox = new BoundingBox();
+
   public Project() {
-    super("Project");
+    this("Project");
   }
 
   public Project(final String name) {
     super(name);
+    baseMapLayers.setLayerGroup(this);
   }
 
   @Override
@@ -20,8 +25,22 @@ public class Project extends LayerGroup {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public <V extends Layer> V getLayer(final String name) {
+    if (name.equals("Base Maps")) {
+      return (V)baseMapLayers;
+    } else {
+      return (V)super.getLayer(name);
+    }
+  }
+
+  @Override
   public Project getProject() {
     return this;
+  }
+
+  public BoundingBox getViewBoundingBox() {
+    return viewBoundingBox;
   }
 
   @Override
@@ -33,16 +52,9 @@ public class Project extends LayerGroup {
         this.geometryFactory);
     }
   }
-  
 
-  private BoundingBox viewBoundingBox = new BoundingBox();
-
-  public BoundingBox getViewBoundingBox() {
-    return viewBoundingBox;
-  }
-
-  public void setViewBoundingBox(BoundingBox viewBoundingBox) {
-    BoundingBox oldValue = this.viewBoundingBox;
+  public void setViewBoundingBox(final BoundingBox viewBoundingBox) {
+    final BoundingBox oldValue = this.viewBoundingBox;
 
     this.viewBoundingBox = viewBoundingBox;
     getPropertyChangeSupport().firePropertyChange("viewBoundingBox", oldValue,

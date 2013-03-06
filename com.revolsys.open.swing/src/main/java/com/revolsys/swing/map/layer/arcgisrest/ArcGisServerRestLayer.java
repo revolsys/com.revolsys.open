@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.arcgisrest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -13,10 +14,23 @@ import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
+import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.Project;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
+
+  public static final LayerFactory<ArcGisServerRestLayer> FACTORY = new InvokeMethodLayerFactory<ArcGisServerRestLayer>(
+    "arcgisServerRest", "Arc GIS Server REST", ArcGisServerRestLayer.class,
+    "create");
+
+  public static ArcGisServerRestLayer create(Map<String, Object> properties) {
+    String url = (String)properties.get("url");
+    ArcGisServerRestLayer layer = new ArcGisServerRestLayer(url);
+    layer.setProperties(properties);
+    return layer;
+  }
 
   private MapServer mapServer;
 

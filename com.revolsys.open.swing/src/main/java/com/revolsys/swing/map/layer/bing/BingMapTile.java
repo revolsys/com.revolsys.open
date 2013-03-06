@@ -3,8 +3,8 @@ package com.revolsys.swing.map.layer.bing;
 import java.awt.Image;
 
 import com.revolsys.gis.bing.BingClient;
-import com.revolsys.gis.bing.BingClient.ImagerySet;
-import com.revolsys.gis.bing.BingClient.MapLayer;
+import com.revolsys.gis.bing.ImagerySet;
+import com.revolsys.gis.bing.MapLayer;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class BingMapTile extends MapTile {
