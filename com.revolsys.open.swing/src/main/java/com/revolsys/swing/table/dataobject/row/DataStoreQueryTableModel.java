@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.dataobject.row;
 
-import java.awt.BorderLayout;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
@@ -21,6 +19,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.table.SortableTableModel;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.CollectionUtil;
 
 public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
@@ -29,10 +28,7 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   public static JPanel createPanel(final DataObjectMetaData metaData) {
     final JTable table = createTable(metaData);
-    final JScrollPane scrollPane = new JScrollPane(table);
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
+    return new TablePanel(table);
   }
 
   public static DataObjectRowTable createTable(final DataObjectMetaData metaData) {

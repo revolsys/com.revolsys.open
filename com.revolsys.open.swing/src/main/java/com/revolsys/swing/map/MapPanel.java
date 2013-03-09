@@ -42,9 +42,10 @@ import com.vividsolutions.jts.geom.Geometry;
 @SuppressWarnings("serial")
 public class MapPanel extends JPanel implements PropertyChangeListener {
 
-  public static final String MAP_CATALOG_WORKING_AREA = "mapCatalogCWorkingArea";
+  public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
+  public static final String MAP_INFO_WORKING_AREA = "mapInfoCWorkingArea";
 
   public static final BoundingBox BC_ENVELOPE = //
   new BoundingBox(GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252,
@@ -222,6 +223,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     zoomNextButton.setEnabled(false);
     addPropertyChangeListener("zoomNextEnabled", new EnableComponentListener(
       zoomNextButton));
+
+    toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
+      "magnifier_zoom_selected", this, "zoomToSelected");
+    // TODO disable if none selected
 
     selectMapScale = new SelectMapScale(this);
     toolBar.addComponent("zoom", selectMapScale);
@@ -432,8 +437,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomIn() {
-    final BoundingBox boundingBox = getBoundingBox().clone();
-    boundingBox.expandPercent(-0.5);
+    BoundingBox boundingBox = getBoundingBox();
+    boundingBox = boundingBox.expandPercent(-0.5);
     setBoundingBox(boundingBox);
   }
 
@@ -442,8 +447,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomOut() {
-    final BoundingBox boundingBox = getBoundingBox().clone();
-    boundingBox.expandPercent(1);
+    BoundingBox boundingBox = getBoundingBox();
+    boundingBox = boundingBox.expandPercent(1);
     setBoundingBox(boundingBox);
   }
 
@@ -461,23 +466,34 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Geometry convertedGeometry = getGeometryFactory().copy(geometry);
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
-        convertedGeometry).clone();
-      boundingBox.expandBy(boundingBox.getWidth() * 0.05,
-        boundingBox.getHeight() * 0.05);
-      setBoundingBox(boundingBox);
+      BoundingBox boudingBox = BoundingBox.getBoundingBox(convertedGeometry);
+      zoomTo(boudingBox);
     }
+  }
+
+  /**
+   * Zoom to the bounding box with a 5% padding on each side
+   * 
+   * @param boudingBox
+   */
+  public void zoomTo(BoundingBox boudingBox) {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = boudingBox.convert(geometryFactory)
+      .expandPercent(0.1);
+    setBoundingBox(boundingBox);
   }
 
   public void zoomTo(final Layer layer) {
     if (layer != null && layer.isVisible()) {
-      final BoundingBox boundingBox = layer.getBoundingBox(true)
-        .clone()
-        .convert(getGeometryFactory());
-      final double width = boundingBox.getWidth();
-      final double height = boundingBox.getHeight();
-      boundingBox.expandBy(width * 0.05, height * 0.05);
-      setBoundingBox(boundingBox);
+      final BoundingBox boundingBox = layer.getBoundingBox(true);
+      zoomTo(boundingBox);
+    }
+  }
+
+  public void zoomToSelected() {
+    BoundingBox boundingBox = project.getSelectedBoundingBox();
+    if (!boundingBox.isNull()) {
+      zoomTo(boundingBox);
     }
   }
 

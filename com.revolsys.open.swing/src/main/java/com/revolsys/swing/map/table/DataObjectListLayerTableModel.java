@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.table;
 
-import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
@@ -9,8 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -21,23 +18,21 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowJxTable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class ListDataObjectLayerTableModel extends DataObjectRowTableModel
+public class DataObjectListLayerTableModel extends DataObjectRowTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
-    DataObjectListLayer.class, ListDataObjectLayerTableModel.class, "createPanel");
+    DataObjectListLayer.class, DataObjectListLayerTableModel.class,
+    "createPanel");
 
-  public static JPanel createPanel(final DataObjectListLayer layer) {
+  public static DataObjectLayerTablePanel createPanel(final DataObjectListLayer layer) {
     final JTable table = createTable(layer);
-    final JScrollPane scrollPane = new JScrollPane(table);
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
+    return new DataObjectLayerTablePanel(layer,table);
   }
 
   public static DataObjectRowJxTable createTable(final DataObjectListLayer layer) {
-    final ListDataObjectLayerTableModel model = new ListDataObjectLayerTableModel(
+    final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
     return new DataObjectRowJxTable(model);
   }
@@ -46,11 +41,11 @@ public class ListDataObjectLayerTableModel extends DataObjectRowTableModel
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
-  public ListDataObjectLayerTableModel(final DataObjectListLayer layer) {
+  public DataObjectListLayerTableModel(final DataObjectListLayer layer) {
     this(layer.getMetaData().getAttributeNames(), layer);
   }
 
-  public ListDataObjectLayerTableModel(final List<String> columnNames,
+  public DataObjectListLayerTableModel(final List<String> columnNames,
     final DataObjectListLayer layer) {
     super(layer.getMetaData(), columnNames);
     this.layer = layer;

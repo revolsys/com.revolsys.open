@@ -1,38 +1,28 @@
 package com.revolsys.swing.map.tree;
 
-import java.awt.Component;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
-
-import com.revolsys.swing.DockingFramesUtil;
-import com.revolsys.swing.map.MapPanel;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.grid.ZoomToMapSheet;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.tree.renderer.LayerTreeCellRenderer;
 import com.revolsys.swing.map.util.LayerUtil;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
@@ -44,63 +34,30 @@ public class BaseLayerTreeNodeModel extends
   @Override
   public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
     super.setObjectTreeModel(objectTreeModel);
-    PopupMenu abstractLayerMenu = objectTreeModel.getMenu(AbstractLayer.class);
-    abstractLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(false));
-    abstractLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(true));
+    MenuFactory abstractLayerMenu = objectTreeModel.getMenu(AbstractLayer.class);
+    abstractLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(false));
+    abstractLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(true));
 
-    PopupMenu gridLayerMenu = objectTreeModel.getMenu(GridLayer.class);
+    MenuFactory gridLayerMenu = objectTreeModel.getMenu(GridLayer.class);
     gridLayerMenu.addMenuItem("zoom", new ZoomToMapSheet());
 
-    PopupMenu dataObjectLayerMenu = objectTreeModel.getMenu(AbstractDataObjectLayer.class);
-    dataObjectLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(false));
-    dataObjectLayerMenu.addMenuItem("scale", new SetLayerScaleMenu(true));
-    dataObjectLayerMenu.addMenuItem("table", new AbstractAction(
-      "View Attributes") {
+    MenuFactory dataObjectLayerMenu = objectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    dataObjectLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(
+      false));
+    dataObjectLayerMenu.addComponentFactory("scale",
+      new SetLayerScaleMenu(true));
 
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        final Layer layer = ObjectTree.getMouseClickItem();
-        if (layer != null) {
-          DefaultSingleCDockable dockable;
-          synchronized (layer) {
-            dockable = layer.getProperty("TableView");
-          }
-          if (dockable == null) {
-            Project project = layer.getProject();
-
-            Component component = LayerUtil.getLayerTablePanel(layer);
-            String id = layer.getClass().getName() + "." + layer.getId();
-            dockable = DockingFramesUtil.addDockable(project,
-              MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
-
-            dockable.setCloseable(true);
-            layer.setProperty("TableView", dockable);
-            dockable.addCDockableStateListener(new CDockableStateListener() {
-              @Override
-              public void extendedModeChanged(final CDockable dockable,
-                final ExtendedMode mode) {
-              }
-
-              @Override
-              public void visibilityChanged(final CDockable dockable) {
-                final boolean visible = dockable.isVisible();
-                if (!visible) {
-                  dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
-                  synchronized (layer) {
-                    layer.setProperty("TableView", null);
-                  }
-                }
-              }
-            });
-          }
-
-          dockable.toFront();
-
-        }
-      }
-    });
+    dataObjectLayerMenu.addMenuItem("zoom", new InvokeMethodAction(
+      "Zoom to Layer", "Zoom to Layer", SilkIconLoader.getIcon("magnifier"),
+      LayerUtil.class, "zoomToLayer"));
+ 
+    dataObjectLayerMenu.addMenuItem("zoom", new InvokeMethodAction(
+      "Zoom to Selected", "Zoom to Selected", SilkIconLoader.getIcon("magnifier_zoom_selected"),
+      LayerUtil.class, "zoomToLayerSelected"));
+    
+    dataObjectLayerMenu.addMenuItem("table", new InvokeMethodAction(
+      "View Attributes", "View Attributes", SilkIconLoader.getIcon("table_go"),
+      LayerUtil.class, "showViewAttributes"));
   }
 
   public static BaseLayerTreeNodeModel create(final String name,

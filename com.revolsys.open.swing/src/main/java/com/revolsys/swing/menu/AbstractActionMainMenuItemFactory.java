@@ -1,18 +1,26 @@
 package com.revolsys.swing.menu;
 
+import java.awt.Component;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
+import com.revolsys.swing.component.ComponentFactory;
+
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
-  implements MenuItemFactory {
+  implements ComponentFactory<JMenuItem> {
 
   private boolean checkBox;
 
   @Override
-  public JMenuItem createJMenuItem() {
+  public void close(Component component) {
+  }
+
+  @Override
+  public JMenuItem createComponent() {
     if (checkBox) {
       return new JCheckBoxMenuItem(this);
     } else {

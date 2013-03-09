@@ -4,22 +4,17 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.springframework.util.CollectionUtils;
 
 import com.revolsys.beans.ClassUtil;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD extends Object>
@@ -110,7 +105,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   }
 
   @Override
-  public PopupMenu getMenu(final NODE node) {
+  public MenuFactory getMenu(final NODE node) {
     if (node == null || objectTreeModel ==null) {
       return null;
     } else {

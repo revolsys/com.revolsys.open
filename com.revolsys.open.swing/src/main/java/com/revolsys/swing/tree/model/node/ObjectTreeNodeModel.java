@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.swing.tree.TreeCellRenderer;
 
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> {
@@ -23,7 +23,7 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   int getIndexOfChild(final NODE node, final CHILD child);
 
-  PopupMenu getMenu(final NODE node);
+  MenuFactory getMenu(final NODE node);
 
   MouseListener getMouseListener(final NODE node);
 

@@ -113,7 +113,7 @@ public class BingClient {
   private final Map<ImagerySet, Map<String, Object>> metaDataCache = new HashMap<ImagerySet, Map<String, Object>>();
 
   public BingClient() {
-    this("ArIUlgTPb9o1ZxL_dqrMpjv3FYzgBdgVKua-8czp3OVpMjGjOIzwoZevIk_gSk4i");
+    this("Av3GGMrdSdD2Xg0CQNLRzmldzrPjaulKt_6fxxTVPTlGX7BqU0sSf4V8OST1WZ_E");
   }
 
   public BingClient(final String bingMapsKey) {

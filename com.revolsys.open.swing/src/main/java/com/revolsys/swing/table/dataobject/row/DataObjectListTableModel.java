@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.dataobject.row;
 
-import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 
@@ -22,6 +20,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.Reorderable;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -32,10 +31,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   public static JPanel createPanel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
     final JTable table = createTable(metaData, objects);
-    final JScrollPane scrollPane = new JScrollPane(table);
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
+    return new TablePanel(table);
   }
 
   public static DataObjectRowJxTable createTable(

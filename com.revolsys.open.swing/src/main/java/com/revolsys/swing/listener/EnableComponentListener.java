@@ -7,11 +7,15 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+
 public class EnableComponentListener implements ItemListener,
-  ListSelectionListener, PropertyChangeListener {
+  ListSelectionListener, PropertyChangeListener, DocumentListener {
   private final Component component;
 
   public EnableComponentListener(final Component component) {
@@ -49,6 +53,25 @@ public class EnableComponentListener implements ItemListener,
       } else {
         component.setEnabled(true);
       }
+    }
+  }
+
+  @Override
+  public void insertUpdate(DocumentEvent e) {
+    changedUpdate(e);
+  }
+
+  @Override
+  public void removeUpdate(DocumentEvent e) {
+    changedUpdate(e);
+  }
+
+  @Override
+  public void changedUpdate(DocumentEvent e) {
+    if (e.getDocument().getLength() == 0) {
+      component.setEnabled(false);
+    } else {
+      component.setEnabled(true);
     }
   }
 }

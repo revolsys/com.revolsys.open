@@ -29,7 +29,8 @@ public class DataStoreSearchComboBox extends JComboBox implements ItemListener,
   public DataStoreSearchComboBox(final DataObjectStore dataStore,
     final String tableName, final String whereClause,
     final String displayAttributeName) {
-    super(new DataStoreSearchComboBoxModel(dataStore, tableName, whereClause));
+    super(new DataStoreSearchComboBoxModel(dataStore, tableName, whereClause,
+      displayAttributeName));
     this.displayAttributeName = displayAttributeName;
     final ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
       displayAttributeName);

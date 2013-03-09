@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -12,8 +11,9 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
 
-public class InvokeMethodAction extends AbstractAction {
+public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
   private static final long serialVersionUID = -5339626097125548212L;
 
@@ -131,10 +131,6 @@ public class InvokeMethodAction extends AbstractAction {
     } else {
       runnable.run();
     }
-  }
-
-  public final Icon getIcon() {
-    return (Icon)getValue(Action.SMALL_ICON);
   }
 
   public Integer getMnemonic() {

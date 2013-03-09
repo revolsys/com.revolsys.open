@@ -1,9 +1,23 @@
 package com.revolsys.swing.map.layer;
 
+import java.lang.ref.WeakReference;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 
 public class Project extends LayerGroup {
+
+  private static WeakReference<Project> project = new WeakReference<Project>(
+    null);
+
+  public static Project get() {
+    return Project.project.get();
+  }
+
+  public static void set(final Project project) {
+    Project.project = new WeakReference<Project>(project);
+  }
+
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3857);
 
   private final LayerGroup baseMapLayers = new LayerGroup("Base Maps");
@@ -17,6 +31,7 @@ public class Project extends LayerGroup {
   public Project(final String name) {
     super(name);
     baseMapLayers.setLayerGroup(this);
+    set(this);
   }
 
   @Override
@@ -54,10 +69,12 @@ public class Project extends LayerGroup {
   }
 
   public void setViewBoundingBox(final BoundingBox viewBoundingBox) {
-    final BoundingBox oldValue = this.viewBoundingBox;
+    if (!viewBoundingBox.isNull()) {
+      final BoundingBox oldValue = this.viewBoundingBox;
 
-    this.viewBoundingBox = viewBoundingBox;
-    getPropertyChangeSupport().firePropertyChange("viewBoundingBox", oldValue,
-      viewBoundingBox);
+      this.viewBoundingBox = viewBoundingBox;
+      getPropertyChangeSupport().firePropertyChange("viewBoundingBox",
+        oldValue, viewBoundingBox);
+    }
   }
 }

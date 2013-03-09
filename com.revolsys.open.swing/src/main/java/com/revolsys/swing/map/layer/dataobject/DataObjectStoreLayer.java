@@ -13,26 +13,49 @@ import java.util.Set;
 
 import javax.swing.SwingWorker;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.swing.SwingWorkerManager;
+import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
+import com.revolsys.swing.map.layer.LayerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
+  public static final LayerFactory<DataObjectStoreLayer> FACTORY = new InvokeMethodLayerFactory<DataObjectStoreLayer>(
+    "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
+
+  public static DataObjectStoreLayer create(Map<String, Object> properties) {
+    @SuppressWarnings("unchecked")
+    Map<String, Object> connectionProperties = (Map<String, Object>)properties.get("connectionProperties");
+    if (connectionProperties == null) {
+      throw new IllegalArgumentException(
+        "A data store layer requires a connectionProperties entry with a url, username and password.");
+    } else {
+      DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
+      dataStore.initialize();
+      DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
+      layer.setProperties(properties);
+      return layer;
+    }
+  }
+
   private final DataObjectStore dataStore;
 
   private final Object sync = new Object();
 
-  private final String typePath;
+  private String typePath;
 
   private DataObjectQuadTree index = new DataObjectQuadTree();
 
@@ -50,11 +73,27 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
 
-  public DataObjectStoreLayer(final DataObjectStore store, final String typePath) {
-    super(PathUtil.getName(typePath), store.getMetaData(typePath)
+  public DataObjectStoreLayer(final DataObjectStore dataStore,
+    final String typePath) {
+    super(PathUtil.getName(typePath), dataStore.getMetaData(typePath)
       .getGeometryFactory());
-    this.dataStore = store;
+    this.dataStore = dataStore;
     this.typePath = typePath;
+  }
+
+  public DataObjectStoreLayer(final DataObjectStore dataStore) {
+    this.dataStore = dataStore;
+  }
+
+  public void setTypePath(String typePath) {
+    this.typePath = typePath;
+    if (StringUtils.hasText(typePath)) {
+      setName(PathUtil.getName(typePath));
+      setMetaData(dataStore.getMetaData(typePath));
+    } else {
+      setName("Type not found " + typePath);
+      setMetaData(null);
+    }
   }
 
   @Override
@@ -354,7 +393,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public void setSelectedObjects(final Collection<DataObject> objects) {
     selectedObjectIds.clear();
     for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
+      if (object != null && object.getMetaData() == getMetaData()) {
         final Object id = object.getIdValue();
         if (id != null) {
           synchronized (cachedObjects) {

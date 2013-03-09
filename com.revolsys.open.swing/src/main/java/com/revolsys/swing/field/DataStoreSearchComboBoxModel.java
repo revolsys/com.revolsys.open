@@ -19,16 +19,22 @@ public class DataStoreSearchComboBoxModel extends
 
   private final String tableName;
 
+  private String orderBy;
+
   public DataStoreSearchComboBoxModel(final DataObjectStore dataStore,
-    final String tableName, final String whereClause) {
+    final String tableName, final String whereClause, String orderBy) {
     super(null, false);
     this.dataStore = dataStore;
     this.tableName = tableName;
     this.whereClause = whereClause;
+    this.orderBy = orderBy;
   }
 
   public ResultPager<DataObject> getNameResultPager(final String text) {
     final Query query = new Query(tableName);
+    if (StringUtils.hasText(orderBy)) {
+      query.setOrderByColumns(orderBy);
+    }
     if (StringUtils.hasText(text)) {
       query.setWhereClause(whereClause);
       int index = 0;

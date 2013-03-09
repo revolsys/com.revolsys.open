@@ -12,8 +12,11 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.intern.CControlAccess;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 public class DockingFramesUtil {
+
+  private static final Map<Object, CControl> OBJECT_CONTROLS = new WeakHashMap<Object, CControl>();
 
   private static final Map<Object, Map<String, CWorkingArea>> OBJECT_WORKING_AREAS = new WeakHashMap<Object, Map<String, CWorkingArea>>();
 
@@ -29,8 +32,10 @@ public class DockingFramesUtil {
         title, component);
       control.addDockable(dockable);
       dockable.setWorkingArea(workingArea);
+      dockable.setMinimizable(true);
+      dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
+        .minimalWest());
       dockable.setVisible(true);
-      dockable.setMinimizable(false);
       return dockable;
     }
   }
@@ -60,6 +65,9 @@ public class DockingFramesUtil {
     final Object object, final String name, CLocation location) {
     final CWorkingArea workingArea = createCWorkingArea(control, object, name);
     if (location != null) {
+      workingArea.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
+        .minimalWest());
+      workingArea.setDefaultLocation(ExtendedMode.NORMALIZED, location);
       workingArea.setLocation(location);
     }
     workingArea.setVisible(true);
@@ -85,16 +93,25 @@ public class DockingFramesUtil {
       OBJECT_WORKING_AREAS.put(object, workingAreas);
     }
     workingAreas.put(name, workingArea);
+    CControl control = workingArea.getControl().getOwner();
+    setCControl(object, control);
+
+  }
+
+  public static void setCControl(final Object object, final CControl control) {
+    OBJECT_CONTROLS.put(object, control);
+  }
+
+  public static CControl getCControl(final Object object) {
+    return OBJECT_CONTROLS.get(object);
   }
 
   public static void setFlapSizes(final CControl control) {
     final CContentArea contentArea = control.getContentArea();
-    final Dimension size = new Dimension(2, 2);
-    // contentArea.setMinimumAreaSize(size);
-    // contentArea.getNorthArea().setPreferredSize(size);
-    contentArea.getEastArea().setPreferredSize(size);
-    contentArea.getSouthArea().setPreferredSize(size);
-    contentArea.getWestArea().setPreferredSize(size);
+    final Dimension zeroSize = new Dimension(0, 0);
+    contentArea.getNorthArea().setPreferredSize(zeroSize);
+    contentArea.getEastArea().setPreferredSize(zeroSize);
+    contentArea.getSouthArea().setPreferredSize(zeroSize);
   }
 
 }

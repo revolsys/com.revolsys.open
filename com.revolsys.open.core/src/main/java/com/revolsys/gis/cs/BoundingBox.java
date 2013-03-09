@@ -38,7 +38,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   @Override
-  public BoundingBox clone()  {
+  public BoundingBox clone() {
     try {
       return (BoundingBox)super.clone();
     } catch (CloneNotSupportedException e) {
@@ -355,7 +355,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     if (this.geometryFactory == null || geometryFactory == null
-      || this.geometryFactory.equals(geometryFactory)) {
+      || this.geometryFactory.equals(geometryFactory) || isNull()) {
       return new BoundingBox(this);
     } else {
       final Polygon polygon = toPolygon();
@@ -710,9 +710,15 @@ public class BoundingBox extends Envelope implements Cloneable {
     return s.toString();
   }
 
-  public void expandPercent(double factor) {
-    double deltaX = getWidth() * factor / 2;
-    double deltaY = getHeight() * factor / 2;
-    expandBy(deltaX, deltaY);
+  public BoundingBox expandPercent(double factor) {
+    if (factor == 0 || isNull()) {
+      return this;
+    } else {
+      BoundingBox boundingBox = clone();
+      double deltaX = getWidth() * factor / 2;
+      double deltaY = getHeight() * factor / 2;
+      boundingBox.expandBy(deltaX, deltaY);
+      return boundingBox;
+    }
   }
 }

@@ -14,17 +14,11 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import javax.swing.DropMode;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
@@ -32,7 +26,6 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
@@ -129,7 +122,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
             final Object node = path.getLastPathComponent();
             final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
             if (nodeModel != null) {
-              final PopupMenu menu = nodeModel.getMenu(node);
+              final JPopupMenu menu = nodeModel.getMenu(node).createJPopupMenu();
               int numItems = menu.getSubElements().length;
               if (menu != null && numItems > 0) {
                 mouseClickItem = node;

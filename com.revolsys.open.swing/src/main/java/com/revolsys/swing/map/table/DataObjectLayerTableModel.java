@@ -1,14 +1,11 @@
 package com.revolsys.swing.map.table;
 
-import java.awt.BorderLayout;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
@@ -35,12 +32,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
     DataObjectLayer.class, DataObjectLayerTableModel.class, "createPanel");
 
-  public static JPanel createPanel(final DataObjectLayer layer) {
+  public static DataObjectLayerTablePanel createPanel(final DataObjectLayer layer) {
     final JTable table = createTable(layer);
-    final JScrollPane scrollPane = new JScrollPane(table);
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
+    return new DataObjectLayerTablePanel(layer, table);
   }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer) {

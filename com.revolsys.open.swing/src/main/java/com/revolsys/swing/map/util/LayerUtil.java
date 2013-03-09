@@ -1,25 +1,49 @@
 package com.revolsys.swing.map.util;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
+
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
 import com.revolsys.swing.map.layer.bing.BingLayer;
+import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
+import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.revolsys.swing.map.table.LayerTablePanelFactory;
-import com.revolsys.swing.map.table.ListDataObjectLayerTableModel;
+import com.revolsys.swing.tree.ObjectTree;
 
 public class LayerUtil {
 
@@ -28,6 +52,7 @@ public class LayerUtil {
   private static final Map<Class<? extends Layer>, LayerTablePanelFactory> LAYER_TABLE_FACTORIES = new HashMap<Class<? extends Layer>, LayerTablePanelFactory>();
 
   static {
+    addLayerFactory(DataObjectStoreLayer.FACTORY);
     addLayerFactory(ArcGisServerRestLayer.FACTORY);
     addLayerFactory(BingLayer.FACTORY);
     addLayerFactory(GridLayer.FACTORY);
@@ -35,12 +60,78 @@ public class LayerUtil {
     addLayerFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
 
     addLayerTablePanelFactory(DataObjectLayerTableModel.FACTORY);
-    addLayerTablePanelFactory(ListDataObjectLayerTableModel.FACTORY);
+    addLayerTablePanelFactory(DataObjectListLayerTableModel.FACTORY);
   }
 
   public static void addLayerFactory(LayerFactory<?> factory) {
     String typeName = factory.getTypeName();
     LAYER_FACTORIES.put(typeName, factory);
+  }
+
+  public static void zoomToLayerSelected() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      Project project = layer.getProject();
+      GeometryFactory geometryFactory = project.getGeometryFactory();
+      BoundingBox boundingBox = layer.getSelectedBoundingBox()
+        .convert(geometryFactory)
+        .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public static void zoomToLayer() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      Project project = layer.getProject();
+      GeometryFactory geometryFactory = project.getGeometryFactory();
+      BoundingBox boundingBox = layer.getBoundingBox()
+        .convert(geometryFactory)
+        .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public static void showViewAttributes() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      DefaultSingleCDockable dockable;
+      synchronized (layer) {
+        dockable = layer.getProperty("TableView");
+      }
+      if (dockable == null) {
+        Project project = layer.getProject();
+
+        Component component = LayerUtil.getLayerTablePanel(layer);
+        String id = layer.getClass().getName() + "." + layer.getId();
+        dockable = DockingFramesUtil.addDockable(project,
+          MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
+
+        dockable.setCloseable(true);
+        layer.setProperty("TableView", dockable);
+        dockable.addCDockableStateListener(new CDockableStateListener() {
+          @Override
+          public void extendedModeChanged(final CDockable dockable,
+            final ExtendedMode mode) {
+          }
+
+          @Override
+          public void visibilityChanged(final CDockable dockable) {
+            final boolean visible = dockable.isVisible();
+            if (!visible) {
+              dockable.getControl()
+                .getOwner()
+                .remove((SingleCDockable)dockable);
+              synchronized (layer) {
+                layer.setProperty("TableView", null);
+              }
+            }
+          }
+        });
+      }
+
+      dockable.toFront();
+    }
   }
 
   public static void addLayerTablePanelFactory(LayerTablePanelFactory factory) {
@@ -92,20 +183,25 @@ public class LayerUtil {
   }
 
   public static void loadLayer(final LayerGroup group, final File file) {
-    final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
-    final Layer layer = getLayer(properties);
-    if (layer != null) {
-      group.add(layer);
+    try {
+      final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
+      final Layer layer = getLayer(properties);
+      if (layer != null) {
+        group.add(layer);
+      }
+    } catch (Throwable t) {
+      LoggerFactory.getLogger(LayerUtil.class).error(
+        "Cannot load layer from " + file, t);
     }
   }
 
-  public static void loadLayerGroup(final File directory,
-    final LayerGroup parent) {
+  public static void loadLayerGroup(final LayerGroup parent,
+    final File directory) {
     for (final File file : directory.listFiles()) {
       final String name = file.getName();
       if (file.isDirectory()) {
         final LayerGroup group = parent.addLayerGroup(name);
-        loadLayerGroup(file, group);
+        loadLayerGroup(group, file);
       } else {
         final String fileExtension = FileUtil.getFileNameExtension(file);
         if (fileExtension.equals("rglayer")) {
@@ -122,5 +218,64 @@ public class LayerUtil {
       return factory.createPanel(layer);
     }
     return null;
+  }
+
+  public static void openFile(File file) {
+    Project project = Project.get();
+    if (project != null) {
+      LayerGroup firstGroup = project.getLayerGroups().get(0);
+      String extension = FileUtil.getFileNameExtension(file);
+      if ("rgmap".equals(extension)) {
+        loadLayerGroup(firstGroup, file);
+      } else if ("rglayer".equals(extension)) {
+        loadLayer(firstGroup, file);
+      } else {
+        DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(new FileSystemResource(
+          file));
+        try {
+          List<DataObject> objects = reader.read();
+          DataObjectMetaData metaData = reader.getMetaData();
+          DataObjectListLayer layer = new DataObjectListLayer(metaData, objects);
+          firstGroup.add(layer);
+        } finally {
+          reader.close();
+        }
+      }
+    }
+
+  }
+
+  public static void openFiles(List<File> files) {
+    for (File file : files) {
+      openFile(file);
+    }
+  }
+
+  private static Map<DataObject, DefaultSingleCDockable> forms = new HashMap<DataObject, DefaultSingleCDockable>();
+
+  public static void showForm(DataObjectLayer layer, DataObject object) {
+    DefaultSingleCDockable dockable = forms.get(object);
+    if (dockable == null) {
+      Project project = layer.getProject();
+      if (project == null) {
+        return;
+      } else {
+        DataObjectMetaData metaData = layer.getMetaData();
+        Object id = object.getIdValue();
+        String dockableId = metaData.getInstanceId() + "-" + id;
+        Component form = DataObjectLayerFormFactory.createFormComponent(layer,
+          object);
+        dockable = DockingFramesUtil.addDockable(project,
+          MapPanel.MAP_INFO_WORKING_AREA, dockableId, metaData.getTypeName()
+            + " " + id, form);
+        Dimension size = form.getPreferredSize();
+        dockable.setLocation(CLocation.external(100, 100, size.width,
+          size.height));
+        forms.put(object, dockable);
+      }
+    }
+    dockable.setCloseable(true);
+    dockable.toFront();
+
   }
 }

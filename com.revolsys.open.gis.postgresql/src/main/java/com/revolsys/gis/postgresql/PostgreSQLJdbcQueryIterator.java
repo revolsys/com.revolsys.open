@@ -22,7 +22,7 @@ public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
       sql += " OFFSET " + offset;
     }
     if (limit > -1) {
-      sql += " LIMIT " + offset;
+      sql += " LIMIT " + limit;
     }
     return sql;
   }
