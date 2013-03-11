@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.doclet.DocletUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.AnnotationTypeElementDoc;
+import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.DocErrorReporter;
@@ -124,21 +123,8 @@ public class ClientDoclet {
 
   public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
-    writer.write(root.commentText());
+    DocletUtil.description(writer, null, root);
     documentation();
-  }
-
-  public void description(final Map<String, String> descriptions,
-    final String name) {
-    writer.startTag(HtmlUtil.TD);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-    final String description = descriptions.get(name);
-    if (description == null) {
-      writer.write("-");
-    } else {
-      writer.write(description);
-    }
-    writer.endTagLn(HtmlUtil.TD);
   }
 
   public void documentation() {
@@ -159,7 +145,7 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(annotationDoc.commentText());
+    DocletUtil.description(writer, annotationDoc, annotationDoc);
 
     final AnnotationTypeElementDoc[] elements = annotationDoc.elements();
     if (elements.length > 0) {
@@ -195,12 +181,17 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "default");
-        writer.text(element.defaultValue());
+        AnnotationValue defaultValue = element.defaultValue();
+        if (defaultValue == null) {
+          writer.text("-");
+        } else {
+          writer.text(defaultValue);
+        }
         writer.endTagLn(HtmlUtil.TD);
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-        writer.text(element.commentText());
+        DocletUtil.description(writer, null, element);
         writer.endTagLn(HtmlUtil.TD);
         writer.endTagLn(HtmlUtil.TR);
       }
@@ -214,7 +205,6 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-
   public void documentationEnum(final ClassDoc enumDoc) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
@@ -224,7 +214,7 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(enumDoc.commentText());
+    DocletUtil.description(writer, enumDoc, enumDoc);
 
     final FieldDoc[] elements = enumDoc.enumConstants();
     if (elements.length > 0) {
@@ -237,7 +227,7 @@ public class ClientDoclet {
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);
       writer.element(HtmlUtil.TH, "Constant");
-       writer.element(HtmlUtil.TH, "Description");
+      writer.element(HtmlUtil.TH, "Description");
       writer.endTagLn(HtmlUtil.TR);
       writer.endTagLn(HtmlUtil.THEAD);
 
@@ -253,7 +243,7 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-        writer.text(element.commentText());
+        DocletUtil.description(writer, null, element);
         writer.endTagLn(HtmlUtil.TD);
         writer.endTagLn(HtmlUtil.TR);
       }
@@ -276,7 +266,7 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(classDoc.commentText());
+    DocletUtil.description(writer, classDoc, classDoc);
 
     final ConstructorDoc[] constructors = classDoc.constructors();
     if (constructors.length > 0) {
@@ -308,13 +298,13 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(member.commentText());
+    DocletUtil.description(writer, member.containingClass(), member);
 
     parameters(member);
 
     if (member instanceof MethodDoc) {
       final MethodDoc method = (MethodDoc)member;
-      documentationReturn(method);
+      DocletUtil.documentationReturn(writer, method);
     }
 
     writer.endTagLn(HtmlUtil.DIV);
@@ -334,7 +324,7 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(packageDoc.commentText());
+    DocletUtil.description(writer, null, packageDoc);
 
     documentationAnnotations(packageDoc);
     documentationEnums(packageDoc);
@@ -344,7 +334,6 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
     writer.endTagLn(HtmlUtil.DIV);
   }
-
 
   public void documentationEnums(final PackageDoc packageDoc) {
     final Map<String, ClassDoc> enums = new TreeMap<String, ClassDoc>();
@@ -358,6 +347,7 @@ public class ClientDoclet {
       }
     }
   }
+
   public void documentationAnnotations(final PackageDoc packageDoc) {
     final Map<String, AnnotationTypeDoc> annotations = new TreeMap<String, AnnotationTypeDoc>();
     for (final AnnotationTypeDoc annotationDoc : packageDoc.annotationTypes()) {
@@ -394,54 +384,6 @@ public class ClientDoclet {
       for (final ClassDoc classDoc : interfaces.values()) {
         documentationClass(classDoc);
       }
-    }
-  }
-
-  private void documentationReturn(final MethodDoc method) {
-    final Type type = method.returnType();
-    if (type != null && !"void".equals(type.qualifiedTypeName())) {
-      String description = "";
-      for (final Tag tag : method.tags()) {
-        if (tag.name().equals("@return")) {
-          description = tag.text();
-        }
-      }
-      DocletUtil.title(writer, "Return");
-
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
-      writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
-      writer.startTag(HtmlUtil.THEAD);
-      writer.startTag(HtmlUtil.TR);
-      writer.element(HtmlUtil.TH, "Type");
-      writer.element(HtmlUtil.TH, "Description");
-      writer.endTagLn(HtmlUtil.TR);
-      writer.endTagLn(HtmlUtil.THEAD);
-
-      writer.startTag(HtmlUtil.TBODY);
-
-      writer.startTag(HtmlUtil.TR);
-      writer.startTag(HtmlUtil.TD);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "type");
-      DocletUtil.typeNameLink(writer, type);
-      writer.endTagLn(HtmlUtil.TD);
-
-      writer.startTag(HtmlUtil.TD);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-      if (StringUtils.hasText(description)) {
-        writer.write(description);
-      } else {
-        writer.write("-");
-      }
-      writer.endTagLn(HtmlUtil.TD);
-
-      writer.endTagLn(HtmlUtil.TR);
-
-      writer.endTagLn(HtmlUtil.TBODY);
-
-      writer.endTagLn(HtmlUtil.TABLE);
-      writer.endTagLn(HtmlUtil.DIV);
     }
   }
 
@@ -512,7 +454,7 @@ public class ClientDoclet {
       parameters.add(parameter);
     }
     if (!parameters.isEmpty()) {
-      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
       DocletUtil.title(writer, "Parameters");
 
@@ -545,7 +487,8 @@ public class ClientDoclet {
         DocletUtil.typeNameLink(writer, type);
         writer.endTagLn(HtmlUtil.TD);
 
-        description(descriptions, name);
+        DocletUtil.descriptionTd(writer, method.containingClass(),
+          descriptions, name);
         writer.endTagLn(HtmlUtil.TR);
       }
       writer.endTagLn(HtmlUtil.TBODY);

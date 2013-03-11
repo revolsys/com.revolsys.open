@@ -39,6 +39,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     this("");
   }
 
+  private BoundingBox boundingBox = new BoundingBox();
+
+  public void setBoundingBox(BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
@@ -56,6 +67,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final GeometryFactory geometryFactory) {
     super(name);
     setGeometryFactory(geometryFactory);
+  }
+
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    super.setGeometryFactory(geometryFactory);
+    if (boundingBox.isNull()) {
+      boundingBox = geometryFactory.getCoordinateSystem().getAreaBoundingBox();
+    }
   }
 
   @Override

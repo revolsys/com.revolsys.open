@@ -2,11 +2,14 @@ package com.revolsys.io.gpx;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public final class GpxConstants {
+
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   public static final String GPX_NS = "gpx";
 
@@ -100,9 +103,13 @@ public final class GpxConstants {
     addAttribute("ageofdgpsdata", DataTypes.DOUBLE, false);
     addAttribute("dgpsid", DataTypes.STRING, false);
     GPX_TYPE.addAttribute("location", DataTypes.GEOMETRY, true);
+    GPX_TYPE.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_WAYPOINT.addAttribute("geometry", DataTypes.POINT, true);
+    GPX_WAYPOINT.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_TRACK.addAttribute("geometry", DataTypes.MULTI_LINE_STRING, true);
+    GPX_TRACK.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_ROUTE.addAttribute("geometry", DataTypes.LINE_STRING, true);
+    GPX_ROUTE.setGeometryFactory(GEOMETRY_FACTORY);
   }
 
   private GpxConstants() {

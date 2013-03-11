@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.doclet.DocletUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
@@ -27,19 +25,6 @@ import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
 
 public class JavaDoclet {
-  public static void description(final XmlWriter writer,
-    final Map<String, String> descriptions, final String name) {
-    writer.startTag(HtmlUtil.TD);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-    final String description = descriptions.get(name);
-    if (description == null) {
-      writer.write("-");
-    } else {
-      writer.write(description);
-    }
-    writer.endTagLn(HtmlUtil.TD);
-  }
-
   public static void documentationClass(final XmlWriter writer,
     final ClassDoc classDoc) {
     writer.startTag(HtmlUtil.DIV);
@@ -50,7 +35,7 @@ public class JavaDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(classDoc.commentText());
+    DocletUtil.description(writer, classDoc, classDoc);
 
     final ConstructorDoc[] constructors = classDoc.constructors();
     if (constructors.length > 0) {
@@ -83,13 +68,13 @@ public class JavaDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(member.commentText());
+    DocletUtil.description(writer, member.containingClass(), member);
 
     parameters(writer, member);
 
     if (member instanceof MethodDoc) {
       final MethodDoc method = (MethodDoc)member;
-      documentationReturn(writer, method);
+      DocletUtil.documentationReturn(writer, method);
     }
 
     writer.endTagLn(HtmlUtil.DIV);
@@ -110,7 +95,7 @@ public class JavaDoclet {
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(packageDoc.commentText());
+    DocletUtil.description(writer, null, packageDoc);
     final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
     for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
       classes.put(classDoc.name(), classDoc);
@@ -120,55 +105,6 @@ public class JavaDoclet {
     }
     writer.endTagLn(HtmlUtil.DIV);
     writer.endTagLn(HtmlUtil.DIV);
-  }
-
-  public static void documentationReturn(final XmlWriter writer,
-    final MethodDoc method) {
-    final Type type = method.returnType();
-    if (type != null && !"void".equals(type.qualifiedTypeName())) {
-      String description = "";
-      for (final Tag tag : method.tags()) {
-        if (tag.name().equals("@return")) {
-          description = tag.text();
-        }
-      }
-      DocletUtil.title(writer, "Return");
-
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
-      writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
-      writer.startTag(HtmlUtil.THEAD);
-      writer.startTag(HtmlUtil.TR);
-      writer.element(HtmlUtil.TH, "Type");
-      writer.element(HtmlUtil.TH, "Description");
-      writer.endTagLn(HtmlUtil.TR);
-      writer.endTagLn(HtmlUtil.THEAD);
-
-      writer.startTag(HtmlUtil.TBODY);
-
-      writer.startTag(HtmlUtil.TR);
-      writer.startTag(HtmlUtil.TD);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "type");
-      DocletUtil.typeNameLink(writer, type);
-      writer.endTagLn(HtmlUtil.TD);
-
-      writer.startTag(HtmlUtil.TD);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-      if (StringUtils.hasText(description)) {
-        writer.write(description);
-      } else {
-        writer.write("-");
-      }
-      writer.endTagLn(HtmlUtil.TD);
-
-      writer.endTagLn(HtmlUtil.TR);
-
-      writer.endTagLn(HtmlUtil.TBODY);
-
-      writer.endTagLn(HtmlUtil.TABLE);
-      writer.endTagLn(HtmlUtil.DIV);
-    }
   }
 
   public static String getAnchor(final ExecutableMemberDoc member) {
@@ -253,7 +189,8 @@ public class JavaDoclet {
       parameters.add(parameter);
     }
     if (!parameters.isEmpty()) {
-      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      ClassDoc containingClass = method.containingClass();
+      final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
       DocletUtil.title(writer, "Parameters");
 
@@ -284,7 +221,7 @@ public class JavaDoclet {
         DocletUtil.typeNameLink(writer, parameter.type());
         writer.endTagLn(HtmlUtil.TD);
 
-        description(writer, descriptions, name);
+        DocletUtil.descriptionTd(writer, containingClass, descriptions, name);
         writer.endTagLn(HtmlUtil.TR);
       }
       writer.endTagLn(HtmlUtil.TBODY);
@@ -354,7 +291,7 @@ public class JavaDoclet {
 
   public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
-    writer.write(root.commentText());
+    DocletUtil.description(writer, null, root);
     documentation();
   }
 

@@ -718,3 +718,28 @@ figcaption {
   font-weight: bold;
   font-style: italic;
 }
+
+div.pageNavigation {
+  border-top: 1px solid black;
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+}
+
+div.paheNavigation > table  {
+  width: 100%;
+}
+div.paheNavigation > table > tr > td {
+  width: 33%;
+}
+
+div.paheNavigation td.previous {
+}
+
+div.paheNavigation td.home {
+  text-align: centre;
+}
+
+div.paheNavigation td.next {
+  text-align: right;
+}
+

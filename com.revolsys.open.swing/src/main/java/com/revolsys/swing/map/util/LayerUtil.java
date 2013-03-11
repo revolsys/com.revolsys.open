@@ -44,6 +44,7 @@ import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.revolsys.swing.map.table.LayerTablePanelFactory;
 import com.revolsys.swing.tree.ObjectTree;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class LayerUtil {
 
@@ -233,9 +234,17 @@ public class LayerUtil {
         DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(new FileSystemResource(
           file));
         try {
-          List<DataObject> objects = reader.read();
           DataObjectMetaData metaData = reader.getMetaData();
-          DataObjectListLayer layer = new DataObjectListLayer(metaData, objects);
+          GeometryFactory geometryFactory = metaData.getGeometryFactory();
+          BoundingBox boundingBox = new BoundingBox(
+            geometryFactory);
+          DataObjectListLayer layer = new DataObjectListLayer(metaData);
+          for (DataObject object : reader) {
+            Geometry geometry = object.getGeometryValue();
+            boundingBox.expandToInclude(geometry);
+            layer.add(object);
+          }
+          layer.setBoundingBox(boundingBox);
           firstGroup.add(layer);
         } finally {
           reader.close();

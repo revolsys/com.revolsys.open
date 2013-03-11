@@ -3,7 +3,11 @@ package com.revolsys.doclet;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
@@ -11,14 +15,32 @@ import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.Doc;
 import com.sun.javadoc.ExecutableMemberDoc;
+import com.sun.javadoc.MemberDoc;
+import com.sun.javadoc.MethodDoc;
+import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.ProgramElementDoc;
+import com.sun.javadoc.SeeTag;
+import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
 import com.sun.javadoc.WildcardType;
 
 public class DocletUtil {
+
+  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
+
+  public static void addPackageUrl(String packagePrefix, String url) {
+    PACKAGE_URLS.put(packagePrefix, url);
+  }
+
+  static {
+    addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
+    addPackageUrl("com.vividsolutions.jts.",
+      "http://tsusiatsoftware.net/jts/javadoc/");
+  }
 
   public static AnnotationDesc getAnnotation(ProgramElementDoc doc, String name) {
     AnnotationDesc[] annotations = doc.annotations();
@@ -52,11 +74,13 @@ public class DocletUtil {
     return annotation != null;
   }
 
-  public static Map<String, String> getParameterDescriptions(
+  public static Map<String, Tag[]> getParameterDescriptions(
     ExecutableMemberDoc method) {
-    Map<String, String> descriptions = new HashMap<String, String>();
+    Map<String, Tag[]> descriptions = new HashMap<String, Tag[]>();
     for (ParamTag tag : method.paramTags()) {
-      descriptions.put(tag.parameterName(), tag.parameterComment());
+      String parameterName = tag.parameterName();
+      Tag[] commentTags = tag.inlineTags();
+      descriptions.put(parameterName, commentTags);
     }
     return descriptions;
   }
@@ -77,12 +101,13 @@ public class DocletUtil {
         }
       }
     } else {
-      boolean included = isTypeIncluded(type);
       final String qualifiedTypeName = type.qualifiedTypeName();
-      if (qualifiedTypeName.startsWith("java.")) {
-        final String url = "http://docs.oracle.com/javase/6/docs/api/"
-          + qualifiedTypeName.replaceAll("\\.", "/") + ".html?is-external=true";
-        HtmlUtil.serializeA(writer, "", url, type.typeName());
+      String externalLink = getExternalUrl(qualifiedTypeName);
+
+      boolean included = isTypeIncluded(type);
+
+      if (externalLink != null) {
+        HtmlUtil.serializeA(writer, "", externalLink, type.typeName());
       } else if (included) {
         final String url = "#" + qualifiedTypeName;
         HtmlUtil.serializeA(writer, "", url, type.typeName());
@@ -108,6 +133,19 @@ public class DocletUtil {
     writer.text(type.dimension());
   }
 
+  public static String getExternalUrl(String qualifiedTypeName) {
+    for (Entry<String, String> entry : PACKAGE_URLS.entrySet()) {
+      String packagePrefix = entry.getKey();
+      if (qualifiedTypeName.startsWith(packagePrefix)) {
+        String baseUrl = entry.getValue();
+        final String url = baseUrl + qualifiedTypeName.replaceAll("\\.", "/")
+          + ".html?is-external=true";
+        return url;
+      }
+    }
+    return null;
+  }
+
   public static boolean isTypeIncluded(final Type type) {
     ClassDoc classDoc = type.asClassDoc();
     ClassDoc annotationDoc = type.asAnnotationTypeDoc();
@@ -118,13 +156,11 @@ public class DocletUtil {
 
   public static void typeName(XmlWriter writer, final Type type) {
     String typeName;
-    if (isTypeIncluded(type)) {
+    String qualifiedTypeName = type.qualifiedTypeName();
+    if (isTypeIncluded(type) || getExternalUrl(qualifiedTypeName) != null) {
       typeName = type.typeName();
     } else {
-      typeName = type.qualifiedTypeName();
-      typeName = typeName.replaceAll("^java.lang.", "");
-      typeName = typeName.replaceAll("^java.io.", "");
-      typeName = typeName.replaceAll("^java.util.", "");
+      typeName = qualifiedTypeName;
     }
     writer.text(typeName);
     writer.text(type.dimension());
@@ -180,4 +216,215 @@ public class DocletUtil {
     }
   }
 
+  public static void description(final XmlWriter writer,
+    ClassDoc containingClass, final Doc doc) {
+    Tag[] tags = doc.inlineTags();
+    description(writer, containingClass, tags);
+  }
+
+  public static void description(final XmlWriter writer,
+    ClassDoc containingClass, Tag[] tags) {
+    if (tags == null || tags.length == 0) {
+      writer.write('-');
+    } else {
+      for (Tag tag : tags) {
+        String kind = tag.kind();
+        if (tag instanceof SeeTag) {
+          SeeTag seeTag = (SeeTag)tag;
+          seeTag(writer, containingClass, seeTag);
+        } else if ("Text".equals(kind)) {
+          writer.write(tag.text());
+        }
+      }
+    }
+  }
+
+  public static void link(XmlWriter writer, String url, String label,
+    boolean code) {
+    boolean hasUrl = StringUtils.hasText(url);
+    if (hasUrl) {
+      writer.startTag(HtmlUtil.A);
+      writer.attribute(HtmlUtil.ATTR_HREF, url);
+    }
+    label(writer, label, code);
+    if (hasUrl) {
+      writer.endTag(HtmlUtil.A);
+    }
+  }
+
+  public static void label(XmlWriter writer, String label, boolean code) {
+    if (code) {
+      writer.startTag(HtmlUtil.CODE);
+    }
+    writer.text(label);
+    if (code) {
+      writer.endTag(HtmlUtil.CODE);
+    }
+  }
+
+  public static String replaceDocRootDir(String text) {
+    int i = text.indexOf("{@");
+    if (i < 0) {
+      return text;
+    } else {
+      String lowerText = text.toLowerCase();
+      i = lowerText.indexOf("{@docroot}", i);
+      if (i < 0) {
+        return text;
+      } else {
+        StringBuffer stringbuffer = new StringBuffer();
+        int k = 0;
+        do {
+          int j = lowerText.indexOf("{@docroot}", k);
+          if (j < 0) {
+            stringbuffer.append(text.substring(k));
+            break;
+          }
+          stringbuffer.append(text.substring(k, j));
+          k = j + 10;
+          stringbuffer.append("./");
+          if ("./".length() > 0 && k < text.length() && text.charAt(k) != '/')
+            stringbuffer.append("/");
+        } while (true);
+        return stringbuffer.toString();
+      }
+    }
+  }
+
+  public static void seeTag(XmlWriter writer, ClassDoc containingClass,
+    SeeTag seeTag) {
+    String name = seeTag.name();
+    if (name.startsWith("@link") || name.equals("@see")) {
+      boolean code = !name.equalsIgnoreCase("@linkplain");
+      String label = seeTag.label();
+
+      StringBuffer stringbuffer = new StringBuffer();
+
+      String seeTagText = replaceDocRootDir(seeTag.text());
+      if (seeTagText.startsWith("<") || seeTagText.startsWith("\"")) {
+        stringbuffer.append(seeTagText);
+        writer.write(seeTagText);
+      } else {
+        ClassDoc referencedClass = seeTag.referencedClass();
+        MemberDoc referencedMember = seeTag.referencedMember();
+        String referencedMemberName = seeTag.referencedMemberName();
+        if (referencedClass == null) {
+          PackageDoc packagedoc = seeTag.referencedPackage();
+          if (packagedoc != null && packagedoc.isIncluded()) {
+            String packageName = packagedoc.name();
+            if (!StringUtils.hasText(label)) {
+              label = packageName;
+            }
+            link(writer, "#" + packageName, label, code);
+          } else {
+            // TODO link to external package or class
+            // String s9 = getCrossPackageLink(referencedClassName);
+            // String s8;
+            // if (s9 != null)
+            // stringbuffer.append(getHyperLink(s9, "", s1.length() != 0 ? s1
+            // : s3, false));
+            // else if ((s8 = getCrossClassLink(referencedClassName,
+            // referencedMemberName, s1, false, "", !plainLink)) != null) {
+            // stringbuffer.append(s8);
+            // } else {
+            // configuration.getDocletSpecificMsg().warning(seeTag.position(),
+            // "doclet.see.class_or_package_not_found", name, s2);
+            // stringbuffer.append(s1.length() != 0 ? s1 : s3);
+            // }
+          }
+        } else {
+          String url = null;
+          String className = referencedClass.qualifiedName();
+          if (referencedClass.isIncluded()) {
+            url = "#" + className;
+          } else {
+            url = getExternalUrl(className);
+            if (!StringUtils.hasText(url)) {
+              label = className;
+            }
+          }
+          if (referencedMember != null) {
+            if (referencedMember instanceof ExecutableMemberDoc) {
+              if (referencedMemberName.indexOf('(') < 0) {
+                ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
+                referencedMemberName = referencedMemberName
+                  + executableDoc.signature();
+              }
+              if (StringUtils.hasText(referencedMemberName)) {
+                label = referencedMemberName;
+              } else {
+                label = seeTagText;
+              }
+            }
+            if (referencedClass.isIncluded()) {
+              url += "." + referencedMemberName;
+            } else if (StringUtils.hasText(url)) {
+              url += "#" + referencedMemberName;
+            } else {
+              label = referencedMember.toString();
+            }
+          }
+          if (!StringUtils.hasText(label)) {
+            label = referencedClass.name();
+          }
+          link(writer, url, label, code);
+        }
+      }
+    }
+  }
+
+  public static void descriptionTd(final XmlWriter writer,
+    ClassDoc containingClass, final Map<String, Tag[]> descriptions,
+    final String name) {
+    writer.startTag(HtmlUtil.TD);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+    final Tag[] description = descriptions.get(name);
+    description(writer, containingClass, description);
+    writer.endTagLn(HtmlUtil.TD);
+  }
+
+  public static void documentationReturn(final XmlWriter writer,
+    final MethodDoc method) {
+    final Type type = method.returnType();
+    if (type != null && !"void".equals(type.qualifiedTypeName())) {
+      Tag[] descriptionTags = null;
+      for (final Tag tag : method.tags()) {
+        if (tag.name().equals("@return")) {
+          descriptionTags = tag.inlineTags();
+        }
+      }
+      title(writer, "Return");
+
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
+      writer.startTag(HtmlUtil.TABLE);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      writer.startTag(HtmlUtil.THEAD);
+      writer.startTag(HtmlUtil.TR);
+      writer.element(HtmlUtil.TH, "Type");
+      writer.element(HtmlUtil.TH, "Description");
+      writer.endTagLn(HtmlUtil.TR);
+      writer.endTagLn(HtmlUtil.THEAD);
+
+      writer.startTag(HtmlUtil.TBODY);
+
+      writer.startTag(HtmlUtil.TR);
+      writer.startTag(HtmlUtil.TD);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "type");
+      typeNameLink(writer, type);
+      writer.endTagLn(HtmlUtil.TD);
+
+      writer.startTag(HtmlUtil.TD);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+      description(writer, method.containingClass(), descriptionTags);
+      writer.endTagLn(HtmlUtil.TD);
+
+      writer.endTagLn(HtmlUtil.TR);
+
+      writer.endTagLn(HtmlUtil.TBODY);
+
+      writer.endTagLn(HtmlUtil.TABLE);
+      writer.endTagLn(HtmlUtil.DIV);
+    }
+  }
 }

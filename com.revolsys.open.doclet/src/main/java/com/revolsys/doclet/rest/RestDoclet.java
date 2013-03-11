@@ -112,20 +112,8 @@ public class RestDoclet {
 
   public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
-    writer.write(root.commentText());
+    DocletUtil.description(writer, null, root);
     documentation();
-  }
-
-  public void description(final Map<String, String> descriptions,
-    final String name) {
-    writer.startTag(HtmlUtil.TD);
-    final String description = descriptions.get(name);
-    if (description == null) {
-      writer.write("-");
-    } else {
-      writer.write(description);
-    }
-    writer.endTag(HtmlUtil.TD);
   }
 
   public void documentation() {
@@ -158,7 +146,7 @@ public class RestDoclet {
         CaseConverter.toCapitalizedWords(name));
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-      writer.write(classDoc.commentText());
+      DocletUtil.description(writer, classDoc, classDoc);
       documentationMethod(classDoc);
       writer.endTag(HtmlUtil.DIV);
       writer.endTag(HtmlUtil.DIV);
@@ -177,7 +165,7 @@ public class RestDoclet {
           CaseConverter.toCapitalizedWords(methodName));
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-        writer.write(method.commentText());
+        DocletUtil.description(writer, method.containingClass(), method);
 
         requestMethods(requestMapping);
 
@@ -239,7 +227,7 @@ public class RestDoclet {
       }
     }
     if (!parameters.isEmpty()) {
-      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
       writer.element(HtmlUtil.H4, "Parameters");
       writer.element(
@@ -279,8 +267,9 @@ public class RestDoclet {
         String typeName = parameter.typeName();
         typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
         typeName = typeName.replaceFirst("^java.lang.", "");
-        typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
-        
+        typeName = typeName.replaceAll(
+          "org.springframework.web.multipart.MultipartFile", "File");
+
         boolean required = true;
         if (requestParam != null) {
           final String value = getElementValue(requestParam, "value");
@@ -318,7 +307,8 @@ public class RestDoclet {
         } else {
           writer.element(HtmlUtil.TD, "No");
         }
-        description(descriptions, name);
+        DocletUtil.descriptionTd(writer, method.containingClass(),
+          descriptions, name);
         writer.endTag(HtmlUtil.TR);
       }
       writer.endTag(HtmlUtil.TBODY);
@@ -491,7 +481,7 @@ public class RestDoclet {
       }
     }
     if (!parameters.isEmpty()) {
-      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
       writer.element(HtmlUtil.H4, "URI Template Parameters");
       writer.element(
         HtmlUtil.P,
@@ -516,7 +506,8 @@ public class RestDoclet {
         final String name = parameter.name();
         writer.element(HtmlUtil.TD, "{" + name + "}");
         writer.element(HtmlUtil.TD, parameter.typeName());
-        description(descriptions, name);
+        DocletUtil.descriptionTd(writer, method.containingClass(),
+          descriptions, name);
 
         writer.endTag(HtmlUtil.TR);
       }
