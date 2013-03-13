@@ -36,14 +36,6 @@ public class DataObjectLayerListSelectionModel extends
   }
 
   @Override
-  public void insertIndexInterval(final int index, final int length,
-    final boolean before) {
-    // TODO Auto-generated method stub
-    super.insertIndexInterval(index, length, before);
-    System.out.println("Insert\t" + index + "\t" + length + "\t" + before);
-  }
-
-  @Override
   public boolean isSelectedIndex(final int index) {
     return model.isSelected(index);
   }

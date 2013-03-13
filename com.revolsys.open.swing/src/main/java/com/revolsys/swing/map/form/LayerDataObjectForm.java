@@ -3,6 +3,7 @@ package com.revolsys.swing.map.form;
 import java.awt.BorderLayout;
 
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
 @SuppressWarnings("serial")
@@ -11,13 +12,19 @@ public class LayerDataObjectForm extends DataObjectForm {
 
   public LayerDataObjectForm(final DataObjectLayer layer, DataObject object) {
     this.layer = layer;
-    setMetaData(layer.getMetaData());
-    setValues(object);
+    DataObjectMetaData metaData = layer.getMetaData();
+    setMetaData(metaData);
     add(createAllAttributesPanel(), BorderLayout.CENTER);
+    getAllAttributes().setEditable(layer.isEditable());
+    if (metaData.getGeometryAttributeName() != null) {
+      addGeometryTab();
+    }
+    setValues(object);
   }
 
   public DataObjectLayer getLayer() {
     return layer;
   }
 
+  
 }

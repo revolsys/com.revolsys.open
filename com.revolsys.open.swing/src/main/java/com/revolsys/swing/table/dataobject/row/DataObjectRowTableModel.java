@@ -34,6 +34,10 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
     final List<String> columnIndexNames) {
     this.metaData = metaData;
+    setColumnIndexNames(columnIndexNames);
+  }
+
+  protected void setColumnIndexNames(final List<String> columnIndexNames) {
     this.columnIndexNames = columnIndexNames;
   }
 

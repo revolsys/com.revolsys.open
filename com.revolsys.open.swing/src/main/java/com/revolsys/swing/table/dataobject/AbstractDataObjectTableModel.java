@@ -70,7 +70,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
 
   private List<String> readOnlyFieldNames = new ArrayList<String>();
 
-  protected final boolean editable;
+  private boolean editable;
 
   private DataObjectMetaData metaData;
 
@@ -154,9 +154,17 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     }
   }
 
+  public boolean isEditable() {
+    return editable;
+  }
+
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+  }
+
+  public void setEditable(final boolean editable) {
+    this.editable = editable;
   }
 
   public void setMetaData(final DataObjectMetaData metaData) {

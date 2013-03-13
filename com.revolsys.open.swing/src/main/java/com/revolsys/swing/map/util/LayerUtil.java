@@ -10,10 +10,12 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
+import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.CControlAccess;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
@@ -236,8 +238,7 @@ public class LayerUtil {
         try {
           DataObjectMetaData metaData = reader.getMetaData();
           GeometryFactory geometryFactory = metaData.getGeometryFactory();
-          BoundingBox boundingBox = new BoundingBox(
-            geometryFactory);
+          BoundingBox boundingBox = new BoundingBox(geometryFactory);
           DataObjectListLayer layer = new DataObjectListLayer(metaData);
           for (DataObject object : reader) {
             Geometry geometry = object.getGeometryValue();
@@ -262,29 +263,57 @@ public class LayerUtil {
 
   private static Map<DataObject, DefaultSingleCDockable> forms = new HashMap<DataObject, DefaultSingleCDockable>();
 
-  public static void showForm(DataObjectLayer layer, DataObject object) {
-    DefaultSingleCDockable dockable = forms.get(object);
-    if (dockable == null) {
-      Project project = layer.getProject();
-      if (project == null) {
-        return;
-      } else {
-        DataObjectMetaData metaData = layer.getMetaData();
-        Object id = object.getIdValue();
-        String dockableId = metaData.getInstanceId() + "-" + id;
-        Component form = DataObjectLayerFormFactory.createFormComponent(layer,
-          object);
-        dockable = DockingFramesUtil.addDockable(project,
-          MapPanel.MAP_INFO_WORKING_AREA, dockableId, metaData.getTypeName()
-            + " " + id, form);
-        Dimension size = form.getPreferredSize();
-        dockable.setLocation(CLocation.external(100, 100, size.width,
-          size.height));
-        forms.put(object, dockable);
+  public static void showForm(DataObjectLayer layer, final DataObject object) {
+    synchronized (forms) {
+
+      DefaultSingleCDockable dockable = forms.get(object);
+      if (dockable == null) {
+        Project project = layer.getProject();
+        if (project == null) {
+          return;
+        } else {
+          DataObjectMetaData metaData = layer.getMetaData();
+          Object id = object.getIdValue();
+          String dockableId = metaData.getInstanceId() + "-" + id;
+          Component form = DataObjectLayerFormFactory.createFormComponent(
+            layer, object);
+          dockable = DockingFramesUtil.addDockable(project,
+            MapPanel.MAP_INFO_WORKING_AREA, dockableId, metaData.getTypeName()
+              + " " + id, form);
+          Dimension size = form.getPreferredSize();
+          dockable.setLocation(CLocation.external(100, 100, size.width,
+            size.height));
+          forms.put(object, dockable);
+          dockable.addCDockableStateListener(new CDockableStateListener() {
+
+            @Override
+            public void visibilityChanged(CDockable dockable) {
+              final boolean visible = dockable.isVisible();
+              if (!visible) {
+                CControlAccess controlAccess = dockable.getControl();
+                if (controlAccess != null) {
+                  CControl owner = controlAccess.getOwner();
+                  if (owner != null) {
+                    owner.remove((SingleCDockable)dockable);
+                  }
+                }
+                synchronized (forms) {
+                  forms.remove(object);
+                }
+              }
+            }
+
+            @Override
+            public void extendedModeChanged(CDockable dockable,
+              ExtendedMode mode) {
+
+            }
+          });
+        }
       }
+      dockable.setCloseable(true);
+      dockable.toFront();
     }
-    dockable.setCloseable(true);
-    dockable.toFront();
 
   }
 }

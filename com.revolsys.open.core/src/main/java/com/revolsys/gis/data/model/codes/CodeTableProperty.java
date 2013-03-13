@@ -248,8 +248,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
       id = getId(values, false);
     } else {
       final StringBuffer where = new StringBuffer();
-      final List<Object> queryValues = new ArrayList<Object>();
-      if (!values.isEmpty()) {
+      final Query query = new Query(typePath);
+        if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
           if (i > 0) {
@@ -260,15 +260,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
           if (value == null) {
             where.append(" IS NULL");
           } else {
-            queryValues.add(value);
-            where.append(" = ?");
+            Attribute attribute = metaData.getAttribute(attributeName);
+            query.addParameter(value, attribute);
+             where.append(" = ?");
           }
           i++;
         }
       }
-      final Query query = new Query(typePath);
       query.setWhereClause(where.toString());
-      query.setParameters(queryValues);
       final Reader<DataObject> reader = dataStore.query(query);
       try {
         addValues(reader);

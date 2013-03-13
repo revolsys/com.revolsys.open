@@ -32,7 +32,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
     DataObjectLayer.class, DataObjectLayerTableModel.class, "createPanel");
 
-  public static DataObjectLayerTablePanel createPanel(final DataObjectLayer layer) {
+  public static DataObjectLayerTablePanel createPanel(
+    final DataObjectLayer layer) {
     final JTable table = createTable(layer);
     return new DataObjectLayerTablePanel(layer, table);
   }
@@ -75,6 +76,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private final Query query;
 
   private final Set<Integer> loadingPageNumbers = new LinkedHashSet<Integer>();
+
+  public DataObjectLayerTableModel(DataObjectLayer layer,
+    List<String> columnIndexNames) {
+    this(layer);
+    setColumnIndexNames(columnIndexNames);
+  }
 
   public DataObjectLayerTableModel(final DataObjectLayer layer) {
     super(layer.getMetaData());

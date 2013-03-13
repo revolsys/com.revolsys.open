@@ -9,16 +9,19 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowJxTable;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectListLayerTableModel extends DataObjectRowTableModel
+public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
@@ -26,15 +29,31 @@ public class DataObjectListLayerTableModel extends DataObjectRowTableModel
     DataObjectListLayer.class, DataObjectListLayerTableModel.class,
     "createPanel");
 
-  public static DataObjectLayerTablePanel createPanel(final DataObjectListLayer layer) {
+  public static DataObjectLayerTablePanel createPanel(
+    final DataObjectListLayer layer) {
     final JTable table = createTable(layer);
-    return new DataObjectLayerTablePanel(layer,table);
+    return new DataObjectLayerTablePanel(layer, table);
   }
 
   public static DataObjectRowJxTable createTable(final DataObjectListLayer layer) {
     final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
-    return new DataObjectRowJxTable(model);
+    DataObjectRowJxTable table = new DataObjectRowJxTable(model);
+
+    final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
+      model);
+    final TableColumnModel columnModel = table.getColumnModel();
+    for (int i = 0; i < columnModel.getColumnCount(); i++) {
+      final TableColumn column = columnModel.getColumn(i);
+
+      column.setCellRenderer(cellRenderer);
+    }
+    
+    table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
+    layer.addPropertyChangeListener("selected",
+      new InvokeMethodPropertyChangeListener(table, "repaint"));
+
+    return table;
   }
 
   private DataObjectListLayer layer;
@@ -42,12 +61,12 @@ public class DataObjectListLayerTableModel extends DataObjectRowTableModel
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
   public DataObjectListLayerTableModel(final DataObjectListLayer layer) {
-    this(layer.getMetaData().getAttributeNames(), layer);
+    this(layer, layer.getMetaData().getAttributeNames());
   }
 
-  public DataObjectListLayerTableModel(final List<String> columnNames,
-    final DataObjectListLayer layer) {
-    super(layer.getMetaData(), columnNames);
+  public DataObjectListLayerTableModel(final DataObjectListLayer layer,
+    final List<String> columnNames) {
+    super(layer, columnNames);
     this.layer = layer;
     layer.addPropertyChangeListener("objects", this);
     setEditable(false);

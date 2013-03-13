@@ -260,7 +260,7 @@ public class Page extends Component {
         Authentication authentication = securityContext.getAuthentication();
         if (authentication != null) {
           uriTemplateVariables.put("remoteUser", authentication.getName());
-        } else {
+        } else if (request != null) {
           Principal userPrincipal = request.getUserPrincipal();
           if (userPrincipal != null) {
             uriTemplateVariables.put("remoteUser", userPrincipal.getName());

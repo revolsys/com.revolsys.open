@@ -2,6 +2,8 @@ package com.revolsys.swing.listener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -12,7 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodListener extends InvokeMethodRunnable implements
-  ActionListener, DocumentListener, ListSelectionListener {
+  ActionListener, DocumentListener, ListSelectionListener, ItemListener {
 
   private final boolean invokeLater;
 
@@ -35,7 +37,7 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   public InvokeMethodListener(final Object object, final String methodName,
     final Object... parameters) {
-    this(true, object, methodName, parameters);
+    this(false, object, methodName, parameters);
   }
 
   @Override
@@ -68,6 +70,11 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void itemStateChanged(ItemEvent e) {
     invokeMethod();
   }
 }

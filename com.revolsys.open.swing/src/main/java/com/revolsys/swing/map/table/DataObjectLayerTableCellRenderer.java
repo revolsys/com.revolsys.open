@@ -9,9 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.springframework.util.StringUtils;
 
-
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
@@ -40,15 +38,12 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
       hasValue = false;
     } else {
       hasValue = true;
-      final DataObjectStore dataStore = metaData.getDataObjectStore();
-      if (dataStore != null) {
-        final CodeTable codeTable = dataStore.getCodeTableByColumn(attributeName);
-        if (attributeName == metaData.getIdAttributeName() || codeTable == null) {
-          text = StringConverterRegistry.toString(value);
-        } else {
-          final List<Object> values = codeTable.getValues(value);
-          text = CollectionUtil.toString(values);
-        }
+      final CodeTable codeTable = metaData.getCodeTableByColumn(attributeName);
+      if (attributeName == metaData.getIdAttributeName() || codeTable == null) {
+        text = StringConverterRegistry.toString(value);
+      } else {
+        final List<Object> values = codeTable.getValues(value);
+        text = CollectionUtil.toString(values);
       }
     }
 

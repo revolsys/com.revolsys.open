@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -39,6 +41,7 @@ import org.jdesktop.swingx.JXTable;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
@@ -56,6 +59,7 @@ import com.revolsys.swing.table.dataobject.DataObjectTableCellRenderer;
 import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectForm extends JPanel implements FocusListener,
   CellEditorListener {
@@ -102,6 +106,33 @@ public class DataObjectForm extends JPanel implements FocusListener,
   private JComponent allAttributesPanel;
 
   private final Map<String, Boolean> tabValid = new HashMap<String, Boolean>();
+
+  public DataObjectMapTableModel getAllAttributes() {
+    return allAttributes;
+  }
+
+  public DataObjectStore getDataStore() {
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.getDataObjectStore();
+    }
+  }
+
+  private GeometryCoordinatesPanel geometryCoordinatesPanel;
+
+  protected void addGeometryTab() {
+    if (geometryCoordinatesPanel == null) {
+      geometryCoordinatesPanel = new GeometryCoordinatesPanel();
+
+      final JPanel panel = new JPanel(new GridLayout(1, 1));
+
+      geometryCoordinatesPanel.setBorder(BorderFactory.createTitledBorder("Coordinates"));
+      panel.add(geometryCoordinatesPanel);
+
+      addTab("Geometry", panel);
+    }
+  }
 
   public DataObjectForm() {
     this(new BorderLayout());
@@ -156,8 +187,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
       tabs.addTab("All Attributes", allAttributesPanel);
       add(tabs, BorderLayout.CENTER);
     }
-    tabs.insertTab(name, null, component, null, tabs.getTabCount() - 1);
-
+    if (name.equals("Geometry")) {
+      tabs.addTab(name, component);
+    } else {
+      tabs.insertTab(name, null, component, null, tabs.getTabCount() - 1);
+    }
   }
 
   protected JComponent createAllAttributesPanel() {
@@ -183,8 +217,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
             final Object fieldValue = getFieldValue(fieldName);
             final Object originalValue = getOriginalValue(fieldName);
             if (!EqualsRegistry.equal(originalValue, fieldValue)) {
-              final CodeTable codeTable = getMetaData().getCodeTableByColumn(
-                fieldName);
+              DataObjectMetaData metaData = getMetaData();
+              CodeTable codeTable = null;
+              if (!fieldName.equals(metaData.getIdAttributeName())) {
+                codeTable = metaData.getCodeTableByColumn(fieldName);
+              }
               String text;
               if (value == null) {
                 text = "-";
@@ -566,6 +603,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
+    String idAttributeName = metaData.getIdAttributeName();
+    if (StringUtils.hasText(idAttributeName)) {
+      this.readOnlyFieldNames.add(idAttributeName);
+    }
   }
 
   public void setReadOnlyFieldNames(final List<String> readOnlyFieldNames) {
@@ -593,6 +634,12 @@ public class DataObjectForm extends JPanel implements FocusListener,
       }
     } finally {
       fieldValidationEnabled = true;
+    }
+    String geometryAttributeName = metaData.getGeometryAttributeName();
+    if (geometryCoordinatesPanel != null
+      && StringUtils.hasText(geometryAttributeName)) {
+      final Geometry geometry = (Geometry)object.get(geometryAttributeName);
+      geometryCoordinatesPanel.setGeometry(geometry);
     }
     validateFields();
   }
@@ -648,7 +695,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     for (int i = 0; i < tabs.getTabCount(); i++) {
       final String tabName = tabs.getTitleAt(i);
       final Boolean valid = tabValid.put(tabName, true);
-      if (valid) {
+      if (valid == Boolean.TRUE) {
         tabs.setForegroundAt(i, null);
         tabs.setBackgroundAt(i, null);
       } else {

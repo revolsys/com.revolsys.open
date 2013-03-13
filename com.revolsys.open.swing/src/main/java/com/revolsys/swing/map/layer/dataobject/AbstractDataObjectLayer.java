@@ -71,7 +71,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     super.setGeometryFactory(geometryFactory);
-    if (boundingBox.isNull()) {
+    if (geometryFactory != null && boundingBox.isNull()) {
       boundingBox = geometryFactory.getCoordinateSystem().getAreaBoundingBox();
     }
   }
@@ -79,7 +79,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void addSelectedObjects(final Collection<? extends DataObject> objects) {
     selectedObjects.addAll(objects);
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+    fireSelected();
+  }
+
+  protected void fireSelected() {
+    boolean selected = !selectedObjects.isEmpty();
+    getPropertyChangeSupport().firePropertyChange("selected", !selected,
+      selected);
   }
 
   @Override
@@ -121,12 +127,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearSelection() {
     selectedObjects = new LinkedHashSet<DataObject>();
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+    getPropertyChangeSupport().firePropertyChange("selected", true, false);
   }
 
   @Override
   public void deleteObjects(final Collection<? extends DataObject> objects) {
-    throw new UnsupportedOperationException();
+    removeSelectedObjects(objects);
+    editingObjects.removeAll(objects);
   }
 
   @Override
@@ -215,12 +222,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void removeSelectedObjects(
     final Collection<? extends DataObject> objects) {
     selectedObjects.removeAll(objects);
+    fireSelected();
   }
 
   @Override
   public void removeSelectedObjects(final DataObject... objects) {
     removeSelectedObjects(Arrays.asList(objects));
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
   }
 
   @Override
@@ -243,6 +250,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     setGeometryFactory(metaData.getGeometryFactory());
+    if (metaData.getGeometryAttributeIndex() == -1) {
+      setSelectSupported(false);
+    }
   }
 
   @Override
@@ -269,8 +279,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void setSelectedObjects(final Collection<DataObject> selectedObjects) {
-    this.selectedObjects = new LinkedHashSet<DataObject>();
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+    this.selectedObjects = new LinkedHashSet<DataObject>(selectedObjects);
+    fireSelected();
+
   }
 
   @Override

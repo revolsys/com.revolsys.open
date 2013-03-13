@@ -77,7 +77,10 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
         if (value == null) {
           text = "-";
         } else {
-          final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+          CodeTable codeTable = null;
+          if (!name.equals(metaData.getIdAttributeName())) {
+            codeTable = metaData.getCodeTableByColumn(name);
+          }
           if (codeTable == null) {
             text = StringConverterRegistry.toString(value);
           } else {

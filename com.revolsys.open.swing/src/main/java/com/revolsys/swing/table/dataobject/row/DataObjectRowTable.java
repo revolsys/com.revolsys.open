@@ -88,7 +88,7 @@ public class DataObjectRowTable extends JTable implements MouseListener {
       final DataObjectRowTableModel model = getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());
-      if (SwingUtilities.isLeftMouseButton(e)) {
+      if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
         final Class<?> attributeClass = metaData.getAttributeClass(column);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
           model.setSortOrder(column);
