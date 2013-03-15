@@ -20,7 +20,7 @@ public interface DataObjectLayer extends Layer {
 
   void clearHiddenObjects();
 
-  void clearSelection();
+  void clearSelectedObjects();
 
   void deleteObjects(DataObject... object);
 
@@ -74,4 +74,6 @@ public interface DataObjectLayer extends Layer {
   void setSelectedObjects(BoundingBox boundingBox);
 
   void setSelectedObjectsById(Object sessionId);
+
+  Query getQuery();
 }

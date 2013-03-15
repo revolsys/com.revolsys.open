@@ -141,7 +141,8 @@ public class ClientDoclet {
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = annotationDoc.name();
 
-    DocletUtil.title(writer, DocletUtil.qualifiedName(annotationDoc), name);
+    String anchor = DocletUtil.qualifiedName(annotationDoc);
+    DocletUtil.title(writer, anchor, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -171,7 +172,7 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "name");
-        writer.text(elementName);
+        DocletUtil.anchor(writer, anchor + "." + elementName, elementName);
         writer.endTagLn(HtmlUtil.TD);
 
         writer.startTag(HtmlUtil.TD);
@@ -427,7 +428,13 @@ public class ClientDoclet {
       writer.text(" ");
       writer.endTagLn(HtmlUtil.CODE);
     }
+    if (member.isStatic()) {
+      writer.startTag(HtmlUtil.I);
+    }
     writer.text(member.name());
+    if (member.isStatic()) {
+      writer.endTag(HtmlUtil.I);
+    }
     writer.startTag(HtmlUtil.CODE);
     writer.text("(");
     final Parameter[] parameters = member.parameters();

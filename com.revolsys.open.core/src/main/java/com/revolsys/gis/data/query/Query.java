@@ -263,7 +263,12 @@ public class Query implements Cloneable {
   }
 
   public void setOrderBy(final Map<String, Boolean> orderBy) {
-    this.orderBy = orderBy;
+    if (orderBy != this.orderBy) {
+      this.orderBy.clear();
+      if (orderBy != null) {
+        this.orderBy.putAll(orderBy);
+      }
+    }
   }
 
   public void setOrderByColumns(final List<String> orderBy) {

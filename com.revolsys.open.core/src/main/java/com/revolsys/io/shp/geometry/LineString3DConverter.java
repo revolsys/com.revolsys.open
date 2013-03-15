@@ -1,6 +1,8 @@
 package com.revolsys.io.shp.geometry;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.io.EndianOutput;
@@ -70,7 +72,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     if (numParts == 1) {
       return geometryFactory.createLineString(coordinates);
     } else {
-      final LineString[] lines = new LineString[numParts];
+      final List<LineString> newLines = new ArrayList<LineString>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int partStart = partIndex[i];
         final int partEnd = partIndex[i + 1];
@@ -78,9 +80,13 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
 
         final Coordinate[] partCoords = new Coordinate[numCoords];
         System.arraycopy(coordinates, partStart, partCoords, 0, numCoords);
-        lines[i] = geometryFactory.createLineString(partCoords);
+        LineString newLine = geometryFactory.createLineString(partCoords);
+        if (newLine != null && !newLine.isEmpty()) {
+          newLines.add(newLine);
+        }
+
       }
-      return geometryFactory.createMultiLineString(lines);
+      return geometryFactory.createMultiLineString(newLines);
     }
   }
 

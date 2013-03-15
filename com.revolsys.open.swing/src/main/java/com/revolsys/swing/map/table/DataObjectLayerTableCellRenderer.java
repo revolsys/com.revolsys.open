@@ -39,7 +39,8 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
     } else {
       hasValue = true;
       final CodeTable codeTable = metaData.getCodeTableByColumn(attributeName);
-      if (attributeName == metaData.getIdAttributeName() || codeTable == null) {
+      if (attributeName.equals(metaData.getIdAttributeName())
+        || codeTable == null) {
         text = StringConverterRegistry.toString(value);
       } else {
         final List<Object> values = codeTable.getValues(value);

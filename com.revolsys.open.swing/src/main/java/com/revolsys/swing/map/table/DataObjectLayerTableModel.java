@@ -1,6 +1,9 @@
 package com.revolsys.swing.map.table;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +18,6 @@ import javax.swing.table.TableColumnModel;
 
 import com.revolsys.collection.LruMap;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
@@ -27,7 +29,7 @@ import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
 public class DataObjectLayerTableModel extends DataObjectRowTableModel
-  implements SortableTableModel {
+  implements SortableTableModel, PropertyChangeListener {
 
   public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
     DataObjectLayer.class, DataObjectLayerTableModel.class, "createPanel");
@@ -39,7 +41,18 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer) {
-    final DataObjectLayerTableModel model = new DataObjectLayerTableModel(layer);
+    return createTable(layer, layer.getMetaData().getAttributeNames());
+  }
+
+  public static DataObjectRowTable createTable(final DataObjectLayer layer,
+    final List<String> attributeNames) {
+    return createTable(layer, attributeNames, attributeNames);
+  }
+
+  public static DataObjectRowTable createTable(final DataObjectLayer layer,
+    final List<String> attributeNames, final List<String> attributeTitles) {
+    final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
+      layer, attributeNames,attributeTitles);
     final DataObjectRowTable table = new DataObjectRowTable(model);
 
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
@@ -73,21 +86,24 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private final Object sync = new Object();
 
-  private final Query query;
-
   private final Set<Integer> loadingPageNumbers = new LinkedHashSet<Integer>();
 
-  public DataObjectLayerTableModel(DataObjectLayer layer,
-    List<String> columnIndexNames) {
-    this(layer);
-    setColumnIndexNames(columnIndexNames);
-  }
+  private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
   public DataObjectLayerTableModel(final DataObjectLayer layer) {
-    super(layer.getMetaData());
+    this(layer, layer.getMetaData().getAttributeNames());
+  }
+
+  public DataObjectLayerTableModel(final DataObjectLayer layer,
+    final List<String> attributeNames) {
+    this(layer, attributeNames, attributeNames);
+  }
+
+  public DataObjectLayerTableModel(final DataObjectLayer layer,
+    final List<String> attributeNames, final List<String> attributeTitles) {
+    super(layer.getMetaData(), attributeNames, attributeTitles);
     this.layer = layer;
-    final DataObjectMetaData metaData = layer.getMetaData();
-    query = new Query(metaData);
+    layer.addPropertyChangeListener(this);
     setEditable(false);
   }
 
@@ -165,16 +181,39 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       } else {
         synchronized (sync) {
           final Map<Integer, List<DataObject>> pageCache = this.pageCache;
-          final Query query = this.query.clone();
-          query.setLimit(pageSize);
-          query.setOffset(pageSize * pageNumber);
-          final List<DataObject> objects = layer.query(query);
+          final Query query = layer.getQuery();
+          final List<DataObject> objects;
+          if (query == null) {
+            objects = Collections.emptyList();
+          } else {
+            query.setOrderBy(orderBy);
+            query.setLimit(pageSize);
+            query.setOffset(pageSize * pageNumber);
+            objects = layer.query(query);
+          }
           pageCache.put(pageNumber, objects);
           loadingPageNumbers.remove(pageNumber);
         }
         fireTableRowsUpdated(pageNumber * pageSize,
           Math.min(rowCount, (pageNumber + 1) * pageSize - 1));
       }
+    }
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent e) {
+    if (e.getSource() == layer) {
+      if (e.getPropertyName().equals("query")) {
+        refresh();
+      }
+    }
+  }
+
+  protected void refresh() {
+    synchronized (sync) {
+      pageCache = new LruMap<Integer, List<DataObject>>(5);
+      countLoaded = false;
+      fireTableDataChanged();
     }
   }
 
@@ -192,15 +231,20 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       orderBy = Collections.emptyMap();
     }
     synchronized (sync) {
-      query.setOrderBy(orderBy);
-      pageCache = new LruMap<Integer, List<DataObject>>(5);
-      countLoaded = false;
+      this.orderBy = orderBy;
+      refresh();
     }
     return sortOrder;
   }
 
   public void updateRowCount() {
-    final int rowCount = layer.getRowCount(query);
+    final Query query = layer.getQuery();
+    final int rowCount;
+    if (query == null) {
+      rowCount = 0;
+    } else {
+      rowCount = layer.getRowCount(query);
+    }
     synchronized (sync) {
       this.rowCount = rowCount;
       countLoaded = true;

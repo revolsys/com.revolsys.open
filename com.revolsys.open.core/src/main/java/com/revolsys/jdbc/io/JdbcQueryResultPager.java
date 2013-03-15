@@ -100,6 +100,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
 
   }
 
+  public boolean isClosed() {
+    return dataStore == null;
+  }
+
   @Override
   protected void finalize() throws Throwable {
     super.finalize();

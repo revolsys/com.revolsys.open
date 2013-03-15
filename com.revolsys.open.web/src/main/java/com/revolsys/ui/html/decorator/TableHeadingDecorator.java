@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.decorator;
 
-import java.util.Iterator;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
@@ -20,11 +20,24 @@ public class TableHeadingDecorator implements Decorator {
     container.add(row);
   }
 
+  public static void addRow(final ElementContainer container,
+    final Element element, final String labelUrl, final String label,
+    final String instructions) {
+
+    final TableHeadingDecorator decorator = new TableHeadingDecorator(labelUrl,label,
+      instructions);
+    final TableRow row = new TableRow();
+    row.add(element, decorator);
+    container.add(row);
+  }
+
   private String label = "";
 
   private String instructions = "";
 
   private boolean required;
+
+  private String labelUrl;
 
   public TableHeadingDecorator(final String label) {
     this.label = label;
@@ -35,16 +48,27 @@ public class TableHeadingDecorator implements Decorator {
     this.instructions = instructions;
   }
 
+  public TableHeadingDecorator(final String labelUrl, final String label,
+    final String instructions) {
+    this.labelUrl = labelUrl;
+    this.label = label;
+    this.instructions = instructions;
+  }
+
   public String getInstructions() {
     return instructions;
   }
 
-  public void setRequired(boolean required) {
-    this.required = required;
-  }
-
   public String getLabel() {
     return label;
+  }
+
+  public String getLabelUrl() {
+    return labelUrl;
+  }
+
+  public boolean isRequired() {
+    return required;
   }
 
   @Override
@@ -62,9 +86,16 @@ public class TableHeadingDecorator implements Decorator {
     out.endTag(HtmlUtil.TD);
   }
 
+  protected void serializeElement(final XmlWriter out, final Element element) {
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
+    element.serializeElement(out);
+    out.endTag(HtmlUtil.DIV);
+  }
+
   protected void serializeErrors(final XmlWriter out, final Element element) {
     if (element instanceof Field) {
-      Field field = (Field)element;
+      final Field field = (Field)element;
       for (final String error : field.getValidationErrors()) {
         out.startTag(HtmlUtil.DIV);
         out.attribute(HtmlUtil.ATTR_CLASS, "errorMessage");
@@ -78,13 +109,6 @@ public class TableHeadingDecorator implements Decorator {
         out.endTag(HtmlUtil.DIV);
       }
     }
-  }
-
-  protected void serializeElement(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
-    element.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
   }
 
   protected void serializeInstructions(final XmlWriter out) {
@@ -103,7 +127,7 @@ public class TableHeadingDecorator implements Decorator {
       out.startTag(HtmlUtil.DIV);
       String cssClass = "label";
       if (element instanceof Field) {
-        Field field = (Field)element;
+        final Field field = (Field)element;
         if (field.isRequired()) {
           cssClass = "label required";
         }
@@ -113,10 +137,17 @@ public class TableHeadingDecorator implements Decorator {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
       out.startTag(HtmlUtil.LABEL);
       if (element instanceof Field) {
-        Field field = (Field)element;
+        final Field field = (Field)element;
         out.attribute(HtmlUtil.ATTR_FOR, field.getName());
       }
+      if (StringUtils.hasText(labelUrl)) {
+        out.startTag(HtmlUtil.A);
+        out.attribute(HtmlUtil.ATTR_HREF, labelUrl);
+      }
       out.text(label);
+      if (StringUtils.hasText(labelUrl)) {
+        out.endTag(HtmlUtil.A);
+      }
       out.endTag(HtmlUtil.LABEL);
       out.endTag(HtmlUtil.DIV);
     }
@@ -128,5 +159,13 @@ public class TableHeadingDecorator implements Decorator {
 
   public void setLabel(final String label) {
     this.label = label;
+  }
+
+  public void setLabelUrl(final String labelUrl) {
+    this.labelUrl = labelUrl;
+  }
+
+  public void setRequired(final boolean required) {
+    this.required = required;
   }
 }

@@ -41,6 +41,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private BoundingBox boundingBox = new BoundingBox();
 
+  protected Query query;
+
   public void setBoundingBox(BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
@@ -125,7 +127,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void clearSelection() {
+  public void clearSelectedObjects() {
     selectedObjects = new LinkedHashSet<DataObject>();
     getPropertyChangeSupport().firePropertyChange("selected", true, false);
   }
@@ -305,6 +307,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       selectedObjects.removeAll(objects);
     }
     return objects.size();
+  }
+
+  public Query getQuery() {
+    if (query == null) {
+      return null;
+    } else {
+      return query.clone();
+    }
+  }
+
+  public void setQuery(Query query) {
+    Query oldValue = this.query;
+    this.query = query;
+    getPropertyChangeSupport().firePropertyChange("query", oldValue, query);
   }
 
   @Override

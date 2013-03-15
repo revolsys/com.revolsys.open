@@ -47,11 +47,11 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
-    this(metaData, metaData.getAttributeNames(), objects);
+    this(metaData, objects, metaData.getAttributeNames());
   }
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
-    final List<String> columnNames, final List<DataObject> objects) {
+    final List<DataObject> objects, final List<String> columnNames) {
     super(metaData, columnNames);
     this.objects.addAll(objects);
     setEditable(true);

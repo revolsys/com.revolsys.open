@@ -152,7 +152,13 @@ public class JavaDoclet {
       writer.text(" ");
       writer.endTagLn(HtmlUtil.CODE);
     }
+    if (member.isStatic()) {
+      writer.startTag(HtmlUtil.I);
+    }
     writer.text(member.name());
+    if (member.isStatic()) {
+      writer.endTag(HtmlUtil.I);
+    }
     writer.startTag(HtmlUtil.CODE);
     writer.text("(");
     final Parameter[] parameters = member.parameters();

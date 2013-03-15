@@ -170,11 +170,16 @@ public class DocletUtil {
     final String title) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    anchor(writer, name, title);
+    writer.endTagLn(HtmlUtil.DIV);
+  }
+
+  public static void anchor(XmlWriter writer, final String name,
+    final String title) {
     writer.startTag(HtmlUtil.A);
     writer.attribute(HtmlUtil.ATTR_NAME, name);
     writer.text(title);
     writer.endTagLn(HtmlUtil.A);
-    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public static void title(final XmlWriter writer, final String title) {
@@ -224,9 +229,7 @@ public class DocletUtil {
 
   public static void description(final XmlWriter writer,
     ClassDoc containingClass, Tag[] tags) {
-    if (tags == null || tags.length == 0) {
-      writer.write('-');
-    } else {
+    if (tags != null && tags.length > 0) {
       for (Tag tag : tags) {
         String kind = tag.kind();
         if (tag instanceof SeeTag) {

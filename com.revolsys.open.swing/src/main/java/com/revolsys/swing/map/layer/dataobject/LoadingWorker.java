@@ -10,6 +10,7 @@ import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 
 public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
@@ -27,21 +28,24 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
 
   @Override
   protected DataObjectQuadTree doInBackground() throws Exception {
-    String typePath = layer.getTypePath();
     final DataObjectQuadTree index = new DataObjectQuadTree();
     final GeometryFactory geometryFactory = layer.getGeometryFactory();
     final BoundingBox queryBoundingBox = viewportBoundingBox.convert(geometryFactory);
-    final Reader<DataObject> reader = layer.getDataStore().query(typePath,
-      queryBoundingBox);
-    try {
-      for (final DataObject object : reader) {
-        if (isCancelled()) {
-          return null;
+    Query query = layer.getQuery();
+    if (query != null) {
+      query = query.clone();
+      query.setBoundingBox(queryBoundingBox);
+      final Reader<DataObject> reader = layer.getDataStore().query(query);
+      try {
+        for (final DataObject object : reader) {
+          if (isCancelled()) {
+            return null;
+          }
+          index.insert(object);
         }
-        index.insert(object);
+      } finally {
+        reader.close();
       }
-    } finally {
-      reader.close();
     }
     return index;
   }

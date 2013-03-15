@@ -19,7 +19,9 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   implements SortableTableModel {
   private static final long serialVersionUID = 1L;
 
-  private List<String> columnIndexNames = new ArrayList<String>();
+  private List<String> attributeNames = new ArrayList<String>();
+
+  private List<String> attributeTitles = new ArrayList<String>();
 
   private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<Integer, SortOrder>();
 
@@ -32,13 +34,27 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
-    final List<String> columnIndexNames) {
-    this.metaData = metaData;
-    setColumnIndexNames(columnIndexNames);
+    final List<String> attributeNames) {
+    this(metaData, attributeNames, attributeNames);
   }
 
-  protected void setColumnIndexNames(final List<String> columnIndexNames) {
-    this.columnIndexNames = columnIndexNames;
+  public DataObjectRowTableModel(final DataObjectMetaData metaData,
+    final List<String> attributeNames, final List<String> attributeTitles) {
+    this.metaData = metaData;
+    setAttributeNames(attributeNames);
+    setAttributeTitles(attributeTitles);
+  }
+
+  public void setAttributeTitles(List<String> columnIndexTitles) {
+    this.attributeTitles = new ArrayList<String>(columnIndexTitles);
+  }
+
+  public List<String> getAttributeTitles() {
+    return attributeTitles;
+  }
+
+  public void setAttributeNames(final List<String> attributeNames) {
+    this.attributeNames = new ArrayList<String>(attributeNames);
   }
 
   public void clearSortedColumns() {
@@ -55,7 +71,13 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public String getAttributeName(final int columnIndex) {
-    return columnIndexNames.get(columnIndex);
+    String attributeName = attributeNames.get(columnIndex);
+    int index = attributeName.indexOf('.');
+    if (index == -1) {
+      return attributeName;
+    } else {
+      return attributeName.substring(0, index);
+    }
   }
 
   public Attribute getColumnAttribute(final int columnIndex) {
@@ -76,13 +98,13 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   @Override
   public int getColumnCount() {
-    return columnIndexNames.size();
+    int numColumns = attributeNames.size();
+    return numColumns;
   }
 
   @Override
   public String getColumnName(final int columnIndex) {
-    // TODO columnIndex titles
-    return columnIndexNames.get(columnIndex);
+    return attributeTitles.get(columnIndex);
   }
 
   public DataObjectMetaData getMetaData() {

@@ -78,7 +78,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     super(PathUtil.getName(typePath), dataStore.getMetaData(typePath)
       .getGeometryFactory());
     this.dataStore = dataStore;
-    this.typePath = typePath;
+    setTypePath(typePath);
   }
 
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
@@ -88,12 +88,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public void setTypePath(String typePath) {
     this.typePath = typePath;
     if (StringUtils.hasText(typePath)) {
-      setName(PathUtil.getName(typePath));
-      setMetaData(dataStore.getMetaData(typePath));
-    } else {
-      setName("Type not found " + typePath);
-      setMetaData(null);
+      DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+      if (metaData != null) {
+        setName(PathUtil.getName(typePath));
+
+        setMetaData(metaData);
+        query = new Query(metaData);
+        return;
+      }
     }
+    setName("Type not found " + typePath);
+    setMetaData(null);
+    query = null;
   }
 
   @Override
@@ -147,7 +153,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void clearSelection() {
+  public void clearSelectedObjects() {
     synchronized (cachedObjects) {
       selectedObjectIds.clear();
       cleanCachedObjects();

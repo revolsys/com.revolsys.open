@@ -42,8 +42,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
           String sql = getSql();
 
           final int startRowNum = ((pageNumber - 1) * pageSize);
-          sql = getSql() + " OFFSET "
-            + startRowNum + " LIMIT " + pageSize;
+          sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;
 
           final DataSource dataSource = getDataSource();
           Connection connection = getConnection();
@@ -54,28 +53,30 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             final JdbcDataObjectStore dataStore = getDataStore();
             final DataObjectFactory dataObjectFactory = getDataObjectFactory();
             final DataObjectMetaData metaData = getMetaData();
-            final List<Attribute> attributes = metaData.getAttributes();
+            if (metaData != null) {
+              final List<Attribute> attributes = metaData.getAttributes();
 
-            final PreparedStatement statement = connection.prepareStatement(sql);
-            try {
-              final ResultSet resultSet = JdbcQueryIterator.getResultSet(
-                metaData, statement, getQuery());
+              final PreparedStatement statement = connection.prepareStatement(sql);
               try {
-                if (resultSet.next()) {
-                  int i = 0;
-                  do {
-                    final DataObject object = JdbcQueryIterator.getNextObject(
-                      dataStore, metaData, attributes, dataObjectFactory,
-                      resultSet);
-                    results.add(object);
-                    i++;
-                  } while (resultSet.next() && i < pageSize);
+                final ResultSet resultSet = JdbcQueryIterator.getResultSet(
+                  metaData, statement, getQuery());
+                try {
+                  if (resultSet.next()) {
+                    int i = 0;
+                    do {
+                      final DataObject object = JdbcQueryIterator.getNextObject(
+                        dataStore, metaData, attributes, dataObjectFactory,
+                        resultSet);
+                      results.add(object);
+                      i++;
+                    } while (resultSet.next() && i < pageSize);
+                  }
+                } finally {
+                  JdbcUtils.close(resultSet);
                 }
               } finally {
-                JdbcUtils.close(resultSet);
+                JdbcUtils.close(statement);
               }
-            } finally {
-              JdbcUtils.close(statement);
             }
           } catch (final SQLException e) {
             JdbcUtils.getException(dataSource, connection, "updateResults",

@@ -47,15 +47,21 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   private SwingWorker<?, ?> rowCountWorker;
 
-  private final Map<Integer, DataObject> cache = new LruMap<Integer, DataObject>(
-    100);
+  private Map<Integer, DataObject> cache = new LruMap<Integer, DataObject>(100);
 
   private Integer rowCount;
 
-  private final Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
+  private Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
 
   public DataStoreQueryTableModel(final DataObjectMetaData metaData) {
     this(metaData.getDataObjectStore(), metaData);
+  }
+
+  public DataStoreQueryTableModel(final DataObjectMetaData metaData,
+    List<String> attributeNames) {
+    this(metaData.getDataObjectStore(), metaData);
+    setAttributeNames(attributeNames);
+    setAttributeTitles(attributeNames);
   }
 
   public DataStoreQueryTableModel(final DataObjectStore dataStore,
@@ -63,11 +69,22 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     super(metaData);
     this.dataStore = dataStore;
     setEditable(false);
+    this.query = new Query(metaData);
+  }
+
+  private Query query;
+
+  public void setQuery(Query query) {
+    if (query == null) {
+      this.query = new Query(getMetaData());
+    } else {
+      this.query = query.clone();
+    }
+    createPagerWorker();
   }
 
   public void createPager() {
-    final DataObjectMetaData metaData = getMetaData();
-    final Query query = new Query(metaData);
+    final Query query = this.query.clone();
     for (final Entry<Integer, SortOrder> entry : getSortedColumns().entrySet()) {
       final Integer column = entry.getKey();
       final String name = getAttributeName(column);
@@ -84,9 +101,12 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
       if (this.pager != null) {
         this.pager.close();
       }
+      loadingRowIndexes = new LinkedHashSet<Integer>();
+      cache = new LruMap<Integer, DataObject>(100);
       this.pager = pager;
-      cache.clear();
+      rowCount = null;
       pagerWorker = null;
+      loadObjectsWorker = null;
     }
     fireTableDataChanged();
   }
@@ -94,7 +114,6 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
   private void createPagerWorker() {
     pagerWorker = SwingWorkerManager.execute("Initialize Query "
       + getTypeName(), this, "createPager");
-    rowCount = null;
   }
 
   public DataObjectStore getDataStore() {
@@ -161,29 +180,35 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
   }
 
   public void loadRows() {
-    if (pager != null) {
-      while (!loadingRowIndexes.isEmpty()) {
-        final int row = CollectionUtil.get(loadingRowIndexes, 0);
-        if (row < getRowCount()) {
-          int pageNumber = (int)Math.ceil((row + 1) / (double)100);
-          if (pageNumber <= 0) {
-            pageNumber = 1;
-          }
-          pager.setPageNumber(pageNumber);
-          final List<DataObject> list = pager.getList();
-          int i = pager.getStartIndex() - 1;
-          synchronized (cache) {
-            for (final DataObject result : list) {
-              cache.put(i, result);
-              loadingRowIndexes.remove(i);
-              fireTableRowsUpdated(i, i);
-              i++;
+    try {
+      ResultPager<DataObject> pager = this.pager;
+      if (pager != null) {
+        Set<Integer> rowIndexes = this.loadingRowIndexes;
+        Map<Integer, DataObject> cache = this.cache;
+        while (!rowIndexes.isEmpty()) {
+          final int row = CollectionUtil.get(rowIndexes, 0);
+          if (row < getRowCount()) {
+            int pageNumber = (int)Math.ceil((row + 1) / (double)100);
+            if (pageNumber <= 0) {
+              pageNumber = 1;
+            }
+            pager.setPageNumber(pageNumber);
+            final List<DataObject> list = pager.getList();
+            int i = pager.getStartIndex() - 1;
+            synchronized (cache) {
+              for (final DataObject result : list) {
+                cache.put(i, result);
+                rowIndexes.remove(i);
+                fireTableRowsUpdated(i, i);
+                i++;
+              }
             }
           }
         }
       }
+    } finally {
+      loadObjectsWorker = null;
     }
-    loadObjectsWorker = null;
   }
 
   @Override

@@ -725,21 +725,21 @@ div.pageNavigation {
   padding-top: 0.5em;
 }
 
-div.paheNavigation > table  {
+div.pageNavigation > table  {
   width: 100%;
 }
-div.paheNavigation > table > tr > td {
-  width: 33%;
+
+div.pageNavigation td.previous {
+  width: 45%;
 }
 
-div.paheNavigation td.previous {
+div.pageNavigation td.home {
+  text-align: center;
+  width: 10%;
 }
 
-div.paheNavigation td.home {
-  text-align: centre;
-}
-
-div.paheNavigation td.next {
+div.pageNavigation td.next {
   text-align: right;
+  width: 45%;
 }
 
