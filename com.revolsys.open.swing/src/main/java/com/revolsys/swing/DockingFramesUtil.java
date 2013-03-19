@@ -11,7 +11,10 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableLocationEvent;
+import bibliothek.gui.dock.common.event.CDockableLocationListener;
 import bibliothek.gui.dock.common.intern.CControlAccess;
+import bibliothek.gui.dock.common.location.CExternalizedLocation;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 public class DockingFramesUtil {
@@ -36,6 +39,26 @@ public class DockingFramesUtil {
       dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
         .minimalWest());
       dockable.setVisible(true);
+      dockable.addCDockableLocationListener(new CDockableLocationListener() {
+
+        @Override
+        public void changed(CDockableLocationEvent event) {
+          CLocation newLocation = event.getNewLocation();
+          if (newLocation != null && newLocation.getClass() == CExternalizedLocation.class) {
+            CExternalizedLocation externalLocation = (CExternalizedLocation)newLocation;
+            CLocation oldLocation = event.getOldLocation();
+            if (oldLocation == null
+              || oldLocation.getClass() != CExternalizedLocation.class) {
+
+              Dimension size = component.getPreferredSize();
+              int x = externalLocation.getX();
+              int y = externalLocation.getY();
+              dockable.setLocation(CLocation.external(x, y, size.width + 20,
+                size.height + 60));
+            }
+          }
+        }
+      });
       return dockable;
     }
   }

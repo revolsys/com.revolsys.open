@@ -54,10 +54,14 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       geometryFactory);
   }
 
-  public Object getInsertUpdateValue(final Object object) throws SQLException {
+  public Object getInsertUpdateValue(Object object) throws SQLException {
     if (object == null) {
       return null;
     } else {
+      if (object instanceof com.vividsolutions.jts.geom.Geometry) {
+        com.vividsolutions.jts.geom.Geometry geometry = (com.vividsolutions.jts.geom.Geometry)object;
+        object = geometryFactory.copy(geometry);
+      }
       Geometry geometry = null;
 
       DataType type = getType();
@@ -367,7 +371,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return pgMultiPolygon;
   }
 
-  private Point toPgPoint(final com.vividsolutions.jts.geom.Point point) {
+  private Point toPgPoint(com.vividsolutions.jts.geom.Point point) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(point);
     final int numAxis = coordinates.getNumAxis();
 

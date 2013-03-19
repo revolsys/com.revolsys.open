@@ -45,7 +45,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
-  public static final String MAP_INFO_WORKING_AREA = "mapInfoCWorkingArea";
 
   public static final BoundingBox BC_ENVELOPE = //
   new BoundingBox(GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252,

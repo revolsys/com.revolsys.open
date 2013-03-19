@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
@@ -35,21 +36,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
-  public AbstractDataObjectLayer() {
-    this("");
-  }
+  private boolean canAddObjects;
+
+  private boolean canEditObjects;
 
   private BoundingBox boundingBox = new BoundingBox();
 
   protected Query query;
 
-  public void setBoundingBox(BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return boundingBox;
+  public AbstractDataObjectLayer() {
+    this("");
   }
 
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
@@ -71,44 +67,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setGeometryFactory(geometryFactory);
   }
 
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
-    if (geometryFactory != null && boundingBox.isNull()) {
-      boundingBox = geometryFactory.getCoordinateSystem().getAreaBoundingBox();
-    }
-  }
-
   @Override
   public void addSelectedObjects(final Collection<? extends DataObject> objects) {
     selectedObjects.addAll(objects);
     fireSelected();
-  }
-
-  protected void fireSelected() {
-    boolean selected = !selectedObjects.isEmpty();
-    getPropertyChangeSupport().firePropertyChange("selected", !selected,
-      selected);
-  }
-
-  @Override
-  public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
-    for (DataObject object : getSelectedObjects()) {
-      Geometry geometry = object.getGeometryValue();
-      boundingBox.expandToInclude(geometry);
-    }
-    return boundingBox;
-  }
-
-  @Override
-  public boolean isVisible(DataObject object) {
-    if (isVisible()) {
-      AbstractDataObjectLayerRenderer renderer = getRenderer();
-      if (renderer.isVisible(object)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
@@ -143,6 +105,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     deleteObjects(Arrays.asList(objects));
   }
 
+  protected void fireSelected() {
+    final boolean selected = !selectedObjects.isEmpty();
+    getPropertyChangeSupport().firePropertyChange("selected", !selected,
+      selected);
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
   public CoordinateSystem getCoordinateSystem() {
     return getGeometryFactory().getCoordinateSystem();
   }
@@ -150,6 +123,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
     return Collections.emptyList();
+  }
+
+  @Override
+  public DataObjectStore getDataStore() {
+    return getMetaData().getDataObjectStore();
   }
 
   @Override
@@ -184,6 +162,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public Query getQuery() {
+    if (query == null) {
+      return null;
+    } else {
+      return query.clone();
+    }
+  }
+
+  @Override
   public int getRowCount() {
     final DataObjectMetaData metaData = getMetaData();
     final Query query = new Query(metaData);
@@ -197,6 +184,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public BoundingBox getSelectedBoundingBox() {
+    final BoundingBox boundingBox = super.getSelectedBoundingBox();
+    for (final DataObject object : getSelectedObjects()) {
+      final Geometry geometry = object.getGeometryValue();
+      boundingBox.expandToInclude(geometry);
+    }
+    return boundingBox;
+  }
+
+  @Override
   public List<DataObject> getSelectedObjects() {
     return new ArrayList<DataObject>(selectedObjects);
   }
@@ -207,12 +204,33 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public boolean isCanAddObjects() {
+    return canAddObjects;
+  }
+
+  @Override
+  public boolean isCanEditObjects() {
+    return canEditObjects;
+  }
+
+  @Override
   public boolean isSelected(final DataObject object) {
     if (object == null) {
       return false;
     } else {
       return selectedObjects.contains(object);
     }
+  }
+
+  @Override
+  public boolean isVisible(final DataObject object) {
+    if (isVisible()) {
+      final AbstractDataObjectLayerRenderer renderer = getRenderer();
+      if (renderer.isVisible(object)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -232,10 +250,30 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     removeSelectedObjects(Arrays.asList(objects));
   }
 
+  public void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
+  public void setCanAddObjects(final boolean canAddObjects) {
+    this.canAddObjects = canAddObjects;
+  }
+
+  public void setCanEditObjects(final boolean canEditObjects) {
+    this.canEditObjects = canEditObjects;
+  }
+
   @Override
   public void setEditingObjects(
     final Collection<? extends DataObject> editingObjects) {
     this.editingObjects = new LinkedHashSet<DataObject>(editingObjects);
+  }
+
+  @Override
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    super.setGeometryFactory(geometryFactory);
+    if (geometryFactory != null && boundingBox.isNull()) {
+      boundingBox = geometryFactory.getCoordinateSystem().getAreaBoundingBox();
+    }
   }
 
   @Override
@@ -274,9 +312,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  public void setQuery(final Query query) {
+    final Query oldValue = this.query;
+    this.query = query;
+    getPropertyChangeSupport().firePropertyChange("query", oldValue, query);
+  }
+
   @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
     super.setRenderer(renderer);
+  }
+
+  @Override
+  public void setSelectedObjects(final BoundingBox boundingBox) {
+    final List<DataObject> objects = getDataObjects(boundingBox);
+    setSelectedObjects(objects);
   }
 
   @Override
@@ -292,9 +342,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void setSelectedObjects(BoundingBox boundingBox) {
-    List<DataObject> objects = getDataObjects(boundingBox);
-    setSelectedObjects(objects);
+  public void setSelectedObjectsById(final Object id) {
+    final DataObjectMetaData metaData = getMetaData();
+    final String idAttributeName = metaData.getIdAttributeName();
+    if (idAttributeName == null) {
+      setSelectedObjects();
+    } else {
+      final Query query = new Query(metaData);
+      query.addFilter(idAttributeName, id);
+      final List<DataObject> objects = query(query);
+      setSelectedObjects(objects);
+    }
   }
 
   @Override
@@ -307,33 +365,5 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       selectedObjects.removeAll(objects);
     }
     return objects.size();
-  }
-
-  public Query getQuery() {
-    if (query == null) {
-      return null;
-    } else {
-      return query.clone();
-    }
-  }
-
-  public void setQuery(Query query) {
-    Query oldValue = this.query;
-    this.query = query;
-    getPropertyChangeSupport().firePropertyChange("query", oldValue, query);
-  }
-
-  @Override
-  public void setSelectedObjectsById(Object id) {
-    DataObjectMetaData metaData = getMetaData();
-    String idAttributeName = metaData.getIdAttributeName();
-    if (idAttributeName == null) {
-      setSelectedObjects();
-    } else {
-      Query query = new Query(metaData);
-      query.addFilter(idAttributeName, id);
-      List<DataObject> objects = query(query);
-      setSelectedObjects(objects);
-    }
   }
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
@@ -14,6 +15,8 @@ import javax.swing.JToolBar;
 public class ComponentGroup {
 
   private final Map<String, List<Component>> groups = new HashMap<String, List<Component>>();
+
+  private final Map<String, ButtonGroup> buttonGroups = new HashMap<String, ButtonGroup>();
 
   private final List<String> groupNames = new ArrayList<String>();
 
@@ -43,6 +46,15 @@ public class ComponentGroup {
       groupNames.add(groupName);
     }
     return components;
+  }
+
+  public ButtonGroup getButtonGroup(final String groupName) {
+    ButtonGroup buttonGroup = buttonGroups.get(groupName);
+    if (buttonGroup == null) {
+      buttonGroup = new ButtonGroup();
+      buttonGroups.put(groupName, buttonGroup);
+    }
+    return buttonGroup;
   }
 
   public void setGroupEnabled(final String groupName, final boolean enabled) {

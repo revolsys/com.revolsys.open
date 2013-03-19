@@ -278,11 +278,11 @@ public class LayerUtil {
           Component form = DataObjectLayerFormFactory.createFormComponent(
             layer, object);
           dockable = DockingFramesUtil.addDockable(project,
-            MapPanel.MAP_INFO_WORKING_AREA, dockableId, metaData.getTypeName()
-              + " " + id, form);
+            MapPanel.MAP_TABLE_WORKING_AREA, dockableId, metaData.getTypeName()
+              + " (#" + id +")", form);
           Dimension size = form.getPreferredSize();
-          dockable.setLocation(CLocation.external(100, 100, size.width,
-            size.height));
+          dockable.setLocation(CLocation.external(50, 50, size.width +20,
+            size.height+60));
           forms.put(object, dockable);
           dockable.addCDockableStateListener(new CDockableStateListener() {
 

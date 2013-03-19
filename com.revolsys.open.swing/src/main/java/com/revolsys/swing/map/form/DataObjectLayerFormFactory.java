@@ -10,7 +10,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
 public class DataObjectLayerFormFactory {
-  public static final String FORM_CLASS_NAME = "dataObjectLayerFormClassName";
+  public static final String FORM_CLASS_NAME = "formClassName";
 
   public static JComponent createFormComponent(DataObjectLayer layer, DataObject object) {
     String formClassName = layer.getProperty(FORM_CLASS_NAME);

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 
 import javax.swing.JFrame;
@@ -14,7 +15,9 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.location.TreeLocationRoot;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
+import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
+import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.swing.DockingFramesUtil;
@@ -45,6 +48,10 @@ public class ProjectFrame extends JFrame {
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
     dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
+    CEclipseTheme theme = (CEclipseTheme)dockControl.getController().getTheme();
+    theme.intern().setMovingImageFactory(
+      new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
+
     final CContentArea dockContentArea = dockControl.getContentArea();
     add(dockContentArea, BorderLayout.CENTER);
     DockingFramesUtil.setFlapSizes(dockControl);
@@ -56,12 +63,6 @@ public class ProjectFrame extends JFrame {
     final CLocation location = CLocation.base().normalWest(0.20);
     DockingFramesUtil.createCWorkingArea(dockControl, project,
       MapPanel.MAP_CONTROLS_WORKING_AREA, location);
-  }
-
-  protected void addInfoWorkingArea() {
-    final CLocation location = CLocation.base().normalEast(0.20);
-    DockingFramesUtil.createCWorkingArea(dockControl, project,
-      MapPanel.MAP_INFO_WORKING_AREA, location);
   }
 
   protected void addLayers() {
@@ -120,7 +121,6 @@ public class ProjectFrame extends JFrame {
 
   protected void addWorkingAreas() {
     addControlWorkingArea();
-    addInfoWorkingArea();
     addTableWorkingArea();
   }
 

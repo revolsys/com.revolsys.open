@@ -92,7 +92,7 @@ public class SwingUtil {
         size = 50;
       }
       if (!enabled) {
-        field = new JTextField(1);
+        field = new JTextField(size);
         field.setEnabled(false);
       } else if (codeTable != null) {
         final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
@@ -106,7 +106,9 @@ public class SwingUtil {
         field = comboBox;
       } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
         final int scale = attribute.getScale();
-        field = new NumberTextField(type, length, scale);
+        NumberTextField numberTextField = new NumberTextField(type, length,
+          scale);
+        field = numberTextField;
       } else if (type.equals(DataTypes.DATE)) {
         final JXDatePicker captureDateField = new JXDatePicker();
         captureDateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
@@ -115,6 +117,13 @@ public class SwingUtil {
       } else {
         final JTextField textField = new JTextField(size);
         field = textField;
+      }
+      if (field instanceof JTextField) {
+        JTextField textField = (JTextField)field;
+        int preferedWidth = textField.getPreferredSize().width;
+        textField.setMinimumSize(new Dimension(preferedWidth, 0));
+        textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+
       }
     }
     return (T)field;

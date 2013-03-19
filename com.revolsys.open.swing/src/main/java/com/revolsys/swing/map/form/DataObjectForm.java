@@ -6,18 +6,24 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
@@ -42,6 +48,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
@@ -81,9 +88,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   private final Map<String, String> originalToolTip = new HashMap<String, String>();
 
-  private List<String> readOnlyFieldNames = new ArrayList<String>();
+  private Set<String> readOnlyFieldNames = new HashSet<String>();
 
-  private List<String> requiredFieldNames = new ArrayList<String>();
+  private Set<String> requiredFieldNames = new HashSet<String>();
 
   private final Map<String, Object> disabledFieldValues = new HashMap<String, Object>();
 
@@ -92,6 +99,17 @@ public class DataObjectForm extends JPanel implements FocusListener,
   private final Color textBackgroundColor = new JTextField().getBackground();
 
   private final Color selectedTextColor = new JTextField().getSelectedTextColor();
+
+  private DataObject object;
+
+  public void setObject(final DataObject object) {
+    this.object = object;
+    setValues(object);
+  }
+
+  public DataObject getObject() {
+    return object;
+  }
 
   private Object previousValue;
 
@@ -112,17 +130,22 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public DataObjectStore getDataStore() {
-    if (metaData == null) {
-      return null;
+    if (dataStore == null) {
+      if (metaData == null) {
+        return null;
+      } else {
+        return metaData.getDataObjectStore();
+      }
     } else {
-      return metaData.getDataObjectStore();
+      return dataStore;
     }
   }
 
   private GeometryCoordinatesPanel geometryCoordinatesPanel;
 
-  protected void addGeometryTab() {
-    if (geometryCoordinatesPanel == null) {
+  protected void addTabGeometry() {
+    if (geometryCoordinatesPanel == null
+      && metaData.getGeometryAttributeIndex() != -1) {
       geometryCoordinatesPanel = new GeometryCoordinatesPanel();
 
       final JPanel panel = new JPanel(new GridLayout(1, 1));
@@ -138,9 +161,21 @@ public class DataObjectForm extends JPanel implements FocusListener,
     this(new BorderLayout());
   }
 
+  public DataObjectForm(DataObject object) {
+    this(object.getMetaData());
+    setObject(object);
+  }
+
   public DataObjectForm(final LayoutManager layout) {
     super(layout);
   }
+
+  public DataObjectForm(DataObjectMetaData metaData) {
+    super(new BorderLayout());
+    setMetaData(metaData);
+  }
+
+  private DataObjectStore dataStore;
 
   protected void addDoubleField(final String fieldName, final int length,
     final int scale, final Double minimumValie, final Double maximumValue) {
@@ -159,6 +194,12 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void addField(final String fieldName, final JComponent field) {
+    if (field instanceof JTextField) {
+      JTextField textField = (JTextField)field;
+      int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+    }
     originalToolTip.put(fieldName, field.getToolTipText());
     field.addFocusListener(this);
     fields.put(fieldName, field);
@@ -181,20 +222,24 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void addTab(final String name, final Component component) {
+    addTab(tabs.getComponentCount(), name, component);
+  }
+
+  public void addTab(final int index, final String name,
+    final Component component) {
+    boolean init = false;
     Container parent = tabs.getParent();
-    if (parent != this && allAttributesPanel != null) {
-      remove(allAttributesPanel);
-      tabs.addTab("All Attributes", allAttributesPanel);
+    if (parent != this) {
       add(tabs, BorderLayout.CENTER);
+      init = true;
     }
-    if (name.equals("Geometry")) {
-      tabs.addTab(name, component);
-    } else {
-      tabs.insertTab(name, null, component, null, tabs.getTabCount() - 1);
+    tabs.insertTab(name, null, component, null, index);
+    if (init) {
+      tabs.setSelectedIndex(0);
     }
   }
 
-  protected JComponent createAllAttributesPanel() {
+  protected JComponent addTabAllAttributes() {
     allAttributes = new DataObjectMapTableModel(getMetaData(), getValues(),
       true);
     allAttributes.setReadOnlyFieldNames(getReadOnlyFieldNames());
@@ -274,7 +319,19 @@ public class DataObjectForm extends JPanel implements FocusListener,
       }
     }
     final JScrollPane scrollPane = new JScrollPane(table);
-    scrollPane.setPreferredSize(new Dimension(800, 600));
+    int maxHeight = Integer.MAX_VALUE;
+    for (GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
+      .getScreenDevices()) {
+      GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
+      Rectangle bounds = graphicsConfiguration.getBounds();
+      maxHeight = Math.min(bounds.height, maxHeight);
+    }
+    maxHeight -= 300;
+    int preferredHeight = allAttributes.getRowCount() * 25;
+    scrollPane.setMinimumSize(new Dimension(0, preferredHeight));
+    scrollPane.setPreferredSize(new Dimension(800, Math.min(maxHeight,
+      allAttributes.getRowCount() * 25)));
+    scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
     this.allAttributesPanel = scrollPane;
     return scrollPane;
   }
@@ -440,11 +497,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return (T)values.get(fieldName);
   }
 
-  public List<String> getReadOnlyFieldNames() {
+  public Set<String> getReadOnlyFieldNames() {
     return readOnlyFieldNames;
   }
 
-  public List<String> getRequiredFieldNames() {
+  public Set<String> getRequiredFieldNames() {
     return requiredFieldNames;
   }
 
@@ -603,18 +660,27 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
+    setDataStore(metaData.getDataObjectStore());
     String idAttributeName = metaData.getIdAttributeName();
     if (StringUtils.hasText(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);
     }
   }
 
-  public void setReadOnlyFieldNames(final List<String> readOnlyFieldNames) {
-    this.readOnlyFieldNames = readOnlyFieldNames;
+  public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
+    this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
   }
 
-  public void setRequiredFieldNames(final List<String> requiredFieldNames) {
-    this.requiredFieldNames = requiredFieldNames;
+  public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
+    this.readOnlyFieldNames.addAll(readOnlyFieldNames);
+  }
+
+  public void addReadOnlyFieldNames(final String... readOnlyFieldNames) {
+    addReadOnlyFieldNames(Arrays.asList(readOnlyFieldNames));
+  }
+
+  public void setRequiredFieldNames(final Collection<String> requiredFieldNames) {
+    this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
   }
 
   protected void setTabsValid() {
@@ -703,6 +769,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
         tabs.setBackgroundAt(i, Color.PINK);
       }
     }
+  }
+
+  protected void setDataStore(DataObjectStore dataStore) {
+    this.dataStore = dataStore;
   }
 
 }

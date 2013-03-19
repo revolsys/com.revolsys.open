@@ -4,10 +4,13 @@ import java.awt.Component;
 import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -18,11 +21,12 @@ public class ToolBar extends JToolBar {
   private final ComponentGroup groups = new ComponentGroup();
 
   public ToolBar() {
-    setRollover(true);
+    setRollover(false);
+    setFloatable(false);
   }
 
-   public JButton addButton(final Action action) {
-    final JButton button = super.add(action);
+  public JButton addButton(final Action action) {
+    final JButton button = createButton(action);
     groups.addComponent(this, button);
     return button;
   }
@@ -33,10 +37,9 @@ public class ToolBar extends JToolBar {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
       object, methodName, parameters);
 
-    final JButton button = createActionComponent(action);
-    button.setFocusPainted(false);
+    final JButton button = createButton(action);
     button.setAction(action);
-    groups.addComponent(this,groupName, button);
+    groups.addComponent(this, groupName, button);
     return button;
   }
 
@@ -48,20 +51,71 @@ public class ToolBar extends JToolBar {
       parameters);
   }
 
-  public void addComponent(final String groupName, final Component component) {
-   groups.addComponent(this,groupName,component);
+  public void addComponent(final Component component) {
+    groups.addComponent(this, component);
   }
 
-  public void addComponent( final Component component) {
-   groups.addComponent(this,component);
+  public void addComponent(final String groupName, final Component component) {
+    groups.addComponent(this, groupName, component);
   }
 
   public void addGroup(final String groupName) {
     groups.addGroup(groupName);
   }
 
+  public JToggleButton addToggleButton(final String groupName,
+    final String name, final String title, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
+      object, methodName, parameters);
+
+    final JToggleButton button = createToggleButton(action);
+    groups.addComponent(this, groupName, button);
+    final ButtonGroup buttonGroup = getButtonGroup(groupName);
+    buttonGroup.add(button);
+    return button;
+  }
+
+  public JToggleButton addToggleButtonTitleIcon(final String groupName,
+    final String title, final String iconName, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    return addToggleButton(groupName, iconName, title, icon, object,
+      methodName, parameters);
+  }
+
+  protected JButton createButton(final Action action) {
+    final JButton button = new JButton(action);
+    if (action != null
+      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+      button.setHideActionText(true);
+    }
+    button.setHorizontalTextPosition(SwingConstants.CENTER);
+    button.setVerticalTextPosition(SwingConstants.BOTTOM);
+    button.setFocusPainted(false);
+    button.setBorderPainted(false);
+    return button;
+  }
+
+  protected JToggleButton createToggleButton(final Action action) {
+    final JToggleButton button = new JToggleButton(action);
+    if (action != null
+      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+      button.setHideActionText(true);
+    }
+    button.setHorizontalTextPosition(SwingConstants.CENTER);
+    button.setVerticalTextPosition(SwingConstants.BOTTOM);
+    button.setFocusPainted(false);
+    button.setBorderPainted(false);
+    return button;
+  }
+
+  public ButtonGroup getButtonGroup(final String groupName) {
+    return groups.getButtonGroup(groupName);
+  }
+
   public List<Component> getGroup(final String groupName) {
-     return groups.getGroup(groupName);
+    return groups.getGroup(groupName);
   }
 
   public void setGroupEnabled(final String groupName, final boolean enabled) {

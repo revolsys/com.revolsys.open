@@ -14,10 +14,10 @@ public class LayerDataObjectForm extends DataObjectForm {
     this.layer = layer;
     DataObjectMetaData metaData = layer.getMetaData();
     setMetaData(metaData);
-    add(createAllAttributesPanel(), BorderLayout.CENTER);
+    add(addTabAllAttributes(), BorderLayout.CENTER);
     getAllAttributes().setEditable(layer.isEditable());
     if (metaData.getGeometryAttributeName() != null) {
-      addGeometryTab();
+      addTabGeometry();
     }
     setValues(object);
   }

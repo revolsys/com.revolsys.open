@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,7 +40,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
-  
+
   /** The cached geometry factories. */
   private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
 
@@ -56,6 +58,7 @@ public class GeometryFactory extends
   public static GeometryFactory getFactory() {
     return getFactory(0, 3, 0, 0);
   }
+
   /**
    * get a 3d geometry factory with a floating scale.
    */
@@ -64,6 +67,7 @@ public class GeometryFactory extends
     final int crsId = getId(coordinateSystem);
     return getFactory(crsId, 3, 0, 0);
   }
+
   /**
    * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y & floating z precision models.</p>
    * 
@@ -169,7 +173,7 @@ public class GeometryFactory extends
   }
 
   private static Set<Class<?>> getGeometryClassSet(
-    final List<? extends Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
     for (final Geometry geometry : geometries) {
       classes.add(geometry.getClass());
@@ -186,10 +190,11 @@ public class GeometryFactory extends
   }
 
   public static LineString[] toLineStringArray(final GeometryFactory factory,
-    final List<?> lines) {
+    final Collection<?> lines) {
     final LineString[] lineStrings = new LineString[lines.size()];
+    Iterator<?> iterator = lines.iterator();
     for (int i = 0; i < lines.size(); i++) {
-      final Object value = lines.get(i);
+      final Object value = iterator.next();
       if (value instanceof LineString) {
         final LineString lineString = (LineString)value;
         lineStrings[i] = lineString;
@@ -208,7 +213,7 @@ public class GeometryFactory extends
   }
 
   public static MultiPolygon toMultiPolygon(
-    final GeometryFactory geometryFactory, final List<?> polygons) {
+    final GeometryFactory geometryFactory, final Collection<?> polygons) {
     final Polygon[] polygonArray = toPolygonArray(geometryFactory, polygons);
     return geometryFactory.createMultiPolygon(polygonArray);
   }
@@ -258,10 +263,10 @@ public class GeometryFactory extends
 
   @SuppressWarnings("unchecked")
   public static Polygon[] toPolygonArray(final GeometryFactory factory,
-    final List<?> polygonList) {
+    final Collection<?> polygonList) {
     final Polygon[] polygons = new Polygon[polygonList.size()];
-    for (int i = 0; i < polygonList.size(); i++) {
-      final Object value = polygonList.get(i);
+    int i = 0;
+    for (Object value : polygonList) {
       if (value instanceof Polygon) {
         final Polygon polygon = (Polygon)value;
         polygons[i] = polygon;
@@ -269,6 +274,7 @@ public class GeometryFactory extends
         final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
         polygons[i] = factory.createPolygon(coordinateList);
       }
+      i++;
     }
     return polygons;
   }
@@ -436,11 +442,11 @@ public class GeometryFactory extends
     }
   }
 
-  public Geometry createGeometry(final List<? extends Geometry> geometries) {
+  public Geometry createGeometry(final Collection<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
       return createEmptyGeometryCollection();
     } else if (geometries.size() == 1) {
-      return geometries.get(0);
+      return CollectionUtil.get(geometries, 0);
     } else {
       final Set<Class<?>> classes = getGeometryClassSet(geometries);
       if (classes.equals(Collections.singleton(Point.class))) {
@@ -588,7 +594,7 @@ public class GeometryFactory extends
     return super.createMultiLineString(lines);
   }
 
-  public MultiLineString createMultiLineString(final List<?> lines) {
+  public MultiLineString createMultiLineString(final Collection<?> lines) {
     final LineString[] lineArray = toLineStringArray(this, lines);
     return createMultiLineString(lineArray);
   }
@@ -605,7 +611,7 @@ public class GeometryFactory extends
     return super.createMultiPoint(points);
   }
 
-  public MultiPolygon createMultiPolygon(final List<?> polygons) {
+  public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
     return toMultiPolygon(this, polygons);
   }
 

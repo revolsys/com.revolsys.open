@@ -3,8 +3,9 @@ package com.revolsys.swing.table.dataobject;
 import java.awt.Font;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -68,7 +69,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     return table;
   }
 
-  private List<String> readOnlyFieldNames = new ArrayList<String>();
+  private Set<String> readOnlyFieldNames = new HashSet<String>();
 
   private boolean editable;
 
@@ -110,7 +111,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     return propertyChangeSupport;
   }
 
-  public List<String> getReadOnlyFieldNames() {
+  public Set<String> getReadOnlyFieldNames() {
     return readOnlyFieldNames;
   }
 
@@ -174,8 +175,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     }
   }
 
-  public void setReadOnlyFieldNames(final List<String> readOnlyFieldNames) {
-    this.readOnlyFieldNames = readOnlyFieldNames;
+  public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
+    this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
   }
 
   protected abstract Object setValue(final Object value, final int rowIndex);
