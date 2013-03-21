@@ -79,7 +79,7 @@ public class DataStoreQueryListModel implements ListModel {
     return objects;
   }
 
-  protected List<DataObject> getObjects(final String searchParam) {
+  protected List<DataObject> getObjects( String searchParam) {
     final Map<String, DataObject> allObjects = new TreeMap<String, DataObject>();
     for (Query query : queries) {
       if (allObjects.size() < 10) {
@@ -89,6 +89,7 @@ public class DataStoreQueryListModel implements ListModel {
         if (whereClause.indexOf("LIKE") == -1) {
           query.addParameter(searchParam);
         } else {
+          searchParam = searchParam.toUpperCase().replaceAll("[^A-Z0-9]", "");
           query.addParameter(searchParam + "%");
         }
         query.setLimit(10);

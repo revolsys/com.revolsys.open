@@ -1,21 +1,23 @@
 package com.revolsys.swing.map.util;
 
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CControlAccess;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
@@ -25,6 +27,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.swing.DockingFramesUtil;
@@ -50,6 +53,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class LayerUtil {
 
+  private static Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
+
   private static final Map<String, LayerFactory<?>> LAYER_FACTORIES = new HashMap<String, LayerFactory<?>>();
 
   private static final Map<Class<? extends Layer>, LayerTablePanelFactory> LAYER_TABLE_FACTORIES = new HashMap<Class<? extends Layer>, LayerTablePanelFactory>();
@@ -71,75 +76,24 @@ public class LayerUtil {
     LAYER_FACTORIES.put(typeName, factory);
   }
 
-  public static void zoomToLayerSelected() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      Project project = layer.getProject();
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = layer.getSelectedBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1);
-      project.setViewBoundingBox(boundingBox);
-    }
-  }
-
-  public static void zoomToLayer() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      Project project = layer.getProject();
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = layer.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1);
-      project.setViewBoundingBox(boundingBox);
-    }
-  }
-
-  public static void showViewAttributes() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      DefaultSingleCDockable dockable;
-      synchronized (layer) {
-        dockable = layer.getProperty("TableView");
-      }
-      if (dockable == null) {
-        Project project = layer.getProject();
-
-        Component component = LayerUtil.getLayerTablePanel(layer);
-        String id = layer.getClass().getName() + "." + layer.getId();
-        dockable = DockingFramesUtil.addDockable(project,
-          MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
-
-        dockable.setCloseable(true);
-        layer.setProperty("TableView", dockable);
-        dockable.addCDockableStateListener(new CDockableStateListener() {
-          @Override
-          public void extendedModeChanged(final CDockable dockable,
-            final ExtendedMode mode) {
-          }
-
-          @Override
-          public void visibilityChanged(final CDockable dockable) {
-            final boolean visible = dockable.isVisible();
-            if (!visible) {
-              dockable.getControl()
-                .getOwner()
-                .remove((SingleCDockable)dockable);
-              synchronized (layer) {
-                layer.setProperty("TableView", null);
-              }
-            }
-          }
-        });
-      }
-
-      dockable.toFront();
-    }
-  }
-
   public static void addLayerTablePanelFactory(LayerTablePanelFactory factory) {
     Class<? extends Layer> layerClass = factory.getLayerClass();
     LAYER_TABLE_FACTORIES.put(layerClass, factory);
+  }
+
+  public static void addNewRecord() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    addNewRecord(layer);
+  }
+
+  public static void addNewRecord(final Layer layer) {
+    if (layer instanceof DataObjectLayer) {
+      DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+      DataObject object = dataObjectLayer.createObject();
+      if (object != null) {
+        showForm(dataObjectLayer, object);
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -160,6 +114,15 @@ public class LayerUtil {
 
   public static LayerFactory<?> getLayerFactory(final String typeName) {
     return LAYER_FACTORIES.get(typeName);
+  }
+
+  public static Component getLayerTablePanel(Layer layer) {
+    Class<? extends Layer> layerClass = layer.getClass();
+    LayerTablePanelFactory factory = getLayerTablePanelFactory(layerClass);
+    if (factory != null) {
+      return factory.createPanel(layer);
+    }
+    return null;
   }
 
   public static LayerTablePanelFactory getLayerTablePanelFactory(
@@ -214,15 +177,6 @@ public class LayerUtil {
     }
   }
 
-  public static Component getLayerTablePanel(Layer layer) {
-    Class<? extends Layer> layerClass = layer.getClass();
-    LayerTablePanelFactory factory = getLayerTablePanelFactory(layerClass);
-    if (factory != null) {
-      return factory.createPanel(layer);
-    }
-    return null;
-  }
-
   public static void openFile(File file) {
     Project project = Project.get();
     if (project != null) {
@@ -261,59 +215,106 @@ public class LayerUtil {
     }
   }
 
-  private static Map<DataObject, DefaultSingleCDockable> forms = new HashMap<DataObject, DefaultSingleCDockable>();
-
   public static void showForm(DataObjectLayer layer, final DataObject object) {
     synchronized (forms) {
-
-      DefaultSingleCDockable dockable = forms.get(object);
-      if (dockable == null) {
+      Window window = forms.get(object);
+      if (window == null) {
         Project project = layer.getProject();
         if (project == null) {
           return;
         } else {
-          DataObjectMetaData metaData = layer.getMetaData();
           Object id = object.getIdValue();
-          String dockableId = metaData.getInstanceId() + "-" + id;
           Component form = DataObjectLayerFormFactory.createFormComponent(
             layer, object);
-          dockable = DockingFramesUtil.addDockable(project,
-            MapPanel.MAP_TABLE_WORKING_AREA, dockableId, metaData.getTypeName()
-              + " (#" + id +")", form);
-          Dimension size = form.getPreferredSize();
-          dockable.setLocation(CLocation.external(50, 50, size.width +20,
-            size.height+60));
-          forms.put(object, dockable);
-          dockable.addCDockableStateListener(new CDockableStateListener() {
-
+          String title;
+          if (object.getState() == DataObjectState.New) {
+            title = "Add NEW " + layer.getName();
+          } else {
+            title = "Edit " + layer.getName() + "#" + id;
+          }
+          window = new JFrame(title);
+          window.add(new JScrollPane(form));
+          window.pack();
+          window.setLocation(50, 50);
+          // TODO smart location
+          window.setVisible(true);
+          forms.put(object, window);
+          window.addWindowListener(new WindowAdapter() {
             @Override
-            public void visibilityChanged(CDockable dockable) {
-              final boolean visible = dockable.isVisible();
-              if (!visible) {
-                CControlAccess controlAccess = dockable.getControl();
-                if (controlAccess != null) {
-                  CControl owner = controlAccess.getOwner();
-                  if (owner != null) {
-                    owner.remove((SingleCDockable)dockable);
-                  }
-                }
-                synchronized (forms) {
-                  forms.remove(object);
-                }
-              }
-            }
-
-            @Override
-            public void extendedModeChanged(CDockable dockable,
-              ExtendedMode mode) {
-
+            public void windowClosed(WindowEvent e) {
+              forms.remove(object);
             }
           });
         }
       }
-      dockable.setCloseable(true);
-      dockable.toFront();
+      window.requestFocus();
     }
 
+  }
+
+  public static void showViewAttributes() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      DefaultSingleCDockable dockable;
+      synchronized (layer) {
+        dockable = layer.getProperty("TableView");
+      }
+      if (dockable == null) {
+        Project project = layer.getProject();
+
+        Component component = LayerUtil.getLayerTablePanel(layer);
+        String id = layer.getClass().getName() + "." + layer.getId();
+        dockable = DockingFramesUtil.addDockable(project,
+          MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
+
+        dockable.setCloseable(true);
+        layer.setProperty("TableView", dockable);
+        dockable.addCDockableStateListener(new CDockableStateListener() {
+          @Override
+          public void extendedModeChanged(final CDockable dockable,
+            final ExtendedMode mode) {
+          }
+
+          @Override
+          public void visibilityChanged(final CDockable dockable) {
+            final boolean visible = dockable.isVisible();
+            if (!visible) {
+              dockable.getControl()
+                .getOwner()
+                .remove((SingleCDockable)dockable);
+              synchronized (layer) {
+                layer.setProperty("TableView", null);
+              }
+            }
+          }
+        });
+      }
+
+      dockable.toFront();
+    }
+  }
+
+  public static void zoomToLayer() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      Project project = layer.getProject();
+      GeometryFactory geometryFactory = project.getGeometryFactory();
+      BoundingBox boundingBox = layer.getBoundingBox()
+        .convert(geometryFactory)
+        .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public static void zoomToLayerSelected() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      Project project = layer.getProject();
+      GeometryFactory geometryFactory = project.getGeometryFactory();
+      BoundingBox boundingBox = layer.getSelectedBoundingBox()
+        .convert(geometryFactory)
+        .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
   }
 }

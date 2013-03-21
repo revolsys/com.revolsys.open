@@ -163,8 +163,23 @@ public abstract class AbstractDataObjectStore extends
     if (metaData == null) {
       return null;
     } else {
-      return dataObjectFactory.createDataObject(metaData);
+      DataObject object = dataObjectFactory.createDataObject(metaData);
+      return object;
     }
+  }
+
+  @Override
+  public DataObject createWithId(final DataObjectMetaData metaData) {
+    DataObject object = create(metaData);
+    if (object != null) {
+      String idAttributeName = metaData.getIdAttributeName();
+      if (StringUtils.hasText(idAttributeName)) {
+        String typePath = metaData.getPath();
+        Object id = createPrimaryIdValue(typePath);
+        object.setIdValue(id);
+      }
+    }
+    return object;
   }
 
   @Override
@@ -173,7 +188,7 @@ public abstract class AbstractDataObjectStore extends
     if (metaData == null) {
       return null;
     } else {
-      return dataObjectFactory.createDataObject(metaData);
+      return create(metaData);
     }
   }
 

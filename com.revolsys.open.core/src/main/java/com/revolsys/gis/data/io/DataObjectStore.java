@@ -127,4 +127,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void updateAll(Collection<DataObject> objects);
 
   int getRowCount(Query query);
+
+  DataObject createWithId(DataObjectMetaData objectMetaData);
 }

@@ -15,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
@@ -36,9 +37,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
-  private boolean canAddObjects;
+  private boolean canAddObjects = true;
 
-  private boolean canEditObjects;
+  private boolean canEditObjects = true;
+
+  private boolean canDeleteObjects = true;
 
   private BoundingBox boundingBox = new BoundingBox();
 
@@ -51,6 +54,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
+  }
+
+  @Override
+  public void setEditable(boolean editable) {
+    super.setEditable(editable);
+    setCanAddObjects(canAddObjects);
+    setCanDeleteObjects(canDeleteObjects);
+    setCanEditObjects(canEditObjects);
   }
 
   public AbstractDataObjectLayer(final String name) {
@@ -92,6 +103,24 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void clearSelectedObjects() {
     selectedObjects = new LinkedHashSet<DataObject>();
     getPropertyChangeSupport().firePropertyChange("selected", true, false);
+  }
+
+  @Override
+  public DataObject createObject() {
+    if (!isReadOnly() && isEditable() && isCanAddObjects()) {
+      final DataObjectMetaData metaData = getMetaData();
+      final DataObjectStore dataStore = getDataStore();
+      DataObject object;
+      if (dataStore == null) {
+        object = new ArrayDataObject(metaData);
+      } else {
+        object = dataStore.createWithId(metaData);
+      }
+      // TODO add to insert objects
+      return object;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -205,12 +234,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isCanAddObjects() {
-    return canAddObjects;
+    return !isReadOnly() && isEditable() && canAddObjects;
+  }
+
+  @Override
+  public boolean isCanDeleteObjects() {
+    return !isReadOnly() && isEditable() && canDeleteObjects;
   }
 
   @Override
   public boolean isCanEditObjects() {
-    return canEditObjects;
+    return !isReadOnly() && isEditable() && canEditObjects;
   }
 
   @Override
@@ -256,10 +290,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void setCanAddObjects(final boolean canAddObjects) {
     this.canAddObjects = canAddObjects;
+    getPropertyChangeSupport().firePropertyChange("canAddObjects",
+      !isCanAddObjects(), isCanAddObjects());
+  }
+
+  public void setCanDeleteObjects(final boolean canDeleteObjects) {
+    this.canDeleteObjects = canDeleteObjects;
+    getPropertyChangeSupport().firePropertyChange("canDeleteObjects",
+      !isCanDeleteObjects(), isCanDeleteObjects());
   }
 
   public void setCanEditObjects(final boolean canEditObjects) {
     this.canEditObjects = canEditObjects;
+    getPropertyChangeSupport().firePropertyChange("canEditObjects",
+      !isCanEditObjects(), isCanEditObjects());
   }
 
   @Override

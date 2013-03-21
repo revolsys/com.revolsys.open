@@ -6,11 +6,12 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
+
+import com.revolsys.swing.action.AbstractAction;
 
 public class ActionToolBarButtonFactory extends AbstractAction implements
   ToolBarButtonFactory {
@@ -21,8 +22,6 @@ public class ActionToolBarButtonFactory extends AbstractAction implements
     Action.SELECTED_KEY, Action.SHORT_DESCRIPTION, Action.SMALL_ICON);
 
   private static final long serialVersionUID = -5626990626102421865L;
-
-  private boolean checkBox;
 
   private ActionListener actionListener;
 
@@ -56,46 +55,11 @@ public class ActionToolBarButtonFactory extends AbstractAction implements
 
   @Override
   public Component createToolbarButton() {
-    if (checkBox) {
+    if (isCheckBox()) {
       return new JToggleButton(this);
     } else {
       return new JButton(this);
     }
   }
 
-  public final Icon getIcon() {
-    return (Icon)getValue(Action.SMALL_ICON);
-  }
-
-  public Integer getMnemonic() {
-    return (Integer)getValue(Action.MNEMONIC_KEY);
-  }
-
-  public String getName() {
-    return (String)getValue(Action.NAME);
-  }
-
-  public String getToolTip() {
-    return (String)getValue(Action.SHORT_DESCRIPTION);
-  }
-
-  public boolean isCheckBox() {
-    return checkBox;
-  }
-
-  protected void setCheckBox(final boolean checkBox) {
-    this.checkBox = checkBox;
-  }
-
-  protected void setIcon(final Icon icon) {
-    putValue(Action.SMALL_ICON, icon);
-  }
-
-  protected void setName(final String name) {
-    putValue(Action.NAME, name);
-  }
-
-  protected void setToolTip(final String toolTip) {
-    putValue(Action.SHORT_DESCRIPTION, toolTip);
-  }
 }

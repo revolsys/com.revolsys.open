@@ -50,14 +50,21 @@ public class BaseLayerTreeNodeModel extends
     dataObjectLayerMenu.addMenuItem("zoom", new InvokeMethodAction(
       "Zoom to Layer", "Zoom to Layer", SilkIconLoader.getIcon("magnifier"),
       LayerUtil.class, "zoomToLayer"));
- 
-    dataObjectLayerMenu.addMenuItem("zoom", new InvokeMethodAction(
-      "Zoom to Selected", "Zoom to Selected", SilkIconLoader.getIcon("magnifier_zoom_selected"),
-      LayerUtil.class, "zoomToLayerSelected"));
-    
+
+    dataObjectLayerMenu.addMenuItem("zoom",
+      new InvokeMethodAction("Zoom to Selected", "Zoom to Selected",
+        SilkIconLoader.getIcon("magnifier_zoom_selected"), LayerUtil.class,
+        "zoomToLayerSelected"));
+
     dataObjectLayerMenu.addMenuItem("table", new InvokeMethodAction(
       "View Attributes", "View Attributes", SilkIconLoader.getIcon("table_go"),
       LayerUtil.class, "showViewAttributes"));
+
+    dataObjectLayerMenu.addMenuItem(
+      "table",
+      new InvokeMethodAction("Add New Record", "Add New Record",
+        SilkIconLoader.getIcon("table_row_insert"), LayerUtil.class,
+        "addNewRecord"));
   }
 
   public static BaseLayerTreeNodeModel create(final String name,

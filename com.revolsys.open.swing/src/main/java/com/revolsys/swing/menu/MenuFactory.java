@@ -15,6 +15,7 @@ import javax.swing.JPopupMenu;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class MenuFactory implements ComponentFactory<JMenuItem> {
@@ -76,11 +77,27 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     addComponentFactory(groupName, action);
   }
 
+  public void addMenuItem(final String groupName, final String name,
+    final String title, final Icon icon, EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
+      object, methodName, parameters);
+    action.setEnableCheck(enableCheck);
+    addComponentFactory(groupName, action);
+  }
+
   public void addMenuItemTitleIcon(final String groupName, final String title,
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    addMenuItem(groupName, title, title, icon, object, methodName,
+    addMenuItem(groupName, title, title, icon, object, methodName, parameters);
+  }
+
+  public void addMenuItemTitleIcon(final String groupName, final String title,
+    final String iconName, EnableCheck enableCheck, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    addMenuItem(groupName, title, title, icon, enableCheck, object, methodName,
       parameters);
   }
 

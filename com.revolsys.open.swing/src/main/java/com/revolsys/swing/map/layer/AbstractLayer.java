@@ -245,11 +245,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setEditable(final boolean editable) {
-    if (this.editable != editable) {
-      final boolean old = this.editable;
+      final boolean old = isEditable();
       this.editable = editable;
-      propertyChangeSupport.firePropertyChange("editable", old, editable);
-    }
+      propertyChangeSupport.firePropertyChange("editable", old, isEditable());
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {

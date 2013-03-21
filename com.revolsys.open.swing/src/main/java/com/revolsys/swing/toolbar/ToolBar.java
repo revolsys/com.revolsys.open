@@ -37,6 +37,10 @@ public class ToolBar extends JToolBar {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
       object, methodName, parameters);
 
+    return addButton(groupName, action);
+  }
+
+  public JButton addButton(final String groupName, final Action action) {
     final JButton button = createButton(action);
     button.setAction(action);
     groups.addComponent(this, groupName, button);

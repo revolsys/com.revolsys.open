@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.grid;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.tree.TreeUtil;
 import com.revolsys.util.CaseConverter;

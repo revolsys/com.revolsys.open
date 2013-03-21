@@ -39,6 +39,8 @@ public interface DataObjectLayer extends Layer {
 
   DataObject getObject(int row);
 
+  boolean isCanDeleteObjects();
+
   boolean isCanAddObjects();
 
   boolean isCanEditObjects();
@@ -83,4 +85,6 @@ public interface DataObjectLayer extends Layer {
 
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
+
+  DataObject createObject();
 }

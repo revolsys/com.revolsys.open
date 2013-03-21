@@ -35,15 +35,24 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public static DataObjectRowJxTable createTable(
+    final DataObjectListTableModel model) {
+    return new DataObjectRowJxTable(model);
+  }
+
+  public static DataObjectRowJxTable createTable(
     final DataObjectMetaData metaData, final List<DataObject> objects) {
     final DataObjectListTableModel model = new DataObjectListTableModel(
       metaData, objects);
-    return new DataObjectRowJxTable(model);
+    return createTable(model);
   }
 
   private final List<DataObject> objects = new ArrayList<DataObject>();
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
+
+  public DataObjectListTableModel(final DataObjectMetaData metaData) {
+    this(metaData, null);
+  }
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
@@ -53,7 +62,9 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final List<DataObject> objects, final List<String> columnNames) {
     super(metaData, columnNames);
-    this.objects.addAll(objects);
+    if (objects != null) {
+      this.objects.addAll(objects);
+    }
     setEditable(true);
   }
 

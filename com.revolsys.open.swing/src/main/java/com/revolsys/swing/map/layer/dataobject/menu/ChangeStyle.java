@@ -4,9 +4,9 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.LineStylePanel;

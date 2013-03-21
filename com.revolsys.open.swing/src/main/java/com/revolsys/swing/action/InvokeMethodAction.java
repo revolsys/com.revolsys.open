@@ -156,4 +156,9 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   protected void setToolTip(final CharSequence toolTip) {
     putValue(Action.SHORT_DESCRIPTION, toolTip.toString());
   }
+  
+  @Override
+  public String toString() {
+    return runnable.toString();
+  }
 }
