@@ -45,10 +45,10 @@ public class MarkerStyle {
     }
   }
 
-  public static GeometryStyle marker(final String markerName,
+  public static MarkerStyle marker(final String markerName,
     final double markerSize, final Color lineColor, final double lineWidth,
     final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
+    final MarkerStyle style = new MarkerStyle();
     style.setMarker(new ShapeMarker(markerName));
     style.setMarkerWidth(markerSize);
     style.setMarkerHeight(markerSize);

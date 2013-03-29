@@ -132,6 +132,8 @@ public class ShapeMarker implements Marker {
     return path;
   }
 
+  private String name;
+
   private Shape shape;
 
   public ShapeMarker(final Shape shape) {
@@ -155,6 +157,7 @@ public class ShapeMarker implements Marker {
 
   public ShapeMarker(final String name) {
     this(SHAPES.get(name));
+    this.name = name;
     if (shape == null) {
       throw new IllegalArgumentException("Unknown shape " + name);
     }
@@ -191,7 +194,7 @@ public class ShapeMarker implements Marker {
     if ("right".equals(horizontalAlignment)) {
       dx -= mapWidth;
     } else if ("center".equals(horizontalAlignment)) {
-      dx -= mapWidth/2;
+      dx -= mapWidth / 2;
     }
 
     graphics.translate(dx, dy);
@@ -206,5 +209,14 @@ public class ShapeMarker implements Marker {
       graphics.draw(newShape);
     }
     graphics.setTransform(savedTransform);
+  }
+
+  @Override
+  public String toString() {
+    if (name == null) {
+      return "unknown";
+    } else {
+      return name;
+    }
   }
 }

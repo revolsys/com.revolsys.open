@@ -36,6 +36,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -52,7 +53,7 @@ public class EditGeometryOverlay extends JComponent implements
 
   private final Viewport2D viewport;
 
-  private  ListCoordinatesList points = new ListCoordinatesList(2);
+  private ListCoordinatesList points = new ListCoordinatesList(2);
 
   private Geometry geometry;
 
@@ -65,14 +66,17 @@ public class EditGeometryOverlay extends JComponent implements
   private static final GeometryStyle HIGHLIGHT_STYLE = GeometryStyle.polygon(
     new Color(0, 255, 255, 255), 3, new Color(0, 255, 255, 127));
 
-  private static final GeometryStyle XOR_STYLE = GeometryStyle.line(new Color(
-    0, 0, 255), 3);
+  private static final MarkerStyle XOR_POINT_STYLE = MarkerStyle.marker(
+    "ellipse", 10, new Color(0, 0, 255), 1, new Color(0, 0, 255));
+
+  private static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
+    new Color(0, 0, 255), 2);
 
   private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(new Color(
     0, 0, 0, 255));
 
-  private static final GeometryStyle VERTEX_STYLE = GeometryStyle.marker(
-    "ellipse", 6, new Color(0, 0, 0, 127), 1, new Color(0, 255, 255, 127));
+  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
+    6, new Color(0, 0, 0, 127), 1, new Color(0, 255, 255, 127));
 
   private DataType geometryDataType;
 
@@ -134,8 +138,14 @@ public class EditGeometryOverlay extends JComponent implements
   protected void drawXorGeometry(final Graphics2D graphics) {
     if (xorGeometry != null) {
       graphics.setXORMode(Color.WHITE);
-      GeometryStyleRenderer.renderGeometry(viewport, graphics, xorGeometry,
-        XOR_STYLE);
+      if (xorGeometry instanceof Point) {
+        Point point = (Point)xorGeometry;
+        MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+          XOR_POINT_STYLE);
+      } else {
+        GeometryStyleRenderer.renderGeometry(viewport, graphics, xorGeometry,
+          XOR_LINE_STYLE);
+      }
     }
   }
 
@@ -184,18 +194,25 @@ public class EditGeometryOverlay extends JComponent implements
       geometry = createGeometry();
       xorGeometry = null;
       event.consume();
+      if (DataTypes.POINT.equals(geometryDataType)) {
+        actionAddGeometryCompleted();
+      }
       if (event.getClickCount() == 2) {
-        if (isGeometryValid()) {
-          firstPoint = null;
-          previousPoint = null;
-          xorGeometry = null;
-          this.completedGeometry = geometry;
-          fireActionPerformed("Geometry Complete");
-          geometry = null;
-          points = new ListCoordinatesList(2);
-        }
+        actionAddGeometryCompleted();
       }
       repaint();
+    }
+  }
+
+  protected void actionAddGeometryCompleted() {
+    if (isGeometryValid()) {
+      firstPoint = null;
+      previousPoint = null;
+      xorGeometry = null;
+      this.completedGeometry = geometry;
+      fireActionPerformed("Geometry Complete");
+      geometry = null;
+      points = new ListCoordinatesList(2);
     }
   }
 

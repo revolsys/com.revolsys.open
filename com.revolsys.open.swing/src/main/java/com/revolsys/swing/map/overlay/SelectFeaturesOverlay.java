@@ -33,6 +33,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -60,8 +61,8 @@ public class SelectFeaturesOverlay extends JComponent implements
   private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(new Color(
     0, 0, 0, 255));
 
-  private static final GeometryStyle VERTEX_STYLE = GeometryStyle.marker(
-    "ellipse", 6, new Color(0, 0, 0, 127), 1, new Color(0, 255, 0, 127));
+  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
+    6, new Color(0, 0, 0, 127), 1, new Color(0, 255, 0, 127));
 
   private static final Color TRANS_BG = new Color(0, 128, 0, 127);
 
