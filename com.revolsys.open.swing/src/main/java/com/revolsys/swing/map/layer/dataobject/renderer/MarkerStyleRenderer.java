@@ -14,6 +14,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.map.Viewport2D;
@@ -45,7 +46,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
       final String placement = style.getMarkerPlacement();
       final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
         placement);
-      final CoordinatesList points = CoordinatesListUtil.get(geometry);
+      //TODO optimize projection?
+       CoordinatesList points = CoordinatesListUtil.get(geometry);
       final int numPoints = points.size();
       if (numPoints > 1) {
         final boolean matches = matcher.matches();
@@ -80,17 +82,18 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
         } else if ("center".equals(placement)) {
           if (geometry instanceof LineString && geometry.getNumPoints() > 1) {
-            final double totalLength = geometry.getLength();
+            Geometry projectedGeometry = viewportGeometryFactory.copy(geometry);
+           points= CoordinatesListUtil.get(projectedGeometry);
+            final double totalLength = projectedGeometry.getLength();
             final double centreLength = totalLength / 2;
             double currentLength = 0;
             for (int i = 1; i < numPoints && currentLength < centreLength; i++) {
-              final Coordinates p1 = ProjectionFactory.convert(points.get(i - 1),
-                geometryFactory, viewportGeometryFactory);
-              final Coordinates p2 = ProjectionFactory.convert(points.get(i),
-                geometryFactory, viewportGeometryFactory);
+              final Coordinates p1 = points.get(i - 1);
+              final Coordinates p2 = points.get(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
-                point = p1;
+                point = LineSegmentUtil.project(p1, p2, (centreLength -currentLength) / segmentLength);
+                // TODO parameter to use orientation or not
                 orientation = Math.toDegrees(-p1.angle2d(p2));
               }
               currentLength += segmentLength;

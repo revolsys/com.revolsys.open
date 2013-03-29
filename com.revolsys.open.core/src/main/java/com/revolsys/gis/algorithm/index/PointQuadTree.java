@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -31,8 +32,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    final Envelope envelope = new Envelope(x, x, y, y);
-    envelope.expandBy(maxDistance);
+    BoundingBox envelope = new BoundingBox(x, y);
+    envelope = envelope.expand(maxDistance);
     final List<T> results = new ArrayList<T>();
     if (root != null) {
       root.findWithin(results, x, y, maxDistance, envelope);

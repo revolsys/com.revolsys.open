@@ -33,6 +33,8 @@ public class SpringUtil {
 
   public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
+  private static final ThreadLocal<Resource> baseResource = new ThreadLocal<Resource>();
+
   public static void close(
     final ConfigurableApplicationContext applicationContext) {
     if (applicationContext != null) {
@@ -81,6 +83,20 @@ public class SpringUtil {
     beanReader.loadBeanDefinitions(resources);
     applicationContext.refresh();
     return applicationContext;
+  }
+
+  public static Resource getBaseResource() {
+    final Resource baseResource = SpringUtil.baseResource.get();
+    if (baseResource == null) {
+      return new FileSystemResource(new File(""));
+    } else {
+      return baseResource;
+    }
+  }
+
+  public static Resource getBaseResource(final String childPath) {
+    final Resource baseResource = getBaseResource();
+    return getResource(baseResource, childPath);
   }
 
   public static BufferedReader getBufferedReader(final Resource resource) {
@@ -222,9 +238,23 @@ public class SpringUtil {
     }
   }
 
+  public static Resource getUrlResource(final String url) {
+    try {
+      return new UrlResource(url);
+    } catch (final MalformedURLException e) {
+      throw new IllegalArgumentException("Not a valid URL " + url, e);
+    }
+  }
+
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
     return new OutputStreamWriter(stream);
+  }
+
+  public static Resource setBaseResource(final Resource baseResource) {
+    Resource oldResource = SpringUtil.baseResource.get();
+    SpringUtil.baseResource.set(baseResource);
+    return oldResource;
   }
 
 }

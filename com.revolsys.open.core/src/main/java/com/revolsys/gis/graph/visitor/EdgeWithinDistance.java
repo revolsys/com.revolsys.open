@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.NestedVisitor;
@@ -11,7 +12,6 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -28,8 +28,8 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Envelope env = new Envelope(geometry.getEnvelopeInternal());
-    env.expandBy(maxDistance);
+    BoundingBox env = BoundingBox.getBoundingBox(geometry);
+    env = env.expand(maxDistance);
     graph.getEdgeIndex().visit(env,
       new EdgeWithinDistance<T>(geometry, maxDistance, results));
     return results.getList();

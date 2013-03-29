@@ -189,9 +189,8 @@ public class ComponentViewport2D extends Viewport2D {
      * units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
-      validBoundingBox = new BoundingBox(validBoundingBox);
-      validBoundingBox.expandBy(getModelUnitsPerViewUnit() * 50,
-        getModelUnitsPerViewUnit() * 50);
+      validBoundingBox = validBoundingBox.expand(
+        getModelUnitsPerViewUnit() * 50, getModelUnitsPerViewUnit() * 50);
       modelWidth = validBoundingBox.getWidth();
       modelHeight = validBoundingBox.getHeight();
     }
@@ -209,8 +208,8 @@ public class ComponentViewport2D extends Viewport2D {
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
       final double minModelHeight = getViewHeightPixels()
         * modelUnitsPerViewUnit;
-      validBoundingBox.expandBy((minModelWidth - modelWidth) / 2,
-        (minModelHeight - modelHeight) / 2);
+      validBoundingBox = validBoundingBox.expand(
+        (minModelWidth - modelWidth) / 2, (minModelHeight - modelHeight) / 2);
     }
     return validBoundingBox;
   }

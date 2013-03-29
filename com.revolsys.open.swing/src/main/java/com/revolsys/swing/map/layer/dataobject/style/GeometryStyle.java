@@ -121,8 +121,12 @@ public class GeometryStyle extends MarkerStyle {
     return lineGammaMethod;
   }
 
-  public LineJoin getLineJoin() {
+  public LineJoin getLineJoinEnum() {
     return lineJoin;
+  }
+
+  public String getLineJoin() {
+    return lineJoin.toString();
   }
 
   public float getLineMiterlimit() {
@@ -236,12 +240,12 @@ public class GeometryStyle extends MarkerStyle {
     setLineGammaMethod(GammaMethod.valueOf(lineGammaMethod));
   }
 
-  public void setLineJoin(final LineJoin lineJoin) {
+  public void setLineJoinEnum(final LineJoin lineJoin) {
     this.lineJoin = lineJoin;
   }
 
   public void setLineJoin(final String lineJoin) {
-    setLineJoin(LineJoin.valueOf(lineJoin.toUpperCase()));
+    setLineJoinEnum(LineJoin.valueOf(lineJoin.toUpperCase()));
   }
 
   public void setLineMiterlimit(final float lineMiterlimit) {

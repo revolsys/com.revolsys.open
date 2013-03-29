@@ -20,8 +20,8 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Coordinates point = node;
-    final BoundingBox boundingBox = new BoundingBox(point);
-    boundingBox.expandBy(maxDistance);
+    BoundingBox boundingBox = new BoundingBox(point);
+    boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node,
       boundingBox, maxDistance, results);

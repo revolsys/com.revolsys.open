@@ -36,11 +36,13 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.component.JLabelWithObject;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.util.PreferencesUtil;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class SwingUtil {
 
@@ -114,6 +116,8 @@ public class SwingUtil {
         captureDateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
           "yyyy/MMM/dd");
         field = captureDateField;
+      } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
+        field = new JLabelWithObject();
       } else {
         final JTextField textField = new JTextField(size);
         field = textField;
@@ -131,7 +135,10 @@ public class SwingUtil {
 
   @SuppressWarnings("unchecked")
   public static <V> V getValue(final JComponent component) {
-    if (component instanceof JXDatePicker) {
+    if (component instanceof JLabelWithObject) {
+      JLabelWithObject label = (JLabelWithObject)component;
+      return (V)label.getObject();
+    } else if (component instanceof JXDatePicker) {
       final JXDatePicker dateField = (JXDatePicker)component;
       return (V)dateField.getDate();
     } else if (component instanceof NumberTextField) {
@@ -181,7 +188,10 @@ public class SwingUtil {
 
   public static void setFieldValue(final JComponent field,
     final String fieldName, final Object value) {
-    if (field instanceof NumberTextField) {
+    if (field instanceof JLabelWithObject) {
+      JLabelWithObject label = (JLabelWithObject)field;
+      label.setObject(value);
+    } else if (field instanceof NumberTextField) {
       final NumberTextField numberField = (NumberTextField)field;
       numberField.setFieldValue((Number)value);
     } else if (field instanceof DateTextField) {

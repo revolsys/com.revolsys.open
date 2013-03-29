@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
 public class SelectFeaturesOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener,KeyListener {
+  PropertyChangeListener, MouseListener, MouseMotionListener, KeyListener {
 
   private List<DataObjectLayer> selectableLayers = new ArrayList<DataObjectLayer>();
 
@@ -76,7 +76,6 @@ public class SelectFeaturesOverlay extends JComponent implements
     updateSelectableLayers();
   }
 
-
   @Override
   public void keyPressed(KeyEvent e) {
     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -94,6 +93,7 @@ public class SelectFeaturesOverlay extends JComponent implements
   @Override
   public void keyTyped(KeyEvent e) {
   }
+
   public boolean hasSelectableLayers() {
     return !this.selectableLayers.isEmpty();
   }
@@ -106,10 +106,10 @@ public class SelectFeaturesOverlay extends JComponent implements
         final int y = event.getY();
         final double[] location = viewport.toModelCoordinates(x, y);
         final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-        final BoundingBox boundingBox = new BoundingBox(geometryFactory,
-          location[0], location[1]);
+        BoundingBox boundingBox = new BoundingBox(geometryFactory, location[0],
+          location[1]);
         final double modelUnitsPerViewUnit = viewport.getModelUnitsPerViewUnit();
-        boundingBox.expandBy(modelUnitsPerViewUnit * 5);
+        boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
         SwingWorkerManager.execute("Select objects", this, "selectObjects",
           boundingBox);
         event.consume();

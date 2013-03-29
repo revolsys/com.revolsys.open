@@ -19,8 +19,8 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, maxDistance, results);
-    final Envelope envelope = new BoundingBox(point);
-    envelope.expandBy(maxDistance);
+    BoundingBox envelope = new BoundingBox(point);
+    envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
     nodeIndex.visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();

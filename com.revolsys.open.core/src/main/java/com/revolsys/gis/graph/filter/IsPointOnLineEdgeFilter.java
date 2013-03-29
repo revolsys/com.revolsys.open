@@ -12,15 +12,15 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
 
   private final Edge<T> edge;
 
-  private final Envelope envelope;
+  private BoundingBox envelope;
 
   private final double maxDistance;
 
   public IsPointOnLineEdgeFilter(final Edge<T> edge, final double maxDistance) {
     this.edge = edge;
     this.maxDistance = maxDistance;
-    this.envelope = new Envelope(edge.getEnvelope());
-    envelope.expandBy(maxDistance);
+    this.envelope = edge.getBoundingBox();
+    envelope = envelope.expand(maxDistance);
   }
 
   @Override

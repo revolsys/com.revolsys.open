@@ -549,8 +549,8 @@ public final class LineStringUtil {
 
   private static LineSegment getLineSegment(final Coordinates point,
     final SpatialIndex index) {
-    final Envelope envelope = new BoundingBox(point);
-    envelope.expandBy(2);
+    BoundingBox envelope = new BoundingBox(point);
+    envelope = envelope.expand(2);
     @SuppressWarnings("unchecked")
     final List<LineSegment> segments = index.query(envelope);
     for (final LineSegment lineSegment : segments) {

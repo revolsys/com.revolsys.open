@@ -13,6 +13,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -24,6 +25,7 @@ import com.revolsys.swing.map.tree.renderer.LayerTreeCellRenderer;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
@@ -60,10 +62,11 @@ public class BaseLayerTreeNodeModel extends
       "View Attributes", "View Attributes", SilkIconLoader.getIcon("table_go"),
       LayerUtil.class, "showViewAttributes"));
 
+    EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
     dataObjectLayerMenu.addMenuItem(
       "table",
       new InvokeMethodAction("Add New Record", "Add New Record",
-        SilkIconLoader.getIcon("table_row_insert"), LayerUtil.class,
+        SilkIconLoader.getIcon("table_row_insert"),canAdd, LayerUtil.class,
         "addNewRecord"));
   }
 

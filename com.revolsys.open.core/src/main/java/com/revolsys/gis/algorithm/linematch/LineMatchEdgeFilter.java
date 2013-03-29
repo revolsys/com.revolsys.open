@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.linematch;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.vividsolutions.jts.geom.Envelope;
@@ -56,7 +57,7 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
 
   private final LineSegmentMatch edgeMatch;
 
-  private final Envelope envelope;
+  private BoundingBox envelope;
 
   private final Node<LineSegmentMatch> fromNode;
 
@@ -72,8 +73,8 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
     this.index = index;
     this.tolerance = tolerance;
 
-    this.envelope = new Envelope(edge.getEnvelope());
-    this.envelope.expandBy(tolerance);
+    this.envelope = edge.getBoundingBox();
+    this.envelope = this.envelope.expand(tolerance);
 
     this.edgeMatch = edge.getObject();
     this.fromNode = edge.getFromNode();

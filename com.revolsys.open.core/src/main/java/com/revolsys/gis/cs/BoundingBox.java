@@ -341,6 +341,10 @@ public class BoundingBox extends Envelope implements Cloneable {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
+  public BoundingBox(double x, double y) {
+    this(GeometryFactory.getFactory(0), x, y);
+  }
+
   public boolean contains(final Coordinates coordinate) {
     final double x = coordinate.getX();
     final double y = coordinate.getY();
@@ -385,22 +389,61 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
-  public void expandToInclude(final BoundingBox other) {
-    if (!other.isNull()) {
-      super.expandToInclude(other.convert(geometryFactory));
+  public BoundingBox expandToInclude(final BoundingBox other) {
+    if (other.isNull()) {
+      return this;
+    } else {
+      GeometryFactory geometryFactory = getGeometryFactory();
+      BoundingBox convertedOther = other.convert(geometryFactory);
+      if (isNull()) {
+        return convertedOther;
+      } else if (contains(convertedOther)) {
+        return this;
+      } else {
+        double minX = Math.min(getMinX(), other.getMinX());
+        double maxX = Math.min(getMaxX(), other.getMaxX());
+        double minY = Math.min(getMinY(), other.getMinY());
+        double maxY = Math.min(getMaxY(), other.getMaxY());
+        return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
+      }
     }
   }
 
-  public void expandToInclude(final Coordinates coordinates) {
-    final double x = coordinates.getX();
-    final double y = coordinates.getY();
-    super.expandToInclude(x, y);
+  public BoundingBox expandToInclude(final Coordinates coordinates) {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    if (isNull()) {
+      return new BoundingBox(geometryFactory, coordinates);
+    } else {
+      final double x = coordinates.getX();
+      final double y = coordinates.getY();
+
+      double minX = getMinX();
+      double maxX = getMaxX();
+      double minY = getMinY();
+      double maxY = getMaxY();
+
+      if (x < minX) {
+        minX = x;
+      }
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+      return new BoundingBox(geometryFactory, minX, minY, maxY, maxY);
+    }
   }
 
-  public void expandToInclude(final Geometry geometry) {
-    if (geometry != null) {
+  public BoundingBox expandToInclude(final Geometry geometry) {
+    if (geometry == null) {
+      return this;
+    } else {
       final BoundingBox box = getBoundingBox(geometry);
-      expandToInclude(box);
+      return expandToInclude(box);
     }
   }
 
@@ -548,12 +591,48 @@ public class BoundingBox extends Envelope implements Cloneable {
     return intersects((Envelope)convertedBoundingBox);
   }
 
-  public void move(final double xDisplacement, final double yDisplacement) {
-    minX = getMinX() + xDisplacement;
-    maxX = getMaxX() + xDisplacement;
-    minY = getMinY() + yDisplacement;
-    maxY = getMaxY() + yDisplacement;
-    initIfNotNull();
+  /**
+   * <p>Create a new BoundingBox by moving the min/max x coordinates by xDisplacement and
+   * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
+   * and yDisplacement are 0 then this bounding box will be returned.</p>
+   * 
+   * @param xDisplacement The distance to move the min/max x coordinates.
+   * @param yDisplacement The distance to move the min/max y coordinates.
+   * @return The moved bounding box.
+   */
+  public BoundingBox move(final double xDisplacement, final double yDisplacement) {
+    if (isNull() || (xDisplacement == 0 && yDisplacement == 0)) {
+      return this;
+    } else {
+      GeometryFactory geometryFactory = getGeometryFactory();
+      double x1 = getMinX() + xDisplacement;
+      double x2 = getMaxX() + xDisplacement;
+      double y1 = getMinY() + yDisplacement;
+      double y2 = getMaxY() + yDisplacement;
+      return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+    }
+  }
+
+  public BoundingBox expand(final double delta) {
+    return expand(delta, delta);
+  }
+
+  public BoundingBox expand(final double deltaX, final double deltaY) {
+    if (isNull() || (deltaX == 0 && deltaY == 0)) {
+      return this;
+    } else {
+      GeometryFactory geometryFactory = getGeometryFactory();
+      double x1 = getMinX() - deltaX;
+      double x2 = getMaxX() + deltaX;
+      double y1 = getMinY() - deltaY;
+      double y2 = getMaxY() + deltaY;
+
+      if (x1 > x2 || y1 > y2) {
+        return new BoundingBox(geometryFactory);
+      } else {
+        return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+      }
+    }
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -714,11 +793,9 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (factor == 0 || isNull()) {
       return this;
     } else {
-      BoundingBox boundingBox = clone();
       double deltaX = getWidth() * factor / 2;
       double deltaY = getHeight() * factor / 2;
-      boundingBox.expandBy(deltaX, deltaY);
-      return boundingBox;
+      return expand(deltaX, deltaY);
     }
   }
 }

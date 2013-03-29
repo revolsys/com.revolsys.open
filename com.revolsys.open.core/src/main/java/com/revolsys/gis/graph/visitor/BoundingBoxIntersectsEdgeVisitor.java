@@ -20,9 +20,9 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends NestedVisitor<Edge<T>> 
 
     final LineString line = edge.getLine();
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory,
+    BoundingBox boundingBox = new BoundingBox(geometryFactory,
       line.getEnvelopeInternal());
-    boundingBox.expandBy(maxDistance);
+    boundingBox = boundingBox.expand(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<T>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();

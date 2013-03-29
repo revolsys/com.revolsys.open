@@ -314,8 +314,8 @@ public class Graph<T> {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, distance, results);
-    final Envelope envelope = new BoundingBox(point);
-    envelope.expandBy(distance);
+    BoundingBox envelope = new BoundingBox(point);
+    envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
@@ -355,8 +355,8 @@ public class Graph<T> {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
       geometry, distance, results);
-    final Envelope envelope = geometry.getEnvelopeInternal();
-    envelope.expandBy(distance);
+    BoundingBox envelope = BoundingBox.getBoundingBox(geometry);
+    envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);

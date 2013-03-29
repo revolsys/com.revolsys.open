@@ -37,7 +37,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   private final List<Coordinates> startPoints = new ArrayList<Coordinates>();
 
-  private final BoundingBox boundingBox;
+  private BoundingBox boundingBox;
 
   private double maxDistance;
 
@@ -108,8 +108,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
 
-    final BoundingBox boundingBox = getBoundingBox(geometry);
-    this.boundingBox.expandToInclude(boundingBox);
+    this.boundingBox = this.boundingBox.expandToInclude(geometry);
   }
 
   @Override
@@ -118,8 +117,8 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
-    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
-    boundingBox.expandBy(maxDistance);
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    boundingBox = boundingBox.expand(maxDistance);
     return boundingBox;
   }
 
@@ -276,13 +275,13 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public boolean intersects(final LineString line) {
-    final BoundingBox boundingBox = BoundingBox.getBoundingBox(line);
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(line);
     final double scaleXY = getGeometryFactory().getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    boundingBox.expandBy(maxDistance);
+    boundingBox = boundingBox.expand(maxDistance);
     if (boundingBox.intersects(this.boundingBox)) {
       final CoordinatesList points = CoordinatesListUtil.get(line);
       final int numPoints = points.size();

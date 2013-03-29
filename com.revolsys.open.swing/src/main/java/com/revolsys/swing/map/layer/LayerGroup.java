@@ -32,14 +32,13 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
   }
-  
-  
+
   public BoundingBox getSelectedBoundingBox() {
     BoundingBox boundingBox = super.getSelectedBoundingBox();
     if (isVisible()) {
       for (Layer layer : this) {
         BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox.expandToInclude(layerBoundingBox);
+        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
       }
     }
     return boundingBox;
@@ -150,11 +149,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public BoundingBox getBoundingBox() {
-    final BoundingBox boudingBox = new BoundingBox();
+    BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isNull()) {
-        boudingBox.expandToInclude(layerBoundingBox);
+        boudingBox = boudingBox.expandToInclude(layerBoundingBox);
       }
     }
     return boudingBox;
@@ -162,13 +161,13 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    final BoundingBox boudingBox = new BoundingBox();
+    BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
     if (!visibleLayersOnly || isVisible()) {
       for (final Layer layer : this) {
         if (!visibleLayersOnly || layer.isVisible()) {
           final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
           if (!layerBoundingBox.isNull()) {
-            boudingBox.expandToInclude(layerBoundingBox);
+            boudingBox = boudingBox.expandToInclude(layerBoundingBox);
           }
         }
       }

@@ -92,7 +92,7 @@ public class TinReader {
       line = readLine();
       final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
       final Coordinates point = new DoubleCoordinates(3, coordinates);
-      boundingBox.expandToInclude(point);
+      boundingBox= boundingBox.expandToInclude(point);
       nodeIdMap.put(i, point);
     }
     line = readLine();

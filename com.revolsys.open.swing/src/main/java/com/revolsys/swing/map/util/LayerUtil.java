@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
@@ -22,15 +23,19 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
 import com.revolsys.swing.map.layer.Layer;
@@ -45,6 +50,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
+import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.revolsys.swing.map.table.LayerTablePanelFactory;
@@ -89,11 +95,36 @@ public class LayerUtil {
   public static void addNewRecord(final Layer layer) {
     if (layer instanceof DataObjectLayer) {
       DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-      DataObject object = dataObjectLayer.createObject();
-      if (object != null) {
-        showForm(dataObjectLayer, object);
+      DataObjectMetaData metaData = dataObjectLayer.getMetaData();
+      Attribute geometryAttribute = metaData.getGeometryAttribute();
+      if (geometryAttribute == null) {
+        DataObject object = dataObjectLayer.createObject();
+        if (object != null) {
+          showForm(dataObjectLayer, object);
+        }
+      } else {
+        MapPanel map = MapPanel.get(dataObjectLayer);
+        if (map != null) {
+          final EditGeometryOverlay editGeometryOverlay = map.getMapOverlay(EditGeometryOverlay.class);
+          editGeometryOverlay.setAddFeatureLayer(dataObjectLayer);
+          editGeometryOverlay.setCompletedAction(new InvokeMethodListener(
+            LayerUtil.class, "actionCompleteAddNewRecord", editGeometryOverlay));
+        }
       }
     }
+  }
+
+  public static void actionCompleteAddNewRecord(
+    final EditGeometryOverlay overlay) {
+    DataObjectLayer layer = overlay.getAddFeatureLayer();
+    Geometry geometry = overlay.getCompletedGeometry();
+    DataObject object = layer.createObject();
+    if (object != null) {
+      object.setGeometryValue(geometry);
+      showForm(layer, object);
+    }
+    overlay.setEnabled(false);
+    overlay.setAddFeatureLayer(null);
   }
 
   @SuppressWarnings("unchecked")
@@ -149,6 +180,9 @@ public class LayerUtil {
   }
 
   public static void loadLayer(final LayerGroup group, final File file) {
+    Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
+      file.getParentFile()));
+
     try {
       final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
       final Layer layer = getLayer(properties);
@@ -158,6 +192,8 @@ public class LayerUtil {
     } catch (Throwable t) {
       LoggerFactory.getLogger(LayerUtil.class).error(
         "Cannot load layer from " + file, t);
+    } finally {
+      SpringUtil.setBaseResource(oldResource);
     }
   }
 
@@ -196,7 +232,7 @@ public class LayerUtil {
           DataObjectListLayer layer = new DataObjectListLayer(metaData);
           for (DataObject object : reader) {
             Geometry geometry = object.getGeometryValue();
-            boundingBox.expandToInclude(geometry);
+            boundingBox = boundingBox.expandToInclude(geometry);
             layer.add(object);
           }
           layer.setBoundingBox(boundingBox);
@@ -302,6 +338,10 @@ public class LayerUtil {
       BoundingBox boundingBox = layer.getBoundingBox()
         .convert(geometryFactory)
         .expandPercent(0.1);
+
+      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+      boundingBox = boundingBox.intersection(areaBoundingBox);
       project.setViewBoundingBox(boundingBox);
     }
   }

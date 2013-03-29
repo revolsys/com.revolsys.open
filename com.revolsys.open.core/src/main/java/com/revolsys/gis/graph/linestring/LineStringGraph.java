@@ -280,13 +280,13 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public boolean intersects(final LineString line) {
-    final Envelope envelope = new Envelope(line.getEnvelopeInternal());
+    BoundingBox envelope = BoundingBox.getBoundingBox(line);
     final double scaleXY = geometryFactory.getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    envelope.expandBy(maxDistance);
+    envelope = envelope.expand(maxDistance);
     if (envelope.intersects(this.envelope)) {
       final CoordinatesList points = CoordinatesListUtil.get(line);
       final int numPoints = points.size();
@@ -446,7 +446,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }
     fromPoint = new DoubleCoordinates(points.get(0));
-    envelope = CoordinatesListUtil.getBoundingBox(points);
+    envelope = CoordinatesListUtil.getBoundingBox(geometryFactory, points);
   }
 
   public void splitCrossingEdges() {

@@ -75,10 +75,10 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (panning) {
-      panDrag(event);
-    } else if (zoomBoxFirstPoint != null) {
+   if (zoomBoxFirstPoint != null) {
       zoomBoxDrag(event);
+    } else {
+      panDrag(event);
     }
   }
 
@@ -143,6 +143,9 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   }
 
   public void panDrag(final MouseEvent event) {
+    if (panFirstPoint == null) {
+      panStart(event);
+    }
     java.awt.Point p = event.getPoint();
     final int dx = (int)(p.getX() - panFirstPoint.getX());
     final int dy = (int)(p.getY() - panFirstPoint.getY());
@@ -165,9 +168,9 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     final double deltaX = fromPoint.getX() - toPoint.getX();
     final double deltaY = fromPoint.getY() - toPoint.getY();
 
-    final BoundingBox boundingBox = viewport.getBoundingBox().clone();
-    boundingBox.move(deltaX, deltaY);
-    map.setBoundingBox(boundingBox);
+    BoundingBox boundingBox = viewport.getBoundingBox();
+    BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
+    map.setBoundingBox(newBoundingBox);
 
     panFirstPoint = null;
     panning = false;

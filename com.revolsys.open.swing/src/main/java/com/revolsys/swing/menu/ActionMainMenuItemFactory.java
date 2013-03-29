@@ -52,4 +52,8 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
     return checkBox;
   }
 
+  @Override
+  public String toString() {
+    return action.toString();
+  }
 }

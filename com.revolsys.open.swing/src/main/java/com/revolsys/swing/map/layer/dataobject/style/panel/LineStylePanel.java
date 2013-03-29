@@ -125,7 +125,7 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
     // dashField.setBorder(BorderFactory.createTitledBorder("Line GeometryStyle"));
     // panel.add(dashField);
 
-    final LineJoin lineJoin = geometryStyle.getLineJoin();
+    final LineJoin lineJoin = geometryStyle.getLineJoinEnum();
     lineJoinField = createLineJoinChooser(lineJoin);
     lineJoinField.addPropertyChangeListener("actionCommand", this);
     lineJoinField.setBorder(BorderFactory.createTitledBorder("Line Join"));
@@ -322,7 +322,7 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
     geometryStyle.setLineCap(LineCap.valueOf(lineCap.toString()));
 
     final CharSequence lineJoin = lineJoinField.getActionCommand();
-    geometryStyle.setLineJoin(LineJoin.valueOf(lineJoin.toString()));
+    geometryStyle.setLineJoin(lineJoin.toString());
     /*
      * final List<Measure<Length>> dash = dashField.getDash();
      * geometryStyle.setDashArray(dash);

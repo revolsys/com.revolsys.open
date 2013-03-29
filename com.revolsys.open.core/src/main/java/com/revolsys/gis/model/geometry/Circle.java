@@ -15,6 +15,7 @@
  */
 package com.revolsys.gis.model.geometry;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -24,7 +25,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class Circle extends DoubleCoordinates {
 
-  private final Envelope envelope;
+  private BoundingBox envelope;
 
   private final double radius;
 
@@ -33,8 +34,8 @@ public class Circle extends DoubleCoordinates {
   public Circle(final Coordinates centre, final double radius) {
     super(centre);
     this.radius = radius;
-    this.envelope = new Envelope(getX(), getX(), getY(), getY());
-    envelope.expandBy(radius);
+    this.envelope = new BoundingBox(getX(), getY());
+    envelope = envelope.expand(radius);
   }
 
   public boolean contains(final Coordinates point) {

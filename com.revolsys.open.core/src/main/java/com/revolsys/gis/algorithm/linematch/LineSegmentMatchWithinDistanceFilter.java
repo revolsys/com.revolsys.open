@@ -8,7 +8,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class LineSegmentMatchWithinDistanceFilter implements
   Filter<Edge<LineSegmentMatch>> {
-  private final Envelope envelope;
+  private BoundingBox boundingBox;
 
   private final double maxDistance;
 
@@ -18,8 +18,8 @@ public class LineSegmentMatchWithinDistanceFilter implements
     final Node<LineSegmentMatch> node, final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
-    this.envelope = new BoundingBox(node);
-    envelope.expandBy(maxDistance);
+    this.boundingBox = new BoundingBox(node);
+    boundingBox = boundingBox.expand(maxDistance);
   }
 
   @Override
@@ -31,7 +31,7 @@ public class LineSegmentMatchWithinDistanceFilter implements
     }
   }
 
-  public Envelope getEnvelope() {
-    return envelope;
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
   }
 }

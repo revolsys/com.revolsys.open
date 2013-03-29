@@ -214,10 +214,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    final BoundingBox boundingBox = super.getSelectedBoundingBox();
+     BoundingBox boundingBox = super.getSelectedBoundingBox();
     for (final DataObject object : getSelectedObjects()) {
       final Geometry geometry = object.getGeometryValue();
-      boundingBox.expandToInclude(geometry);
+      boundingBox= boundingBox.expandToInclude(geometry);
     }
     return boundingBox;
   }

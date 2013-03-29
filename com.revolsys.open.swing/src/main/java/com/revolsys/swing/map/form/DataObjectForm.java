@@ -58,6 +58,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
+import com.revolsys.swing.component.JLabelWithObject;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ValidatingField;
@@ -664,7 +665,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
     if (oldValue == null & value != null
       || !EqualsRegistry.equal(value, oldValue)) {
       final JComponent field = getField(fieldName);
-      if (field instanceof NumberTextField) {
+      if (field instanceof JLabelWithObject) {
+        final JLabelWithObject label = (JLabelWithObject)field;
+        label.setObject(value);
+      } else if (field instanceof NumberTextField) {
         final NumberTextField numberField = (NumberTextField)field;
         numberField.setFieldValue((Number)value);
       } else if (field instanceof DateTextField) {

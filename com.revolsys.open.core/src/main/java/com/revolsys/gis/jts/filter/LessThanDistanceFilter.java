@@ -21,13 +21,14 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LessThanDistanceFilter implements Filter<Geometry> {
-  private Envelope envelope;
+  private BoundingBox envelope;
 
   /** The geometry to compare the data objects to to. */
   private Geometry geometry;
@@ -100,7 +101,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    this.envelope = new Envelope(geometry.getEnvelopeInternal());
-    this.envelope.expandBy(distance);
+    this.envelope = BoundingBox.getBoundingBox(geometry);
+    this.envelope = this.envelope.expand(distance);
   }
 }

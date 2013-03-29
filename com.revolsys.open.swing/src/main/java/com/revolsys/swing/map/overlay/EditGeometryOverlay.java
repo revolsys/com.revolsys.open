@@ -37,6 +37,10 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -48,7 +52,7 @@ public class EditGeometryOverlay extends JComponent implements
 
   private final Viewport2D viewport;
 
-  private final ListCoordinatesList points = new ListCoordinatesList(2);
+  private  ListCoordinatesList points = new ListCoordinatesList(2);
 
   private Geometry geometry;
 
@@ -74,7 +78,7 @@ public class EditGeometryOverlay extends JComponent implements
 
   private DataObjectLayer addFeatureLayer;
 
-  private Polygon completedGeometry;
+  private Geometry completedGeometry;
 
   private int actionId = 0;
 
@@ -115,7 +119,8 @@ public class EditGeometryOverlay extends JComponent implements
     final int size = points.size();
     if (size == 1) {
       geometry = geometryFactory.createPoint(points);
-    } else if (size == 2 || DataTypes.LINE_STRING.equals(geometryDataType)) {
+    } else if (size == 2 || DataTypes.LINE_STRING.equals(geometryDataType)
+      || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
       geometry = geometryFactory.createLineString(points);
     } else if (DataTypes.POLYGON.equals(geometryDataType)) {
       final Coordinates endPoint = points.get(0);
@@ -145,8 +150,9 @@ public class EditGeometryOverlay extends JComponent implements
     return addFeatureLayer;
   }
 
-  public Polygon getCompletedGeometry() {
-    return completedGeometry;
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G getCompletedGeometry() {
+    return (G)completedGeometry;
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -179,26 +185,65 @@ public class EditGeometryOverlay extends JComponent implements
       xorGeometry = null;
       event.consume();
       if (event.getClickCount() == 2) {
-        firstPoint = null;
-        previousPoint = null;
-        xorGeometry = null;
-        if (geometry instanceof Polygon) {
-          this.completedGeometry = (Polygon)geometry;
+        if (isGeometryValid()) {
+          firstPoint = null;
+          previousPoint = null;
+          xorGeometry = null;
+          this.completedGeometry = geometry;
           fireActionPerformed("Geometry Complete");
+          geometry = null;
+          points = new ListCoordinatesList(2);
         }
-        geometry = null;
-        points.clear();
       }
       repaint();
     }
   }
 
+  protected boolean isGeometryValid() {
+    if (DataTypes.POINT.equals(geometryDataType)) {
+      if (geometry instanceof Point) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
+      if ((geometry instanceof Point) || (geometry instanceof MultiPoint)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
+      if (geometry instanceof LineString) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+      if ((geometry instanceof LineString)
+        || (geometry instanceof MultiLineString)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (DataTypes.POLYGON.equals(geometryDataType)) {
+      if (geometry instanceof Polygon) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+      if ((geometry instanceof Polygon) || (geometry instanceof MultiPolygon)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
-      mouseMoved(event);
-      event.consume();
-    }
   }
 
   @Override
@@ -218,6 +263,9 @@ public class EditGeometryOverlay extends JComponent implements
       xorGeometry = geometryFactory.copy(point);
     } else if (previousPoint == null) {
       xorGeometry = geometryFactory.createLineString(firstPoint, point);
+    } else if (DataTypes.LINE_STRING.equals(geometryDataType)
+      || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+      xorGeometry = geometryFactory.createLineString(previousPoint, point);
     } else {
       xorGeometry = geometryFactory.createLineString(previousPoint, point,
         firstPoint);

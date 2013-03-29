@@ -39,8 +39,8 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public boolean isWithinDistance(final Coordinates point) {
-    final Envelope envelope = new BoundingBox(point);
-    envelope.expandBy(1);
+    BoundingBox envelope = new BoundingBox(point);
+    envelope = envelope.expand(1);
     @SuppressWarnings("unchecked")
     final List<LineSegment> lines = query(envelope);
     for (final LineSegment line : lines) {

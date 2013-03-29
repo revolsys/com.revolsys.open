@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgeVisitor;
 import com.vividsolutions.jts.algorithm.Angle;
@@ -22,8 +23,8 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public Envelope getEnvelope() {
-    final Envelope envelope = new Envelope(line.getEnvelopeInternal());
-    envelope.expandBy(maxDistance);
+    BoundingBox envelope = BoundingBox.getBoundingBox(line);
+    envelope = envelope.expand(maxDistance);
     return envelope;
   }
 

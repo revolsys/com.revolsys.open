@@ -293,16 +293,14 @@ public class Viewport2D {
               final double height = convertedBoundingBox.getHeight();
               final double newWidth = height * viewAspectRatio;
               final double expandX = (newWidth - width) / 2;
-              this.boundingBox = this.boundingBox.clone();
-              this.boundingBox.expandBy(expandX, 0);
+              this.boundingBox = this.boundingBox.expand(expandX, 0);
 
             } else if (aspectRatio > viewAspectRatio) {
               final double width = convertedBoundingBox.getWidth();
               final double height = convertedBoundingBox.getHeight();
               final double newHeight = width / viewAspectRatio;
               final double expandY = (newHeight - height) / 2;
-              this.boundingBox = this.boundingBox.clone();
-              this.boundingBox.expandBy(0, expandY);
+              this.boundingBox = this.boundingBox.expand(0, expandY);
 
             }
           }

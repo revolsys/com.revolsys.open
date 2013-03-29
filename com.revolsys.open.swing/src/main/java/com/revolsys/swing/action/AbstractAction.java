@@ -14,6 +14,13 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   private EnableCheck enableCheck;
 
+  @Override
+  public boolean isEnabled() {
+    if (enableCheck != null) {
+      enableCheck.isEnabled();
+    }
+    return super.isEnabled();
+  }
   public void setEnableCheck(EnableCheck enableCheck) {
     if (this.enableCheck != null) {
       this.enableCheck.removePropertyChangeListener("enabled", enabledListener);

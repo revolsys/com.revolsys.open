@@ -21,15 +21,15 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   private final CoordinatesList points;
 
-  private final Envelope envelope;
+  private BoundingBox envelope;
 
   private double tolerance;
 
@@ -37,15 +37,15 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
 
   public LineContainsWithinToleranceFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
-    this.envelope = line.getEnvelopeInternal();
+    this.envelope = BoundingBox.getBoundingBox(line);
   }
 
   public LineContainsWithinToleranceFilter(final LineString line,
     final double tolerance) {
     this.points = CoordinatesListUtil.get(line);
     this.tolerance = tolerance;
-    this.envelope = line.getEnvelopeInternal();
-    this.envelope.expandBy(tolerance);
+    this.envelope = BoundingBox.getBoundingBox(line);
+    this.envelope = this.envelope.expand(tolerance);
   }
 
   public LineContainsWithinToleranceFilter(final LineString line,

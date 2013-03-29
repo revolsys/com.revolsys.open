@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
 
 public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
@@ -112,6 +113,13 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final Icon icon, final Object object, final String methodName,
     final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
+  }
+
+  public InvokeMethodAction(final CharSequence name, final String toolTip,
+    final Icon icon,final EnableCheck enableCheck, final Object object, final String methodName,
+    final Object... parameters) {
+    this(name, toolTip, icon, true, object, methodName, parameters);
+    setEnableCheck(enableCheck);
   }
 
   public InvokeMethodAction(final Icon icon, final boolean invokeLater,

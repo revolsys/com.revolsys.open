@@ -42,46 +42,62 @@ import com.vividsolutions.jts.geom.Geometry;
 @SuppressWarnings("serial")
 public class MapPanel extends JPanel implements PropertyChangeListener {
 
-  public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
-
-  public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
-
   public static final BoundingBox BC_ENVELOPE = //
   new BoundingBox(GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252,
     6174862, -12346993, 8584083);
 
-  private final LayerGroup baseMapLayers;
+  public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
-  private final LayerRendererOverlay map;
+  public static final String MAP_PANEL = "mapPanel";
+
+  public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
+
+  public static MapPanel get(Layer layer) {
+    if (layer == null) {
+      return null;
+    } else {
+      Project project = layer.getProject();
+      if (project == null) {
+        return null;
+      } else {
+        return project.getProperty(MAP_PANEL);
+      }
+    }
+  }
+
+  private final LayerGroup baseMapLayers;
 
   private final LayerRendererOverlay baseMapOverlay;
 
-  private final Project project = new Project();
-
-  private final JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-  private final ToolBar toolBar;
-
-  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
-
-  private int zoomHistoryIndex = -1;
-
-  private double scale = 0;
-
-  private SelectMapScale selectMapScale;
-
-  private final Viewport2D viewport;
-
   private final JLayeredPane layeredPane;
+
+  private final LayerRendererOverlay map;
 
   private MouseOverlay mouseOverlay;
 
   private int overlayIndex = 1;
 
+  private final Project project = new Project();
+
+  private double scale = 0;
+
+  private SelectMapScale selectMapScale;
+
+  private final JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+  private final ToolBar toolBar;
+
+  private final Viewport2D viewport;
+
+  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
+
+  private int zoomHistoryIndex = -1;
+
   public MapPanel() {
     super(new BorderLayout());
     this.baseMapLayers = project.addLayerGroup("Base Maps");
     project.addPropertyChangeListener(this);
+    project.setProperty(MAP_PANEL, this);
 
     toolBar = new ToolBar();
     add(toolBar, BorderLayout.NORTH);
@@ -231,6 +247,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     toolBar.addComponent("zoom", selectMapScale);
   }
 
+  public void clearZoomHistory() {
+    zoomHistory.clear();
+    zoomHistoryIndex = -1;
+  }
+
   public void dispose() {
     map.dispose();
   }
@@ -319,11 +340,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       baseMapOverlay.setLayer(layer);
       firePropertyChange("baseMapLayer", oldValue, layer);
     }
-  }
-
-  public void clearZoomHistory() {
-    zoomHistory.clear();
-    zoomHistoryIndex = -1;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -455,6 +471,18 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     setZoomHistoryIndex(zoomHistoryIndex - 1);
   }
 
+  /**
+   * Zoom to the bounding box with a 5% padding on each side
+   * 
+   * @param boudingBox
+   */
+  public void zoomTo(BoundingBox boudingBox) {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = boudingBox.convert(geometryFactory)
+      .expandPercent(0.1);
+    setBoundingBox(boundingBox);
+  }
+
   public void zoomTo(final DataObject object) {
     if (object != null) {
       final Geometry geometry = object.getGeometryValue();
@@ -468,18 +496,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       BoundingBox boudingBox = BoundingBox.getBoundingBox(convertedGeometry);
       zoomTo(boudingBox);
     }
-  }
-
-  /**
-   * Zoom to the bounding box with a 5% padding on each side
-   * 
-   * @param boudingBox
-   */
-  public void zoomTo(BoundingBox boudingBox) {
-    GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = boudingBox.convert(geometryFactory)
-      .expandPercent(0.1);
-    setBoundingBox(boundingBox);
   }
 
   public void zoomTo(final Layer layer) {

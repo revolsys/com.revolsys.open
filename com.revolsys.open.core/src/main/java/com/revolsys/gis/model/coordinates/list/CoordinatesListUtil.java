@@ -49,10 +49,10 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static BoundingBox getBoundingBox(CoordinatesList points) {
-    final BoundingBox boundingBox = new BoundingBox();
+  public static BoundingBox getBoundingBox(GeometryFactory geometryFactory,CoordinatesList points) {
+    BoundingBox boundingBox = new BoundingBox(geometryFactory);
     for (final Coordinates point : points) {
-      boundingBox.expandToInclude(point);
+      boundingBox = boundingBox.expandToInclude(point);
     }
     return boundingBox;
   }

@@ -92,7 +92,6 @@ public final class FileUtil {
       try {
         in.close();
       } catch (final IOException e) {
-        LOG.error(e.getMessage(), e);
       }
     }
   }

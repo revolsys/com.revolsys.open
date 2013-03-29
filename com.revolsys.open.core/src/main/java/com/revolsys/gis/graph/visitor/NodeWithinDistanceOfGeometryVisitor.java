@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -17,8 +17,8 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Envelope env = new Envelope(geometry.getEnvelopeInternal());
-    env.expandBy(maxDistance);
+    BoundingBox env = BoundingBox.getBoundingBox(geometry);
+    env = env.expand(maxDistance);
     final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
     final NodeWithinDistanceOfGeometryVisitor<T> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
       geometry, maxDistance, results);

@@ -21,6 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -37,7 +38,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
     return new DataObjectGeometryFilter<LineString>(lineFilter);
   }
 
-  private Envelope envelope;
+  private BoundingBox envelope;
 
   /** The geometry to compare the data objects to to. */
   private LineString geometry;
@@ -104,7 +105,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
-    this.envelope = new Envelope(geometry.getEnvelopeInternal());
-    this.envelope.expandBy(distance);
+    this.envelope = BoundingBox.getBoundingBox(geometry);
+    this.envelope = this.envelope.expand(distance);
   }
 }

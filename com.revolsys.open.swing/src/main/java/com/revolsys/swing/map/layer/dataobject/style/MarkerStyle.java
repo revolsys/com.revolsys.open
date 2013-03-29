@@ -5,13 +5,18 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -90,6 +95,10 @@ public class MarkerStyle {
 
   private Measure<Length> markerLineWidth = ONE_PIXEL;
 
+  private String markerFile;
+
+  private Resource markerFileResource;
+
   public MarkerStyle() {
   }
 
@@ -119,6 +128,10 @@ public class MarkerStyle {
 
   public Measure<Length> getMarkerDeltaY() {
     return markerDeltaY;
+  }
+
+  public String getMarkerFile() {
+    return markerFile;
   }
 
   public Color getMarkerFill() {
@@ -203,6 +216,24 @@ public class MarkerStyle {
 
   public void setMarkerDy(final double markerDy) {
     setMarkerDeltaY(Measure.valueOf(markerDy, NonSI.PIXEL));
+  }
+
+  public void setMarkerFile(final String markerFile) {
+    this.markerFile = markerFile;
+    final Pattern pattern = Pattern.compile("url\\('?([^']+)'?\\)");
+    String url;
+    Matcher matcher = pattern.matcher(markerFile);
+    if (matcher.find()) {
+      url = matcher.group(1);
+    } else {
+      url = markerFile;
+    }
+    if (url.toUpperCase().matches("[A-Z][A-Z0-9\\+\\.\\-]*:")) {
+      this.markerFileResource = SpringUtil.getUrlResource(url);
+    } else {
+      this.markerFileResource = SpringUtil.getBaseResource(url);
+    }
+    setMarker(new ImageMarker(this.markerFileResource));
   }
 
   public void setMarkerFill(final Color markerFill) {

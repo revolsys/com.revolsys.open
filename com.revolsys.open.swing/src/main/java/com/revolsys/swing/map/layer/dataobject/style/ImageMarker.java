@@ -2,14 +2,18 @@ package com.revolsys.swing.map.layer.dataobject.style;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
+import org.springframework.core.io.Resource;
+
+import com.revolsys.io.FileUtil;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 
 public class ImageMarker implements Marker {
@@ -18,6 +22,17 @@ public class ImageMarker implements Marker {
 
   public ImageMarker(final Image image) {
     this.image = image;
+  }
+
+  public ImageMarker(Resource resource) {
+    InputStream in = SpringUtil.getInputStream(resource);
+    try {
+      this.image = ImageIO.read(in);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to read file: " + resource);
+    } finally {
+      FileUtil.closeSilent(in);
+    }
   }
 
   @Override
