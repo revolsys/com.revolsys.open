@@ -3,7 +3,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>2013.04.08.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <artifactId>com.revolsys.open.doclet</artifactId>
   <name>RS Doclet</name>
