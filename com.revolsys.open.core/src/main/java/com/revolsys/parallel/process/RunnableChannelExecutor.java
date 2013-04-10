@@ -8,10 +8,12 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.parallel.NamedThreadFactory;
@@ -29,13 +31,16 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
 
   private ProcessNetwork processNetwork;
 
+  private final AtomicInteger taskCount = new AtomicInteger();
+
   public RunnableChannelExecutor() {
-    super(0, 100, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+    super(1, 100, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1),
       new NamedThreadFactory());
   }
 
   @Override
   protected void afterExecute(final Runnable r, final Throwable t) {
+    taskCount.decrementAndGet();
     synchronized (monitor) {
       monitor.notifyAll();
     }
@@ -50,6 +55,36 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
         }
       }
       this.channels = null;
+    }
+  }
+
+  @Override
+  public void execute(final Runnable command) {
+    if (command != null) {
+      while (!isShutdown()) {
+        if (taskCount.get() >= getMaximumPoolSize()) {
+          synchronized (monitor) {
+            try {
+              monitor.wait();
+            } catch (InterruptedException e) {
+              return;
+            }
+          }
+        }
+        taskCount.incrementAndGet();
+        try {
+          super.execute(command);
+          return;
+        } catch (final RejectedExecutionException e) {
+          taskCount.decrementAndGet();
+        } catch (final RuntimeException e) {
+          taskCount.decrementAndGet();
+          throw e;
+        } catch (final Error e) {
+          taskCount.decrementAndGet();
+          throw e;
+        }
+      }
     }
   }
 
@@ -92,20 +127,13 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
       final MultiInputSelector selector = new MultiInputSelector();
 
       while (!isShutdown()) {
-        synchronized (monitor) {
-          if (getActiveCount() >= getMaximumPoolSize()) {
-            monitor.wait();
-          }
-        }
         final List<Channel<Runnable>> channels = this.channels;
         try {
           if (!isShutdown()) {
             final Channel<Runnable> channel = selector.selectChannelInput(channels);
             if (channel != null) {
               final Runnable runnable = channel.read();
-              if (!isShutdown()) {
-                execute(runnable);
-              }
+              execute(runnable);
             }
           }
         } catch (final ClosedException e) {
@@ -127,10 +155,11 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           }
         }
       }
-    } catch (final RejectedExecutionException e) {
     } catch (final InterruptedException e) {
     } catch (final Throwable t) {
-      t.printStackTrace();
+      if (!isShutdown()) {
+        LoggerFactory.getLogger(getClass()).error("Unexexpected error ", t);
+      }
     } finally {
       postRun();
     }
