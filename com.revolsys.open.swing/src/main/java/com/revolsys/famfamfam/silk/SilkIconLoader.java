@@ -16,9 +16,22 @@ public class SilkIconLoader {
     + SilkIconLoader.class.getPackage().getName().replace(".", "/") + "/icons/";
 
   public static Cursor getCursor(final String imageName) {
+    return getCursor(imageName, 0, 0);
+
+  }
+
+  public static Cursor getCursor(final String imageName, final int delta) {
+    return getCursor(imageName, delta, delta);
+  }
+
+  public static Cursor getCursor(final String imageName, final int dx, int dy) {
     final Image image = getImage(imageName);
-    final Toolkit toolkit = Toolkit.getDefaultToolkit();
-    return toolkit.createCustomCursor(image, new Point(16, 16), imageName);
+    if (image == null) {
+      return null;
+    } else {
+      final Toolkit toolkit = Toolkit.getDefaultToolkit();
+      return toolkit.createCustomCursor(image, new Point(dx, dy), imageName);
+    }
   }
 
   public static ImageIcon getIcon(final String imageName) {

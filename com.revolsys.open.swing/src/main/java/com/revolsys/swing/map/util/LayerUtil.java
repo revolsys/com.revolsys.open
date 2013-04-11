@@ -50,6 +50,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
+import com.revolsys.swing.map.overlay.AddGeometryOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
@@ -105,26 +106,30 @@ public class LayerUtil {
       } else {
         MapPanel map = MapPanel.get(dataObjectLayer);
         if (map != null) {
-          final EditGeometryOverlay editGeometryOverlay = map.getMapOverlay(EditGeometryOverlay.class);
-          editGeometryOverlay.setAddFeatureLayer(dataObjectLayer);
-          editGeometryOverlay.setCompletedAction(new InvokeMethodListener(
-            LayerUtil.class, "actionCompleteAddNewRecord", editGeometryOverlay));
+          final AddGeometryOverlay addGeometryOverlay = map.getMapOverlay(AddGeometryOverlay.class);
+          synchronized (addGeometryOverlay) {
+            // TODO what if there is another feature being edited?
+            addGeometryOverlay.setAddFeatureLayer(dataObjectLayer);
+            addGeometryOverlay.setCompletedAction(new InvokeMethodListener(
+              LayerUtil.class, "actionCompleteAddNewRecord", addGeometryOverlay));
+          }
         }
       }
     }
   }
 
-  public static void actionCompleteAddNewRecord(
-    final EditGeometryOverlay overlay) {
-    DataObjectLayer layer = overlay.getAddFeatureLayer();
-    Geometry geometry = overlay.getCompletedGeometry();
-    DataObject object = layer.createObject();
-    if (object != null) {
-      object.setGeometryValue(geometry);
-      showForm(layer, object);
+  public static void actionCompleteAddNewRecord(final AddGeometryOverlay overlay) {
+    synchronized (overlay) {
+      DataObjectLayer layer = overlay.getAddFeatureLayer();
+      Geometry geometry = overlay.getCompletedGeometry();
+      DataObject object = layer.createObject();
+      if (object != null) {
+        object.setGeometryValue(geometry);
+        showForm(layer, object);
+      }
+      overlay.setEnabled(false);
+      overlay.setAddFeatureLayer(null);
     }
-    overlay.setEnabled(false);
-    overlay.setAddFeatureLayer(null);
   }
 
   @SuppressWarnings("unchecked")

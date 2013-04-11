@@ -87,4 +87,6 @@ public interface DataObjectLayer extends Layer {
     int distance);
 
   DataObject createObject();
+
+  void setEditingObjects(BoundingBox boundingBox);
 }
