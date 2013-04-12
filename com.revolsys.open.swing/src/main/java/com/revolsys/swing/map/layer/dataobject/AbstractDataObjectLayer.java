@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -19,6 +24,7 @@ import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -37,6 +43,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
+  private Set<Object> deletedObjectIds = new LinkedHashSet<Object>();
+
+  private Set<DataObject> newObjects = new LinkedHashSet<DataObject>();
+
+  private Map<Object, DataObject> modifiedObjects = new LinkedHashMap<Object, DataObject>();
+
   private boolean canAddObjects = true;
 
   private boolean canEditObjects = true;
@@ -47,6 +59,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected Query query;
 
+  private final Object editSync = new Object();
+
   public AbstractDataObjectLayer() {
     this("");
   }
@@ -54,14 +68,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
-  }
-
-  @Override
-  public void setEditable(boolean editable) {
-    super.setEditable(editable);
-    setCanAddObjects(canAddObjects);
-    setCanDeleteObjects(canDeleteObjects);
-    setCanEditObjects(canEditObjects);
   }
 
   public AbstractDataObjectLayer(final String name) {
@@ -89,6 +95,25 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     addSelectedObjects(Arrays.asList(objects));
   }
 
+  public void cancelChanges() {
+    synchronized (editSync) {
+      internalCancelChanges();
+      fireObjectsChanged();
+    }
+  }
+
+  protected void internalCancelChanges() {
+    clearChanges();
+  }
+
+  protected void clearChanges() {
+    newObjects = new LinkedHashSet<DataObject>();
+    modifiedObjects = new LinkedHashMap<Object, DataObject>();
+    deletedObjectIds = new LinkedHashSet<Object>();
+    hiddenObjects.clear();
+    editingObjects.clear();
+  }
+
   @Override
   public void clearEditingObjects() {
     this.editingObjects.clear();
@@ -114,9 +139,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (dataStore == null) {
         object = new ArrayDataObject(metaData);
       } else {
-        object = dataStore.createWithId(metaData);
+        object = dataStore.create(metaData);
       }
-      // TODO add to insert objects
+      newObjects.add(object);
       return object;
     } else {
       return null;
@@ -125,8 +150,35 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void deleteObjects(final Collection<? extends DataObject> objects) {
-    removeSelectedObjects(objects);
-    editingObjects.removeAll(objects);
+    synchronized (editSync) {
+      unselectObjects(objects);
+      for (final DataObject object : objects) {
+        final DataObjectMetaData metaData = getMetaData();
+        if (object.getMetaData() == metaData) {
+          if (newObjects.contains(object)) {
+            newObjects.remove(object);
+          } else {
+            final Object id = object.getIdValue();
+            modifiedObjects.remove(id);
+            deletedObjectIds.add(id);
+            hideObject(object);
+          }
+        }
+      }
+    }
+    fireObjectsChanged();
+  }
+
+  protected void fireObjectsChanged() {
+    getPropertyChangeSupport().firePropertyChange("objectsChanged", false, true);
+  }
+
+  protected void hideObject(DataObject object) {
+    hiddenObjects.add(object);
+  }
+
+  protected void showObject(DataObject object) {
+    hiddenObjects.remove(object);
   }
 
   @Override
@@ -159,6 +211,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getMetaData().getDataObjectStore();
   }
 
+  public Set<Object> getDeletedObjectIds() {
+    return deletedObjectIds;
+  }
+
   @Override
   public Set<DataObject> getEditingObjects() {
     return editingObjects;
@@ -172,6 +228,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
+  }
+
+  public Map<Object, DataObject> getModifiedObjects() {
+    return new LinkedHashMap<Object, DataObject>(modifiedObjects);
+  }
+
+  public Set<DataObject> getNewObjects() {
+    return newObjects;
   }
 
   @Override
@@ -232,6 +296,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return selectedObjects.size();
   }
 
+  private boolean hasChanges() {
+    synchronized (editSync) {
+      if (!newObjects.isEmpty()) {
+        return true;
+      } else if (!modifiedObjects.isEmpty()) {
+        return true;
+      } else if (!deletedObjectIds.isEmpty()) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   @Override
   public boolean isCanAddObjects() {
     return !isReadOnly() && isEditable() && canAddObjects;
@@ -273,15 +351,29 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void removeSelectedObjects(
-    final Collection<? extends DataObject> objects) {
+  public void unselectObjects(final Collection<? extends DataObject> objects) {
     selectedObjects.removeAll(objects);
     fireSelected();
   }
 
   @Override
-  public void removeSelectedObjects(final DataObject... objects) {
-    removeSelectedObjects(Arrays.asList(objects));
+  public void unelectObjects(final DataObject... objects) {
+    unselectObjects(Arrays.asList(objects));
+  }
+
+  public boolean saveChanges() {
+    synchronized (editSync) {
+      boolean saved = internalSaveChanges();
+      if (saved) {
+        clearChanges();
+      }
+      fireObjectsChanged();
+      return saved;
+    }
+  }
+
+  protected boolean internalSaveChanges() {
+    return true;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -304,6 +396,48 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     this.canEditObjects = canEditObjects;
     getPropertyChangeSupport().firePropertyChange("canEditObjects",
       !isCanEditObjects(), isCanEditObjects());
+  }
+
+  @Override
+  public void setEditable(final boolean editable) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      SwingWorkerManager.execute("Set editable", this, "setEditable", editable);
+    } else {
+      synchronized (editSync) {
+        if (editable == false) {
+          if (hasChanges()) {
+            final int result = InvokeMethodCallable.invokeAndWait(
+              JOptionPane.class,
+              "showConfirmDialog",
+              JOptionPane.getRootFrame(),
+              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (result == JOptionPane.YES_OPTION) {
+              if (!saveChanges()) {
+                return;
+              }
+            } else if (result == JOptionPane.NO_OPTION) {
+              cancelChanges();
+            } else {
+              // Don't allow state change if cancelled
+              return;
+            }
+
+          }
+        }
+        super.setEditable(editable);
+        setCanAddObjects(canAddObjects);
+        setCanDeleteObjects(canDeleteObjects);
+        setCanEditObjects(canEditObjects);
+      }
+    }
+  }
+
+  @Override
+  public void setEditingObjects(final BoundingBox boundingBox) {
+    final List<DataObject> objects = getDataObjects(boundingBox);
+    setEditingObjects(objects);
   }
 
   @Override
@@ -371,12 +505,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void setSelectedObjects(final BoundingBox boundingBox) {
     final List<DataObject> objects = getDataObjects(boundingBox);
     setSelectedObjects(objects);
-  }
-
-  @Override
-  public void setEditingObjects(final BoundingBox boundingBox) {
-    final List<DataObject> objects = getDataObjects(boundingBox);
-    setEditingObjects(objects);
   }
 
   @Override

@@ -1,7 +1,8 @@
 package com.revolsys.parallel.process;
 
 import java.util.Arrays;
-import java.util.Collection;
+
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.beanutils.MethodUtils;
 
@@ -12,8 +13,13 @@ import org.apache.commons.beanutils.MethodUtils;
  * @author Paul Austin
  */
 public class InvokeMethodRunnable implements Runnable {
-  /** A constant for zero length parameters. */
-  public static final Object[] NULL_PARAMETERS = new Object[0];
+
+  public static void invokeLater(final Object object, final String methodName,
+    final Object... parameters) {
+    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
+      methodName, parameters);
+    SwingUtilities.invokeLater(runnable);
+  }
 
   /** The object to invoke the method on. */
   private final Object object;
@@ -23,16 +29,6 @@ public class InvokeMethodRunnable implements Runnable {
 
   /** The name of the method to invoke. */
   private final String methodName;
-
-  /**
-   * Construct a new InvokeMethodRunnable with no parameters.
-   * 
-   * @param object The object to invoke the method on.
-   * @param methodName The name of the method to invoke.
-   */
-  public InvokeMethodRunnable(final Object object, final String methodName) {
-    this(object, methodName, NULL_PARAMETERS);
-  }
 
   /**
    * Construct a new InvokeMethodRunnable.
@@ -48,19 +44,6 @@ public class InvokeMethodRunnable implements Runnable {
     this.parameters = parameters;
   }
 
-  /**
-   * Construct a new InvokeMethodRunnable.
-   * 
-   * @param object The object to invoke the method on.
-   * @param methodName The name of the method to invoke.
-   * @param parameters The parameters to pass to the method.
-   */
-  public InvokeMethodRunnable(final Object object, final String methodName,
-    final Collection<Object> parameters) {
-    this.object = object;
-    this.methodName = methodName;
-    this.parameters = parameters.toArray();
-  }
 
   /**
    * Execute the method.

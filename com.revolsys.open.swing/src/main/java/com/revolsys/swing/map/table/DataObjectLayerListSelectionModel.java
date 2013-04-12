@@ -51,7 +51,7 @@ public class DataObjectLayerListSelectionModel extends
     super.removeSelectionInterval(index0, index1);
     final List<DataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
-    layer.removeSelectedObjects(objects);
+    layer.unselectObjects(objects);
   }
 
   @Override

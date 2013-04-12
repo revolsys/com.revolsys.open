@@ -12,7 +12,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.parallel.process.InvokeMethodCallable;
+import com.revolsys.beans.InvokeMethodCallable;
 
 public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
   private Callable<T> backgroundTask;

@@ -76,6 +76,11 @@ public class DataObjectLayerTablePanel extends TablePanel {
     LayerUtil.showForm(layer, object);
   }
 
+  public void deleteRecord() {
+    DataObject object = getEventRowObject();
+    layer.deleteObjects(object);
+  }
+
   protected DataObject getEventRowObject() {
     DataObjectRowTableModel model = getTableModel();
     int row = getEventRow();

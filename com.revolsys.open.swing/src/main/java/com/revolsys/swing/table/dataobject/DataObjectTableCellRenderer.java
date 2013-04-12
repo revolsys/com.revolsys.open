@@ -96,6 +96,17 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
         component = valueComponent;
       }
     }
+    if (required && model.getValue(attributeIndex) == null) {
+      component.setBackground(new Color(255, 0, 0, 100));
+      component.setForeground(table.getForeground());
+    } else {
+      setRowColor(table, component, row);
+    }
+    return component;
+  }
+
+  protected void setRowColor(final JTable table, Component component,
+    final int row) {
     final int[] selectedRows = table.getSelectedRows();
     boolean selected = false;
     for (final int selectedRow : selectedRows) {
@@ -103,10 +114,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
         selected = true;
       }
     }
-    if (required && model.getValue(attributeIndex) == null) {
-      component.setBackground(new Color(255, 0, 0, 100));
-      component.setForeground(table.getForeground());
-    } else if (selected) {
+    if (selected) {
       component.setBackground(table.getSelectionBackground());
       component.setForeground(table.getSelectionForeground());
     } else if (row % 2 == 0) {
@@ -116,7 +124,6 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
       component.setBackground(Color.LIGHT_GRAY);
       component.setForeground(table.getForeground());
     }
-    return component;
   }
 
   public void setUiBuilderRegistry(

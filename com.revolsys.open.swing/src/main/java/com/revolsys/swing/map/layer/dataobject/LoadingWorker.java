@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import javax.swing.SwingWorker;
@@ -11,7 +12,6 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.io.Reader;
 
 public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
   private final BoundingBox viewportBoundingBox;
@@ -35,16 +35,12 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     if (query != null) {
       query = query.clone();
       query.setBoundingBox(queryBoundingBox);
-      final Reader<DataObject> reader = layer.getDataStore().query(query);
-      try {
-        for (final DataObject object : reader) {
-          if (isCancelled()) {
-            return null;
-          }
-          index.insert(object);
+      final List<DataObject> reader = layer.query(query);
+      for (final DataObject object : reader) {
+        if (isCancelled()) {
+          return null;
         }
-      } finally {
-        reader.close();
+        index.insert(object);
       }
     }
     return index;

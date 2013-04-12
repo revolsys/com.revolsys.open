@@ -87,7 +87,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
           DataTypes.INT, minimumPoolSize);
         cacheProperties.put("MinLimit", minPoolSize);
       }
-      Object maximumPoolSize = newConfig.remove("minPoolSize");
+      Object maximumPoolSize = newConfig.remove("maxPoolSize");
       if (maximumPoolSize != null) {
         final int maxPoolSize = (Integer)StringConverterRegistry.toObject(
           DataTypes.INT, maximumPoolSize);

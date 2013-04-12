@@ -65,9 +65,9 @@ public interface DataObjectLayer extends Layer {
 
   List<DataObject> query(Query query);
 
-  void removeSelectedObjects(Collection<? extends DataObject> objects);
+  void unselectObjects(Collection<? extends DataObject> objects);
 
-  void removeSelectedObjects(DataObject... objects);
+  void unelectObjects(DataObject... objects);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 

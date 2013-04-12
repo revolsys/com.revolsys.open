@@ -123,6 +123,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     map = new LayerRendererOverlay(viewport, project);
     layeredPane.add(map, new Integer(1));
 
+    project.addPropertyChangeListener(this);
+
     project.addPropertyChangeListener("viewBoundingBox",
       new PropertyChangeListener() {
 
@@ -191,7 +193,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new SelectFeaturesOverlay(this);
     new EditGeometryOverlay(this);
     new AddGeometryOverlay(this);
-     this.mouseOverlay = new MouseOverlay(layeredPane);
+    this.mouseOverlay = new MouseOverlay(layeredPane);
   }
 
   private void addPointerLocation(final String title, final int srid,
@@ -333,6 +335,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           baseMapOverlay.setLayer(layer);
         }
       }
+    } else {
+      repaint();
     }
   }
 

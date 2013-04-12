@@ -25,6 +25,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
@@ -36,16 +37,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public static final LayerFactory<DataObjectStoreLayer> FACTORY = new InvokeMethodLayerFactory<DataObjectStoreLayer>(
     "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
 
-  public static DataObjectStoreLayer create(Map<String, Object> properties) {
+  public static DataObjectStoreLayer create(final Map<String, Object> properties) {
     @SuppressWarnings("unchecked")
-    Map<String, Object> connectionProperties = (Map<String, Object>)properties.get("connectionProperties");
+    final Map<String, Object> connectionProperties = (Map<String, Object>)properties.get("connectionProperties");
     if (connectionProperties == null) {
       throw new IllegalArgumentException(
         "A data store layer requires a connectionProperties entry with a url, username and password.");
     } else {
-      DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
+      final DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
+      dataStore.setProperty("autoCommit", true);
       dataStore.initialize();
-      DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
+      final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
       layer.setProperties(properties);
       return layer;
     }
@@ -73,6 +75,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
 
+  public DataObjectStoreLayer(final DataObjectStore dataStore) {
+    this.dataStore = dataStore;
+  }
+
   public DataObjectStoreLayer(final DataObjectStore dataStore,
     final String typePath) {
     super(PathUtil.getName(typePath), dataStore.getMetaData(typePath)
@@ -81,25 +87,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     setTypePath(typePath);
   }
 
-  public DataObjectStoreLayer(final DataObjectStore dataStore) {
-    this.dataStore = dataStore;
-  }
-
-  public void setTypePath(String typePath) {
-    this.typePath = typePath;
-    if (StringUtils.hasText(typePath)) {
-      DataObjectMetaData metaData = dataStore.getMetaData(typePath);
-      if (metaData != null) {
-        setName(PathUtil.getName(typePath));
-
-        setMetaData(metaData);
-        query = new Query(metaData);
-        return;
+  @Override
+  public void refresh() {
+    super.refresh();
+    synchronized (sync) {
+      if (loadingWorker != null) {
+        loadingWorker.cancel(true);
       }
+
+      boundingBox = new BoundingBox();
+      loadingBoundingBox = boundingBox;
+      index = new DataObjectQuadTree();
     }
-    setName("Type not found " + typePath);
-    setMetaData(null);
-    query = null;
   }
 
   @Override
@@ -195,6 +194,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  @Override
   public DataObjectStore getDataStore() {
     return dataStore;
   }
@@ -223,9 +223,52 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return objects;
   }
 
+  public BoundingBox getLoadingBoundingBox() {
+    return loadingBoundingBox;
+  }
+
   @Override
   public DataObjectMetaData getMetaData() {
     return dataStore.getMetaData(typePath);
+  }
+
+  protected List<DataObject> getObjects(final BoundingBox boundingBox) {
+    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+    BoundingBox loadedBoundingBox;
+    DataObjectQuadTree index;
+    synchronized (sync) {
+      loadedBoundingBox = this.boundingBox;
+      index = this.index;
+    }
+    List<DataObject> queryObjects;
+    if (loadedBoundingBox.contains(boundingBox)) {
+      queryObjects = index.query(convertedBoundingBox);
+    } else {
+      queryObjects = getObjectsFromDataStore(convertedBoundingBox);
+    }
+    final List<DataObject> allObjects = new ArrayList<DataObject>();
+    if (!queryObjects.isEmpty()) {
+      final Polygon polygon = convertedBoundingBox.toPolygon();
+      for (final DataObject object : queryObjects) {
+        final Geometry geometry = object.getGeometryValue();
+        if (geometry.intersects(polygon)) {
+          allObjects.add(object);
+        }
+      }
+    }
+    return allObjects;
+  }
+
+  protected List<DataObject> getObjectsFromDataStore(
+    final BoundingBox boundingBox) {
+    List<DataObject> queryObjects;
+    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
+    try {
+      queryObjects = reader.read();
+    } finally {
+      reader.close();
+    }
+    return queryObjects;
   }
 
   @Override
@@ -252,6 +295,71 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   public String getTypePath() {
     return typePath;
+  }
+
+  @Override
+  protected void hideObject(final DataObject object) {
+    if (object.getMetaData() == getMetaData()) {
+      final Object id = object.getIdValue();
+      synchronized (hiddenObjectIds) {
+        if (!hiddenObjectIds.contains(id)) {
+          hiddenObjectIds.add(id);
+          cacheObject(id, object);
+        }
+      }
+    }
+    // TODO correct property change
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  @Override
+  protected void showObject(final DataObject object) {
+    if (object.getMetaData() == getMetaData()) {
+      final Object id = object.getIdValue();
+      synchronized (hiddenObjectIds) {
+        if (hiddenObjectIds.contains(id)) {
+          hiddenObjectIds.remove(id);
+        }
+      }
+    }
+    // TODO correct property change
+    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  @Override
+  protected boolean internalSaveChanges() {
+    // TODO check to see if the can be saved
+    final DataObjectStore dataStore = getDataStore();
+    final DataObjectMetaData metaData = getMetaData();
+    final String idAttributeName = metaData.getIdAttributeName();
+    // TODO transaction?
+    final Set<Object> deletedObjectIds = getDeletedObjectIds();
+    for (final Object id : deletedObjectIds) {
+      final Query deleteQuery = new Query(getMetaData());
+      deleteQuery.addFilter(idAttributeName, id);
+      dataStore.delete(deleteQuery);
+    }
+    final Writer<DataObject> writer = dataStore.createWriter();
+    try {
+      final Collection<DataObject> modifiedObjects = getModifiedObjects().values();
+      for (final DataObject object : modifiedObjects) {
+        writer.write(object);
+      }
+
+      final Collection<DataObject> newObjects = getNewObjects();
+      for (final DataObject object : newObjects) {
+        writer.write(object);
+      }
+    } finally {
+      writer.close();
+    }
+    return true;
+  }
+
+  @Override
+  protected void fireObjectsChanged() {
+    refresh();
+    super.fireObjectsChanged();
   }
 
   @Override
@@ -289,8 +397,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void removeSelectedObjects(
-    final Collection<? extends DataObject> objects) {
+  protected void clearChanges() {
+    super.clearChanges();
+    cachedObjects.clear();
+    editingObjectIds.clear();
+    hiddenObjectIds.clear();
+    selectedObjectIds.clear();
+  }
+
+  @Override
+  public void unselectObjects(final Collection<? extends DataObject> objects) {
     for (final DataObject object : objects) {
       if (object.getMetaData() == getMetaData()) {
         final Object id = object.getIdValue();
@@ -346,53 +462,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     getPropertyChangeSupport().firePropertyChange("refresh", false, true);
   }
 
-  public BoundingBox getLoadingBoundingBox() {
-    return loadingBoundingBox;
-  }
-
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
     final List<DataObject> objects = getObjects(boundingBox);
     setSelectedObjects(objects);
-  }
-
-  protected List<DataObject> getObjects(BoundingBox boundingBox) {
-    BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
-    BoundingBox loadedBoundingBox;
-    DataObjectQuadTree index;
-    synchronized (sync) {
-      loadedBoundingBox = this.boundingBox;
-      index = this.index;
-    }
-    List<DataObject> queryObjects;
-    if (loadedBoundingBox.contains(boundingBox)) {
-      queryObjects = index.query(convertedBoundingBox);
-    } else {
-      queryObjects = getObjectsFromDataStore(convertedBoundingBox);
-    }
-    final List<DataObject> allObjects = new ArrayList<DataObject>();
-    if (!queryObjects.isEmpty()) {
-      final Polygon polygon = convertedBoundingBox.toPolygon();
-      for (final DataObject object : queryObjects) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry.intersects(polygon)) {
-          allObjects.add(object);
-        }
-      }
-    }
-    return allObjects;
-  }
-
-  protected List<DataObject> getObjectsFromDataStore(
-    final BoundingBox boundingBox) {
-    List<DataObject> queryObjects;
-    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
-    try {
-      queryObjects = reader.read();
-    } finally {
-      reader.close();
-    }
-    return queryObjects;
   }
 
   @Override
@@ -412,6 +485,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
     getPropertyChangeSupport().firePropertyChange("selected", false, true);
+  }
+
+  public void setTypePath(final String typePath) {
+    this.typePath = typePath;
+    if (StringUtils.hasText(typePath)) {
+      final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+      if (metaData != null) {
+        setName(PathUtil.getName(typePath));
+
+        setMetaData(metaData);
+        query = new Query(metaData);
+        return;
+      }
+    }
+    setName("Type not found " + typePath);
+    setMetaData(null);
+    query = null;
   }
 
 }

@@ -1,4 +1,4 @@
-package com.revolsys.parallel.process;
+package com.revolsys.beans;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -14,8 +14,13 @@ import com.revolsys.util.ExceptionUtil;
  * @author Paul Austin
  */
 public class InvokeMethodCallable<T> implements Callable<T> {
-  /** A constant for zero length parameters. */
-  public static final Object[] NULL_PARAMETERS = new Object[0];
+
+  public static <V> V invokeAndWait(final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodCallable<V> callable = new InvokeMethodCallable<V>(
+      object, methodName, parameters);
+    return RunnableCallable.invokeAndWait(callable);
+  }
 
   /** The object to invoke the method on. */
   private Object object;
@@ -25,31 +30,6 @@ public class InvokeMethodCallable<T> implements Callable<T> {
 
   /** The name of the method to invoke. */
   private String methodName;
-
-  /**
-   * Construct a new InvokeMethodRunnable with no parameters.
-   * 
-   * @param object The object to invoke the method on.
-   * @param methodName The name of the method to invoke.
-   */
-  public InvokeMethodCallable(final Object object, final String methodName) {
-    this(object, methodName, NULL_PARAMETERS);
-  }
-
-
-  /**
-   * Construct a new InvokeMethodCallable.
-   * 
-   * @param object The object to invoke the method on.
-   * @param methodName The name of the method to invoke.
-   * @param parameters The parameters to pass to the method.
-   */
-  public InvokeMethodCallable(final Object object, final String methodName,
-    final Collection<Object> parameters) {
-    this.object = object;
-    this.methodName = methodName;
-    this.parameters = parameters.toArray();
-  }
 
   /**
    * Construct a new InvokeMethodCallable.

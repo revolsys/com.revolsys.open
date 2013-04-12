@@ -52,7 +52,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static DataObjectRowTable createTable(final DataObjectLayer layer,
     final List<String> attributeNames, final List<String> attributeTitles) {
     final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
-      layer, attributeNames,attributeTitles);
+      layer, attributeNames, attributeTitles);
     final DataObjectRowTable table = new DataObjectRowTable(model);
 
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
@@ -203,7 +203,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == layer) {
-      if (e.getPropertyName().equals("query")) {
+      String propertyName = e.getPropertyName();
+      if (propertyName.equals("query")) {
+        refresh();
+      } else if (propertyName.equals("editable")) {
         refresh();
       }
     }

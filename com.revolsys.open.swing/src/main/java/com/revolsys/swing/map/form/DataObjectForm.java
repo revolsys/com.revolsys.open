@@ -15,6 +15,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
+import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -62,6 +64,7 @@ import com.revolsys.swing.component.JLabelWithObject;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ValidatingField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectMapTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
@@ -251,25 +254,33 @@ public class DataObjectForm extends JPanel implements FocusListener,
     final JXTable table = AbstractDataObjectTableModel.create(allAttributes);
     table.setRowFilter(new ExcludeGeometryRowFilter());
     final TableColumnModel columnModel = table.getColumnModel();
+    final DataObjectMetaData metaData = getMetaData();
     final DataObjectTableCellRenderer cellRenderer = new DataObjectTableCellRenderer() {
       @Override
       public Component getTableCellRendererComponent(final JTable table,
-        final Object value, final boolean isSelected, final boolean hasFocus,
+        Object value, final boolean isSelected, final boolean hasFocus,
         final int row, final int column) {
         final boolean even = row % 2 == 0;
 
         final String fieldName = (String)table.getValueAt(row, 1);
+        boolean isIdField = fieldName.equals(metaData.getIdAttributeName());
+        if (isIdField) {
+          if (value == null) {
+            value = "NEW";
+          }
+        }
         final JComponent component = (JComponent)super.getTableCellRendererComponent(
           table, value, isSelected, hasFocus, row, column);
         component.setToolTipText("");
-        if (isFieldValid(fieldName)) {
+        if (isIdField) {
+          setRowColor(table, component, row);
+        } else if (isFieldValid(fieldName)) {
           if (hasOriginalValue(fieldName)) {
             final Object fieldValue = getFieldValue(fieldName);
             final Object originalValue = getOriginalValue(fieldName);
             if (!EqualsRegistry.equal(originalValue, fieldValue)) {
-              final DataObjectMetaData metaData = getMetaData();
               CodeTable codeTable = null;
-              if (!fieldName.equals(metaData.getIdAttributeName())) {
+              if (!isIdField) {
                 codeTable = metaData.getCodeTableByColumn(fieldName);
               }
               String text;
@@ -399,6 +410,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
         final Object value = getFieldValue(fieldName);
         if (!EqualsRegistry.equal(value, previousValue)) {
           validateFields();
+          if (allAttributes != null) {
+            allAttributes.setValues(getFieldValues());
+          }
+
         }
       }
     }
@@ -865,6 +880,22 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   protected void postValidate() {
 
+  }
+
+  protected void addPanel(final JPanel container, final String title, final List<String> fieldNames) {
+    final JPanel panel = new JPanel();
+    container.add(panel);
+  
+    final GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
+  
+    panel.setBorder(BorderFactory.createTitledBorder(title));
+  
+    for (final String fieldName : fieldNames) {
+      addLabelledField(panel, fieldName);
+    }
+  
+    GroupLayoutUtil.makeColumns(panel, 2);
   }
 
 }
