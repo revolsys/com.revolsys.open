@@ -20,25 +20,25 @@ public class MonotoneChainOverlapAction {
   protected LineSegment overlapSeg2 = new LineSegment();
 
   /**
-   * This function can be overridden if the original chains are needed
-   * 
-   * @param start1 the index of the start of the overlapping segment from mc1
-   * @param start2 the index of the start of the overlapping segment from mc2
-   */
-  public void overlap(MonotoneChain mc1, int start1, MonotoneChain mc2,
-    int start2) {
-    mc1.getLineSegment(start1, overlapSeg1);
-    mc2.getLineSegment(start2, overlapSeg2);
-    overlap(overlapSeg1, overlapSeg2);
-  }
-
-  /**
    * This is a convenience function which can be overridden to obtain the actual
    * line segments which overlap
    * 
    * @param seg1
    * @param seg2
    */
-  public void overlap(LineSegment seg1, LineSegment seg2) {
+  public void overlap(final LineSegment seg1, final LineSegment seg2) {
+  }
+
+  /**
+   * This function can be overridden if the original chains are needed
+   * 
+   * @param start1 the index of the start of the overlapping segment from mc1
+   * @param start2 the index of the start of the overlapping segment from mc2
+   */
+  public void overlap(final MonotoneChain mc1, final int start1,
+    final MonotoneChain mc2, final int start2) {
+    mc1.getLineSegment(start1, overlapSeg1);
+    mc2.getLineSegment(start2, overlapSeg2);
+    overlap(overlapSeg1, overlapSeg2);
   }
 }

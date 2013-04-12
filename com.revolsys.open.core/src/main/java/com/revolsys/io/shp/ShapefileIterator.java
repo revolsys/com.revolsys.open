@@ -58,16 +58,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private boolean mappedFile;
 
-  public void setCloseFile(boolean closeFile) {
-    this.closeFile = closeFile;
-    if (xbaseIterator != null) {
-      xbaseIterator.setCloseFile(closeFile);
-    }
-  }
-
-  public boolean isCloseFile() {
-    return closeFile;
-  }
+  private int position;
 
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
@@ -84,49 +75,14 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     }
   }
 
-  public void forceClose() {
-    FileUtil.closeSilent(in);
-    FileUtil.closeSilent(indexIn);
-    if (xbaseIterator != null) {
-      xbaseIterator.forceClose();
-    }
-  }
-
-  private int position;
-
-  public void setPosition(int position) {
-    if (mappedFile) {
-      EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
-      this.position = position;
-      try {
-        indexIn.seek(100 + 8 * position);
-        int offset = indexIn.readInt();
-        file.seek(offset * 2);
-        setLoadNext(true);
-      } catch (IOException e) {
-        throw new RuntimeException("Unable to find record " + position, e);
-      }
-      if (xbaseIterator != null) {
-        xbaseIterator.setPosition(position);
-      }
-    } else {
-      throw new UnsupportedOperationException(
-        "The position can only be set on files");
-    }
-  }
-
-  public int getPosition() {
-    return position;
-  }
-
   @Override
   protected synchronized void doInit() {
     if (in == null) {
       try {
-        Boolean memoryMapped = getProperty("memoryMapped");
+        final Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          File file = SpringUtil.getFile(resource);
-          File indexFile = new File(file.getParentFile(), name + ".shx");
+          final File file = SpringUtil.getFile(resource);
+          final File indexFile = new File(file.getParentFile(), name + ".shx");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
             this.indexIn = new EndianMappedByteBuffer(indexFile,
@@ -135,7 +91,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           } else {
             this.in = new LittleEndianRandomAccessFile(file, "r");
           }
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
           this.in = new EndianInputStream(resource.getInputStream());
         }
 
@@ -197,6 +153,14 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     }
   }
 
+  public void forceClose() {
+    FileUtil.closeSilent(in);
+    FileUtil.closeSilent(indexIn);
+    if (xbaseIterator != null) {
+      xbaseIterator.forceClose();
+    }
+  }
+
   public DataObjectFactory getDataObjectFactory() {
     return dataObjectFactory;
   }
@@ -234,6 +198,14 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     return object;
   }
 
+  public int getPosition() {
+    return position;
+  }
+
+  public boolean isCloseFile() {
+    return closeFile;
+  }
+
   /**
    * Load the header record from the shape mappedFile.
    * 
@@ -253,6 +225,34 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     final double maxZ = in.readLEDouble();
     final double minM = in.readLEDouble();
     final double maxM = in.readLEDouble();
+  }
+
+  public void setCloseFile(final boolean closeFile) {
+    this.closeFile = closeFile;
+    if (xbaseIterator != null) {
+      xbaseIterator.setCloseFile(closeFile);
+    }
+  }
+
+  public void setPosition(final int position) {
+    if (mappedFile) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
+      this.position = position;
+      try {
+        indexIn.seek(100 + 8 * position);
+        final int offset = indexIn.readInt();
+        file.seek(offset * 2);
+        setLoadNext(true);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to find record " + position, e);
+      }
+      if (xbaseIterator != null) {
+        xbaseIterator.setPosition(position);
+      }
+    } else {
+      throw new UnsupportedOperationException(
+        "The position can only be set on files");
+    }
   }
 
   @Override

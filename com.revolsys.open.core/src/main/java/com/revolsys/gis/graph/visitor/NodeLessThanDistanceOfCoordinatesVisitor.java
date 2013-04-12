@@ -10,7 +10,6 @@ import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
   Visitor<Node<T>> {

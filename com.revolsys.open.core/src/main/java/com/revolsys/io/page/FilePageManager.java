@@ -18,7 +18,7 @@ public class FilePageManager implements PageManager {
 
   private RandomAccessFile randomAccessFile;
 
-  // TODO 
+  // TODO
   private final Map<Integer, Page> pages = new WeakCache<Integer, Page>();
 
   private final Set<Integer> freePageIndexes = new TreeSet<Integer>();

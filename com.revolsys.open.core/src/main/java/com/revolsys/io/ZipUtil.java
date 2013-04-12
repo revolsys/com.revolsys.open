@@ -15,7 +15,6 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 public class ZipUtil {
   /**

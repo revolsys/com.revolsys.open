@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import java.util.ArrayList;
@@ -20,48 +19,81 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  *
  * @version 1.7
  */
-public class MCIndexNoder
-    extends SinglePassNoder
-{
-  private List monoChains = new ArrayList();
-  private SpatialIndex index= new STRtree();
+public class MCIndexNoder extends SinglePassNoder {
+  public class SegmentOverlapAction extends MonotoneChainOverlapAction {
+    private SegmentIntersector si = null;
+
+    public SegmentOverlapAction(final SegmentIntersector si) {
+      this.si = si;
+    }
+
+    @Override
+    public void overlap(final MonotoneChain mc1, final int start1,
+      final MonotoneChain mc2, final int start2) {
+      final SegmentString ss1 = (SegmentString)mc1.getContext();
+      final SegmentString ss2 = (SegmentString)mc2.getContext();
+      si.processIntersections(ss1, start1, ss2, start2);
+    }
+
+  }
+
+  private final List monoChains = new ArrayList();
+
+  private final SpatialIndex index = new STRtree();
+
   private int idCounter = 0;
+
   private Collection nodedSegStrings;
+
   // statistics
   private int nOverlaps = 0;
 
-  public MCIndexNoder()
-  {
+  public MCIndexNoder() {
   }
 
-  public List getMonotoneChains() { return monoChains; }
-
-  public SpatialIndex getIndex() { return index; }
-
-  public Collection getNodedSubstrings()
-  {
-    return  NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+  private void add(final SegmentString segStr) {
+    final List segChains = MonotoneChainBuilder.getChains(
+      segStr.getCoordinates(), segStr);
+    for (final Iterator i = segChains.iterator(); i.hasNext();) {
+      final MonotoneChain mc = (MonotoneChain)i.next();
+      mc.setId(idCounter++);
+      index.insert(JtsGeometryUtil.getEnvelope(mc.getBoundingBox()), mc);
+      monoChains.add(mc);
+    }
   }
 
-  public void computeNodes(Collection inputSegStrings)
-  {
+  @Override
+  public void computeNodes(final Collection inputSegStrings) {
     this.nodedSegStrings = inputSegStrings;
-    for (Iterator i = inputSegStrings.iterator(); i.hasNext(); ) {
-      add((SegmentString) i.next());
+    for (final Iterator i = inputSegStrings.iterator(); i.hasNext();) {
+      add((SegmentString)i.next());
     }
     intersectChains();
-//System.out.println("MCIndexNoder: # chain overlaps = " + nOverlaps);
+    // System.out.println("MCIndexNoder: # chain overlaps = " + nOverlaps);
   }
 
-  private void intersectChains()
-  {
-    MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(segInt);
+  public SpatialIndex getIndex() {
+    return index;
+  }
 
-    for (Iterator i = monoChains.iterator(); i.hasNext(); ) {
-      MonotoneChain queryChain = (MonotoneChain) i.next();
-      List overlapChains = index.query(JtsGeometryUtil.getEnvelope(queryChain.getBoundingBox()));
-      for (Iterator j = overlapChains.iterator(); j.hasNext(); ) {
-        MonotoneChain testChain = (MonotoneChain) j.next();
+  public List getMonotoneChains() {
+    return monoChains;
+  }
+
+  @Override
+  public Collection getNodedSubstrings() {
+    return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+  }
+
+  private void intersectChains() {
+    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(
+      segInt);
+
+    for (final Iterator i = monoChains.iterator(); i.hasNext();) {
+      final MonotoneChain queryChain = (MonotoneChain)i.next();
+      final List overlapChains = index.query(JtsGeometryUtil.getEnvelope(queryChain.getBoundingBox()));
+      for (final Iterator j = overlapChains.iterator(); j.hasNext();) {
+        final MonotoneChain testChain = (MonotoneChain)j.next();
         /**
          * following test makes sure we only compare each pair of chains once
          * and that we don't compare a chain to itself
@@ -71,39 +103,10 @@ public class MCIndexNoder
           nOverlaps++;
         }
         // short-circuit if possible
-        if (segInt.isDone())
-        	return;
+        if (segInt.isDone()) {
+          return;
+        }
       }
     }
-  }
-
-  private void add(SegmentString segStr)
-  {
-    List segChains = MonotoneChainBuilder.getChains(segStr.getCoordinates(), segStr);
-    for (Iterator i = segChains.iterator(); i.hasNext(); ) {
-      MonotoneChain mc = (MonotoneChain) i.next();
-      mc.setId(idCounter++);
-      index.insert(JtsGeometryUtil.getEnvelope(mc.getBoundingBox()), mc);
-      monoChains.add(mc);
-    }
-  }
-
-  public class SegmentOverlapAction
-      extends MonotoneChainOverlapAction
-  {
-    private SegmentIntersector si = null;
-
-    public SegmentOverlapAction(SegmentIntersector si)
-    {
-      this.si = si;
-    }
-
-    public void overlap(MonotoneChain mc1, int start1, MonotoneChain mc2, int start2)
-    {
-      SegmentString ss1 = (SegmentString) mc1.getContext();
-      SegmentString ss2 = (SegmentString) mc2.getContext();
-      si.processIntersections(ss1, start1, ss2, start2);
-    }
-
   }
 }

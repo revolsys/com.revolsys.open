@@ -252,7 +252,7 @@ public class SpringUtil {
   }
 
   public static Resource setBaseResource(final Resource baseResource) {
-    Resource oldResource = SpringUtil.baseResource.get();
+    final Resource oldResource = SpringUtil.baseResource.get();
     SpringUtil.baseResource.set(baseResource);
     return oldResource;
   }

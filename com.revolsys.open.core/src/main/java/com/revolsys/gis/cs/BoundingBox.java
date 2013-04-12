@@ -37,15 +37,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
   }
 
-  @Override
-  public BoundingBox clone() {
-    try {
-      return (BoundingBox)super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   /**
    * Point intersects the bounding box of the line.
    * 
@@ -64,26 +55,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     final double x = point.getX();
     final double y = point.getY();
     return intersects(x1, y1, x2, y2, x, y);
-  }
-
-  public LineSegment getNorthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
-      getMaxX(), getMaxY());
-  }
-
-  public LineSegment getSouthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
-      getMaxX(), getMinY());
-  }
-
-  public LineSegment getWestLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
-      getMinX(), getMaxY());
-  }
-
-  public LineSegment getEastLine() {
-    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(),
-      getMaxX(), getMaxY());
   }
 
   public static boolean intersects(final Coordinates line1Start,
@@ -200,6 +171,10 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox(final Coordinates point1, final Coordinates point2) {
     this(null, point1.getX(), point1.getY(), point2.getX(), point2.getY());
+  }
+
+  public BoundingBox(final double x, final double y) {
+    this(GeometryFactory.getFactory(0), x, y);
   }
 
   public BoundingBox(final Geometry geometry) {
@@ -341,8 +316,13 @@ public class BoundingBox extends Envelope implements Cloneable {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
-  public BoundingBox(double x, double y) {
-    this(GeometryFactory.getFactory(0), x, y);
+  @Override
+  public BoundingBox clone() {
+    try {
+      return (BoundingBox)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public boolean contains(final Coordinates coordinate) {
@@ -389,28 +369,60 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
+  public BoundingBox expand(final double delta) {
+    return expand(delta, delta);
+  }
+
+  public BoundingBox expand(final double deltaX, final double deltaY) {
+    if (isNull() || (deltaX == 0 && deltaY == 0)) {
+      return this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x1 = getMinX() - deltaX;
+      final double x2 = getMaxX() + deltaX;
+      final double y1 = getMinY() - deltaY;
+      final double y2 = getMaxY() + deltaY;
+
+      if (x1 > x2 || y1 > y2) {
+        return new BoundingBox(geometryFactory);
+      } else {
+        return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+      }
+    }
+  }
+
+  public BoundingBox expandPercent(final double factor) {
+    if (factor == 0 || isNull()) {
+      return this;
+    } else {
+      final double deltaX = getWidth() * factor / 2;
+      final double deltaY = getHeight() * factor / 2;
+      return expand(deltaX, deltaY);
+    }
+  }
+
   public BoundingBox expandToInclude(final BoundingBox other) {
     if (other.isNull()) {
       return this;
     } else {
-      GeometryFactory geometryFactory = getGeometryFactory();
-      BoundingBox convertedOther = other.convert(geometryFactory);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox convertedOther = other.convert(geometryFactory);
       if (isNull()) {
         return convertedOther;
       } else if (contains(convertedOther)) {
         return this;
       } else {
-        double minX = Math.min(getMinX(), other.getMinX());
-        double maxX = Math.min(getMaxX(), other.getMaxX());
-        double minY = Math.min(getMinY(), other.getMinY());
-        double maxY = Math.min(getMaxY(), other.getMaxY());
+        final double minX = Math.min(getMinX(), other.getMinX());
+        final double maxX = Math.min(getMaxX(), other.getMaxX());
+        final double minY = Math.min(getMinY(), other.getMinY());
+        final double maxY = Math.min(getMaxY(), other.getMaxY());
         return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
       }
     }
   }
 
   public BoundingBox expandToInclude(final Coordinates coordinates) {
-    GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isNull()) {
       return new BoundingBox(geometryFactory, coordinates);
     } else {
@@ -474,6 +486,11 @@ public class BoundingBox extends Envelope implements Cloneable {
    */
   public CoordinateSystem getCoordinateSystem() {
     return geometryFactory.getCoordinateSystem();
+  }
+
+  public LineSegment getEastLine() {
+    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(),
+      getMaxX(), getMaxY());
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -560,6 +577,21 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
+  public LineSegment getNorthLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
+      getMaxX(), getMaxY());
+  }
+
+  public LineSegment getSouthLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
+      getMaxX(), getMinY());
+  }
+
+  public LineSegment getWestLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
+      getMinX(), getMaxY());
+  }
+
   public Measure<Length> getWidthLength() {
     final double width = getWidth();
     return Measure.valueOf(width, getCoordinateSystem().getLengthUnit());
@@ -604,34 +636,12 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (isNull() || (xDisplacement == 0 && yDisplacement == 0)) {
       return this;
     } else {
-      GeometryFactory geometryFactory = getGeometryFactory();
-      double x1 = getMinX() + xDisplacement;
-      double x2 = getMaxX() + xDisplacement;
-      double y1 = getMinY() + yDisplacement;
-      double y2 = getMaxY() + yDisplacement;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x1 = getMinX() + xDisplacement;
+      final double x2 = getMaxX() + xDisplacement;
+      final double y1 = getMinY() + yDisplacement;
+      final double y2 = getMaxY() + yDisplacement;
       return new BoundingBox(geometryFactory, x1, y1, x2, y2);
-    }
-  }
-
-  public BoundingBox expand(final double delta) {
-    return expand(delta, delta);
-  }
-
-  public BoundingBox expand(final double deltaX, final double deltaY) {
-    if (isNull() || (deltaX == 0 && deltaY == 0)) {
-      return this;
-    } else {
-      GeometryFactory geometryFactory = getGeometryFactory();
-      double x1 = getMinX() - deltaX;
-      double x2 = getMaxX() + deltaX;
-      double y1 = getMinY() - deltaY;
-      double y2 = getMaxY() + deltaY;
-
-      if (x1 > x2 || y1 > y2) {
-        return new BoundingBox(geometryFactory);
-      } else {
-        return new BoundingBox(geometryFactory, x1, y1, x2, y2);
-      }
     }
   }
 
@@ -771,7 +781,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   @Override
   public String toString() {
-    StringBuffer s = new StringBuffer();
+    final StringBuffer s = new StringBuffer();
     if (geometryFactory != null) {
       s.append("SRID=");
       s.append(geometryFactory.getSRID());
@@ -787,15 +797,5 @@ public class BoundingBox extends Envelope implements Cloneable {
     s.append(StringConverterRegistry.toString(getMaxY()));
     s.append(')');
     return s.toString();
-  }
-
-  public BoundingBox expandPercent(double factor) {
-    if (factor == 0 || isNull()) {
-      return this;
-    } else {
-      double deltaX = getWidth() * factor / 2;
-      double deltaY = getHeight() * factor / 2;
-      return expand(deltaX, deltaY);
-    }
   }
 }

@@ -1,6 +1,3 @@
-
-
-
 package com.revolsys.gis.model.geometry.operation.relate;
 
 import java.io.PrintStream;
@@ -16,69 +13,59 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 import com.vividsolutions.jts.geom.Location;
+
 /**
  * A collection of {@link EdgeEnd}s which obey the following invariant:
  * They originate at the same node and have the same direction.
  *
  * @version 1.7
  */
-public class EdgeEndBundle
-  extends EdgeEnd
-{
-//  private BoundaryNodeRule boundaryNodeRule;
-  private List edgeEnds = new ArrayList();
+public class EdgeEndBundle extends EdgeEnd {
+  // private BoundaryNodeRule boundaryNodeRule;
+  private final List edgeEnds = new ArrayList();
 
-  public EdgeEndBundle(BoundaryNodeRule boundaryNodeRule, EdgeEnd e)
-  {
-    super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(e.getLabel()));
+  public EdgeEndBundle(final BoundaryNodeRule boundaryNodeRule, final EdgeEnd e) {
+    super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(
+      e.getLabel()));
     insert(e);
     /*
-    if (boundaryNodeRule != null)
-      this.boundaryNodeRule = boundaryNodeRule;
-    else
-      boundaryNodeRule = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
-    */
+     * if (boundaryNodeRule != null) this.boundaryNodeRule = boundaryNodeRule;
+     * else boundaryNodeRule = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
+     */
   }
 
-  public EdgeEndBundle(EdgeEnd e)
-  {
+  public EdgeEndBundle(final EdgeEnd e) {
     this(null, e);
   }
 
-  public Label getLabel() { return label; }
-  public Iterator iterator() { return edgeEnds.iterator(); }
-  public List getEdgeEnds() { return edgeEnds; }
-
-  public void insert(EdgeEnd e)
-  {
-    // Assert: start point is the same
-    // Assert: direction is the same
-    edgeEnds.add(e);
-  }
   /**
    * This computes the overall edge label for the set of
    * edges in this EdgeStubBundle.  It essentially merges
    * the ON and side labels for each edge.  These labels must be compatible
    */
-  public void computeLabel(BoundaryNodeRule boundaryNodeRule)
-  {
-    // create the label.  If any of the edges belong to areas,
+  @Override
+  public void computeLabel(final BoundaryNodeRule boundaryNodeRule) {
+    // create the label. If any of the edges belong to areas,
     // the label must be an area label
     boolean isArea = false;
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEnd e = (EdgeEnd) it.next();
-      if (e.getLabel().isArea()) isArea = true;
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEnd e = (EdgeEnd)it.next();
+      if (e.getLabel().isArea()) {
+        isArea = true;
+      }
     }
-    if (isArea)
+    if (isArea) {
       label = new Label(Location.NONE, Location.NONE, Location.NONE);
-    else
+    } else {
       label = new Label(Location.NONE);
+    }
 
     // compute the On label, and the side labels if present
     for (int i = 0; i < 2; i++) {
       computeLabelOn(i, boundaryNodeRule);
-      if (isArea)
+      if (isArea) {
         computeLabelSides(i);
+      }
     }
   }
 
@@ -102,33 +89,31 @@ public class EdgeEndBundle
    * <li> otherwise, the attribute is NULL.
    * </ul>
    */
-  private void computeLabelOn(int geomIndex, BoundaryNodeRule boundaryNodeRule)
-  {
+  private void computeLabelOn(final int geomIndex,
+    final BoundaryNodeRule boundaryNodeRule) {
     // compute the ON location value
     int boundaryCount = 0;
     boolean foundInterior = false;
 
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEnd e = (EdgeEnd) it.next();
-      int loc = e.getLabel().getLocation(geomIndex);
-      if (loc == Location.BOUNDARY) boundaryCount++;
-      if (loc == Location.INTERIOR) foundInterior = true;
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEnd e = (EdgeEnd)it.next();
+      final int loc = e.getLabel().getLocation(geomIndex);
+      if (loc == Location.BOUNDARY) {
+        boundaryCount++;
+      }
+      if (loc == Location.INTERIOR) {
+        foundInterior = true;
+      }
     }
     int loc = Location.NONE;
-    if (foundInterior)  loc = Location.INTERIOR;
+    if (foundInterior) {
+      loc = Location.INTERIOR;
+    }
     if (boundaryCount > 0) {
       loc = GeometryGraph.determineBoundary(boundaryNodeRule, boundaryCount);
     }
     label.setLocation(geomIndex, loc);
 
-  }
-  /**
-   * Compute the labelling for each side
-   */
-  private void computeLabelSides(int geomIndex)
-  {
-    computeLabelSide(geomIndex, Position.LEFT);
-    computeLabelSide(geomIndex, Position.RIGHT);
   }
 
   /**
@@ -145,36 +130,62 @@ public class EdgeEndBundle
    *  along an edge.  This is the reason for Interior-primacy rule above - it
    *  results in the summary label having the Geometry interior on <b>both</b> sides.
    */
-  private void computeLabelSide(int geomIndex, int side)
-  {
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEnd e = (EdgeEnd) it.next();
+  private void computeLabelSide(final int geomIndex, final int side) {
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEnd e = (EdgeEnd)it.next();
       if (e.getLabel().isArea()) {
-        int loc = e.getLabel().getLocation(geomIndex, side);
+        final int loc = e.getLabel().getLocation(geomIndex, side);
         if (loc == Location.INTERIOR) {
-            label.setLocation(geomIndex, side, Location.INTERIOR);
-            return;
+          label.setLocation(geomIndex, side, Location.INTERIOR);
+          return;
+        } else if (loc == Location.EXTERIOR) {
+          label.setLocation(geomIndex, side, Location.EXTERIOR);
         }
-        else if (loc == Location.EXTERIOR)
-              label.setLocation(geomIndex, side, Location.EXTERIOR);
       }
+    }
+  }
+
+  /**
+   * Compute the labelling for each side
+   */
+  private void computeLabelSides(final int geomIndex) {
+    computeLabelSide(geomIndex, Position.LEFT);
+    computeLabelSide(geomIndex, Position.RIGHT);
+  }
+
+  public List getEdgeEnds() {
+    return edgeEnds;
+  }
+
+  @Override
+  public Label getLabel() {
+    return label;
+  }
+
+  public void insert(final EdgeEnd e) {
+    // Assert: start point is the same
+    // Assert: direction is the same
+    edgeEnds.add(e);
+  }
+
+  public Iterator iterator() {
+    return edgeEnds.iterator();
+  }
+
+  @Override
+  public void print(final PrintStream out) {
+    out.println("EdgeEndBundle--> Label: " + label);
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEnd ee = (EdgeEnd)it.next();
+      ee.print(out);
+      out.println();
     }
   }
 
   /**
    * Update the IM with the contribution for the computed label for the EdgeStubs.
    */
-  void updateIM(IntersectionMatrix im)
-  {
+  void updateIM(final IntersectionMatrix im) {
     Edge.updateIM(label, im);
-  }
-  public void print(PrintStream out)
-  {
-    out.println("EdgeEndBundle--> Label: " + label);
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEnd ee = (EdgeEnd) it.next();
-      ee.print(out);
-      out.println();
-    }
   }
 }

@@ -194,8 +194,8 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addPolygon(final Polygon polygon) {
-    MultiLinearRing rings = polygon.getRings();
-    LinearRing exteriorRing = polygon.getExteriorRing();
+    final MultiLinearRing rings = polygon.getRings();
+    final LinearRing exteriorRing = polygon.getExteriorRing();
     addPolygonRing(exteriorRing, Location.EXTERIOR, Location.INTERIOR);
 
     for (int i = 1; i < rings.getGeometryCount(); i++) {
@@ -356,7 +356,7 @@ public class GeometryGraph extends PlanarGraph {
     int i = 0;
     for (final Iterator it = coll.iterator(); it.hasNext();) {
       final Node node = (Node)it.next();
-      pts[i++] = (Coordinates)node.getCoordinate().cloneCoordinates();
+      pts[i++] = node.getCoordinate().cloneCoordinates();
     }
     return pts;
   }

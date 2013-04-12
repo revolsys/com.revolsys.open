@@ -44,23 +44,32 @@ public class RightmostEdgeFinder {
   public RightmostEdgeFinder() {
   }
 
-  public DirectedEdge getEdge() {
-    return orientedDe;
+  private void checkForRightmostCoordinate(final DirectedEdge de) {
+    final CoordinatesList coord = de.getEdge().getCoordinates();
+    for (int i = 0; i < coord.size() - 1; i++) {
+      // only check vertices which are the start or end point of a
+      // non-horizontal segment
+      // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
+      // must have a non-horiz segment adjacent to it
+      if (minCoord == null || coord.getX(i) > minCoord.getX()) {
+        minDe = de;
+        minIndex = i;
+        minCoord = coord.get(i);
+      }
+      // }
+    }
   }
 
-  public Coordinates getCoordinate() {
-    return minCoord;
-  }
-
-  public void findEdge(List dirEdgeList) {
+  public void findEdge(final List dirEdgeList) {
     /**
      * Check all forward DirectedEdges only. This is still general, because each
      * edge has a forward DirectedEdge.
      */
-    for (Iterator i = dirEdgeList.iterator(); i.hasNext();) {
-      DirectedEdge de = (DirectedEdge)i.next();
-      if (!de.isForward())
+    for (final Iterator i = dirEdgeList.iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
+      if (!de.isForward()) {
         continue;
+      }
       checkForRightmostCoordinate(de);
     }
 
@@ -80,15 +89,15 @@ public class RightmostEdgeFinder {
      * instead.
      */
     orientedDe = minDe;
-    int rightmostSide = getRightmostSide(minDe, minIndex);
+    final int rightmostSide = getRightmostSide(minDe, minIndex);
     if (rightmostSide == Position.LEFT) {
       orientedDe = minDe.getSym();
     }
   }
 
   private void findRightmostEdgeAtNode() {
-    Node node = minDe.getNode();
-    DirectedEdgeStar star = (DirectedEdgeStar)node.getEdges();
+    final Node node = minDe.getNode();
+    final DirectedEdgeStar star = (DirectedEdgeStar)node.getEdges();
     minDe = star.getRightmostEdge();
     // the DirectedEdge returned by the previous call is not
     // necessarily in the forward direction. Use the sym edge if it isn't.
@@ -105,12 +114,13 @@ public class RightmostEdgeFinder {
      * point, we need to determine their relative orientation to decide which is
      * rightmost.
      */
-    CoordinatesList pts = minDe.getEdge().getCoordinates();
+    final CoordinatesList pts = minDe.getEdge().getCoordinates();
     Assert.isTrue(minIndex > 0 && minIndex < pts.size(),
       "rightmost point expected to be interior vertex of edge");
-    Coordinates pPrev = pts.get(minIndex - 1);
-    Coordinates pNext = pts.get(minIndex + 1);
-    int orientation = CoordinatesUtil.orientationIndex(minCoord, pNext, pPrev);
+    final Coordinates pPrev = pts.get(minIndex - 1);
+    final Coordinates pNext = pts.get(minIndex + 1);
+    final int orientation = CoordinatesUtil.orientationIndex(minCoord, pNext,
+      pPrev);
     boolean usePrev = false;
     // both segments are below min point
     if (pPrev.getY() < minCoord.getY() && pNext.getY() < minCoord.getY()
@@ -127,26 +137,19 @@ public class RightmostEdgeFinder {
     }
   }
 
-  private void checkForRightmostCoordinate(DirectedEdge de) {
-    CoordinatesList coord = de.getEdge().getCoordinates();
-    for (int i = 0; i < coord.size() - 1; i++) {
-      // only check vertices which are the start or end point of a
-      // non-horizontal segment
-      // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
-      // must have a non-horiz segment adjacent to it
-      if (minCoord == null || coord.getX(i) > minCoord.getX()) {
-        minDe = de;
-        minIndex = i;
-        minCoord = coord.get(i);
-      }
-      // }
-    }
+  public Coordinates getCoordinate() {
+    return minCoord;
   }
 
-  private int getRightmostSide(DirectedEdge de, int index) {
+  public DirectedEdge getEdge() {
+    return orientedDe;
+  }
+
+  private int getRightmostSide(final DirectedEdge de, final int index) {
     int side = getRightmostSideOfSegment(de, index);
-    if (side < 0)
+    if (side < 0) {
       side = getRightmostSideOfSegment(de, index - 1);
+    }
     if (side < 0) {
       // reaching here can indicate that segment is horizontal
       // Assert.shouldNeverReachHere("problem with finding rightmost side of segment at "
@@ -158,18 +161,21 @@ public class RightmostEdgeFinder {
     return side;
   }
 
-  private int getRightmostSideOfSegment(DirectedEdge de, int i) {
-    Edge e = de.getEdge();
-    CoordinatesList coord = e.getCoordinates();
+  private int getRightmostSideOfSegment(final DirectedEdge de, final int i) {
+    final Edge e = de.getEdge();
+    final CoordinatesList coord = e.getCoordinates();
 
-    if (i < 0 || i + 1 >= coord.size())
+    if (i < 0 || i + 1 >= coord.size()) {
       return -1;
-    if (coord.getY(i) == coord.getY(i + 1))
+    }
+    if (coord.getY(i) == coord.getY(i + 1)) {
       return -1; // indicates edge is parallel to x-axis
+    }
 
     int pos = Position.LEFT;
-    if (coord.getY(i) < coord.getY(i + 1))
+    if (coord.getY(i) < coord.getY(i + 1)) {
       pos = Position.RIGHT;
+    }
     return pos;
   }
 }

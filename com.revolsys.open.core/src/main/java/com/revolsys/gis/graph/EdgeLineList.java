@@ -10,7 +10,7 @@ public class EdgeLineList extends AbstractList<LineString> {
 
   private final Graph<?> graph;
 
-  private List<Integer> edgeIds;
+  private final List<Integer> edgeIds;
 
   public EdgeLineList(final Graph<?> graph) {
     this(graph, new ArrayList<Integer>());
@@ -21,13 +21,11 @@ public class EdgeLineList extends AbstractList<LineString> {
     this.edgeIds = edgeIds;
   }
 
-
   @Override
   public LineString get(final int index) {
     final Integer edgeId = edgeIds.get(index);
     return graph.getEdgeLine(edgeId);
   }
-
 
   @Override
   public int size() {

@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.algorithm;
 
 import com.revolsys.gis.model.coordinates.Coordinates;

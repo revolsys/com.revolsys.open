@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 

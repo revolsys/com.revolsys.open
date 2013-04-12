@@ -303,6 +303,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return graph.getEdgeAttributes(id);
   }
 
+  public BoundingBox getBoundingBox() {
+    return BoundingBox.getBoundingBox(getLine());
+  }
+
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
     final Collection<Node<T>> nodes1 = getNodes();
     final Collection<Node<T>> nodes2 = edge.getNodes();
@@ -330,10 +334,6 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   public Envelope getEnvelope() {
     return getLine().getEnvelopeInternal();
-  }
-
-  public BoundingBox getBoundingBox() {
-    return BoundingBox.getBoundingBox(getLine());
   }
 
   public double getFromAngle() {

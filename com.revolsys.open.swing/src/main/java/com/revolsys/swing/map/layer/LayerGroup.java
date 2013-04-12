@@ -20,15 +20,14 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   @Override
-  public void add(final int index, final Layer element) {
+  public void add(final int index, final Layer layer) {
     synchronized (layers) {
-      if (element != null && !layers.contains(element)) {
-        layers.add(index, element);
-        element.setLayerGroup(this);
-        element.addPropertyChangeListener(this);
+      if (layer != null && !layers.contains(layer)) {
+        layers.add(index, layer);
+        layer.setLayerGroup(this);
         final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
         propertyChangeSupport.fireIndexedPropertyChange("layers", index, null,
-          element);
+          layer);
       }
     }
   }

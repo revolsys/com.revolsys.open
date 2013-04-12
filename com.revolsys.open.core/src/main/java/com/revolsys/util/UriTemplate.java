@@ -17,7 +17,6 @@
 package com.revolsys.util;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -44,6 +43,48 @@ import org.springframework.web.util.UriUtils;
  */
 public class UriTemplate implements Serializable {
 
+  /**
+   * Static inner class to parse URI template strings into a matching regular expression.
+   */
+  private static class Parser {
+
+    private final List<String> variableNames = new LinkedList<String>();
+
+    private final StringBuilder patternBuilder = new StringBuilder();
+
+    private Parser(final String uriTemplate) {
+      Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
+      final Matcher m = NAMES_PATTERN.matcher(uriTemplate);
+      int end = 0;
+      while (m.find()) {
+        this.patternBuilder.append(quote(uriTemplate, end, m.start()));
+        this.patternBuilder.append(VALUE_REGEX);
+        this.variableNames.add(m.group(1));
+        end = m.end();
+      }
+      this.patternBuilder.append(quote(uriTemplate, end, uriTemplate.length()));
+      final int lastIdx = this.patternBuilder.length() - 1;
+      if (lastIdx >= 0 && this.patternBuilder.charAt(lastIdx) == '/') {
+        this.patternBuilder.deleteCharAt(lastIdx);
+      }
+    }
+
+    private Pattern getMatchPattern() {
+      return Pattern.compile(this.patternBuilder.toString());
+    }
+
+    private List<String> getVariableNames() {
+      return Collections.unmodifiableList(this.variableNames);
+    }
+
+    private String quote(final String fullPath, final int start, final int end) {
+      if (start == end) {
+        return "";
+      }
+      return Pattern.quote(fullPath.substring(start, end));
+    }
+  }
+
   /** Captures URI template variable names. */
   private static final Pattern NAMES_PATTERN = Pattern.compile("\\{([^/]+?)\\}");
 
@@ -60,19 +101,26 @@ public class UriTemplate implements Serializable {
    * Construct a new {@link UriTemplate} with the given URI String.
    * @param uriTemplate the URI template string
    */
-  public UriTemplate(String uriTemplate) {
-    Parser parser = new Parser(uriTemplate);
+  public UriTemplate(final String uriTemplate) {
+    final Parser parser = new Parser(uriTemplate);
     this.uriTemplate = uriTemplate;
     this.variableNames = parser.getVariableNames();
     this.matchPattern = parser.getMatchPattern();
   }
 
   /**
-   * Return the names of the variables in the template, in order.
-   * @return the template variable names
+   * Encodes the given String as URL.
+   * <p>Defaults to {@link UriUtils#encodeUri(String, String)}.
+   * @param uri the URI to encode
+   * @return the encoded URI
    */
-  public List<String> getVariableNames() {
-    return this.variableNames;
+  protected URI encodeUri(final String uri) {
+    try {
+      return new URI(uri);
+    } catch (final URISyntaxException ex) {
+      throw new IllegalArgumentException("Could not create URI from [" + uri
+        + "]: " + ex, ex);
+    }
   }
 
   /**
@@ -92,11 +140,11 @@ public class UriTemplate implements Serializable {
    * @throws IllegalArgumentException if <code>uriVariables</code> is <code>null</code>;
    * or if it does not contain values for all the variable names
    */
-  public URI expand(Map<String, ?> uriVariables) {
+  public URI expand(final Map<String, ?> uriVariables) {
     Assert.notNull(uriVariables, "'uriVariables' must not be null");
-    Object[] values = new Object[this.variableNames.size()];
+    final Object[] values = new Object[this.variableNames.size()];
     for (int i = 0; i < this.variableNames.size(); i++) {
-      String name = this.variableNames.get(i);
+      final String name = this.variableNames.get(i);
       if (!uriVariables.containsKey(name)) {
         throw new IllegalArgumentException(
           "'uriVariables' Map has no value for '" + name + "'");
@@ -120,7 +168,7 @@ public class UriTemplate implements Serializable {
    * @throws IllegalArgumentException if <code>uriVariables</code> is <code>null</code>
    * or if it does not contain sufficient variables
    */
-  public URI expand(Object... uriVariableValues) {
+  public URI expand(final Object... uriVariableValues) {
     Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
     if (uriVariableValues.length != this.variableNames.size()) {
       throw new IllegalArgumentException(
@@ -128,12 +176,12 @@ public class UriTemplate implements Serializable {
           + "]: expected " + this.variableNames.size() + "; got "
           + uriVariableValues.length);
     }
-    Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
-    StringBuffer buffer = new StringBuffer();
+    final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
+    final StringBuffer buffer = new StringBuffer();
     int i = 0;
     while (matcher.find()) {
-      Object uriVariable = uriVariableValues[i++];
-      String replacement = Matcher.quoteReplacement(uriVariable != null ? uriVariable.toString()
+      final Object uriVariable = uriVariableValues[i++];
+      final String replacement = Matcher.quoteReplacement(uriVariable != null ? uriVariable.toString()
         : "");
       matcher.appendReplacement(buffer, replacement);
     }
@@ -142,16 +190,11 @@ public class UriTemplate implements Serializable {
   }
 
   /**
-   * Indicate whether the given URI matches this template.
-   * @param uri the URI to match to
-   * @return <code>true</code> if it matches; <code>false</code> otherwise
+   * Return the names of the variables in the template, in order.
+   * @return the template variable names
    */
-  public boolean matches(String uri) {
-    if (uri == null) {
-      return false;
-    }
-    Matcher matcher = this.matchPattern.matcher(uri);
-    return matcher.matches();
+  public List<String> getVariableNames() {
+    return this.variableNames;
   }
 
   /**
@@ -166,15 +209,15 @@ public class UriTemplate implements Serializable {
    * @param uri the URI to match to
    * @return a map of variable values
    */
-  public Map<String, String> match(String uri) {
+  public Map<String, String> match(final String uri) {
     Assert.notNull(uri, "'uri' must not be null");
-    Map<String, String> result = new LinkedHashMap<String, String>(
+    final Map<String, String> result = new LinkedHashMap<String, String>(
       this.variableNames.size());
-    Matcher matcher = this.matchPattern.matcher(uri);
+    final Matcher matcher = this.matchPattern.matcher(uri);
     if (matcher.find()) {
       for (int i = 1; i <= matcher.groupCount(); i++) {
-        String name = this.variableNames.get(i - 1);
-        String value = matcher.group(i);
+        final String name = this.variableNames.get(i - 1);
+        final String value = matcher.group(i);
         result.put(name, value);
       }
     }
@@ -182,65 +225,21 @@ public class UriTemplate implements Serializable {
   }
 
   /**
-   * Encodes the given String as URL.
-   * <p>Defaults to {@link UriUtils#encodeUri(String, String)}.
-   * @param uri the URI to encode
-   * @return the encoded URI
+   * Indicate whether the given URI matches this template.
+   * @param uri the URI to match to
+   * @return <code>true</code> if it matches; <code>false</code> otherwise
    */
-  protected URI encodeUri(String uri) {
-    try {
-      return new URI(uri);
-    } catch (URISyntaxException ex) {
-      throw new IllegalArgumentException("Could not create URI from [" + uri
-        + "]: " + ex, ex);
+  public boolean matches(final String uri) {
+    if (uri == null) {
+      return false;
     }
+    final Matcher matcher = this.matchPattern.matcher(uri);
+    return matcher.matches();
   }
 
   @Override
   public String toString() {
     return this.uriTemplate;
-  }
-
-  /**
-   * Static inner class to parse URI template strings into a matching regular expression.
-   */
-  private static class Parser {
-
-    private final List<String> variableNames = new LinkedList<String>();
-
-    private final StringBuilder patternBuilder = new StringBuilder();
-
-    private Parser(String uriTemplate) {
-      Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
-      Matcher m = NAMES_PATTERN.matcher(uriTemplate);
-      int end = 0;
-      while (m.find()) {
-        this.patternBuilder.append(quote(uriTemplate, end, m.start()));
-        this.patternBuilder.append(VALUE_REGEX);
-        this.variableNames.add(m.group(1));
-        end = m.end();
-      }
-      this.patternBuilder.append(quote(uriTemplate, end, uriTemplate.length()));
-      int lastIdx = this.patternBuilder.length() - 1;
-      if (lastIdx >= 0 && this.patternBuilder.charAt(lastIdx) == '/') {
-        this.patternBuilder.deleteCharAt(lastIdx);
-      }
-    }
-
-    private String quote(String fullPath, int start, int end) {
-      if (start == end) {
-        return "";
-      }
-      return Pattern.quote(fullPath.substring(start, end));
-    }
-
-    private List<String> getVariableNames() {
-      return Collections.unmodifiableList(this.variableNames);
-    }
-
-    private Pattern getMatchPattern() {
-      return Pattern.compile(this.patternBuilder.toString());
-    }
   }
 
 }

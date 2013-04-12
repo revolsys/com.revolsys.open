@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import java.util.Collection;
@@ -14,6 +13,7 @@ import com.revolsys.gis.model.geometry.operation.noding.snapround.HotPixel;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.IntersectionFinderAdder;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.MCIndexPointSnapper;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.NodingValidator;
+
 /**
  * Uses Snap Rounding to compute a rounded,
  * fully noded arrangement from a set of {@link SegmentString}s.
@@ -32,55 +32,86 @@ import com.revolsys.gis.model.geometry.operation.noding.snapround.NodingValidato
  *
  * @version 1.7
  */
-public class MCIndexSnapRounder
-    implements Noder
-{
+public class MCIndexSnapRounder implements Noder {
   private final CoordinatesPrecisionModel pm;
-  private LineIntersector li;
+
+  private final LineIntersector li;
+
   private final double scaleFactor;
+
   private MCIndexNoder noder;
+
   private MCIndexPointSnapper pointSnapper;
+
   private Collection nodedSegStrings;
 
-  public MCIndexSnapRounder(CoordinatesPrecisionModel pm) {
+  public MCIndexSnapRounder(final CoordinatesPrecisionModel pm) {
     this.pm = pm;
     li = new RobustLineIntersector();
     li.setPrecisionModel(pm);
     scaleFactor = pm.getScaleXY();
   }
 
-  public Collection getNodedSubstrings()
-  {
-    return  NodedSegmentString.getNodedSubstrings(nodedSegStrings);
-  }
-
-  public void computeNodes(Collection inputSegmentStrings)
-  {
-    this.nodedSegStrings = inputSegmentStrings;
-    noder = new MCIndexNoder();
-    pointSnapper = new MCIndexPointSnapper(noder.getMonotoneChains(), noder.getIndex());
-    snapRound(inputSegmentStrings, li);
-
-    // testing purposes only - remove in final version
-    //checkCorrectness(inputSegmentStrings);
-  }
-
-  private void checkCorrectness(Collection inputSegmentStrings)
-  {
-    Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
-    NodingValidator nv = new NodingValidator(resultSegStrings);
+  private void checkCorrectness(final Collection inputSegmentStrings) {
+    final Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
+    final NodingValidator nv = new NodingValidator(resultSegStrings);
     try {
       nv.checkValid();
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       ex.printStackTrace();
     }
   }
 
-  private void snapRound(Collection segStrings, LineIntersector li)
-  {
-    List intersections = findInteriorIntersections(segStrings, li);
-    computeIntersectionSnaps(intersections);
-    computeVertexSnaps(segStrings);
+  /**
+   * Computes nodes introduced as a result of snapping segments to snap points (hot pixels)
+   */
+  private void computeIntersectionSnaps(final Collection snapPts) {
+    for (final Iterator it = snapPts.iterator(); it.hasNext();) {
+      final Coordinates snapPt = (Coordinates)it.next();
+      final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
+      pointSnapper.snap(hotPixel);
+    }
+  }
+
+  @Override
+  public void computeNodes(final Collection inputSegmentStrings) {
+    this.nodedSegStrings = inputSegmentStrings;
+    noder = new MCIndexNoder();
+    pointSnapper = new MCIndexPointSnapper(noder.getMonotoneChains(),
+      noder.getIndex());
+    snapRound(inputSegmentStrings, li);
+
+    // testing purposes only - remove in final version
+    // checkCorrectness(inputSegmentStrings);
+  }
+
+  /**
+   * Computes nodes introduced as a result of
+   * snapping segments to vertices of other segments
+   *
+   * @param edges the list of segment strings to snap together
+   */
+  public void computeVertexSnaps(final Collection edges) {
+    for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
+      final NodedSegmentString edge0 = (NodedSegmentString)i0.next();
+      computeVertexSnaps(edge0);
+    }
+  }
+
+  /**
+   * Performs a brute-force comparison of every segment in each {@link SegmentString}.
+   * This has n^2 performance.
+   */
+  private void computeVertexSnaps(final NodedSegmentString e) {
+    final CoordinatesList pts0 = e.getCoordinates();
+    for (int i = 0; i < pts0.size() - 1; i++) {
+      final HotPixel hotPixel = new HotPixel(pts0.get(i), scaleFactor, li);
+      final boolean isNodeAdded = pointSnapper.snap(hotPixel, e, i);
+      // if a node is created for a vertex, that vertex must be noded too
+      if (isNodeAdded) {
+        e.addIntersection(pts0.get(i), i);
+      }
+    }
   }
 
   /**
@@ -91,55 +122,24 @@ public class MCIndexSnapRounder
    *
    * @return a list of Coordinates for the intersections
    */
-  private List findInteriorIntersections(Collection segStrings, LineIntersector li)
-  {
-    IntersectionFinderAdder intFinderAdder = new IntersectionFinderAdder(li);
+  private List findInteriorIntersections(final Collection segStrings,
+    final LineIntersector li) {
+    final IntersectionFinderAdder intFinderAdder = new IntersectionFinderAdder(
+      li);
     noder.setSegmentIntersector(intFinderAdder);
     noder.computeNodes(segStrings);
     return intFinderAdder.getInteriorIntersections();
   }
 
-  /**
-   * Computes nodes introduced as a result of snapping segments to snap points (hot pixels)
-   */
-  private void computeIntersectionSnaps(Collection snapPts)
-  {
-    for (Iterator it = snapPts.iterator(); it.hasNext(); ) {
-      Coordinates snapPt = (Coordinates) it.next();
-      HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
-      pointSnapper.snap(hotPixel);
-    }
+  @Override
+  public Collection getNodedSubstrings() {
+    return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
   }
 
-  /**
-   * Computes nodes introduced as a result of
-   * snapping segments to vertices of other segments
-   *
-   * @param edges the list of segment strings to snap together
-   */
-  public void computeVertexSnaps(Collection edges)
-  {
-    for (Iterator i0 = edges.iterator(); i0.hasNext(); ) {
-      NodedSegmentString edge0 = (NodedSegmentString) i0.next();
-      computeVertexSnaps(edge0);
-    }
+  private void snapRound(final Collection segStrings, final LineIntersector li) {
+    final List intersections = findInteriorIntersections(segStrings, li);
+    computeIntersectionSnaps(intersections);
+    computeVertexSnaps(segStrings);
   }
-
-  /**
-   * Performs a brute-force comparison of every segment in each {@link SegmentString}.
-   * This has n^2 performance.
-   */
-  private void computeVertexSnaps(NodedSegmentString e)
-  {
-    CoordinatesList pts0 = e.getCoordinates();
-    for (int i = 0; i < pts0.size() - 1; i++) {
-      HotPixel hotPixel = new HotPixel(pts0.get(i), scaleFactor, li);
-      boolean isNodeAdded = pointSnapper.snap(hotPixel, e, i);
-      // if a node is created for a vertex, that vertex must be noded too
-      if (isNodeAdded) {
-        e.addIntersection(pts0.get(i), i);
-      }
-  }
-}
 
 }

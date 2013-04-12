@@ -83,7 +83,7 @@ class OffsetSegmentGenerator {
    * The angle quantum with which to approximate a fillet curve (based on the
    * input # of quadrant segments)
    */
-  private double filletAngleQuantum;
+  private final double filletAngleQuantum;
 
   /**
    * The Closing Segment Length Factor controls how long "closing segments" are.
@@ -103,28 +103,28 @@ class OffsetSegmentGenerator {
 
   private double distance = 0.0;
 
-  private CoordinatesPrecisionModel precisionModel;
+  private final CoordinatesPrecisionModel precisionModel;
 
-  private BufferParameters bufParams;
+  private final BufferParameters bufParams;
 
-  private LineIntersector li;
+  private final LineIntersector li;
 
   private Coordinates s0, s1, s2;
 
-  private LineSegment seg0 = new LineSegment();
+  private final LineSegment seg0 = new LineSegment();
 
-  private LineSegment seg1 = new LineSegment();
+  private final LineSegment seg1 = new LineSegment();
 
-  private LineSegment offset0 = new LineSegment();
+  private final LineSegment offset0 = new LineSegment();
 
-  private LineSegment offset1 = new LineSegment();
+  private final LineSegment offset1 = new LineSegment();
 
   private int side = 0;
 
   private boolean hasNarrowConcaveAngle = false;
 
-  public OffsetSegmentGenerator(CoordinatesPrecisionModel precisionModel,
-    BufferParameters bufParams, double distance) {
+  public OffsetSegmentGenerator(final CoordinatesPrecisionModel precisionModel,
+    final BufferParameters bufParams, final double distance) {
     this.precisionModel = precisionModel;
     this.bufParams = bufParams;
 
@@ -139,103 +139,31 @@ class OffsetSegmentGenerator {
      * small buffer distances.
      */
     if (bufParams.getQuadrantSegments() >= 8
-      && bufParams.getJoinStyle() == BufferParameters.JOIN_ROUND)
+      && bufParams.getJoinStyle() == BufferParameters.JOIN_ROUND) {
       closingSegLengthFactor = MAX_CLOSING_SEG_LEN_FACTOR;
+    }
     init(distance);
   }
 
   /**
-   * Tests whether the input has a narrow concave angle (relative to the offset
-   * distance). In this case the generated offset curve will contain
-   * self-intersections and heuristic closing segments. This is expected
-   * behaviour in the case of buffer curves. For pure offset curves, the output
-   * needs to be further treated before it can be used.
+   * Adds a bevel join connecting the two offset segments around a reflex
+   * corner.
    * 
-   * @return true if the input has a narrow concave angle
+   * @param offset0 the first offset segment
+   * @param offset1 the second offset segment
    */
-  public boolean hasNarrowConcaveAngle() {
-    return hasNarrowConcaveAngle;
-  }
-
-  private void init(double distance) {
-    this.distance = distance;
-    segList = new OffsetSegmentString();
-    segList.setPrecisionModel(precisionModel);
-    /**
-     * Choose the min vertex separation as a small fraction of the offset
-     * distance.
-     */
-    segList.setMinimumVertexDistance(distance
-      * CURVE_VERTEX_SNAP_DISTANCE_FACTOR);
-  }
-
-  public void initSideSegments(Coordinates s1, Coordinates s2, int side) {
-    this.s1 = s1;
-    this.s2 = s2;
-    this.side = side;
-    seg1.setCoordinates(s1, s2);
-    computeOffsetSegment(seg1, side, distance, offset1);
-  }
-
-  public CoordinatesList getCoordinates() {
-    return segList.getCoordinates();
-  }
-
-  public void closeRing() {
-    segList.closeRing();
-  }
-
-  public void addSegments(CoordinatesList pt, boolean isForward) {
-    segList.addPts(pt, isForward);
-  }
-
-  public void addFirstSegment() {
+  private void addBevelJoin(final LineSegment offset0, final LineSegment offset1) {
+    segList.addPt(offset0.get(1));
     segList.addPt(offset1.get(0));
   }
 
-  /**
-   * Add last offset point
-   */
-  public void addLastSegment() {
-    segList.addPt(offset1.get(1));
-  }
-
-  // private static double MAX_CLOSING_SEG_LEN = 3.0;
-
-  public void addNextSegment(Coordinates p, boolean addStartPoint) {
-    // s0-s1-s2 are the coordinates of the previous segment and the current one
-    s0 = s1;
-    s1 = s2;
-    s2 = p;
-    seg0.setCoordinates(s0, s1);
-    computeOffsetSegment(seg0, side, distance, offset0);
-    seg1.setCoordinates(s1, s2);
-    computeOffsetSegment(seg1, side, distance, offset1);
-
-    // do nothing if points are equal
-    if (s1.equals(s2))
-      return;
-
-    int orientation = CoordinatesUtil.orientationIndex(s0, s1, s2);
-    boolean outsideTurn = (orientation == CGAlgorithms.CLOCKWISE && side == Position.LEFT)
-      || (orientation == CGAlgorithms.COUNTERCLOCKWISE && side == Position.RIGHT);
-
-    if (orientation == 0) { // lines are collinear
-      addCollinear(addStartPoint);
-    } else if (outsideTurn) {
-      addOutsideTurn(orientation, addStartPoint);
-    } else { // inside turn
-      addInsideTurn(orientation, addStartPoint);
-    }
-  }
-
-  private void addCollinear(boolean addStartPoint) {
+  private void addCollinear(final boolean addStartPoint) {
     /**
      * This test could probably be done more efficiently, but the situation of
      * exact collinearity should be fairly rare.
      */
     li.computeIntersection(s0, s1, s1, s2);
-    int numInt = li.getIntersectionNum();
+    final int numInt = li.getIntersectionNum();
     /**
      * if numInt is < 2, the lines are parallel and in the same direction. In
      * this case the point can be ignored, since the offset lines will also be
@@ -251,8 +179,9 @@ class OffsetSegmentGenerator {
        */
       if (bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL
         || bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
-        if (addStartPoint)
+        if (addStartPoint) {
           segList.addPt(offset0.get(1));
+        }
         segList.addPt(offset1.get(0));
       } else {
         addFillet(s1, offset0.get(1), offset1.get(0), CGAlgorithms.CLOCKWISE,
@@ -262,36 +191,77 @@ class OffsetSegmentGenerator {
   }
 
   /**
-   * Adds the offset points for an outside (convex) turn
+   * Add points for a circular fillet around a reflex corner. Adds the start and
+   * end points
    * 
-   * @param orientation
-   * @param addStartPoint
+   * @param p base point of curve
+   * @param p0 start point of fillet curve
+   * @param p1 endpoint of fillet curve
+   * @param direction the orientation of the fillet
+   * @param radius the radius of the fillet
    */
-  private void addOutsideTurn(int orientation, boolean addStartPoint) {
-    /**
-     * Heuristic: If offset endpoints are very close together, just use one of
-     * them as the corner vertex. This avoids problems with computing mitre
-     * corners in the case where the two segments are almost parallel (which is
-     * hard to compute a robust intersection for).
-     */
-    if (offset0.get(1).distance(offset1.get(0)) < distance
-      * OFFSET_SEGMENT_SEPARATION_FACTOR) {
-      segList.addPt(offset0.get(1));
-      return;
+  private void addFillet(final Coordinates p, final Coordinates p0,
+    final Coordinates p1, final int direction, final double radius) {
+    final double dx0 = p0.getX() - p.getX();
+    final double dy0 = p0.getY() - p.getY();
+    double startAngle = Math.atan2(dy0, dx0);
+    final double dx1 = p1.getX() - p.getX();
+    final double dy1 = p1.getY() - p.getY();
+    final double endAngle = Math.atan2(dy1, dx1);
+
+    if (direction == CGAlgorithms.CLOCKWISE) {
+      if (startAngle <= endAngle) {
+        startAngle += 2.0 * Math.PI;
+      }
+    } else { // direction == COUNTERCLOCKWISE
+      if (startAngle >= endAngle) {
+        startAngle -= 2.0 * Math.PI;
+      }
+    }
+    segList.addPt(p0);
+    addFillet(p, startAngle, endAngle, direction, radius);
+    segList.addPt(p1);
+  }
+
+  /**
+   * Adds points for a circular fillet arc between two specified angles. The
+   * start and end point for the fillet are not added - the caller must add them
+   * if required.
+   * 
+   * @param direction is -1 for a CW angle, 1 for a CCW angle
+   * @param radius the radius of the fillet
+   */
+  private void addFillet(final Coordinates p, final double startAngle,
+    final double endAngle, final int direction, final double radius) {
+    final int directionFactor = direction == CGAlgorithms.CLOCKWISE ? -1 : 1;
+
+    final double totalAngle = Math.abs(startAngle - endAngle);
+    final int nSegs = (int)(totalAngle / filletAngleQuantum + 0.5);
+
+    if (nSegs < 1) {
+      return; // no segments because angle is less than increment - nothing to
+              // do!
     }
 
-    if (bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
-      addMitreJoin(s1, offset0, offset1, distance);
-    } else if (bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL) {
-      addBevelJoin(offset0, offset1);
-    } else {
-      // add a circular fillet connecting the endpoints of the offset segments
-      if (addStartPoint)
-        segList.addPt(offset0.get(1));
-      // TESTING - comment out to produce beveled joins
-      addFillet(s1, offset0.get(1), offset1.get(0), orientation, distance);
-      segList.addPt(offset1.get(0));
+    double initAngle, currAngleInc;
+
+    // choose angle increment so that each segment has equal length
+    initAngle = 0.0;
+    currAngleInc = totalAngle / nSegs;
+
+    double currAngle = initAngle;
+    final Coordinates pt = new DoubleCoordinates();
+    while (currAngle < totalAngle) {
+      final double angle = startAngle + directionFactor * currAngle;
+      pt.setX(p.getX() + radius * Math.cos(angle));
+      pt.setY(p.getY() + radius * Math.sin(angle));
+      segList.addPt(pt);
+      currAngle += currAngleInc;
     }
+  }
+
+  public void addFirstSegment() {
+    segList.addPt(offset1.get(0));
   }
 
   /**
@@ -300,7 +270,7 @@ class OffsetSegmentGenerator {
    * @param orientation
    * @param addStartPoint
    */
-  private void addInsideTurn(int orientation, boolean addStartPoint) {
+  private void addInsideTurn(final int orientation, final boolean addStartPoint) {
     /**
      * add intersection point of offset segments (if any)
      */
@@ -346,17 +316,17 @@ class OffsetSegmentGenerator {
          * Add "closing segment" of required length.
          */
         if (closingSegLengthFactor > 0) {
-          Coordinates mid0 = new DoubleCoordinates((closingSegLengthFactor
-            * offset0.get(1).getX() + s1.getX())
-            / (closingSegLengthFactor + 1), (closingSegLengthFactor
-            * offset0.get(1).getY() + s1.getY())
-            / (closingSegLengthFactor + 1));
+          final Coordinates mid0 = new DoubleCoordinates(
+            (closingSegLengthFactor * offset0.get(1).getX() + s1.getX())
+              / (closingSegLengthFactor + 1), (closingSegLengthFactor
+              * offset0.get(1).getY() + s1.getY())
+              / (closingSegLengthFactor + 1));
           segList.addPt(mid0);
-          Coordinates mid1 = new DoubleCoordinates((closingSegLengthFactor
-            * offset1.get(0).getX() + s1.getX())
-            / (closingSegLengthFactor + 1), (closingSegLengthFactor
-            * offset1.get(0).getY() + s1.getY())
-            / (closingSegLengthFactor + 1));
+          final Coordinates mid1 = new DoubleCoordinates(
+            (closingSegLengthFactor * offset1.get(0).getX() + s1.getX())
+              / (closingSegLengthFactor + 1), (closingSegLengthFactor
+              * offset1.get(0).getY() + s1.getY())
+              / (closingSegLengthFactor + 1));
           segList.addPt(mid1);
         } else {
           /**
@@ -375,45 +345,87 @@ class OffsetSegmentGenerator {
   }
 
   /**
-   * Compute an offset segment for an input segment on a given side and at a
-   * given distance. The offset points are computed in full double precision,
-   * for accuracy.
-   * 
-   * @param seg the segment to offset
-   * @param side the side of the segment ({@link Position}) the offset lies on
-   * @param distance the offset distance
-   * @param offset the points computed for the offset segment
+   * Add last offset point
    */
-  private void computeOffsetSegment(LineSegment seg, int side, double distance,
-    LineSegment offset) {
-    int sideSign = side == Position.LEFT ? 1 : -1;
-    double dx = seg.get(1).getX() - seg.get(0).getX();
-    double dy = seg.get(1).getY() - seg.get(0).getY();
-    double len = Math.sqrt(dx * dx + dy * dy);
-    // u is the vector that is the length of the offset, in the direction of the
-    // segment
-    double ux = sideSign * distance * dx / len;
-    double uy = sideSign * distance * dy / len;
-    offset.setX(0, seg.get(0).getX() - uy);
-    offset.setY(0, seg.get(0).getY() + ux);
-    offset.setX(1, seg.get(1).getX() - uy);
-    offset.setY(1, seg.get(1).getY() + ux);
+  public void addLastSegment() {
+    segList.addPt(offset1.get(1));
   }
+
+  /**
+   * Adds a limited mitre join connecting the two reflex offset segments. A
+   * limited mitre is a mitre which is beveled at the distance determined by the
+   * mitre ratio limit.
+   * 
+   * @param offset0 the first offset segment
+   * @param offset1 the second offset segment
+   * @param distance the offset distance
+   * @param mitreLimit the mitre limit ratio
+   */
+  private void addLimitedMitreJoin(final LineSegment offset0,
+    final LineSegment offset1, final double distance, final double mitreLimit) {
+    final Coordinates basePt = seg0.get(1);
+
+    final double ang0 = basePt.angle2d(seg0.get(0));
+
+    // oriented angle between segments
+    final double angDiff = CoordinatesUtil.angleBetweenOriented(seg0.get(0),
+      basePt, seg1.get(1));
+    // half of the interior angle
+    final double angDiffHalf = angDiff / 2;
+
+    // angle for bisector of the interior angle between the segments
+    final double midAng = Angle.normalize(ang0 + angDiffHalf);
+    // rotating this by PI gives the bisector of the reflex angle
+    final double mitreMidAng = Angle.normalize(midAng + Math.PI);
+
+    // the miterLimit determines the distance to the mitre bevel
+    final double mitreDist = mitreLimit * distance;
+    // the bevel delta is the difference between the buffer distance
+    // and half of the length of the bevel segment
+    final double bevelDelta = mitreDist * Math.abs(Math.sin(angDiffHalf));
+    final double bevelHalfLen = distance - bevelDelta;
+
+    // compute the midpoint of the bevel segment
+    final double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
+    final double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
+    final Coordinates bevelMidPt = new DoubleCoordinates(bevelMidX, bevelMidY);
+
+    // compute the mitre midline segment from the corner point to the bevel
+    // segment midpoint
+    final LineSegment mitreMidLine = new LineSegment(basePt, bevelMidPt);
+
+    // finally the bevel segment endpoints are computed as offsets from
+    // the mitre midline
+    final Coordinates bevelEndLeft = mitreMidLine.pointAlongOffset(1.0,
+      bevelHalfLen);
+    final Coordinates bevelEndRight = mitreMidLine.pointAlongOffset(1.0,
+      -bevelHalfLen);
+
+    if (side == Position.LEFT) {
+      segList.addPt(bevelEndLeft);
+      segList.addPt(bevelEndRight);
+    } else {
+      segList.addPt(bevelEndRight);
+      segList.addPt(bevelEndLeft);
+    }
+  }
+
+  // private static double MAX_CLOSING_SEG_LEN = 3.0;
 
   /**
    * Add an end cap around point p1, terminating a line segment coming from p0
    */
-  public void addLineEndCap(Coordinates p0, Coordinates p1) {
-    LineSegment seg = new LineSegment(p0, p1);
+  public void addLineEndCap(final Coordinates p0, final Coordinates p1) {
+    final LineSegment seg = new LineSegment(p0, p1);
 
-    LineSegment offsetL = new LineSegment();
+    final LineSegment offsetL = new LineSegment();
     computeOffsetSegment(seg, Position.LEFT, distance, offsetL);
-    LineSegment offsetR = new LineSegment();
+    final LineSegment offsetR = new LineSegment();
     computeOffsetSegment(seg, Position.RIGHT, distance, offsetR);
 
-    double dx = p1.getX() - p0.getX();
-    double dy = p1.getY() - p0.getY();
-    double angle = Math.atan2(dy, dx);
+    final double dx = p1.getX() - p0.getX();
+    final double dy = p1.getY() - p0.getY();
+    final double angle = Math.atan2(dy, dx);
 
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
@@ -430,15 +442,17 @@ class OffsetSegmentGenerator {
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        Coordinates squareCapSideOffset = new DoubleCoordinates();
+        final Coordinates squareCapSideOffset = new DoubleCoordinates();
         squareCapSideOffset.setX(Math.abs(distance) * Math.cos(angle));
         squareCapSideOffset.setY(Math.abs(distance) * Math.sin(angle));
 
-        Coordinates squareCapLOffset = new DoubleCoordinates(offsetL.get(1)
-          .getX() + squareCapSideOffset.getX(), offsetL.get(1).getY()
+        final Coordinates squareCapLOffset = new DoubleCoordinates(offsetL.get(
+          1).getX()
+          + squareCapSideOffset.getX(), offsetL.get(1).getY()
           + squareCapSideOffset.getY());
-        Coordinates squareCapROffset = new DoubleCoordinates(offsetR.get(1)
-          .getX() + squareCapSideOffset.getX(), offsetR.get(1).getY()
+        final Coordinates squareCapROffset = new DoubleCoordinates(offsetR.get(
+          1).getX()
+          + squareCapSideOffset.getX(), offsetR.get(1).getY()
           + squareCapSideOffset.getY());
         segList.addPt(squareCapLOffset);
         segList.addPt(squareCapROffset);
@@ -455,8 +469,8 @@ class OffsetSegmentGenerator {
    * @param offset1 the second offset segment
    * @param distance the offset distance
    */
-  private void addMitreJoin(Coordinates p, LineSegment offset0,
-    LineSegment offset1, double distance) {
+  private void addMitreJoin(final Coordinates p, final LineSegment offset0,
+    final LineSegment offset1, final double distance) {
     boolean isMitreWithinLimit = true;
     Coordinates intPt = null;
 
@@ -469,12 +483,13 @@ class OffsetSegmentGenerator {
       intPt = HCoordinate.intersection(offset0.get(0), offset0.get(1),
         offset1.get(0), offset1.get(1));
 
-      double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distance(p)
+      final double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distance(p)
         / Math.abs(distance);
 
-      if (mitreRatio > bufParams.getMitreLimit())
+      if (mitreRatio > bufParams.getMitreLimit()) {
         isMitreWithinLimit = false;
-    } catch (NotRepresentableException ex) {
+      }
+    } catch (final NotRepresentableException ex) {
       intPt = new DoubleCoordinates(0.0, 0.0);
       isMitreWithinLimit = false;
     }
@@ -487,149 +502,108 @@ class OffsetSegmentGenerator {
     }
   }
 
+  public void addNextSegment(final Coordinates p, final boolean addStartPoint) {
+    // s0-s1-s2 are the coordinates of the previous segment and the current one
+    s0 = s1;
+    s1 = s2;
+    s2 = p;
+    seg0.setCoordinates(s0, s1);
+    computeOffsetSegment(seg0, side, distance, offset0);
+    seg1.setCoordinates(s1, s2);
+    computeOffsetSegment(seg1, side, distance, offset1);
+
+    // do nothing if points are equal
+    if (s1.equals(s2)) {
+      return;
+    }
+
+    final int orientation = CoordinatesUtil.orientationIndex(s0, s1, s2);
+    final boolean outsideTurn = (orientation == CGAlgorithms.CLOCKWISE && side == Position.LEFT)
+      || (orientation == CGAlgorithms.COUNTERCLOCKWISE && side == Position.RIGHT);
+
+    if (orientation == 0) { // lines are collinear
+      addCollinear(addStartPoint);
+    } else if (outsideTurn) {
+      addOutsideTurn(orientation, addStartPoint);
+    } else { // inside turn
+      addInsideTurn(orientation, addStartPoint);
+    }
+  }
+
   /**
-   * Adds a limited mitre join connecting the two reflex offset segments. A
-   * limited mitre is a mitre which is beveled at the distance determined by the
-   * mitre ratio limit.
+   * Adds the offset points for an outside (convex) turn
    * 
-   * @param offset0 the first offset segment
-   * @param offset1 the second offset segment
-   * @param distance the offset distance
-   * @param mitreLimit the mitre limit ratio
+   * @param orientation
+   * @param addStartPoint
    */
-  private void addLimitedMitreJoin(LineSegment offset0, LineSegment offset1,
-    double distance, double mitreLimit) {
-    Coordinates basePt = seg0.get(1);
+  private void addOutsideTurn(final int orientation, final boolean addStartPoint) {
+    /**
+     * Heuristic: If offset endpoints are very close together, just use one of
+     * them as the corner vertex. This avoids problems with computing mitre
+     * corners in the case where the two segments are almost parallel (which is
+     * hard to compute a robust intersection for).
+     */
+    if (offset0.get(1).distance(offset1.get(0)) < distance
+      * OFFSET_SEGMENT_SEPARATION_FACTOR) {
+      segList.addPt(offset0.get(1));
+      return;
+    }
 
-    double ang0 = basePt.angle2d(seg0.get(0));
-
-    // oriented angle between segments
-    double angDiff = CoordinatesUtil.angleBetweenOriented(seg0.get(0), basePt,
-      seg1.get(1));
-    // half of the interior angle
-    double angDiffHalf = angDiff / 2;
-
-    // angle for bisector of the interior angle between the segments
-    double midAng = Angle.normalize(ang0 + angDiffHalf);
-    // rotating this by PI gives the bisector of the reflex angle
-    double mitreMidAng = Angle.normalize(midAng + Math.PI);
-
-    // the miterLimit determines the distance to the mitre bevel
-    double mitreDist = mitreLimit * distance;
-    // the bevel delta is the difference between the buffer distance
-    // and half of the length of the bevel segment
-    double bevelDelta = mitreDist * Math.abs(Math.sin(angDiffHalf));
-    double bevelHalfLen = distance - bevelDelta;
-
-    // compute the midpoint of the bevel segment
-    double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
-    double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
-    Coordinates bevelMidPt = new DoubleCoordinates(bevelMidX, bevelMidY);
-
-    // compute the mitre midline segment from the corner point to the bevel
-    // segment midpoint
-    LineSegment mitreMidLine = new LineSegment(basePt, bevelMidPt);
-
-    // finally the bevel segment endpoints are computed as offsets from
-    // the mitre midline
-    Coordinates bevelEndLeft = mitreMidLine.pointAlongOffset(1.0, bevelHalfLen);
-    Coordinates bevelEndRight = mitreMidLine.pointAlongOffset(1.0,
-      -bevelHalfLen);
-
-    if (side == Position.LEFT) {
-      segList.addPt(bevelEndLeft);
-      segList.addPt(bevelEndRight);
+    if (bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
+      addMitreJoin(s1, offset0, offset1, distance);
+    } else if (bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL) {
+      addBevelJoin(offset0, offset1);
     } else {
-      segList.addPt(bevelEndRight);
-      segList.addPt(bevelEndLeft);
+      // add a circular fillet connecting the endpoints of the offset segments
+      if (addStartPoint) {
+        segList.addPt(offset0.get(1));
+      }
+      // TESTING - comment out to produce beveled joins
+      addFillet(s1, offset0.get(1), offset1.get(0), orientation, distance);
+      segList.addPt(offset1.get(0));
     }
   }
 
-  /**
-   * Adds a bevel join connecting the two offset segments around a reflex
-   * corner.
-   * 
-   * @param offset0 the first offset segment
-   * @param offset1 the second offset segment
-   */
-  private void addBevelJoin(LineSegment offset0, LineSegment offset1) {
-    segList.addPt(offset0.get(1));
-    segList.addPt(offset1.get(0));
+  public void addSegments(final CoordinatesList pt, final boolean isForward) {
+    segList.addPts(pt, isForward);
+  }
+
+  public void closeRing() {
+    segList.closeRing();
   }
 
   /**
-   * Add points for a circular fillet around a reflex corner. Adds the start and
-   * end points
+   * Compute an offset segment for an input segment on a given side and at a
+   * given distance. The offset points are computed in full double precision,
+   * for accuracy.
    * 
-   * @param p base point of curve
-   * @param p0 start point of fillet curve
-   * @param p1 endpoint of fillet curve
-   * @param direction the orientation of the fillet
-   * @param radius the radius of the fillet
+   * @param seg the segment to offset
+   * @param side the side of the segment ({@link Position}) the offset lies on
+   * @param distance the offset distance
+   * @param offset the points computed for the offset segment
    */
-  private void addFillet(Coordinates p, Coordinates p0, Coordinates p1,
-    int direction, double radius) {
-    double dx0 = p0.getX() - p.getX();
-    double dy0 = p0.getY() - p.getY();
-    double startAngle = Math.atan2(dy0, dx0);
-    double dx1 = p1.getX() - p.getX();
-    double dy1 = p1.getY() - p.getY();
-    double endAngle = Math.atan2(dy1, dx1);
-
-    if (direction == CGAlgorithms.CLOCKWISE) {
-      if (startAngle <= endAngle)
-        startAngle += 2.0 * Math.PI;
-    } else { // direction == COUNTERCLOCKWISE
-      if (startAngle >= endAngle)
-        startAngle -= 2.0 * Math.PI;
-    }
-    segList.addPt(p0);
-    addFillet(p, startAngle, endAngle, direction, radius);
-    segList.addPt(p1);
-  }
-
-  /**
-   * Adds points for a circular fillet arc between two specified angles. The
-   * start and end point for the fillet are not added - the caller must add them
-   * if required.
-   * 
-   * @param direction is -1 for a CW angle, 1 for a CCW angle
-   * @param radius the radius of the fillet
-   */
-  private void addFillet(Coordinates p, double startAngle, double endAngle,
-    int direction, double radius) {
-    int directionFactor = direction == CGAlgorithms.CLOCKWISE ? -1 : 1;
-
-    double totalAngle = Math.abs(startAngle - endAngle);
-    int nSegs = (int)(totalAngle / filletAngleQuantum + 0.5);
-
-    if (nSegs < 1)
-      return; // no segments because angle is less than increment - nothing to
-              // do!
-
-    double initAngle, currAngleInc;
-
-    // choose angle increment so that each segment has equal length
-    initAngle = 0.0;
-    currAngleInc = totalAngle / nSegs;
-
-    double currAngle = initAngle;
-    Coordinates pt = new DoubleCoordinates();
-    while (currAngle < totalAngle) {
-      double angle = startAngle + directionFactor * currAngle;
-      pt.setX(p.getX() + radius * Math.cos(angle));
-      pt.setY(p.getY() + radius * Math.sin(angle));
-      segList.addPt(pt);
-      currAngle += currAngleInc;
-    }
+  private void computeOffsetSegment(final LineSegment seg, final int side,
+    final double distance, final LineSegment offset) {
+    final int sideSign = side == Position.LEFT ? 1 : -1;
+    final double dx = seg.get(1).getX() - seg.get(0).getX();
+    final double dy = seg.get(1).getY() - seg.get(0).getY();
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = sideSign * distance * dx / len;
+    final double uy = sideSign * distance * dy / len;
+    offset.setX(0, seg.get(0).getX() - uy);
+    offset.setY(0, seg.get(0).getY() + ux);
+    offset.setX(1, seg.get(1).getX() - uy);
+    offset.setY(1, seg.get(1).getY() + ux);
   }
 
   /**
    * Creates a CW circle around a point
    */
-  public void createCircle(Coordinates p) {
+  public void createCircle(final Coordinates p) {
     // add start point
-    Coordinates pt = new DoubleCoordinates(p.getX() + distance, p.getY());
+    final Coordinates pt = new DoubleCoordinates(p.getX() + distance, p.getY());
     segList.addPt(pt);
     addFillet(p, 0.0, 2.0 * Math.PI, -1, distance);
     segList.closeRing();
@@ -638,7 +612,7 @@ class OffsetSegmentGenerator {
   /**
    * Creates a CW square around a point
    */
-  public void createSquare(Coordinates p) {
+  public void createSquare(final Coordinates p) {
     segList.addPt(new DoubleCoordinates(p.getX() + distance, p.getY()
       + distance));
     segList.addPt(new DoubleCoordinates(p.getX() + distance, p.getY()
@@ -648,5 +622,43 @@ class OffsetSegmentGenerator {
     segList.addPt(new DoubleCoordinates(p.getX() - distance, p.getY()
       + distance));
     segList.closeRing();
+  }
+
+  public CoordinatesList getCoordinates() {
+    return segList.getCoordinates();
+  }
+
+  /**
+   * Tests whether the input has a narrow concave angle (relative to the offset
+   * distance). In this case the generated offset curve will contain
+   * self-intersections and heuristic closing segments. This is expected
+   * behaviour in the case of buffer curves. For pure offset curves, the output
+   * needs to be further treated before it can be used.
+   * 
+   * @return true if the input has a narrow concave angle
+   */
+  public boolean hasNarrowConcaveAngle() {
+    return hasNarrowConcaveAngle;
+  }
+
+  private void init(final double distance) {
+    this.distance = distance;
+    segList = new OffsetSegmentString();
+    segList.setPrecisionModel(precisionModel);
+    /**
+     * Choose the min vertex separation as a small fraction of the offset
+     * distance.
+     */
+    segList.setMinimumVertexDistance(distance
+      * CURVE_VERTEX_SNAP_DISTANCE_FACTOR);
+  }
+
+  public void initSideSegments(final Coordinates s1, final Coordinates s2,
+    final int side) {
+    this.s1 = s1;
+    this.s2 = s2;
+    this.side = side;
+    seg1.setCoordinates(s1, s2);
+    computeOffsetSegment(seg1, side, distance, offset1);
   }
 }

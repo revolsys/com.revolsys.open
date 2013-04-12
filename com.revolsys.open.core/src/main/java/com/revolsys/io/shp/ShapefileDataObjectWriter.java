@@ -209,7 +209,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         final Resource codePageResource = SpringUtil.getResourceWithExtension(
           resource, "cpg");
         if (!(codePageResource instanceof NonExistingResource)) {
-          PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
+          final PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
           try {
             writer.print("UTF-8");
           } finally {

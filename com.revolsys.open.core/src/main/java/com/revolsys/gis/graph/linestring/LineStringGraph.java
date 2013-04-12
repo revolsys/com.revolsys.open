@@ -39,7 +39,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.filter.CrossingLineSegmentFilter;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -505,7 +504,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         final LineSegment lineSegment = new LineSegment(previousPoint, point);
         final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint,
           point);
-        List<Integer> newIndecies = new ArrayList<Integer>(index);
+        final List<Integer> newIndecies = new ArrayList<Integer>(index);
         newIndecies.add(i++);
         newEdge.setAttribute(INDEX, newIndecies);
         newEdges.add(newEdge);

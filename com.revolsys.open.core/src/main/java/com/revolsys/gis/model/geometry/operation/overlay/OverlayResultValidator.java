@@ -38,6 +38,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.vividsolutions.jts.geom.Location;
+
 /**
  * Validates that the result of an overlay operation is
  * geometrically correct, within a determined tolerance.
@@ -55,77 +56,69 @@ import com.vividsolutions.jts.geom.Location;
  * @version 1.7
  * @see OverlayOp
  */
-public class OverlayResultValidator
-{
-  public static boolean isValid(Geometry a, Geometry b, int overlayOp, Geometry result)
-  {
-    OverlayResultValidator validator = new OverlayResultValidator(a, b, result);
+public class OverlayResultValidator {
+  private static final double TOLERANCE = 0.000001;
+
+  private static double computeBoundaryDistanceTolerance(final Geometry g0,
+    final Geometry g1) {
+    return Math.min(GeometrySnapper.computeSizeBasedSnapTolerance(g0),
+      GeometrySnapper.computeSizeBasedSnapTolerance(g1));
+  }
+
+  private static boolean hasLocation(final int[] location, final int loc) {
+    for (int i = 0; i < 3; i++) {
+      if (location[i] == loc) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isValid(final Geometry a, final Geometry b,
+    final int overlayOp, final Geometry result) {
+    final OverlayResultValidator validator = new OverlayResultValidator(a, b,
+      result);
     return validator.isValid(overlayOp);
   }
 
-  private static double computeBoundaryDistanceTolerance(Geometry g0, Geometry g1)
-  {
-  	return Math.min(GeometrySnapper.computeSizeBasedSnapTolerance(g0),
-  			GeometrySnapper.computeSizeBasedSnapTolerance(g1));
-  }
-  
-  private static final double TOLERANCE = 0.000001;
+  private final Geometry[] geom;
 
-  private Geometry[] geom;
-  private FuzzyPointLocator[] locFinder;
-  private int[] location = new int[3] ;
+  private final FuzzyPointLocator[] locFinder;
+
+  private final int[] location = new int[3];
+
   private Coordinates invalidLocation = null;
+
   private double boundaryDistanceTolerance = TOLERANCE;
 
-  private List testCoords = new ArrayList();
+  private final List testCoords = new ArrayList();
 
-  public OverlayResultValidator(Geometry a, Geometry b, Geometry result) 
-  {
-  	/**
-  	 * The tolerance to use needs to depend on the size of the geometries.
-  	 * It should not be more precise than double-precision can support. 
-  	 */
+  public OverlayResultValidator(final Geometry a, final Geometry b,
+    final Geometry result) {
+    /**
+     * The tolerance to use needs to depend on the size of the geometries.
+     * It should not be more precise than double-precision can support. 
+     */
     boundaryDistanceTolerance = computeBoundaryDistanceTolerance(a, b);
-    geom = new Geometry[] { a, b, result };
+    geom = new Geometry[] {
+      a, b, result
+    };
     locFinder = new FuzzyPointLocator[] {
       new FuzzyPointLocator(geom[0], boundaryDistanceTolerance),
       new FuzzyPointLocator(geom[1], boundaryDistanceTolerance),
       new FuzzyPointLocator(geom[2], boundaryDistanceTolerance)
-      };
+    };
   }
 
-  public boolean isValid(int overlayOp)
-  {
-    addTestPts(geom[0]);
-    addTestPts(geom[1]);
-    boolean isValid = checkValid(overlayOp);
-
-    /*
-    System.out.println("OverlayResultValidator: " + isValid);
-    System.out.println("G0");
-    System.out.println(geom[0]);
-    System.out.println("G1");
-    System.out.println(geom[1]);
-    System.out.println("Result");
-    System.out.println(geom[2]);
-    */
-    
-    return isValid;
-  }
-
-  public Coordinates getInvalidLocation() { return invalidLocation; }
-
-  private void addTestPts(Geometry g)
-  {
-    OffsetPointGenerator ptGen = new OffsetPointGenerator(g);
+  private void addTestPts(final Geometry g) {
+    final OffsetPointGenerator ptGen = new OffsetPointGenerator(g);
     testCoords.addAll(ptGen.getPoints(5 * boundaryDistanceTolerance));
   }
 
-  private boolean checkValid(int overlayOp)
-  {
+  private boolean checkValid(final int overlayOp) {
     for (int i = 0; i < testCoords.size(); i++) {
-      Coordinates pt = (Coordinates) testCoords.get(i);
-      if (! checkValid(overlayOp, pt)) {
+      final Coordinates pt = (Coordinates)testCoords.get(i);
+      if (!checkValid(overlayOp, pt)) {
         invalidLocation = pt;
         return false;
       }
@@ -133,8 +126,7 @@ public class OverlayResultValidator
     return true;
   }
 
-  private boolean checkValid(int overlayOp, Coordinates pt)
-  {
+  private boolean checkValid(final int overlayOp, final Coordinates pt) {
     location[0] = locFinder[0].getLocation(pt);
     location[1] = locFinder[1].getLocation(pt);
     location[2] = locFinder[2].getLocation(pt);
@@ -142,42 +134,53 @@ public class OverlayResultValidator
     /**
      * If any location is on the Boundary, can't deduce anything, so just return true
      */
-    if (hasLocation(location, Location.BOUNDARY))
+    if (hasLocation(location, Location.BOUNDARY)) {
       return true;
+    }
 
     return isValidResult(overlayOp, location);
   }
 
-  private static boolean hasLocation(int[] location, int loc)
-  {
-    for (int i = 0; i < 3; i ++) {
-      if (location[i] == loc)
-        return true;
-    }
-    return false;
+  public Coordinates getInvalidLocation() {
+    return invalidLocation;
   }
 
-  private boolean isValidResult(int overlayOp, int[] location)
-  {
-    boolean expectedInterior = OverlayOp.isResultOfOp(location[0], location[1], overlayOp);
+  public boolean isValid(final int overlayOp) {
+    addTestPts(geom[0]);
+    addTestPts(geom[1]);
+    final boolean isValid = checkValid(overlayOp);
 
-    boolean resultInInterior = (location[2] == Location.INTERIOR);
-    // MD use simpler: boolean isValid = (expectedInterior == resultInInterior);
-    boolean isValid = ! (expectedInterior ^ resultInInterior);
-    
-    if (! isValid) reportResult(overlayOp, location, expectedInterior);
-    
+    /*
+     * System.out.println("OverlayResultValidator: " + isValid);
+     * System.out.println("G0"); System.out.println(geom[0]);
+     * System.out.println("G1"); System.out.println(geom[1]);
+     * System.out.println("Result"); System.out.println(geom[2]);
+     */
+
     return isValid;
- }
+  }
 
-  private void reportResult(int overlayOp, int[] location, boolean expectedInterior)
-  {
-  	System.out.println(
-  			"Overlay result invalid - A:" + Location.toLocationSymbol(location[0])
-  			+ " B:" + Location.toLocationSymbol(location[1])
-  			+ " expected:" + (expectedInterior ? 'i' : 'e')
-  			+ " actual:" + Location.toLocationSymbol(location[2])
-  			);
+  private boolean isValidResult(final int overlayOp, final int[] location) {
+    final boolean expectedInterior = OverlayOp.isResultOfOp(location[0],
+      location[1], overlayOp);
+
+    final boolean resultInInterior = (location[2] == Location.INTERIOR);
+    // MD use simpler: boolean isValid = (expectedInterior == resultInInterior);
+    final boolean isValid = !(expectedInterior ^ resultInInterior);
+
+    if (!isValid) {
+      reportResult(overlayOp, location, expectedInterior);
+    }
+
+    return isValid;
+  }
+
+  private void reportResult(final int overlayOp, final int[] location,
+    final boolean expectedInterior) {
+    System.out.println("Overlay result invalid - A:"
+      + Location.toLocationSymbol(location[0]) + " B:"
+      + Location.toLocationSymbol(location[1]) + " expected:"
+      + (expectedInterior ? 'i' : 'e') + " actual:"
+      + Location.toLocationSymbol(location[2]));
   }
 }
-

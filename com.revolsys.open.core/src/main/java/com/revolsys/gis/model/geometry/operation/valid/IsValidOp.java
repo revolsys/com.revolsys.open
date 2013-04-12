@@ -24,7 +24,6 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeIntersectionList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.util.Assert;
 
 /**
@@ -124,7 +123,7 @@ public class IsValidOp {
       return;
     }
     for (int i = 1; i < poly.getRingCount(); i++) {
-      checkClosedRing((LinearRing)poly.getRing(i));
+      checkClosedRing(poly.getRing(i));
       if (validErr != null) {
         return;
       }
@@ -181,9 +180,8 @@ public class IsValidOp {
 
     for (int i = 1; i < p.getRingCount(); i++) {
 
-      final LinearRing hole = (LinearRing)p.getRing(i);
-      final Coordinates holePt = findPtNotNode(hole, shell,
-        graph);
+      final LinearRing hole = p.getRing(i);
+      final Coordinates holePt = findPtNotNode(hole, shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must split the
        * polygon into disconnected interiors. This will be caught by a
@@ -242,7 +240,7 @@ public class IsValidOp {
 
   private boolean checkInvalidCoordinates(final CoordinatesList coords) {
     for (int i = 0; i < coords.size(); i++) {
-      Coordinates point = coords.get(i);
+      final Coordinates point = coords.get(i);
       if (!checkInvalidCoordinates(point)) {
         return false;
       }
@@ -251,7 +249,7 @@ public class IsValidOp {
   }
 
   private boolean checkInvalidCoordinates(final List<CoordinatesList> coords) {
-    for (CoordinatesList points : coords) {
+    for (final CoordinatesList points : coords) {
       if (!checkInvalidCoordinates(points)) {
         return false;
       }
@@ -339,7 +337,8 @@ public class IsValidOp {
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
-      final boolean insideShell = CoordinatesListUtil.isPointInRing(holePt, shellPts);
+      final boolean insideShell = CoordinatesListUtil.isPointInRing(holePt,
+        shellPts);
       if (insideShell) {
         return holePt;
       }
@@ -370,7 +369,8 @@ public class IsValidOp {
     if (shellPt == null) {
       return;
     }
-    final boolean insidePolyShell = CoordinatesListUtil.isPointInRing(shellPt, polyPts);
+    final boolean insidePolyShell = CoordinatesListUtil.isPointInRing(shellPt,
+      polyPts);
     if (!insidePolyShell) {
       return;
     }
@@ -389,7 +389,7 @@ public class IsValidOp {
      */
     Coordinates badNestedPt = null;
     for (int i = 1; i < p.getRingCount(); i++) {
-      final LinearRing hole = (LinearRing)p.getRing(i);
+      final LinearRing hole = p.getRing(i);
       badNestedPt = checkShellInsideHole(shell, hole, graph);
       if (badNestedPt == null) {
         return;

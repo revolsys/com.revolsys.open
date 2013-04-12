@@ -54,6 +54,15 @@ public final class EpsgCoordinateSystems {
 
   private static HashMap<Integer, LinearUnit> linearUnits;
 
+  private static void addCoordinateSystem(
+    final CoordinateSystem coordinateSystem) {
+    final Integer id = coordinateSystem.getId();
+    final String name = coordinateSystem.getName();
+    coordinateSystemsById.put(id, coordinateSystem);
+    coordinateSystemsByCoordinateSystem.put(coordinateSystem, coordinateSystem);
+    coordinateSystemsByName.put(name, coordinateSystem);
+  }
+
   public static void clear() {
     coordinateSystems = null;
     coordinateSystemsByCoordinateSystem.clear();
@@ -162,6 +171,22 @@ public final class EpsgCoordinateSystems {
     }
   }
 
+  private static Map<String, Object> getParameters(final String parametersString) {
+    final Map<String, Object> parameters = new TreeMap<String, Object>();
+    final Map<String, Object> jsonParams = JsonMapIoFactory.toObjectMap(parametersString);
+    for (final Entry<String, Object> parameter : jsonParams.entrySet()) {
+      final String key = parameter.getKey();
+      final Object value = parameter.getValue();
+      if (value instanceof BigDecimal) {
+        final BigDecimal decimal = (BigDecimal)value;
+        parameters.put(key, decimal.doubleValue());
+      } else {
+        parameters.put(key, value);
+      }
+    }
+    return parameters;
+  }
+
   private static String getString(final String string) {
     return new String(string);
   }
@@ -169,8 +194,8 @@ public final class EpsgCoordinateSystems {
   public synchronized static void initialize() {
     if (!initialized) {
       try {
-        Map<Integer, List<Axis>> axisMap = loadAxis();
-        Map<Integer, Area> areas = loadAreas();
+        final Map<Integer, List<Axis>> axisMap = loadAxis();
+        final Map<Integer, Area> areas = loadAreas();
         loadAngularUnits();
         loadLinearUnits();
         loadGeographicCoordinateSystems(axisMap, areas);
@@ -184,90 +209,26 @@ public final class EpsgCoordinateSystems {
     }
   }
 
-  private static Map<Integer, Spheroid> loadSpheroids() {
-    Map<Integer, Spheroid> spheroids = new HashMap<Integer, Spheroid>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/spheroid.csv");
-    if (resource != null) {
-      try {
-
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = Integer.parseInt(values.get(0));
-            String name = values.get(1);
-            double semiMajorAxis = getDouble(values.get(2));
-            double semiMinorAxis = getDouble(values.get(3));
-            double inverseFlattening = getDouble(values.get(4));
-            boolean deprecated = Boolean.parseBoolean(values.get(5));
-            EpsgAuthority authority = new EpsgAuthority(id);
-            Spheroid spheroid = new Spheroid(name, semiMajorAxis,
-              semiMinorAxis, inverseFlattening, authority, deprecated);
-            spheroids.put(id, spheroid);
-          }
-        }
-      } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-    return spheroids;
-  }
-
-  private static Map<Integer, Datum> loadDatums() {
-    Map<Integer, Spheroid> spheroids = loadSpheroids();
-    Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
-    Map<Integer, Datum> datums = new HashMap<Integer, Datum>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
-    if (resource != null) {
-      try {
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = Integer.parseInt(values.get(0));
-            String name = values.get(1);
-            int spheroidId = Integer.parseInt(values.get(2));
-            int primeMeridianId = Integer.parseInt(values.get(3));
-            boolean deprecated = Boolean.parseBoolean(values.get(4));
-            Spheroid spheroid = spheroids.get(spheroidId);
-            PrimeMeridian primeMeridian = primeMeridians.get(primeMeridianId);
-            EpsgAuthority authority = new EpsgAuthority(id);
-            Datum datum = new Datum(name, spheroid, primeMeridian, authority,
-              deprecated);
-            datums.put(id, datum);
-          }
-        }
-      } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-    return datums;
-  }
-
   private static void loadAngularUnits() {
     angularUnits = new HashMap<Integer, AngularUnit>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
     if (resource != null) {
       try {
 
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
           while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = getInteger(values.get(0));
-            String name = values.get(1);
-            Integer baseId = getInteger(values.get(2));
-            double conversionFactor = getDouble(values.get(3));
-            boolean deprecated = Boolean.parseBoolean(values.get(4));
-            AngularUnit baseUnit = angularUnits.get(baseId);
-            EpsgAuthority authority = new EpsgAuthority(id);
-            AngularUnit unit = new AngularUnit(name, baseUnit,
+            final List<String> values = csv.next();
+            final int id = getInteger(values.get(0));
+            final String name = values.get(1);
+            final Integer baseId = getInteger(values.get(2));
+            final double conversionFactor = getDouble(values.get(3));
+            final boolean deprecated = Boolean.parseBoolean(values.get(4));
+            final AngularUnit baseUnit = angularUnits.get(baseId);
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final AngularUnit unit = new AngularUnit(name, baseUnit,
               conversionFactor, authority, deprecated);
             angularUnits.put(id, unit);
           }
@@ -278,181 +239,18 @@ public final class EpsgCoordinateSystems {
     }
   }
 
-  private static void loadLinearUnits() {
-    linearUnits = new HashMap<Integer, LinearUnit>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
-    if (resource != null) {
-      try {
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = getInteger(values.get(0));
-            String name = values.get(1);
-            Integer baseId = getInteger(values.get(2));
-            double conversionFactor = getDouble(values.get(3));
-            boolean deprecated = Boolean.parseBoolean(values.get(4));
-            LinearUnit baseUnit = linearUnits.get(baseId);
-            EpsgAuthority authority = new EpsgAuthority(id);
-            LinearUnit unit = new LinearUnit(name, baseUnit, conversionFactor,
-              authority, deprecated);
-            linearUnits.put(id, unit);
-          }
-        }
-      } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-  }
-
-  private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
-    Map<Integer, PrimeMeridian> primeMeridians = new HashMap<Integer, PrimeMeridian>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
-    if (resource != null) {
-      try {
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = Integer.parseInt(values.get(0));
-            String name = values.get(1);
-            double longitude = getDouble(values.get(2));
-            boolean deprecated = Boolean.parseBoolean(values.get(3));
-            EpsgAuthority authority = new EpsgAuthority(id);
-            PrimeMeridian primeMeridian = new PrimeMeridian(name, longitude,
-              authority, deprecated);
-            primeMeridians.put(id, primeMeridian);
-          }
-        }
-      } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-    return primeMeridians;
-  }
-
-  private static void loadGeographicCoordinateSystems(
-    Map<Integer, List<Axis>> axisMap, Map<Integer, Area> areas) {
-    Map<Integer, Datum> datums = loadDatums();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
-    if (resource != null) {
-      try {
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = Integer.parseInt(values.get(0));
-            String name = values.get(1);
-            Integer datumId = getInteger(values.get(2));
-            Integer unitId = getInteger(values.get(3));
-            Integer axisId = getInteger(values.get(4));
-            Integer areaId = getInteger(values.get(5));
-            boolean deprecated = Boolean.parseBoolean(values.get(6));
-            Datum datum = datums.get(datumId);
-            EpsgAuthority authority = new EpsgAuthority(id);
-            AngularUnit angularUnit = angularUnits.get(unitId);
-            List<Axis> axis = axisMap.get(axisId);
-            Area area = areas.get(areaId);
-            GeographicCoordinateSystem coordinateSystem = new GeographicCoordinateSystem(
-              id, name, datum, angularUnit, axis, area, authority, deprecated);
-            addCoordinateSystem(coordinateSystem);
-          }
-        }
-      } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-  }
-
-  private static void loadProjectedCoordinateSystems(
-    Map<Integer, List<Axis>> axisMap, Map<Integer, Area> areas) {
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
-    if (resource != null) {
-      try {
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
-        if (csv.hasNext()) {
-          csv.next();
-          while (csv.hasNext()) {
-            List<String> values = csv.next();
-            int id = Integer.parseInt(values.get(0));
-            String name = values.get(1);
-            Integer geoCsId = getInteger(values.get(2));
-            Integer unitId = getInteger(values.get(3));
-            Integer methodCode = getInteger(values.get(4));
-            String methodName = values.get(5);
-            String parametersString = values.get(6);
-            Integer axisId = getInteger(values.get(7));
-            Integer areaId = getInteger(values.get(8));
-            boolean deprecated = Boolean.parseBoolean(values.get(9));
-            CoordinateSystem referencedCoordinateSystem = coordinateSystemsById.get(geoCsId);
-            if (referencedCoordinateSystem instanceof GeographicCoordinateSystem) {
-              GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
-              EpsgAuthority authority = new EpsgAuthority(id);
-              LinearUnit linearUnit = linearUnits.get(unitId);
-              final Authority projectionAuthority = new EpsgAuthority(
-                methodCode);
-              final Projection projection = new Projection(methodName,
-                projectionAuthority);
-              Map<String, Object> parameters = getParameters(parametersString);
-              List<Axis> axis = axisMap.get(axisId);
-              Area area = areas.get(areaId);
-              ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-                id, name, geographicCoordinateSystem, area, projection,
-                parameters, linearUnit, axis, authority, deprecated);
-
-              addCoordinateSystem(coordinateSystem);
-              if (id == 3857) {
-                 authority = new EpsgAuthority(102100);
-                ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(
-                  102100, name, geographicCoordinateSystem, area, projection,
-                  parameters, linearUnit, axis, authority, deprecated);
-
-                addCoordinateSystem(webMercator);
-              }
-            }
-          }
-        }
-       } finally {
-        FileUtil.closeSilent(resource);
-      }
-    }
-  }
-
-  private static Map<String, Object> getParameters(String parametersString) {
-    Map<String, Object> parameters = new TreeMap<String, Object>();
-    Map<String, Object> jsonParams = JsonMapIoFactory.toObjectMap(parametersString);
-    for (Entry<String, Object> parameter : jsonParams.entrySet()) {
-      String key = parameter.getKey();
-      Object value = parameter.getValue();
-      if (value instanceof BigDecimal) {
-        BigDecimal decimal = (BigDecimal)value;
-        parameters.put(key, decimal.doubleValue());
-      } else {
-        parameters.put(key, value);
-      }
-    }
-    return parameters;
-  }
-
   private static Map<Integer, Area> loadAreas() {
     final Map<Integer, Area> areas = new HashMap<Integer, Area>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/area.csv");
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/area.csv");
     if (resource != null) {
       try {
 
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
           while (csv.hasNext()) {
-            List<String> values = csv.next();
+            final List<String> values = csv.next();
             final Integer code = getInteger(values.get(0));
             final String name = getString(values.get(1));
             final Double minX = getDouble(values.get(2));
@@ -477,23 +275,23 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, List<Axis>> loadAxis() {
     final Map<Integer, List<Axis>> axisMap = new HashMap<Integer, List<Axis>>();
-    InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/axis.csv");
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/axis.csv");
     if (resource != null) {
       try {
 
-        java.io.Reader reader = new InputStreamReader(resource);
-        CsvIterator csv = new CsvIterator(reader);
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
           while (csv.hasNext()) {
-            List<String> values = csv.next();
+            final List<String> values = csv.next();
             final Integer id = getInteger(values.get(0));
-            List<Axis> axisList = new ArrayList<Axis>();
+            final List<Axis> axisList = new ArrayList<Axis>();
             for (int i = 1; i < values.size(); i += 2) {
-              String name = values.get(i);
+              final String name = values.get(i);
               if (StringUtils.hasText(name)) {
-                String direction = values.get(i + 1);
-                Axis axis = new Axis(name, direction);
+                final String direction = values.get(i + 1);
+                final Axis axis = new Axis(name, direction);
                 axisList.add(axis);
               }
             }
@@ -508,19 +306,218 @@ public final class EpsgCoordinateSystems {
 
   }
 
-  private static void addCoordinateSystem(
-    final CoordinateSystem coordinateSystem) {
-    Integer id = coordinateSystem.getId();
-    String name = coordinateSystem.getName();
-    coordinateSystemsById.put(id, coordinateSystem);
-    coordinateSystemsByCoordinateSystem.put(coordinateSystem, coordinateSystem);
-    coordinateSystemsByName.put(name, coordinateSystem);
+  private static Map<Integer, Datum> loadDatums() {
+    final Map<Integer, Spheroid> spheroids = loadSpheroids();
+    final Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
+    final Map<Integer, Datum> datums = new HashMap<Integer, Datum>();
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
+    if (resource != null) {
+      try {
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = Integer.parseInt(values.get(0));
+            final String name = values.get(1);
+            final int spheroidId = Integer.parseInt(values.get(2));
+            final int primeMeridianId = Integer.parseInt(values.get(3));
+            final boolean deprecated = Boolean.parseBoolean(values.get(4));
+            final Spheroid spheroid = spheroids.get(spheroidId);
+            final PrimeMeridian primeMeridian = primeMeridians.get(primeMeridianId);
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final Datum datum = new Datum(name, spheroid, primeMeridian,
+              authority, deprecated);
+            datums.put(id, datum);
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
+    return datums;
   }
 
-  private EpsgCoordinateSystems() {
+  private static void loadGeographicCoordinateSystems(
+    final Map<Integer, List<Axis>> axisMap, final Map<Integer, Area> areas) {
+    final Map<Integer, Datum> datums = loadDatums();
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
+    if (resource != null) {
+      try {
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = Integer.parseInt(values.get(0));
+            final String name = values.get(1);
+            final Integer datumId = getInteger(values.get(2));
+            final Integer unitId = getInteger(values.get(3));
+            final Integer axisId = getInteger(values.get(4));
+            final Integer areaId = getInteger(values.get(5));
+            final boolean deprecated = Boolean.parseBoolean(values.get(6));
+            final Datum datum = datums.get(datumId);
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final AngularUnit angularUnit = angularUnits.get(unitId);
+            final List<Axis> axis = axisMap.get(axisId);
+            final Area area = areas.get(areaId);
+            final GeographicCoordinateSystem coordinateSystem = new GeographicCoordinateSystem(
+              id, name, datum, angularUnit, axis, area, authority, deprecated);
+            addCoordinateSystem(coordinateSystem);
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
   }
 
-  public static double toDegrees(int sourceUomCode, double value) {
+  private static void loadLinearUnits() {
+    linearUnits = new HashMap<Integer, LinearUnit>();
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
+    if (resource != null) {
+      try {
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = getInteger(values.get(0));
+            final String name = values.get(1);
+            final Integer baseId = getInteger(values.get(2));
+            final double conversionFactor = getDouble(values.get(3));
+            final boolean deprecated = Boolean.parseBoolean(values.get(4));
+            final LinearUnit baseUnit = linearUnits.get(baseId);
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final LinearUnit unit = new LinearUnit(name, baseUnit,
+              conversionFactor, authority, deprecated);
+            linearUnits.put(id, unit);
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
+  }
+
+  private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
+    final Map<Integer, PrimeMeridian> primeMeridians = new HashMap<Integer, PrimeMeridian>();
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
+    if (resource != null) {
+      try {
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = Integer.parseInt(values.get(0));
+            final String name = values.get(1);
+            final double longitude = getDouble(values.get(2));
+            final boolean deprecated = Boolean.parseBoolean(values.get(3));
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final PrimeMeridian primeMeridian = new PrimeMeridian(name,
+              longitude, authority, deprecated);
+            primeMeridians.put(id, primeMeridian);
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
+    return primeMeridians;
+  }
+
+  private static void loadProjectedCoordinateSystems(
+    final Map<Integer, List<Axis>> axisMap, final Map<Integer, Area> areas) {
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
+    if (resource != null) {
+      try {
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = Integer.parseInt(values.get(0));
+            final String name = values.get(1);
+            final Integer geoCsId = getInteger(values.get(2));
+            final Integer unitId = getInteger(values.get(3));
+            final Integer methodCode = getInteger(values.get(4));
+            final String methodName = values.get(5);
+            final String parametersString = values.get(6);
+            final Integer axisId = getInteger(values.get(7));
+            final Integer areaId = getInteger(values.get(8));
+            final boolean deprecated = Boolean.parseBoolean(values.get(9));
+            final CoordinateSystem referencedCoordinateSystem = coordinateSystemsById.get(geoCsId);
+            if (referencedCoordinateSystem instanceof GeographicCoordinateSystem) {
+              final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
+              EpsgAuthority authority = new EpsgAuthority(id);
+              final LinearUnit linearUnit = linearUnits.get(unitId);
+              final Authority projectionAuthority = new EpsgAuthority(
+                methodCode);
+              final Projection projection = new Projection(methodName,
+                projectionAuthority);
+              final Map<String, Object> parameters = getParameters(parametersString);
+              final List<Axis> axis = axisMap.get(axisId);
+              final Area area = areas.get(areaId);
+              final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
+                id, name, geographicCoordinateSystem, area, projection,
+                parameters, linearUnit, axis, authority, deprecated);
+
+              addCoordinateSystem(coordinateSystem);
+              if (id == 3857) {
+                authority = new EpsgAuthority(102100);
+                final ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(
+                  102100, name, geographicCoordinateSystem, area, projection,
+                  parameters, linearUnit, axis, authority, deprecated);
+
+                addCoordinateSystem(webMercator);
+              }
+            }
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
+  }
+
+  private static Map<Integer, Spheroid> loadSpheroids() {
+    final Map<Integer, Spheroid> spheroids = new HashMap<Integer, Spheroid>();
+    final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/spheroid.csv");
+    if (resource != null) {
+      try {
+
+        final java.io.Reader reader = new InputStreamReader(resource);
+        final CsvIterator csv = new CsvIterator(reader);
+        if (csv.hasNext()) {
+          csv.next();
+          while (csv.hasNext()) {
+            final List<String> values = csv.next();
+            final int id = Integer.parseInt(values.get(0));
+            final String name = values.get(1);
+            final double semiMajorAxis = getDouble(values.get(2));
+            final double semiMinorAxis = getDouble(values.get(3));
+            final double inverseFlattening = getDouble(values.get(4));
+            final boolean deprecated = Boolean.parseBoolean(values.get(5));
+            final EpsgAuthority authority = new EpsgAuthority(id);
+            final Spheroid spheroid = new Spheroid(name, semiMajorAxis,
+              semiMinorAxis, inverseFlattening, authority, deprecated);
+            spheroids.put(id, spheroid);
+          }
+        }
+      } finally {
+        FileUtil.closeSilent(resource);
+      }
+    }
+    return spheroids;
+  }
+
+  public static double toDegrees(final int sourceUomCode, final double value) {
     double degrees;
     if (sourceUomCode == 9101) {
       degrees = Math.toDegrees(value);
@@ -529,16 +526,19 @@ public final class EpsgCoordinateSystems {
     } else if (sourceUomCode == 9110) {
       degrees = EpsgUtil.toDecimalFromSexagesimalDegrees(value);
     } else {
-      AngularUnit angularUnit = angularUnits.get(sourceUomCode);
+      final AngularUnit angularUnit = angularUnits.get(sourceUomCode);
       if (angularUnit == null) {
         throw new IllegalArgumentException("Angular unit of measure not found "
           + sourceUomCode);
       } else {
-        Unit<Angle> unit = angularUnit.getUnit();
-        UnitConverter converter = unit.getConverterTo(NonSI.DEGREE_ANGLE);
+        final Unit<Angle> unit = angularUnit.getUnit();
+        final UnitConverter converter = unit.getConverterTo(NonSI.DEGREE_ANGLE);
         degrees = converter.convert(value);
       }
     }
     return degrees;
+  }
+
+  private EpsgCoordinateSystems() {
   }
 }

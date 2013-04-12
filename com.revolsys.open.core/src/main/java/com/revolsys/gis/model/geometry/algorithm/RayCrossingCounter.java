@@ -70,13 +70,13 @@ public class RayCrossingCounter {
    * @param ring an array of Coordinates forming a ring
    * @return the location of the point in the ring
    */
-  public static int locatePointInRing(Coordinates coordinates,
-    CoordinatesList ring) {
-    RayCrossingCounter counter = new RayCrossingCounter(coordinates);
+  public static int locatePointInRing(final Coordinates coordinates,
+    final CoordinatesList ring) {
+    final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
 
     for (int i = 1; i < ring.size(); i++) {
-      Coordinates p1 = ring.get(i);
-      Coordinates p2 = ring.get(i - 1);
+      final Coordinates p1 = ring.get(i);
+      final Coordinates p2 = ring.get(i - 1);
       counter.countSegment(p1, p2);
       if (counter.isOnSegment()) {
         return counter.getLocation();
@@ -85,14 +85,14 @@ public class RayCrossingCounter {
     return counter.getLocation();
   }
 
-  private Coordinates coordinates;
+  private final Coordinates coordinates;
 
   private int crossingCount = 0;
 
   // true if the test point lies on an input segment
   private boolean isPointOnSegment = false;
 
-  public RayCrossingCounter(Coordinates p) {
+  public RayCrossingCounter(final Coordinates p) {
     this.coordinates = p;
   }
 
@@ -102,15 +102,16 @@ public class RayCrossingCounter {
    * @param p1 an endpoint of the segment
    * @param p2 another endpoint of the segment
    */
-  public void countSegment(Coordinates p1, Coordinates p2) {
+  public void countSegment(final Coordinates p1, final Coordinates p2) {
     /**
      * For each segment, check if it crosses a horizontal ray running from the
      * test point in the positive x direction.
      */
 
     // check if the segment is strictly to the left of the test point
-    if (p1.getX() < coordinates.getX() && p2.getX() < coordinates.getX())
+    if (p1.getX() < coordinates.getX() && p2.getX() < coordinates.getX()) {
       return;
+    }
 
     // check if the point is equal to the current ring vertex
     if (coordinates.getX() == p2.getX() && coordinates.getY() == p2.getY()) {
@@ -147,10 +148,10 @@ public class RayCrossingCounter {
     if (((p1.getY() > coordinates.getY()) && (p2.getY() <= coordinates.getY()))
       || ((p2.getY() > coordinates.getY()) && (p1.getY() <= coordinates.getY()))) {
       // translate the segment so that the test point lies on the origin
-      double x1 = p1.getX() - coordinates.getX();
-      double y1 = p1.getY() - coordinates.getY();
-      double x2 = p2.getX() - coordinates.getX();
-      double y2 = p2.getY() - coordinates.getY();
+      final double x1 = p1.getX() - coordinates.getX();
+      final double y1 = p1.getY() - coordinates.getY();
+      final double x2 = p2.getX() - coordinates.getX();
+      final double y2 = p2.getY() - coordinates.getY();
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
@@ -165,9 +166,10 @@ public class RayCrossingCounter {
         isPointOnSegment = true;
         return;
       }
-      if (y2 < y1)
+      if (y2 < y1) {
         xIntSign = -xIntSign;
-      // xsave = xInt;
+        // xsave = xInt;
+      }
 
       // System.out.println("xIntSign(" + x1 + ", " + y1 + ", " + x2 + ", " + y2
       // + " = " + xIntSign);
@@ -176,6 +178,27 @@ public class RayCrossingCounter {
         crossingCount++;
       }
     }
+  }
+
+  /**
+   * Gets the {@link Location} of the point relative to the ring, polygon or
+   * multipolygon from which the processed segments were provided. <coordinates>
+   * This method only determines the correct location if <b>all</b> relevant
+   * segments must have been processed.
+   * 
+   * @return the Location of the point
+   */
+  public int getLocation() {
+    if (isPointOnSegment) {
+      return Location.BOUNDARY;
+    }
+
+    // The point is in the interior of the ring if the number of X-crossings is
+    // odd.
+    if ((crossingCount % 2) == 1) {
+      return Location.INTERIOR;
+    }
+    return Location.EXTERIOR;
   }
 
   /**
@@ -188,26 +211,6 @@ public class RayCrossingCounter {
    */
   public boolean isOnSegment() {
     return isPointOnSegment;
-  }
-
-  /**
-   * Gets the {@link Location} of the point relative to the ring, polygon or
-   * multipolygon from which the processed segments were provided. <coordinates>
-   * This method only determines the correct location if <b>all</b> relevant
-   * segments must have been processed.
-   * 
-   * @return the Location of the point
-   */
-  public int getLocation() {
-    if (isPointOnSegment)
-      return Location.BOUNDARY;
-
-    // The point is in the interior of the ring if the number of X-crossings is
-    // odd.
-    if ((crossingCount % 2) == 1) {
-      return Location.INTERIOR;
-    }
-    return Location.EXTERIOR;
   }
 
   /**

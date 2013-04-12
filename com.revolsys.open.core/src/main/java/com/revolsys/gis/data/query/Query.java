@@ -16,11 +16,12 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Query implements Cloneable {
+public class Query extends AbstractObjectWithProperties implements Cloneable {
   private List<String> attributeNames = Collections.emptyList();
 
   private BoundingBox boundingBox;
@@ -52,22 +53,6 @@ public class Query implements Cloneable {
   private int offset = 0;
 
   private int limit = -1;
-
-  public int getOffset() {
-    return offset;
-  }
-
-  public void setOffset(int offset) {
-    this.offset = offset;
-  }
-
-  public int getLimit() {
-    return limit;
-  }
-
-  public void setLimit(int limit) {
-    this.limit = limit;
-  }
 
   public Query() {
   }
@@ -187,8 +172,16 @@ public class Query implements Cloneable {
     return geometry;
   }
 
+  public int getLimit() {
+    return limit;
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
+  }
+
+  public int getOffset() {
+    return offset;
   }
 
   public Map<String, Boolean> getOrderBy() {
@@ -254,12 +247,20 @@ public class Query implements Cloneable {
     this.geometry = geometry;
   }
 
+  public void setLimit(final int limit) {
+    this.limit = limit;
+  }
+
   public void setLockResults(final boolean lockResults) {
     this.lockResults = lockResults;
   }
 
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
+  }
+
+  public void setOffset(final int offset) {
+    this.offset = offset;
   }
 
   public void setOrderBy(final Map<String, Boolean> orderBy) {

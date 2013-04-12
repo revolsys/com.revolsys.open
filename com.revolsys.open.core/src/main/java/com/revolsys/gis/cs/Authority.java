@@ -1,9 +1,8 @@
 package com.revolsys.gis.cs;
 
-
 public interface Authority {
 
-   String getCode();
+  String getCode();
 
-   String getName();
+  String getName();
 }

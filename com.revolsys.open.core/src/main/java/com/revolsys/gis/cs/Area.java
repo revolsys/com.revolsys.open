@@ -27,6 +27,20 @@ public class Area implements Serializable {
     this.deprecated = deprecated;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Area) {
+      final Area area = (Area)obj;
+      if (!EqualsRegistry.equal(latLonBounds, area.latLonBounds)) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
   public Authority getAuthority() {
     return authority;
   }
@@ -39,27 +53,13 @@ public class Area implements Serializable {
     return name;
   }
 
-  public boolean isDeprecated() {
-    return deprecated;
-  }
-
   @Override
   public int hashCode() {
     return latLonBounds.hashCode();
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof Area) {
-      Area area = (Area)obj;
-      if (!EqualsRegistry.equal(latLonBounds, area.latLonBounds)) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
+  public boolean isDeprecated() {
+    return deprecated;
   }
 
   @Override

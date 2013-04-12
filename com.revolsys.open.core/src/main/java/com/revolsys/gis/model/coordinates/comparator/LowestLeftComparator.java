@@ -16,6 +16,21 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
  * @author paustin
  */
 public class LowestLeftComparator implements Comparator<Coordinates> {
+  public static int compareCoordinates(final Coordinates point1,
+    final Coordinates point2) {
+    final Double x1 = point1.getX();
+    final Double y1 = point1.getY();
+    final Double x2 = point2.getX();
+    final Double y2 = point2.getY();
+
+    final int yCompare = y1.compareTo(y2);
+    if (yCompare == 0) {
+      return x1.compareTo(x2);
+    } else {
+      return yCompare;
+    }
+  }
+
   private final CoordinatesOperation inverseOperation;
 
   public LowestLeftComparator(final int srid) {
@@ -39,20 +54,5 @@ public class LowestLeftComparator implements Comparator<Coordinates> {
     }
 
     return compareCoordinates(point1, point2);
-  }
-
-  public static int compareCoordinates(final Coordinates point1,
-    final Coordinates point2) {
-    final Double x1 = point1.getX();
-    final Double y1 = point1.getY();
-    final Double x2 = point2.getX();
-    final Double y2 = point2.getY();
-
-    final int yCompare = y1.compareTo(y2);
-    if (yCompare == 0) {
-      return x1.compareTo(x2);
-    } else {
-      return yCompare;
-    }
   }
 }

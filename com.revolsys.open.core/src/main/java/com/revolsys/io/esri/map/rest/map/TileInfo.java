@@ -11,11 +11,11 @@ import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Point;
 
 public class TileInfo extends AbstractMapWrapper {
-  public TileInfo() {
-  }
+  private double originX = Double.NaN;
 
-  public Integer getWidth() {
-    return getIntValue("cols");
+  private double originY = Double.NaN;
+
+  public TileInfo() {
   }
 
   public Integer getCompressionQuality() {
@@ -30,30 +30,39 @@ public class TileInfo extends AbstractMapWrapper {
     return getValue("format");
   }
 
+  public Integer getHeight() {
+    return getIntValue("rows");
+  }
+
+  public LevelOfDetail getLevelOfDetail(final int zoomLevel) {
+    final List<LevelOfDetail> levelOfDetails = getLevelOfDetails();
+    for (final LevelOfDetail levelOfDetail : levelOfDetails) {
+      final Integer level = levelOfDetail.getLevel();
+      if (level == zoomLevel) {
+        return levelOfDetail;
+      }
+    }
+    return null;
+  }
+
   public List<LevelOfDetail> getLevelOfDetails() {
     return getList(LevelOfDetail.class, "lods");
   }
 
-  public double getModelValue(int zoomLevel, int pixels) {
-    double pixelSize = getPixelSize();
-    LevelOfDetail levelOfDetail = getLevelOfDetail(zoomLevel);
-    Double scale = levelOfDetail.getScale();
-    double modelValue = pixels * pixelSize * scale;
-    return modelValue;
-  }
-
-  public double getModelWidth(int zoomLevel) {
-    return getModelValue(zoomLevel, getWidth());
-  }
-
-  public double getModelHeight(int zoomLevel) {
+  public double getModelHeight(final int zoomLevel) {
     return getModelValue(zoomLevel, getHeight());
   }
 
-  public double getPixelSize() {
-    int dpi = getDpi();
-    double pixelSize = 0.0254 / dpi;
-    return pixelSize;
+  public double getModelValue(final int zoomLevel, final int pixels) {
+    final double pixelSize = getPixelSize();
+    final LevelOfDetail levelOfDetail = getLevelOfDetail(zoomLevel);
+    final Double scale = levelOfDetail.getScale();
+    final double modelValue = pixels * pixelSize * scale;
+    return modelValue;
+  }
+
+  public double getModelWidth(final int zoomLevel) {
+    return getModelValue(zoomLevel, getWidth());
   }
 
   public Coordinates getOrigin() {
@@ -67,33 +76,11 @@ public class TileInfo extends AbstractMapWrapper {
     }
   }
 
-  public LevelOfDetail getLevelOfDetail(final int zoomLevel) {
-    List<LevelOfDetail> levelOfDetails = getLevelOfDetails();
-    for (LevelOfDetail levelOfDetail : levelOfDetails) {
-      Integer level = levelOfDetail.getLevel();
-      if (level == zoomLevel) {
-        return levelOfDetail;
-      }
-    }
-    return null;
+  public Point getOriginPoint() {
+    final GeometryFactory spatialReference = getSpatialReference();
+    final Coordinates origin = getOrigin();
+    return spatialReference.createPoint(origin);
   }
-
-  @Override
-  protected void setValues(Map<String, Object> values) {
-    super.setValues(values);
-    final Map<String, Object> origin = getValue("origin");
-    if (origin == null) {
-      originX = Double.NaN;
-      originY = Double.NaN;
-    } else {
-      originX = CollectionUtil.getDoubleValue(origin, "x");
-      originY = CollectionUtil.getDoubleValue(origin, "y");
-    }
-  }
-
-  private double originX = Double.NaN;
-
-  private double originY = Double.NaN;
 
   public double getOriginX() {
     return originX;
@@ -103,14 +90,27 @@ public class TileInfo extends AbstractMapWrapper {
     return originY;
   }
 
-  public Point getOriginPoint() {
-    final GeometryFactory spatialReference = getSpatialReference();
-    final Coordinates origin = getOrigin();
-    return spatialReference.createPoint(origin);
+  public double getPixelSize() {
+    final int dpi = getDpi();
+    final double pixelSize = 0.0254 / dpi;
+    return pixelSize;
   }
 
-  public Integer getHeight() {
-    return getIntValue("rows");
+  public Integer getWidth() {
+    return getIntValue("cols");
+  }
+
+  @Override
+  protected void setValues(final Map<String, Object> values) {
+    super.setValues(values);
+    final Map<String, Object> origin = getValue("origin");
+    if (origin == null) {
+      originX = Double.NaN;
+      originY = Double.NaN;
+    } else {
+      originX = CollectionUtil.getDoubleValue(origin, "x");
+      originY = CollectionUtil.getDoubleValue(origin, "y");
+    }
   }
 
 }

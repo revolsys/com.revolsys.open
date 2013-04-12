@@ -22,30 +22,24 @@ public class FastSegmentSetIntersectionFinder {
 
   private static final String KEY = FastSegmentSetIntersectionFinder.class.getName();
 
-  public static FastSegmentSetIntersectionFinder get(Geometry geometry) {
+  private static LineIntersector li = new RobustLineIntersector();
+
+  // for testing purposes
+  // private SimpleSegmentSetMutualIntersector mci;
+
+  public static FastSegmentSetIntersectionFinder get(final Geometry geometry) {
     FastSegmentSetIntersectionFinder instance = geometry.getProperty(KEY);
     if (instance == null) {
-      List<SegmentString> segments = SegmentStringUtil.extractSegmentStrings(geometry);
+      final List<SegmentString> segments = SegmentStringUtil.extractSegmentStrings(geometry);
       instance = new FastSegmentSetIntersectionFinder(segments);
       geometry.setPropertySoft(KEY, instance);
     }
     return instance;
   }
 
-  // for testing purposes
-  // private SimpleSegmentSetMutualIntersector mci;
-
   public FastSegmentSetIntersectionFinder(
-    Collection<SegmentString> baseSegStrings) {
+    final Collection<SegmentString> baseSegStrings) {
     init(baseSegStrings);
-  }
-
-  private void init(Collection<SegmentString> baseSegStrings) {
-    segSetMutInt = new MCIndexSegmentSetMutualIntersector();
-    // segSetMutInt = new MCIndexIntersectionSegmentSetMutualIntersector();
-
-    // mci = new SimpleSegmentSetMutualIntersector();
-    segSetMutInt.setBaseSegments(baseSegStrings);
   }
 
   /**
@@ -58,18 +52,25 @@ public class FastSegmentSetIntersectionFinder {
     return segSetMutInt;
   }
 
-  private static LineIntersector li = new RobustLineIntersector();
+  private void init(final Collection<SegmentString> baseSegStrings) {
+    segSetMutInt = new MCIndexSegmentSetMutualIntersector();
+    // segSetMutInt = new MCIndexIntersectionSegmentSetMutualIntersector();
 
-  public boolean intersects(Collection<SegmentString> segStrings) {
-    SegmentIntersectionDetector intFinder = new SegmentIntersectionDetector(li);
+    // mci = new SimpleSegmentSetMutualIntersector();
+    segSetMutInt.setBaseSegments(baseSegStrings);
+  }
+
+  public boolean intersects(final Collection<SegmentString> segStrings) {
+    final SegmentIntersectionDetector intFinder = new SegmentIntersectionDetector(
+      li);
     segSetMutInt.setSegmentIntersector(intFinder);
 
     segSetMutInt.process(segStrings);
     return intFinder.hasIntersection();
   }
 
-  public boolean intersects(Collection<SegmentString> segStrings,
-    SegmentIntersectionDetector intDetector) {
+  public boolean intersects(final Collection<SegmentString> segStrings,
+    final SegmentIntersectionDetector intDetector) {
     segSetMutInt.setSegmentIntersector(intDetector);
 
     segSetMutInt.process(segStrings);

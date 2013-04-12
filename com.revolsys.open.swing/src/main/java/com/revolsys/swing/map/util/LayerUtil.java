@@ -27,7 +27,6 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -35,7 +34,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
-import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
 import com.revolsys.swing.map.layer.Layer;
@@ -50,8 +48,6 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
-import com.revolsys.swing.map.overlay.AddGeometryOverlay;
-import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.revolsys.swing.map.table.LayerTablePanelFactory;
@@ -88,49 +84,20 @@ public class LayerUtil {
     LAYER_TABLE_FACTORIES.put(layerClass, factory);
   }
 
+  public static void toggleEditable() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    boolean editable = layer.isEditable();
+    layer.setEditable(!editable);
+  }
+
   public static void addNewRecord() {
     final Layer layer = ObjectTree.getMouseClickItem();
-    addNewRecord(layer);
-  }
-
-  public static void addNewRecord(final Layer layer) {
     if (layer instanceof DataObjectLayer) {
       DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-      DataObjectMetaData metaData = dataObjectLayer.getMetaData();
-      Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute == null) {
-        DataObject object = dataObjectLayer.createObject();
-        if (object != null) {
-          showForm(dataObjectLayer, object);
-        }
-      } else {
-        MapPanel map = MapPanel.get(dataObjectLayer);
-        if (map != null) {
-          final AddGeometryOverlay addGeometryOverlay = map.getMapOverlay(AddGeometryOverlay.class);
-          synchronized (addGeometryOverlay) {
-            // TODO what if there is another feature being edited?
-            addGeometryOverlay.setAddFeatureLayer(dataObjectLayer);
-            addGeometryOverlay.setCompletedAction(new InvokeMethodListener(
-              LayerUtil.class, "actionCompleteAddNewRecord", addGeometryOverlay));
-          }
-        }
-      }
+      dataObjectLayer.addNewRecord();
     }
   }
 
-  public static void actionCompleteAddNewRecord(final AddGeometryOverlay overlay) {
-    synchronized (overlay) {
-      DataObjectLayer layer = overlay.getAddFeatureLayer();
-      Geometry geometry = overlay.getCompletedGeometry();
-      DataObject object = layer.createObject();
-      if (object != null) {
-        object.setGeometryValue(geometry);
-        showForm(layer, object);
-      }
-      overlay.setEnabled(false);
-      overlay.setAddFeatureLayer(null);
-    }
-  }
 
   @SuppressWarnings("unchecked")
   public static <T extends Layer> T getLayer(

@@ -79,30 +79,35 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters;
  *
  * @version 1.7
  */
-public class BufferOp
-{
+public class BufferOp {
   /**
    * Specifies a round line buffer end cap style.
    * @deprecated use BufferParameters
    */
+  @Deprecated
   public static final int CAP_ROUND = BufferParameters.CAP_ROUND;
+
   /**
    * Specifies a butt (or flat) line buffer end cap style.
    * @deprecated use BufferParameters
    */
+  @Deprecated
   public static final int CAP_BUTT = BufferParameters.CAP_FLAT;
-  
+
   /**
    * Specifies a butt (or flat) line buffer end cap style.
    * @deprecated use BufferParameters
    */
+  @Deprecated
   public static final int CAP_FLAT = BufferParameters.CAP_FLAT;
+
   /**
    * Specifies a square line buffer end cap style.
    * @deprecated use BufferParameters
    */
+  @Deprecated
   public static final int CAP_SQUARE = BufferParameters.CAP_SQUARE;
-  
+
   /**
    * A number of digits of precision which leaves some computational "headroom"
    * for floating point operations.
@@ -110,6 +115,76 @@ public class BufferOp
    * This value should be less than the decimal precision of double-precision values (16).
    */
   private static int MAX_PRECISION_DIGITS = 12;
+
+  /**
+   * Computes the buffer of a geometry for a given buffer distance.
+   *
+   * @param g the geometry to buffer
+   * @param distance the buffer distance
+   * @return the buffer of the input geometry
+   */
+  public static Geometry bufferOp(final Geometry g, final double distance) {
+    final BufferOp gBuf = new BufferOp(g);
+    final Geometry geomBuf = gBuf.getResultGeometry(distance);
+    // BufferDebug.saveBuffer(geomBuf);
+    // BufferDebug.runCount++;
+    return geomBuf;
+  }
+
+  /**
+   * Comutes the buffer for a geometry for a given buffer distance
+   * and accuracy of approximation.
+   *
+   * @param g the geometry to buffer
+   * @param distance the buffer distance
+   * @param params the buffer parameters to use
+   * @return the buffer of the input geometry
+   *
+   */
+  public static Geometry bufferOp(final Geometry g, final double distance,
+    final BufferParameters params) {
+    final BufferOp bufOp = new BufferOp(g, params);
+    final Geometry geomBuf = bufOp.getResultGeometry(distance);
+    return geomBuf;
+  }
+
+  /**
+   * Comutes the buffer for a geometry for a given buffer distance
+   * and accuracy of approximation.
+   *
+   * @param g the geometry to buffer
+   * @param distance the buffer distance
+   * @param quadrantSegments the number of segments used to approximate a quarter circle
+   * @return the buffer of the input geometry
+   *
+   */
+  public static Geometry bufferOp(final Geometry g, final double distance,
+    final int quadrantSegments) {
+    final BufferOp bufOp = new BufferOp(g);
+    bufOp.setQuadrantSegments(quadrantSegments);
+    final Geometry geomBuf = bufOp.getResultGeometry(distance);
+    return geomBuf;
+  }
+
+  /**
+   * Comutes the buffer for a geometry for a given buffer distance
+   * and accuracy of approximation.
+   *
+   * @param g the geometry to buffer
+   * @param distance the buffer distance
+   * @param quadrantSegments the number of segments used to approximate a quarter circle
+   * @param endCapStyle the end cap style to use
+   * @return the buffer of the input geometry
+   *
+   */
+  public static Geometry bufferOp(final Geometry g, final double distance,
+    final int quadrantSegments, final int endCapStyle) {
+    final BufferOp bufOp = new BufferOp(g);
+    bufOp.setQuadrantSegments(quadrantSegments);
+    bufOp.setEndCapStyle(endCapStyle);
+    final Geometry geomBuf = bufOp.getResultGeometry(distance);
+    return geomBuf;
+  }
 
   /**
    * Compute a scale factor to limit the precision of
@@ -125,111 +200,37 @@ public class BufferOp
    *
    * @return a scale factor for the buffer computation
    */
-  private static double precisionScaleFactor(Geometry g,
-      double distance,
-    int maxPrecisionDigits)
-  {
-    BoundingBox env = g.getBoundingBox();
-    double envSize = Math.max(env.getHeight(), env.getWidth());
-    double expandByDistance = distance > 0.0 ? distance : 0.0;
-    double bufEnvSize = envSize + 2 * expandByDistance;
+  private static double precisionScaleFactor(final Geometry g,
+    final double distance, final int maxPrecisionDigits) {
+    final BoundingBox env = g.getBoundingBox();
+    final double envSize = Math.max(env.getHeight(), env.getWidth());
+    final double expandByDistance = distance > 0.0 ? distance : 0.0;
+    final double bufEnvSize = envSize + 2 * expandByDistance;
 
     // the smallest power of 10 greater than the buffer envelope
-    int bufEnvLog10 = (int) (Math.log(bufEnvSize) / Math.log(10) + 1.0);
-    int minUnitLog10 = bufEnvLog10 - maxPrecisionDigits;
+    final int bufEnvLog10 = (int)(Math.log(bufEnvSize) / Math.log(10) + 1.0);
+    final int minUnitLog10 = bufEnvLog10 - maxPrecisionDigits;
     // scale factor is inverse of min Unit size, so flip sign of exponent
-    double scaleFactor = Math.pow(10.0, -minUnitLog10);
+    final double scaleFactor = Math.pow(10.0, -minUnitLog10);
     return scaleFactor;
   }
 
-  /**
-   * Computes the buffer of a geometry for a given buffer distance.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @return the buffer of the input geometry
-   */
-  public static Geometry bufferOp(Geometry g, double distance)
-  {
-    BufferOp gBuf = new BufferOp(g);
-    Geometry geomBuf = gBuf.getResultGeometry(distance);
-//BufferDebug.saveBuffer(geomBuf);
-    //BufferDebug.runCount++;
-    return geomBuf;
-  }
+  private final Geometry argGeom;
 
-  /**
-   * Comutes the buffer for a geometry for a given buffer distance
-   * and accuracy of approximation.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @param params the buffer parameters to use
-   * @return the buffer of the input geometry
-   *
-   */
-  public static Geometry bufferOp(Geometry g, double distance, BufferParameters params)
-  {
-    BufferOp bufOp = new BufferOp(g, params);
-    Geometry geomBuf = bufOp.getResultGeometry(distance);
-    return geomBuf;
-  }
-  
-  /**
-   * Comutes the buffer for a geometry for a given buffer distance
-   * and accuracy of approximation.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @param quadrantSegments the number of segments used to approximate a quarter circle
-   * @return the buffer of the input geometry
-   *
-   */
-  public static Geometry bufferOp(Geometry g, double distance, int quadrantSegments)
-  {
-    BufferOp bufOp = new BufferOp(g);
-    bufOp.setQuadrantSegments(quadrantSegments);
-    Geometry geomBuf = bufOp.getResultGeometry(distance);
-    return geomBuf;
-  }
-
-  /**
-   * Comutes the buffer for a geometry for a given buffer distance
-   * and accuracy of approximation.
-   *
-   * @param g the geometry to buffer
-   * @param distance the buffer distance
-   * @param quadrantSegments the number of segments used to approximate a quarter circle
-   * @param endCapStyle the end cap style to use
-   * @return the buffer of the input geometry
-   *
-   */
-  public static Geometry bufferOp(Geometry g,
-                                  double distance,
-    int quadrantSegments,
-    int endCapStyle)
-  {
-    BufferOp bufOp = new BufferOp(g);
-    bufOp.setQuadrantSegments(quadrantSegments);
-    bufOp.setEndCapStyle(endCapStyle);
-    Geometry geomBuf = bufOp.getResultGeometry(distance);
-    return geomBuf;
-  }
-
-  private Geometry argGeom;
   private double distance;
-  
+
   private BufferParameters bufParams = new BufferParameters();
 
   private Geometry resultGeometry = null;
-  private RuntimeException saveException;   // debugging only
+
+  private RuntimeException saveException; // debugging only
 
   /**
    * Initializes a buffer computation for the given geometry
    *
    * @param g the geometry to buffer
    */
-  public BufferOp(Geometry g) {
+  public BufferOp(final Geometry g) {
     argGeom = g;
   }
 
@@ -240,9 +241,92 @@ public class BufferOp
    * @param g the geometry to buffer
    * @param bufParams the buffer parameters to use
    */
-  public BufferOp(Geometry g, BufferParameters bufParams) {
+  public BufferOp(final Geometry g, final BufferParameters bufParams) {
     argGeom = g;
     this.bufParams = bufParams;
+  }
+
+  private void bufferFixedPrecision(final CoordinatesPrecisionModel fixedPM) {
+    final Noder noder = new ScaledNoder(new MCIndexSnapRounder(
+      new SimpleCoordinatesPrecisionModel(1.0)), fixedPM.getScaleXY());
+
+    final BufferBuilder bufBuilder = new BufferBuilder(bufParams);
+    bufBuilder.setWorkingPrecisionModel(fixedPM);
+    bufBuilder.setNoder(noder);
+    // this may throw an exception, if robustness errors are encountered
+    resultGeometry = bufBuilder.buffer(argGeom, distance);
+  }
+
+  private void bufferOriginalPrecision() {
+    try {
+      // use fast noding by default
+      final BufferBuilder bufBuilder = new BufferBuilder(bufParams);
+      resultGeometry = bufBuilder.buffer(argGeom, distance);
+    } catch (final RuntimeException ex) {
+      saveException = ex;
+      // don't propagate the exception - it will be detected by fact that
+      // resultGeometry is null
+
+      // testing ONLY - propagate exception
+      // throw ex;
+    }
+  }
+
+  private void bufferReducedPrecision() {
+    // try and compute with decreasing precision
+    for (int precDigits = MAX_PRECISION_DIGITS; precDigits >= 0; precDigits--) {
+      try {
+        bufferReducedPrecision(precDigits);
+      } catch (final TopologyException ex) {
+        // update the saved exception to reflect the new input geometry
+        saveException = ex;
+        // don't propagate the exception - it will be detected by fact that
+        // resultGeometry is null
+      }
+      if (resultGeometry != null) {
+        return;
+      }
+    }
+
+    // tried everything - have to bail
+    throw saveException;
+  }
+
+  private void bufferReducedPrecision(final int precisionDigits) {
+    final double sizeBasedScaleFactor = precisionScaleFactor(argGeom, distance,
+      precisionDigits);
+    // System.out.println("recomputing with precision scale factor = " +
+    // sizeBasedScaleFactor);
+
+    final CoordinatesPrecisionModel fixedPM = new SimpleCoordinatesPrecisionModel(
+      sizeBasedScaleFactor);
+    bufferFixedPrecision(fixedPM);
+  }
+
+  private void computeGeometry() {
+    bufferOriginalPrecision();
+    if (resultGeometry != null) {
+      return;
+    }
+
+    final GeometryFactory geometryFactory = argGeom.getGeometryFactory();
+    if (geometryFactory.getScaleXY() > 0) {
+      bufferFixedPrecision(geometryFactory);
+    } else {
+      bufferReducedPrecision();
+    }
+  }
+
+  /**
+   * Returns the buffer computed for a geometry for a given buffer distance.
+   *
+   * @param distance the buffer distance
+   * @return the buffer of the input geometry
+   */
+  public Geometry getResultGeometry(final double distance) {
+    this.distance = distance;
+    computeGeometry();
+    return resultGeometry;
   }
 
   /**
@@ -252,8 +336,7 @@ public class BufferOp
    *
    * @param endCapStyle the end cap style to specify
    */
-  public void setEndCapStyle(int endCapStyle)
-  {
+  public void setEndCapStyle(final int endCapStyle) {
     bufParams.setEndCapStyle(endCapStyle);
   }
 
@@ -262,90 +345,7 @@ public class BufferOp
    *
    * @param quadrantSegments the number of segments in a fillet for a quadrant
    */
-  public void setQuadrantSegments(int quadrantSegments)
-  {
+  public void setQuadrantSegments(final int quadrantSegments) {
     bufParams.setQuadrantSegments(quadrantSegments);
-  }
-
-  /**
-   * Returns the buffer computed for a geometry for a given buffer distance.
-   *
-   * @param distance the buffer distance
-   * @return the buffer of the input geometry
-   */
-  public Geometry getResultGeometry(double distance)
-  {
-    this.distance = distance;
-    computeGeometry();
-    return resultGeometry;
-  }
-
-  private void computeGeometry()
-  {
-    bufferOriginalPrecision();
-    if (resultGeometry != null) return;
-
-    GeometryFactory geometryFactory = argGeom.getGeometryFactory();
-    if (geometryFactory.getScaleXY()> 0) {
-      bufferFixedPrecision(geometryFactory);
-    } else {
-      bufferReducedPrecision();
-    }
-  }
-
-  private void bufferReducedPrecision()
-  {
-    // try and compute with decreasing precision
-    for (int precDigits = MAX_PRECISION_DIGITS; precDigits >= 0; precDigits--) {
-      try {
-        bufferReducedPrecision(precDigits);
-      }
-      catch (TopologyException ex) {
-      	// update the saved exception to reflect the new input geometry
-        saveException = ex;
-        // don't propagate the exception - it will be detected by fact that resultGeometry is null
-      }
-      if (resultGeometry != null) return;
-    }
-
-    // tried everything - have to bail
-    throw saveException;
-  }
-
-  private void bufferOriginalPrecision()
-  {
-    try {
-      // use fast noding by default
-      BufferBuilder bufBuilder = new BufferBuilder(bufParams);
-      resultGeometry = bufBuilder.buffer(argGeom, distance);
-    }
-    catch (RuntimeException ex) {
-      saveException = ex;
-      // don't propagate the exception - it will be detected by fact that resultGeometry is null
-
-      // testing ONLY - propagate exception
-      //throw ex;
-    }
-  }
-
-  private void bufferReducedPrecision(int precisionDigits)
-  {
-    double sizeBasedScaleFactor = precisionScaleFactor(argGeom, distance, precisionDigits);
-//    System.out.println("recomputing with precision scale factor = " + sizeBasedScaleFactor);
-
-    CoordinatesPrecisionModel fixedPM = new SimpleCoordinatesPrecisionModel(sizeBasedScaleFactor);
-    bufferFixedPrecision(fixedPM);
-  }
-
-  private void bufferFixedPrecision(CoordinatesPrecisionModel fixedPM)
-  {
-    Noder noder = new ScaledNoder(new MCIndexSnapRounder(new SimpleCoordinatesPrecisionModel(1.0)),
-                                  fixedPM.getScaleXY());
-
-    BufferBuilder bufBuilder = new BufferBuilder(bufParams);
-    bufBuilder.setWorkingPrecisionModel(fixedPM);
-    bufBuilder.setNoder(noder);
-    // this may throw an exception, if robustness errors are encountered
-    resultGeometry = bufBuilder.buffer(argGeom, distance);
   }
 }

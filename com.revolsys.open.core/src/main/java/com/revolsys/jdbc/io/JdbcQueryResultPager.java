@@ -100,10 +100,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
 
   }
 
-  public boolean isClosed() {
-    return dataStore == null;
-  }
-
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
@@ -114,8 +110,16 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return connection;
   }
 
+  public DataObjectFactory getDataObjectFactory() {
+    return dataObjectFactory;
+  }
+
   public DataSource getDataSource() {
     return dataSource;
+  }
+
+  public JdbcDataObjectStore getDataStore() {
+    return dataStore;
   }
 
   /**
@@ -158,14 +162,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   @Override
   public int getNextPageNumber() {
     return pageNumber + 2;
-  }
-
-  public JdbcDataObjectStore getDataStore() {
-    return dataStore;
-  }
-
-  public DataObjectFactory getDataObjectFactory() {
-    return dataObjectFactory;
   }
 
   /**
@@ -275,6 +271,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
         throw new RuntimeException("Error executing query:" + sql, e);
       }
     }
+  }
+
+  public boolean isClosed() {
+    return dataStore == null;
   }
 
   /**

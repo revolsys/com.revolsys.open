@@ -22,10 +22,6 @@ public class Datum implements Serializable {
 
   private PrimeMeridian primeMeridian;
 
-  public PrimeMeridian getPrimeMeridian() {
-    return primeMeridian;
-  }
-
   public Datum(final String name, final Spheroid spheroid,
     final Authority authority) {
     this.name = name;
@@ -34,20 +30,21 @@ public class Datum implements Serializable {
   }
 
   public Datum(final String name, final Spheroid spheroid,
-    final ToWgs84 toWgs84, final Authority authority) {
-    this.name = name;
-    this.spheroid = spheroid;
-    this.toWgs84 = toWgs84;
-    this.authority = authority;
-  }
-
-  public Datum(String name, Spheroid spheroid, PrimeMeridian primeMeridian,
-    Authority authority, boolean deprecated) {
+    final PrimeMeridian primeMeridian, final Authority authority,
+    final boolean deprecated) {
     this.name = name;
     this.spheroid = spheroid;
     this.primeMeridian = primeMeridian;
     this.authority = authority;
     this.deprecated = deprecated;
+  }
+
+  public Datum(final String name, final Spheroid spheroid,
+    final ToWgs84 toWgs84, final Authority authority) {
+    this.name = name;
+    this.spheroid = spheroid;
+    this.toWgs84 = toWgs84;
+    this.authority = authority;
   }
 
   @Override
@@ -71,12 +68,32 @@ public class Datum implements Serializable {
     return false;
   }
 
+  public boolean equalsExact(final Datum datum) {
+    if (!EqualsRegistry.equal(authority, datum.authority)) {
+      return false;
+    } else if (deprecated != datum.deprecated) {
+      return false;
+    } else if (!EqualsRegistry.equal(name, datum.name)) {
+      return false;
+    } else if (!primeMeridian.equalsExact(primeMeridian)) {
+      return false;
+    } else if (!spheroid.equalsExact(datum.spheroid)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public Authority getAuthority() {
     return authority;
   }
 
   public String getName() {
     return name;
+  }
+
+  public PrimeMeridian getPrimeMeridian() {
+    return primeMeridian;
   }
 
   public Spheroid getSpheroid() {
@@ -103,21 +120,5 @@ public class Datum implements Serializable {
   @Override
   public String toString() {
     return name;
-  }
-
-  public boolean equalsExact(Datum datum) {
-    if (!EqualsRegistry.equal(authority, datum.authority)) {
-      return false;
-    } else if (deprecated != datum.deprecated) {
-      return false;
-    } else if (!EqualsRegistry.equal(name, datum.name)) {
-      return false;
-    } else if (!primeMeridian.equalsExact(primeMeridian)) {
-      return false;
-    } else if (!spheroid.equalsExact(datum.spheroid)) {
-      return false;
-    } else {
-      return true;
-    }
   }
 }

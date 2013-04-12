@@ -9,17 +9,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 
 public interface GeometryFactory extends CoordinatesPrecisionModel {
-  /**
-   * Get the geometry converted to this geometry factory. If the factory is this
-   * factory then the geometry will be returned, otherwise a new geometry will
-   * be created. If the coordinate system is different the coordinates will be
-   * converted to the correct coordinate system.
-   * 
-   * @param geometry
-   * @return
-   */
-  <G extends Geometry> G getGeometry(Geometry geometry);
-
   <G extends Geometry> G createGeometry(
     Collection<? extends Geometry> geometries);
 
@@ -59,6 +48,17 @@ public interface GeometryFactory extends CoordinatesPrecisionModel {
   Polygon createPolygon(final Polygon polygon);
 
   CoordinateSystem getCoordinateSystem();
+
+  /**
+   * Get the geometry converted to this geometry factory. If the factory is this
+   * factory then the geometry will be returned, otherwise a new geometry will
+   * be created. If the coordinate system is different the coordinates will be
+   * converted to the correct coordinate system.
+   * 
+   * @param geometry
+   * @return
+   */
+  <G extends Geometry> G getGeometry(Geometry geometry);
 
   int getSrid();
 }

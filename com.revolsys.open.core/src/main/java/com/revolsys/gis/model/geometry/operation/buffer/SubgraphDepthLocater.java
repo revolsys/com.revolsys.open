@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.buffer;
 
 import java.util.ArrayList;
@@ -24,142 +23,23 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @version 1.7
  */
-public class SubgraphDepthLocater
-{
-  private Collection subgraphs;
-  private LineSegment seg = new LineSegment();
-  private CGAlgorithms cga = new CGAlgorithms();
-
-  public SubgraphDepthLocater(List subgraphs)
-  {
-    this.subgraphs = subgraphs;
-  }
-
-  public int getDepth(Coordinates p)
-  {
-    List stabbedSegments = findStabbedSegments(p);
-    // if no segments on stabbing line subgraph must be outside all others.
-    if (stabbedSegments.size() == 0)
-      return 0;
-    Collections.sort(stabbedSegments);
-    DepthSegment ds = (DepthSegment) stabbedSegments.get(0);
-    return ds.leftDepth;
-  }
-
-  /**
-   * Finds all non-horizontal segments intersecting the stabbing line.
-   * The stabbing line is the ray to the right of stabbingRayLeftPt.
-   *
-   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
-   * @return a List of {@link DepthSegments} intersecting the stabbing line
-   */
-  private List findStabbedSegments(Coordinates stabbingRayLeftPt)
-  {
-    List stabbedSegments = new ArrayList();
-    for (Iterator i = subgraphs.iterator(); i.hasNext(); ) {
-      BufferSubgraph bsg = (BufferSubgraph) i.next();
-
-      // optimization - don't bother checking subgraphs which the ray does not intersect
-      Envelope env = bsg.getEnvelope();
-      if (stabbingRayLeftPt.getY() < env.getMinY()
-          || stabbingRayLeftPt.getY() > env.getMaxY())
-        continue;
-
-      findStabbedSegments(stabbingRayLeftPt, bsg.getDirectedEdges(), stabbedSegments);
-    }
-    return stabbedSegments;
-  }
-
-  /**
-   * Finds all non-horizontal segments intersecting the stabbing line
-   * in the list of dirEdges.
-   * The stabbing line is the ray to the right of stabbingRayLeftPt.
-   *
-   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
-   * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
-   */
-  private void findStabbedSegments(Coordinates stabbingRayLeftPt,
-                                   List dirEdges,
-                                   List stabbedSegments)
-  {
-    /**
-     * Check all forward DirectedEdges only.  This is still general,
-     * because each Edge has a forward DirectedEdge.
-     */
-    for (Iterator i = dirEdges.iterator(); i.hasNext();) {
-      DirectedEdge de = (DirectedEdge) i.next();
-      if (! de.isForward())
-        continue;
-      findStabbedSegments(stabbingRayLeftPt, de, stabbedSegments);
-    }
-  }
-
-  /**
-   * Finds all non-horizontal segments intersecting the stabbing line
-   * in the input dirEdge.
-   * The stabbing line is the ray to the right of stabbingRayLeftPt.
-   *
-   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
-   * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
-   */
-  private void findStabbedSegments(Coordinates stabbingRayLeftPt,
-                                   DirectedEdge dirEdge,
-                                   List stabbedSegments)
-  {
-    CoordinatesList pts = dirEdge.getEdge().getCoordinates();
-    for (int i = 0; i < pts.size() - 1; i++) {
-      seg.setPoint(0,pts.get(i));
-      seg.setPoint(1,pts.get(i + 1));
-      // ensure segment always points upwards
-      if (seg.get(0).getY() > seg.get(1).getY())
-        seg.reverse();
-
-      // skip segment if it is left of the stabbing line
-      double maxx = Math.max(seg.get(0).getX(), seg.get(1).getX());
-      if (maxx < stabbingRayLeftPt.getX())
-        continue;
-
-      // skip horizontal segments (there will be a non-horizontal one carrying the same depth info
-      if (seg.isHorizontal())
-        continue;
-
-      // skip if segment is above or below stabbing line
-      if (stabbingRayLeftPt.getY() < seg.get(0).getY() || stabbingRayLeftPt.getY() > seg.get(1).getY())
-        continue;
-
-      // skip if stabbing ray is right of the segment
-      if (CoordinatesUtil.orientationIndex(seg.get(0), seg.get(1), stabbingRayLeftPt)
-          == CGAlgorithms.RIGHT)
-        continue;
-
-      // stabbing line cuts this segment, so record it
-      int depth = dirEdge.getDepth(Position.LEFT);
-      // if segment direction was flipped, use RHS depth instead
-      if (! seg.get(0).equals(pts.get(i)))
-        depth = dirEdge.getDepth(Position.RIGHT);
-      DepthSegment ds = new DepthSegment(seg, depth);
-      stabbedSegments.add(ds);
-    }
-  }
-
-
+public class SubgraphDepthLocater {
   /**
    * A segment from a directed edge which has been assigned a depth value
    * for its sides.
    */
-  private class DepthSegment
-      implements Comparable
-  {
-    private LineSegment upwardSeg;
-    private int leftDepth;
+  private class DepthSegment implements Comparable {
+    private final LineSegment upwardSeg;
 
-    public DepthSegment(LineSegment seg, int depth)
-    {
+    private final int leftDepth;
+
+    public DepthSegment(final LineSegment seg, final int depth) {
       // input seg is assumed to be normalized
       upwardSeg = new LineSegment(seg);
-      //upwardSeg.normalize();
+      // upwardSeg.normalize();
       this.leftDepth = depth;
     }
+
     /**
      * Defines a comparision operation on DepthSegments
      * which orders them left to right
@@ -172,9 +52,9 @@ public class SubgraphDepthLocater
      * @param obj
      * @return
      */
-    public int compareTo(Object obj)
-    {
-      DepthSegment other = (DepthSegment) obj;
+    @Override
+    public int compareTo(final Object obj) {
+      final DepthSegment other = (DepthSegment)obj;
       /**
        * try and compute a determinate orientation for the segments.
        * Test returns 1 if other is left of this (i.e. this > other)
@@ -188,12 +68,14 @@ public class SubgraphDepthLocater
        * so have to flip sign to get proper comparison value of
        * -1 if this is leftmost
        */
-      if (orientIndex == 0)
+      if (orientIndex == 0) {
         orientIndex = -1 * other.upwardSeg.orientationIndex(upwardSeg);
+      }
 
       // if orientation is determinate, return it
-      if (orientIndex != 0)
+      if (orientIndex != 0) {
         return orientIndex;
+      }
 
       // otherwise, segs must be collinear - sort based on minimum X value
       return compareX(this.upwardSeg, other.upwardSeg);
@@ -210,14 +92,139 @@ public class SubgraphDepthLocater
      * @param seg1 a segment to compare
      * @return
      */
-    private int compareX(LineSegment seg0, LineSegment seg1)
-    {
-      int compare0 = seg0.getCoordinate(0).compareTo(seg1.getCoordinate(0));
-      if (compare0 != 0)
+    private int compareX(final LineSegment seg0, final LineSegment seg1) {
+      final int compare0 = seg0.getCoordinate(0).compareTo(
+        seg1.getCoordinate(0));
+      if (compare0 != 0) {
         return compare0;
+      }
       return seg0.getCoordinate(1).compareTo(seg1.getCoordinate(1));
 
     }
 
+  }
+
+  private final Collection subgraphs;
+
+  private final LineSegment seg = new LineSegment();
+
+  private final CGAlgorithms cga = new CGAlgorithms();
+
+  public SubgraphDepthLocater(final List subgraphs) {
+    this.subgraphs = subgraphs;
+  }
+
+  /**
+   * Finds all non-horizontal segments intersecting the stabbing line.
+   * The stabbing line is the ray to the right of stabbingRayLeftPt.
+   *
+   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
+   * @return a List of {@link DepthSegments} intersecting the stabbing line
+   */
+  private List findStabbedSegments(final Coordinates stabbingRayLeftPt) {
+    final List stabbedSegments = new ArrayList();
+    for (final Iterator i = subgraphs.iterator(); i.hasNext();) {
+      final BufferSubgraph bsg = (BufferSubgraph)i.next();
+
+      // optimization - don't bother checking subgraphs which the ray does not
+      // intersect
+      final Envelope env = bsg.getEnvelope();
+      if (stabbingRayLeftPt.getY() < env.getMinY()
+        || stabbingRayLeftPt.getY() > env.getMaxY()) {
+        continue;
+      }
+
+      findStabbedSegments(stabbingRayLeftPt, bsg.getDirectedEdges(),
+        stabbedSegments);
+    }
+    return stabbedSegments;
+  }
+
+  /**
+   * Finds all non-horizontal segments intersecting the stabbing line
+   * in the input dirEdge.
+   * The stabbing line is the ray to the right of stabbingRayLeftPt.
+   *
+   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
+   * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
+   */
+  private void findStabbedSegments(final Coordinates stabbingRayLeftPt,
+    final DirectedEdge dirEdge, final List stabbedSegments) {
+    final CoordinatesList pts = dirEdge.getEdge().getCoordinates();
+    for (int i = 0; i < pts.size() - 1; i++) {
+      seg.setPoint(0, pts.get(i));
+      seg.setPoint(1, pts.get(i + 1));
+      // ensure segment always points upwards
+      if (seg.get(0).getY() > seg.get(1).getY()) {
+        seg.reverse();
+      }
+
+      // skip segment if it is left of the stabbing line
+      final double maxx = Math.max(seg.get(0).getX(), seg.get(1).getX());
+      if (maxx < stabbingRayLeftPt.getX()) {
+        continue;
+      }
+
+      // skip horizontal segments (there will be a non-horizontal one carrying
+      // the same depth info
+      if (seg.isHorizontal()) {
+        continue;
+      }
+
+      // skip if segment is above or below stabbing line
+      if (stabbingRayLeftPt.getY() < seg.get(0).getY()
+        || stabbingRayLeftPt.getY() > seg.get(1).getY()) {
+        continue;
+      }
+
+      // skip if stabbing ray is right of the segment
+      if (CoordinatesUtil.orientationIndex(seg.get(0), seg.get(1),
+        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+        continue;
+      }
+
+      // stabbing line cuts this segment, so record it
+      int depth = dirEdge.getDepth(Position.LEFT);
+      // if segment direction was flipped, use RHS depth instead
+      if (!seg.get(0).equals(pts.get(i))) {
+        depth = dirEdge.getDepth(Position.RIGHT);
+      }
+      final DepthSegment ds = new DepthSegment(seg, depth);
+      stabbedSegments.add(ds);
+    }
+  }
+
+  /**
+   * Finds all non-horizontal segments intersecting the stabbing line
+   * in the list of dirEdges.
+   * The stabbing line is the ray to the right of stabbingRayLeftPt.
+   *
+   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
+   * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
+   */
+  private void findStabbedSegments(final Coordinates stabbingRayLeftPt,
+    final List dirEdges, final List stabbedSegments) {
+    /**
+     * Check all forward DirectedEdges only.  This is still general,
+     * because each Edge has a forward DirectedEdge.
+     */
+    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
+      if (!de.isForward()) {
+        continue;
+      }
+      findStabbedSegments(stabbingRayLeftPt, de, stabbedSegments);
+    }
+  }
+
+  public int getDepth(final Coordinates p) {
+    final List stabbedSegments = findStabbedSegments(p);
+    // if no segments on stabbing line subgraph must be outside all others.
+    if (stabbedSegments.size() == 0) {
+      return 0;
+    }
+    Collections.sort(stabbedSegments);
+    final DepthSegment ds = (DepthSegment)stabbedSegments.get(0);
+    return ds.leftDepth;
   }
 }

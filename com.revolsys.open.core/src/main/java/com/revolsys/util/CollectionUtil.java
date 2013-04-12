@@ -30,44 +30,6 @@ public final class CollectionUtil {
     return count;
   }
 
-  public static <T> boolean containsReference(List<WeakReference<T>> list,
-    T object) {
-    for (int i = 0; i < list.size(); i++) {
-      WeakReference<T> reference = list.get(i);
-      T value = reference.get();
-      if (value == null) {
-        list.remove(i);
-      } else if (value == object) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static <T> void removeReference(List<WeakReference<T>> list, T object) {
-    for (int i = 0; i < list.size(); i++) {
-      WeakReference<T> reference = list.get(i);
-      T value = reference.get();
-      if (value == null) {
-        list.remove(i);
-      } else if (value == object) {
-        list.remove(i);
-      }
-    }
-  }
-  public static <T> List<T> getReferences(List<WeakReference<T>> list) {
-    List<T> values = new ArrayList<T>();
-    for (int i = 0; i < list.size(); i++) {
-      WeakReference<T> reference = list.get(i);
-      T value = reference.get();
-      if (value == null) {
-        list.remove(i);
-      } else {
-        values.add(value);
-      }
-    }
-    return values;
-  }
   public static void append(final StringBuffer string,
     final Collection<? extends Object> values) {
     append(string, values, ",");
@@ -89,6 +51,20 @@ public final class CollectionUtil {
         }
       }
     }
+  }
+
+  public static <T> boolean containsReference(
+    final List<WeakReference<T>> list, final T object) {
+    for (int i = 0; i < list.size(); i++) {
+      final WeakReference<T> reference = list.get(i);
+      final T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else if (value == object) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,
@@ -136,19 +112,6 @@ public final class CollectionUtil {
         return value;
       }
     }
-  }
-
-  public static <K, V> List<V> getNotNull(Map<K, V> map, Collection<K> keys) {
-    List<V> values = new ArrayList<V>();
-    if (keys != null) {
-      for (K key : keys) {
-        V value = map.get(key);
-        if (value != null) {
-          values.add(value);
-        }
-      }
-    }
-    return values;
   }
 
   public static boolean getBool(final Map<String, ? extends Object> map,
@@ -207,6 +170,34 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> List<V> getNotNull(final Map<K, V> map,
+    final Collection<K> keys) {
+    final List<V> values = new ArrayList<V>();
+    if (keys != null) {
+      for (final K key : keys) {
+        final V value = map.get(key);
+        if (value != null) {
+          values.add(value);
+        }
+      }
+    }
+    return values;
+  }
+
+  public static <T> List<T> getReferences(final List<WeakReference<T>> list) {
+    final List<T> values = new ArrayList<T>();
+    for (int i = 0; i < list.size(); i++) {
+      final WeakReference<T> reference = list.get(i);
+      final T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else {
+        values.add(value);
+      }
+    }
+    return values;
+  }
+
   public static String getString(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = map.get(name);
@@ -217,12 +208,32 @@ public final class CollectionUtil {
     }
   }
 
+  public static boolean isNotNullAndNotZero(final Map<String, Object> object,
+    final String name) {
+    final Integer value = getInteger(object, name);
+    if (value == null || value == 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public static <K, V extends Comparable<V>> void putIfGreaterThan(
     final Map<K, V> map, final K key, final V value) {
     synchronized (map) {
       final V lastValue = map.get(key);
       if (lastValue == null || value.compareTo(lastValue) > 1) {
         map.put(key, value);
+      }
+    }
+  }
+
+  public static <K, V extends Comparable<V>> void removeIfGreaterThanEqual(
+    final Map<K, V> map, final K key, final V value) {
+    synchronized (map) {
+      final V lastValue = map.get(key);
+      if (lastValue == null || value.compareTo(lastValue) >= 0) {
+        map.remove(key);
       }
     }
   }
@@ -237,12 +248,15 @@ public final class CollectionUtil {
     }
   }
 
-  public static <K, V extends Comparable<V>> void removeIfGreaterThanEqual(
-    final Map<K, V> map, final K key, final V value) {
-    synchronized (map) {
-      final V lastValue = map.get(key);
-      if (lastValue == null || value.compareTo(lastValue) >= 0) {
-        map.remove(key);
+  public static <T> void removeReference(final List<WeakReference<T>> list,
+    final T object) {
+    for (int i = 0; i < list.size(); i++) {
+      final WeakReference<T> reference = list.get(i);
+      final T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else if (value == object) {
+        list.remove(i);
       }
     }
   }
@@ -385,15 +399,5 @@ public final class CollectionUtil {
   }
 
   private CollectionUtil() {
-  }
-
-  public static boolean isNotNullAndNotZero(Map<String,Object> object,String name ) {
-    final Integer value = getInteger(object,
-      name);
-    if (value == null || value == 0) {
-      return false; 
-    } else {
-      return true;
-    }
   }
 }

@@ -3,7 +3,6 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryProjectionUtil {
@@ -83,6 +82,46 @@ public class GeometryProjectionUtil {
   }
 
   /**
+   * Convert the geometry to the geometry factory. If the geometry has a
+   * geometry factory with the same coordinate system it will not be copied. The
+   * number of axis are not changed if the SRID is the same
+   * 
+   * @param geometry
+   * @param geometryFactory
+   * @return
+   */
+  public static <T extends Geometry> T perform(final T geometry,
+    final GeometryFactory geometryFactory) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final int factorySrid = geometryFactory.getSRID();
+      final int geometrySrid = geometry.getSRID();
+      if (geometrySrid == factorySrid) {
+        return geometry;
+      } else if (geometrySrid == 0) {
+        return geometry;
+      } else {
+        final GeometryOperation operation = getGeometryOperation(geometrySrid,
+          geometryFactory);
+        final T newGeometry = perform(operation, geometry);
+        return newGeometry;
+      }
+    }
+  }
+
+  public static <T extends Geometry> T perform(final T geometry, final int srid) {
+    final int geometrySrid = geometry.getSRID();
+    if (geometrySrid == 0) {
+      return geometry;
+    } else {
+      final GeometryOperation operation = getGeometryOperation(geometrySrid,
+        srid);
+      return perform(operation, geometry);
+    }
+  }
+
+  /**
    * Convert the geometry to the geometry factory. Even if the geometry is the
    * same it will be copied.
    * 
@@ -107,46 +146,6 @@ public class GeometryProjectionUtil {
         }
         return newGeometry;
       }
-    }
-  }
-
-  /**
-   * Convert the geometry to the geometry factory. If the geometry has a
-   * geometry factory with the same coordinate system it will not be copied. The
-   * number of axis are not changed if the SRID is the same
-   * 
-   * @param geometry
-   * @param geometryFactory
-   * @return
-   */
-  public static <T extends Geometry> T perform(final T geometry,
-    final GeometryFactory geometryFactory) {
-    if (geometry == null) {
-      return null;
-    } else {
-      final int factorySrid = geometryFactory.getSRID();
-      final int geometrySrid = geometry.getSRID();
-      if (geometrySrid == factorySrid) {
-        return geometry;
-      } else if (geometrySrid == 0) {
-        return geometry;
-      } else {
-        final GeometryOperation operation = getGeometryOperation(geometrySrid,
-          geometryFactory);
-        T newGeometry = perform(operation, geometry);
-        return newGeometry;
-      }
-    }
-  }
-
-  public static <T extends Geometry> T perform(final T geometry, final int srid) {
-    final int geometrySrid = geometry.getSRID();
-    if (geometrySrid == 0) {
-      return geometry;
-    } else {
-      final GeometryOperation operation = getGeometryOperation(geometrySrid,
-        srid);
-      return perform(operation, geometry);
     }
   }
 }

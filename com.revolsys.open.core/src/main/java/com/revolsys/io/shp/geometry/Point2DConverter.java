@@ -45,7 +45,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
     return geometryFactory.createPoint(coordinates);
   }
 
- @Override
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {

@@ -80,14 +80,44 @@ public class PointLocator {
   public PointLocator() {
   }
 
-  public PointLocator(BoundaryNodeRule boundaryRule) {
-    if (boundaryRule == null)
+  public PointLocator(final BoundaryNodeRule boundaryRule) {
+    if (boundaryRule == null) {
       throw new IllegalArgumentException("Rule must be non-null");
+    }
     this.boundaryRule = boundaryRule;
   }
 
-  public PointLocator(GeometryFactory geometryFactory) {
+  public PointLocator(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  private void computeLocation(final Coordinates p, final Geometry geom) {
+    if (geom instanceof Point) {
+      updateLocationInfo(locate(p, (Point)geom));
+    }
+    if (geom instanceof LineString) {
+      updateLocationInfo(locate(p, (LineString)geom));
+    } else if (geom instanceof Polygon) {
+      updateLocationInfo(locate(p, (Polygon)geom));
+    } else if (geom instanceof MultiLineString) {
+      final MultiLineString ml = (MultiLineString)geom;
+      for (int i = 0; i < ml.getGeometryCount(); i++) {
+        final LineString l = (LineString)ml.getGeometry(i);
+        updateLocationInfo(locate(p, l));
+      }
+    } else if (geom instanceof MultiPolygon) {
+      final MultiPolygon mpoly = (MultiPolygon)geom;
+      for (int i = 0; i < mpoly.getGeometryCount(); i++) {
+        final Polygon poly = (Polygon)mpoly.getGeometry(i);
+        updateLocationInfo(locate(p, poly));
+      }
+    } else if (geom instanceof GeometryCollection) {
+      for (final Geometry g2 : geom.getGeometries()) {
+        if (g2 != geom) {
+          computeLocation(p, g2);
+        }
+      }
+    }
   }
 
   /**
@@ -98,7 +128,7 @@ public class PointLocator {
    * @return <code>true</code> if the point is in the interior or boundary of
    *         the Geometry
    */
-  public boolean intersects(Coordinates p, Geometry geom) {
+  public boolean intersects(final Coordinates p, final Geometry geom) {
     return locate(p, geom) != Location.EXTERIOR;
   }
 
@@ -110,9 +140,10 @@ public class PointLocator {
    * 
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public int locate(Coordinates p, Geometry geom) {
-    if (geom.isEmpty())
+  public int locate(final Coordinates p, final Geometry geom) {
+    if (geom.isEmpty()) {
       return Location.EXTERIOR;
+    }
 
     if (geom instanceof LineString) {
       return locate(p, (LineString)geom);
@@ -123,50 +154,35 @@ public class PointLocator {
     isIn = false;
     numBoundaries = 0;
     computeLocation(p, geom);
-    if (boundaryRule.isInBoundary(numBoundaries))
+    if (boundaryRule.isInBoundary(numBoundaries)) {
       return Location.BOUNDARY;
-    if (numBoundaries > 0 || isIn)
+    }
+    if (numBoundaries > 0 || isIn) {
       return Location.INTERIOR;
+    }
 
     return Location.EXTERIOR;
   }
 
-  private void computeLocation(Coordinates p, Geometry geom) {
-    if (geom instanceof Point) {
-      updateLocationInfo(locate(p, (Point)geom));
+  private int locate(final Coordinates p, final LineString l) {
+    // bounding-box check
+    if (!l.getBoundingBox().intersects(p)) {
+      return Location.EXTERIOR;
     }
-    if (geom instanceof LineString) {
-      updateLocationInfo(locate(p, (LineString)geom));
-    } else if (geom instanceof Polygon) {
-      updateLocationInfo(locate(p, (Polygon)geom));
-    } else if (geom instanceof MultiLineString) {
-      MultiLineString ml = (MultiLineString)geom;
-      for (int i = 0; i < ml.getGeometryCount(); i++) {
-        LineString l = (LineString)ml.getGeometry(i);
-        updateLocationInfo(locate(p, l));
+
+    if (!l.isClosed()) {
+      if (p.equals(l.get(0)) || p.equals(l.get(l.size() - 1))) {
+        return Location.BOUNDARY;
       }
-    } else if (geom instanceof MultiPolygon) {
-      MultiPolygon mpoly = (MultiPolygon)geom;
-      for (int i = 0; i < mpoly.getGeometryCount(); i++) {
-        Polygon poly = (Polygon)mpoly.getGeometry(i);
-        updateLocationInfo(locate(p, poly));
-      }
-    } else if (geom instanceof GeometryCollection) {
-      for (Geometry g2 : geom.getGeometries()) {
-        if (g2 != geom)
-          computeLocation(p, g2);
-      }
+    }
+    if (CoordinatesListUtil.isPointOnLine(geometryFactory, l, p)) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
   }
 
-  private void updateLocationInfo(int loc) {
-    if (loc == Location.INTERIOR)
-      isIn = true;
-    if (loc == Location.BOUNDARY)
-      numBoundaries++;
-  }
-
-  private int locate(Coordinates p, Point point) {
+  private int locate(final Coordinates p, final Point point) {
     if (point.equals2d(p)) {
       return Location.INTERIOR;
     } else {
@@ -174,25 +190,37 @@ public class PointLocator {
     }
   }
 
-  private int locate(Coordinates p, LineString l) {
-    // bounding-box check
-    if (!l.getBoundingBox().intersects(p))
+  private int locate(final Coordinates p, final Polygon poly) {
+    if (poly.isEmpty()) {
       return Location.EXTERIOR;
+    } else {
+      final MultiLinearRing rings = poly.getRings();
+      final LinearRing shell = poly.getExteriorRing();
 
-    if (!l.isClosed()) {
-      if (p.equals(l.get(0)) || p.equals(l.get(l.size() - 1))) {
+      final int shellLoc = locateInPolygonRing(p, shell);
+      if (shellLoc == Location.EXTERIOR) {
+        return Location.EXTERIOR;
+      }
+      if (shellLoc == Location.BOUNDARY) {
         return Location.BOUNDARY;
       }
-    }
-    if (CoordinatesListUtil.isPointOnLine(geometryFactory, l,p)) {
+      // now test if the point lies in or on the holes
+      for (int i = 1; i < rings.getGeometryCount(); i++) {
+        final LinearRing hole = rings.getGeometry(i);
+        final int holeLoc = locateInPolygonRing(p, hole);
+        if (holeLoc == Location.INTERIOR) {
+          return Location.EXTERIOR;
+        }
+        if (holeLoc == Location.BOUNDARY) {
+          return Location.BOUNDARY;
+        }
+      }
       return Location.INTERIOR;
-    } else {
-      return Location.EXTERIOR;
     }
   }
 
-  private int locateInPolygonRing(Coordinates p, LinearRing ring) {
-    BoundingBox boundingBox = ring.getBoundingBox();
+  private int locateInPolygonRing(final Coordinates p, final LinearRing ring) {
+    final BoundingBox boundingBox = ring.getBoundingBox();
     if (boundingBox.intersects(p)) {
       return RayCrossingCounter.locatePointInRing(p, ring);
     } else {
@@ -200,28 +228,12 @@ public class PointLocator {
     }
   }
 
-  private int locate(Coordinates p, Polygon poly) {
-    if (poly.isEmpty()) {
-      return Location.EXTERIOR;
-    } else {
-      MultiLinearRing rings = poly.getRings();
-      LinearRing shell = poly.getExteriorRing();
-
-      int shellLoc = locateInPolygonRing(p, shell);
-      if (shellLoc == Location.EXTERIOR)
-        return Location.EXTERIOR;
-      if (shellLoc == Location.BOUNDARY)
-        return Location.BOUNDARY;
-      // now test if the point lies in or on the holes
-      for (int i = 1; i < rings.getGeometryCount(); i++) {
-        LinearRing hole = rings.getGeometry(i);
-        int holeLoc = locateInPolygonRing(p, hole);
-        if (holeLoc == Location.INTERIOR)
-          return Location.EXTERIOR;
-        if (holeLoc == Location.BOUNDARY)
-          return Location.BOUNDARY;
-      }
-      return Location.INTERIOR;
+  private void updateLocationInfo(final int loc) {
+    if (loc == Location.INTERIOR) {
+      isIn = true;
+    }
+    if (loc == Location.BOUNDARY) {
+      numBoundaries++;
     }
   }
 

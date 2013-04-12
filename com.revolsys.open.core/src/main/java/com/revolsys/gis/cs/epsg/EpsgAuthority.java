@@ -37,10 +37,12 @@ public class EpsgAuthority implements Authority, Serializable {
     }
   }
 
+  @Override
   public String getCode() {
     return code;
   }
 
+  @Override
   public String getName() {
     return "EPSG";
   }

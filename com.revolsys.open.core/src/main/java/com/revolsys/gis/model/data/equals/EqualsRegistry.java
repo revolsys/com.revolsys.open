@@ -16,13 +16,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class EqualsRegistry implements Equals<Object> {
 
-  public static boolean equal(final Object object1, final Object object2) {
-    return INSTANCE.equals(object1, object2);
-  }
-
   private static final ObjectEquals DEFAULT_EQUALS = new ObjectEquals();
 
   public static final EqualsRegistry INSTANCE = new EqualsRegistry();
+
+  public static boolean equal(final Object object1, final Object object2) {
+    return INSTANCE.equals(object1, object2);
+  }
 
   private final Map<Class<?>, Equals<?>> classEqualsMap = new HashMap<Class<?>, Equals<?>>();
 

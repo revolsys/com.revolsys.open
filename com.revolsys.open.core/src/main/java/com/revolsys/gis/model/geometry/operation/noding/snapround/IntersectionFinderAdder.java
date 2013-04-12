@@ -48,25 +48,34 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
  *
  * @version 1.7
  */
-public class IntersectionFinderAdder
-    implements SegmentIntersector
-{
-  private LineIntersector li;
-  private final List interiorIntersections;
+public class IntersectionFinderAdder implements SegmentIntersector {
+  private final LineIntersector li;
 
+  private final List interiorIntersections;
 
   /**
    * Creates an intersection finder which finds all proper intersections
    *
    * @param li the LineIntersector to use
    */
-  public IntersectionFinderAdder(LineIntersector li)
-  {
+  public IntersectionFinderAdder(final LineIntersector li) {
     this.li = li;
     interiorIntersections = new ArrayList();
   }
 
-  public List getInteriorIntersections()  {    return interiorIntersections;  }
+  public List getInteriorIntersections() {
+    return interiorIntersections;
+  }
+
+  /**
+   * Always process all intersections
+   * 
+   * @return false always
+   */
+  @Override
+  public boolean isDone() {
+    return false;
+  }
 
   /**
    * This method is called by clients
@@ -76,38 +85,31 @@ public class IntersectionFinderAdder
    * this call for segment pairs which they have determined do not intersect
    * (e.g. by an disjoint envelope test).
    */
-  public void processIntersections(
-      SegmentString e0,  int segIndex0,
-      SegmentString e1,  int segIndex1
-      )
-  {
+  @Override
+  public void processIntersections(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
     // don't bother intersecting a segment with itself
-    if (e0 == e1 && segIndex0 == segIndex1) return;
+    if (e0 == e1 && segIndex0 == segIndex1) {
+      return;
+    }
 
-    Coordinates p00 = e0.getCoordinate(segIndex0);
-    Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    Coordinates p10 = e1.getCoordinate(segIndex1);
-    Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Coordinates p00 = e0.getCoordinate(segIndex0);
+    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
+    final Coordinates p10 = e1.getCoordinate(segIndex1);
+    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
-//if (li.hasIntersection() && li.isProper()) Debug.println(li);
+    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
 
     if (li.hasIntersection()) {
       if (li.isInteriorIntersection()) {
         for (int intIndex = 0; intIndex < li.getIntersectionNum(); intIndex++) {
           interiorIntersections.add(li.getIntersection(intIndex));
         }
-        ((NodedSegmentString) e0).addIntersections(li, segIndex0, 0);
-        ((NodedSegmentString) e1).addIntersections(li, segIndex1, 1);
+        ((NodedSegmentString)e0).addIntersections(li, segIndex0, 0);
+        ((NodedSegmentString)e1).addIntersections(li, segIndex1, 1);
       }
     }
   }
-  
-  /**
-   * Always process all intersections
-   * 
-   * @return false always
-   */
-  public boolean isDone() { return false; }
 
 }

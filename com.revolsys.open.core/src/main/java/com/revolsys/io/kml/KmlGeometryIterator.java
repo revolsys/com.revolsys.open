@@ -138,10 +138,6 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
     return ring;
   }
 
-  public String toString() {
-    return StaxUtils.toString(in);
-  }
-
   private LineString parseLineString() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINE_STRING);
     CoordinatesList cooordinatesList = null;
@@ -233,6 +229,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String toString() {
+    return StaxUtils.toString(in);
   }
 
 }

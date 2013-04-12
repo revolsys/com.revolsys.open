@@ -7,7 +7,6 @@ import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
-import com.vividsolutions.jts.geom.GeometryFilter;
 
 /**
  * A ConnectedElementPointFilter extracts a single point from each connected
@@ -26,26 +25,27 @@ public class ConnectedElementLocationFilter {
    * list are {@link com.vividsolutions.jts.operation.distance.GeometryLocation}
    * s.
    */
-  public static List<GeometryLocation> getLocations(Geometry geom) {
-    List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
-    ConnectedElementLocationFilter filter = new ConnectedElementLocationFilter(
+  public static List<GeometryLocation> getLocations(final Geometry geom) {
+    final List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
+    final ConnectedElementLocationFilter filter = new ConnectedElementLocationFilter(
       locations);
-    for (Geometry geometry : geom.getGeometries()) {
+    for (final Geometry geometry : geom.getGeometries()) {
       filter.filter(geometry);
     }
     return locations;
   }
 
-  private List<GeometryLocation> locations;
+  private final List<GeometryLocation> locations;
 
-  ConnectedElementLocationFilter(List<GeometryLocation> locations) {
+  ConnectedElementLocationFilter(final List<GeometryLocation> locations) {
     this.locations = locations;
   }
 
-  public void filter(Geometry geom) {
+  public void filter(final Geometry geom) {
     if (geom instanceof Point || geom instanceof LineString
-      || geom instanceof Polygon)
+      || geom instanceof Polygon) {
       locations.add(new GeometryLocation(geom, 0, geom.getFirstPoint()));
+    }
   }
 
 }

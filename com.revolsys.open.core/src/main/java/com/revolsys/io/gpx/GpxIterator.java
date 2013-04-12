@@ -195,28 +195,25 @@ public class GpxIterator implements DataObjectIterator {
     }
   }
 
-  private DataObject parseDataObject() throws XMLStreamException {
-    if (!objects.isEmpty()) {
-      return objects.remove();
+  protected Object parseAttribute(final DataObject dataObject) {
+    final String attributeName = in.getLocalName();
+    final String stringValue = StaxUtils.getElementText(in);
+    Object value;
+    if (stringValue == null) {
+      value = null;
+    } else if (attributeName.equals("time")) {
+      try {
+        value = TIMESTAMP_FORMAT.parse(stringValue);
+      } catch (final ParseException e) {
+        throw new IllegalArgumentException("Invalid date " + stringValue);
+      }
     } else {
-      if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        StaxUtils.skipToStartElement(in);
-      }
-      while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
-        final QName name = in.getName();
-        if (name.equals(GpxConstants.WAYPOINT_ELEMENT)) {
-          return parseWaypoint();
-        } else if (name.equals(GpxConstants.TRACK_ELEMENT)) {
-          return parseTrack();
-        } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
-          return parseRoute();
-        } else {
-          StaxUtils.skipSubTree(in);
-          in.nextTag();
-        }
-      }
-      return null;
+      value = stringValue;
     }
+    if (value != null) {
+      dataObject.setValue(attributeName, value);
+    }
+    return value;
   }
 
   //
@@ -251,6 +248,30 @@ public class GpxIterator implements DataObjectIterator {
   // in.require(XMLStreamReader.END_ELEMENT, propertySchemaName, propertyName);
   // return attribute;
   // }
+
+  private DataObject parseDataObject() throws XMLStreamException {
+    if (!objects.isEmpty()) {
+      return objects.remove();
+    } else {
+      if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
+        StaxUtils.skipToStartElement(in);
+      }
+      while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
+        final QName name = in.getName();
+        if (name.equals(GpxConstants.WAYPOINT_ELEMENT)) {
+          return parseWaypoint();
+        } else if (name.equals(GpxConstants.TRACK_ELEMENT)) {
+          return parseTrack();
+        } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
+          return parseRoute();
+        } else {
+          StaxUtils.skipSubTree(in);
+          in.nextTag();
+        }
+      }
+      return null;
+    }
+  }
 
   protected DataObject parsePoint(final String featureType, final double index)
     throws XMLStreamException {
@@ -357,27 +378,6 @@ public class GpxIterator implements DataObjectIterator {
     final MultiLineString lines = geometryFactory.createMultiLineString(segments);
     dataObject.setGeometryValue(lines);
     return dataObject;
-  }
-
-  protected Object parseAttribute(final DataObject dataObject) {
-    final String attributeName = in.getLocalName();
-    final String stringValue = StaxUtils.getElementText(in);
-    Object value;
-    if (stringValue == null) {
-      value = null;
-    } else if (attributeName.equals("time")) {
-      try {
-        value = TIMESTAMP_FORMAT.parse(stringValue);
-      } catch (ParseException e) {
-        throw new IllegalArgumentException("Invalid date " + stringValue);
-      }
-    } else {
-      value = stringValue;
-    }
-    if (value != null) {
-      dataObject.setValue(attributeName, value);
-    }
-    return value;
   }
 
   private int parseTrackPoint(final CoordinatesList points)

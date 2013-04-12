@@ -33,13 +33,6 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
   }
 
   @Override
-  public Edge<T> set(int index, Edge<T> edge) {
-    final int edgeId = edge.getId();
-     edgeIds.set(index, edgeId);
-     return edge;
-  }
-  
-  @Override
   public boolean addAll(final Collection<? extends Edge<T>> collection) {
     boolean added = false;
     for (final Edge<T> edge : collection) {
@@ -84,6 +77,13 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
       removed |= remove(object);
     }
     return removed;
+  }
+
+  @Override
+  public Edge<T> set(final int index, final Edge<T> edge) {
+    final int edgeId = edge.getId();
+    edgeIds.set(index, edgeId);
+    return edge;
   }
 
   @Override

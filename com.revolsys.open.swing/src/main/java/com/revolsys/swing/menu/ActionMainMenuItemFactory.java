@@ -7,16 +7,23 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
-  private boolean checkBox;
+  private EnableCheck checkBoxSelectedCheck;
 
   private final Action action;
 
   public ActionMainMenuItemFactory(final Action action) {
     this.action = action;
+  }
+
+  public ActionMainMenuItemFactory(EnableCheck checkBoxSelectedCheck,
+    Action action) {
+    this(action);
+    this.checkBoxSelectedCheck = checkBoxSelectedCheck;
   }
 
   @Override
@@ -26,8 +33,10 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public JMenuItem createComponent() {
-    if (checkBox) {
-      return new JCheckBoxMenuItem(action);
+    if (checkBoxSelectedCheck != null) {
+      JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
+      menuItem.setSelected(checkBoxSelectedCheck.isEnabled());
+      return menuItem;
     } else {
       return new JMenuItem(action);
     }
@@ -46,10 +55,6 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public String getToolTip() {
     return (String)action.getValue(Action.SHORT_DESCRIPTION);
-  }
-
-  public boolean isCheckBox() {
-    return checkBox;
   }
 
   @Override

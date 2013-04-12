@@ -80,14 +80,6 @@ public class XmlWriter extends Writer {
       attributeDefinedNamespaces.add(namespaceUri);
     }
 
-    public void setTagDefinedNamespace(String tagDefinedNamespace) {
-      this.tagDefinedNamespace = tagDefinedNamespace;
-    }
-
-    public String getTagDefinedNamespace() {
-      return tagDefinedNamespace;
-    }
-
     /**
      * Get the namespaces defined on the element.
      * 
@@ -104,6 +96,14 @@ public class XmlWriter extends Writer {
      */
     public QName getElement() {
       return element;
+    }
+
+    public String getTagDefinedNamespace() {
+      return tagDefinedNamespace;
+    }
+
+    public void setTagDefinedNamespace(final String tagDefinedNamespace) {
+      this.tagDefinedNamespace = tagDefinedNamespace;
     }
 
     /**
@@ -145,14 +145,6 @@ public class XmlWriter extends Writer {
   private boolean indent;
 
   private boolean writeNewLine = true;
-
-  public void setWriteNewLine(boolean writeNewLine) {
-    this.writeNewLine = writeNewLine;
-  }
-
-  public boolean isWriteNewLine() {
-    return writeNewLine;
-  }
 
   /** The map of XML Namespace URIs to prefixes. */
   private final Map<String, String> namespacePrefixMap = new LinkedHashMap<String, String>();
@@ -652,11 +644,6 @@ public class XmlWriter extends Writer {
     newLine();
   }
 
-  public void startTagLn(final QName element) {
-    startTag(element);
-    newLine();
-  }
-
   /**
    * Write the entity reference for the specified character.
    * 
@@ -733,7 +720,7 @@ public class XmlWriter extends Writer {
    * @param attribute
    * @return The QName with the prefix.
    */
-  private QName getQNameWithPrefix(final QName qName, boolean attribute) {
+  private QName getQNameWithPrefix(final QName qName, final boolean attribute) {
     final String namespaceUri = qName.getNamespaceURI();
     if (namespaceUri.equals("")) {
       return new QName(qName.getLocalPart());
@@ -762,6 +749,10 @@ public class XmlWriter extends Writer {
    */
   public boolean isIndent() {
     return indent;
+  }
+
+  public boolean isWriteNewLine() {
+    return writeNewLine;
   }
 
   /**
@@ -868,6 +859,10 @@ public class XmlWriter extends Writer {
     if (currentTag != null) {
       currentTag.addAttributeDefinedNamespace(namespaceUri);
     }
+  }
+
+  public void setWriteNewLine(final boolean writeNewLine) {
+    this.writeNewLine = writeNewLine;
   }
 
   /**
@@ -984,6 +979,11 @@ public class XmlWriter extends Writer {
    */
   public void startTag(final String namespaceUri, final String localPart) {
     startTag(new QName(namespaceUri, localPart));
+  }
+
+  public void startTagLn(final QName element) {
+    startTag(element);
+    newLine();
   }
 
   /**
@@ -1152,18 +1152,18 @@ public class XmlWriter extends Writer {
     write(string.toCharArray(), 0, length);
   }
 
-/**
-         * Write content for an attribute value to the output, escaping the characters
-         * that are used within markup. This method will escape characters ' <', '>',
-         * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
-         * unless it is part of "]]>" for simplicity it is allways escaped in this
-         * implementation.
-         * 
-         * @param buffer The character buffer to write
-         * @param offset The offset in the character data to write
-         * @param length The number of characters to write.
-         * @throws IOException If an I/O exception occurs.
-         */
+  /**
+           * Write content for an attribute value to the output, escaping the characters
+           * that are used within markup. This method will escape characters ' <', '>',
+           * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
+           * unless it is part of "]]>" for simplicity it is allways escaped in this
+           * implementation.
+           * 
+           * @param buffer The character buffer to write
+           * @param offset The offset in the character data to write
+           * @param length The number of characters to write.
+           * @throws IOException If an I/O exception occurs.
+           */
   protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
@@ -1225,17 +1225,17 @@ public class XmlWriter extends Writer {
     writeAttributeContent(value.toCharArray(), 0, value.length());
   }
 
-/**
-         * Write content for an element to the output, escaping the characters that
-         * are used within markup. This method will escape characters ' <', '>' and
-         * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
-         * of "]]>" for simplicity it is allways escaped in this implementation.
-         * 
-         * @param buffer The character buffer to write
-         * @param offest The offset in the character data to write
-         * @param length The number of characters to write.
-         * @throws IOException If an I/O exception occurs.
-         */
+  /**
+           * Write content for an element to the output, escaping the characters that
+           * are used within markup. This method will escape characters ' <', '>' and
+           * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
+           * of "]]>" for simplicity it is allways escaped in this implementation.
+           * 
+           * @param buffer The character buffer to write
+           * @param offest The offset in the character data to write
+           * @param length The number of characters to write.
+           * @throws IOException If an I/O exception occurs.
+           */
   protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
@@ -1328,7 +1328,7 @@ public class XmlWriter extends Writer {
    * @param attribute TODO
    * @throws IOException If an I/O exception occurs.
    */
-  private void writeName(final QName qName, boolean attribute) {
+  private void writeName(final QName qName, final boolean attribute) {
     if (useNamespaces) {
       final String namespaceUri = qName.getNamespaceURI();
       String prefix = namespacePrefixMap.get(namespaceUri);
@@ -1370,7 +1370,7 @@ public class XmlWriter extends Writer {
       if (elementStack.size() == 1) {
         namespaceUris = namespacePrefixMap.keySet();
       } else {
-        String tagNamespace = tag.getTagDefinedNamespace();
+        final String tagNamespace = tag.getTagDefinedNamespace();
         if (tagNamespace == null) {
           namespaceUris = Collections.emptyList();
         } else {

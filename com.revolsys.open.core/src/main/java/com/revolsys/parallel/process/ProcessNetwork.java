@@ -39,6 +39,8 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   private final Object sync = new Object();
 
+  private boolean stopping = false;
+
   public ProcessNetwork() {
   }
 
@@ -243,8 +245,6 @@ public class ProcessNetwork implements BeanPostProcessor,
       waitTillFinished();
     }
   }
-
-  private boolean stopping = false;
 
   @PreDestroy
   public void stop() {

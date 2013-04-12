@@ -28,6 +28,27 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   public CopyProcess() {
   }
 
+  protected DataObject copy(final DataObject object) {
+    DataObject targetObject;
+    if (metaData == null) {
+      targetObject = object;
+    } else {
+      targetObject = new ArrayDataObject(metaData);
+      for (final String attributeName : metaData.getAttributeNames()) {
+        copyAttribute(object, attributeName, targetObject, attributeName);
+      }
+      if (attributeMap != null) {
+        for (final Entry<String, String> mapping : attributeMap.entrySet()) {
+          final String sourceAttributeName = mapping.getKey();
+          final String targetAttributeName = mapping.getValue();
+          copyAttribute(object, sourceAttributeName, targetObject,
+            targetAttributeName);
+        }
+      }
+    }
+    return targetObject;
+  }
+
   private void copyAttribute(final DataObject sourceObject,
     final String sourceAttributeName, final DataObject targetObject,
     final String targetAttributeName) {
@@ -74,29 +95,8 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   @Override
   protected void process(final Channel<DataObject> in,
     final Channel<DataObject> out, final DataObject object) {
-    DataObject targetObject = copy(object);
+    final DataObject targetObject = copy(object);
     out.write(targetObject);
-  }
-
-  protected DataObject copy(final DataObject object) {
-    DataObject targetObject;
-    if (metaData == null) {
-      targetObject = object;
-    } else {
-      targetObject = new ArrayDataObject(metaData);
-      for (final String attributeName : metaData.getAttributeNames()) {
-        copyAttribute(object, attributeName, targetObject, attributeName);
-      }
-      if (attributeMap != null) {
-        for (final Entry<String, String> mapping : attributeMap.entrySet()) {
-          final String sourceAttributeName = mapping.getKey();
-          final String targetAttributeName = mapping.getValue();
-          copyAttribute(object, sourceAttributeName, targetObject,
-            targetAttributeName);
-        }
-      }
-    }
-    return targetObject;
   }
 
   public void setAttributeMap(final Map<String, String> attributeMap) {

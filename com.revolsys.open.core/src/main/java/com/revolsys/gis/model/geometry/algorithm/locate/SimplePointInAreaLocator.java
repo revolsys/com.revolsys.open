@@ -55,29 +55,12 @@ import com.vividsolutions.jts.geom.Location;
  */
 public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
-  /**
-   * Determines the {@link Location} of a point in an areal {@link Geometry}.
-   * Currently this will never return a value of BOUNDARY.
-   * 
-   * @param point the point to test
-   * @param geometry the areal geometry to test
-   * @return the Location of the point in the geometry
-   */
-  public static int locate(Coordinates point, Geometry geometry) {
-    if (geometry.isEmpty()) {
-      return Location.EXTERIOR;
-    } else if (containsPoint(point, geometry)) {
-      return Location.INTERIOR;
-    } else {
-      return Location.EXTERIOR;
-    }
-  }
-
-  private static boolean containsPoint(Coordinates point, Geometry geometry) {
+  private static boolean containsPoint(final Coordinates point,
+    final Geometry geometry) {
     if (geometry instanceof Polygon) {
       return containsPointInPolygon(point, (Polygon)geometry);
     } else if (geometry instanceof GeometryCollection) {
-      for (Geometry geometry2 : geometry.getGeometries()) {
+      for (final Geometry geometry2 : geometry.getGeometries()) {
         if (geometry2 != geometry) {
           if (containsPoint(point, geometry2)) {
             return true;
@@ -88,13 +71,14 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     return false;
   }
 
-  public static boolean containsPointInPolygon(Coordinates p, Polygon polygon) {
+  public static boolean containsPointInPolygon(final Coordinates p,
+    final Polygon polygon) {
     if (polygon.isEmpty()) {
       return false;
     } else {
       boolean exterior = true;
-      for (LinearRing ring : polygon.getRings()) {
-        boolean pointInRing = isPointInRing(p, ring);
+      for (final LinearRing ring : polygon.getRings()) {
+        final boolean pointInRing = isPointInRing(p, ring);
         // point is outside exterior ring or inside exterior rings
         if (pointInRing != exterior) {
           return false;
@@ -113,8 +97,9 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @param ring a linear ring
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(Coordinates point, LinearRing ring) {
-    BoundingBox boundingBox = ring.getBoundingBox();
+  private static boolean isPointInRing(final Coordinates point,
+    final LinearRing ring) {
+    final BoundingBox boundingBox = ring.getBoundingBox();
     if (boundingBox.intersects(point)) {
       return RayCrossingCounter.locatePointInRing(point, ring) != Location.EXTERIOR;
     } else {
@@ -122,13 +107,32 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     }
   }
 
-  private Geometry geometry;
+  /**
+   * Determines the {@link Location} of a point in an areal {@link Geometry}.
+   * Currently this will never return a value of BOUNDARY.
+   * 
+   * @param point the point to test
+   * @param geometry the areal geometry to test
+   * @return the Location of the point in the geometry
+   */
+  public static int locate(final Coordinates point, final Geometry geometry) {
+    if (geometry.isEmpty()) {
+      return Location.EXTERIOR;
+    } else if (containsPoint(point, geometry)) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
+    }
+  }
 
-  public SimplePointInAreaLocator(Geometry geometry) {
+  private final Geometry geometry;
+
+  public SimplePointInAreaLocator(final Geometry geometry) {
     this.geometry = geometry;
   }
 
-  public int locate(Coordinates point) {
+  @Override
+  public int locate(final Coordinates point) {
     return SimplePointInAreaLocator.locate(point, geometry);
   }
 

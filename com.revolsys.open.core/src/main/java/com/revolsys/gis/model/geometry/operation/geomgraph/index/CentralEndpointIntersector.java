@@ -35,7 +35,6 @@ package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 
-
 /**
  * Computes an approximate intersection of two line segments
  * by taking the most central of the endpoints of the segments.
@@ -54,50 +53,45 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
  * @author Martin Davis
  * @version 1.8
  */
-public class CentralEndpointIntersector 
-{
-	public static Coordinates getIntersection(Coordinates p00, Coordinates p01,
-			Coordinates p10, Coordinates p11)
-	{
-		CentralEndpointIntersector intor = new CentralEndpointIntersector(p00, p01, p10, p11);
-		return intor.getIntersection();
-	}
-	
-	private Coordinates[] pts;
-	private Coordinates intPt = null;
+public class CentralEndpointIntersector {
+  private static Coordinates average(final Coordinates[] pts) {
+    final Coordinates avg = new DoubleCoordinates();
+    final int n = pts.length;
+    for (int i = 0; i < pts.length; i++) {
+      avg.setX(avg.getX() + pts[i].getX());
+      avg.setY(avg.getY() + pts[i].getY());
+    }
+    if (n > 0) {
+      avg.setX(avg.getX() / n);
+      avg.setY(avg.getY() / n);
+    }
+    return avg;
+  }
 
-	public CentralEndpointIntersector(Coordinates p00, Coordinates p01,
-			Coordinates p10, Coordinates p11) 
-	{
-		pts = new Coordinates[] { p00, p01, p10, p11 };
-		compute();
-	}
+  public static Coordinates getIntersection(final Coordinates p00,
+    final Coordinates p01, final Coordinates p10, final Coordinates p11) {
+    final CentralEndpointIntersector intor = new CentralEndpointIntersector(
+      p00, p01, p10, p11);
+    return intor.getIntersection();
+  }
 
-	private void compute() 
-	{
-		Coordinates centroid = average(pts);
-		intPt = findNearestPoint(centroid, pts);
-	}
+  private final Coordinates[] pts;
 
-	public Coordinates getIntersection() {
-		return intPt;
-	}
+  private Coordinates intPt = null;
 
-	private static Coordinates average(Coordinates[] pts)
-	{
-		Coordinates avg = new DoubleCoordinates();
-		int n = pts.length;
-		for (int i = 0; i < pts.length; i++) {
-		  avg.setX(avg.getX() + pts[i].getX());
-		  avg.setY(avg.getY() + pts[i].getY());
-		}
-		if (n > 0) {
-		  avg.setX(avg.getX() / n);
-		  avg.setY(avg.getY() / n);
-		}
-		return avg;
-	}
-	
+  public CentralEndpointIntersector(final Coordinates p00,
+    final Coordinates p01, final Coordinates p10, final Coordinates p11) {
+    pts = new Coordinates[] {
+      p00, p01, p10, p11
+    };
+    compute();
+  }
+
+  private void compute() {
+    final Coordinates centroid = average(pts);
+    intPt = findNearestPoint(centroid, pts);
+  }
+
   /**
    * Determines a point closest to the given point.
    * 
@@ -108,19 +102,22 @@ public class CentralEndpointIntersector
    * @param q2 a potential result point
    * @return the point closest to the input point p
    */
-  private Coordinates findNearestPoint(Coordinates p, Coordinates[] pts)
-  {
-  	double minDist = Double.MAX_VALUE;
-  	Coordinates result = null;
-  	for (int i = 0; i < pts.length; i++) {
-  		double dist = p.distance(pts[i]);
-  		if (dist < minDist) {
-  			minDist = dist;
-  			result = pts[i];
-  		}
-  	}
-  	return result;
+  private Coordinates findNearestPoint(final Coordinates p,
+    final Coordinates[] pts) {
+    double minDist = Double.MAX_VALUE;
+    Coordinates result = null;
+    for (int i = 0; i < pts.length; i++) {
+      final double dist = p.distance(pts[i]);
+      if (dist < minDist) {
+        minDist = dist;
+        result = pts[i];
+      }
+    }
+    return result;
   }
-  
+
+  public Coordinates getIntersection() {
+    return intPt;
+  }
 
 }

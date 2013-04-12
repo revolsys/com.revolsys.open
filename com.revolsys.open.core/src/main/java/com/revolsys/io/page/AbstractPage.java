@@ -78,7 +78,7 @@ public abstract class AbstractPage implements Page {
   @Override
   public byte[] readBytes(final int size) {
     final byte[] bytes = new byte[size];
-    byte[] content = getContent();
+    final byte[] content = getContent();
     System.arraycopy(content, getOffset(), bytes, 0, size);
     setOffset(getOffset() + size);
     return bytes;

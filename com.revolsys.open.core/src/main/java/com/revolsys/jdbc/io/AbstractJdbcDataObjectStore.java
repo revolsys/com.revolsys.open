@@ -18,6 +18,7 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -49,6 +50,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.transaction.DataSourceTransactionManagerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
@@ -89,45 +91,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
-  }
-
-  @Override
-  public int getRowCount(Query query) {
-    query = query.clone();
-    query.setSql(null);
-    query.setAttributeNames("count(*)");
-    query.setOrderBy(Collections.<String,Boolean>emptyMap());
-    final String sql = JdbcUtils.getSelectSql(query);
-    final DataSource dataSource = getDataSource();
-    Connection connection = getConnection();
-    if (dataSource != null) {
-      connection = JdbcUtils.getConnection(dataSource);
-    }
-    try {
-      final PreparedStatement statement = connection.prepareStatement(sql);
-      try {
-        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
-        final ResultSet resultSet = statement.executeQuery();
-        try {
-          if (resultSet.next()) {
-            return resultSet.getInt(1);
-          } else {
-            return 0;
-          }
-        } finally {
-          JdbcUtils.close(resultSet);
-        }
-
-      } finally {
-        JdbcUtils.close(statement);
-      }
-    } catch (final SQLException e) {
-      throw JdbcUtils.getException(dataSource, connection, "selectInt", sql, e);
-    } finally {
-      if (dataSource != null) {
-        JdbcUtils.release(connection, dataSource);
-      }
-    }
   }
 
   public AbstractJdbcDataObjectStore(final DataSource dataSource) {
@@ -445,6 +408,45 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Override
+  public int getRowCount(Query query) {
+    query = query.clone();
+    query.setSql(null);
+    query.setAttributeNames("count(*)");
+    query.setOrderBy(Collections.<String, Boolean> emptyMap());
+    final String sql = JdbcUtils.getSelectSql(query);
+    final DataSource dataSource = getDataSource();
+    Connection connection = getConnection();
+    if (dataSource != null) {
+      connection = JdbcUtils.getConnection(dataSource);
+    }
+    try {
+      final PreparedStatement statement = connection.prepareStatement(sql);
+      try {
+        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+        final ResultSet resultSet = statement.executeQuery();
+        try {
+          if (resultSet.next()) {
+            return resultSet.getInt(1);
+          } else {
+            return 0;
+          }
+        } finally {
+          JdbcUtils.close(resultSet);
+        }
+
+      } finally {
+        JdbcUtils.close(statement);
+      }
+    } catch (final SQLException e) {
+      throw JdbcUtils.getException(dataSource, connection, "selectInt", sql, e);
+    } finally {
+      if (dataSource != null) {
+        JdbcUtils.release(connection, dataSource);
+      }
+    }
+  }
+
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
@@ -491,6 +493,12 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public String getSqlSuffix() {
     return sqlSuffix;
+  }
+
+  @Override
+  public PlatformTransactionManager getTransactionManager() {
+    final DataSource dataSource = getDataSource();
+    return DataSourceTransactionManagerFactory.getTransactionManager(dataSource);
   }
 
   @Override

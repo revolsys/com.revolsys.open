@@ -35,7 +35,6 @@ package com.revolsys.gis.model.geometry.operation.chain;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 
-
 //import com.vividsolutions.jts.util.Debug;
 
 /**
@@ -48,18 +47,21 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
  *
  * @version 1.7
  */
-public class SegmentIntersectionDetector
-    implements SegmentIntersector
-{
-  private LineIntersector li;
+public class SegmentIntersectionDetector implements SegmentIntersector {
+  private final LineIntersector li;
+
   private boolean findProper = false;
+
   private boolean findAllTypes = false;
-  
+
   private boolean hasIntersection = false;
+
   private boolean hasProperIntersection = false;
+
   private boolean hasNonProperIntersection = false;
-  
+
   private Coordinates intPt = null;
+
   private Coordinates[] intSegments = null;
 
   /**
@@ -67,73 +69,75 @@ public class SegmentIntersectionDetector
    *
    * @param li the LineIntersector to use
    */
-  public SegmentIntersectionDetector(LineIntersector li)
-  {
+  public SegmentIntersectionDetector(final LineIntersector li) {
     this.li = li;
-   }
+  }
 
-  public void setFindProper(boolean findProper)
-  {
-    this.findProper = findProper;
-  }
-  
-  public void setFindAllIntersectionTypes(boolean findAllTypes)
-  {
-    this.findAllTypes = findAllTypes;
-  }
-  
-  /**
-   * Tests whether an intersection was found.
-   * 
-   * @return true if an intersection was found
-   */
-  public boolean hasIntersection() 
-  { 
-  	return hasIntersection; 
-  }
-  
-  /**
-   * Tests whether a proper intersection was found.
-   * 
-   * @return true if a proper intersection was found
-   */
-  public boolean hasProperIntersection() 
-  { 
-    return hasProperIntersection; 
-  }
-  
-  /**
-   * Tests whether a non-proper intersection was found.
-   * 
-   * @return true if a non-proper intersection was found
-   */
-  public boolean hasNonProperIntersection() 
-  { 
-    return hasNonProperIntersection; 
-  }
-  
   /**
    * Gets the computed location of the intersection.
    * Due to round-off, the location may not be exact.
    * 
    * @return the coordinate for the intersection location
    */
-  public Coordinates getIntersection()  
-  {    
-  	return intPt;  
+  public Coordinates getIntersection() {
+    return intPt;
   }
-
 
   /**
    * Gets the endpoints of the intersecting segments.
    * 
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Coordinates[] getIntersectionSegments()
-  {
-  	return intSegments;
+  public Coordinates[] getIntersectionSegments() {
+    return intSegments;
   }
-  
+
+  /**
+   * Tests whether an intersection was found.
+   * 
+   * @return true if an intersection was found
+   */
+  public boolean hasIntersection() {
+    return hasIntersection;
+  }
+
+  /**
+   * Tests whether a non-proper intersection was found.
+   * 
+   * @return true if a non-proper intersection was found
+   */
+  public boolean hasNonProperIntersection() {
+    return hasNonProperIntersection;
+  }
+
+  /**
+   * Tests whether a proper intersection was found.
+   * 
+   * @return true if a proper intersection was found
+   */
+  public boolean hasProperIntersection() {
+    return hasProperIntersection;
+  }
+
+  @Override
+  public boolean isDone() {
+    /**
+     * If finding all types, we can stop
+     * when both possible types have been found.
+     */
+    if (findAllTypes) {
+      return hasProperIntersection && hasNonProperIntersection;
+    }
+
+    /**
+     * If searching for a proper intersection, only stop if one is found
+     */
+    if (findProper) {
+      return hasProperIntersection;
+    }
+    return hasIntersection;
+  }
+
   /**
    * This method is called by clients
    * of the {@link SegmentIntersector} class to process
@@ -142,73 +146,66 @@ public class SegmentIntersectionDetector
    * this call for segment pairs which they have determined do not intersect
    * (e.g. by an disjoint envelope test).
    */
-  public void processIntersections(
-      SegmentString e0,  int segIndex0,
-      SegmentString e1,  int segIndex1
-      )
-  {  	
+  @Override
+  public void processIntersections(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
     // don't bother intersecting a segment with itself
-    if (e0 == e1 && segIndex0 == segIndex1) return;
-    
-    Coordinates p00 = e0.getCoordinate(segIndex0);
-    Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    Coordinates p10 = e1.getCoordinate(segIndex1);
-    Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
-    
+    if (e0 == e1 && segIndex0 == segIndex1) {
+      return;
+    }
+
+    final Coordinates p00 = e0.getCoordinate(segIndex0);
+    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
+    final Coordinates p10 = e1.getCoordinate(segIndex1);
+    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+
     li.computeIntersection(p00, p01, p10, p11);
-//  if (li.hasIntersection() && li.isProper()) Debug.println(li);
+    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
 
     if (li.hasIntersection()) {
-			// System.out.println(li);
-    	
-    	// record intersection info
-			hasIntersection = true;
-			
-			boolean isProper = li.isProper();
-			if (isProper)
-				hasProperIntersection = true;
-      if (! isProper)
+      // System.out.println(li);
+
+      // record intersection info
+      hasIntersection = true;
+
+      final boolean isProper = li.isProper();
+      if (isProper) {
+        hasProperIntersection = true;
+      }
+      if (!isProper) {
         hasNonProperIntersection = true;
-			
-			/**
-			 * If this is the kind of intersection we are searching for
-			 * OR no location has yet been recorded
-			 * save the location data
-			 */
-			boolean saveLocation = true;
-			if (findProper && ! isProper) saveLocation = false;
-			
-			if (intPt == null || saveLocation) {
+      }
 
-				// record intersection location (approximate)
-				intPt = li.getIntersection(0);
+      /**
+       * If this is the kind of intersection we are searching for
+       * OR no location has yet been recorded
+       * save the location data
+       */
+      boolean saveLocation = true;
+      if (findProper && !isProper) {
+        saveLocation = false;
+      }
 
-				// record intersecting segments
-				intSegments = new Coordinates[4];
-				intSegments[0] = p00;
-				intSegments[1] = p01;
-				intSegments[2] = p10;
-				intSegments[3] = p11;
-			}
-		}
-  }
-  
-  public boolean isDone()
-  { 
-    /**
-     * If finding all types, we can stop
-     * when both possible types have been found.
-     */
-    if (findAllTypes) {
-      return hasProperIntersection && hasNonProperIntersection;
+      if (intPt == null || saveLocation) {
+
+        // record intersection location (approximate)
+        intPt = li.getIntersection(0);
+
+        // record intersecting segments
+        intSegments = new Coordinates[4];
+        intSegments[0] = p00;
+        intSegments[1] = p01;
+        intSegments[2] = p10;
+        intSegments[3] = p11;
+      }
     }
-    
-  	/**
-  	 * If searching for a proper intersection, only stop if one is found
-  	 */
-  	if (findProper) {
-  		return hasProperIntersection;
-  	}
-  	return hasIntersection;
+  }
+
+  public void setFindAllIntersectionTypes(final boolean findAllTypes) {
+    this.findAllTypes = findAllTypes;
+  }
+
+  public void setFindProper(final boolean findProper) {
+    this.findProper = findProper;
   }
 }

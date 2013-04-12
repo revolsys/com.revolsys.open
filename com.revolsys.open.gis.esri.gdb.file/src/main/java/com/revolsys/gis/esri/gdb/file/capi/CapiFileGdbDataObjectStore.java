@@ -444,7 +444,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
 
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, sql.toString(), boundingBox, query.getOffset(),
+      typePath, sql.toString(), boundingBox, query,query.getOffset(),
       query.getLimit());
     return iterator;
   }

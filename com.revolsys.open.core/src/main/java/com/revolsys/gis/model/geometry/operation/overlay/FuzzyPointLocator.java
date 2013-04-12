@@ -25,32 +25,19 @@ import com.vividsolutions.jts.geom.Location;
  * @version 1.7
  */
 public class FuzzyPointLocator {
-  private Geometry g;
+  private final Geometry g;
 
-  private double boundaryDistanceTolerance;
+  private final double boundaryDistanceTolerance;
 
-  private MultiLineString linework;
+  private final MultiLineString linework;
 
-  private PointLocator ptLocator = new PointLocator();
+  private final PointLocator ptLocator = new PointLocator();
 
-  public FuzzyPointLocator(Geometry g, double boundaryDistanceTolerance) {
+  public FuzzyPointLocator(final Geometry g,
+    final double boundaryDistanceTolerance) {
     this.g = g;
     this.boundaryDistanceTolerance = boundaryDistanceTolerance;
     linework = extractLinework(g);
-  }
-
-  public int getLocation(Coordinates pt) {
-    if (isWithinToleranceOfBoundary(pt))
-      return Location.BOUNDARY;
-    /*
-     * double dist = linework.distance(point); // if point is close to boundary,
-     * it is considered to be on the boundary if (dist < tolerance) return
-     * Location.BOUNDARY;
-     */
-
-    // now we know point must be clearly inside or outside geometry, so return
-    // actual location value
-    return ptLocator.locate(pt, g);
   }
 
   /**
@@ -59,11 +46,11 @@ public class FuzzyPointLocator {
    * @param g the geometry from which to extract
    * @return a lineal geometry containing the extracted linework
    */
-  private MultiLineString extractLinework(Geometry g) {
-    List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
-    for (Geometry part : g.getGeometries()) {
+  private MultiLineString extractLinework(final Geometry g) {
+    final List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
+    for (final Geometry part : g.getGeometries()) {
       if (part instanceof Polygon) {
-        Polygon polygon = (Polygon)part;
+        final Polygon polygon = (Polygon)part;
         lines.addAll(polygon.getCoordinatesLists());
       }
 
@@ -71,13 +58,28 @@ public class FuzzyPointLocator {
     return g.getGeometryFactory().createMultiLineString(lines);
   }
 
-  private boolean isWithinToleranceOfBoundary(Coordinates pt) {
+  public int getLocation(final Coordinates pt) {
+    if (isWithinToleranceOfBoundary(pt)) {
+      return Location.BOUNDARY;
+      /*
+       * double dist = linework.distance(point); // if point is close to
+       * boundary, it is considered to be on the boundary if (dist < tolerance)
+       * return Location.BOUNDARY;
+       */
+    }
+
+    // now we know point must be clearly inside or outside geometry, so return
+    // actual location value
+    return ptLocator.locate(pt, g);
+  }
+
+  private boolean isWithinToleranceOfBoundary(final Coordinates pt) {
     for (int i = 0; i < linework.getGeometryCount(); i++) {
-      LineString line = (LineString)linework.getGeometry(i);
+      final LineString line = (LineString)linework.getGeometry(i);
       for (int j = 0; j < line.size() - 1; j++) {
-        Coordinates p0 = line.get(j);
-        Coordinates p1 = line.get(j + 1);
-        double dist = LineSegmentUtil.distance(p0, p1, pt);
+        final Coordinates p0 = line.get(j);
+        final Coordinates p1 = line.get(j + 1);
+        final double dist = LineSegmentUtil.distance(p0, p1, pt);
         if (dist <= boundaryDistanceTolerance) {
           return true;
         }

@@ -35,11 +35,6 @@ public class CsvIterator implements Iterator<List<String>>,
     readNextRecord();
   }
 
-  @Override
-  public Iterator<List<String>> iterator() {
-    return this;
-  }
-
   /**
    * Closes the underlying reader.
    * 
@@ -78,6 +73,11 @@ public class CsvIterator implements Iterator<List<String>>,
   @Override
   public boolean hasNext() {
     return hasNext;
+  }
+
+  @Override
+  public Iterator<List<String>> iterator() {
+    return this;
   }
 
   /**

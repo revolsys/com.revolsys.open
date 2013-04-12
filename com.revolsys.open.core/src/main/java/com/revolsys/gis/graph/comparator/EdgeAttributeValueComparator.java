@@ -29,7 +29,7 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
       return -11;
     } else {
       for (final String attributeName : attributeNames) {
-        Object object1 = edge1.getAttribute(attributeName);
+        final Object object1 = edge1.getAttribute(attributeName);
 
         final Object object2 = edge2.getAttribute(attributeName);
         if (object1 == null) {
@@ -44,7 +44,7 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
             final Comparable<Object> comparable1 = (Comparable<Object>)object1;
             compare = comparable1.compareTo(object2);
           } else if (object1 instanceof Collection) {
-            Collection collection1 = (Collection)object1;
+            final Collection collection1 = (Collection)object1;
             compare = new CollectionComparator().compare(collection1,
               (Collection)object2);
 

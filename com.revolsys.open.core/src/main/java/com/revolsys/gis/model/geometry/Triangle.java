@@ -142,23 +142,6 @@ public class Triangle extends AbstractCoordinatesList {
     return coordinateIndex;
   }
 
-  public Coordinates getInCentre() {
-    Coordinates a = get(0);
-    Coordinates b = get(1);
-    Coordinates c = get(2);
-    // the lengths of the sides, labelled by their opposite vertex
-    double len0 = b.distance(c);
-    double len1 = a.distance(c);
-    double len2 = a.distance(b);
-    double circum = len0 + len1 + len2;
-
-    double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX())
-      / circum;
-    double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY())
-      / circum;
-    return new DoubleCoordinates(inCentreX, inCentreY);
-  }
-
   /**
    * Get the envelope of the Triangle.
    * 
@@ -172,6 +155,25 @@ public class Triangle extends AbstractCoordinatesList {
       envelope.expandToInclude(x, y);
     }
     return envelope;
+  }
+
+  public Coordinates getInCentre() {
+    final Coordinates a = get(0);
+    final Coordinates b = get(1);
+    final Coordinates c = get(2);
+    // the lengths of the sides, labelled by their opposite vertex
+    final double len0 = b.distance(c);
+    final double len1 = a.distance(c);
+    final double len2 = a.distance(b);
+    final double circum = len0 + len1 + len2;
+
+    final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2
+      * c.getX())
+      / circum;
+    final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
+      * c.getY())
+      / circum;
+    return new DoubleCoordinates(inCentreX, inCentreY);
   }
 
   @Override

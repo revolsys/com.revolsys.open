@@ -49,53 +49,6 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static BoundingBox getBoundingBox(GeometryFactory geometryFactory,CoordinatesList points) {
-    BoundingBox boundingBox = new BoundingBox(geometryFactory);
-    for (final Coordinates point : points) {
-      boundingBox = boundingBox.expandToInclude(point);
-    }
-    return boundingBox;
-  }
-
-  public static boolean isPointInRing(Coordinates p, CoordinatesList ring) {
-    return locatePointInRing(p, ring) != Location.EXTERIOR;
-  }
-
-  /**
-   * Determines whether a point lies in the interior, on the boundary, or in the
-   * exterior of a ring. The ring may be oriented in either direction.
-   * <p>
-   * This method does <i>not</i> first check the point against the envelope of
-   * the ring.
-   * 
-   * @param p point to check for ring inclusion
-   * @param ring an array of coordinates representing the ring (which must have
-   *          first point identical to last point)
-   * @return the {@link Location} of p relative to the ring
-   */
-  public static int locatePointInRing(Coordinates p, CoordinatesList ring) {
-    return RayCrossingCounter.locatePointInRing(p, ring);
-  }
-
-  public static double signedArea(CoordinatesList ring) {
-    int n = ring.size();
-    if (n < 3) {
-      return 0.0;
-    } else {
-      double sum = 0.0;
-      double bx = ring.getX(0);
-      double by = ring.getY(0);
-      for (int i = 1; i < n; i++) {
-        double cx = ring.getX(i);
-        double cy = ring.getY(i);
-        sum += (bx + cx) * (cy - by);
-        bx = cx;
-        by = cy;
-      }
-      return -sum / 2.0;
-    }
-  }
-
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates coordinate, final CoordinatesList line) {
@@ -456,19 +409,6 @@ public class CoordinatesListUtil {
     }
   }
 
-  public static CoordinatesList get(final MultiPoint multiPoint) {
-    int numPoints = multiPoint.getNumGeometries();
-    GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    int numAxis = geometryFactory.getNumAxis();
-    DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints, numAxis);
-    for (int i = 0; i < numPoints; i++) {
-      Point point = (Point)multiPoint.getGeometryN(i);
-      Coordinates coordinates = CoordinatesUtil.get(point);
-      points.setPoint(i, coordinates);
-    }
-    return points;
-  }
-
   public static CoordinatesList get(final LineString line) {
     return get(line.getCoordinateSequence());
   }
@@ -494,6 +434,20 @@ public class CoordinatesListUtil {
       }
       return coordinatesList;
     }
+  }
+
+  public static CoordinatesList get(final MultiPoint multiPoint) {
+    final int numPoints = multiPoint.getNumGeometries();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    final int numAxis = geometryFactory.getNumAxis();
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
+      numAxis);
+    for (int i = 0; i < numPoints; i++) {
+      final Point point = (Point)multiPoint.getGeometryN(i);
+      final Coordinates coordinates = CoordinatesUtil.get(point);
+      points.setPoint(i, coordinates);
+    }
+    return points;
   }
 
   public static CoordinatesList get(final Point... points) {
@@ -533,6 +487,15 @@ public class CoordinatesListUtil {
       }
     }
     return pointsList;
+  }
+
+  public static BoundingBox getBoundingBox(
+    final GeometryFactory geometryFactory, final CoordinatesList points) {
+    BoundingBox boundingBox = new BoundingBox(geometryFactory);
+    for (final Coordinates point : points) {
+      boundingBox = boundingBox.expandToInclude(point);
+    }
+    return boundingBox;
   }
 
   private static Set<Coordinates> getCoordinatesSet2d(
@@ -679,6 +642,11 @@ public class CoordinatesListUtil {
     return isCCW;
   }
 
+  public static boolean isPointInRing(final Coordinates p,
+    final CoordinatesList ring) {
+    return locatePointInRing(p, ring) != Location.EXTERIOR;
+  }
+
   public static boolean isPointOnLine(final Coordinates coordinate,
     final CoordinatesList points, final double tolerance) {
     final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
@@ -697,7 +665,8 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static boolean isPointOnLine(CoordinatesPrecisionModel precisionModel,
+  public static boolean isPointOnLine(
+    final CoordinatesPrecisionModel precisionModel,
     final CoordinatesList points, final Coordinates point) {
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
       points);
@@ -746,6 +715,23 @@ public class CoordinatesListUtil {
       }
     }
     return length;
+  }
+
+  /**
+   * Determines whether a point lies in the interior, on the boundary, or in the
+   * exterior of a ring. The ring may be oriented in either direction.
+   * <p>
+   * This method does <i>not</i> first check the point against the envelope of
+   * the ring.
+   * 
+   * @param p point to check for ring inclusion
+   * @param ring an array of coordinates representing the ring (which must have
+   *          first point identical to last point)
+   * @return the {@link Location} of p relative to the ring
+   */
+  public static int locatePointInRing(final Coordinates p,
+    final CoordinatesList ring) {
+    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   public static CoordinatesList merge(final Coordinates point,
@@ -939,6 +925,52 @@ public class CoordinatesListUtil {
     }
 
     return toCoordinateList(numAxis, listOfCoordinateArrays);
+  }
+
+  public static CoordinatesList removeRepeatedPoints(
+    final CoordinatesList points) {
+    final byte numAxis = points.getNumAxis();
+    final List<Double> coordinates = new ArrayList<Double>();
+    double x = points.getX(0);
+    double y = points.getY(0);
+    coordinates.add(x);
+    coordinates.add(y);
+    for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+      coordinates.add(points.getValue(0, axisIndex));
+    }
+    for (int i = 0; i < points.size(); i++) {
+      final double x1 = points.getX(i);
+      final double y1 = points.getY(i);
+      if (x != x1 || y != y1) {
+        coordinates.add(x1);
+        coordinates.add(y1);
+        for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+          coordinates.add(points.getValue(i, axisIndex));
+        }
+        x = x1;
+        y = y1;
+      }
+    }
+    return new DoubleCoordinatesList(numAxis, coordinates);
+  }
+
+  public static double signedArea(final CoordinatesList ring) {
+    final int n = ring.size();
+    if (n < 3) {
+      return 0.0;
+    } else {
+      double sum = 0.0;
+      double bx = ring.getX(0);
+      double by = ring.getY(0);
+      for (int i = 1; i < n; i++) {
+        final double cx = ring.getX(i);
+        final double cy = ring.getY(i);
+        sum += (bx + cx) * (cy - by);
+        bx = cx;
+        by = cy;
+      }
+      return -sum / 2.0;
+    }
   }
 
   public static <V extends Coordinates> List<LineString> split(
@@ -1155,32 +1187,6 @@ public class CoordinatesListUtil {
     } else {
       return coordinates.subList(0, length);
     }
-  }
-
-  public static CoordinatesList removeRepeatedPoints(CoordinatesList points) {
-    byte numAxis = points.getNumAxis();
-    List<Double> coordinates = new ArrayList<Double>();
-    double x = points.getX(0);
-    double y = points.getY(0);
-    coordinates.add(x);
-    coordinates.add(y);
-    for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
-      coordinates.add(points.getValue(0, axisIndex));
-    }
-    for (int i = 0; i < points.size(); i++) {
-      double x1 = points.getX(i);
-      double y1 = points.getY(i);
-      if (x != x1 || y != y1) {
-        coordinates.add(x1);
-        coordinates.add(y1);
-        for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
-          coordinates.add(points.getValue(i, axisIndex));
-        }
-        x = x1;
-        y = y1;
-      }
-    }
-    return new DoubleCoordinatesList(numAxis, coordinates);
   }
 
 }

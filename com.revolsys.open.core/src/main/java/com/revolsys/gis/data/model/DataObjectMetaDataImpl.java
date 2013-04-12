@@ -311,6 +311,18 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public Class<?> getAttributeClass(final CharSequence name) {
+    final DataType dataType = getAttributeType(name);
+    return dataType.getJavaClass();
+  }
+
+  @Override
+  public Class<?> getAttributeClass(final int i) {
+    final DataType dataType = getAttributeType(i);
+    return dataType.getJavaClass();
+  }
+
+  @Override
   public int getAttributeCount() {
     return attributes.size();
   }
@@ -384,18 +396,6 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public DataType getAttributeType(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getType();
-  }
-
-  @Override
-  public Class<?> getAttributeClass(final int i) {
-    final DataType dataType = getAttributeType(i);
-    return dataType.getJavaClass();
-  }
-
-  @Override
-  public Class<?> getAttributeClass(final CharSequence name) {
-    final DataType dataType = getAttributeType(name);
-    return dataType.getJavaClass();
   }
 
   @Override

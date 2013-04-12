@@ -18,16 +18,57 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  *
  * @version 1.7
  */
-public class MCIndexPointSnapper
-{
+public class MCIndexPointSnapper {
+  public class HotPixelSnapAction extends MonotoneChainSelectAction {
+    private final HotPixel hotPixel;
+
+    private final SegmentString parentEdge;
+
+    private final int vertexIndex;
+
+    private boolean isNodeAdded = false;
+
+    public HotPixelSnapAction(final HotPixel hotPixel,
+      final SegmentString parentEdge, final int vertexIndex) {
+      this.hotPixel = hotPixel;
+      this.parentEdge = parentEdge;
+      this.vertexIndex = vertexIndex;
+    }
+
+    public boolean isNodeAdded() {
+      return isNodeAdded;
+    }
+
+    @Override
+    public void select(final MonotoneChain mc, final int startIndex) {
+      final NodedSegmentString ss = (NodedSegmentString)mc.getContext();
+      // don't snap a vertex to itself
+      if (parentEdge != null) {
+        if (ss == parentEdge && startIndex == vertexIndex) {
+          return;
+        }
+      }
+      // isNodeAdded = SimpleSnapRounder.addSnappedNode(hotPixel, ss,
+      // startIndex);
+      isNodeAdded = hotPixel.addSnappedNode(ss, startIndex);
+    }
+
+  }
+
   public static int nSnaps = 0;
 
-  private Collection monoChains;
-  private STRtree index;
+  private final Collection monoChains;
 
-  public MCIndexPointSnapper(Collection monoChains, SpatialIndex index) {
+  private final STRtree index;
+
+  public MCIndexPointSnapper(final Collection monoChains,
+    final SpatialIndex index) {
     this.monoChains = monoChains;
-    this.index = (STRtree) index;
+    this.index = (STRtree)index;
+  }
+
+  public boolean snap(final HotPixel hotPixel) {
+    return snap(hotPixel, null, -1);
   }
 
   /**
@@ -41,55 +82,20 @@ public class MCIndexPointSnapper
    * @param vertexIndex the index of the vertex, if applicable, or -1
    * @return <code>true</code> if a node was added for this pixel
    */
-  public boolean snap(HotPixel hotPixel, SegmentString parentEdge, int vertexIndex)
-  {
+  public boolean snap(final HotPixel hotPixel, final SegmentString parentEdge,
+    final int vertexIndex) {
     final BoundingBox pixelEnv = hotPixel.getSafeBoundingBox();
-    final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(hotPixel, parentEdge, vertexIndex);
+    final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(
+      hotPixel, parentEdge, vertexIndex);
 
     index.query(JtsGeometryUtil.getEnvelope(pixelEnv), new ItemVisitor() {
-      public void visitItem(Object item) {
-        MonotoneChain testChain = (MonotoneChain) item;
+      @Override
+      public void visitItem(final Object item) {
+        final MonotoneChain testChain = (MonotoneChain)item;
         testChain.select(pixelEnv, hotPixelSnapAction);
       }
-    }
-    );
+    });
     return hotPixelSnapAction.isNodeAdded();
-  }
-
-  public boolean snap(HotPixel hotPixel)
-  {
-    return snap(hotPixel, null, -1);
-  }
-
-  public class HotPixelSnapAction
-      extends MonotoneChainSelectAction
-  {
-    private HotPixel hotPixel;
-    private SegmentString parentEdge;
-    private int vertexIndex;
-    private boolean isNodeAdded = false;
-
-    public HotPixelSnapAction(HotPixel hotPixel, SegmentString parentEdge, int vertexIndex)
-    {
-      this.hotPixel = hotPixel;
-      this.parentEdge = parentEdge;
-      this.vertexIndex = vertexIndex;
-    }
-
-    public boolean isNodeAdded() { return isNodeAdded; }
-
-    public void select(MonotoneChain mc, int startIndex)
-    {
-    	NodedSegmentString ss = (NodedSegmentString) mc.getContext();
-      // don't snap a vertex to itself
-      if (parentEdge != null) {
-        if (ss == parentEdge && startIndex == vertexIndex)
-          return;
-      }
-//      isNodeAdded = SimpleSnapRounder.addSnappedNode(hotPixel, ss, startIndex);
-      isNodeAdded = hotPixel.addSnappedNode(ss, startIndex);
-    }
-
   }
 
 }

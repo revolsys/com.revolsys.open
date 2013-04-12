@@ -80,7 +80,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
 
         final Coordinate[] partCoords = new Coordinate[numCoords];
         System.arraycopy(coordinates, partStart, partCoords, 0, numCoords);
-        LineString newLine = geometryFactory.createLineString(partCoords);
+        final LineString newLine = geometryFactory.createLineString(partCoords);
         if (newLine != null && !newLine.isEmpty()) {
           newLines.add(newLine);
         }

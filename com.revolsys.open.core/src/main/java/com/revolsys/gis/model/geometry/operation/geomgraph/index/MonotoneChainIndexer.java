@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Quadrant;
 
@@ -29,8 +28,8 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.Quadrant;
  */
 public class MonotoneChainIndexer {
 
-  public static int[] toIntArray(List list) {
-    int[] array = new int[list.size()];
+  public static int[] toIntArray(final List list) {
+    final int[] array = new int[list.size()];
     for (int i = 0; i < array.length; i++) {
       array[i] = ((Integer)list.get(i)).intValue();
     }
@@ -40,36 +39,37 @@ public class MonotoneChainIndexer {
   public MonotoneChainIndexer() {
   }
 
-  public int[] getChainStartIndices(CoordinatesList pts) {
+  /**
+   * @return the index of the last point in the monotone chain
+   */
+  private int findChainEnd(final CoordinatesList pts, final int start) {
+    // determine quadrant for chain
+    final int chainQuad = Quadrant.quadrant(pts.get(start), pts.get(start + 1));
+    int last = start + 1;
+    while (last < pts.size()) {
+      // compute quadrant for next possible segment in chain
+      final int quad = Quadrant.quadrant(pts.get(last - 1), pts.get(last));
+      if (quad != chainQuad) {
+        break;
+      }
+      last++;
+    }
+    return last - 1;
+  }
+
+  public int[] getChainStartIndices(final CoordinatesList pts) {
     // find the startpoint (and endpoints) of all monotone chains in this edge
     int start = 0;
-    List<Integer> startIndexList = new ArrayList<Integer>();
+    final List<Integer> startIndexList = new ArrayList<Integer>();
     startIndexList.add(start);
     do {
-      int last = findChainEnd(pts, start);
+      final int last = findChainEnd(pts, start);
       startIndexList.add(last);
       start = last;
     } while (start < pts.size() - 1);
     // copy list to an array of ints, for efficiency
-    int[] startIndex = toIntArray(startIndexList);
+    final int[] startIndex = toIntArray(startIndexList);
     return startIndex;
-  }
-
-  /**
-   * @return the index of the last point in the monotone chain
-   */
-  private int findChainEnd(CoordinatesList pts, int start) {
-    // determine quadrant for chain
-    int chainQuad = Quadrant.quadrant(pts.get(start), pts.get(start + 1));
-    int last = start + 1;
-    while (last < pts.size()) {
-      // compute quadrant for next possible segment in chain
-      int quad = Quadrant.quadrant(pts.get(last - 1), pts.get(last));
-      if (quad != chainQuad)
-        break;
-      last++;
-    }
-    return last - 1;
   }
 
 }

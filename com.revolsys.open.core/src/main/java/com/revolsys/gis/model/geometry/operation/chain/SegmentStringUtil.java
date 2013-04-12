@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.LineString;
 
 /**
  * Utility methods for processing {@link SegmentString}s.
@@ -21,9 +20,9 @@ public class SegmentStringUtil {
    * @param geom the geometry to extract from
    * @return a List of SegmentStrings
    */
-  public static List<SegmentString> extractSegmentStrings(Geometry geom) {
-    List<SegmentString> segments = new ArrayList<SegmentString>();
-    for (CoordinatesList points : geom.getCoordinatesLists()) {
+  public static List<SegmentString> extractSegmentStrings(final Geometry geom) {
+    final List<SegmentString> segments = new ArrayList<SegmentString>();
+    for (final CoordinatesList points : geom.getCoordinatesLists()) {
       if (points.size() > 1) {
         segments.add(new NodedSegmentString(points, geom));
       }

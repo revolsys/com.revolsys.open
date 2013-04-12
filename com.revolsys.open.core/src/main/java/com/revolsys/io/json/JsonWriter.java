@@ -110,10 +110,6 @@ public final class JsonWriter {
     startAttribute = true;
   }
 
-  public void list(Object... values) {
-    list(Arrays.asList(values));
-  }
-
   public void list(final Collection<? extends Object> values) {
     startList();
     int i = 0;
@@ -130,6 +126,10 @@ public final class JsonWriter {
       value(value);
     }
     endList();
+  }
+
+  public void list(final Object... values) {
+    list(Arrays.asList(values));
   }
 
   public void newLine() {
@@ -177,8 +177,8 @@ public final class JsonWriter {
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {
-      Number number = (Number)value;
-      double doubleValue = number.doubleValue();
+      final Number number = (Number)value;
+      final double doubleValue = number.doubleValue();
       if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
         out.print("null");
       } else {

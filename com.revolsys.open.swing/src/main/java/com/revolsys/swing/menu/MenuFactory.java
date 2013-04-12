@@ -177,6 +177,14 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     return null;
   }
 
+  public void addCheckboxMenuItem(String groupName,
+    Action action, EnableCheck itemChecked) {
+    final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
+      itemChecked, action);
+    addComponentFactory(groupName, factory);
+   
+  }
+
   // public void setGroupEnabled(final String groupName, final boolean enabled)
   // {
   // groups.setGroupEnabled(groupName, enabled);

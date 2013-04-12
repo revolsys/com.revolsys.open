@@ -19,7 +19,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
 
     private void addLine(final CoordinatesList points) {
-      int size = points.size();
+      final int size = points.size();
       if (size > 1) {
         for (int i = 1; i < size; i++) {
           final LineSegment seg = new LineSegment(points.get(i - 1),
@@ -34,7 +34,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
 
     private void init(final Geometry geometry) {
-      for (CoordinatesList points : geometry.getCoordinatesLists()) {
+      for (final CoordinatesList points : geometry.getCoordinatesLists()) {
         addLine(points);
       }
     }

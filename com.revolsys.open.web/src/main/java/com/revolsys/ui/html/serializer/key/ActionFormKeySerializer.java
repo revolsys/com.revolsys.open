@@ -82,7 +82,8 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
       }
       for (final Entry<String, String> entry : parameterNameMap.entrySet()) {
         final String parameterName = entry.getKey();
-        final Object value = JavaBeanUtil.getValue(object, entry.getValue());
+        String keyName = entry.getValue();
+        final Object value = uiBuilder.getProperty(object, keyName);
         parameters.put(parameterName, value);
       }
       if (enabledExpression != null) {

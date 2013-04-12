@@ -28,13 +28,6 @@ public class NodeList<T> extends AbstractList<Node<T>> {
   }
 
   @Override
-  public Node<T> set(int index, Node<T> edge) {
-    final int nodeId = edge.getId();
-     nodeIds.set(index, nodeId);
-     return edge;
-  }
-  
-  @Override
   public boolean addAll(final Collection<? extends Node<T>> collection) {
     boolean added = false;
     for (final Node<T> node : collection) {
@@ -79,6 +72,13 @@ public class NodeList<T> extends AbstractList<Node<T>> {
       removed |= remove(object);
     }
     return removed;
+  }
+
+  @Override
+  public Node<T> set(final int index, final Node<T> edge) {
+    final int nodeId = edge.getId();
+    nodeIds.set(index, nodeId);
+    return edge;
   }
 
   @Override

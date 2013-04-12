@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs.projection;
 
-import javax.measure.converter.ConversionException;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 

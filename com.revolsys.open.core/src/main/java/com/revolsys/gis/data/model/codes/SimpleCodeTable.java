@@ -11,20 +11,16 @@ import com.revolsys.gis.data.model.DataObject;
 
 public class SimpleCodeTable extends AbstractCodeTable {
 
-  public SimpleCodeTable(String name) {
-    setName(name);
-  }
-
-  public static CodeTable create(String name, Resource resource) {
-    SimpleCodeTable codeTable = new SimpleCodeTable(name);
-    DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+  public static CodeTable create(final String name, final Resource resource) {
+    final SimpleCodeTable codeTable = new SimpleCodeTable(name);
+    final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
     try {
-      for (DataObject codeObject : reader) {
-        Object id = codeObject.getValue(0);
-        List<Object> values = new ArrayList<Object>();
-        int attributeCount = codeObject.getMetaData().getAttributeCount();
+      for (final DataObject codeObject : reader) {
+        final Object id = codeObject.getValue(0);
+        final List<Object> values = new ArrayList<Object>();
+        final int attributeCount = codeObject.getMetaData().getAttributeCount();
         for (int i = 1; i < attributeCount; i++) {
-          Object value = codeObject.getValue(i);
+          final Object value = codeObject.getValue(i);
           values.add(value);
         }
         codeTable.addValue(id, values);
@@ -36,6 +32,10 @@ public class SimpleCodeTable extends AbstractCodeTable {
   }
 
   private int index = 0;
+
+  public SimpleCodeTable(final String name) {
+    setName(name);
+  }
 
   @Override
   public void addValue(final Object id, final Object... values) {

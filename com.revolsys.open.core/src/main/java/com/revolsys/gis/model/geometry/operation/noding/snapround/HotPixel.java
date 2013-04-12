@@ -21,17 +21,17 @@ public class HotPixel {
   // testing only
   // public static int nTests = 0;
 
-  private LineIntersector li;
+  private final LineIntersector li;
 
   private Coordinates pt;
 
-  private Coordinates originalPt;
+  private final Coordinates originalPt;
 
   private Coordinates p0Scaled;
 
   private Coordinates p1Scaled;
 
-  private double scaleFactor;
+  private final double scaleFactor;
 
   private double minx;
 
@@ -44,9 +44,11 @@ public class HotPixel {
   /**
    * The corners of the hot pixel, in the order: 10 23
    */
-  private Coordinates[] corner = new Coordinates[4];
+  private final Coordinates[] corner = new Coordinates[4];
 
   private BoundingBox safeEnv = null;
+
+  private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
   /**
    * Creates a new hot pixel.
@@ -56,7 +58,8 @@ public class HotPixel {
    * @param li the intersector to use for testing intersection with line
    *          segments
    */
-  public HotPixel(Coordinates pt, double scaleFactor, LineIntersector li) {
+  public HotPixel(final Coordinates pt, final double scaleFactor,
+    final LineIntersector li) {
     originalPt = pt;
     this.pt = pt;
     this.scaleFactor = scaleFactor;
@@ -71,6 +74,35 @@ public class HotPixel {
   }
 
   /**
+   * Adds a new node (equal to the snap pt) to the specified segment if the
+   * segment passes through the hot pixel
+   * 
+   * @param segStr
+   * @param segIndex
+   * @return true if a node was added to the segment
+   */
+  public boolean addSnappedNode(final NodedSegmentString segStr,
+    final int segIndex) {
+    final Coordinates p0 = segStr.getCoordinate(segIndex);
+    final Coordinates p1 = segStr.getCoordinate(segIndex + 1);
+
+    if (intersects(p0, p1)) {
+      // System.out.println("snapped: " + snapPt);
+      // System.out.println("POINT (" + snapPt.getX() + " " + snapPt.getY() +
+      // ")");
+      segStr.addIntersection(getCoordinates(), segIndex);
+
+      return true;
+    }
+    return false;
+  }
+
+  private void copyScaled(final Coordinates p, final Coordinates pScaled) {
+    pScaled.setX(scale(p.getX()));
+    pScaled.setY(scale(p.getY()));
+  }
+
+  /**
    * Gets the coordinate this hot pixel is based at.
    * 
    * @return the coordinate of the pixel
@@ -78,8 +110,6 @@ public class HotPixel {
   public Coordinates getCoordinates() {
     return originalPt;
   }
-
-  private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
   /**
    * Returns a "safe" envelope that is guaranteed to contain the hot pixel. The
@@ -89,7 +119,7 @@ public class HotPixel {
    */
   public BoundingBox getSafeBoundingBox() {
     if (safeEnv == null) {
-      double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
+      final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
       safeEnv = new BoundingBox(null, originalPt.getX() - safeTolerance,
         originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
         originalPt.getY() + safeTolerance);
@@ -97,8 +127,8 @@ public class HotPixel {
     return safeEnv;
   }
 
-  private void initCorners(Coordinates pt) {
-    double tolerance = 0.5;
+  private void initCorners(final Coordinates pt) {
+    final double tolerance = 0.5;
     minx = pt.getX() - tolerance;
     maxx = pt.getX() + tolerance;
     miny = pt.getY() - tolerance;
@@ -110,10 +140,6 @@ public class HotPixel {
     corner[3] = new DoubleCoordinates(maxx, miny);
   }
 
-  private double scale(double val) {
-    return (double)Math.round(val * scaleFactor);
-  }
-
   /**
    * Tests whether the line segment (p0-p1) intersects this hot pixel.
    * 
@@ -121,31 +147,28 @@ public class HotPixel {
    * @param p1 the second coordinate of the line segment to test
    * @return true if the line segment intersects this hot pixel
    */
-  public boolean intersects(Coordinates p0, Coordinates p1) {
-    if (scaleFactor == 1.0)
+  public boolean intersects(final Coordinates p0, final Coordinates p1) {
+    if (scaleFactor == 1.0) {
       return intersectsScaled(p0, p1);
+    }
 
     copyScaled(p0, p0Scaled);
     copyScaled(p1, p1Scaled);
     return intersectsScaled(p0Scaled, p1Scaled);
   }
 
-  private void copyScaled(Coordinates p, Coordinates pScaled) {
-    pScaled.setX(scale(p.getX()));
-    pScaled.setY(scale(p.getY()));
-  }
+  private boolean intersectsScaled(final Coordinates p0, final Coordinates p1) {
+    final double segMinx = Math.min(p0.getX(), p1.getX());
+    final double segMaxx = Math.max(p0.getX(), p1.getX());
+    final double segMiny = Math.min(p0.getY(), p1.getY());
+    final double segMaxy = Math.max(p0.getY(), p1.getY());
 
-  private boolean intersectsScaled(Coordinates p0, Coordinates p1) {
-    double segMinx = Math.min(p0.getX(), p1.getX());
-    double segMaxx = Math.max(p0.getX(), p1.getX());
-    double segMiny = Math.min(p0.getY(), p1.getY());
-    double segMaxy = Math.max(p0.getY(), p1.getY());
-
-    boolean isOutsidePixelEnv = maxx < segMinx || minx > segMaxx
+    final boolean isOutsidePixelEnv = maxx < segMinx || minx > segMaxx
       || maxy < segMiny || miny > segMaxy;
-    if (isOutsidePixelEnv)
+    if (isOutsidePixelEnv) {
       return false;
-    boolean intersects = intersectsToleranceSquare(p0, p1);
+    }
+    final boolean intersects = intersectsToleranceSquare(p0, p1);
     // boolean intersectsPixelClosure = intersectsPixelClosure(p0, p1);
 
     // if (intersectsPixel != intersects) {
@@ -188,62 +211,53 @@ public class HotPixel {
    * @param p1
    * @return
    */
-  private boolean intersectsToleranceSquare(Coordinates p0, Coordinates p1) {
+  private boolean intersectsToleranceSquare(final Coordinates p0,
+    final Coordinates p1) {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
     li.computeIntersection(p0, p1, corner[0], corner[1]);
-    if (li.isProper())
+    if (li.isProper()) {
       return true;
+    }
 
     li.computeIntersection(p0, p1, corner[1], corner[2]);
-    if (li.isProper())
+    if (li.isProper()) {
       return true;
-    if (li.hasIntersection())
+    }
+    if (li.hasIntersection()) {
       intersectsLeft = true;
+    }
 
     li.computeIntersection(p0, p1, corner[2], corner[3]);
-    if (li.isProper())
+    if (li.isProper()) {
       return true;
-    if (li.hasIntersection())
+    }
+    if (li.hasIntersection()) {
       intersectsBottom = true;
+    }
 
     li.computeIntersection(p0, p1, corner[3], corner[0]);
-    if (li.isProper())
+    if (li.isProper()) {
       return true;
+    }
 
-    if (intersectsLeft && intersectsBottom)
+    if (intersectsLeft && intersectsBottom) {
       return true;
+    }
 
-    if (p0.equals(pt))
+    if (p0.equals(pt)) {
       return true;
-    if (p1.equals(pt))
+    }
+    if (p1.equals(pt)) {
       return true;
+    }
 
     return false;
   }
 
-  /**
-   * Adds a new node (equal to the snap pt) to the specified segment if the
-   * segment passes through the hot pixel
-   * 
-   * @param segStr
-   * @param segIndex
-   * @return true if a node was added to the segment
-   */
-  public boolean addSnappedNode(NodedSegmentString segStr, int segIndex) {
-    Coordinates p0 = segStr.getCoordinate(segIndex);
-    Coordinates p1 = segStr.getCoordinate(segIndex + 1);
-
-    if (intersects(p0, p1)) {
-      // System.out.println("snapped: " + snapPt);
-      // System.out.println("POINT (" + snapPt.getX() + " " + snapPt.getY() +
-      // ")");
-      segStr.addIntersection(getCoordinates(), segIndex);
-
-      return true;
-    }
-    return false;
+  private double scale(final double val) {
+    return Math.round(val * scaleFactor);
   }
 
 }

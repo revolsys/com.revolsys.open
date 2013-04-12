@@ -8,9 +8,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
  * 
  * @author Martin Davis
  */
-public interface NodableSegmentString
-	extends SegmentString
-{
+public interface NodableSegmentString extends SegmentString {
   /**
    * Adds an intersection node for a given point and segment to this segment string.
    * 

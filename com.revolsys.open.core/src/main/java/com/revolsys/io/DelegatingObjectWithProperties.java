@@ -21,12 +21,11 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
-  public void removeProperty(final String propertyName) {
-    object.removeProperty(propertyName);
+  public void clearProperties() {
     if (getObject() == null) {
-      properties.remove(propertyName);
+      properties.clear();
     } else {
-      getObject().removeProperty(propertyName);
+      getObject().clearProperties();
     }
   }
 
@@ -49,21 +48,12 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
-  public void clearProperties() {
-    if (getObject() == null) {
-      properties.clear();
-    } else {
-       getObject().clearProperties();
-    }
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
-    Map<String, Object> properties = getProperties();
+    final Map<String, Object> properties = getProperties();
     Object value = properties.get(name);
     if (value instanceof Reference) {
-      Reference<C> reference = (Reference<C>)value;
+      final Reference<C> reference = (Reference<C>)value;
       if (reference.isEnqueued()) {
         value = null;
       } else {
@@ -76,16 +66,6 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     return (C)value;
   }
 
-  public void setPropertySoft(final String name, final Object value) {
-    Map<String, Object> properties = getProperties();
-    properties.put(name, new SoftReference<Object>(value));
-  }
-
-  public void setPropertyWeak(final String name, final Object value) {
-    Map<String, Object> properties = getProperties();
-    properties.put(name, new WeakReference<Object>(value));
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <C> C getProperty(final String name, final C defaultValue) {
@@ -94,6 +74,16 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
       return defaultValue;
     } else {
       return value;
+    }
+  }
+
+  @Override
+  public void removeProperty(final String propertyName) {
+    object.removeProperty(propertyName);
+    if (getObject() == null) {
+      properties.remove(propertyName);
+    } else {
+      getObject().removeProperty(propertyName);
     }
   }
 
@@ -114,6 +104,18 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     } else {
       getObject().setProperty(name, value);
     }
+  }
+
+  @Override
+  public void setPropertySoft(final String name, final Object value) {
+    final Map<String, Object> properties = getProperties();
+    properties.put(name, new SoftReference<Object>(value));
+  }
+
+  @Override
+  public void setPropertyWeak(final String name, final Object value) {
+    final Map<String, Object> properties = getProperties();
+    properties.put(name, new WeakReference<Object>(value));
   }
 
 }

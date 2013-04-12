@@ -35,9 +35,9 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
 
   public EndianMappedByteBuffer(final File file, final MapMode mapMode)
     throws IOException {
-     String mode = "r";
+    String mode = "r";
     if (mapMode.equals(MapMode.READ_WRITE)) {
-mode="rw";
+      mode = "rw";
     }
     randomAccessFile = new RandomAccessFile(file, mode);
     final FileChannel channel = randomAccessFile.getChannel();

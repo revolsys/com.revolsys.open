@@ -3,7 +3,7 @@ package com.revolsys.io.page;
 import java.nio.MappedByteBuffer;
 
 public class FileMappedPage implements Page {
-  private MappedByteBuffer buffer;
+  private final MappedByteBuffer buffer;
 
   private final int index;
 
@@ -23,8 +23,38 @@ public class FileMappedPage implements Page {
   }
 
   @Override
+  public void clearBytes(final int startIndex) {
+    buffer.mark();
+    try {
+      buffer.position(startIndex);
+      for (int i = startIndex; i < getSize(); i++) {
+        writeByte((byte)0);
+      }
+    } finally {
+      buffer.reset();
+    }
+  }
+
+  @Override
+  public int compareTo(final Page page) {
+    final int index = getIndex();
+    final int index2 = page.getIndex();
+    if (index == index2) {
+      return 0;
+    } else if (index < index2) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+
+  @Override
+  public void flush() {
+  }
+
+  @Override
   public byte[] getContent() {
-    byte[] data = new byte[getSize()];
+    final byte[] data = new byte[getSize()];
     buffer.mark();
     try {
       buffer.position(0);
@@ -33,6 +63,36 @@ public class FileMappedPage implements Page {
       buffer.reset();
     }
     return data;
+  }
+
+  @Override
+  public int getIndex() {
+    return index;
+  }
+
+  @Override
+  public int getOffset() {
+    return buffer.position();
+  }
+
+  @Override
+  public PageManager getPageManager() {
+    return pageManager;
+  }
+
+  @Override
+  public int getSize() {
+    return buffer.capacity();
+  }
+
+  @Override
+  public byte readByte() {
+    if (getOffset() + 1 > getSize()) {
+      throw new ArrayIndexOutOfBoundsException(
+        "Unable to read past end of record");
+    } else {
+      return buffer.get();
+    }
   }
 
   @Override
@@ -100,16 +160,6 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public int getOffset() {
-    return buffer.position();
-  }
-
-  @Override
-  public int getSize() {
-    return buffer.capacity();
-  }
-
-  @Override
   public void setContent(final Page page) {
     buffer.position(0);
     buffer.put(page.getContent());
@@ -126,62 +176,12 @@ public class FileMappedPage implements Page {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
     } else {
-      buffer.put((byte)b);
+      buffer.put(b);
     }
   }
 
   @Override
-  public int compareTo(Page page) {
-    final int index = getIndex();
-    final int index2 = page.getIndex();
-    if (index == index2) {
-      return 0;
-    } else if (index < index2) {
-      return -1;
-    } else {
-      return 1;
-    }
-  }
-
-  @Override
-  public void clearBytes(int startIndex) {
-    buffer.mark();
-    try {
-      buffer.position(startIndex);
-      for (int i = startIndex; i < getSize(); i++) {
-        writeByte((byte)0);
-      }
-    } finally {
-      buffer.reset();
-    }
-  }
-
-  @Override
-  public void flush() {
-  }
-
-  @Override
-  public int getIndex() {
-    return index;
-  }
-
-  @Override
-  public PageManager getPageManager() {
-    return pageManager;
-  }
-
-  @Override
-  public byte readByte() {
-    if (getOffset() + 1 > getSize()) {
-      throw new ArrayIndexOutOfBoundsException(
-        "Unable to read past end of record");
-    } else {
-      return buffer.get();
-    }
-  }
-
-  @Override
-  public void writeBytes(byte[] bytes) {
+  public void writeBytes(final byte[] bytes) {
     if (getOffset() + bytes.length > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -191,7 +191,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeBytes(byte[] bytes, int offset, int count) {
+  public void writeBytes(final byte[] bytes, final int offset, final int count) {
     if (getOffset() + count > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -201,7 +201,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeDouble(double d) {
+  public void writeDouble(final double d) {
     if (getOffset() + 8 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -211,7 +211,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeFloat(float f) {
+  public void writeFloat(final float f) {
     if (getOffset() + 4 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -221,7 +221,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeInt(int i) {
+  public void writeInt(final int i) {
     if (getOffset() + 4 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -231,7 +231,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeLong(long l) {
+  public void writeLong(final long l) {
     if (getOffset() + 8 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");
@@ -241,7 +241,7 @@ public class FileMappedPage implements Page {
   }
 
   @Override
-  public void writeShort(short s) {
+  public void writeShort(final short s) {
     if (getOffset() + 2 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
         "Unable to read past end of record");

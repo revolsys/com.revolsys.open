@@ -7,9 +7,9 @@ import java.util.Iterator;
 
 public class ReferenceSet<V> extends AbstractSet<V> {
 
-  private Collection<Reference<V>> collection;
+  private final Collection<Reference<V>> collection;
 
-  public ReferenceSet(Collection<Reference<V>> collection) {
+  public ReferenceSet(final Collection<Reference<V>> collection) {
     this.collection = collection;
   }
 

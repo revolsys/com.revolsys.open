@@ -137,6 +137,17 @@ public final class StaxUtils {
     }
   }
 
+  public static boolean isEndElementLocalName(final XMLStreamReader parser,
+    final QName name) {
+    if (parser.isEndElement()) {
+      final QName elementName = parser.getName();
+      if (elementName.getLocalPart().equals(name.getLocalPart())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Check that the parser is currently at the specified XML element.
    * 
@@ -306,17 +317,6 @@ public final class StaxUtils {
       next(parser);
     }
     next(parser);
-  }
-
-  public static boolean isEndElementLocalName(final XMLStreamReader parser,
-    final QName name) {
-    if (parser.isEndElement()) {
-      QName elementName = parser.getName();
-      if (elementName.getLocalPart().equals(name.getLocalPart())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

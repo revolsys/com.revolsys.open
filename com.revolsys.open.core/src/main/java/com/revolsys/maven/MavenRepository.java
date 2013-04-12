@@ -103,20 +103,20 @@ public class MavenRepository implements URLStreamHandlerFactory {
     if (metaDataResource.exists()) {
       try {
         return XmlMapIoFactory.toMap(metaDataResource);
-      } catch (RuntimeException e) {
+      } catch (final RuntimeException e) {
         LoggerFactory.getLogger(getClass()).error(
           "Error loading maven resource" + metaDataResource, e);
         if (metaDataResource instanceof FileSystemResource) {
           try {
-            File file = metaDataResource.getFile();
+            final File file = metaDataResource.getFile();
             if (file.delete()) {
               LoggerFactory.getLogger(getClass()).error(
                 "Deleting corrupt maven resource" + metaDataResource, e);
             }
-          } catch (IOException ioe) {
+          } catch (final IOException ioe) {
           }
         }
-       throw e;
+        throw e;
       }
     } else {
       return Collections.emptyMap();

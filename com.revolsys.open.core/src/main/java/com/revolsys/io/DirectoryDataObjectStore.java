@@ -57,11 +57,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     }
     super.close();
   }
-  @Override
-  public int getRowCount(Query query) {
-    throw new UnsupportedOperationException();
-  }
- 
+
   @Override
   public Writer<DataObject> createWriter() {
     return new DirectoryDataObjectStoreWriter(this);
@@ -99,6 +95,11 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
       schema.addMetaData(newMetaData);
     }
     return metaData;
+  }
+
+  @Override
+  public int getRowCount(final Query query) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

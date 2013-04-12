@@ -85,7 +85,14 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction(final CharSequence name, final String toolTip,
     final Icon icon, final boolean invokeLater, final Object object,
     final String methodName, final Object... parameters) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this(name, toolTip, icon, invokeLater, new InvokeMethodRunnable(object,
+      methodName, parameters));
+  }
+
+  public InvokeMethodAction(final CharSequence name, final String toolTip,
+    final Icon icon, final boolean invokeLater,
+    Runnable runnable) {
+    this.runnable = runnable;
     this.invokeLater = invokeLater;
     if (name != null) {
       putValue(NAME, name.toString());
@@ -116,8 +123,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   }
 
   public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon,final EnableCheck enableCheck, final Object object, final String methodName,
-    final Object... parameters) {
+    final Icon icon, final EnableCheck enableCheck, final Object object,
+    final String methodName, final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
     setEnableCheck(enableCheck);
   }
@@ -164,7 +171,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   protected void setToolTip(final CharSequence toolTip) {
     putValue(Action.SHORT_DESCRIPTION, toolTip.toString());
   }
-  
+
   @Override
   public String toString() {
     return runnable.toString();

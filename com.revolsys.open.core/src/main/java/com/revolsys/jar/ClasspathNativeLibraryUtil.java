@@ -93,6 +93,32 @@ public class ClasspathNativeLibraryUtil {
     }
   }
 
+  public static void loadLibrary(final String path, final String name) {
+    final URL url = ClasspathNativeLibraryUtil.class.getResource(path);
+    if (url == null) {
+      try {
+        System.loadLibrary(name);
+      } catch (final Throwable e) {
+        LOG.error("Unable to load shared library " + name, e);
+        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+        throw new RuntimeException("Unable to load shared library " + name, e);
+      }
+    } else {
+      try {
+        final File directory = FileUtil.createTempDirectory("jni", "name");
+        final File file = new File(directory, name + ".dll");
+        file.deleteOnExit();
+        FileUtil.copy(url.openStream(), file);
+        System.load(file.getCanonicalPath());
+        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+      } catch (final Throwable e) {
+        LOG.error("Unable to load shared library from classpath " + url, e);
+        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+        throw new RuntimeException("Unable to load shared library " + url, e);
+      }
+    }
+  }
+
   private static void loadLibrary(final String prefix, final String name,
     final String arch, final String operatingSystemName, final String ext) {
     final String fileName = prefix + name + "-" + arch + "-"
@@ -127,32 +153,6 @@ public class ClasspathNativeLibraryUtil {
         LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
         throw new RuntimeException("Unable to load shared library " + fileName,
           e);
-      }
-    }
-  }
-
-  public static void loadLibrary(final String path, String name) {
-    final URL url = ClasspathNativeLibraryUtil.class.getResource(path);
-    if (url == null) {
-      try {
-        System.loadLibrary(name);
-      } catch (final Throwable e) {
-        LOG.error("Unable to load shared library " + name, e);
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-        throw new RuntimeException("Unable to load shared library " + name, e);
-      }
-    } else {
-      try {
-        final File directory = FileUtil.createTempDirectory("jni", "name");
-        final File file = new File(directory, name +".dll");
-        file.deleteOnExit();
-        FileUtil.copy(url.openStream(), file);
-        System.load(file.getCanonicalPath());
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-      } catch (final Throwable e) {
-        LOG.error("Unable to load shared library from classpath " + url, e);
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-        throw new RuntimeException("Unable to load shared library " + url, e);
       }
     }
   }

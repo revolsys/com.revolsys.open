@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 
 public class ReferenceEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
 
-  private Collection<Entry<K, Reference<V>>> collection;
+  private final Collection<Entry<K, Reference<V>>> collection;
 
-  public ReferenceEntrySet(Collection<Entry<K, Reference<V>>> collection) {
+  public ReferenceEntrySet(final Collection<Entry<K, Reference<V>>> collection) {
     this.collection = collection;
   }
 

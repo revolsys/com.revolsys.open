@@ -1,6 +1,5 @@
 package com.revolsys.beans;
 
-import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.beanutils.MethodUtils;
@@ -23,13 +22,13 @@ public class InvokeMethodCallable<T> implements Callable<T> {
   }
 
   /** The object to invoke the method on. */
-  private Object object;
+  private final Object object;
 
   /** The parameters to pass to the method. */
-  private Object[] parameters;
+  private final Object[] parameters;
 
   /** The name of the method to invoke. */
-  private String methodName;
+  private final String methodName;
 
   /**
    * Construct a new InvokeMethodCallable.

@@ -119,6 +119,10 @@ public class DataObjectConverterProcess extends
     return statistics;
   }
 
+  public DataObjectMetaData getTargetMetaData(final String typePath) {
+    return targetMetaDataFactory.getMetaData(typePath);
+  }
+
   public DataObjectMetaDataFactory getTargetMetaDataFactory() {
     return targetMetaDataFactory;
   }
@@ -167,10 +171,6 @@ public class DataObjectConverterProcess extends
         addTypeConverter(sourceTypeName, converter);
       }
     }
-  }
-
-  public DataObjectMetaData getTargetMetaData(String typePath) {
-    return targetMetaDataFactory.getMetaData(typePath);
   }
 
   @Override

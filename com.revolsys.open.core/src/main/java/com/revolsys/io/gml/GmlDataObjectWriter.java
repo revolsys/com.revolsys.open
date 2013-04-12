@@ -112,9 +112,9 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     final DataObjectMetaData metaData = object.getMetaData();
     QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      String typeName = metaData.getPath();
-      String path = PathUtil.getPath(typeName);
-      String name = PathUtil.getName(typeName);
+      final String typeName = metaData.getPath();
+      final String path = PathUtil.getPath(typeName);
+      final String name = PathUtil.getName(typeName);
       qualifiedName = new QName(path, name);
       metaData.setProperty(DataObjectMetaDataProperties.QUALIFIED_NAME,
         qualifiedName);

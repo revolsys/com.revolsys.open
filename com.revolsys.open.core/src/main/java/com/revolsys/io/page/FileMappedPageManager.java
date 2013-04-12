@@ -51,11 +51,11 @@ public class FileMappedPageManager implements PageManager {
       if (freePageIndexes.isEmpty()) {
         try {
           final int index = (int)(randomAccessFile.length() / pageSize);
-          long offset = (long)index * pageSize;
+          final long offset = (long)index * pageSize;
           randomAccessFile.setLength(offset + pageSize);
-          FileChannel channel = randomAccessFile.getChannel();
-          MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, offset,
-            pageSize);
+          final FileChannel channel = randomAccessFile.getChannel();
+          final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE,
+            offset, pageSize);
           page = new FileMappedPage(this, index, buffer);
 
           pages.put(page.getIndex(), page);
@@ -112,8 +112,8 @@ public class FileMappedPageManager implements PageManager {
 
   private Page loadPage(final int index) {
     try {
-      MappedByteBuffer buffer = fileChannel.map(MapMode.READ_WRITE, (long)index
-        * pageSize, pageSize);
+      final MappedByteBuffer buffer = fileChannel.map(MapMode.READ_WRITE,
+        (long)index * pageSize, pageSize);
       final Page page = new FileMappedPage(this, index, buffer);
       pages.put(index, page);
       return page;

@@ -53,6 +53,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private String typePath;
 
+  private String idAttributeName;
+
+  private boolean createMissingCodes = true;
+
   public CodeTableProperty() {
   }
 
@@ -149,12 +153,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return dataStore;
   }
 
-  private String idAttributeName;
-
-  public void setIdAttributeName(String idAttributeName) {
-    this.idAttributeName = idAttributeName;
-  }
-
   @Override
   public String getIdAttributeName() {
     if (StringUtils.hasText(idAttributeName)) {
@@ -210,6 +208,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return valueAttributeNames;
   }
 
+  public boolean isCreateMissingCodes() {
+    return createMissingCodes;
+  }
+
   public boolean isLoadAll() {
     return loadAll;
   }
@@ -221,22 +223,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
     final Reader<DataObject> reader = dataStore.query(query);
     try {
-      List<DataObject> codes = reader.read();
+      final List<DataObject> codes = reader.read();
       Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
       addValues(codes);
     } finally {
       reader.close();
     }
-  }
-
-  private boolean createMissingCodes = true;
-
-  public void setCreateMissingCodes(boolean createMissingCodes) {
-    this.createMissingCodes = createMissingCodes;
-  }
-
-  public boolean isCreateMissingCodes() {
-    return createMissingCodes;
   }
 
   @Override
@@ -249,7 +241,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     } else {
       final StringBuffer where = new StringBuffer();
       final Query query = new Query(typePath);
-        if (!values.isEmpty()) {
+      if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
           if (i > 0) {
@@ -260,9 +252,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
           if (value == null) {
             where.append(" IS NULL");
           } else {
-            Attribute attribute = metaData.getAttribute(attributeName);
+            final Attribute attribute = metaData.getAttribute(attributeName);
             query.addParameter(value, attribute);
-             where.append(" = ?");
+            where.append(" = ?");
           }
           i++;
         }
@@ -303,9 +295,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
     this.attributeAliases = columnAliases;
   }
 
+  public void setCreateMissingCodes(final boolean createMissingCodes) {
+    this.createMissingCodes = createMissingCodes;
+  }
+
   public void setCreationTimestampAttributeName(
     final String creationTimestampAttributeName) {
     this.creationTimestampAttributeName = creationTimestampAttributeName;
+  }
+
+  public void setIdAttributeName(final String idAttributeName) {
+    this.idAttributeName = idAttributeName;
   }
 
   public void setLoadAll(final boolean loadAll) {

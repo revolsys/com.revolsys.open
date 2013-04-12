@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.geomgraph;
 
 import java.util.ArrayList;
@@ -14,9 +13,8 @@ import com.revolsys.gis.model.geometry.util.TopologyException;
  *
  * @version 1.7
  */
-public class EdgeNodingValidator 
-{  
-	/**
+public class EdgeNodingValidator {
+  /**
    * Checks whether the supplied {@link Edge}s
    * are correctly noded.  
    * Throws a  {@link TopologyException} if they are not.
@@ -25,32 +23,29 @@ public class EdgeNodingValidator
    * @throws TopologyException if the SegmentStrings are not correctly noded
    *
    */
-	public static void checkValid(Collection edges)
-	{
-		EdgeNodingValidator validator = new EdgeNodingValidator(edges);
-		validator.checkValid();
-	}
-	
-  public static Collection toSegmentStrings(Collection edges)
-  {
+  public static void checkValid(final Collection edges) {
+    final EdgeNodingValidator validator = new EdgeNodingValidator(edges);
+    validator.checkValid();
+  }
+
+  public static Collection toSegmentStrings(final Collection edges) {
     // convert Edges to SegmentStrings
-    Collection segStrings = new ArrayList();
-    for (Iterator i = edges.iterator(); i.hasNext(); ) {
-      Edge e = (Edge) i.next();
+    final Collection segStrings = new ArrayList();
+    for (final Iterator i = edges.iterator(); i.hasNext();) {
+      final Edge e = (Edge)i.next();
       segStrings.add(new BasicSegmentString(e.getCoordinates(), e));
     }
     return segStrings;
   }
 
-  private FastNodingValidator nv;
+  private final FastNodingValidator nv;
 
   /**
    * Creates a new validator for the given collection of {@link Edge}s.
    * 
    * @param edges a collection of Edges.
    */
-  public EdgeNodingValidator(Collection edges)
-  {
+  public EdgeNodingValidator(final Collection edges) {
     nv = new FastNodingValidator(toSegmentStrings(edges));
   }
 
@@ -61,8 +56,7 @@ public class EdgeNodingValidator
    * @throws TopologyException if the SegmentStrings are not correctly noded
    *
    */
-  public void checkValid()
-  {
+  public void checkValid() {
     nv.checkValid();
   }
 

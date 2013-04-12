@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -19,7 +20,7 @@ import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 
 public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
   private Table table;
 
@@ -37,9 +38,11 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   private final String typePath;
 
-  private int offset;
+  private final int offset;
 
-  private int limit;
+  private final int limit;
+
+  private int count;
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath) {
@@ -58,8 +61,13 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String whereClause,
-    final BoundingBox boundingBox, int offset, int limit) {
+    final BoundingBox boundingBox, final Query query, final int offset,
+    final int limit) {
     this(dataStore, typePath, "*", whereClause, boundingBox, offset, limit);
+    final DataObjectFactory factory = query.getProperty("dataObjectFactory");
+    if (factory != null) {
+      this.dataObjectFactory = factory;
+    }
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
@@ -69,7 +77,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath, final String fields, final String whereClause,
-    final BoundingBox boundingBox, int offset, int limit) {
+    final BoundingBox boundingBox, final int offset, final int limit) {
     this.dataStore = dataStore;
     this.typePath = typePath;
     this.metaData = dataStore.getMetaData(typePath);
@@ -129,8 +137,6 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     return metaData;
   }
 
-  private int count;
-
   @Override
   protected DataObject getNext() throws NoSuchElementException {
     synchronized (dataStore) {
@@ -175,7 +181,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
         }
       }
     }
-     }
+  }
 
   public void setWhereClause(final String whereClause) {
     this.whereClause = whereClause;

@@ -36,6 +36,8 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   Object getNextPrimaryKey(String typePath);
 
+  Statistics getStatistics(String name);
+
   @Override
   void initialize();
 
@@ -47,6 +49,4 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   @Override
   void setLabel(String label);
-
-  Statistics getStatistics(String name);
 }

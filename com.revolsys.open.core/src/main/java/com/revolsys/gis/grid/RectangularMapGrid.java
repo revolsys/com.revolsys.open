@@ -18,6 +18,8 @@ public interface RectangularMapGrid {
 
   String getMapTileName(final double x, final double y);
 
+  String getName();
+
   Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem);
 
@@ -36,6 +38,4 @@ public interface RectangularMapGrid {
   List<RectangularMapTile> getTiles(final BoundingBox boundingBox);
 
   double getTileWidth();
-
-  String getName();
 }

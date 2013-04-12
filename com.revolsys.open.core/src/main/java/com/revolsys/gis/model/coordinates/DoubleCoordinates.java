@@ -12,10 +12,10 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   private final double[] coordinates;
 
   public DoubleCoordinates(final Coordinates coordinates) {
-    byte numAxis = coordinates.getNumAxis();
+    final byte numAxis = coordinates.getNumAxis();
     this.coordinates = new double[numAxis];
     for (int i = 0; i < numAxis; i++) {
-      double value = coordinates.getValue(i);
+      final double value = coordinates.getValue(i);
       this.coordinates[i] = value;
     }
   }

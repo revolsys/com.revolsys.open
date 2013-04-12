@@ -70,12 +70,12 @@ public class Graph<T> {
   private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
 
   @SuppressWarnings("unchecked")
-  public static <V> Graph<V> getGraph(int id) {
-    WeakReference<Graph<?>> reference = graphs.get(id);
+  public static <V> Graph<V> getGraph(final int id) {
+    final WeakReference<Graph<?>> reference = graphs.get(id);
     if (reference == null) {
       return null;
     } else {
-      Graph<?> graph = reference.get();
+      final Graph<?> graph = reference.get();
       if (graph == null) {
         graphs.remove(id);
         return null;
@@ -85,11 +85,7 @@ public class Graph<T> {
     }
   }
 
-  public int getId() {
-    return id;
-  }
-
-  private int id = GRAPH_IDS.incrementAndGet();
+  private final int id = GRAPH_IDS.incrementAndGet();
 
   private int maxEdgesInMemory = Integer.MAX_VALUE;
 
@@ -109,7 +105,7 @@ public class Graph<T> {
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<Edge<T>>();
 
-  private Map<Edge<T>, Integer> edgeIds = new TreeMap<Edge<T>, Integer>();
+  private final Map<Edge<T>, Integer> edgeIds = new TreeMap<Edge<T>, Integer>();
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
@@ -127,30 +123,8 @@ public class Graph<T> {
 
   private CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
 
-  public int getMaxEdgesInMemory() {
-    return maxEdgesInMemory;
-  }
-
-  public void setMaxEdgesInMemory(int maxEdgesInMemory) {
-    this.maxEdgesInMemory = maxEdgesInMemory;
-  }
-
   public Graph() {
     this(true);
-  }
-
-  @PreDestroy
-  public void close() {
-    edgeAttributesById.clear();
-    edgeIds.clear();
-    // TODO edgeIndex
-    edgeLinesById.clear();
-    edgeObjectsById.clear();
-    edgesById.clear();
-
-    // TODO nodeIndex.clear();
-    nodeAttributesById.clear();
-    nodesIdsByCoordinates.clear();
   }
 
   protected Graph(final boolean storeLines) {
@@ -244,6 +218,20 @@ public class Graph<T> {
     } else {
       return null;
     }
+  }
+
+  @PreDestroy
+  public void close() {
+    edgeAttributesById.clear();
+    edgeIds.clear();
+    // TODO edgeIndex
+    edgeLinesById.clear();
+    edgeObjectsById.clear();
+    edgesById.clear();
+
+    // TODO nodeIndex.clear();
+    nodeAttributesById.clear();
+    nodesIdsByCoordinates.clear();
   }
 
   public boolean contains(final Edge<T> edge) {
@@ -457,6 +445,11 @@ public class Graph<T> {
     return edgeLinesById.get(edgeId);
   }
 
+  public List<LineString> getEdgeLines() {
+    final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
+    return new EdgeLineList(this, edgeIds);
+  }
+
   public T getEdgeObject(final int edgeId) {
     return edgeObjectsById.get(edgeId);
   }
@@ -464,11 +457,6 @@ public class Graph<T> {
   public List<Edge<T>> getEdges() {
     final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
     return new EdgeList<T>(this, edgeIds);
-  }
-
-  public List<LineString> getEdgeLines() {
-    final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
-    return new EdgeLineList(this, edgeIds);
   }
 
   public List<Edge<T>> getEdges(final Comparator<Edge<T>> comparator) {
@@ -569,6 +557,14 @@ public class Graph<T> {
 
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public int getMaxEdgesInMemory() {
+    return maxEdgesInMemory;
   }
 
   /**
@@ -1049,6 +1045,10 @@ public class Graph<T> {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     setPrecisionModel(geometryFactory);
+  }
+
+  public void setMaxEdgesInMemory(final int maxEdgesInMemory) {
+    this.maxEdgesInMemory = maxEdgesInMemory;
   }
 
   protected void setNodeAttribute(final int edgeId, final String name,

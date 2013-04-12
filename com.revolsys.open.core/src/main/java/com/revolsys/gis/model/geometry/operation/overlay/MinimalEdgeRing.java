@@ -1,5 +1,3 @@
-
-
 package com.revolsys.gis.model.geometry.operation.overlay;
 
 import com.revolsys.gis.model.geometry.GeometryFactory;
@@ -15,20 +13,20 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
  * @version 1.7
  * @see com.vividsolutions.jts.operation.overlay.MaximalEdgeRing
  */
-public class MinimalEdgeRing
-  extends EdgeRing
-{
+public class MinimalEdgeRing extends EdgeRing {
 
-  public MinimalEdgeRing(DirectedEdge start, GeometryFactory geometryFactory) {
+  public MinimalEdgeRing(final DirectedEdge start,
+    final GeometryFactory geometryFactory) {
     super(start, geometryFactory);
-   }
+  }
 
-  public DirectedEdge getNext(DirectedEdge de)
-  {
+  @Override
+  public DirectedEdge getNext(final DirectedEdge de) {
     return de.getNextMin();
   }
-  public void setEdgeRing(DirectedEdge de, EdgeRing er)
-  {
+
+  @Override
+  public void setEdgeRing(final DirectedEdge de, final EdgeRing er) {
     de.setMinEdgeRing(er);
   }
 

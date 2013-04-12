@@ -46,6 +46,20 @@ public class PrimeMeridian implements Serializable {
     return false;
   }
 
+  public boolean equalsExact(final PrimeMeridian primeMeridian) {
+    if (!EqualsRegistry.equal(authority, primeMeridian.authority)) {
+      return false;
+    } else if (deprecated != primeMeridian.deprecated) {
+      return false;
+    } else if (longitude != longitude) {
+      return false;
+    } else if (!EqualsRegistry.equal(name, primeMeridian.name)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public Authority getAuthority() {
     return authority;
   }
@@ -71,19 +85,5 @@ public class PrimeMeridian implements Serializable {
   @Override
   public String toString() {
     return name;
-  }
-
-  public boolean equalsExact(PrimeMeridian primeMeridian) {
-    if (!EqualsRegistry.equal(authority, primeMeridian.authority)) {
-      return false;
-    } else if (deprecated != primeMeridian.deprecated) {
-      return false;
-    } else if (longitude != longitude) {
-      return false;
-    } else if (!EqualsRegistry.equal(name, primeMeridian.name)) {
-      return false;
-    } else {
-      return true;
-    }
   }
 }

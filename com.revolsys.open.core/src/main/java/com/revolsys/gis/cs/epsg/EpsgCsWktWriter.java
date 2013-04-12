@@ -31,7 +31,7 @@ public class EpsgCsWktWriter {
       write(out, unit.getName());
       out.write(',');
       out.print(unit.getConversionFactor());
-      Authority authority = unit.getAuthority();
+      final Authority authority = unit.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -66,7 +66,7 @@ public class EpsgCsWktWriter {
       if (spheroid != null) {
         write(out, spheroid);
       }
-      Authority authority = datum.getAuthority();
+      final Authority authority = datum.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -83,7 +83,7 @@ public class EpsgCsWktWriter {
       write(out, primeMeridian);
       final AngularUnit unit = coordinateSystem.getAngularUnit();
       write(out, unit);
-      Authority authority = coordinateSystem.getAuthority();
+      final Authority authority = coordinateSystem.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -95,7 +95,7 @@ public class EpsgCsWktWriter {
       write(out, unit.getName());
       out.write(',');
       write(out, unit.getConversionFactor());
-      Authority authority = unit.getAuthority();
+      final Authority authority = unit.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -114,7 +114,7 @@ public class EpsgCsWktWriter {
       out.write(',');
       final double longitude = primeMeridian.getLongitude();
       write(out, longitude);
-      Authority authority = primeMeridian.getAuthority();
+      final Authority authority = primeMeridian.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -140,7 +140,7 @@ public class EpsgCsWktWriter {
       if (unit != null) {
         write(out, unit);
       }
-      Authority authority = coordinateSystem.getAuthority();
+      final Authority authority = coordinateSystem.getAuthority();
       write(out, authority);
       out.write(']');
     }
@@ -164,7 +164,7 @@ public class EpsgCsWktWriter {
       out.print(',');
       final double inverseFlattening = spheroid.getInverseFlattening();
       write(out, inverseFlattening);
-      Authority authority = spheroid.getAuthority();
+      final Authority authority = spheroid.getAuthority();
       write(out, authority);
       out.write(']');
     }

@@ -16,6 +16,10 @@ public class WmsCapabilities {
     return capability;
   }
 
+  public WmsLayer getLayer(final String name) {
+    return getLayer(capability.getLayer(), name);
+  }
+
   private WmsLayer getLayer(final WmsLayer layer, final String name) {
 
     final String layerName = layer.getName();
@@ -29,10 +33,6 @@ public class WmsCapabilities {
       }
     }
     return null;
-  }
-
-  public WmsLayer getLayer(final String name) {
-    return getLayer(capability.getLayer(), name);
   }
 
   public Request getRequest(final String requestName) {
@@ -77,6 +77,12 @@ public class WmsCapabilities {
     return getLayer(name) != null;
   }
 
+  public boolean isSrsSupported(final String srsId,
+    final List<String> layerNames) {
+    final WmsLayer layer = capability.getLayer();
+    return isSrsSupported(srsId, layer, layerNames, false);
+  }
+
   private boolean isSrsSupported(final String srsId, final WmsLayer layer,
     final List<String> layerNames, final boolean parentHasSrs) {
     final boolean hasSrs = layer.getSrs().contains(srsId) || parentHasSrs;
@@ -91,12 +97,6 @@ public class WmsCapabilities {
       }
     }
     return false;
-  }
-
-  public boolean isSrsSupported(final String srsId,
-    final List<String> layerNames) {
-    final WmsLayer layer = capability.getLayer();
-    return isSrsSupported(srsId, layer, layerNames, false);
   }
 
   public void setCapability(final Capability capability) {

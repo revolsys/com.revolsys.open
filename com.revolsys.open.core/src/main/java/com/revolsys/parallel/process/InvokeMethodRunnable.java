@@ -22,7 +22,7 @@ public class InvokeMethodRunnable implements Runnable {
   }
 
   /** The object to invoke the method on. */
-  private final Object object;
+  private Object object;
 
   /** The parameters to pass to the method. */
   private final Object[] parameters;
@@ -44,6 +44,26 @@ public class InvokeMethodRunnable implements Runnable {
     this.parameters = parameters;
   }
 
+  /**
+   * Construct a new InvokeMethodRunnable.
+   * 
+   * @param object The object to invoke the method on.
+   * @param methodName The name of the method to invoke.
+   * @param parameters The parameters to pass to the method.
+   */
+  protected InvokeMethodRunnable(final String methodName,
+    final Object... parameters) {
+    this.methodName = methodName;
+    this.parameters = parameters;
+  }
+
+  protected void setObject(Object object) {
+    this.object = object;
+  }
+
+  public Object getObject() {
+    return object;
+  }
 
   /**
    * Execute the method.
@@ -51,6 +71,7 @@ public class InvokeMethodRunnable implements Runnable {
   @Override
   public void run() {
     try {
+      Object object = getObject();
       if (object == null) {
         throw new RuntimeException("Object cannot be null " + this);
       } else if (object instanceof Class<?>) {
@@ -67,7 +88,7 @@ public class InvokeMethodRunnable implements Runnable {
   @Override
   public String toString() {
     if (object == null) {
-      return object + "." + methodName + parameters;
+      return methodName + parameters;
     } else if (object instanceof Class<?>) {
       return object + "." + methodName + parameters;
     } else {

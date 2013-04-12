@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.transaction.PlatformTransactionManager;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -23,9 +25,9 @@ import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DelegatingDataObjectStore extends AbstractDataObjectStore {
-  private AbstractDataObjectStore dataStore;
+  private final AbstractDataObjectStore dataStore;
 
-  public DelegatingDataObjectStore(AbstractDataObjectStore dataStore) {
+  public DelegatingDataObjectStore(final AbstractDataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 
@@ -37,15 +39,6 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   @Override
   public void addCodeTable(final String columnName, final CodeTable codeTable) {
     dataStore.addCodeTable(columnName, codeTable);
-  }
-
-  public AbstractDataObjectStore getDataStore() {
-    return dataStore;
-  }
-
-  @Override
-  public int getRowCount(Query query) {
-    return dataStore.getRowCount(query);
   }
 
   @Override
@@ -163,6 +156,10 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
     return dataStore.getDataObjectFactory();
   }
 
+  public AbstractDataObjectStore getDataStore() {
+    return dataStore;
+  }
+
   @Override
   public GeometryFactory getGeometryFactory() {
     return dataStore.getGeometryFactory();
@@ -199,6 +196,11 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
+  public int getRowCount(final Query query) {
+    return dataStore.getRowCount(query);
+  }
+
+  @Override
   public DataObjectStoreSchema getSchema(final String schemaName) {
     return dataStore.getSchema(schemaName);
   }
@@ -226,6 +228,11 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   @Override
   public String getString(final Object name) {
     return dataStore.getString(name);
+  }
+
+  @Override
+  public PlatformTransactionManager getTransactionManager() {
+    return dataStore.getTransactionManager();
   }
 
   @Override

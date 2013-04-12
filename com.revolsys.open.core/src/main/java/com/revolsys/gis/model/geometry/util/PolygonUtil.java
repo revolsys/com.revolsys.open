@@ -16,7 +16,7 @@ public class PolygonUtil {
 
   public static boolean isAllTestComponentsInTarget(final Polygon polygon,
     final Geometry geometry) {
-    PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
+    final PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
@@ -32,7 +32,7 @@ public class PolygonUtil {
 
   public static boolean isAllTestComponentsInTargetInterior(
     final Polygon polygon, final Geometry geometry) {
-    PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
+    final PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
@@ -62,7 +62,7 @@ public class PolygonUtil {
 
   public static boolean isAnyTestComponentInTarget(final Polygon polygon,
     final Geometry geometry) {
-    PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
+    final PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
@@ -77,7 +77,7 @@ public class PolygonUtil {
 
   public static boolean isAnyTestComponentInTargetInterior(
     final Polygon polygon, final Geometry geometry) {
-    PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
+    final PointOnGeometryLocator targetPointLocator = IndexedPointInAreaLocator.get(polygon);
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {

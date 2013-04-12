@@ -51,7 +51,6 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private Map<String, String> shortNames = new HashMap<String, String>();
 
-
   public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
     this.metaData = metaData;
@@ -194,7 +193,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       final Resource codePageResource = SpringUtil.getResourceWithExtension(
         resource, "cpg");
       if (!(codePageResource instanceof NonExistingResource)) {
-        PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
+        final PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
         try {
           writer.print("UTF-8");
         } finally {

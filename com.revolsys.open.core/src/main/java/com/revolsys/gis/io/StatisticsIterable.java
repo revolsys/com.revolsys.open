@@ -33,6 +33,10 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     return statistics;
   }
 
+  public String getStatsName() {
+    return statsName;
+  }
+
   @PostConstruct
   public void init() {
     if (this.statistics == null) {
@@ -61,19 +65,15 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     this.iterable = iterable;
   }
 
-  public void setStatsName(String statsName) {
-    this.statsName = statsName;
-  }
-
-  public String getStatsName() {
-    return statsName;
-  }
-
   /**
    * @param stats the stats to set
    */
   public void setStatistics(final Statistics statistics) {
     this.statistics = statistics;
+  }
+
+  public void setStatsName(final String statsName) {
+    this.statsName = statsName;
   }
 
   @Override

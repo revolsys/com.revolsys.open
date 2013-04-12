@@ -54,8 +54,8 @@ public class SegmentNode implements Comparable {
 
   private final boolean isInterior;
 
-  public SegmentNode(NodedSegmentString segString, Coordinates coord,
-    int segmentIndex, int segmentOctant) {
+  public SegmentNode(final NodedSegmentString segString,
+    final Coordinates coord, final int segmentIndex, final int segmentOctant) {
     this.segString = segString;
     this.coord = new DoubleCoordinates(coord);
     this.segmentIndex = segmentIndex;
@@ -63,39 +63,45 @@ public class SegmentNode implements Comparable {
     isInterior = !coord.equals2d(segString.getCoordinate(segmentIndex));
   }
 
-  public boolean isInterior() {
-    return isInterior;
-  }
-
-  public boolean isEndPoint(int maxSegmentIndex) {
-    if (segmentIndex == 0 && !isInterior)
-      return true;
-    if (segmentIndex == maxSegmentIndex)
-      return true;
-    return false;
-  }
-
   /**
    * @return -1 this SegmentNode is located before the argument location
    * @return 0 this SegmentNode is at the argument location
    * @return 1 this SegmentNode is located after the argument location
    */
-  public int compareTo(Object obj) {
-    SegmentNode other = (SegmentNode)obj;
+  @Override
+  public int compareTo(final Object obj) {
+    final SegmentNode other = (SegmentNode)obj;
 
-    if (segmentIndex < other.segmentIndex)
+    if (segmentIndex < other.segmentIndex) {
       return -1;
-    if (segmentIndex > other.segmentIndex)
+    }
+    if (segmentIndex > other.segmentIndex) {
       return 1;
+    }
 
-    if (coord.equals2d(other.coord))
+    if (coord.equals2d(other.coord)) {
       return 0;
+    }
 
     return SegmentPointComparator.compare(segmentOctant, coord, other.coord);
     // return segment.compareNodePosition(this, other);
   }
 
-  public void print(PrintStream out) {
+  public boolean isEndPoint(final int maxSegmentIndex) {
+    if (segmentIndex == 0 && !isInterior) {
+      return true;
+    }
+    if (segmentIndex == maxSegmentIndex) {
+      return true;
+    }
+    return false;
+  }
+
+  public boolean isInterior() {
+    return isInterior;
+  }
+
+  public void print(final PrintStream out) {
     out.print(coord);
     out.print(" seg # = " + segmentIndex);
   }

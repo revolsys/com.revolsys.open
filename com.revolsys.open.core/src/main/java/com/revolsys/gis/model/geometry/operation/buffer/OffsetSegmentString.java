@@ -50,7 +50,7 @@ import com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl;
 class OffsetSegmentString {
   private static final Coordinates[] COORDINATE_ARRAY_TYPE = new Coordinates[0];
 
-  private ListCoordinatesList points = new ListCoordinatesList(3);
+  private final ListCoordinatesList points = new ListCoordinatesList(3);
 
   private CoordinatesPrecisionModel precisionModel = null;
 
@@ -64,25 +64,18 @@ class OffsetSegmentString {
   public OffsetSegmentString() {
   }
 
-  public void setPrecisionModel(CoordinatesPrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
-  }
-
-  public void setMinimumVertexDistance(double minimimVertexDistance) {
-    this.minimimVertexDistance = minimimVertexDistance;
-  }
-
-  public void addPt(Coordinates pt) {
-    Coordinates bufPt = new DoubleCoordinates(pt);
+  public void addPt(final Coordinates pt) {
+    final Coordinates bufPt = new DoubleCoordinates(pt);
     precisionModel.makePrecise(bufPt);
     // don't add duplicate (or near-duplicate) points
-    if (isRedundant(bufPt))
+    if (isRedundant(bufPt)) {
       return;
+    }
     points.add(bufPt);
     // System.out.println(bufPt);
   }
 
-  public void addPts(CoordinatesList pt, boolean isForward) {
+  public void addPts(final CoordinatesList pt, final boolean isForward) {
     if (isForward) {
       for (int i = 0; i < pt.size(); i++) {
         addPt(pt.get(i));
@@ -94,6 +87,26 @@ class OffsetSegmentString {
     }
   }
 
+  public void closeRing() {
+    if (points.size() < 1) {
+      return;
+    }
+    final Coordinates startPt = new DoubleCoordinates(points.get(0));
+    final Coordinates lastPt = points.get(points.size() - 1);
+    Coordinates last2Pt = null;
+    if (points.size() >= 2) {
+      last2Pt = points.get(points.size() - 2);
+    }
+    if (startPt.equals(lastPt)) {
+      return;
+    }
+    points.add(startPt);
+  }
+
+  public CoordinatesList getCoordinates() {
+    return points;
+  }
+
   /**
    * Tests whether the given point is redundant relative to the previous point
    * in the list (up to tolerance).
@@ -101,40 +114,34 @@ class OffsetSegmentString {
    * @param pt
    * @return true if the point is redundant
    */
-  private boolean isRedundant(Coordinates pt) {
-    if (points.size() < 1)
+  private boolean isRedundant(final Coordinates pt) {
+    if (points.size() < 1) {
       return false;
-    Coordinates lastPt = points.get(points.size() - 1);
-    double ptDist = pt.distance(lastPt);
-    if (ptDist < minimimVertexDistance)
+    }
+    final Coordinates lastPt = points.get(points.size() - 1);
+    final double ptDist = pt.distance(lastPt);
+    if (ptDist < minimimVertexDistance) {
       return true;
+    }
     return false;
-  }
-
-  public void closeRing() {
-    if (points.size() < 1)
-      return;
-    Coordinates startPt = new DoubleCoordinates(points.get(0));
-    Coordinates lastPt = points.get(points.size() - 1);
-    Coordinates last2Pt = null;
-    if (points.size() >= 2)
-      last2Pt = points.get(points.size() - 2);
-    if (startPt.equals(lastPt))
-      return;
-    points.add(startPt);
   }
 
   public void reverse() {
 
   }
 
-  public CoordinatesList getCoordinates() {
-    return points;
+  public void setMinimumVertexDistance(final double minimimVertexDistance) {
+    this.minimimVertexDistance = minimimVertexDistance;
   }
 
+  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
+    this.precisionModel = precisionModel;
+  }
+
+  @Override
   public String toString() {
-    GeometryFactory fact = GeometryFactoryImpl.getFactory();
-    LineString line = fact.createLineString(getCoordinates());
+    final GeometryFactory fact = GeometryFactoryImpl.getFactory();
+    final LineString line = fact.createLineString(getCoordinates());
     return line.toString();
   }
 }

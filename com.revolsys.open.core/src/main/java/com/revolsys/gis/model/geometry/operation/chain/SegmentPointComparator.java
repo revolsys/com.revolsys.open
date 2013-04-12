@@ -23,13 +23,15 @@ public class SegmentPointComparator {
    * @return 0 the two nodes are equal
    * @return 1 node1 occurs first
    */
-  public static int compare(int octant, Coordinates p0, Coordinates p1) {
+  public static int compare(final int octant, final Coordinates p0,
+    final Coordinates p1) {
     // nodes can only be equal if their coordinates are equal
-    if (p0.equals2d(p1))
+    if (p0.equals2d(p1)) {
       return 0;
+    }
 
-    int xSign = relativeSign(p0.getX(), p1.getX());
-    int ySign = relativeSign(p0.getY(), p1.getY());
+    final int xSign = relativeSign(p0.getX(), p1.getX());
+    final int ySign = relativeSign(p0.getY(), p1.getY());
 
     switch (octant) {
       case 0:
@@ -53,24 +55,30 @@ public class SegmentPointComparator {
     return 0;
   }
 
-  public static int relativeSign(double x0, double x1) {
-    if (x0 < x1)
+  private static int compareValue(final int compareSign0, final int compareSign1) {
+    if (compareSign0 < 0) {
       return -1;
-    if (x0 > x1)
+    }
+    if (compareSign0 > 0) {
       return 1;
+    }
+    if (compareSign1 < 0) {
+      return -1;
+    }
+    if (compareSign1 > 0) {
+      return 1;
+    }
     return 0;
+
   }
 
-  private static int compareValue(int compareSign0, int compareSign1) {
-    if (compareSign0 < 0)
+  public static int relativeSign(final double x0, final double x1) {
+    if (x0 < x1) {
       return -1;
-    if (compareSign0 > 0)
+    }
+    if (x0 > x1) {
       return 1;
-    if (compareSign1 < 0)
-      return -1;
-    if (compareSign1 > 0)
-      return 1;
+    }
     return 0;
-
   }
 }

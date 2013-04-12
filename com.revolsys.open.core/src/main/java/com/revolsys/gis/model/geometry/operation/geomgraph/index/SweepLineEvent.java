@@ -10,49 +10,26 @@ public class SweepLineEvent implements Comparable {
 
   Object edgeSet; // used for red-blue intersection detection
 
-  private double xValue;
+  private final double xValue;
 
   private int eventType;
 
-  private SweepLineEvent insertEvent; // null if this is an INSERT event
+  private final SweepLineEvent insertEvent; // null if this is an INSERT event
 
   private int deleteEventIndex;
 
-  private Object obj;
+  private final Object obj;
 
-  public SweepLineEvent(Object edgeSet, double x, SweepLineEvent insertEvent,
-    Object obj) {
+  public SweepLineEvent(final Object edgeSet, final double x,
+    final SweepLineEvent insertEvent, final Object obj) {
     this.edgeSet = edgeSet;
     xValue = x;
     this.insertEvent = insertEvent;
     this.eventType = INSERT;
-    if (insertEvent != null)
+    if (insertEvent != null) {
       eventType = DELETE;
+    }
     this.obj = obj;
-  }
-
-  public boolean isInsert() {
-    return insertEvent == null;
-  }
-
-  public boolean isDelete() {
-    return insertEvent != null;
-  }
-
-  public SweepLineEvent getInsertEvent() {
-    return insertEvent;
-  }
-
-  public int getDeleteEventIndex() {
-    return deleteEventIndex;
-  }
-
-  public void setDeleteEventIndex(int deleteEventIndex) {
-    this.deleteEventIndex = deleteEventIndex;
-  }
-
-  public Object getObject() {
-    return obj;
   }
 
   /**
@@ -61,17 +38,46 @@ public class SweepLineEvent implements Comparable {
    * events, so that items whose Insert and Delete events occur at the same
    * x-value will be correctly handled.
    */
-  public int compareTo(Object o) {
-    SweepLineEvent pe = (SweepLineEvent)o;
-    if (xValue < pe.xValue)
+  @Override
+  public int compareTo(final Object o) {
+    final SweepLineEvent pe = (SweepLineEvent)o;
+    if (xValue < pe.xValue) {
       return -1;
-    if (xValue > pe.xValue)
+    }
+    if (xValue > pe.xValue) {
       return 1;
-    if (eventType < pe.eventType)
+    }
+    if (eventType < pe.eventType) {
       return -1;
-    if (eventType > pe.eventType)
+    }
+    if (eventType > pe.eventType) {
       return 1;
+    }
     return 0;
+  }
+
+  public int getDeleteEventIndex() {
+    return deleteEventIndex;
+  }
+
+  public SweepLineEvent getInsertEvent() {
+    return insertEvent;
+  }
+
+  public Object getObject() {
+    return obj;
+  }
+
+  public boolean isDelete() {
+    return insertEvent != null;
+  }
+
+  public boolean isInsert() {
+    return insertEvent == null;
+  }
+
+  public void setDeleteEventIndex(final int deleteEventIndex) {
+    this.deleteEventIndex = deleteEventIndex;
   }
 
 }

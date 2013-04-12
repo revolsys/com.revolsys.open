@@ -5,9 +5,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -62,7 +59,7 @@ public class Statistics {
   }
 
   public synchronized void add(final String name, final long count) {
-     final Long oldCount = counts.get(name);
+    final Long oldCount = counts.get(name);
     if (oldCount == null) {
       counts.put(name, count);
     } else {

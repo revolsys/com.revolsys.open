@@ -41,10 +41,12 @@ public class BaseAuthority implements Serializable, Authority {
     }
   }
 
+  @Override
   public String getCode() {
     return code;
   }
 
+  @Override
   public String getName() {
     return name;
   }

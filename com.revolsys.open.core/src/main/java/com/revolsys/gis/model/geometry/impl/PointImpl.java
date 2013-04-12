@@ -93,6 +93,11 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
+  public double distance(final Point point) {
+    return distance((Coordinates)point);
+  }
+
+  @Override
   public boolean equals(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate = coordinates[i];
@@ -246,11 +251,6 @@ public class PointImpl extends GeometryImpl implements Point {
     } else {
       return "";
     }
-  }
-
-  @Override
-  public double distance(Point point) {
-    return distance((Coordinates)point);
   }
 
 }

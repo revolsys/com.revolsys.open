@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.ObjectWithProperties;
 
 public interface Layer extends PropertyChangeSupportProxy,

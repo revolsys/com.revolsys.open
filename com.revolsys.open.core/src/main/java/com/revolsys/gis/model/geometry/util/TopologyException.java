@@ -10,19 +10,20 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
  * @version 1.7
  */
 public class TopologyException extends RuntimeException {
-  private static String msgWithCoord(String msg, Coordinates pt) {
-    if (pt != null)
+  private static String msgWithCoord(final String msg, final Coordinates pt) {
+    if (pt != null) {
       return msg + " [ " + pt + " ]";
+    }
     return msg;
   }
 
   private Coordinates pt = null;
 
-  public TopologyException(String msg) {
+  public TopologyException(final String msg) {
     super(msg);
   }
 
-  public TopologyException(String msg, Coordinates pt) {
+  public TopologyException(final String msg, final Coordinates pt) {
     super(msgWithCoord(msg, pt));
     this.pt = new DoubleCoordinates(pt);
   }

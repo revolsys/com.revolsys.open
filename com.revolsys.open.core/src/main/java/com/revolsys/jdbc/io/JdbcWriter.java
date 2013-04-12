@@ -173,14 +173,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     if (dataStore != null) {
       try {
 
-        close(typeInsertSqlMap, typeInsertStatementMap,
-          typeInsertBatchCountMap);
+        close(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap);
         close(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
           typeInsertSequenceBatchCountMap);
-        close(typeUpdateSqlMap, typeUpdateStatementMap,
-          typeUpdateBatchCountMap);
-        close(typeDeleteSqlMap, typeDeleteStatementMap,
-          typeDeleteBatchCountMap);
+        close(typeUpdateSqlMap, typeUpdateStatementMap, typeUpdateBatchCountMap);
+        close(typeDeleteSqlMap, typeDeleteStatementMap, typeDeleteBatchCountMap);
         if (statistics != null) {
           statistics.disconnect();
           statistics = null;

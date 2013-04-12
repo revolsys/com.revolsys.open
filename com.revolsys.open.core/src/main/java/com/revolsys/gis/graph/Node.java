@@ -486,6 +486,18 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
     }
   }
 
+  @Override
+  public void readExternal(final ObjectInput in) throws IOException,
+    ClassNotFoundException {
+    final int graphId = in.readInt();
+    graph = Graph.getGraph(graphId);
+    id = in.readInt();
+    inEdgeIds = (int[])in.readObject();
+    outEdgeIds = (int[])in.readObject();
+    x = in.readDouble();
+    y = in.readDouble();
+  }
+
   void remove() {
     graph = null;
     inEdgeIds = null;
@@ -562,18 +574,6 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
         proxy.clearValue();
       }
     }
-  }
-
-  @Override
-  public void readExternal(final ObjectInput in) throws IOException,
-    ClassNotFoundException {
-    final int graphId = in.readInt();
-    graph = Graph.getGraph(graphId);
-    id = in.readInt();
-    inEdgeIds = (int[])in.readObject();
-    outEdgeIds = (int[])in.readObject();
-    x = in.readDouble();
-    y = in.readDouble();
   }
 
   @Override

@@ -16,7 +16,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  private CoordinatesList pts;
+  private final CoordinatesList pts;
 
   private Object data;
 
@@ -26,9 +26,19 @@ public class BasicSegmentString implements SegmentString {
    * @param pts the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(CoordinatesList pts, Object data) {
+  public BasicSegmentString(final CoordinatesList pts, final Object data) {
     this.pts = pts;
     this.data = data;
+  }
+
+  @Override
+  public Coordinates getCoordinate(final int i) {
+    return pts.get(i);
+  }
+
+  @Override
+  public CoordinatesList getCoordinates() {
+    return pts;
   }
 
   /**
@@ -36,33 +46,9 @@ public class BasicSegmentString implements SegmentString {
    * 
    * @return the user-defined data
    */
+  @Override
   public Object getData() {
     return data;
-  }
-
-  /**
-   * Sets the user-defined data for this segment string.
-   * 
-   * @param data an Object containing user-defined data
-   */
-  public void setData(Object data) {
-    this.data = data;
-  }
-
-  public int size() {
-    return pts.size();
-  }
-
-  public Coordinates getCoordinate(int i) {
-    return pts.get(i);
-  }
-
-  public CoordinatesList getCoordinates() {
-    return pts;
-  }
-
-  public boolean isClosed() {
-    return pts.get(0).equals(pts.get(pts.size() - 1));
   }
 
   /**
@@ -72,11 +58,32 @@ public class BasicSegmentString implements SegmentString {
    *          last index in the vertex list
    * @return the octant of the segment at the vertex
    */
-  public int getSegmentOctant(int index) {
-    if (index == pts.size() - 1)
+  public int getSegmentOctant(final int index) {
+    if (index == pts.size() - 1) {
       return -1;
+    }
     return CoordinatesUtil.octant(getCoordinate(index),
       getCoordinate(index + 1));
+  }
+
+  @Override
+  public boolean isClosed() {
+    return pts.get(0).equals(pts.get(pts.size() - 1));
+  }
+
+  /**
+   * Sets the user-defined data for this segment string.
+   * 
+   * @param data an Object containing user-defined data
+   */
+  @Override
+  public void setData(final Object data) {
+    this.data = data;
+  }
+
+  @Override
+  public int size() {
+    return pts.size();
   }
 
 }

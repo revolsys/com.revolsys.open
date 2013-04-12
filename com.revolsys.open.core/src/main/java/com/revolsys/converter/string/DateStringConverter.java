@@ -8,7 +8,8 @@ import java.text.SimpleDateFormat;
 import org.springframework.util.StringUtils;
 
 public class DateStringConverter implements StringConverter<Date> {
-  private DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  private final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
   public DateStringConverter() {
   }
 
@@ -32,7 +33,7 @@ public class DateStringConverter implements StringConverter<Date> {
     } else if (value instanceof java.util.Date) {
       final java.util.Date date = (java.util.Date)value;
       return new Date(date.getTime());
-    } else  {
+    } else {
       return toObject(value.toString());
     }
   }
@@ -42,16 +43,17 @@ public class DateStringConverter implements StringConverter<Date> {
     if (StringUtils.hasText(string)) {
       try {
         return new Date(FORMAT.parse(string).getTime());
-      } catch (ParseException e) {
-       throw new IllegalArgumentException("Date must be YYYY-MM-DD " + string, e);
+      } catch (final ParseException e) {
+        throw new IllegalArgumentException("Date must be YYYY-MM-DD " + string,
+          e);
       }
     } else {
       return null;
     }
   }
-  
+
   @Override
-  public String toString(Object value) {
+  public String toString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Date) {

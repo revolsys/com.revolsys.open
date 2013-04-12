@@ -55,8 +55,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
         break;
 
         default:
-          throw new RuntimeException("Unknown geometry type" + shapeType +
-          		" for " + tableName +"." + fieldName);
+          throw new RuntimeException("Unknown geometry type" + shapeType
+            + " for " + tableName + "." + fieldName);
       }
 
     } else if (precision > 0
@@ -86,8 +86,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final DataType dataType = attribute.getType();
     final EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
     if (fieldType == null) {
-      throw new RuntimeException("Data type not supported " + dataType +
-        " for " + table.getName() +"." + fieldName);
+      throw new RuntimeException("Data type not supported " + dataType
+        + " for " + table.getName() + "." + fieldName);
     } else {
       final Field field = new Field();
       field.setName(fieldName);

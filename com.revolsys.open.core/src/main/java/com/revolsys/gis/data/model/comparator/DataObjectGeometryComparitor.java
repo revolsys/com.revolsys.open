@@ -35,13 +35,13 @@ public class DataObjectGeometryComparitor implements Comparator<DataObject> {
       if (compare == 0) {
         compare = geometry1.compareTo(geometry2);
         if (compare == 0) {
-          Object id1 = object1.getIdValue();
-          Object id2 = object2.getIdValue();
+          final Object id1 = object1.getIdValue();
+          final Object id2 = object2.getIdValue();
           compare = CompareUtil.compare(id1, id2);
           if (compare == 0) {
-            DataObjectMetaData metaData1 = object1.getMetaData();
-            DataObjectMetaData metaData2 = object2.getMetaData();
-            Set<String> attributeNames = new LinkedHashSet<String>();
+            final DataObjectMetaData metaData1 = object1.getMetaData();
+            final DataObjectMetaData metaData2 = object2.getMetaData();
+            final Set<String> attributeNames = new LinkedHashSet<String>();
             attributeNames.addAll(metaData1.getAttributeNames());
             attributeNames.addAll(metaData2.getAttributeNames());
             compare = compareAttributes(object1, object2, attributeNames);
@@ -57,11 +57,11 @@ public class DataObjectGeometryComparitor implements Comparator<DataObject> {
   }
 
   public int compareAttributes(final DataObject object1,
-    final DataObject object2, Set<String> attributeNames) {
-    for (String attributeName : attributeNames) {
-      Object value1 = object1.getValue(attributeName);
-      Object value2 = object2.getValue(attributeName);
-      int compare = CompareUtil.compare(value1, value2);
+    final DataObject object2, final Set<String> attributeNames) {
+    for (final String attributeName : attributeNames) {
+      final Object value1 = object1.getValue(attributeName);
+      final Object value2 = object2.getValue(attributeName);
+      final int compare = CompareUtil.compare(value1, value2);
       if (compare != 0) {
         return compare;
       }

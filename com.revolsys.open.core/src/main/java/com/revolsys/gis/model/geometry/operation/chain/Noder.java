@@ -1,4 +1,3 @@
-
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import java.util.Collection;
@@ -12,8 +11,7 @@ import java.util.Collection;
  *
  * @version 1.7
  */
-public interface Noder
-{
+public interface Noder {
 
   /**
    * Computes the noding for a collection of {@link SegmentString}s.

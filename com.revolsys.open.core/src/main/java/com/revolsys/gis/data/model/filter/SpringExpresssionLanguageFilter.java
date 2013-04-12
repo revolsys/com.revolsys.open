@@ -18,23 +18,24 @@ public class SpringExpresssionLanguageFilter implements Filter<DataObject> {
   private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser(
     EXPRESSION_CONFIGURATION);
 
-  private Expression expression;
+  private final Expression expression;
 
   private final StandardEvaluationContext context = new StandardEvaluationContext();
 
-  public SpringExpresssionLanguageFilter(String expression) {
-    this(expression, Collections.<String,Object>emptyMap());
+  public SpringExpresssionLanguageFilter(final String expression) {
+    this(expression, Collections.<String, Object> emptyMap());
   }
 
   @SuppressWarnings("unchecked")
-  public SpringExpresssionLanguageFilter(String expression, Map<String,? extends Object> variables) {
+  public SpringExpresssionLanguageFilter(final String expression,
+    final Map<String, ? extends Object> variables) {
     this.expression = EXPRESSION_PARSER.parseExpression(expression);
     context.addPropertyAccessor(new DataObjectAccessor());
     context.setVariables((Map<String, Object>)variables);
   }
-  
+
   @Override
-  public boolean accept(DataObject object) {
+  public boolean accept(final DataObject object) {
     return expression.getValue(context, object, Boolean.class);
   }
 }

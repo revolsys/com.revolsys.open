@@ -23,6 +23,7 @@ public abstract class AbstractCoordinates implements Coordinates {
     return Math.atan2(dy, dx);
   }
 
+  @Override
   public Coordinates clone() {
     try {
       return (Coordinates)super.clone();
@@ -30,7 +31,7 @@ public abstract class AbstractCoordinates implements Coordinates {
       throw new UnsupportedOperationException();
     }
   }
-  
+
   @Override
   public Coordinates cloneCoordinates() {
     return clone();

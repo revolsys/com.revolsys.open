@@ -26,11 +26,6 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     doClose();
   }
 
-  @Override
-  public Iterator<T> iterator() {
-    return this;
-  }
-
   protected void doClose() {
   }
 
@@ -71,6 +66,11 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
   }
 
   @Override
+  public Iterator<T> iterator() {
+    return this;
+  }
+
+  @Override
   public final T next() {
     if (hasNext()) {
       final T currentObject = object;
@@ -88,6 +88,6 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   protected void setLoadNext(final boolean loadNext) {
     this.loadNext = loadNext;
-    hasNext= true;
+    hasNext = true;
   }
 }

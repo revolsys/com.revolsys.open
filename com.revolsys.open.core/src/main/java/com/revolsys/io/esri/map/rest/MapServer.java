@@ -23,6 +23,23 @@ public class MapServer extends Service {
     super("MapServer");
   }
 
+  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX,
+    final int tileY) {
+    final TileInfo tileInfo = getTileInfo();
+
+    final double originX = tileInfo.getOriginX();
+    final double tileWidth = tileInfo.getModelWidth(zoomLevel);
+    final double x1 = originX + tileWidth * tileX;
+    final double x2 = x1 + tileWidth;
+
+    final double originY = tileInfo.getOriginY();
+    final double tileHeight = tileInfo.getModelHeight(zoomLevel);
+    final double y1 = originY - tileHeight * tileY;
+    final double y2 = y1 - tileHeight;
+
+    return new BoundingBox(tileInfo.getSpatialReference(), x1, y1, x2, y2);
+  }
+
   public String getCapabilities() {
     return getValue("capabilities");
   }
@@ -67,75 +84,8 @@ public class MapServer extends Service {
     return getList(TableDescription.class, "tables");
   }
 
-  public TileInfo getTileInfo() {
-    return getObject(TileInfo.class, "tileInfo");
-  }
-
-  public TimeInfo getTimeInfo() {
-    return getObject(TimeInfo.class, "timeInfo");
-  }
-
-  public String getUnits() {
-    return getValue("units");
-  }
-
-  public int getTileX(final int zoomLevel, final double x) {
-    TileInfo tileInfo = getTileInfo();
-    double modelTileSize = tileInfo.getModelWidth(zoomLevel);
-    double originX = tileInfo.getOriginX();
-    double deltaX = x - originX;
-    double ratio = deltaX / modelTileSize;
-    int tileX = (int)Math.floor(ratio);
-    if (tileX > 0 && ratio - tileX < 0.0001) {
-      tileX--;
-    }
-    return tileX;
-  }
-
-  public int getTileY(final int zoomLevel, final double y) {
-    TileInfo tileInfo = getTileInfo();
-    double modelTileSize = tileInfo.getModelHeight(zoomLevel);
-
-    double originY = tileInfo.getOriginY();
-    double deltaY = originY - y;
-
-    double ratio = deltaY / modelTileSize;
-    int tileY = (int)Math.floor(ratio);
-    return tileY;
-  }
-
-  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX,
+  public Image getTileImage(final int zoomLevel, final int tileX,
     final int tileY) {
-    TileInfo tileInfo = getTileInfo();
-
-    double originX = tileInfo.getOriginX();
-    double tileWidth = tileInfo.getModelWidth(zoomLevel);
-    double x1 = originX + tileWidth * tileX;
-    double x2 = x1 + tileWidth;
-
-    double originY = tileInfo.getOriginY();
-    double tileHeight = tileInfo.getModelHeight(zoomLevel);
-    double y1 = originY - tileHeight * tileY;
-    double y2 = y1 - tileHeight;
-
-    return new BoundingBox(tileInfo.getSpatialReference(), x1, y1, x2, y2);
-  }
-
-  public int getZoomLevel(final double metresPerPixel) {
-    TileInfo tileInfo = getTileInfo();
-    List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
-    Integer minLevel = levelOfDetails.get(0).getLevel();
-    for (LevelOfDetail levelOfDetail : levelOfDetails) {
-      final double zoomLevelMetresPerPixel = levelOfDetail.getResolution();
-      if (metresPerPixel > zoomLevelMetresPerPixel) {
-        Integer level = levelOfDetail.getLevel();
-        return Math.max(level, minLevel);
-      }
-    }
-    return levelOfDetails.get(levelOfDetails.size() - 1).getLevel();
-  }
-
-  public Image getTileImage(int zoomLevel, int tileX, int tileY) {
     final String url = getTileUrl(zoomLevel, tileX, tileY);
     try {
       final URLConnection connection = new URL(url).openConnection();
@@ -146,8 +96,59 @@ public class MapServer extends Service {
     }
   }
 
-  public String getTileUrl(int zoomLevel, int tileX, int tileY) {
+  public TileInfo getTileInfo() {
+    return getObject(TileInfo.class, "tileInfo");
+  }
+
+  public String getTileUrl(final int zoomLevel, final int tileX, final int tileY) {
     return getServiceUrl() + getPath() + "/tile/" + zoomLevel + "/" + tileY
       + "/" + tileX;
+  }
+
+  public int getTileX(final int zoomLevel, final double x) {
+    final TileInfo tileInfo = getTileInfo();
+    final double modelTileSize = tileInfo.getModelWidth(zoomLevel);
+    final double originX = tileInfo.getOriginX();
+    final double deltaX = x - originX;
+    final double ratio = deltaX / modelTileSize;
+    int tileX = (int)Math.floor(ratio);
+    if (tileX > 0 && ratio - tileX < 0.0001) {
+      tileX--;
+    }
+    return tileX;
+  }
+
+  public int getTileY(final int zoomLevel, final double y) {
+    final TileInfo tileInfo = getTileInfo();
+    final double modelTileSize = tileInfo.getModelHeight(zoomLevel);
+
+    final double originY = tileInfo.getOriginY();
+    final double deltaY = originY - y;
+
+    final double ratio = deltaY / modelTileSize;
+    final int tileY = (int)Math.floor(ratio);
+    return tileY;
+  }
+
+  public TimeInfo getTimeInfo() {
+    return getObject(TimeInfo.class, "timeInfo");
+  }
+
+  public String getUnits() {
+    return getValue("units");
+  }
+
+  public int getZoomLevel(final double metresPerPixel) {
+    final TileInfo tileInfo = getTileInfo();
+    final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
+    final Integer minLevel = levelOfDetails.get(0).getLevel();
+    for (final LevelOfDetail levelOfDetail : levelOfDetails) {
+      final double zoomLevelMetresPerPixel = levelOfDetail.getResolution();
+      if (metresPerPixel > zoomLevelMetresPerPixel) {
+        final Integer level = levelOfDetail.getLevel();
+        return Math.max(level, minLevel);
+      }
+    }
+    return levelOfDetails.get(levelOfDetails.size() - 1).getLevel();
   }
 }

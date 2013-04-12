@@ -123,7 +123,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
               final Object value = values.get(i);
               index = JdbcUtils.setValue(statement, index, value);
             }
-             if (statement.executeUpdate() > 0) {
+            if (statement.executeUpdate() > 0) {
               return id;
             } else {
               return null;

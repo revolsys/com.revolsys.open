@@ -5,11 +5,11 @@ import java.util.Iterator;
 
 class BPlusTreeLeafSet<T> extends AbstractSet<T> {
 
-  private BPlusTreeMap<?, ?> map;
+  private final BPlusTreeMap<?, ?> map;
 
-  private boolean key;
+  private final boolean key;
 
-  public BPlusTreeLeafSet(BPlusTreeMap<?, ?> map, boolean key) {
+  public BPlusTreeLeafSet(final BPlusTreeMap<?, ?> map, final boolean key) {
     this.map = map;
     this.key = key;
   }

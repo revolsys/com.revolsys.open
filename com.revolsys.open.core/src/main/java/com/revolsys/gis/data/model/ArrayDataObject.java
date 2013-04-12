@@ -53,7 +53,7 @@ public class ArrayDataObject extends BaseDataObject {
    */
   @Override
   public ArrayDataObject clone() {
-    ArrayDataObject clone = (ArrayDataObject)super.clone();
+    final ArrayDataObject clone = (ArrayDataObject)super.clone();
     clone.attributes = attributes.clone();
     return clone;
   }

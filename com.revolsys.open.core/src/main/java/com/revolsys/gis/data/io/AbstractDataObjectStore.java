@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
@@ -163,23 +164,9 @@ public abstract class AbstractDataObjectStore extends
     if (metaData == null) {
       return null;
     } else {
-      DataObject object = dataObjectFactory.createDataObject(metaData);
+      final DataObject object = dataObjectFactory.createDataObject(metaData);
       return object;
     }
-  }
-
-  @Override
-  public DataObject createWithId(final DataObjectMetaData metaData) {
-    DataObject object = create(metaData);
-    if (object != null) {
-      String idAttributeName = metaData.getIdAttributeName();
-      if (StringUtils.hasText(idAttributeName)) {
-        String typePath = metaData.getPath();
-        Object id = createPrimaryIdValue(typePath);
-        object.setIdValue(id);
-      }
-    }
-    return object;
   }
 
   @Override
@@ -226,6 +213,20 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
+  public DataObject createWithId(final DataObjectMetaData metaData) {
+    final DataObject object = create(metaData);
+    if (object != null) {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (StringUtils.hasText(idAttributeName)) {
+        final String typePath = metaData.getPath();
+        final Object id = createPrimaryIdValue(typePath);
+        object.setIdValue(id);
+      }
+    }
+    return object;
+  }
+
+  @Override
   public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }
@@ -233,9 +234,9 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public int delete(final Query query) {
     int i = 0;
-    Reader<DataObject> reader = query(query);
+    final Reader<DataObject> reader = query(query);
     try {
-      for (DataObject object : reader) {
+      for (final DataObject object : reader) {
         delete(object);
       }
     } finally {
@@ -372,7 +373,7 @@ public abstract class AbstractDataObjectStore extends
     return statistics;
   }
 
-  public Statistics getStatistics(String name) {
+  public Statistics getStatistics(final String name) {
     return statistics.getStatistics(name);
   }
 
@@ -382,6 +383,11 @@ public abstract class AbstractDataObjectStore extends
     } else {
       return String.valueOf(name.toString());
     }
+  }
+
+  @Override
+  public PlatformTransactionManager getTransactionManager() {
+    return null;
   }
 
   @Override

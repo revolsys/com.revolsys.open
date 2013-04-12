@@ -44,28 +44,18 @@ public class OverlayOp extends GeometryGraphOperation {
 
   public static final int SYMDIFFERENCE = 4;
 
-  public static Geometry overlayOp(Geometry geom0, Geometry geom1, int opCode) {
-    OverlayOp gov = new OverlayOp(geom0, geom1);
-    Geometry geomOv = gov.getResultGeometry(opCode);
-    return geomOv;
-  }
-
-  public static boolean isResultOfOp(Label label, int opCode) {
-    int loc0 = label.getLocation(0);
-    int loc1 = label.getLocation(1);
-    return isResultOfOp(loc0, loc1, opCode);
-  }
-
   /**
    * This method will handle arguments of Location.NONE correctly
    * 
    * @return true if the locations correspond to the opCode
    */
-  public static boolean isResultOfOp(int loc0, int loc1, int opCode) {
-    if (loc0 == Location.BOUNDARY)
+  public static boolean isResultOfOp(int loc0, int loc1, final int opCode) {
+    if (loc0 == Location.BOUNDARY) {
       loc0 = Location.INTERIOR;
-    if (loc1 == Location.BOUNDARY)
+    }
+    if (loc1 == Location.BOUNDARY) {
       loc1 = Location.INTERIOR;
+    }
     switch (opCode) {
       case INTERSECTION:
         return loc0 == Location.INTERIOR && loc1 == Location.INTERIOR;
@@ -80,15 +70,28 @@ public class OverlayOp extends GeometryGraphOperation {
     return false;
   }
 
+  public static boolean isResultOfOp(final Label label, final int opCode) {
+    final int loc0 = label.getLocation(0);
+    final int loc1 = label.getLocation(1);
+    return isResultOfOp(loc0, loc1, opCode);
+  }
+
+  public static Geometry overlayOp(final Geometry geom0, final Geometry geom1,
+    final int opCode) {
+    final OverlayOp gov = new OverlayOp(geom0, geom1);
+    final Geometry geomOv = gov.getResultGeometry(opCode);
+    return geomOv;
+  }
+
   private final PointLocator ptLocator = new PointLocator();
 
-  private GeometryFactory geomFact;
+  private final GeometryFactory geomFact;
 
   private Geometry resultGeom;
 
-  private PlanarGraph graph;
+  private final PlanarGraph graph;
 
-  private EdgeList edgeList = new EdgeList();
+  private final EdgeList edgeList = new EdgeList();
 
   private List<Polygon> resultPolyList = new ArrayList<Polygon>();
 
@@ -96,7 +99,7 @@ public class OverlayOp extends GeometryGraphOperation {
 
   private List<Point> resultPointList = new ArrayList<Point>();
 
-  public OverlayOp(Geometry g0, Geometry g1) {
+  public OverlayOp(final Geometry g0, final Geometry g1) {
     super(g0, g1);
     graph = new PlanarGraph(new OverlayNodeFactory());
     /**
@@ -107,129 +110,51 @@ public class OverlayOp extends GeometryGraphOperation {
     geomFact = g0.getGeometryFactory();
   }
 
-  public Geometry getResultGeometry(int funcCode) {
-    computeOverlay(funcCode);
-    return resultGeom;
-  }
-
-  public PlanarGraph getGraph() {
-    return graph;
-  }
-
-  private void computeOverlay(int opCode) {
-    // copy points from input Geometries.
-    // This ensures that any Point geometries
-    // in the input are considered for inclusion in the result set
-    copyPoints(0);
-    copyPoints(1);
-
-    // node the input Geometries
-    arg[0].computeSelfNodes(li, false);
-    arg[1].computeSelfNodes(li, false);
-
-    // compute intersections between edges of the two input geometries
-    arg[0].computeEdgeIntersections(arg[1], li, true);
-
-    List baseSplitEdges = new ArrayList();
-    arg[0].computeSplitEdges(baseSplitEdges);
-    arg[1].computeSplitEdges(baseSplitEdges);
-    List splitEdges = baseSplitEdges;
-    // add the noded edges to this result graph
-    insertUniqueEdges(baseSplitEdges);
-
-    computeLabelsFromDepths();
-    replaceCollapsedEdges();
-
-    // Debug.println(edgeList);
-
-    /**
-     * Check that the noding completed correctly. This test is slow, but
-     * necessary in order to catch robustness failure situations. If an
-     * exception is thrown because of a noding failure, then snapping will be
-     * performed, which will hopefully avoid the problem. In the future
-     * hopefully a faster check can be developed.
-     */
-    EdgeNodingValidator.checkValid(edgeList.getEdges());
-
-    graph.addEdges(edgeList.getEdges());
-    computeLabelling();
-    // Debug.printWatch();
-    labelIncompleteNodes();
-    // Debug.printWatch();
-    // nodeMap.print(System.out);
-
-    /**
-     * The ordering of building the result Geometries is important. Areas must
-     * be built before lines, which must be built before points. This is so that
-     * lines which are covered by areas are not included explicitly, and
-     * similarly for points.
-     */
-    findResultAreaEdges(opCode);
-    cancelDuplicateResultEdges();
-
-    PolygonBuilder polyBuilder = new PolygonBuilder(geomFact);
-    polyBuilder.add(graph);
-    resultPolyList = polyBuilder.getPolygons();
-
-    LineBuilder lineBuilder = new LineBuilder(this, geomFact);
-    resultLineList = lineBuilder.build(opCode);
-
-    PointBuilder pointBuilder = new PointBuilder(this, geomFact, ptLocator);
-    resultPointList = pointBuilder.build(opCode);
-
-    // gather the results from all calculations into a single Geometry for the
-    // result set
-    resultGeom = computeGeometry(resultPointList, resultLineList,
-      resultPolyList, opCode);
-  }
-
-  private void insertUniqueEdges(List edges) {
-    for (Iterator i = edges.iterator(); i.hasNext();) {
-      Edge e = (Edge)i.next();
-      insertUniqueEdge(e);
+  /**
+   * If both a dirEdge and its sym are marked as being in the result, cancel
+   * them out.
+   */
+  private void cancelDuplicateResultEdges() {
+    // remove any dirEdges whose sym is also included
+    // (they "cancel each other out")
+    for (final Iterator it = graph.getEdgeEnds().iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
+      final DirectedEdge sym = de.getSym();
+      if (de.isInResult() && sym.isInResult()) {
+        de.setInResult(false);
+        sym.setInResult(false);
+        // Debug.print("cancelled "); Debug.println(de); Debug.println(sym);
+      }
     }
+  }
+
+  private Geometry computeGeometry(final List<Point> resultPointList,
+    final List<LineString> resultLineList, final List<Polygon> resultPolyList,
+    final int opcode) {
+    final List<Geometry> geometries = new ArrayList<Geometry>();
+    // element geometries of the result are always in the order P,L,A
+    geometries.addAll(resultPointList);
+    geometries.addAll(resultLineList);
+    geometries.addAll(resultPolyList);
+
+    return geomFact.createGeometry(geometries);
   }
 
   /**
-   * Insert an edge from one of the noded input graphs. Checks edges that are
-   * inserted to see if an identical edge already exists. If so, the edge is not
-   * inserted, but its label is merged with the existing edge.
+   * Compute initial labelling for all DirectedEdges at each node. In this step,
+   * DirectedEdges will acquire a complete labelling (i.e. one with labels for
+   * both Geometries) only if they are incident on a node which has edges for
+   * both Geometries
    */
-  protected void insertUniqueEdge(Edge e) {
-    // <FIX> MD 8 Oct 03 speed up identical edge lookup
-    // fast lookup
-    Edge existingEdge = edgeList.findEqualEdge(e);
-
-    // If an identical edge already exists, simply update its label
-    if (existingEdge != null) {
-      Label existingLabel = existingEdge.getLabel();
-
-      Label labelToMerge = e.getLabel();
-      // check if new edge is in reverse direction to existing edge
-      // if so, must flip the label before merging it
-      if (!existingEdge.isPointwiseEqual(e)) {
-        labelToMerge = new Label(e.getLabel());
-        labelToMerge.flip();
-      }
-      Depth depth = existingEdge.getDepth();
-      // if this is the first duplicate found for this edge, initialize the
-      // depths
-      // /*
-      if (depth.isNull()) {
-        depth.add(existingLabel);
-      }
-      // */
-      depth.add(labelToMerge);
-      existingLabel.merge(labelToMerge);
-      // Debug.print("inserted edge: "); Debug.println(e);
-      // Debug.print("existing edge: "); Debug.println(existingEdge);
-
-    } else { // no matching existing edge was found
-      // add this new edge to the list of edges in this graph
-      // e.setName(name + edges.size());
-      // e.getDepth().add(e.getLabel());
-      edgeList.add(e);
+  private void computeLabelling() {
+    for (final Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      // if (node.getCoordinates().equals(new Coordinates(222, 100)) )
+      // Debug.addWatch(node.getEdges());
+      node.getEdges().computeLabelling(arg);
     }
+    mergeSymLabels();
+    updateNodeLabelling();
   }
 
   /**
@@ -256,10 +181,10 @@ public class OverlayOp extends GeometryGraphOperation {
    * corresponds to INTERIOR)
    */
   private void computeLabelsFromDepths() {
-    for (Iterator it = edgeList.iterator(); it.hasNext();) {
-      Edge e = (Edge)it.next();
-      Label lbl = e.getLabel();
-      Depth depth = e.getDepth();
+    for (final Iterator it = edgeList.iterator(); it.hasNext();) {
+      final Edge e = (Edge)it.next();
+      final Label lbl = e.getLabel();
+      final Depth depth = e.getDepth();
       /**
        * Only check edges for which there were duplicates, since these are the
        * only ones which might be the result of dimensional collapses.
@@ -298,21 +223,72 @@ public class OverlayOp extends GeometryGraphOperation {
     }
   }
 
-  /**
-   * If edges which have undergone dimensional collapse are found, replace them
-   * with a new edge which is a L edge
-   */
-  private void replaceCollapsedEdges() {
-    List newEdges = new ArrayList();
-    for (Iterator it = edgeList.iterator(); it.hasNext();) {
-      Edge e = (Edge)it.next();
-      if (e.isCollapsed()) {
-        // Debug.print(e);
-        it.remove();
-        newEdges.add(e.getCollapsedEdge());
-      }
-    }
-    edgeList.addAll(newEdges);
+  private void computeOverlay(final int opCode) {
+    // copy points from input Geometries.
+    // This ensures that any Point geometries
+    // in the input are considered for inclusion in the result set
+    copyPoints(0);
+    copyPoints(1);
+
+    // node the input Geometries
+    arg[0].computeSelfNodes(li, false);
+    arg[1].computeSelfNodes(li, false);
+
+    // compute intersections between edges of the two input geometries
+    arg[0].computeEdgeIntersections(arg[1], li, true);
+
+    final List baseSplitEdges = new ArrayList();
+    arg[0].computeSplitEdges(baseSplitEdges);
+    arg[1].computeSplitEdges(baseSplitEdges);
+    final List splitEdges = baseSplitEdges;
+    // add the noded edges to this result graph
+    insertUniqueEdges(baseSplitEdges);
+
+    computeLabelsFromDepths();
+    replaceCollapsedEdges();
+
+    // Debug.println(edgeList);
+
+    /**
+     * Check that the noding completed correctly. This test is slow, but
+     * necessary in order to catch robustness failure situations. If an
+     * exception is thrown because of a noding failure, then snapping will be
+     * performed, which will hopefully avoid the problem. In the future
+     * hopefully a faster check can be developed.
+     */
+    EdgeNodingValidator.checkValid(edgeList.getEdges());
+
+    graph.addEdges(edgeList.getEdges());
+    computeLabelling();
+    // Debug.printWatch();
+    labelIncompleteNodes();
+    // Debug.printWatch();
+    // nodeMap.print(System.out);
+
+    /**
+     * The ordering of building the result Geometries is important. Areas must
+     * be built before lines, which must be built before points. This is so that
+     * lines which are covered by areas are not included explicitly, and
+     * similarly for points.
+     */
+    findResultAreaEdges(opCode);
+    cancelDuplicateResultEdges();
+
+    final PolygonBuilder polyBuilder = new PolygonBuilder(geomFact);
+    polyBuilder.add(graph);
+    resultPolyList = polyBuilder.getPolygons();
+
+    final LineBuilder lineBuilder = new LineBuilder(this, geomFact);
+    resultLineList = lineBuilder.build(opCode);
+
+    final PointBuilder pointBuilder = new PointBuilder(this, geomFact,
+      ptLocator);
+    resultPointList = pointBuilder.build(opCode);
+
+    // gather the results from all calculations into a single Geometry for the
+    // result set
+    resultGeom = computeGeometry(resultPointList, resultLineList,
+      resultPolyList, opCode);
   }
 
   /**
@@ -322,198 +298,15 @@ public class OverlayOp extends GeometryGraphOperation {
    * of BOUNDARY, but in the original arg Geometry it is actually in the
    * interior due to the Boundary Determination Rule)
    */
-  private void copyPoints(int argIndex) {
-    for (Iterator i = arg[argIndex].getNodeIterator(); i.hasNext();) {
-      Node graphNode = (Node)i.next();
-      Node newNode = graph.addNode(graphNode.getCoordinate());
+  private void copyPoints(final int argIndex) {
+    for (final Iterator i = arg[argIndex].getNodeIterator(); i.hasNext();) {
+      final Node graphNode = (Node)i.next();
+      final Node newNode = graph.addNode(graphNode.getCoordinate());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
     }
   }
 
-  /**
-   * Compute initial labelling for all DirectedEdges at each node. In this step,
-   * DirectedEdges will acquire a complete labelling (i.e. one with labels for
-   * both Geometries) only if they are incident on a node which has edges for
-   * both Geometries
-   */
-  private void computeLabelling() {
-    for (Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
-      Node node = (Node)nodeit.next();
-      // if (node.getCoordinates().equals(new Coordinates(222, 100)) )
-      // Debug.addWatch(node.getEdges());
-      node.getEdges().computeLabelling(arg);
-    }
-    mergeSymLabels();
-    updateNodeLabelling();
-  }
-
-  /**
-   * For nodes which have edges from only one Geometry incident on them, the
-   * previous step will have left their dirEdges with no labelling for the other
-   * Geometry. However, the sym dirEdge may have a labelling for the other
-   * Geometry, so merge the two labels.
-   */
-  private void mergeSymLabels() {
-    for (Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
-      Node node = (Node)nodeit.next();
-      ((DirectedEdgeStar)node.getEdges()).mergeSymLabels();
-      // node.print(System.out);
-    }
-  }
-
-  private void updateNodeLabelling() {
-    // update the labels for nodes
-    // The label for a node is updated from the edges incident on it
-    // (Note that a node may have already been labelled
-    // because it is a point in one of the input geometries)
-    for (Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
-      Node node = (Node)nodeit.next();
-      Label lbl = ((DirectedEdgeStar)node.getEdges()).getLabel();
-      node.getLabel().merge(lbl);
-    }
-  }
-
-  /**
-   * Incomplete nodes are nodes whose labels are incomplete. (e.g. the location
-   * for one Geometry is null). These are either isolated nodes, or nodes which
-   * have edges from only a single Geometry incident on them. Isolated nodes are
-   * found because nodes in one graph which don't intersect nodes in the other
-   * are not completely labelled by the initial process of adding nodes to the
-   * nodeList. To complete the labelling we need to check for nodes that lie in
-   * the interior of edges, and in the interior of areas.
-   * <p>
-   * When each node labelling is completed, the labelling of the incident edges
-   * is updated, to complete their labelling as well.
-   */
-  private void labelIncompleteNodes() {
-    int nodeCount = 0;
-    for (Iterator ni = graph.getNodes().iterator(); ni.hasNext();) {
-      Node n = (Node)ni.next();
-      Label label = n.getLabel();
-      if (n.isIsolated()) {
-        nodeCount++;
-        if (label.isNull(0))
-          labelIncompleteNode(n, 0);
-        else
-          labelIncompleteNode(n, 1);
-      }
-      // now update the labelling for the DirectedEdges incident on this node
-      ((DirectedEdgeStar)n.getEdges()).updateLabelling(label);
-      // n.print(System.out);
-    }
-    /*
-     * int nPoly0 = arg[0].getGeometry().getNumGeometries(); int nPoly1 =
-     * arg[1].getGeometry().getNumGeometries();
-     * System.out.println("# isolated nodes= " + nodeCount + "   # poly[0] = " +
-     * nPoly0 + "   # poly[1] = " + nPoly1);
-     */
-  }
-
-  /**
-   * Label an isolated node with its relationship to the target geometry.
-   */
-  private void labelIncompleteNode(Node n, int targetIndex) {
-    int loc = ptLocator.locate(n.getCoordinate(),
-      arg[targetIndex].getGeometry());
-
-    // MD - 2008-10-24 - experimental for now
-    // int loc = arg[targetIndex].locate(n.getCoordinates());
-    n.getLabel().setLocation(targetIndex, loc);
-  }
-
-  /**
-   * Find all edges whose label indicates that they are in the result area(s),
-   * according to the operation being performed. Since we want polygon shells to
-   * be oriented CW, choose dirEdges with the interior of the result on the RHS.
-   * Mark them as being in the result. Interior Area edges are the result of
-   * dimensional collapses. They do not form part of the result area boundary.
-   */
-  private void findResultAreaEdges(int opCode) {
-    for (Iterator it = graph.getEdgeEnds().iterator(); it.hasNext();) {
-      DirectedEdge de = (DirectedEdge)it.next();
-      // mark all dirEdges with the appropriate label
-      Label label = de.getLabel();
-      if (label.isArea()
-        && !de.isInteriorAreaEdge()
-        && isResultOfOp(label.getLocation(0, Position.RIGHT),
-          label.getLocation(1, Position.RIGHT), opCode)) {
-        de.setInResult(true);
-        // Debug.print("in result "); Debug.println(de);
-      }
-    }
-  }
-
-  /**
-   * If both a dirEdge and its sym are marked as being in the result, cancel
-   * them out.
-   */
-  private void cancelDuplicateResultEdges() {
-    // remove any dirEdges whose sym is also included
-    // (they "cancel each other out")
-    for (Iterator it = graph.getEdgeEnds().iterator(); it.hasNext();) {
-      DirectedEdge de = (DirectedEdge)it.next();
-      DirectedEdge sym = de.getSym();
-      if (de.isInResult() && sym.isInResult()) {
-        de.setInResult(false);
-        sym.setInResult(false);
-        // Debug.print("cancelled "); Debug.println(de); Debug.println(sym);
-      }
-    }
-  }
-
-  /**
-   * This method is used to decide if a point node should be included in the
-   * result or not.
-   * 
-   * @return true if the coord point is covered by a result Line or Area
-   *         geometry
-   */
-  public boolean isCoveredByLA(Coordinates coord) {
-    if (isCovered(coord, resultLineList))
-      return true;
-    if (isCovered(coord, resultPolyList))
-      return true;
-    return false;
-  }
-
-  /**
-   * This method is used to decide if an L edge should be included in the result
-   * or not.
-   * 
-   * @return true if the coord point is covered by a result Area geometry
-   */
-  public boolean isCoveredByA(Coordinates coord) {
-    if (isCovered(coord, resultPolyList))
-      return true;
-    return false;
-  }
-
-  /**
-   * @return true if the coord is located in the interior or boundary of a
-   *         geometry in the list.
-   */
-  private boolean isCovered(Coordinates coord, List geomList) {
-    for (Iterator it = geomList.iterator(); it.hasNext();) {
-      Geometry geom = (Geometry)it.next();
-      int loc = ptLocator.locate(coord, geom);
-      if (loc != Location.EXTERIOR)
-        return true;
-    }
-    return false;
-  }
-
-  private Geometry computeGeometry(List<Point> resultPointList,
-    List<LineString> resultLineList, List<Polygon> resultPolyList, int opcode) {
-    List<Geometry> geometries = new ArrayList<Geometry>();
-    // element geometries of the result are always in the order P,L,A
-    geometries.addAll(resultPointList);
-    geometries.addAll(resultLineList);
-    geometries.addAll(resultPolyList);
-
-    return geomFact.createGeometry(geometries);
-  }
-
-  private Geometry createEmptyResult(int opCode) {
+  private Geometry createEmptyResult(final int opCode) {
     Geometry result = null;
     switch (resultDimension(opCode, arg[0].getGeometry(), arg[1].getGeometry())) {
       case -1:
@@ -532,9 +325,215 @@ public class OverlayOp extends GeometryGraphOperation {
     return result;
   }
 
-  private int resultDimension(int opCode, Geometry g0, Geometry g1) {
-    int dim0 = g0.getDimension();
-    int dim1 = g1.getDimension();
+  /**
+   * Find all edges whose label indicates that they are in the result area(s),
+   * according to the operation being performed. Since we want polygon shells to
+   * be oriented CW, choose dirEdges with the interior of the result on the RHS.
+   * Mark them as being in the result. Interior Area edges are the result of
+   * dimensional collapses. They do not form part of the result area boundary.
+   */
+  private void findResultAreaEdges(final int opCode) {
+    for (final Iterator it = graph.getEdgeEnds().iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
+      // mark all dirEdges with the appropriate label
+      final Label label = de.getLabel();
+      if (label.isArea()
+        && !de.isInteriorAreaEdge()
+        && isResultOfOp(label.getLocation(0, Position.RIGHT),
+          label.getLocation(1, Position.RIGHT), opCode)) {
+        de.setInResult(true);
+        // Debug.print("in result "); Debug.println(de);
+      }
+    }
+  }
+
+  public PlanarGraph getGraph() {
+    return graph;
+  }
+
+  public Geometry getResultGeometry(final int funcCode) {
+    computeOverlay(funcCode);
+    return resultGeom;
+  }
+
+  /**
+   * Insert an edge from one of the noded input graphs. Checks edges that are
+   * inserted to see if an identical edge already exists. If so, the edge is not
+   * inserted, but its label is merged with the existing edge.
+   */
+  protected void insertUniqueEdge(final Edge e) {
+    // <FIX> MD 8 Oct 03 speed up identical edge lookup
+    // fast lookup
+    final Edge existingEdge = edgeList.findEqualEdge(e);
+
+    // If an identical edge already exists, simply update its label
+    if (existingEdge != null) {
+      final Label existingLabel = existingEdge.getLabel();
+
+      Label labelToMerge = e.getLabel();
+      // check if new edge is in reverse direction to existing edge
+      // if so, must flip the label before merging it
+      if (!existingEdge.isPointwiseEqual(e)) {
+        labelToMerge = new Label(e.getLabel());
+        labelToMerge.flip();
+      }
+      final Depth depth = existingEdge.getDepth();
+      // if this is the first duplicate found for this edge, initialize the
+      // depths
+      // /*
+      if (depth.isNull()) {
+        depth.add(existingLabel);
+      }
+      // */
+      depth.add(labelToMerge);
+      existingLabel.merge(labelToMerge);
+      // Debug.print("inserted edge: "); Debug.println(e);
+      // Debug.print("existing edge: "); Debug.println(existingEdge);
+
+    } else { // no matching existing edge was found
+      // add this new edge to the list of edges in this graph
+      // e.setName(name + edges.size());
+      // e.getDepth().add(e.getLabel());
+      edgeList.add(e);
+    }
+  }
+
+  private void insertUniqueEdges(final List edges) {
+    for (final Iterator i = edges.iterator(); i.hasNext();) {
+      final Edge e = (Edge)i.next();
+      insertUniqueEdge(e);
+    }
+  }
+
+  /**
+   * @return true if the coord is located in the interior or boundary of a
+   *         geometry in the list.
+   */
+  private boolean isCovered(final Coordinates coord, final List geomList) {
+    for (final Iterator it = geomList.iterator(); it.hasNext();) {
+      final Geometry geom = (Geometry)it.next();
+      final int loc = ptLocator.locate(coord, geom);
+      if (loc != Location.EXTERIOR) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * This method is used to decide if an L edge should be included in the result
+   * or not.
+   * 
+   * @return true if the coord point is covered by a result Area geometry
+   */
+  public boolean isCoveredByA(final Coordinates coord) {
+    if (isCovered(coord, resultPolyList)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * This method is used to decide if a point node should be included in the
+   * result or not.
+   * 
+   * @return true if the coord point is covered by a result Line or Area
+   *         geometry
+   */
+  public boolean isCoveredByLA(final Coordinates coord) {
+    if (isCovered(coord, resultLineList)) {
+      return true;
+    }
+    if (isCovered(coord, resultPolyList)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Label an isolated node with its relationship to the target geometry.
+   */
+  private void labelIncompleteNode(final Node n, final int targetIndex) {
+    final int loc = ptLocator.locate(n.getCoordinate(),
+      arg[targetIndex].getGeometry());
+
+    // MD - 2008-10-24 - experimental for now
+    // int loc = arg[targetIndex].locate(n.getCoordinates());
+    n.getLabel().setLocation(targetIndex, loc);
+  }
+
+  /**
+   * Incomplete nodes are nodes whose labels are incomplete. (e.g. the location
+   * for one Geometry is null). These are either isolated nodes, or nodes which
+   * have edges from only a single Geometry incident on them. Isolated nodes are
+   * found because nodes in one graph which don't intersect nodes in the other
+   * are not completely labelled by the initial process of adding nodes to the
+   * nodeList. To complete the labelling we need to check for nodes that lie in
+   * the interior of edges, and in the interior of areas.
+   * <p>
+   * When each node labelling is completed, the labelling of the incident edges
+   * is updated, to complete their labelling as well.
+   */
+  private void labelIncompleteNodes() {
+    int nodeCount = 0;
+    for (final Iterator ni = graph.getNodes().iterator(); ni.hasNext();) {
+      final Node n = (Node)ni.next();
+      final Label label = n.getLabel();
+      if (n.isIsolated()) {
+        nodeCount++;
+        if (label.isNull(0)) {
+          labelIncompleteNode(n, 0);
+        } else {
+          labelIncompleteNode(n, 1);
+        }
+      }
+      // now update the labelling for the DirectedEdges incident on this node
+      ((DirectedEdgeStar)n.getEdges()).updateLabelling(label);
+      // n.print(System.out);
+    }
+    /*
+     * int nPoly0 = arg[0].getGeometry().getNumGeometries(); int nPoly1 =
+     * arg[1].getGeometry().getNumGeometries();
+     * System.out.println("# isolated nodes= " + nodeCount + "   # poly[0] = " +
+     * nPoly0 + "   # poly[1] = " + nPoly1);
+     */
+  }
+
+  /**
+   * For nodes which have edges from only one Geometry incident on them, the
+   * previous step will have left their dirEdges with no labelling for the other
+   * Geometry. However, the sym dirEdge may have a labelling for the other
+   * Geometry, so merge the two labels.
+   */
+  private void mergeSymLabels() {
+    for (final Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      ((DirectedEdgeStar)node.getEdges()).mergeSymLabels();
+      // node.print(System.out);
+    }
+  }
+
+  /**
+   * If edges which have undergone dimensional collapse are found, replace them
+   * with a new edge which is a L edge
+   */
+  private void replaceCollapsedEdges() {
+    final List newEdges = new ArrayList();
+    for (final Iterator it = edgeList.iterator(); it.hasNext();) {
+      final Edge e = (Edge)it.next();
+      if (e.isCollapsed()) {
+        // Debug.print(e);
+        it.remove();
+        newEdges.add(e.getCollapsedEdge());
+      }
+    }
+    edgeList.addAll(newEdges);
+  }
+
+  private int resultDimension(final int opCode, final Geometry g0,
+    final Geometry g1) {
+    final int dim0 = g0.getDimension();
+    final int dim1 = g1.getDimension();
 
     int resultDimension = -1;
     switch (opCode) {
@@ -552,5 +551,17 @@ public class OverlayOp extends GeometryGraphOperation {
       break;
     }
     return resultDimension;
+  }
+
+  private void updateNodeLabelling() {
+    // update the labels for nodes
+    // The label for a node is updated from the edges incident on it
+    // (Note that a node may have already been labelled
+    // because it is a point in one of the input geometries)
+    for (final Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      final Label lbl = ((DirectedEdgeStar)node.getEdges()).getLabel();
+      node.getLabel().merge(lbl);
+    }
   }
 }

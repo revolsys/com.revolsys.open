@@ -36,14 +36,14 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    */
   <T extends Geometry> T getGeometryValue();
 
+  Integer getIdInteger();
+
   /**
    * Get the value of the unique identifier attribute.
    * 
    * @return The unique identifier.
    */
   <T extends Object> T getIdValue();
-
-  Integer getIdInteger();
 
   Integer getInteger(CharSequence name);
 
@@ -58,9 +58,9 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   Short getShort(final CharSequence name);
 
-  String getString(final CharSequence name);
-
   DataObjectState getState();
+
+  String getString(final CharSequence name);
 
   String getTypeName();
 

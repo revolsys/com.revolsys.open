@@ -66,7 +66,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           synchronized (monitor) {
             try {
               monitor.wait();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
               return;
             }
           }

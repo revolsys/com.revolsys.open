@@ -8,22 +8,23 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 public class ReferenceEntryIterator<K, V> extends AbstractIterator<Entry<K, V>> {
-  private Iterator<Entry<K, Reference<V>>> iterator;
+  private final Iterator<Entry<K, Reference<V>>> iterator;
 
-  public ReferenceEntryIterator(Collection<Entry<K, Reference<V>>> collection) {
+  public ReferenceEntryIterator(
+    final Collection<Entry<K, Reference<V>>> collection) {
     this.iterator = collection.iterator();
   }
 
   @Override
   protected Entry<K, V> getNext() throws NoSuchElementException {
     while (iterator.hasNext()) {
-      Entry<K, Reference<V>> entry = iterator.next();
-      K key = entry.getKey();
-      Reference<V> reference = entry.getValue();
+      final Entry<K, Reference<V>> entry = iterator.next();
+      final K key = entry.getKey();
+      final Reference<V> reference = entry.getValue();
       if (reference != null) {
-        V value = reference.get();
+        final V value = reference.get();
         if (value != null) {
-          return new SimpleImmutableEntry<K,V>(key,value);
+          return new SimpleImmutableEntry<K, V>(key, value);
         }
       }
     }

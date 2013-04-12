@@ -183,14 +183,14 @@ public class BingClient {
     if (imagerySet == null) {
       imagerySet = ImagerySet.Aerial;
     }
-    Map<String, Object> metaData = getImageryMetadata(imagerySet);
-    List<Map<String, Object>> recordSets = (List<Map<String, Object>>)metaData.get("resourceSets");
-    Map<String, Object> recordSet = recordSets.get(0);
-    List<Map<String, Object>> resources = (List<Map<String, Object>>)recordSet.get("resources");
-    Map<String, Object> resource = resources.get(0);
-    String imageUrl = (String)resource.get("imageUrl");
+    final Map<String, Object> metaData = getImageryMetadata(imagerySet);
+    final List<Map<String, Object>> recordSets = (List<Map<String, Object>>)metaData.get("resourceSets");
+    final Map<String, Object> recordSet = recordSets.get(0);
+    final List<Map<String, Object>> resources = (List<Map<String, Object>>)recordSet.get("resources");
+    final Map<String, Object> resource = resources.get(0);
+    final String imageUrl = (String)resource.get("imageUrl");
 
-    UriTemplate uriTemplate = new UriTemplate(imageUrl);
+    final UriTemplate uriTemplate = new UriTemplate(imageUrl);
 
     // http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1173&mkt={culture}&shading=hill
     final Map<String, Object> parameters = createParameterMap();

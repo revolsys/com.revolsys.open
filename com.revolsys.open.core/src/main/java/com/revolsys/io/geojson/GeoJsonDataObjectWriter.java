@@ -273,7 +273,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
           final Object value = object.getValue(i);
           out.label(name);
           if (value instanceof Geometry) {
-            Geometry geometry = (Geometry)value;
+            final Geometry geometry = (Geometry)value;
             geometry(geometry);
           } else {
             out.value(value);

@@ -48,7 +48,7 @@ public class Edge extends GraphComponent {
   private int depthDelta = 0; // the change in area depth from the R to L side
                               // of this edge
 
-  public Edge(CoordinatesList pts, Label label) {
+  public Edge(final CoordinatesList pts, final Label label) {
     this.pts = pts;
     this.label = label;
   }

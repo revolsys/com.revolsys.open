@@ -81,50 +81,6 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static List<Coordinates> getCoordinates(final Geometry geometry) {
-    List<Coordinates> allPoints = new ArrayList<Coordinates>();
-    for (CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
-      for (Coordinates point : new InPlaceIterator(points)) {
-        allPoints.add(new DoubleCoordinates(point));
-      }
-    }
-    return allPoints;
-  }
-
-  public static List<Coordinates> getCoordinatesList(
-    final CoordinatesList points) {
-    List<Coordinates> allPoints = new ArrayList<Coordinates>();
-    for (Coordinates point : new InPlaceIterator(points)) {
-      allPoints.add(new DoubleCoordinates(point));
-    }
-    return allPoints;
-  }
-
-  public static <G extends com.revolsys.gis.model.geometry.Geometry> G createGeometry(
-    Geometry jtsGeometry) {
-    GeometryFactory jtsFactory = GeometryFactory.getFactory(jtsGeometry);
-    int srid = jtsFactory.getSRID();
-    int numAxis = jtsFactory.getNumAxis();
-    double scaleXY = jtsFactory.getScaleXY();
-    double scaleZ = jtsFactory.getScaleZ();
-    com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl factory = com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl.getFactory(
-      srid, numAxis, scaleXY, scaleZ);
-    if (jtsGeometry instanceof Point) {
-      Point point = (Point)jtsGeometry;
-      return (G)factory.createPoint(CoordinatesUtil.get(point));
-    } else if (jtsGeometry instanceof LineString) {
-      LineString line = (LineString)jtsGeometry;
-      return (G)factory.createLineString(CoordinatesListUtil.get(line));
-    } else if (jtsGeometry instanceof Polygon) {
-      Polygon polygon = (Polygon)jtsGeometry;
-      return (G)factory.createPolygon(CoordinatesListUtil.getAll(polygon));
-    } else {
-      throw new IllegalArgumentException("Not supported "
-        + jtsGeometry.getClass());
-    }
-
-  }
-
   private static void addElevation(final LineString original,
     final LineString update) {
     final Coordinate c0 = update.getCoordinateN(0);
@@ -226,6 +182,31 @@ public final class JtsGeometryUtil {
     if (userData != null) {
       newGeometry.setUserData(new TreeMap<String, Object>(userData));
     }
+  }
+
+  public static <G extends com.revolsys.gis.model.geometry.Geometry> G createGeometry(
+    final Geometry jtsGeometry) {
+    final GeometryFactory jtsFactory = GeometryFactory.getFactory(jtsGeometry);
+    final int srid = jtsFactory.getSRID();
+    final int numAxis = jtsFactory.getNumAxis();
+    final double scaleXY = jtsFactory.getScaleXY();
+    final double scaleZ = jtsFactory.getScaleZ();
+    final com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl factory = com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl.getFactory(
+      srid, numAxis, scaleXY, scaleZ);
+    if (jtsGeometry instanceof Point) {
+      final Point point = (Point)jtsGeometry;
+      return (G)factory.createPoint(CoordinatesUtil.get(point));
+    } else if (jtsGeometry instanceof LineString) {
+      final LineString line = (LineString)jtsGeometry;
+      return (G)factory.createLineString(CoordinatesListUtil.get(line));
+    } else if (jtsGeometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)jtsGeometry;
+      return (G)factory.createPolygon(CoordinatesListUtil.getAll(polygon));
+    } else {
+      throw new IllegalArgumentException("Not supported "
+        + jtsGeometry.getClass());
+    }
+
   }
 
   public static LinearRing createLinearRing(final GeometryFactory factory,
@@ -471,9 +452,51 @@ public final class JtsGeometryUtil {
     return factory.createLinearRing(coordinates2d);
   }
 
+  public static Coordinates getCoordinate(final Geometry geometry,
+    final int pointIndex) {
+    final CoordinatesList points = CoordinatesListUtil.get(geometry);
+    if (pointIndex < points.size()) {
+      return new DoubleCoordinates(points.get(pointIndex));
+    } else {
+      return null;
+    }
+  }
+
+  public static Coordinates getCoordinate(final GeometryCollection geometry,
+    final int partIndex, final int pointIndex) {
+    if (partIndex < geometry.getNumGeometries()) {
+      final Geometry part = geometry.getGeometryN(partIndex);
+      return getCoordinate(part, pointIndex);
+    }
+    return null;
+  }
+
+  public static Coordinates getCoordinate(final Polygon polygon,
+    final int ringIndex, final int pointIndex) {
+    if (ringIndex == 0) {
+      final LineString ring = polygon.getExteriorRing();
+      return getCoordinate(ring, pointIndex);
+    } else if (ringIndex - 1 < polygon.getNumInteriorRing()) {
+      final LineString ring = polygon.getInteriorRingN(ringIndex - 1);
+      return getCoordinate(ring, pointIndex);
+    } else {
+      return null;
+    }
+  }
+
   public static List<Coordinate> getCoordinateList(final LineString line) {
     return new ArrayList<Coordinate>(Arrays.asList(line.getCoordinates()));
 
+  }
+
+  public static List<Coordinates> getCoordinates(final Geometry geometry) {
+    final List<Coordinates> allPoints = new ArrayList<Coordinates>();
+    for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
+      for (final Coordinates point : new InPlaceIterator(points)) {
+        allPoints.add(new DoubleCoordinates(point));
+      }
+    }
+    return allPoints;
   }
 
   public static Set<Coordinate> getCoordinateSet(final LineString line) {
@@ -484,6 +507,15 @@ public final class JtsGeometryUtil {
       coordinates.add(coordinate);
     }
     return coordinates;
+  }
+
+  public static List<Coordinates> getCoordinatesList(
+    final CoordinatesList points) {
+    final List<Coordinates> allPoints = new ArrayList<Coordinates>();
+    for (final Coordinates point : new InPlaceIterator(points)) {
+      allPoints.add(new DoubleCoordinates(point));
+    }
+    return allPoints;
   }
 
   /**
@@ -563,6 +595,12 @@ public final class JtsGeometryUtil {
     final Coordinate c0 = line.p0;
     final Coordinate c1 = line.p1;
     return getElevation(coordinate, c0, c1);
+  }
+
+  public static Envelope getEnvelope(
+    final com.revolsys.gis.model.geometry.impl.BoundingBox boundingBox) {
+    return new Envelope(boundingBox.getMinX(), boundingBox.getMaxX(),
+      boundingBox.getMinY(), boundingBox.getMaxY());
   }
 
   public static List<Geometry> getGeometries(final Geometry geometry) {
@@ -1469,42 +1507,5 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
-  }
-
-  public static Envelope getEnvelope(
-    com.revolsys.gis.model.geometry.impl.BoundingBox boundingBox) {
-    return new Envelope(boundingBox.getMinX(), boundingBox.getMaxX(),
-      boundingBox.getMinY(), boundingBox.getMaxY());
-  }
-
-  public static Coordinates getCoordinate(GeometryCollection geometry,
-    int partIndex, int pointIndex) {
-    if (partIndex < geometry.getNumGeometries()) {
-      Geometry part = geometry.getGeometryN(partIndex);
-      return getCoordinate(part, pointIndex);
-    }
-    return null;
-  }
-
-  public static Coordinates getCoordinate(Geometry geometry, int pointIndex) {
-    CoordinatesList points = CoordinatesListUtil.get(geometry);
-    if (pointIndex < points.size()) {
-      return new DoubleCoordinates(points.get(pointIndex));
-    } else {
-      return null;
-    }
-  }
-
-  public static Coordinates getCoordinate(Polygon polygon, int ringIndex,
-    int pointIndex) {
-    if (ringIndex == 0) {
-      LineString ring = polygon.getExteriorRing();
-      return getCoordinate(ring, pointIndex);
-    } else if (ringIndex - 1 < polygon.getNumInteriorRing()) {
-      LineString ring = polygon.getInteriorRingN(ringIndex - 1);
-      return getCoordinate(ring, pointIndex);
-    } else {
-      return null;
-    }
   }
 }

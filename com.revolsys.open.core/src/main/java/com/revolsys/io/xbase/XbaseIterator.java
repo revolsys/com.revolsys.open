@@ -88,7 +88,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private boolean mappedFile;
 
-  private Resource resource;
+  private final Resource resource;
 
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
@@ -112,24 +112,20 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     }
   }
 
-  public void forceClose() {
-    FileUtil.closeSilent(in);
-  }
-
   @Override
   protected void doInit() {
     if (in == null) {
       try {
         try {
-          File file = SpringUtil.getFile(resource);
-          Boolean memoryMapped = getProperty("memoryMapped");
+          final File file = SpringUtil.getFile(resource);
+          final Boolean memoryMapped = getProperty("memoryMapped");
           if (Boolean.TRUE == memoryMapped) {
-           this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-          this.mappedFile = true;
+            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+            this.mappedFile = true;
           } else {
             this.in = new LittleEndianRandomAccessFile(file, "r");
           }
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
           this.in = new EndianInputStream(resource.getInputStream());
         }
         loadHeader();
@@ -142,6 +138,10 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
         throw new RuntimeException("Error initializing mappedFile ", e);
       }
     }
+  }
+
+  public void forceClose() {
+    FileUtil.closeSilent(in);
   }
 
   private Boolean getBoolean(final int startIndex) {
@@ -357,7 +357,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
       this.position = position;
       try {
-        long offset = firstIndex + (long)(recordSize + 1) * position;
+        final long offset = firstIndex + (long)(recordSize + 1) * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {

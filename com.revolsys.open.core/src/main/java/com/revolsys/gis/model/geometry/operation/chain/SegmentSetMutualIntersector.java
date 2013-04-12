@@ -45,9 +45,21 @@ import java.util.Collection;
  * @author Martin Davis
  * @version 1.10
  */
-public abstract class SegmentSetMutualIntersector
-{
+public abstract class SegmentSetMutualIntersector {
   protected SegmentIntersector segInt;
+
+  /**
+   * Computes the intersections for two collections of {@link SegmentString}s.
+   *
+  * @param segStrings1 a collection of {@link SegmentString}s to node
+   */
+  public abstract void process(Collection<SegmentString> segStrings);
+
+  /**
+   * 
+   * @param segStrings0 a collection of {@link SegmentString}s to node
+   */
+  public abstract void setBaseSegments(Collection<SegmentString> segStrings);
 
   /**
    * Sets the {@link SegmentIntersector} to use with this intersector.
@@ -56,21 +68,7 @@ public abstract class SegmentSetMutualIntersector
    *
    * @param segInt the segment intersector to use
    */
-  public void setSegmentIntersector(SegmentIntersector segInt)
-  {
+  public void setSegmentIntersector(final SegmentIntersector segInt) {
     this.segInt = segInt;
   }
-
-  /**
-   * 
-   * @param segStrings0 a collection of {@link SegmentString}s to node
-   */
-  public abstract void setBaseSegments(Collection<SegmentString> segStrings);
-  
-  /**
-   * Computes the intersections for two collections of {@link SegmentString}s.
-   *
-  * @param segStrings1 a collection of {@link SegmentString}s to node
-   */
-  public abstract void process(Collection<SegmentString> segStrings);
 }

@@ -12,27 +12,16 @@ import com.revolsys.gis.model.geometry.Polygon;
 
 public class GeometryUtil {
 
-  public static List<Point> getPoints(Geometry geometry) {
-    List<Point> points = new ArrayList<Point>();
-    for (Geometry part : geometry.getGeometries()) {
-      if (part instanceof Point) {
-        Point point = (Point)part;
-        points.add(point);
-      }
-    }
-    return points;
-  }
-
-  public static List<LineString> getLines(Geometry geometry) {
-    List<LineString> lines = new ArrayList<LineString>();
-    for (Geometry part : geometry.getGeometries()) {
+  public static List<LineString> getLines(final Geometry geometry) {
+    final List<LineString> lines = new ArrayList<LineString>();
+    for (final Geometry part : geometry.getGeometries()) {
       if (part instanceof LineString) {
-        LineString line = (LineString)part;
+        final LineString line = (LineString)part;
         lines.add(line);
       } else if (part instanceof Polygon) {
-        Polygon polygon = (Polygon)part;
-        MultiLinearRing rings = polygon.getRings();
-        for (LinearRing ring : rings) {
+        final Polygon polygon = (Polygon)part;
+        final MultiLinearRing rings = polygon.getRings();
+        for (final LinearRing ring : rings) {
           lines.add(ring);
         }
       }
@@ -40,11 +29,22 @@ public class GeometryUtil {
     return lines;
   }
 
-  public static List<Polygon> getPolygons(Geometry geometry) {
-    List<Polygon> polygons = new ArrayList<Polygon>();
-    for (Geometry part : geometry.getGeometries()) {
+  public static List<Point> getPoints(final Geometry geometry) {
+    final List<Point> points = new ArrayList<Point>();
+    for (final Geometry part : geometry.getGeometries()) {
+      if (part instanceof Point) {
+        final Point point = (Point)part;
+        points.add(point);
+      }
+    }
+    return points;
+  }
+
+  public static List<Polygon> getPolygons(final Geometry geometry) {
+    final List<Polygon> polygons = new ArrayList<Polygon>();
+    for (final Geometry part : geometry.getGeometries()) {
       if (part instanceof Polygon) {
-        Polygon polygon = (Polygon)part;
+        final Polygon polygon = (Polygon)part;
         polygons.add(polygon);
       }
     }

@@ -13,7 +13,7 @@ public class Spheroid implements Serializable {
 
   private final Authority authority;
 
-  private boolean deprecated;
+  private final boolean deprecated;
 
   private final double eccentricity;
 
@@ -54,9 +54,9 @@ public class Spheroid implements Serializable {
 
     // double a2 = this.semiMajorAxis * this.semiMajorAxis;
     // double b2 = this.semiMinorAxis * this.semiMinorAxis;
-    //eccentricitySquared = 1.0 - b2 / a2;
+    // eccentricitySquared = 1.0 - b2 / a2;
 
-     eccentricitySquared = f + f - f * f;
+    eccentricitySquared = f + f - f * f;
     eccentricity = Math.sqrt(eccentricitySquared);
   }
 

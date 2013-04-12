@@ -147,17 +147,17 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
         out.element(HtmlUtil.TITLE, title);
       }
 
-      Object style = getProperty("htmlCssStyleUrl");
+      final Object style = getProperty("htmlCssStyleUrl");
       if (style instanceof String) {
-        String styleUrl = (String)style;
+        final String styleUrl = (String)style;
         out.startTag(HtmlUtil.LINK);
         out.attribute(HtmlUtil.ATTR_HREF, styleUrl);
         out.attribute(HtmlUtil.ATTR_REL, "stylesheet");
         out.attribute(HtmlUtil.ATTR_TYPE, "text/css");
         out.endTag(HtmlUtil.LINK);
       } else if (style instanceof List) {
-        List styleUrls = (List)style;
-        for (Object styleUrl : styleUrls) {
+        final List styleUrls = (List)style;
+        for (final Object styleUrl : styleUrls) {
           out.startTag(HtmlUtil.LINK);
           out.attribute(HtmlUtil.ATTR_HREF, styleUrl);
           out.attribute(HtmlUtil.ATTR_REL, "stylesheet");

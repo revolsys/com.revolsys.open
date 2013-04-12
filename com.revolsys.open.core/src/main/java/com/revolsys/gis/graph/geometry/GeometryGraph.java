@@ -116,76 +116,6 @@ public class GeometryGraph extends Graph<LineSegment> {
     return new LineSegment(line);
   }
 
-  public BoundingBox getBoundingBox(final Geometry geometry) {
-    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
-    boundingBox = boundingBox.expand(maxDistance);
-    return boundingBox;
-  }
-
-  @Override
-  public LineString getEdgeLine(final int edgeId) {
-    final LineSegment object = getEdgeObject(edgeId);
-    if (object == null) {
-      return null;
-    } else {
-      final LineString line = object.getLine();
-      return line;
-    }
-  }
-
-  /**
-   * Only currently works for lines and points.
-   * 
-   * @return
-   */
-
-  public Geometry getGeometry() {
-    removeDuplicateLineEdges();
-    final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
-      "geometryIndex", "partIndex", "segmentIndex");
-    final List<Geometry> geometries = new ArrayList<Geometry>(points);
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final int numAxis = geometryFactory.getNumAxis();
-    DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
-    Node<LineSegment> previousNode = null;
-    for (final Edge<LineSegment> edge : getEdges(comparator)) {
-      final LineSegment lineSegment = edge.getObject();
-      if (lineSegment.getLength() > 0) {
-        final Node<LineSegment> fromNode = edge.getFromNode();
-        final Node<LineSegment> toNode = edge.getToNode();
-        if (previousNode == null) {
-          points.addAll(lineSegment);
-        } else if (fromNode == previousNode) {
-          if (edge.getLength() > 0) {
-            points.add(toNode);
-          }
-        } else {
-          if (points.size() > 1) {
-            final LineString line = geometryFactory.createLineString(points);
-            geometries.add(line);
-          }
-          points = new DoubleListCoordinatesList(numAxis);
-          points.addAll(lineSegment);
-        }
-        if (points.size() > 1) {
-          final int toDegree = toNode.getDegree();
-          if (toDegree != 2) {
-            final LineString line = geometryFactory.createLineString(points);
-            geometries.add(line);
-            points = new DoubleListCoordinatesList(numAxis);
-            points.add(toNode);
-          }
-        }
-        previousNode = toNode;
-      }
-    }
-    if (points.size() > 1) {
-      final LineString line = geometryFactory.createLineString(points);
-      geometries.add(line);
-    }
-    return geometryFactory.createGeometry(geometries);
-  }
-
   /**
    * Get the intersection between the line and the boundary of this geometry.
    * 
@@ -272,6 +202,76 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
     return geometryFactory.createGeometry(intersections).union();
+  }
+
+  public BoundingBox getBoundingBox(final Geometry geometry) {
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    boundingBox = boundingBox.expand(maxDistance);
+    return boundingBox;
+  }
+
+  @Override
+  public LineString getEdgeLine(final int edgeId) {
+    final LineSegment object = getEdgeObject(edgeId);
+    if (object == null) {
+      return null;
+    } else {
+      final LineString line = object.getLine();
+      return line;
+    }
+  }
+
+  /**
+   * Only currently works for lines and points.
+   * 
+   * @return
+   */
+
+  public Geometry getGeometry() {
+    removeDuplicateLineEdges();
+    final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
+      "geometryIndex", "partIndex", "segmentIndex");
+    final List<Geometry> geometries = new ArrayList<Geometry>(points);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int numAxis = geometryFactory.getNumAxis();
+    DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
+    Node<LineSegment> previousNode = null;
+    for (final Edge<LineSegment> edge : getEdges(comparator)) {
+      final LineSegment lineSegment = edge.getObject();
+      if (lineSegment.getLength() > 0) {
+        final Node<LineSegment> fromNode = edge.getFromNode();
+        final Node<LineSegment> toNode = edge.getToNode();
+        if (previousNode == null) {
+          points.addAll(lineSegment);
+        } else if (fromNode == previousNode) {
+          if (edge.getLength() > 0) {
+            points.add(toNode);
+          }
+        } else {
+          if (points.size() > 1) {
+            final LineString line = geometryFactory.createLineString(points);
+            geometries.add(line);
+          }
+          points = new DoubleListCoordinatesList(numAxis);
+          points.addAll(lineSegment);
+        }
+        if (points.size() > 1) {
+          final int toDegree = toNode.getDegree();
+          if (toDegree != 2) {
+            final LineString line = geometryFactory.createLineString(points);
+            geometries.add(line);
+            points = new DoubleListCoordinatesList(numAxis);
+            points.add(toNode);
+          }
+        }
+        previousNode = toNode;
+      }
+    }
+    if (points.size() > 1) {
+      final LineString line = geometryFactory.createLineString(points);
+      geometries.add(line);
+    }
+    return geometryFactory.createGeometry(geometries);
   }
 
   public boolean intersects(final LineString line) {

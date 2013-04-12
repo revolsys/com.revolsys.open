@@ -27,13 +27,15 @@ abstract class AbstractPolygonContains extends PolygonPredicate {
   }
 
   protected boolean eval(final Geometry geometry) {
-    final boolean isAllInTargetArea = PolygonUtil.isAllTestComponentsInTarget(polygon,geometry);
+    final boolean isAllInTargetArea = PolygonUtil.isAllTestComponentsInTarget(
+      polygon, geometry);
     if (!isAllInTargetArea) {
       return false;
     }
 
     if (requireSomePointInInterior && geometry.getDimension() == 0) {
-      final boolean isAnyInTargetInterior = PolygonUtil.isAnyTestComponentInTargetInterior(polygon,geometry);
+      final boolean isAnyInTargetInterior = PolygonUtil.isAnyTestComponentInTargetInterior(
+        polygon, geometry);
       return isAnyInTargetInterior;
     } else {
 
@@ -65,7 +67,8 @@ abstract class AbstractPolygonContains extends PolygonPredicate {
     final SegmentIntersectionDetector intDetector = new SegmentIntersectionDetector(
       li);
     intDetector.setFindAllIntersectionTypes(true);
-    FastSegmentSetIntersectionFinder.get(polygon).intersects(lineSegStr, intDetector);
+    FastSegmentSetIntersectionFinder.get(polygon).intersects(lineSegStr,
+      intDetector);
 
     hasSegmentIntersection = intDetector.hasIntersection();
     hasProperIntersection = intDetector.hasProperIntersection();

@@ -29,19 +29,19 @@ public interface Geometry extends Cloneable, ObjectWithProperties {
 
   boolean disjoint(Geometry geometry);
 
+  double distance(Geometry g);
+
   double getArea();
 
   int getBoundaryDimension();
 
   BoundingBox getBoundingBox();
 
-  double distance(Geometry g);
-
-  Point getFirstPoint();
-
   List<CoordinatesList> getCoordinatesLists();
 
   int getDimension();
+
+  Point getFirstPoint();
 
   <G extends Geometry> List<G> getGeometries();
 

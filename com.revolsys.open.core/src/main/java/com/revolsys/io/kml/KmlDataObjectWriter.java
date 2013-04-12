@@ -60,6 +60,28 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   }
 
   @Override
+  public void setProperty(final String name, final Object value) {
+    super.setProperty(name, value);
+    if (Kml22Constants.STYLE_URL_PROPERTY.equals(name)) {
+      String styleUrl;
+      if (value == null) {
+        styleUrl = null;
+      } else {
+        styleUrl = value.toString();
+      }
+      if (StringUtils.hasText(styleUrl)) {
+        if (StringUtils.hasText(defaultStyleUrl)) {
+          this.styleUrl = styleUrl;
+        } else {
+          defaultStyleUrl = styleUrl;
+        }
+      } else {
+        this.styleUrl = defaultStyleUrl;
+      }
+    }
+  }
+
+  @Override
   public String toString() {
     return null;
   }
@@ -127,15 +149,15 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     if (hasValues) {
       writer.endTag(EXTENDED_DATA);
     }
-    List<Integer> geometryAttributeIndexes = metaData.getGeometryAttributeIndexes();
+    final List<Integer> geometryAttributeIndexes = metaData.getGeometryAttributeIndexes();
     if (!geometryAttributeIndexes.isEmpty()) {
       Geometry geometry = null;
       if (geometryAttributeIndexes.size() == 1) {
         geometry = object.getValue(geometryAttributeIndexes.get(0));
       } else {
-        List<Geometry> geometries = new ArrayList<Geometry>();
-        for (Integer geometryAttributeIndex : geometryAttributeIndexes) {
-          Geometry part = object.getValue(geometryAttributeIndex);
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        for (final Integer geometryAttributeIndex : geometryAttributeIndexes) {
+          final Geometry part = object.getValue(geometryAttributeIndex);
           if (part != null) {
             geometries.add(part);
           }
@@ -149,28 +171,6 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       }
     }
     writer.endTag();
-  }
-
-  @Override
-  public void setProperty(String name, Object value) {
-    super.setProperty(name, value);
-    if (Kml22Constants.STYLE_URL_PROPERTY.equals(name)) {
-      String styleUrl;
-      if (value == null) {
-        styleUrl = null;
-      } else {
-        styleUrl = value.toString();
-      }
-      if (StringUtils.hasText(styleUrl)) {
-        if (StringUtils.hasText(defaultStyleUrl)) {
-          this.styleUrl = styleUrl;
-        } else {
-          defaultStyleUrl = styleUrl;
-        }
-      } else {
-        this.styleUrl = defaultStyleUrl;
-      }
-    }
   }
 
   private void writeHeader() {
@@ -194,7 +194,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
         writer.element(DESCRIPTION, description);
       }
       writer.element(OPEN, 1);
-      String style = getProperty(STYLE_PROPERTY);
+      final String style = getProperty(STYLE_PROPERTY);
       if (StringUtils.hasText(style)) {
         writer.write(style);
       }

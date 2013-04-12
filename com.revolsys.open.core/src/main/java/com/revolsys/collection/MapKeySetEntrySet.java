@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import com.revolsys.collection.bplus.BPlusTreeMap;
 
 public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
-  private Map<K, V> map;
+  private final Map<K, V> map;
 
-  public MapKeySetEntrySet(Map<K, V> map) {
+  public MapKeySetEntrySet(final Map<K, V> map) {
     this.map = map;
   }
 

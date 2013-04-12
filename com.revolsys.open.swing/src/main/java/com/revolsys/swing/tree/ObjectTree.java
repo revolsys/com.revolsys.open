@@ -91,8 +91,19 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
 
       @Override
       public void mousePressed(final MouseEvent e) {
-        if (e.isPopupTrigger()) {
-          popup(model, e);
+        final int x = e.getX();
+        final int y = e.getY();
+        final TreePath path = ObjectTree.this.getPathForLocation(x, y);
+        if (path != null) {
+          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          if (nodeModel != null) {
+            final Object node = path.getLastPathComponent();
+            if (e.isPopupTrigger()) {
+              mouseClickItem = node;
+              popup(model, e);
+              repaint();
+            }
+          }
         }
       }
 
@@ -122,7 +133,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
             final Object node = path.getLastPathComponent();
             final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
             if (nodeModel != null) {
-              final JPopupMenu menu = nodeModel.getMenu(node).createJPopupMenu();
+              final JPopupMenu menu = nodeModel.getMenu(node)
+                .createJPopupMenu();
               int numItems = menu.getSubElements().length;
               if (menu != null && numItems > 0) {
                 mouseClickItem = node;

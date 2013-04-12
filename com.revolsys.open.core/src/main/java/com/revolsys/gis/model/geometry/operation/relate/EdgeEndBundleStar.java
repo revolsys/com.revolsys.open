@@ -1,6 +1,3 @@
-
-
-
 package com.revolsys.gis.model.geometry.operation.relate;
 
 import java.util.Iterator;
@@ -16,9 +13,7 @@ import com.vividsolutions.jts.geom.IntersectionMatrix;
  *
  * @version 1.7
  */
-public class EdgeEndBundleStar
-  extends EdgeEndStar
-{
+public class EdgeEndBundleStar extends EdgeEndStar {
   /**
    * Creates a new empty EdgeEndBundleStar
    */
@@ -32,14 +27,13 @@ public class EdgeEndBundleStar
    * to contain the EdgeEnd.
    * <br>
    */
-  public void insert(EdgeEnd e)
-  {
-    EdgeEndBundle eb = (EdgeEndBundle) edgeMap.get(e);
+  @Override
+  public void insert(final EdgeEnd e) {
+    EdgeEndBundle eb = (EdgeEndBundle)edgeMap.get(e);
     if (eb == null) {
       eb = new EdgeEndBundle(e);
       insertEdgeEnd(e, eb);
-    }
-    else {
+    } else {
       eb.insert(e);
     }
   }
@@ -47,10 +41,9 @@ public class EdgeEndBundleStar
   /**
    * Update the IM with the contribution for the EdgeStubs around the node.
    */
-  void updateIM(IntersectionMatrix im)
-  {
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEndBundle esb = (EdgeEndBundle) it.next();
+  void updateIM(final IntersectionMatrix im) {
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeEndBundle esb = (EdgeEndBundle)it.next();
       esb.updateIM(im);
     }
   }

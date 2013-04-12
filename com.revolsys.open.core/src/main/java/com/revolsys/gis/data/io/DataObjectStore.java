@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.PlatformTransactionManager;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
@@ -40,6 +42,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   DataObjectReader createReader(String typePath, String query,
     List<Object> parameters);
 
+  DataObject createWithId(DataObjectMetaData objectMetaData);
+
   Writer<DataObject> createWriter();
 
   void delete(DataObject object);
@@ -69,6 +73,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   @Override
   DataObjectMetaData getMetaData(String typePath);
 
+  int getRowCount(Query query);
+
   DataObjectStoreSchema getSchema(final String schemaName);
 
   /**
@@ -79,6 +85,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   List<DataObjectStoreSchema> getSchemas();
 
   StatisticsMap getStatistics();
+
+  PlatformTransactionManager getTransactionManager();
 
   /**
    * Get the list of type names (including name space) in the name space.
@@ -125,8 +133,4 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void update(DataObject object);
 
   void updateAll(Collection<DataObject> objects);
-
-  int getRowCount(Query query);
-
-  DataObject createWithId(DataObjectMetaData objectMetaData);
 }

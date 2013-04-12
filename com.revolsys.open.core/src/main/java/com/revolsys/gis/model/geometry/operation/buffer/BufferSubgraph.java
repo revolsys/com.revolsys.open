@@ -33,11 +33,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version 1.7
  */
 public class BufferSubgraph implements Comparable {
-  private RightmostEdgeFinder finder;
+  private final RightmostEdgeFinder finder;
 
-  private List dirEdgeList = new ArrayList();
+  private final List dirEdgeList = new ArrayList();
 
-  private List nodes = new ArrayList();
+  private final List nodes = new ArrayList();
 
   private Coordinates rightMostCoord = null;
 
@@ -47,52 +47,29 @@ public class BufferSubgraph implements Comparable {
     finder = new RightmostEdgeFinder();
   }
 
-  public List getDirectedEdges() {
-    return dirEdgeList;
-  }
-
-  public List getNodes() {
-    return nodes;
-  }
-
   /**
-   * Computes the envelope of the edges in the subgraph. The envelope is cached
-   * after being computed.
+   * Adds the argument node and all its out edges to the subgraph
    * 
-   * @return the envelope of the graph.
+   * @param node the node to add
+   * @param nodeStack the current set of nodes being traversed
    */
-  public Envelope getEnvelope() {
-    if (env == null) {
-      Envelope edgeEnv = new Envelope();
-      for (Iterator it = dirEdgeList.iterator(); it.hasNext();) {
-        DirectedEdge dirEdge = (DirectedEdge)it.next();
-        CoordinatesList pts = dirEdge.getEdge().getCoordinates();
-        for (int i = 0; i < pts.size() - 1; i++) {
-          edgeEnv.expandToInclude(pts.getCoordinate(i));
-        }
+  private void add(final Node node, final Stack nodeStack) {
+    node.setVisited(true);
+    nodes.add(node);
+    for (final Iterator i = ((DirectedEdgeStar)node.getEdges()).iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
+      dirEdgeList.add(de);
+      final DirectedEdge sym = de.getSym();
+      final Node symNode = sym.getNode();
+      /**
+       * NOTE: this is a depth-first traversal of the graph. This will cause a
+       * large depth of recursion. It might be better to do a breadth-first
+       * traversal.
+       */
+      if (!symNode.isVisited()) {
+        nodeStack.push(symNode);
       }
-      env = edgeEnv;
     }
-    return env;
-  }
-
-  /**
-   * Gets the rightmost coordinate in the edges of the subgraph
-   */
-  public Coordinates getRightmostCoordinate() {
-    return rightMostCoord;
-  }
-
-  /**
-   * Creates the subgraph consisting of all edges reachable from this node.
-   * Finds the edges in the graph and the rightmost coordinate.
-   * 
-   * @param node a node to start the graph traversal from
-   */
-  public void create(Node node) {
-    addReachable(node);
-    finder.findEdge(dirEdgeList);
-    rightMostCoord = finder.getCoordinate();
   }
 
   /**
@@ -101,52 +78,51 @@ public class BufferSubgraph implements Comparable {
    * 
    * @param node a node known to be in the subgraph
    */
-  private void addReachable(Node startNode) {
-    Stack nodeStack = new Stack();
+  private void addReachable(final Node startNode) {
+    final Stack nodeStack = new Stack();
     nodeStack.add(startNode);
     while (!nodeStack.empty()) {
-      Node node = (Node)nodeStack.pop();
+      final Node node = (Node)nodeStack.pop();
       add(node, nodeStack);
     }
   }
 
-  /**
-   * Adds the argument node and all its out edges to the subgraph
-   * 
-   * @param node the node to add
-   * @param nodeStack the current set of nodes being traversed
-   */
-  private void add(Node node, Stack nodeStack) {
-    node.setVisited(true);
-    nodes.add(node);
-    for (Iterator i = ((DirectedEdgeStar)node.getEdges()).iterator(); i.hasNext();) {
-      DirectedEdge de = (DirectedEdge)i.next();
-      dirEdgeList.add(de);
-      DirectedEdge sym = de.getSym();
-      Node symNode = sym.getNode();
-      /**
-       * NOTE: this is a depth-first traversal of the graph. This will cause a
-       * large depth of recursion. It might be better to do a breadth-first
-       * traversal.
-       */
-      if (!symNode.isVisited())
-        nodeStack.push(symNode);
-    }
-  }
-
   private void clearVisitedEdges() {
-    for (Iterator it = dirEdgeList.iterator(); it.hasNext();) {
-      DirectedEdge de = (DirectedEdge)it.next();
+    for (final Iterator it = dirEdgeList.iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
       de.setVisited(false);
     }
   }
 
-  public void computeDepth(int outsideDepth) {
+  /**
+   * BufferSubgraphs are compared on the x-value of their rightmost Coordinate.
+   * This defines a partial ordering on the graphs such that:
+   * <p>
+   * g1 >= g2 <==> Ring(g2) does not contain Ring(g1)
+   * <p>
+   * where Polygon(g) is the buffer polygon that is built from g.
+   * <p>
+   * This relationship is used to sort the BufferSubgraphs so that shells are
+   * guaranteed to be built before holes.
+   */
+  @Override
+  public int compareTo(final Object o) {
+    final BufferSubgraph graph = (BufferSubgraph)o;
+    if (this.rightMostCoord.getX() < graph.rightMostCoord.getX()) {
+      return -1;
+    }
+    if (this.rightMostCoord.getX() > graph.rightMostCoord.getX()) {
+      return 1;
+    }
+    return 0;
+  }
+
+  public void computeDepth(final int outsideDepth) {
     clearVisitedEdges();
     // find an outside edge to assign depth to
-    DirectedEdge de = finder.getEdge();
-    Node n = de.getNode();
-    Label label = de.getLabel();
+    final DirectedEdge de = finder.getEdge();
+    final Node n = de.getNode();
+    final Label label = de.getLabel();
     // right side of line returned by finder is on the outside
     de.setEdgeDepths(Position.RIGHT, outsideDepth);
     copySymDepths(de);
@@ -163,18 +139,18 @@ public class BufferSubgraph implements Comparable {
    */
   // <FIX> MD - use iteration & queue rather than recursion, for speed and
   // robustness
-  private void computeDepths(DirectedEdge startEdge) {
-    Set nodesVisited = new HashSet();
-    LinkedList nodeQueue = new LinkedList();
+  private void computeDepths(final DirectedEdge startEdge) {
+    final Set nodesVisited = new HashSet();
+    final LinkedList nodeQueue = new LinkedList();
 
-    Node startNode = startEdge.getNode();
+    final Node startNode = startEdge.getNode();
     nodeQueue.addLast(startNode);
     nodesVisited.add(startNode);
     startEdge.setVisited(true);
 
     while (!nodeQueue.isEmpty()) {
       // System.out.println(nodes.size() + " queue: " + nodeQueue.size());
-      Node n = (Node)nodeQueue.removeFirst();
+      final Node n = (Node)nodeQueue.removeFirst();
       nodesVisited.add(n);
       // compute depths around node, starting at this edge since it has depths
       // assigned
@@ -182,12 +158,13 @@ public class BufferSubgraph implements Comparable {
 
       // add all adjacent nodes to process queue,
       // unless the node has been visited already
-      for (Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-        DirectedEdge de = (DirectedEdge)i.next();
-        DirectedEdge sym = de.getSym();
-        if (sym.isVisited())
+      for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
+        final DirectedEdge de = (DirectedEdge)i.next();
+        final DirectedEdge sym = de.getSym();
+        if (sym.isVisited()) {
           continue;
-        Node adjNode = sym.getNode();
+        }
+        final Node adjNode = sym.getNode();
         if (!(nodesVisited.contains(adjNode))) {
           nodeQueue.addLast(adjNode);
           nodesVisited.add(adjNode);
@@ -196,11 +173,11 @@ public class BufferSubgraph implements Comparable {
     }
   }
 
-  private void computeNodeDepth(Node n) {
+  private void computeNodeDepth(final Node n) {
     // find a visited dirEdge to start at
     DirectedEdge startEdge = null;
-    for (Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-      DirectedEdge de = (DirectedEdge)i.next();
+    for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
       if (de.isVisited() || de.getSym().isVisited()) {
         startEdge = de;
         break;
@@ -210,24 +187,37 @@ public class BufferSubgraph implements Comparable {
     // if (startEdge == null) return;
 
     // only compute string append if assertion would fail
-    if (startEdge == null)
+    if (startEdge == null) {
       throw new TopologyException("unable to find edge to compute depths at "
         + n.getCoordinate());
+    }
 
     ((DirectedEdgeStar)n.getEdges()).computeDepths(startEdge);
 
     // copy depths to sym edges
-    for (Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-      DirectedEdge de = (DirectedEdge)i.next();
+    for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
       de.setVisited(true);
       copySymDepths(de);
     }
   }
 
-  private void copySymDepths(DirectedEdge de) {
-    DirectedEdge sym = de.getSym();
+  private void copySymDepths(final DirectedEdge de) {
+    final DirectedEdge sym = de.getSym();
     sym.setDepth(Position.LEFT, de.getDepth(Position.RIGHT));
     sym.setDepth(Position.RIGHT, de.getDepth(Position.LEFT));
+  }
+
+  /**
+   * Creates the subgraph consisting of all edges reachable from this node.
+   * Finds the edges in the graph and the rightmost coordinate.
+   * 
+   * @param node a node to start the graph traversal from
+   */
+  public void create(final Node node) {
+    addReachable(node);
+    finder.findEdge(dirEdgeList);
+    rightMostCoord = finder.getCoordinate();
   }
 
   /**
@@ -238,8 +228,8 @@ public class BufferSubgraph implements Comparable {
    * form part of the result area boundary.
    */
   public void findResultEdges() {
-    for (Iterator it = dirEdgeList.iterator(); it.hasNext();) {
-      DirectedEdge de = (DirectedEdge)it.next();
+    for (final Iterator it = dirEdgeList.iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
       /**
        * Select edges which have an interior depth on the RHS and an exterior
        * depth on the LHS. Note that because of weird rounding effects there may
@@ -255,26 +245,40 @@ public class BufferSubgraph implements Comparable {
     }
   }
 
+  public List getDirectedEdges() {
+    return dirEdgeList;
+  }
+
   /**
-   * BufferSubgraphs are compared on the x-value of their rightmost Coordinate.
-   * This defines a partial ordering on the graphs such that:
-   * <p>
-   * g1 >= g2 <==> Ring(g2) does not contain Ring(g1)
-   * <p>
-   * where Polygon(g) is the buffer polygon that is built from g.
-   * <p>
-   * This relationship is used to sort the BufferSubgraphs so that shells are
-   * guaranteed to be built before holes.
+   * Computes the envelope of the edges in the subgraph. The envelope is cached
+   * after being computed.
+   * 
+   * @return the envelope of the graph.
    */
-  public int compareTo(Object o) {
-    BufferSubgraph graph = (BufferSubgraph)o;
-    if (this.rightMostCoord.getX() < graph.rightMostCoord.getX()) {
-      return -1;
+  public Envelope getEnvelope() {
+    if (env == null) {
+      final Envelope edgeEnv = new Envelope();
+      for (final Iterator it = dirEdgeList.iterator(); it.hasNext();) {
+        final DirectedEdge dirEdge = (DirectedEdge)it.next();
+        final CoordinatesList pts = dirEdge.getEdge().getCoordinates();
+        for (int i = 0; i < pts.size() - 1; i++) {
+          edgeEnv.expandToInclude(pts.getCoordinate(i));
+        }
+      }
+      env = edgeEnv;
     }
-    if (this.rightMostCoord.getX() > graph.rightMostCoord.getX()) {
-      return 1;
-    }
-    return 0;
+    return env;
+  }
+
+  public List getNodes() {
+    return nodes;
+  }
+
+  /**
+   * Gets the rightmost coordinate in the edges of the subgraph
+   */
+  public Coordinates getRightmostCoordinate() {
+    return rightMostCoord;
   }
 
 }

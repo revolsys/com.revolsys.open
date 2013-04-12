@@ -134,8 +134,8 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
 
   @Override
   public void project(final Coordinates from, final Coordinates to) {
-    final double lon =from.getX();
-    final double lat =from.getY();
+    final double lon = from.getX();
+    final double lat = from.getY();
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
     final double n = spheroid.primeVerticalRadiusOfCurvature(lat);

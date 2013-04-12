@@ -87,7 +87,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!EqualsRegistry.equal(geographicCoordinateSystem,cs.geographicCoordinateSystem)) {
+      if (!EqualsRegistry.equal(geographicCoordinateSystem,
+        cs.geographicCoordinateSystem)) {
         return false;
       } else if (!EqualsRegistry.equal(projection, cs.projection)) {
         return false;
@@ -163,6 +164,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return authority;
   }
 
+  @Override
   public List<Axis> getAxis() {
     return axis;
   }

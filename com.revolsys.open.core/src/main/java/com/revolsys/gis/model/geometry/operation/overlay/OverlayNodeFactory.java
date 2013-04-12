@@ -16,7 +16,8 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
  * @version 1.7
  */
 public class OverlayNodeFactory extends NodeFactory {
-  public Node createNode(Coordinates coord) {
+  @Override
+  public Node createNode(final Coordinates coord) {
     return new Node(coord, new DirectedEdgeStar());
   }
 }

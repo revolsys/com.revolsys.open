@@ -17,12 +17,12 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
  * @version 1.7
  */
 public class EdgeList {
-  private List edges = new ArrayList();
+  private final List edges = new ArrayList();
 
   /**
    * An index of the edges, for fast lookup.
    */
-  private Map ocaMap = new TreeMap();
+  private final Map ocaMap = new TreeMap();
 
   public EdgeList() {
   }
@@ -30,21 +30,31 @@ public class EdgeList {
   /**
    * Insert an edge unless it is already in the list
    */
-  public void add(Edge e) {
+  public void add(final Edge e) {
     edges.add(e);
-    OrientedCoordinateArray oca = new OrientedCoordinateArray(
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(
       e.getCoordinates());
     ocaMap.put(oca, e);
   }
 
-  public void addAll(Collection edgeColl) {
-    for (Iterator i = edgeColl.iterator(); i.hasNext();) {
+  public void addAll(final Collection edgeColl) {
+    for (final Iterator i = edgeColl.iterator(); i.hasNext();) {
       add((Edge)i.next());
     }
   }
 
-  public List getEdges() {
-    return edges;
+  /**
+   * If the edge e is already in the list, return its index.
+   * 
+   * @return index, if e is already in the list -1 otherwise
+   */
+  public int findEdgeIndex(final Edge e) {
+    for (int i = 0; i < edges.size(); i++) {
+      if (((Edge)edges.get(i)).equals(e)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -53,46 +63,39 @@ public class EdgeList {
    * 
    * @return equal edge, if there is one already in the list null otherwise
    */
-  public Edge findEqualEdge(Edge e) {
-    OrientedCoordinateArray oca = new OrientedCoordinateArray(
+  public Edge findEqualEdge(final Edge e) {
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(
       e.getCoordinates());
     // will return null if no edge matches
-    Edge matchEdge = (Edge)ocaMap.get(oca);
+    final Edge matchEdge = (Edge)ocaMap.get(oca);
     return matchEdge;
+  }
+
+  public Edge get(final int i) {
+    return (Edge)edges.get(i);
+  }
+
+  public List getEdges() {
+    return edges;
   }
 
   public Iterator iterator() {
     return edges.iterator();
   }
 
-  public Edge get(int i) {
-    return (Edge)edges.get(i);
-  }
-
-  /**
-   * If the edge e is already in the list, return its index.
-   * 
-   * @return index, if e is already in the list -1 otherwise
-   */
-  public int findEdgeIndex(Edge e) {
-    for (int i = 0; i < edges.size(); i++) {
-      if (((Edge)edges.get(i)).equals(e))
-        return i;
-    }
-    return -1;
-  }
-
-  public void print(PrintStream out) {
+  public void print(final PrintStream out) {
     out.print("MULTILINESTRING ( ");
     for (int j = 0; j < edges.size(); j++) {
-      Edge e = (Edge)edges.get(j);
-      if (j > 0)
+      final Edge e = (Edge)edges.get(j);
+      if (j > 0) {
         out.print(",");
+      }
       out.print("(");
-      CoordinatesList pts = e.getCoordinates();
+      final CoordinatesList pts = e.getCoordinates();
       for (int i = 0; i < pts.size(); i++) {
-        if (i > 0)
+        if (i > 0) {
           out.print(",");
+        }
         out.print(pts.getX(i) + " " + pts.getY(i));
       }
       out.println(")");

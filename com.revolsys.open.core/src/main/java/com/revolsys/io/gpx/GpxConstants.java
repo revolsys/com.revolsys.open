@@ -73,13 +73,6 @@ public final class GpxConstants {
 
   public static final String MEDIA_TYPE = "application/gpx+xml";
 
-  private static void addAttribute(String name, DataType type, boolean required) {
-    GPX_TYPE.addAttribute(name, type, required);
-    GPX_WAYPOINT.addAttribute(name, type, required);
-    GPX_TRACK.addAttribute(name, type, required);
-    GPX_ROUTE.addAttribute(name, type, required);
-  }
-
   static {
     addAttribute("dataset_name", DataTypes.STRING, false);
     addAttribute("index", DataTypes.DOUBLE, false);
@@ -110,6 +103,14 @@ public final class GpxConstants {
     GPX_TRACK.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_ROUTE.addAttribute("geometry", DataTypes.LINE_STRING, true);
     GPX_ROUTE.setGeometryFactory(GEOMETRY_FACTORY);
+  }
+
+  private static void addAttribute(final String name, final DataType type,
+    final boolean required) {
+    GPX_TYPE.addAttribute(name, type, required);
+    GPX_WAYPOINT.addAttribute(name, type, required);
+    GPX_TRACK.addAttribute(name, type, required);
+    GPX_ROUTE.addAttribute(name, type, required);
   }
 
   private GpxConstants() {

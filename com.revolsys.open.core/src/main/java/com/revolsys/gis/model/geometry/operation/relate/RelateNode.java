@@ -20,7 +20,7 @@ import com.vividsolutions.jts.geom.IntersectionMatrix;
  */
 public class RelateNode extends Node {
 
-  public RelateNode(Coordinates coord, EdgeEndStar edges) {
+  public RelateNode(final Coordinates coord, final EdgeEndStar edges) {
     super(coord, edges);
   }
 
@@ -28,14 +28,15 @@ public class RelateNode extends Node {
    * Update the IM with the contribution for this component. A component only
    * contributes if it has a labelling for both parent geometries
    */
-  protected void computeIM(IntersectionMatrix im) {
+  @Override
+  protected void computeIM(final IntersectionMatrix im) {
     im.setAtLeastIfValid(label.getLocation(0), label.getLocation(1), 0);
   }
 
   /**
    * Update the IM with the contribution for the EdgeEnds incident on this node.
    */
-  void updateIMFromEdges(IntersectionMatrix im) {
+  void updateIMFromEdges(final IntersectionMatrix im) {
     ((EdgeEndBundleStar)edges).updateIM(im);
   }
 

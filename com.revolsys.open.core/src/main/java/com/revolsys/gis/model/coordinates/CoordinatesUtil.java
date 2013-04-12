@@ -54,11 +54,11 @@ public class CoordinatesUtil {
    * @param tip2 the tip of v2
    * @return the angle between v1 and v2, relative to v1
    */
-  public static double angleBetweenOriented(Coordinates tip1, Coordinates tail,
-    Coordinates tip2) {
-    double a1 = tail.angle2d(tip1);
-    double a2 = tail.angle2d(tip2);
-    double angDel = a2 - a1;
+  public static double angleBetweenOriented(final Coordinates tip1,
+    final Coordinates tail, final Coordinates tip2) {
+    final double a1 = tail.angle2d(tip1);
+    final double a2 = tail.angle2d(tip2);
+    final double angDel = a2 - a1;
 
     // normalize, maintaining orientation
     if (angDel <= -Math.PI) {

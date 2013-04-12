@@ -123,8 +123,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     map = new LayerRendererOverlay(viewport, project);
     layeredPane.add(map, new Integer(1));
 
-    project.addPropertyChangeListener(this);
-
     project.addPropertyChangeListener("viewBoundingBox",
       new PropertyChangeListener() {
 

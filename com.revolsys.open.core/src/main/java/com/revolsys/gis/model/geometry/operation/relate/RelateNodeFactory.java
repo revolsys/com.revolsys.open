@@ -1,5 +1,3 @@
-
-
 package com.revolsys.gis.model.geometry.operation.relate;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -12,11 +10,9 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.NodeMap;
  *
  * @version 1.7
  */
-public class RelateNodeFactory
-  extends NodeFactory
-{
-  public Node createNode(Coordinates coord)
-  {
+public class RelateNodeFactory extends NodeFactory {
+  @Override
+  public Node createNode(final Coordinates coord) {
     return new RelateNode(coord, new EdgeEndBundleStar());
   }
 }

@@ -152,6 +152,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
       addQuery(query);
     }
   }
+
   public void setQueries(final List<Query> queries) {
     this.queries.clear();
     for (final Query query : queries) {

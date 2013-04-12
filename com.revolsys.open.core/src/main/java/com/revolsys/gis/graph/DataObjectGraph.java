@@ -38,9 +38,9 @@ public class DataObjectGraph extends Graph<DataObject> {
   }
 
   public List<Edge<DataObject>> addEdges(final Collection<DataObject> objects) {
-    List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
+    final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (final DataObject object : objects) {
-      Edge<DataObject> edge = addEdge(object);
+      final Edge<DataObject> edge = addEdge(object);
       edges.add(edge);
     }
     return edges;
@@ -125,7 +125,8 @@ public class DataObjectGraph extends Graph<DataObject> {
     final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (final Edge<DataObject> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
-      final List<Edge<DataObject>> splitEdges = edge.split(new DoubleCoordinates(point));
+      final List<Edge<DataObject>> splitEdges = edge.split(new DoubleCoordinates(
+        point));
       DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
       edges.addAll(splitEdges);
     }

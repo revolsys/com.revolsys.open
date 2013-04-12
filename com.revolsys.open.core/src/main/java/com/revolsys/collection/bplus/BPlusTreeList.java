@@ -21,9 +21,9 @@ public class BPlusTreeList<T> extends AbstractList<T> {
 
   public BPlusTreeList(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
-    ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();
-    tree = BPlusTreeMap.create(pageManager, comparator,
-      PageValueManager.INT, valueSerializer);
+    final ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();
+    tree = BPlusTreeMap.create(pageManager, comparator, PageValueManager.INT,
+      valueSerializer);
   }
 
   @Override

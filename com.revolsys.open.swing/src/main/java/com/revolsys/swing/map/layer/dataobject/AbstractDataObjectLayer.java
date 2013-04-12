@@ -20,20 +20,25 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
+import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.overlay.AddGeometryOverlay;
+import com.revolsys.swing.map.util.LayerUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
-  DataObjectLayer {
+  DataObjectLayer, DataObjectFactory {
 
   private DataObjectMetaData metaData;
 
@@ -63,6 +68,53 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public AbstractDataObjectLayer() {
     this("");
+  }
+
+  public void addNewRecord() {
+    DataObjectMetaData metaData = this.getMetaData();
+    Attribute geometryAttribute = metaData.getGeometryAttribute();
+    if (geometryAttribute == null) {
+      DataObject object = this.createObject();
+      if (object != null) {
+        LayerUtil.showForm(this, object);
+      }
+    } else {
+      MapPanel map = MapPanel.get(this);
+      if (map != null) {
+        final AddGeometryOverlay addGeometryOverlay = map.getMapOverlay(AddGeometryOverlay.class);
+        synchronized (addGeometryOverlay) {
+          // TODO what if there is another feature being edited?
+          addGeometryOverlay.setAddFeatureLayer(this);
+          addGeometryOverlay.setCompletedAction(new InvokeMethodListener(this,
+            "actionCompleteAddNewRecord", addGeometryOverlay));
+          // TODO cancel action
+        }
+      }
+    }
+  }
+
+  public static void actionCompleteAddNewRecord(final AddGeometryOverlay overlay) {
+    synchronized (overlay) {
+      DataObjectLayer layer = overlay.getAddFeatureLayer();
+      Geometry geometry = overlay.getCompletedGeometry();
+      DataObject object = layer.createObject();
+      if (object != null) {
+        object.setGeometryValue(geometry);
+        LayerUtil.showForm(layer, object);
+      }
+      overlay.setEnabled(false);
+      overlay.setAddFeatureLayer(null);
+    }
+  }
+
+  @Override
+  public DataObject createDataObject(DataObjectMetaData metaData) {
+    if (metaData.equals(getMetaData())) {
+      return new LayerDataObject(this);
+    } else {
+      throw new IllegalArgumentException("Cannot create objects for "
+        + metaData);
+    }
   }
 
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
@@ -133,14 +185,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public DataObject createObject() {
     if (!isReadOnly() && isEditable() && isCanAddObjects()) {
-      final DataObjectMetaData metaData = getMetaData();
-      final DataObjectStore dataStore = getDataStore();
-      DataObject object;
-      if (dataStore == null) {
-        object = new ArrayDataObject(metaData);
-      } else {
-        object = dataStore.create(metaData);
-      }
+      DataObject object = new LayerDataObject(this);
       newObjects.add(object);
       return object;
     } else {
@@ -296,17 +341,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return selectedObjects.size();
   }
 
-  private boolean hasChanges() {
-    synchronized (editSync) {
-      if (!newObjects.isEmpty()) {
-        return true;
-      } else if (!modifiedObjects.isEmpty()) {
-        return true;
-      } else if (!deletedObjectIds.isEmpty()) {
-        return true;
-      } else {
-        return false;
+  public boolean isHasChanges() {
+    if (isEditable()) {
+      synchronized (editSync) {
+        if (!newObjects.isEmpty()) {
+          return true;
+        } else if (!modifiedObjects.isEmpty()) {
+          return true;
+        } else if (!deletedObjectIds.isEmpty()) {
+          return true;
+        } else {
+          return false;
+        }
       }
+    } else {
+      return false;
     }
   }
 
@@ -363,7 +412,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public boolean saveChanges() {
     synchronized (editSync) {
-      boolean saved = internalSaveChanges();
+      boolean saved = doSaveChanges();
       if (saved) {
         clearChanges();
       }
@@ -372,7 +421,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected boolean internalSaveChanges() {
+  protected boolean doSaveChanges() {
     return true;
   }
 
@@ -405,8 +454,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       synchronized (editSync) {
         if (editable == false) {
-          if (hasChanges()) {
-            final int result = InvokeMethodCallable.invokeAndWait(
+          if (isHasChanges()) {
+            final Integer result = InvokeMethodCallable.invokeAndWait(
               JOptionPane.class,
               "showConfirmDialog",
               JOptionPane.getRootFrame(),

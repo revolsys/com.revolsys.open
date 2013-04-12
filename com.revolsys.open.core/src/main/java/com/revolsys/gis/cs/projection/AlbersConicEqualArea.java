@@ -218,9 +218,9 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     final double lambda = from.getX();
     final double phi = from.getY();
     final double q = q(phi);
-    double lminusl0 = lambda - lambda0;
+    final double lminusl0 = lambda - lambda0;
     final double theta = n * lminusl0;
-    double sqrtCminsNQOverN = Math.sqrt(c - n * q) / n;
+    final double sqrtCminsNQOverN = Math.sqrt(c - n * q) / n;
     final double rho = semiMajorAxis * sqrtCminsNQOverN;
 
     final double x = x0 + rho * Math.sin(theta);

@@ -10,7 +10,7 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
 
   private final K key;
 
-  public MapKeyEntry(Map<K, V> map, final K key) {
+  public MapKeyEntry(final Map<K, V> map, final K key) {
     this.key = key;
   }
 
@@ -33,10 +33,12 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
 
   }
 
+  @Override
   public K getKey() {
     return key;
   }
 
+  @Override
   public V getValue() {
     return map.get(key);
   }
@@ -46,8 +48,9 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
     return key.hashCode();
   }
 
+  @Override
   public V setValue(final V newValue) {
-    V oldValue = map.get(key);
+    final V oldValue = map.get(key);
     map.put(key, newValue);
     return oldValue;
   }

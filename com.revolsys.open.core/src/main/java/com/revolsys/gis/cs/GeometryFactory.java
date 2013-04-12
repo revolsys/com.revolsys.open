@@ -192,7 +192,7 @@ public class GeometryFactory extends
   public static LineString[] toLineStringArray(final GeometryFactory factory,
     final Collection<?> lines) {
     final LineString[] lineStrings = new LineString[lines.size()];
-    Iterator<?> iterator = lines.iterator();
+    final Iterator<?> iterator = lines.iterator();
     for (int i = 0; i < lines.size(); i++) {
       final Object value = iterator.next();
       if (value instanceof LineString) {
@@ -266,7 +266,7 @@ public class GeometryFactory extends
     final Collection<?> polygonList) {
     final Polygon[] polygons = new Polygon[polygonList.size()];
     int i = 0;
-    for (Object value : polygonList) {
+    for (final Object value : polygonList) {
       if (value instanceof Polygon) {
         final Polygon polygon = (Polygon)value;
         polygons[i] = polygon;
@@ -296,7 +296,7 @@ public class GeometryFactory extends
   }
 
   @SuppressWarnings("unchecked")
-  public <G extends Geometry> G copy(G geometry) {
+  public <G extends Geometry> G copy(final G geometry) {
     return (G)createGeometry(geometry);
   }
 
@@ -376,6 +376,26 @@ public class GeometryFactory extends
     return new GeometryCollection(null, this);
   }
 
+  public Geometry createGeometry(final Collection<? extends Geometry> geometries) {
+    if (geometries == null || geometries.size() == 0) {
+      return createEmptyGeometryCollection();
+    } else if (geometries.size() == 1) {
+      return CollectionUtil.get(geometries, 0);
+    } else {
+      final Set<Class<?>> classes = getGeometryClassSet(geometries);
+      if (classes.equals(Collections.singleton(Point.class))) {
+        return createMultiPoint(geometries);
+      } else if (classes.equals(Collections.singleton(LineString.class))) {
+        return createMultiLineString(geometries);
+      } else if (classes.equals(Collections.singleton(Polygon.class))) {
+        return createMultiPolygon(geometries);
+      } else {
+        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
+        return createGeometryCollection(geometryArray);
+      }
+    }
+  }
+
   @Override
   public Geometry createGeometry(final Geometry geometry) {
     if (geometry == null) {
@@ -438,26 +458,6 @@ public class GeometryFactory extends
         return createPolygon(polygon);
       } else {
         throw new RuntimeException("Unknown geometry type " + geometry);
-      }
-    }
-  }
-
-  public Geometry createGeometry(final Collection<? extends Geometry> geometries) {
-    if (geometries == null || geometries.size() == 0) {
-      return createEmptyGeometryCollection();
-    } else if (geometries.size() == 1) {
-      return CollectionUtil.get(geometries, 0);
-    } else {
-      final Set<Class<?>> classes = getGeometryClassSet(geometries);
-      if (classes.equals(Collections.singleton(Point.class))) {
-        return createMultiPoint(geometries);
-      } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return createMultiLineString(geometries);
-      } else if (classes.equals(Collections.singleton(Polygon.class))) {
-        return createMultiPolygon(geometries);
-      } else {
-        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
-        return createGeometryCollection(geometryArray);
       }
     }
   }
@@ -589,14 +589,14 @@ public class GeometryFactory extends
     return createLineString(coordinatesList);
   }
 
-  @Override
-  public MultiLineString createMultiLineString(final LineString... lines) {
-    return super.createMultiLineString(lines);
-  }
-
   public MultiLineString createMultiLineString(final Collection<?> lines) {
     final LineString[] lineArray = toLineStringArray(this, lines);
     return createMultiLineString(lineArray);
+  }
+
+  @Override
+  public MultiLineString createMultiLineString(final LineString... lines) {
+    return super.createMultiLineString(lines);
   }
 
   public MultiPoint createMultiPoint(final Collection<?> points) {
@@ -763,7 +763,7 @@ public class GeometryFactory extends
     coordinatesPrecisionModel.makePrecise(point);
   }
 
-  public double makePrecise(double value) {
+  public double makePrecise(final double value) {
     return getPrecisionModel().makePrecise(value);
   }
 
@@ -777,8 +777,8 @@ public class GeometryFactory extends
     return coordinatesPrecisionModel.makeZPrecise(value);
   }
 
-  public <G extends Geometry> G project(G geometry) {
-    return (G)GeometryProjectionUtil.perform(geometry, this);
+  public <G extends Geometry> G project(final G geometry) {
+    return GeometryProjectionUtil.perform(geometry, this);
   }
 
   @Override

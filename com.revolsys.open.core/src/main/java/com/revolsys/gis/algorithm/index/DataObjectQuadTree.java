@@ -29,6 +29,12 @@ public class DataObjectQuadTree extends Quadtree {
     insert(objects);
   }
 
+  public void insert(final Collection<? extends DataObject> objects) {
+    for (final DataObject object : objects) {
+      insert(object);
+    }
+  }
+
   public void insert(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
@@ -37,16 +43,25 @@ public class DataObjectQuadTree extends Quadtree {
     }
   }
 
-  public void insert(final Collection<? extends DataObject> objects) {
+  public void insertAll(final Collection<? extends DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
-  public void insertAll(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      insert(object);
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<DataObject> query(final Envelope envelope) {
+    final List<DataObject> results = super.query(envelope);
+    for (final Iterator<DataObject> iterator = results.iterator(); iterator.hasNext();) {
+      final DataObject object = iterator.next();
+      final Geometry geometry = object.getGeometryValue();
+      final Envelope objectEnvelope = geometry.getEnvelopeInternal();
+      if (!envelope.intersects(objectEnvelope)) {
+        iterator.remove();
+      }
     }
+    return results;
   }
 
   public void query(final Envelope searchEnv, final Visitor<DataObject> visitor) {
@@ -77,24 +92,15 @@ public class DataObjectQuadTree extends Quadtree {
     return query(envelope);
   }
 
+  public List<DataObject> queryEnvelope(
+    final com.revolsys.gis.model.geometry.Geometry geometry) {
+    final Envelope envelope = JtsGeometryUtil.getEnvelope(geometry.getBoundingBox());
+    return query(envelope);
+  }
+
   public List<DataObject> queryEnvelope(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     return queryEnvelope(geometry);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<DataObject> query(Envelope envelope) {
-    List<DataObject> results = super.query(envelope);
-    for (Iterator<DataObject> iterator = results.iterator(); iterator.hasNext();) {
-      DataObject object = iterator.next();
-      Geometry geometry = object.getGeometryValue();
-      Envelope objectEnvelope = geometry.getEnvelopeInternal();
-      if (!envelope.intersects(objectEnvelope)) {
-        iterator.remove();
-      }
-    }
-    return results;
   }
 
   public List<DataObject> queryEnvelope(final Geometry geometry) {
@@ -102,10 +108,6 @@ public class DataObjectQuadTree extends Quadtree {
     return query(envelope);
   }
 
-  public List<DataObject> queryEnvelope(final com.revolsys.gis.model.geometry.Geometry geometry) {
-    final Envelope envelope = JtsGeometryUtil.getEnvelope(geometry.getBoundingBox());
-    return query(envelope);
-  }
   public DataObject queryFirst(final DataObject object,
     final Filter<DataObject> filter) {
     final Geometry geometry = object.getGeometryValue();
@@ -176,15 +178,15 @@ public class DataObjectQuadTree extends Quadtree {
     return queryList(envelope, filter, comparator);
   }
 
-  public boolean remove(final DataObject object) {
-    final Geometry geometry = object.getGeometryValue();
-    final Envelope envelope = geometry.getEnvelopeInternal();
-    return super.remove(envelope, object);
-  }
-
   public void remove(final Collection<? extends DataObject> objects) {
     for (final DataObject object : objects) {
       remove(object);
     }
+  }
+
+  public boolean remove(final DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    final Envelope envelope = geometry.getEnvelopeInternal();
+    return super.remove(envelope, object);
   }
 }

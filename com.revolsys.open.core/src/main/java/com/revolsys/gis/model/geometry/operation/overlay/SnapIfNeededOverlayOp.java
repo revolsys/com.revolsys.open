@@ -14,13 +14,22 @@ import com.revolsys.gis.model.geometry.util.TopologyException;
  * @version 1.7
  */
 public class SnapIfNeededOverlayOp {
-  public static Geometry overlayOp(Geometry geometry1, Geometry geometry2, int opCode) {
+  public static Geometry difference(final Geometry g0, final Geometry g1) {
+    return overlayOp(g0, g1, OverlayOp.DIFFERENCE);
+  }
+
+  public static Geometry intersection(final Geometry g0, final Geometry g1) {
+    return overlayOp(g0, g1, OverlayOp.INTERSECTION);
+  }
+
+  public static Geometry overlayOp(final Geometry geometry1,
+    final Geometry geometry2, final int opCode) {
     Geometry result = null;
     boolean isSuccess = false;
     RuntimeException savedException = null;
     try {
       result = OverlayOp.overlayOp(geometry1, geometry2, opCode);
-      boolean isValid = true;
+      final boolean isValid = true;
       // not needed if noding validation is used
       // boolean isValid = OverlayResultValidator.isValid(geom[0], geom[1],
       // OverlayOp.INTERSECTION, result);
@@ -28,7 +37,7 @@ public class SnapIfNeededOverlayOp {
         isSuccess = true;
       }
 
-    } catch (RuntimeException ex) {
+    } catch (final RuntimeException ex) {
       savedException = ex;
       // ignore this exception, since the operation will be rerun
       // System.out.println(ex.getMessage());
@@ -42,26 +51,18 @@ public class SnapIfNeededOverlayOp {
       // if so, throw the original exception since it has the input coordinates
       try {
         result = SnapOverlayOp.overlayOp(geometry1, geometry2, opCode);
-      } catch (RuntimeException ex) {
+      } catch (final RuntimeException ex) {
         throw savedException;
       }
     }
     return result;
   }
 
-  public static Geometry intersection(Geometry g0, Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.INTERSECTION);
-  }
-
-  public static Geometry union(Geometry g0, Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.UNION);
-  }
-
-  public static Geometry difference(Geometry g0, Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.DIFFERENCE);
-  }
-
-  public static Geometry symDifference(Geometry g0, Geometry g1) {
+  public static Geometry symDifference(final Geometry g0, final Geometry g1) {
     return overlayOp(g0, g1, OverlayOp.SYMDIFFERENCE);
+  }
+
+  public static Geometry union(final Geometry g0, final Geometry g1) {
+    return overlayOp(g0, g1, OverlayOp.UNION);
   }
 }

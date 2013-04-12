@@ -34,6 +34,21 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   private final PrimeMeridian primeMeridian;
 
   public GeographicCoordinateSystem(final int id, final String name,
+    final Datum datum, final AngularUnit angularUnit, final List<Axis> axis,
+    final Area area, final Authority authority, final boolean deprecated) {
+    this.id = id;
+    this.name = name;
+    this.datum = datum;
+    this.primeMeridian = null;
+    this.angularUnit = angularUnit;
+    if (axis != null && !axis.isEmpty()) {
+      this.axis.addAll(axis);
+    }
+    this.area = area;
+    this.authority = authority;
+  }
+
+  public GeographicCoordinateSystem(final int id, final String name,
     final Datum datum, final PrimeMeridian primeMeridian,
     final AngularUnit angularUnit, final List<Axis> axis, final Area area,
     final Authority authority, final boolean deprecated) {
@@ -65,21 +80,6 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.authority = authority;
   }
 
-  public GeographicCoordinateSystem(final int id, final String name,
-    final Datum datum, final AngularUnit angularUnit, final List<Axis> axis,
-    final Area area, final Authority authority, final boolean deprecated) {
-    this.id = id;
-    this.name = name;
-    this.datum = datum;
-    this.primeMeridian = null;
-    this.angularUnit = angularUnit;
-    if (axis != null && !axis.isEmpty()) {
-      this.axis.addAll(axis);
-    }
-    this.area = area;
-    this.authority = authority;
-  }
-
   @Override
   public boolean equals(final Object object) {
     if (object == null) {
@@ -102,6 +102,16 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  private boolean equals(final Object object1, final Object object2) {
+    if (object1 == object2) {
+      return true;
+    } else if (object1 == null || object2 == null) {
+      return false;
+    } else {
+      return object1.equals(object2);
+    }
+  }
+
   public boolean equalsExact(final GeographicCoordinateSystem cs) {
     if (cs == null) {
       return false;
@@ -111,7 +121,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       if (!equals(angularUnit, cs.angularUnit)) {
         return false;
       } else if (!equals(area, cs.area)) {
-  return false;
+        return false;
       } else if (!equals(authority, cs.authority)) {
         return false;
       } else if (!equals(axis, cs.axis)) {
@@ -129,16 +139,6 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       } else {
         return true;
       }
-    }
-  }
-
-  private boolean equals(final Object object1, final Object object2) {
-    if (object1 == object2) {
-      return true;
-    } else if (object1 == null || object2 == null) {
-      return false;
-    } else {
-      return object1.equals(object2);
     }
   }
 
@@ -166,6 +166,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return authority;
   }
 
+  @Override
   public List<Axis> getAxis() {
     return axis;
   }

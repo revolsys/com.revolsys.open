@@ -20,12 +20,6 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
     this(coordinatesList.getNumAxis(), coordinatesList);
   }
 
-  public ListCoordinatesList(final int numAxis,
-    final CoordinatesList coordinatesList) {
-    this(numAxis);
-    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
-  }
-
   public ListCoordinatesList(final int numAxis) {
     this.numAxis = (byte)numAxis;
   }
@@ -39,6 +33,12 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   }
 
   public ListCoordinatesList(final int numAxis,
+    final CoordinatesList coordinatesList) {
+    this(numAxis);
+    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
+  }
+
+  public ListCoordinatesList(final int numAxis,
     final List<Coordinates> coordinates) {
     this(numAxis);
     for (final Coordinates coordinate : coordinates) {
@@ -48,6 +48,10 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
 
   public void add(final Coordinates point) {
     coordinates.add(new DoubleCoordinates(point, numAxis));
+  }
+
+  public void add(final Point point) {
+    add(CoordinatesUtil.get(point));
   }
 
   public void clear() {
@@ -98,9 +102,5 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   @Override
   public int size() {
     return coordinates.size();
-  }
-
-  public void add(Point point) {
-    add(CoordinatesUtil.get(point));
   }
 }

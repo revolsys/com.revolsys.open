@@ -455,7 +455,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
       setValue(index, id);
 
     } else {
-      Object oldId = getValue(index);
+      final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
         throw new IllegalStateException(
           "Cannot change the ID on a persisted object");
@@ -556,7 +556,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
       Object targetValue;
       if (codeTableValueName == null) {
         if (value instanceof List) {
-          List list = (List)value;
+          final List list = (List)value;
           targetValue = codeTable.getId(list.toArray());
         } else {
           targetValue = codeTable.getId(value);

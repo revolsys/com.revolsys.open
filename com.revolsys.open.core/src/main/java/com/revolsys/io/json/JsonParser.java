@@ -78,21 +78,8 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     }
   }
 
-  public static Map<String, Object> getMap(InputStream in) {
-    JsonParser parser = new JsonParser(in);
-    try {
-      if (parser.next() == EventType.startDocument) {
-        return getMap(parser);
-      } else {
-        return Collections.emptyMap();
-      }
-    } finally {
-      parser.close();
-    }
-  }
-
-  public static Map<String, Object> getMap(Reader reader) {
-    JsonParser parser = new JsonParser(reader);
+  public static Map<String, Object> getMap(final InputStream in) {
+    final JsonParser parser = new JsonParser(in);
     try {
       if (parser.next() == EventType.startDocument) {
         return getMap(parser);
@@ -134,6 +121,19 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
         + parser.getEvent());
     }
 
+  }
+
+  public static Map<String, Object> getMap(final Reader reader) {
+    final JsonParser parser = new JsonParser(reader);
+    try {
+      if (parser.next() == EventType.startDocument) {
+        return getMap(parser);
+      } else {
+        return Collections.emptyMap();
+      }
+    } finally {
+      parser.close();
+    }
   }
 
   public static String getString(final JsonParser parser) {
@@ -263,7 +263,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     this.reader = new BufferedReader(reader);
     try {
       currentCharacter = this.reader.read();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }

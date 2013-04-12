@@ -13,6 +13,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
+  void addNewRecord();
+
   void addSelectedObjects(Collection<? extends DataObject> objects);
 
   void addSelectedObjects(DataObject... objects);
@@ -22,6 +24,8 @@ public interface DataObjectLayer extends Layer {
   void clearHiddenObjects();
 
   void clearSelectedObjects();
+
+  DataObject createObject();
 
   void deleteObjects(Collection<? extends DataObject> objects);
 
@@ -39,12 +43,6 @@ public interface DataObjectLayer extends Layer {
 
   DataObject getObject(int row);
 
-  boolean isCanDeleteObjects();
-
-  boolean isCanAddObjects();
-
-  boolean isCanEditObjects();
-  
   List<DataObject> getObjects();
 
   List<DataObject> getObjects(Geometry geometry, double distance);
@@ -59,15 +57,21 @@ public interface DataObjectLayer extends Layer {
 
   int getSelectionCount();
 
+  boolean isCanAddObjects();
+
+  boolean isCanDeleteObjects();
+
+  boolean isCanEditObjects();
+
+  boolean isHasChanges();
+
   boolean isSelected(DataObject object);
 
   boolean isVisible(DataObject object);
 
   List<DataObject> query(Query query);
 
-  void unselectObjects(Collection<? extends DataObject> objects);
-
-  void unelectObjects(DataObject... objects);
+  void setEditingObjects(BoundingBox boundingBox);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 
@@ -86,7 +90,7 @@ public interface DataObjectLayer extends Layer {
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
-  DataObject createObject();
+  void unelectObjects(DataObject... objects);
 
-  void setEditingObjects(BoundingBox boundingBox);
+  void unselectObjects(Collection<? extends DataObject> objects);
 }

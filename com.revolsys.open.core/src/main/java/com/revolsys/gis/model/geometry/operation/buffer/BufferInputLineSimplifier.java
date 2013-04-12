@@ -67,7 +67,6 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms;
 public class BufferInputLineSimplifier {
   private static final int DELETE = 1;
 
-
   private static final int NUM_PTS_TO_CHECK = 10;
 
   /**
@@ -100,7 +99,8 @@ public class BufferInputLineSimplifier {
   }
 
   private CoordinatesList collapseLine() {
-    final ListCoordinatesList points = new ListCoordinatesList(inputLine.getNumAxis());
+    final ListCoordinatesList points = new ListCoordinatesList(
+      inputLine.getNumAxis());
     for (int i = 0; i < inputLine.size(); i++) {
       if (isDeleted[i] != DELETE) {
         points.add(inputLine.get(i));
@@ -122,7 +122,7 @@ public class BufferInputLineSimplifier {
      * end caps are generated consistently.
      */
     int index = 1;
-  
+
     int midIndex = findNextNonDeletedIndex(index);
     int lastIndex = findNextNonDeletedIndex(midIndex);
 

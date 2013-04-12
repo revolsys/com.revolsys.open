@@ -59,16 +59,6 @@ public final class UrlUtil {
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
-  public static String getContent(final String urlString) {
-    try {
-      final URL url = UrlUtil.getUrl(urlString);
-      final InputStream in = url.openStream();
-      return FileUtil.getString(in);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to read " + urlString);
-    }
-  }
-
   /**
    * Clean repeated // characters from the URL path.
    * 
@@ -79,6 +69,16 @@ public final class UrlUtil {
     return url.replaceAll("/+", "/")
       .replaceAll("^((\\w)+:)/", "$1//")
       .replaceAll("^file://", "file:///");
+  }
+
+  public static String getContent(final String urlString) {
+    try {
+      final URL url = UrlUtil.getUrl(urlString);
+      final InputStream in = url.openStream();
+      return FileUtil.getString(in);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to read " + urlString);
+    }
   }
 
   public static String getFileBaseName(final URL url) {
@@ -175,11 +175,11 @@ public final class UrlUtil {
    */
   public static String getUrl(String baseUrl,
     final Map<String, ? extends Object> parameters) {
-    int fragmentIndex = baseUrl.indexOf('#');
+    final int fragmentIndex = baseUrl.indexOf('#');
     String fragment = null;
     if (fragmentIndex > -1 && fragmentIndex < baseUrl.length() - 1) {
       fragment = baseUrl.substring(fragmentIndex + 1);
-          baseUrl = baseUrl.substring(0, fragmentIndex);
+      baseUrl = baseUrl.substring(0, fragmentIndex);
     }
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {

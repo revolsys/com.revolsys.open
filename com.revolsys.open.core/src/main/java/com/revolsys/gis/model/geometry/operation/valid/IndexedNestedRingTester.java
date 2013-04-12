@@ -52,49 +52,64 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  *
  * @version 1.7
  */
-public class IndexedNestedRingTester
-{
-  private GeometryGraph graph;  // used to find non-node vertices
-  private List rings = new ArrayList();
+public class IndexedNestedRingTester {
+  private final GeometryGraph graph; // used to find non-node vertices
+
+  private final List rings = new ArrayList();
+
   private BoundingBox totalEnv = new BoundingBox();
+
   private SpatialIndex index;
+
   private Coordinates nestedPt;
 
-  public IndexedNestedRingTester(GeometryGraph graph)
-  {
+  public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
   }
 
-  public Coordinates getNestedPoint() { return nestedPt; }
-
-  public void add(LinearRing ring)
-  {
+  public void add(final LinearRing ring) {
     rings.add(ring);
     totalEnv = totalEnv.expandToInclude(ring.getBoundingBox());
   }
 
-  public boolean isNonNested()
-  {
+  private void buildIndex() {
+    index = new STRtree();
+
+    for (int i = 0; i < rings.size(); i++) {
+      final LinearRing ring = (LinearRing)rings.get(i);
+      final BoundingBox env = ring.getBoundingBox();
+      index.insert(JtsGeometryUtil.getEnvelope(env), ring);
+    }
+  }
+
+  public Coordinates getNestedPoint() {
+    return nestedPt;
+  }
+
+  public boolean isNonNested() {
     buildIndex();
 
     for (int i = 0; i < rings.size(); i++) {
-      LinearRing innerRing = (LinearRing) rings.get(i);
-      CoordinatesList innerRingPts = innerRing;
+      final LinearRing innerRing = (LinearRing)rings.get(i);
+      final CoordinatesList innerRingPts = innerRing;
 
-      List results = index.query(JtsGeometryUtil.getEnvelope(innerRing.getBoundingBox()));
-//System.out.println(results.size());
+      final List results = index.query(JtsGeometryUtil.getEnvelope(innerRing.getBoundingBox()));
+      // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
-        LinearRing searchRing = (LinearRing) results.get(j);
-        CoordinatesList searchRingPts = searchRing;
+        final LinearRing searchRing = (LinearRing)results.get(j);
+        final CoordinatesList searchRingPts = searchRing;
 
-        if (innerRing == searchRing)
+        if (innerRing == searchRing) {
           continue;
+        }
 
-        if (! innerRing.getBoundingBox().intersects(searchRing.getBoundingBox()))
+        if (!innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
           continue;
+        }
 
-        Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
-        
+        final Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts,
+          searchRing, graph);
+
         /**
          * If no non-node pts can be found, this means
          * that the searchRing touches ALL of the innerRing vertices.
@@ -105,10 +120,12 @@ public class IndexedNestedRingTester
          * Both of these cases are caught by other tests,
          * so it is safe to simply skip this situation here.
          */
-        if (innerRingPt == null)
+        if (innerRingPt == null) {
           continue;
+        }
 
-        boolean isInside = CoordinatesListUtil.isPointInRing(innerRingPt, searchRingPts);
+        final boolean isInside = CoordinatesListUtil.isPointInRing(innerRingPt,
+          searchRingPts);
         if (isInside) {
           nestedPt = innerRingPt;
           return false;
@@ -116,16 +133,5 @@ public class IndexedNestedRingTester
       }
     }
     return true;
-  }
-
-  private void buildIndex()
-  {
-    index = new STRtree();
-
-    for (int i = 0; i < rings.size(); i++) {
-      LinearRing ring = (LinearRing) rings.get(i);
-      BoundingBox env = ring.getBoundingBox();
-      index.insert(JtsGeometryUtil.getEnvelope(env), ring);
-    }
   }
 }

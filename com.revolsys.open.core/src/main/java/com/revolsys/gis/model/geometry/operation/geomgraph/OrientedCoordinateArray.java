@@ -44,19 +44,36 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @version 1.7
  */
 public class OrientedCoordinateArray implements Comparable {
-  private CoordinatesList pts;
+  private static int compareOriented(final CoordinatesList pts1,
+    final boolean orientation1, final CoordinatesList pts2,
+    final boolean orientation2) {
+    final int dir1 = orientation1 ? 1 : -1;
+    final int dir2 = orientation2 ? 1 : -1;
+    final int limit1 = orientation1 ? pts1.size() : -1;
+    final int limit2 = orientation2 ? pts2.size() : -1;
 
-  private boolean orientation;
-
-  /**
-   * Creates a new {@link OrientedCoordinateArray} for the given
-   * {@link Coordinate} array.
-   * 
-   * @param pts the coordinates to orient
-   */
-  public OrientedCoordinateArray(CoordinatesList pts) {
-    this.pts = pts;
-    orientation = orientation(pts);
+    int i1 = orientation1 ? 0 : pts1.size() - 1;
+    int i2 = orientation2 ? 0 : pts2.size() - 1;
+    final int comp = 0;
+    while (true) {
+      final int compPt = pts1.get(i1).compareTo(pts2.get(i2));
+      if (compPt != 0) {
+        return compPt;
+      }
+      i1 += dir1;
+      i2 += dir2;
+      final boolean done1 = i1 == limit1;
+      final boolean done2 = i2 == limit2;
+      if (done1 && !done2) {
+        return -1;
+      }
+      if (!done1 && done2) {
+        return 1;
+      }
+      if (done1 && done2) {
+        return 0;
+      }
+    }
   }
 
   /**
@@ -66,8 +83,23 @@ public class OrientedCoordinateArray implements Comparable {
    * @return <code>true</code> if the points are oriented forwards
    * @return <code>false</code if the points are oriented in reverse
    */
-  private static boolean orientation(CoordinatesList pts) {
+  private static boolean orientation(final CoordinatesList pts) {
     return CoordinateArrays.increasingDirection(pts) == 1;
+  }
+
+  private final CoordinatesList pts;
+
+  private final boolean orientation;
+
+  /**
+   * Creates a new {@link OrientedCoordinateArray} for the given
+   * {@link Coordinate} array.
+   * 
+   * @param pts the coordinates to orient
+   */
+  public OrientedCoordinateArray(final CoordinatesList pts) {
+    this.pts = pts;
+    orientation = orientation(pts);
   }
 
   /**
@@ -78,9 +110,10 @@ public class OrientedCoordinateArray implements Comparable {
    * @return 1 this one is greater
    */
 
-  public int compareTo(Object o1) {
-    OrientedCoordinateArray oca = (OrientedCoordinateArray)o1;
-    int comp = compareOriented(pts, orientation, oca.pts, oca.orientation);
+  @Override
+  public int compareTo(final Object o1) {
+    final OrientedCoordinateArray oca = (OrientedCoordinateArray)o1;
+    final int comp = compareOriented(pts, orientation, oca.pts, oca.orientation);
     /*
      * // MD - testing only int oldComp =
      * SegmentStringDissolver.ptsComp.compare(pts, oca.pts); if ((oldComp == 0
@@ -91,33 +124,6 @@ public class OrientedCoordinateArray implements Comparable {
      * SegmentStringDissolver.ptsComp.compare(pts, oca.pts); }
      */
     return comp;
-  }
-
-  private static int compareOriented(CoordinatesList pts1,
-    boolean orientation1, CoordinatesList pts2, boolean orientation2) {
-    int dir1 = orientation1 ? 1 : -1;
-    int dir2 = orientation2 ? 1 : -1;
-    int limit1 = orientation1 ? pts1.size() : -1;
-    int limit2 = orientation2 ? pts2.size() : -1;
-
-    int i1 = orientation1 ? 0 : pts1.size() - 1;
-    int i2 = orientation2 ? 0 : pts2.size() - 1;
-    int comp = 0;
-    while (true) {
-      int compPt = pts1.get(i1).compareTo(pts2.get(i2));
-      if (compPt != 0)
-        return compPt;
-      i1 += dir1;
-      i2 += dir2;
-      boolean done1 = i1 == limit1;
-      boolean done2 = i2 == limit2;
-      if (done1 && !done2)
-        return -1;
-      if (!done1 && done2)
-        return 1;
-      if (done1 && done2)
-        return 0;
-    }
   }
 
 }

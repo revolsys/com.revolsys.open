@@ -82,6 +82,13 @@ public final class DataObjectUtil {
     return value;
   }
 
+  public static DataObject copy(final DataObjectMetaData metaData,
+    final DataObject object) {
+    final DataObject copy = new ArrayDataObject(metaData);
+    copy.setValues(object);
+    return copy;
+  }
+
   /**
    * Create a copy of the data object replacing the geometry with the new
    * geometry. If the existing geometry on the object has user data it will be
@@ -101,13 +108,6 @@ public final class DataObjectUtil {
       geometry.setUserData(new HashMap<String, Object>(userData));
     }
     return newObject;
-  }
-
-  public static DataObject copy(final DataObjectMetaData metaData,
-    final DataObject object) {
-    DataObject copy = new ArrayDataObject(metaData);
-    copy.setValues(object);
-    return copy;
   }
 
   @SuppressWarnings("unchecked")
@@ -243,42 +243,14 @@ public final class DataObjectUtil {
     }
   }
 
-  public static void setValues(final DataObject target,
-    final DataObject source, final Collection<String> attributesNames,
-    final Collection<String> ignoreAttributeNames) {
-    for (final String attributeName : attributesNames) {
-      if (!ignoreAttributeNames.contains(attributeName)) {
-        final Object oldValue = target.getValue(attributeName);
-        Object newValue = source.getValue(attributeName);
-        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
-          newValue = DataObjectUtil.clone(newValue);
-          target.setValue(attributeName, newValue);
-        }
-      }
-    }
-  }
-
-  private DataObjectUtil() {
-  }
-
-  public static List<DataObject> getObjects(DataObjectMetaData metaData,
-    Collection<? extends Map<String, Object>> list) {
-    List<DataObject> objects = new ArrayList<DataObject>();
-    for (Map<String, Object> map : list) {
-      DataObject object = getObject(metaData, map);
-      objects.add(object);
-    }
-    return objects;
-  }
-
-  public static DataObject getObject(DataObjectMetaData metaData,
-    Map<String, Object> values) {
-    DataObject object = new ArrayDataObject(metaData);
-    for (Entry<String, Object> entry : values.entrySet()) {
-      String name = entry.getKey();
-      Attribute attribute = metaData.getAttribute(name);
+  public static DataObject getObject(final DataObjectMetaData metaData,
+    final Map<String, Object> values) {
+    final DataObject object = new ArrayDataObject(metaData);
+    for (final Entry<String, Object> entry : values.entrySet()) {
+      final String name = entry.getKey();
+      final Attribute attribute = metaData.getAttribute(name);
       if (attribute != null) {
-        Object value = entry.getValue();
+        final Object value = entry.getValue();
         if (value != null) {
           final DataType dataType = attribute.getType();
           @SuppressWarnings("unchecked")
@@ -299,6 +271,34 @@ public final class DataObjectUtil {
       }
     }
     return object;
+  }
+
+  public static List<DataObject> getObjects(final DataObjectMetaData metaData,
+    final Collection<? extends Map<String, Object>> list) {
+    final List<DataObject> objects = new ArrayList<DataObject>();
+    for (final Map<String, Object> map : list) {
+      final DataObject object = getObject(metaData, map);
+      objects.add(object);
+    }
+    return objects;
+  }
+
+  public static void setValues(final DataObject target,
+    final DataObject source, final Collection<String> attributesNames,
+    final Collection<String> ignoreAttributeNames) {
+    for (final String attributeName : attributesNames) {
+      if (!ignoreAttributeNames.contains(attributeName)) {
+        final Object oldValue = target.getValue(attributeName);
+        Object newValue = source.getValue(attributeName);
+        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+          newValue = DataObjectUtil.clone(newValue);
+          target.setValue(attributeName, newValue);
+        }
+      }
+    }
+  }
+
+  private DataObjectUtil() {
   }
 
 }

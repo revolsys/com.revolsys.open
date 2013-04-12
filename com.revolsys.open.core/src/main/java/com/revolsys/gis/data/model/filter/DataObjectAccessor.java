@@ -9,46 +9,12 @@ import com.revolsys.gis.data.model.DataObject;
 
 public class DataObjectAccessor implements PropertyAccessor {
 
-  public boolean canRead(EvaluationContext context, Object target, String name)
-    throws AccessException {
-    DataObject object = (DataObject)target;
-    return object.hasAttribute(name);
-  }
-
-  public TypedValue read(EvaluationContext context, Object target, String name)
-    throws AccessException {
-    DataObject object = (DataObject)target;
-    Object value = object.getValue(name);
-    if (value == null && !object.hasAttribute(name)) {
-      throw new DataObjectAccessException(name);
-    }
-    return new TypedValue(value);
-  }
-
-  public boolean canWrite(EvaluationContext context, Object target, String name)
-    throws AccessException {
-    return true;
-  }
-
-  public void write(EvaluationContext context, Object target, String name,
-    Object newValue) throws AccessException {
-    DataObject object = (DataObject)target;
-    object.setValue(name, newValue);
-  }
-
-  @SuppressWarnings("rawtypes")
-  public Class[] getSpecificTargetClasses() {
-    return new Class[] {
-      DataObject.class
-    };
-  }
-
   @SuppressWarnings("serial")
   private static class DataObjectAccessException extends AccessException {
 
     private final String key;
 
-    public DataObjectAccessException(String key) {
+    public DataObjectAccessException(final String key) {
       super(null);
       this.key = key;
     }
@@ -57,6 +23,45 @@ public class DataObjectAccessor implements PropertyAccessor {
     public String getMessage() {
       return "DataObject does not contain a value for key '" + this.key + "'";
     }
+  }
+
+  @Override
+  public boolean canRead(final EvaluationContext context, final Object target,
+    final String name) throws AccessException {
+    final DataObject object = (DataObject)target;
+    return object.hasAttribute(name);
+  }
+
+  @Override
+  public boolean canWrite(final EvaluationContext context, final Object target,
+    final String name) throws AccessException {
+    return true;
+  }
+
+  @Override
+  @SuppressWarnings("rawtypes")
+  public Class[] getSpecificTargetClasses() {
+    return new Class[] {
+      DataObject.class
+    };
+  }
+
+  @Override
+  public TypedValue read(final EvaluationContext context, final Object target,
+    final String name) throws AccessException {
+    final DataObject object = (DataObject)target;
+    final Object value = object.getValue(name);
+    if (value == null && !object.hasAttribute(name)) {
+      throw new DataObjectAccessException(name);
+    }
+    return new TypedValue(value);
+  }
+
+  @Override
+  public void write(final EvaluationContext context, final Object target,
+    final String name, final Object newValue) throws AccessException {
+    final DataObject object = (DataObject)target;
+    object.setValue(name, newValue);
   }
 
 }

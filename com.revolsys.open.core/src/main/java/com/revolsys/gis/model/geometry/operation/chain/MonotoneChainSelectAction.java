@@ -16,19 +16,19 @@ public class MonotoneChainSelectAction {
   LineSegment selectedSegment = new LineSegment();
 
   /**
-   * This function can be overridden if the original chain is needed.
-   */
-  public void select(MonotoneChain mc, int start) {
-    mc.getLineSegment(start, selectedSegment);
-    select(selectedSegment);
-  }
-
-  /**
    * This is a convenience function which can be overridden to obtain the actual
    * line segment which is selected.
    * 
    * @param seg
    */
-  public void select(LineSegment seg) {
+  public void select(final LineSegment seg) {
+  }
+
+  /**
+   * This function can be overridden if the original chain is needed.
+   */
+  public void select(final MonotoneChain mc, final int start) {
+    mc.getLineSegment(start, selectedSegment);
+    select(selectedSegment);
   }
 }

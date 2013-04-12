@@ -144,7 +144,7 @@ public abstract class EdgeRing {
     }
     final Coordinates[] coord = new Coordinates[pts.size()];
     for (int i = 0; i < pts.size(); i++) {
-      coord[i] = (Coordinates)pts.get(i);
+      coord[i] = pts.get(i);
     }
     ring = geometryFactory.createLinearRing(coord);
     isHole = CoordinatesListUtil.isCCW(ring);
@@ -177,7 +177,7 @@ public abstract class EdgeRing {
   }
 
   public Coordinates getCoordinate(final int i) {
-    return (Coordinates)pts.get(i);
+    return pts.get(i);
   }
 
   /**
@@ -264,10 +264,10 @@ public abstract class EdgeRing {
   }
 
   public Polygon toPolygon(final GeometryFactory geometryFactory) {
-    List<LinearRing> rings = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
     rings.add(getLinearRing());
 
-    for (EdgeRing hole : holes) {
+    for (final EdgeRing hole : holes) {
       rings.add(hole.getLinearRing());
     }
     final Polygon poly = geometryFactory.createPolygon(rings);

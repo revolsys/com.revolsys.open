@@ -82,10 +82,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       return false;
     }
 
-    public Integer getKey() {
-      return key;
-    }
-
     /**
      * @return The int key of this entry
      */
@@ -93,9 +89,15 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       return key;
     }
 
+    @Override
+    public Integer getKey() {
+      return key;
+    }
+
     /**
      * @return Gets the value object of this entry
      */
+    @Override
     public T getValue() {
       return value;
     }
@@ -112,6 +114,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
      * @param newValue
      * @return The previous value
      */
+    @Override
     public T setValue(final T newValue) {
       final T oldValue = value;
       value = newValue;
@@ -510,6 +513,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   /**
    * Removes all mappings from this map.
    */
+  @Override
   public void clear() {
     modCount++;
     final Entry<T> tab[] = table;
@@ -561,6 +565,16 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     return false;
   }
 
+  @Override
+  public boolean containsKey(final Object obj) {
+    if (obj instanceof Integer) {
+      final Integer integer = (Integer)obj;
+      return get(integer.intValue()) != null;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Special-case code for containsValue with null argument
    * 
@@ -586,6 +600,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @return <tt>true</tt> if this map maps one or more keys to the specified
    *         value.
    */
+  @Override
   public boolean containsValue(final Object value) {
     if (value == null) {
       return containsNullValue();
@@ -618,6 +633,13 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     size++;
   }
 
+  public Set<Entry<T>> entryIntSet() {
+    if (entrySet == null) {
+      entrySet = new EntrySet();
+    }
+    return entrySet;
+  }
+
   /**
    * Returns a collection view of the mappings contained in this map. Each
    * element in the returned collection is a <tt>Map.Entry</tt>. The collection
@@ -631,6 +653,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * @return a collection view of the mappings contained in this map.
    * @see Map.Entry
    */
+  @Override
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
@@ -639,13 +662,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       entrySet = new EntrySet();
     }
     return (Set)entrySet;
-  }
-
-  public Set<Entry<T>> entryIntSet() {
-    if (entrySet == null) {
-      entrySet = new EntrySet();
-    }
-    return entrySet;
   }
 
   /**
@@ -672,6 +688,16 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
         return e.value;
       }
       e = e.next;
+    }
+  }
+
+  @Override
+  public T get(final Object obj) {
+    if (obj instanceof Integer) {
+      final Integer integer = (Integer)obj;
+      return get(integer.intValue());
+    } else {
+      return null;
     }
   }
 
@@ -705,6 +731,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * 
    * @return <tt>true</tt> if this map contains no key-value mappings.
    */
+  @Override
   public boolean isEmpty() {
     return size == 0;
   }
@@ -719,6 +746,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * 
    * @return a set view of the keys contained in this map.
    */
+  @Override
   public Set<Integer> keySet() {
     final Set<Integer> ks = keySet;
     return (ks != null ? ks : (keySet = new KeySet()));
@@ -736,6 +764,8 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   Iterator<Integer> newKeyIterator() {
     return new KeyIterator();
   }
+
+  // Views
 
   Iterator<T> newValueIterator() {
     return new ValueIterator();
@@ -768,7 +798,10 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     return null;
   }
 
-  // Views
+  @Override
+  public T put(final Integer key, final T value) {
+    return put(key.intValue(), value);
+  }
 
   /**
    * Copies all of the mappings from the specified map to this map These
@@ -808,6 +841,32 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
 
     for (final Entry<T> e : m.entryIntSet()) {
       put(e.getIntKey(), e.getValue());
+    }
+  }
+
+  @Override
+  public void putAll(final Map<? extends Integer, ? extends T> map) {
+    final int numKeysToBeAdded = map.size();
+    if (numKeysToBeAdded > 0) {
+      if (numKeysToBeAdded > threshold) {
+        int targetCapacity = (int)(numKeysToBeAdded / loadFactor + 1);
+        if (targetCapacity > MAXIMUM_CAPACITY) {
+          targetCapacity = MAXIMUM_CAPACITY;
+        }
+        int newCapacity = table.length;
+        while (newCapacity < targetCapacity) {
+          newCapacity <<= 1;
+        }
+        if (newCapacity > table.length) {
+          resize(newCapacity);
+        }
+      }
+
+      for (final Map.Entry<? extends Integer, ? extends T> e : map.entrySet()) {
+        final Integer key = e.getKey();
+        final T value = e.getValue();
+        put(key, value);
+      }
     }
   }
 
@@ -890,6 +949,16 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
       return null;
     } else {
       return e.value;
+    }
+  }
+
+  @Override
+  public T remove(final Object obj) {
+    if (obj instanceof Integer) {
+      final Integer integer = (Integer)obj;
+      return remove(integer.intValue());
+    } else {
+      return null;
     }
   }
 
@@ -992,6 +1061,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * 
    * @return the number of key-value mappings in this map.
    */
+  @Override
   public int size() {
     return size;
   }
@@ -1030,6 +1100,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    * 
    * @return a collection view of the values contained in this map.
    */
+  @Override
   public Collection<T> values() {
     final Collection<T> vs = values;
     return (vs != null ? vs : (values = new Values()));
@@ -1064,67 +1135,6 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     for (final Entry<T> e : entryIntSet()) {
       s.writeInt(e.getIntKey());
       s.writeObject(e.getValue());
-    }
-  }
-
-  @Override
-  public boolean containsKey(Object obj) {
-    if (obj instanceof Integer) {
-      Integer integer = (Integer)obj;
-      return get(integer.intValue()) != null;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public T get(Object obj) {
-    if (obj instanceof Integer) {
-      Integer integer = (Integer)obj;
-      return get(integer.intValue());
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public T put(Integer key, T value) {
-    return put(key.intValue(), value);
-  }
-
-  @Override
-  public T remove(Object obj) {
-    if (obj instanceof Integer) {
-      Integer integer = (Integer)obj;
-      return remove(integer.intValue());
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public void putAll(Map<? extends Integer, ? extends T> map) {
-    final int numKeysToBeAdded = map.size();
-    if (numKeysToBeAdded > 0) {
-      if (numKeysToBeAdded > threshold) {
-        int targetCapacity = (int)(numKeysToBeAdded / loadFactor + 1);
-        if (targetCapacity > MAXIMUM_CAPACITY) {
-          targetCapacity = MAXIMUM_CAPACITY;
-        }
-        int newCapacity = table.length;
-        while (newCapacity < targetCapacity) {
-          newCapacity <<= 1;
-        }
-        if (newCapacity > table.length) {
-          resize(newCapacity);
-        }
-      }
-
-      for (final Map.Entry<? extends Integer, ? extends T> e : map.entrySet()) {
-        Integer key = e.getKey();
-        T value = e.getValue();
-        put(key, value);
-      }
     }
   }
 }

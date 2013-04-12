@@ -50,7 +50,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
  * @version 1.7
  */
 public class IntersectionAdder implements SegmentIntersector {
-  public static boolean isAdjacentSegments(int i1, int i2) {
+  public static boolean isAdjacentSegments(final int i1, final int i2) {
     return Math.abs(i1 - i2) == 1;
   }
 
@@ -67,9 +67,9 @@ public class IntersectionAdder implements SegmentIntersector {
   private boolean hasInterior = false;
 
   // the proper intersection point found
-  private Coordinates properIntersectionPoint = null;
+  private final Coordinates properIntersectionPoint = null;
 
-  private LineIntersector li;
+  private final LineIntersector li;
 
   private boolean isSelfIntersection;
 
@@ -83,7 +83,7 @@ public class IntersectionAdder implements SegmentIntersector {
   // testing only
   public int numTests = 0;
 
-  public IntersectionAdder(LineIntersector li) {
+  public IntersectionAdder(final LineIntersector li) {
     this.li = li;
   }
 
@@ -99,8 +99,24 @@ public class IntersectionAdder implements SegmentIntersector {
     return properIntersectionPoint;
   }
 
+  /**
+   * An interior intersection is an intersection which is in the interior of
+   * some segment.
+   */
+  public boolean hasInteriorIntersection() {
+    return hasInterior;
+  }
+
   public boolean hasIntersection() {
     return hasIntersection;
+  }
+
+  /**
+   * A proper interior intersection is a proper intersection which is <b>not</b>
+   * contained in the set of boundary nodes set for this SegmentIntersector.
+   */
+  public boolean hasProperInteriorIntersection() {
+    return hasProperInterior;
   }
 
   /**
@@ -115,19 +131,13 @@ public class IntersectionAdder implements SegmentIntersector {
   }
 
   /**
-   * A proper interior intersection is a proper intersection which is <b>not</b>
-   * contained in the set of boundary nodes set for this SegmentIntersector.
+   * Always process all intersections
+   * 
+   * @return false always
    */
-  public boolean hasProperInteriorIntersection() {
-    return hasProperInterior;
-  }
-
-  /**
-   * An interior intersection is an intersection which is in the interior of
-   * some segment.
-   */
-  public boolean hasInteriorIntersection() {
-    return hasInterior;
+  @Override
+  public boolean isDone() {
+    return false;
   }
 
   /**
@@ -136,14 +146,15 @@ public class IntersectionAdder implements SegmentIntersector {
    * require a special check for the point shared by the beginning and end
    * segments.
    */
-  private boolean isTrivialIntersection(SegmentString e0, int segIndex0,
-    SegmentString e1, int segIndex1) {
+  private boolean isTrivialIntersection(final SegmentString e0,
+    final int segIndex0, final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
       if (li.getIntersectionNum() == 1) {
-        if (isAdjacentSegments(segIndex0, segIndex1))
+        if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
+        }
         if (e0.isClosed()) {
-          int maxSegIndex = e0.size() - 1;
+          final int maxSegIndex = e0.size() - 1;
           if ((segIndex0 == 0 && segIndex1 == maxSegIndex)
             || (segIndex1 == 0 && segIndex0 == maxSegIndex)) {
             return true;
@@ -161,15 +172,17 @@ public class IntersectionAdder implements SegmentIntersector {
    * optimize away this call for segment pairs which they have determined do not
    * intersect (e.g. by an disjoint envelope test).
    */
-  public void processIntersections(SegmentString e0, int segIndex0,
-    SegmentString e1, int segIndex1) {
-    if (e0 == e1 && segIndex0 == segIndex1)
+  @Override
+  public void processIntersections(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
+    if (e0 == e1 && segIndex0 == segIndex1) {
       return;
+    }
     numTests++;
-    Coordinates p00 = e0.getCoordinate(segIndex0);
-    Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    Coordinates p10 = e1.getCoordinate(segIndex1);
-    Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Coordinates p00 = e0.getCoordinate(segIndex0);
+    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
+    final Coordinates p10 = e1.getCoordinate(segIndex1);
+    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
@@ -199,14 +212,5 @@ public class IntersectionAdder implements SegmentIntersector {
         }
       }
     }
-  }
-
-  /**
-   * Always process all intersections
-   * 
-   * @return false always
-   */
-  public boolean isDone() {
-    return false;
   }
 }

@@ -11,12 +11,18 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
  * @version 1.7
  */
 public interface SegmentString {
+  public Coordinates getCoordinate(int i);
+
+  public CoordinatesList getCoordinates();
+
   /**
    * Gets the user-defined data for this segment string.
    * 
    * @return the user-defined data
    */
   public Object getData();
+
+  public boolean isClosed();
 
   /**
    * Sets the user-defined data for this segment string.
@@ -26,10 +32,4 @@ public interface SegmentString {
   public void setData(Object data);
 
   public int size();
-
-  public Coordinates getCoordinate(int i);
-
-  public CoordinatesList getCoordinates();
-
-  public boolean isClosed();
 }

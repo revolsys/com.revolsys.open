@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.dataobject;
 
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 import javax.swing.SwingWorker;
 
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
@@ -29,6 +32,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.transaction.InvokeMethodInTransaction;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -45,7 +49,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         "A data store layer requires a connectionProperties entry with a url, username and password.");
     } else {
       final DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
-      dataStore.setProperty("autoCommit", true);
       dataStore.initialize();
       final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
       layer.setProperties(properties);
@@ -75,15 +78,20 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
 
+  private final Method saveChangesMethod;
+
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
+    saveChangesMethod = ReflectionUtils.findMethod(getClass(),
+      "transactionSaveChanges");
+    saveChangesMethod.setAccessible(true);
+
   }
 
   public DataObjectStoreLayer(final DataObjectStore dataStore,
     final String typePath) {
-    super(PathUtil.getName(typePath), dataStore.getMetaData(typePath)
-      .getGeometryFactory());
-    this.dataStore = dataStore;
+    this(dataStore);
+    setMetaData(dataStore.getMetaData(typePath));
     setTypePath(typePath);
   }
 
@@ -327,8 +335,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected boolean internalSaveChanges() {
-    // TODO check to see if the can be saved
+  protected boolean doSaveChanges() {
+
+    return (Boolean)invokeInTransaction(saveChangesMethod);
+  }
+
+  protected boolean invokeInTransaction(Method saveChangesMethod) {
+    DataObjectStore dataStore = getDataStore();
+    PlatformTransactionManager transactionManager = dataStore.getTransactionManager();
+    return (Boolean)InvokeMethodInTransaction.execute(transactionManager, this,
+      saveChangesMethod);
+  }
+
+  protected boolean transactionSaveChanges() {
     final DataObjectStore dataStore = getDataStore();
     final DataObjectMetaData metaData = getMetaData();
     final String idAttributeName = metaData.getIdAttributeName();
@@ -375,6 +394,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public List<DataObject> query(final Query query) {
+    query.setProperty("dataObjectFactory", this);
     final Reader<DataObject> reader = dataStore.query(query);
     try {
       final List<DataObject> readObjects = reader.read();
