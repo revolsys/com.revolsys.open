@@ -129,7 +129,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   @Override
   public int getEndIndex() {
-    if (pageNumber == numPages) {
+    if (pageNumber == getNumPages()) {
       return numResults;
     } else {
       return (pageNumber + 1) * pageSize;
@@ -243,7 +243,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   @Override
   public boolean hasNextPage() {
-    return pageNumber < numPages;
+    return pageNumber < getNumPages();
   }
 
   /**
@@ -294,7 +294,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   @Override
   public boolean isLastPage() {
-    return pageNumber == numPages;
+    return pageNumber == getNumPages();
   }
 
   /**
@@ -304,8 +304,8 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   @Override
   public void setPageNumber(final int pageNumber) {
-    if (pageNumber - 1 > numPages) {
-      this.pageNumber = numPages;
+    if (pageNumber > getNumPages()) {
+      this.pageNumber = getNumPages() - 1;
     } else if (pageNumber <= 0) {
       this.pageNumber = 0;
     } else {
@@ -322,8 +322,12 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   @Override
   public void setPageSize(final int pageSize) {
     this.pageSize = pageSize;
-    this.numPages = Math.max(0, ((numResults - 1) / pageSize));
+    updateNumPages();
     updateResults();
+  }
+
+  protected void updateNumPages() {
+    this.numPages = Math.max(0, ((getNumResults() - 1) / getPageSize()));
   }
 
   /**

@@ -99,6 +99,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
       JdbcDataObjectStore dataStore = getDataStore();
       Query query = getQuery();
       numResults = dataStore.getRowCount(query);
+      updateNumPages();
     }
     return numResults;
   }
