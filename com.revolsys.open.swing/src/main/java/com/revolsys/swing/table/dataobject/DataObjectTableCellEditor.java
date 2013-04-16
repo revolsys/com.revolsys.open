@@ -9,6 +9,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 
+import org.jdesktop.swingx.JXTable;
+
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
@@ -51,11 +53,18 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public Component getTableCellEditorComponent(final JTable table,
     final Object value, final boolean isSelected, final int row,
     final int column) {
+    int attributeIndex;
+    if (table instanceof JXTable) {
+      final JXTable jxTable = (JXTable)table;
+      attributeIndex = jxTable.convertRowIndexToModel(row);
+    } else {
+      attributeIndex = row;
+    }
     if (column == 2) {
       final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
       final DataObjectMetaData metaData = model.getMetaData();
-      this.attributeName = metaData.getAttributeName(row);
-      uiBuilder = uiBuilderRegistry.getValueUiBuilder(metaData, row);
+      this.attributeName = metaData.getAttributeName(attributeIndex);
+      uiBuilder = uiBuilderRegistry.getValueUiBuilder(metaData, attributeIndex);
       if (uiBuilder != null) {
         return uiBuilder.getEditorComponent(value);
       } else {

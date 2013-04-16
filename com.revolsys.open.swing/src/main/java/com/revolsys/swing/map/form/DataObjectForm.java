@@ -15,7 +15,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +56,6 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.component.JLabelWithObject;
@@ -164,16 +162,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void saveChanges() {
-    DataObject object = updateDataObject();
-    DataObjectStore dataStore = getDataStore();
-    if (dataStore != null) {
-      Writer<DataObject> writer = dataStore.createWriter();
-      try {
-        writer.write(object);
-      } finally {
-        writer.close();
-      }
-    }
+    updateDataObject();
   }
 
   public void addField(final String fieldName, final JComponent field) {
@@ -525,6 +514,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
     for (final String name : fields.keySet()) {
       final Object value = getFieldValue(name);
       values.put(name, value);
+    }
+    String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    if (geometryAttributeName != null) {
+      values.put(geometryAttributeName, object.getGeometryValue());
     }
     return values;
   }
@@ -882,19 +875,20 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   }
 
-  protected void addPanel(final JPanel container, final String title, final List<String> fieldNames) {
+  protected void addPanel(final JPanel container, final String title,
+    final List<String> fieldNames) {
     final JPanel panel = new JPanel();
     container.add(panel);
-  
+
     final GroupLayout layout = new GroupLayout(panel);
     panel.setLayout(layout);
-  
+
     panel.setBorder(BorderFactory.createTitledBorder(title));
-  
+
     for (final String fieldName : fieldNames) {
       addLabelledField(panel, fieldName);
     }
-  
+
     GroupLayoutUtil.makeColumns(panel, 2);
   }
 

@@ -31,7 +31,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.list.LayerGroupListModel;
-import com.revolsys.swing.map.overlay.AddGeometryOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
@@ -190,7 +189,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new ZoomOverlay(this);
     new SelectFeaturesOverlay(this);
     new EditGeometryOverlay(this);
-    new AddGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(layeredPane);
   }
 

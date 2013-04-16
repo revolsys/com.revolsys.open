@@ -21,8 +21,6 @@ public interface DataObjectLayer extends Layer {
 
   void clearEditingObjects();
 
-  void clearHiddenObjects();
-
   void clearSelectedObjects();
 
   DataObject createObject();
@@ -36,8 +34,6 @@ public interface DataObjectLayer extends Layer {
   DataObjectStore getDataStore();
 
   Set<DataObject> getEditingObjects();
-
-  Set<DataObject> getHiddenObjects();
 
   DataObjectMetaData getMetaData();
 
@@ -75,10 +71,6 @@ public interface DataObjectLayer extends Layer {
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 
-  void setHiddenObjects(Collection<? extends DataObject> hiddenObjects);
-
-  void setHiddenObjects(DataObject... hiddenObjects);
-
   void setSelectedObjects(BoundingBox boundingBox);
 
   void setSelectedObjects(Collection<DataObject> objects);
@@ -90,7 +82,9 @@ public interface DataObjectLayer extends Layer {
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
-  void unelectObjects(DataObject... objects);
+  void unselectObjects(DataObject... objects);
 
   void unselectObjects(Collection<? extends DataObject> objects);
+
+  boolean isHidden(DataObject object);
 }

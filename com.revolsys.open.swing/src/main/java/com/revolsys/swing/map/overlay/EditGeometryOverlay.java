@@ -1,18 +1,23 @@
 package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
-import javax.swing.event.EventListenerList;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -21,11 +26,15 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -41,7 +50,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 @SuppressWarnings("serial")
-public class EditGeometryOverlay extends SelectFeaturesOverlay {
+public class EditGeometryOverlay extends SelectFeaturesOverlay implements
+  PropertyChangeListener, MouseListener, MouseMotionListener {
 
   private final Project project;
 
@@ -65,31 +75,30 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
 
   private DataType geometryDataType;
 
-  private DataObjectLayer editFeatureLayer;
+  private DataObjectLayer layer;
 
-  private Geometry completedGeometry;
+  private String mode;
 
   private int actionId = 0;
 
   private Geometry xorGeometry;
 
-  private EventListenerList completedActions = new EventListenerList();
+  private Cursor cursor;
 
-  public boolean hasEditableLayers() {
-    return hasSelectableLayers();
+  private DataObject object;
+
+  public DataObject getObject() {
+    return object;
   }
 
-  @Override
-  protected boolean isSelectable(DataObjectLayer dataObjectLayer) {
-    return isEditable(dataObjectLayer);
-  }
+  private final Cursor addNodeCursor = SilkIconLoader.getCursor(
+    "cursor_new_node", 8, 7);
 
-  protected boolean isEditable(DataObjectLayer dataObjectLayer) {
-    return dataObjectLayer.isCanEditObjects();
-  }
+  private ActionListener completedAction;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map, new Color(0, 255, 255));
+
     this.viewport = map.getViewport();
     this.project = map.getProject();
     this.geometryFactory = viewport.getGeometryFactory();
@@ -97,29 +106,30 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
     project.addPropertyChangeListener(this);
 
     map.addMapOverlay(this);
-    updateSelectableLayers();
   }
 
-  public void addCompletedAction(final ActionListener listener) {
-    completedActions.add(ActionListener.class, listener);
-  }
-  
-  @Override
-  public void selectObjects(BoundingBox boundingBox) {
-    for (final DataObjectLayer layer : getEditableLayers()) {
-      layer.setEditingObjects(boundingBox);
+  protected void actionAddGeometryCompleted() {
+    if (isGeometryValid()) {
+      try {
+        firstPoint = null;
+        previousPoint = null;
+        xorGeometry = null;
+        points = new ListCoordinatesList(2);
+        if ("add".equals(mode)) {
+          object = layer.createObject();
+          if (object != null) {
+            object.setGeometryValue(geometry);
+            mode = "edit";
+          }
+        }
+        fireActionPerformed(completedAction, "Geometry Complete");
+      } finally {
+      }
     }
-  }
-  public List<DataObjectLayer> getEditableLayers() {
-    return getSelectableLayers();
-  }
-  public void clearCompletedActions() {
-    completedActions = new EventListenerList();
   }
 
   protected Geometry createGeometry() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final ListCoordinatesList points = getPoints();
     Geometry geometry = null;
     final int size = points.size();
     if (size == 1) {
@@ -136,6 +146,20 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
     return geometry;
   }
 
+  protected LineString createXorLine(final Point p0, final Point p1) {
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final Coordinates c0 = CoordinatesUtil.get(viewportGeometryFactory.copy(p0));
+    final Coordinates c1 = CoordinatesUtil.get(viewportGeometryFactory.copy(p1));
+    final LineSegment line = new LineSegment(viewportGeometryFactory, c0, c1);
+    final double length = line.getLength();
+    final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
+    final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
+      / length, 0);
+    Point point = viewportGeometryFactory.createPoint(newC1);
+    point = geometryFactory.copy(point);
+    return geometryFactory.createLineString(p0, point);
+  }
+
   protected void drawXorGeometry(final Graphics2D graphics) {
     if (xorGeometry != null) {
       graphics.setXORMode(Color.WHITE);
@@ -150,20 +174,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
     }
   }
 
-  protected void fireActionPerformed(final String command) {
-    final ActionEvent actionEvent = new ActionEvent(this, actionId++, command);
-    for (final ActionListener listener : completedActions.getListeners(ActionListener.class)) {
+  protected void fireActionPerformed(ActionListener listener,
+    final String command) {
+    if (listener != null) {
+      final ActionEvent actionEvent = new ActionEvent(this, actionId++, command);
       listener.actionPerformed(actionEvent);
     }
   }
 
-  public DataObjectLayer getEditFeatureLayer() {
-    return editFeatureLayer;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <G extends Geometry> G getCompletedGeometry() {
-    return (G)completedGeometry;
+  public DataObjectLayer getLayer() {
+    return layer;
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -174,47 +194,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
     final java.awt.Point eventPoint = event.getPoint();
     final Point point = viewport.toModelPoint(eventPoint);
     return geometryFactory.copy(point);
-  }
-
-  protected ListCoordinatesList getPoints() {
-    return points;
-  }
-
-  @Override
-  public void mouseClicked(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
-      // final Point point = getPoint(event);
-      // points.add(point);
-      // final int size = points.size();
-      // if (size == 1) {
-      // firstPoint = point;
-      // } else {
-      // previousPoint = point;
-      // }
-      //
-      // geometry = createGeometry();
-      // xorGeometry = null;
-      // event.consume();
-      // if (DataTypes.POINT.equals(geometryDataType)) {
-      // actionEditGeometryCompleted();
-      // }
-      // if (event.getClickCount() == 2) {
-      // actionEditGeometryCompleted();
-      // }
-      repaint();
-    }
-  }
-
-  protected void actionEditGeometryCompleted() {
-    if (isGeometryValid()) {
-      firstPoint = null;
-      previousPoint = null;
-      xorGeometry = null;
-      this.completedGeometry = geometry;
-      fireActionPerformed("Geometry Complete");
-      geometry = null;
-      points = new ListCoordinatesList(2);
-    }
   }
 
   protected boolean isGeometryValid() {
@@ -261,61 +240,101 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
   }
 
   @Override
-  public void mouseDragged(final MouseEvent event) {
-    super.mouseDragged(event);
+  public void mouseClicked(final MouseEvent event) {
+    if ("add".equals(mode)) {
+      modeAddMouseClick(event);
+    }
   }
 
-  @Override
-  public void mouseEntered(final MouseEvent event) {
+  protected void modeAddMouseClick(final MouseEvent event) {
+    if (SwingUtilities.isLeftMouseButton(event)) {
+      final Point point = getPoint(event);
+      final int size = points.size();
+      if (size == 0) {
+        points.add(point);
+        firstPoint = point;
+      } else {
+        Coordinates lastPoint = points.get(size - 1);
+        if (!CoordinatesUtil.get(point).equals(lastPoint)) {
+          points.add(point);
+          previousPoint = point;
+        }
+      }
+
+      geometry = createGeometry();
+      xorGeometry = null;
+      event.consume();
+      if (DataTypes.POINT.equals(geometryDataType)) {
+        actionAddGeometryCompleted();
+      }
+      if (event.getClickCount() == 2) {
+        actionAddGeometryCompleted();
+      }
+      repaint();
+    }
   }
-
-  @Override
-  public void mouseExited(final MouseEvent event) {
-  }
-
-  @Override
-  public void mouseMoved(final MouseEvent event) {
-    // final Point point = getPoint(event);
-    // final Graphics2D graphics = (Graphics2D)getGraphics();
-    // drawXorGeometry(graphics);
-    // if (firstPoint == null) {
-    // xorGeometry = geometryFactory.copy(point);
-    // } else if (previousPoint == null) {
-    // xorGeometry = geometryFactory.createLineString(firstPoint, point);
-    // } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-    // || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-    // xorGeometry = geometryFactory.createLineString(previousPoint, point);
-    // } else {
-    // xorGeometry = geometryFactory.createLineString(previousPoint, point,
-    // firstPoint);
-    // }
-    // drawXorGeometry(graphics);
-  }
-
-  private DataObject editObject;
-
-  @Override
-  public void mousePressed(final MouseEvent event) {
-    // TODO Don't call super depending on mode
-    super.mousePressed(event);
-  }
-
 
   public boolean isSelectEvent(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
+    if (!"add".equals(mode) && SwingUtilities.isLeftMouseButton(event)) {
       final boolean keyPress = event.isAltDown();
       return keyPress;
     }
     return false;
   }
-  @Override
-  public void mouseReleased(final MouseEvent event) {
-    super.mouseReleased(event);
-  }
 
   protected Collection<DataObject> getSelectedObjects(
     final DataObjectLayer layer) {
-    return layer.getEditingObjects();
+    if ("add".equals(mode)) {
+      return Collections.emptyList();
+    } else {
+      return layer.getEditingObjects();
+    }
+  }
+
+  @Override
+  public void mouseDragged(final MouseEvent event) {
+    super.mouseDragged(event);
+  }
+
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseMoved(final MouseEvent event) {
+    final Graphics2D graphics = (Graphics2D)getGraphics();
+    final Point point = getPoint(event);
+    drawXorGeometry(graphics);
+    if (firstPoint == null) {
+      xorGeometry = null;
+    } else if (previousPoint == null) {
+      xorGeometry = createXorLine(firstPoint, point);
+    } else if (DataTypes.LINE_STRING.equals(geometryDataType)
+      || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+      xorGeometry = createXorLine(previousPoint, point);
+    } else {
+      xorGeometry = geometryFactory.createLineString(previousPoint, point,
+        firstPoint);
+    }
+    drawXorGeometry(graphics);
+  }
+
+  @Override
+  public void mousePressed(final MouseEvent event) {
+    if ("add".equals(mode) && SwingUtilities.isLeftMouseButton(event)) {
+      event.consume();
+    } else {
+      super.mousePressed(event);
+    }
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent event) {
+    super.mouseReleased(event);
   }
 
   @Override
@@ -346,36 +365,88 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay {
       updateSelectableLayers();
       repaint();
     }
+    repaint();
+
+  }
+
+  private void restoreCursor() {
+    if (cursor != null) {
+      getParent().setCursor(cursor);
+      cursor = null;
+    }
+  }
+
+  private void saveCursor() {
+    cursor = getParent().getCursor();
   }
 
   /**
    * Set the layer that a new feature is to be added to.
    * 
-   * @param editFeatureLayer 
+   * @param layer 
    */
-  public void setEditFeatureLayer(final DataObjectLayer editFeatureLayer) {
-    // TODO handle case where feature is being edited or added
-    if (editFeatureLayer == null) {
-      this.editFeatureLayer = editFeatureLayer;
-      setEnabled(false);
+  public void addObject(final DataObjectLayer layer,
+    ActionListener completedAction) {
+    // TODO what if there is already editing going on with unsaved changes?
+    clearEditingObjects(project);
+    if (layer == null) {
+      this.layer = layer;
+      restoreCursor();
+      mode = null;
     } else {
-      final DataObjectMetaData metaData = editFeatureLayer.getMetaData();
+      this.completedAction = completedAction;
+      final DataObjectMetaData metaData = layer.getMetaData();
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       if (geometryAttribute == null) {
-        this.editFeatureLayer = null;
-        setEnabled(false);
+        this.layer = null;
+        restoreCursor();
+        mode = null;
       } else {
-        this.editFeatureLayer = editFeatureLayer;
+        mode = "add";
+        this.layer = layer;
         this.geometryFactory = metaData.getGeometryFactory();
         this.geometryDataType = geometryAttribute.getType();
-        setEnabled(true);
+        saveCursor();
+        getParent().setCursor(addNodeCursor);
       }
     }
   }
 
-  public void setCompletedAction(final ActionListener listener) {
-    clearCompletedActions();
-    addCompletedAction(listener);
+  private void clearEditingObjects(LayerGroup layerGroup) {
+    for (Layer layer : layerGroup.getLayers()) {
+      if (layer instanceof LayerGroup) {
+        LayerGroup childGroup = (LayerGroup)layer;
+        clearEditingObjects(childGroup);
+      }
+      if (layer instanceof DataObjectLayer) {
+        DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+        dataObjectLayer.clearEditingObjects();
+      }
+    }
+
   }
 
+  @Override
+  public void selectObjects(BoundingBox boundingBox) {
+    for (final DataObjectLayer layer : getEditableLayers()) {
+      layer.setEditingObjects(boundingBox);
+    }
+  }
+
+  public List<DataObjectLayer> getEditableLayers() {
+    return getSelectableLayers();
+  }
+
+  public boolean hasEditableLayers() {
+    return hasSelectableLayers();
+  }
+
+  @Override
+  protected boolean isSelectable(DataObjectLayer dataObjectLayer) {
+    return isEditable(dataObjectLayer);
+  }
+
+  protected boolean isEditable(DataObjectLayer dataObjectLayer) {
+    return dataObjectLayer.isCanEditObjects();
+  }
 }

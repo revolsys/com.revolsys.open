@@ -121,7 +121,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public static boolean isDataTableCallback() {
-    return HttpServletUtils.getParameter("_") != null && HttpServletUtils.getParameter("callback") == null;
+    return HttpServletUtils.getParameter("_") != null
+      && HttpServletUtils.getParameter("callback") == null;
   }
 
   public static boolean isHtmlPage(final HttpServletRequest request) {
@@ -595,10 +596,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
       final int recordNumber = HttpServletUtils.getIntegerParameter(request,
         "iDisplayStart");
-      int pageNumber = (int)Math.ceil(recordNumber / (double)pageSize);
-      if (pageNumber <= 0) {
-        pageNumber = 1;
-      }
+      int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
       pager.setPageNumber(pageNumber);
 
       final List<KeySerializer> serializers = getSerializers(pageName, "list");

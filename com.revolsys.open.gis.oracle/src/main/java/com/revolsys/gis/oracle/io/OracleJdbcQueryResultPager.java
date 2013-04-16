@@ -43,7 +43,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
           final int startRowNum = ((pageNumber - 1) * pageSize) + 1;
           final int endRowNum = startRowNum + pageSize - 1;
-          sql = "SELECT * FROM ( " + getSql() + ") WHERE ROWNUM BETWEEN "
+          sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql + ") T2 ) WHERE TROWNUM BETWEEN "
             + startRowNum + " AND " + endRowNum;
 
           final DataSource dataSource = getDataSource();

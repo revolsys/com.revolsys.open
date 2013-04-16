@@ -143,9 +143,9 @@ public abstract class GeoReferencedRaster {
 
   protected void setEnvelope() {
     final Coordinates coorRaster_imageLB = new DoubleCoordinates(
-      topLeftRasterPoint.getX(), image.getHeight() - 1);
+      topLeftRasterPoint.getX(), image.getHeight() - 1.0);
     final Coordinates coorRaster_imageRT = new DoubleCoordinates(
-      image.getWidth() - 1, 0);
+      image.getWidth() - 1.0, 0);
     final Coordinates coorModel_imageLB = rasterToModelSpace(coorRaster_imageLB);
     final Coordinates coorModel_imageRT = rasterToModelSpace(coorRaster_imageRT);
 

@@ -94,6 +94,14 @@ public class ProjectFrame extends JFrame {
     return mapPanel;
   }
 
+  public ObjectTreePanel getTocPanel() {
+    return tocPanel;
+  }
+
+  public CControl getDockControl() {
+    return dockControl;
+  }
+
   protected void addTableOfContents() {
     final JPanel panel = new JPanel(new BorderLayout());
 

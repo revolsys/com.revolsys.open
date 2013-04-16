@@ -214,8 +214,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent evt) {
-    propertyChangeSupport.firePropertyChange(evt);
+  public void propertyChange(final PropertyChangeEvent event) {
+    propertyChangeSupport.firePropertyChange(event);
   }
 
   @Override

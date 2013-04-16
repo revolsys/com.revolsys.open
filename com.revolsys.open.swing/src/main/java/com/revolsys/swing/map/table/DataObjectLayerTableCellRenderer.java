@@ -16,6 +16,8 @@ import com.revolsys.util.CollectionUtil;
 
 public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
 
+  private static final long serialVersionUID = 1L;
+
   private static final Color DARK_SALMON = new Color(250, 128, 114);
 
   private final DataObjectLayerTableModel model;

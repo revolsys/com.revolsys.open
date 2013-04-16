@@ -29,12 +29,9 @@ public class DockingFramesUtil {
     if (component == null) {
       return null;
     } else {
-      final CControlAccess controlAccess = workingArea.getControl();
-      final CControl control = controlAccess.getOwner();
       final DefaultSingleCDockable dockable = new DefaultSingleCDockable(id,
         title, component);
-      control.addDockable(dockable);
-      dockable.setWorkingArea(workingArea);
+      workingArea.add(dockable);
       dockable.setMinimizable(true);
       dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
         .minimalWest());
@@ -44,7 +41,8 @@ public class DockingFramesUtil {
         @Override
         public void changed(CDockableLocationEvent event) {
           CLocation newLocation = event.getNewLocation();
-          if (newLocation != null && newLocation.getClass() == CExternalizedLocation.class) {
+          if (newLocation != null
+            && newLocation.getClass() == CExternalizedLocation.class) {
             CExternalizedLocation externalLocation = (CExternalizedLocation)newLocation;
             CLocation oldLocation = event.getOldLocation();
             if (oldLocation == null

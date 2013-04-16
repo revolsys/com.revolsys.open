@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,29 +55,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  private BoundingBox boundingBox = new BoundingBox();
+
+  private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
+
   private final DataObjectStore dataStore;
 
-  private final Object sync = new Object();
-
-  private String typePath;
-
   private DataObjectQuadTree index = new DataObjectQuadTree();
-
-  private BoundingBox boundingBox = new BoundingBox();
 
   private BoundingBox loadingBoundingBox = new BoundingBox();
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
 
-  private final Set<Object> selectedObjectIds = new LinkedHashSet<Object>();
-
-  private final Set<Object> editingObjectIds = new LinkedHashSet<Object>();
-
-  private final Set<Object> hiddenObjectIds = new LinkedHashSet<Object>();
-
-  private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
-
   private final Method saveChangesMethod;
+
+  private final Object sync = new Object();
+
+  private String typePath;
 
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
@@ -96,40 +89,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void refresh() {
-    super.refresh();
-    synchronized (sync) {
-      if (loadingWorker != null) {
-        loadingWorker.cancel(true);
-      }
-
-      boundingBox = new BoundingBox();
-      loadingBoundingBox = boundingBox;
-      index = new DataObjectQuadTree();
+  public void addEditingObject(DataObject object) {
+    DataObject cachedObject = getCacheObject(object);
+    if (cachedObject != null) {
+      super.addEditingObject(cachedObject);
     }
   }
 
   @Override
-  public void addSelectedObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!selectedObjectIds.contains(id)) {
-            selectedObjectIds.add(id);
-            cacheObject(id, object);
-          }
-        }
-      }
+  protected void addModifiedObject(final DataObject object) {
+    final DataObject cacheObject = getCacheObject(object);
+    if (cacheObject != null) {
+      super.addModifiedObject(cacheObject);
     }
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
   }
 
-  private void cacheObject(final Object id, final DataObject object) {
-    synchronized (cachedObjects) {
-      if (!cachedObjects.containsKey(id)) {
-        cachedObjects.put(id, object);
-      }
+  @Override
+  protected void addSelectedObject(DataObject object) {
+    DataObject cachedObject = getCacheObject(object);
+    if (cachedObject != null) {
+      super.addSelectedObject(object);
     }
   }
 
@@ -138,12 +117,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
    */
   private void cleanCachedObjects() {
     synchronized (cachedObjects) {
-      final Set<Object> ids = new HashSet<Object>();
-      ids.addAll(selectedObjectIds);
-      ids.addAll(hiddenObjectIds);
-      ids.addAll(editingObjectIds);
-      cachedObjects.keySet().retainAll(ids);
+      final Set<DataObject> objects = new HashSet<DataObject>();
+      objects.addAll(getSelectedObjects());
+      objects.addAll(getEditingObjects());
+      objects.addAll(getModifiedObjects());
+      cachedObjects.values().retainAll(objects);
     }
+  }
+
+  @Override
+  protected void clearChanges() {
+    super.clearChanges();
+    cachedObjects.clear();
   }
 
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
@@ -160,9 +145,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  public void clearEditingObjects() {
+    synchronized (cachedObjects) {
+      super.clearEditingObjects();
+      cleanCachedObjects();
+    }
+  }
+
+  @Override
   public void clearSelectedObjects() {
     synchronized (cachedObjects) {
-      selectedObjectIds.clear();
+      super.clearSelectedObjects();
       cleanCachedObjects();
     }
   }
@@ -172,8 +165,40 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  protected boolean doSaveChanges() {
+
+    return invokeInTransaction(saveChangesMethod);
+  }
+
+  @Override
+  protected void fireObjectsChanged() {
+    refresh();
+    super.fireObjectsChanged();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return getCoordinateSystem().getAreaBoundingBox();
+  }
+
+  protected DataObject getCacheObject(final DataObject object) {
+    final Object idValue = object.getIdValue();
+    return getCacheObject(idValue, object);
+  }
+
+  private DataObject getCacheObject(final Object id, final DataObject object) {
+    if (isLayerObject(object)) {
+      synchronized (cachedObjects) {
+        if (cachedObjects.containsKey(id)) {
+          return cachedObjects.get(id);
+        } else {
+          cachedObjects.put(id, object);
+          return object;
+        }
+      }
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -205,30 +230,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public DataObjectStore getDataStore() {
     return dataStore;
-  }
-
-  @Override
-  public Set<DataObject> getEditingObjects() {
-    final Set<DataObject> objects = new HashSet<DataObject>();
-    for (final Object id : editingObjectIds) {
-      final DataObject object = cachedObjects.get(id);
-      if (object != null) {
-        objects.add(object);
-      }
-    }
-    return objects;
-  }
-
-  @Override
-  public Set<DataObject> getHiddenObjects() {
-    final Set<DataObject> objects = new HashSet<DataObject>();
-    for (final Object id : hiddenObjectIds) {
-      final DataObject object = cachedObjects.get(id);
-      if (object != null) {
-        objects.add(object);
-      }
-    }
-    return objects;
   }
 
   public BoundingBox getLoadingBoundingBox() {
@@ -284,109 +285,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return dataStore.getRowCount(query);
   }
 
-  @Override
-  public List<DataObject> getSelectedObjects() {
-    final List<DataObject> objects = new ArrayList<DataObject>();
-    for (final Object id : selectedObjectIds) {
-      final DataObject object = cachedObjects.get(id);
-      if (object != null) {
-        objects.add(object);
-      }
-    }
-    return objects;
-  }
-
-  @Override
-  public int getSelectionCount() {
-    return selectedObjectIds.size();
-  }
-
   public String getTypePath() {
     return typePath;
   }
 
-  @Override
-  protected void hideObject(final DataObject object) {
-    if (object.getMetaData() == getMetaData()) {
-      final Object id = object.getIdValue();
-      synchronized (hiddenObjectIds) {
-        if (!hiddenObjectIds.contains(id)) {
-          hiddenObjectIds.add(id);
-          cacheObject(id, object);
-        }
-      }
-    }
-    // TODO correct property change
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
-  }
-
-  @Override
-  protected void showObject(final DataObject object) {
-    if (object.getMetaData() == getMetaData()) {
-      final Object id = object.getIdValue();
-      synchronized (hiddenObjectIds) {
-        if (hiddenObjectIds.contains(id)) {
-          hiddenObjectIds.remove(id);
-        }
-      }
-    }
-    // TODO correct property change
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
-  }
-
-  @Override
-  protected boolean doSaveChanges() {
-
-    return (Boolean)invokeInTransaction(saveChangesMethod);
-  }
-
-  protected boolean invokeInTransaction(Method saveChangesMethod) {
-    DataObjectStore dataStore = getDataStore();
-    PlatformTransactionManager transactionManager = dataStore.getTransactionManager();
+  protected boolean invokeInTransaction(final Method saveChangesMethod) {
+    final DataObjectStore dataStore = getDataStore();
+    final PlatformTransactionManager transactionManager = dataStore.getTransactionManager();
     return (Boolean)InvokeMethodInTransaction.execute(transactionManager, this,
       saveChangesMethod);
   }
 
-  protected boolean transactionSaveChanges() {
-    final DataObjectStore dataStore = getDataStore();
-    final DataObjectMetaData metaData = getMetaData();
-    final String idAttributeName = metaData.getIdAttributeName();
-    // TODO transaction?
-    final Set<Object> deletedObjectIds = getDeletedObjectIds();
-    for (final Object id : deletedObjectIds) {
-      final Query deleteQuery = new Query(getMetaData());
-      deleteQuery.addFilter(idAttributeName, id);
-      dataStore.delete(deleteQuery);
-    }
-    final Writer<DataObject> writer = dataStore.createWriter();
-    try {
-      final Collection<DataObject> modifiedObjects = getModifiedObjects().values();
-      for (final DataObject object : modifiedObjects) {
-        writer.write(object);
-      }
-
-      final Collection<DataObject> newObjects = getNewObjects();
-      for (final DataObject object : newObjects) {
-        writer.write(object);
-      }
-    } finally {
-      writer.close();
-    }
-    return true;
-  }
-
   @Override
-  protected void fireObjectsChanged() {
-    refresh();
-    super.fireObjectsChanged();
-  }
-
-  @Override
-  public boolean isSelected(final DataObject object) {
-    if (object != null) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        return selectedObjectIds.contains(id);
+  public boolean isLayerObject(final DataObject object) {
+    if (object instanceof LayerDataObject) {
+      final LayerDataObject layerDataObject = (LayerDataObject)object;
+      if (layerDataObject.getLayer() == this) {
+        return true;
       }
     }
     return false;
@@ -417,57 +332,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void clearChanges() {
-    super.clearChanges();
-    cachedObjects.clear();
-    editingObjectIds.clear();
-    hiddenObjectIds.clear();
-    selectedObjectIds.clear();
-  }
-
-  @Override
-  public void unselectObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          selectedObjectIds.remove(id);
-        }
-      }
-    }
-    cleanCachedObjects();
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
-  }
-
-  @Override
-  public void setEditingObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!editingObjectIds.contains(id)) {
-            editingObjectIds.add(id);
-            cacheObject(id, object);
-          }
-        }
+  public void refresh() {
+    super.refresh();
+    synchronized (sync) {
+      if (loadingWorker != null) {
+        loadingWorker.cancel(true);
       }
 
-    }
-  }
-
-  @Override
-  public void setHiddenObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
-      if (object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          if (!hiddenObjectIds.contains(id)) {
-            hiddenObjectIds.add(id);
-            cacheObject(id, object);
-          }
-        }
-      }
-
+      boundingBox = new BoundingBox();
+      loadingBoundingBox = boundingBox;
+      index = new DataObjectQuadTree();
     }
   }
 
@@ -490,21 +364,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void setSelectedObjects(final Collection<DataObject> objects) {
-    selectedObjectIds.clear();
-    for (final DataObject object : objects) {
-      if (object != null && object.getMetaData() == getMetaData()) {
-        final Object id = object.getIdValue();
-        if (id != null) {
-          synchronized (cachedObjects) {
-            if (!selectedObjectIds.contains(id)) {
-              selectedObjectIds.add(id);
-              cacheObject(id, object);
-            }
-          }
-        }
-      }
-    }
-    getPropertyChangeSupport().firePropertyChange("selected", false, true);
+    super.setSelectedObjects(objects);
+    cleanCachedObjects();
   }
 
   public void setTypePath(final String typePath) {
@@ -522,6 +383,39 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     setName("Type not found " + typePath);
     setMetaData(null);
     query = null;
+  }
+
+  protected boolean transactionSaveChanges() {
+    final DataObjectStore dataStore = getDataStore();
+    final DataObjectMetaData metaData = getMetaData();
+    final String idAttributeName = metaData.getIdAttributeName();
+    // TODO transaction?
+    final Set<Object> deletedObjectIds = getDeletedObjectIds();
+    for (final Object id : deletedObjectIds) {
+      final Query deleteQuery = new Query(getMetaData());
+      deleteQuery.addFilter(idAttributeName, id);
+      dataStore.delete(deleteQuery);
+    }
+    final Writer<DataObject> writer = dataStore.createWriter();
+    try {
+      for (final DataObject object : getModifiedObjects()) {
+        writer.write(object);
+      }
+
+      final Collection<DataObject> newObjects = getNewObjects();
+      for (final DataObject object : newObjects) {
+        writer.write(object);
+      }
+    } finally {
+      writer.close();
+    }
+    return true;
+  }
+
+  @Override
+  public void unselectObjects(final Collection<? extends DataObject> objects) {
+    super.unselectObjects(objects);
+    cleanCachedObjects();
   }
 
 }

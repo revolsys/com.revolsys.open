@@ -96,7 +96,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public boolean isVisible(final DataObject object) {
-    return filter.accept(object);
+    return filter.accept(object) && !getLayer().isHidden(object);
   }
 
   @Override
@@ -105,12 +105,6 @@ public abstract class AbstractDataObjectLayerRenderer extends
     viewport.setUseModelCoordinates(true, graphics);
     final BoundingBox boundingBox = viewport.getBoundingBox();
     final List<DataObject> dataObjects = layer.getDataObjects(boundingBox);
-
-    if (layer.isEditable()) {
-      dataObjects.removeAll(layer.getEditingObjects());
-    }
-    dataObjects.removeAll(layer.getHiddenObjects());
-
     renderObjects(viewport, graphics, layer, dataObjects);
   }
 

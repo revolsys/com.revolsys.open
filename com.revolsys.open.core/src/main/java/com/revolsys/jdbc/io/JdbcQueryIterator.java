@@ -33,6 +33,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final DataObjectMetaData metaData, final List<Attribute> attributes,
     final DataObjectFactory dataObjectFactory, final ResultSet resultSet) {
     final DataObject object = dataObjectFactory.createDataObject(metaData);
+    object.setState(DataObjectState.Initalizing);
     int columnIndex = 1;
 
     for (final Attribute attribute : attributes) {

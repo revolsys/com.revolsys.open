@@ -73,8 +73,8 @@ public class GeoTiffRaster extends GeoReferencedRaster {
   }
 
   protected void setTransformationMatrix(double[] transformationMatrix) {
-    setTopLeftRasterPoint(new DoubleCoordinates(0, 0));
-    setTopLeftModelPoint(new DoubleCoordinates(0, 0));
+    setTopLeftRasterPoint(new DoubleCoordinates(0.0, 0.0));
+    setTopLeftModelPoint(new DoubleCoordinates(0.0, 0.0));
     setAffineTransformation(new AffineTransform(transformationMatrix));
   }
 
