@@ -142,19 +142,20 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     synchronized (dataStore) {
       Row row = null;
       while (offset > 0 && count < offset) {
-        rows.next();
+        dataStore.nextRow(rows);
         count++;
       }
       if (limit > -1 && count >= offset + limit) {
         throw new NoSuchElementException();
       }
-      row = rows.next();
+      row = dataStore.nextRow(rows);
       count++;
       if (row == null) {
         throw new NoSuchElementException();
       } else {
         try {
           final DataObject object = dataObjectFactory.createDataObject(metaData);
+          object.setState(DataObjectState.Initalizing);
           for (final Attribute attribute : metaData.getAttributes()) {
             final String name = attribute.getName();
             final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
@@ -164,7 +165,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
           object.setState(DataObjectState.Persisted);
           return object;
         } finally {
-          row.delete();
+          dataStore.closeRow(row);
         }
       }
     }

@@ -1,5 +1,6 @@
 package com.revolsys.parallel.process;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
@@ -80,7 +81,9 @@ public class InvokeMethodRunnable implements Runnable {
       } else {
         MethodUtils.invokeMethod(object, methodName, parameters);
       }
-    } catch (final Throwable e) {
+    } catch (final InvocationTargetException e) {
+      throw new RuntimeException("Unable to invoke " + this, e.getCause());
+      } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke " + this, e);
     }
   }

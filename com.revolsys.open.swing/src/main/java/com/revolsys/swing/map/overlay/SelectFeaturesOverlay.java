@@ -188,7 +188,7 @@ public class SelectFeaturesOverlay extends JComponent implements
     final Graphics2D graphics2d = (Graphics2D)graphics;
     for (final DataObjectLayer layer : selectableLayers) {
       for (final DataObject object : getSelectedObjects(layer)) {
-        if (layer.isVisible(object)) {
+        if (object != null && layer.isVisible(object)) {
           final Geometry geometry = object.getGeometryValue();
           MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
             geometry, vertexStyle);

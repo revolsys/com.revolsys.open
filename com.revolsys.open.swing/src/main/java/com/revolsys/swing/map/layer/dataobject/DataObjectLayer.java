@@ -35,6 +35,10 @@ public interface DataObjectLayer extends Layer {
 
   Set<DataObject> getEditingObjects();
 
+  List<DataObject> getChanges();
+
+  int getChangeCount();
+
   DataObjectMetaData getMetaData();
 
   DataObject getObject(int row);
@@ -42,6 +46,10 @@ public interface DataObjectLayer extends Layer {
   List<DataObject> getObjects();
 
   List<DataObject> getObjects(Geometry geometry, double distance);
+
+  List<DataObject> getNewObjects();
+
+  int getNewObjectCount();
 
   Query getQuery();
 
@@ -59,7 +67,15 @@ public interface DataObjectLayer extends Layer {
 
   boolean isCanEditObjects();
 
+  boolean isDeleted(DataObject object);
+
   boolean isHasChanges();
+
+  boolean isHidden(DataObject object);
+
+  boolean isModified(DataObject object);
+
+  boolean isNew(DataObject object);
 
   boolean isSelected(DataObject object);
 
@@ -82,9 +98,7 @@ public interface DataObjectLayer extends Layer {
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
-  void unselectObjects(DataObject... objects);
-
   void unselectObjects(Collection<? extends DataObject> objects);
 
-  boolean isHidden(DataObject object);
+  void unselectObjects(DataObject... objects);
 }

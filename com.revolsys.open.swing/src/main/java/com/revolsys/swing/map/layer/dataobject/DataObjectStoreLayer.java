@@ -24,6 +24,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -182,12 +183,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected DataObject getCacheObject(final DataObject object) {
-    final Object idValue = object.getIdValue();
-    return getCacheObject(idValue, object);
+    if (object == null) {
+      return null;
+    } else {
+      final Object idValue = object.getIdValue();
+      return getCacheObject(idValue, object);
+    }
   }
 
   private DataObject getCacheObject(final Object id, final DataObject object) {
-    if (isLayerObject(object)) {
+    if (object != null && isLayerObject(object)) {
       synchronized (cachedObjects) {
         if (cachedObjects.containsKey(id)) {
           return cachedObjects.get(id);
@@ -386,18 +391,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected boolean transactionSaveChanges() {
-    final DataObjectStore dataStore = getDataStore();
-    final DataObjectMetaData metaData = getMetaData();
-    final String idAttributeName = metaData.getIdAttributeName();
-    // TODO transaction?
-    final Set<Object> deletedObjectIds = getDeletedObjectIds();
-    for (final Object id : deletedObjectIds) {
-      final Query deleteQuery = new Query(getMetaData());
-      deleteQuery.addFilter(idAttributeName, id);
-      dataStore.delete(deleteQuery);
-    }
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
+      final Set<DataObject> deletedObjects = getDeletedObjects();
+
+      for (final DataObject object : deletedObjects) {
+        object.setState(DataObjectState.Deleted);
+        writer.write(object);
+      }
+      unselectObjects(deletedObjects);
+
       for (final DataObject object : getModifiedObjects()) {
         writer.write(object);
       }

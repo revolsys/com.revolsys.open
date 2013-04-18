@@ -14,10 +14,12 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
-      return row.getFloat(name);
+      synchronized (getDataStore()) {
+        return row.getFloat(name);
+      }
     }
   }
 
@@ -35,18 +37,22 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        getDataStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final float floatValue = number.floatValue();
-      row.setFloat(name, floatValue);
+      synchronized (getDataStore()) {
+        row.setFloat(name, floatValue);
+      }
       return floatValue;
     } else {
       final String string = value.toString();
       final float floatValue = Float.parseFloat(string);
-      row.setFloat(name, floatValue);
+      synchronized (getDataStore()) {
+        row.setFloat(name, floatValue);
+      }
       return floatValue;
     }
   }

@@ -1,13 +1,12 @@
 package com.revolsys.swing.map.table;
 
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -44,14 +43,30 @@ public class DataObjectLayerTablePanel extends TablePanel {
 
     ToolBar toolBar = getToolBar();
 
-    final InvokeMethodAction addNewRecord = new InvokeMethodAction(null,
-      "Add New Record", SilkIconLoader.getIcon("table_row_insert"),
-      LayerUtil.class, "addNewRecord", layer);
     ObjectPropertyEnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canAddObjects");
-    addNewRecord.setEnableCheck(canAddObjectsEnableCheck);
+    toolBar.addButton("record", "Add New Record", "table_row_insert",
+      canAddObjectsEnableCheck, layer, "addNewRecord");
 
-    toolBar.addButton("record", addNewRecord);
+    // Filter buttons
+    DataObjectLayerTableModel tableModel = getTableModel();
+
+    JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
+      "filter_group", "Show All Records", "filter_delete", tableModel,
+      "setMode", DataObjectLayerTableModel.MODE_ALL);
+    clearFilter.doClick();
+
+    ObjectPropertyEnableCheck selectableEnableCheck = new ObjectPropertyEnableCheck(
+      layer, "selectable");
+    toolBar.addToggleButton("filter_group", "Show Only Selected Records",
+      "filter_selected", selectableEnableCheck, tableModel, "setMode",
+      DataObjectLayerTableModel.MODE_SELECTED);
+
+    ObjectPropertyEnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
+      layer, "editable");
+    toolBar.addToggleButton("filter_group", "Show Only Changed Records",
+      "filter_changes", editableEnableCheck, tableModel, "setMode",
+      DataObjectLayerTableModel.MODE_CHANGES);
   }
 
   public DataObjectLayer getLayer() {
@@ -88,8 +103,8 @@ public class DataObjectLayerTablePanel extends TablePanel {
     return object;
   }
 
-  public DataObjectRowTableModel getTableModel() {
+  public DataObjectLayerTableModel getTableModel() {
     JTable table = getTable();
-    return (DataObjectRowTableModel)table.getModel();
+    return (DataObjectLayerTableModel)table.getModel();
   }
 }

@@ -10,6 +10,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -32,9 +33,35 @@ public class BoundingBox extends Envelope implements Cloneable {
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
 
+  public static BoundingBox getBoundingBox(final DataObject object) {
+    if (object == null) {
+      return new BoundingBox();
+    } else {
+      final Geometry geometry = object.getGeometryValue();
+      return getBoundingBox(geometry);
+    }
+  }
+
   public static BoundingBox getBoundingBox(final Geometry geometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-    return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
+    if (geometry == null) {
+      return new BoundingBox();
+    } else {
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final Envelope envelope = geometry.getEnvelopeInternal();
+      return new BoundingBox(geometryFactory, envelope);
+    }
+  }
+
+  public static BoundingBox getBoundingBox(
+    final GeometryFactory geometryFactory, final DataObject object) {
+    final BoundingBox boundingBox = getBoundingBox(object);
+    return boundingBox.convert(geometryFactory);
+  }
+
+  public static BoundingBox getBoundingBox(
+    final GeometryFactory geometryFactory, final Geometry geometry) {
+    final BoundingBox boundingBox = getBoundingBox(geometry);
+    return boundingBox.convert(geometryFactory);
   }
 
   /**
@@ -314,6 +341,17 @@ public class BoundingBox extends Envelope implements Cloneable {
    */
   public BoundingBox(final int srid) {
     this.geometryFactory = GeometryFactory.getFactory(srid);
+  }
+
+  public BoundingBox clipToCoordinateSystem() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return this;
+    } else {
+      final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+      return intersection(areaBoundingBox);
+    }
   }
 
   @Override

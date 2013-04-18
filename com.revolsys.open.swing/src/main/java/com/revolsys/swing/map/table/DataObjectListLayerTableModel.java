@@ -18,7 +18,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowJxTable;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
@@ -35,10 +35,10 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     return new DataObjectLayerTablePanel(layer, table);
   }
 
-  public static DataObjectRowJxTable createTable(final DataObjectListLayer layer) {
+  public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
     final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
-    DataObjectRowJxTable table = new DataObjectRowJxTable(model);
+    DataObjectRowTable table = new DataObjectRowTable(model);
 
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);

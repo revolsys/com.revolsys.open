@@ -26,6 +26,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
     super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE
       || !field.isIsNullable());
   }
+
   @Override
   public int getMaxStringLength() {
     return 10;
@@ -34,14 +35,16 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row,name)) {
       return null;
     } else {
-      long time;
-      synchronized (LOCK) {
-        time = row.getDate(name) * 1000;
+      synchronized (getDataStore()) {
+        long time;
+        synchronized (LOCK) {
+          time = row.getDate(name) * 1000;
+        }
+        return new Date(time);
       }
-      return new Date(time);
     }
   }
 
@@ -53,7 +56,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        getDataStore().setNull(row, name);
       }
       return null;
     } else {
@@ -74,7 +77,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
           if (isRequired()) {
             date = MIN_DATE;
           } else {
-            row.setNull(name);
+            getDataStore().setNull(row, name);
             return null;
           }
         } else if (date.after(MAX_DATE)) {
@@ -84,15 +87,17 @@ public class DateAttribute extends AbstractFileGdbAttribute {
           if (isRequired()) {
             date = MAX_DATE;
           } else {
-            row.setNull(name);
+            getDataStore().setNull(row, name);
             return null;
           }
         }
-        final long time = date.getTime() / 1000;
-        synchronized (LOCK) {
-          row.setDate(name, time);
+        synchronized (getDataStore()) {
+          final long time = date.getTime() / 1000;
+          synchronized (LOCK) {
+            row.setDate(name, time);
+          }
+          return time;
         }
-        return time;
       } else {
         throw new IllegalArgumentException("Expecting a java,util.Date not "
           + value.getClass() + " " + value);

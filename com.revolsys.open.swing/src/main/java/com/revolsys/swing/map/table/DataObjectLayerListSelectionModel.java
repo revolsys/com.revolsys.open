@@ -37,7 +37,12 @@ public class DataObjectLayerListSelectionModel extends
 
   @Override
   public boolean isSelectedIndex(final int index) {
-    return model.isSelected(index);
+    final DataObject object = model.getObject(index);
+    if (object != null) {
+      DataObjectLayer layer = model.getLayer();
+      return layer.isSelected(object);
+    }
+    return false;
   }
 
   @Override

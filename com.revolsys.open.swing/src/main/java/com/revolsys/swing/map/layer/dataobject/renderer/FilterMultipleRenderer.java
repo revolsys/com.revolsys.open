@@ -25,7 +25,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
     if (isVisible(object)) {
       double scale = viewport.getScale();
       for (AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-        if (renderer.isVisible(object)) {
+        if (renderer.isVisible(object) && !layer.isHidden(object)) {
           if (renderer.isVisible(scale)) {
             renderer.renderObject(viewport, graphics, visibleArea, layer,
               object);

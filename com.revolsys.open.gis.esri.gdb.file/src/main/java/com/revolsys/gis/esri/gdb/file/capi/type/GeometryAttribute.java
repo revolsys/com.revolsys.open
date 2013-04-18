@@ -161,10 +161,13 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
-      final byte[] buffer = row.getGeometry();
+      final byte[] buffer;
+      synchronized (getDataStore()) {
+        buffer = row.getGeometry();
+      }
       final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);
       final EndianInput in = new EndianInputStream(byteIn);
       try {
@@ -191,7 +194,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        getDataStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Geometry) {
@@ -203,7 +206,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       JavaBeanUtil.invokeMethod(writeMethod, geometryUtil, out,
         projectedGeometry);
       final byte[] bytes = byteOut.toByteArray();
-      row.setGeometry(bytes);
+      synchronized (getDataStore()) {
+        row.setGeometry(bytes);
+      }
       return bytes;
     } else {
       throw new IllegalArgumentException("Expecting a " + Geometry.class

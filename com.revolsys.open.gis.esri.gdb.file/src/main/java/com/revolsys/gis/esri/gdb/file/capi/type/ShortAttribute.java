@@ -19,10 +19,12 @@ public class ShortAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
-      return row.getShort(name);
+      synchronized (getDataStore()) {
+        return row.getShort(name);
+      }
     }
   }
 
@@ -35,18 +37,22 @@ public class ShortAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        getDataStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final short shortValue = number.shortValue();
-      row.setShort(name, shortValue);
+      synchronized (getDataStore()) {
+        row.setShort(name, shortValue);
+      }
       return shortValue;
     } else {
       final String string = value.toString();
       final short shortValue = Short.parseShort(string);
-      row.setShort(name, shortValue);
+      synchronized (getDataStore()) {
+        row.setShort(name, shortValue);
+      }
       return shortValue;
     }
   }

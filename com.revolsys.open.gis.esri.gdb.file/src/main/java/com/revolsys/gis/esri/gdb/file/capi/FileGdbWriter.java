@@ -41,7 +41,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       for (final Entry<String, Table> entry : tables.entrySet()) {
         final Table table = entry.getValue();
         try {
-          table.freeWriteLock();
+          dataStore.freeWriteLock(table);
         } catch (final Throwable e) {
           LOG.error("Unable to close table", e);
         }
@@ -59,13 +59,13 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
       + object.getValue("OBJECTID"), false);
     try {
-      final Row row = rows.next();
+      final Row row = dataStore.nextRow(rows);
       if (row != null) {
         try {
-          table.deleteRow(row);
+          dataStore.deletedRow(table, row);
           object.setState(DataObjectState.Deleted);
         } finally {
-          row.delete();
+          dataStore.closeRow(row);
           dataStore.addStatistic("Delete", object);
         }
       }
@@ -80,7 +80,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       table = dataStore.getTable(typePath);
       if (table != null) {
         tables.put(typePath, table);
-        table.setWriteLock();
+        dataStore.setWriteLock(table);
       }
     }
     return table;
@@ -102,7 +102,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     }
     final Table table = getTable(typePath);
     try {
-      final Row row = table.createRowObject();
+      final Row row = dataStore.createRowObject(table);
       try {
         final List<Object> values = new ArrayList<Object>();
         for (final Attribute attribute : metaData.getAttributes()) {
@@ -113,14 +113,14 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
             value);
           values.add(esriValue);
         }
-        table.insertRow(row);
+        dataStore.insertRow(table,row);
         for (final Attribute attribute : metaData.getAttributes()) {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           esriAttribute.setPostInsertValue(object, row);
         }
         object.setState(DataObjectState.Persisted);
       } finally {
-        row.delete();
+        dataStore.closeRow(row);
         dataStore.addStatistic("Insert", object);
       }
     } catch (final IllegalArgumentException e) {
@@ -142,7 +142,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
       + object.getValue("OBJECTID"), false);
     try {
-      final Row row = rows.next();
+      final Row row = dataStore.nextRow(rows);
 
       try {
         final List<Object> esriValues = new ArrayList<Object>();
@@ -153,7 +153,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
             final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
             esriValues.add(esriAttribute.setUpdateValue(object, row, value));
           }
-          table.updateRow(row);
+          dataStore.updateRow(table,row);
         } finally {
           dataStore.addStatistic("Update", object);
         }
@@ -167,7 +167,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
         }
         throw new RuntimeException("Unable to update row", e);
       } finally {
-        row.delete();
+        dataStore.closeRow(row);
       }
     } finally {
       dataStore.closeEnumRows(rows);

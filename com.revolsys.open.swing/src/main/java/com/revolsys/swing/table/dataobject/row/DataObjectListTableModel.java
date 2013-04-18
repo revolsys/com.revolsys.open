@@ -34,12 +34,12 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     return new TablePanel(table);
   }
 
-  public static DataObjectRowJxTable createTable(
+  public static DataObjectRowTable createTable(
     final DataObjectListTableModel model) {
-    return new DataObjectRowJxTable(model);
+    return new DataObjectRowTable(model);
   }
 
-  public static DataObjectRowJxTable createTable(
+  public static DataObjectRowTable createTable(
     final DataObjectMetaData metaData, final List<DataObject> objects) {
     final DataObjectListTableModel model = new DataObjectListTableModel(
       metaData, objects);
@@ -156,6 +156,11 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
         fireTableRowsDeleted(row, row + 1);
       }
     }
+  }
+
+  public void clear() {
+    this.objects.clear();
+    fireTableDataChanged();
   }
 
   public void removeAll(final DataObject... removedFeatures) {

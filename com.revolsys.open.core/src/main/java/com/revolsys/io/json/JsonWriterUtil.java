@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.io.StringPrinter;
 
 public final class JsonWriterUtil {
   public static void charSequence(final PrintWriter out,
@@ -123,6 +124,9 @@ public final class JsonWriterUtil {
   public static void write(final PrintWriter out, final Object value) {
     if (value == null) {
       out.print("null");
+    } else if (value instanceof StringPrinter) {
+      StringPrinter printer = (StringPrinter)value;
+      printer.write(out);
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {

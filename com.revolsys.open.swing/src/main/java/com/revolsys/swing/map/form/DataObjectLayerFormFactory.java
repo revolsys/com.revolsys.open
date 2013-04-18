@@ -15,14 +15,14 @@ public class DataObjectLayerFormFactory {
   public static JComponent createFormComponent(DataObjectLayer layer,
     DataObject object) {
     String formClassName = layer.getProperty(FORM_CLASS_NAME);
-    LayerDataObjectForm form = null;
+    DataObjectLayerForm form = null;
     if (StringUtils.hasText(formClassName)) {
       try {
         Class<?> formClass = Class.forName(formClassName);
         Object[] args = {
           layer
         };
-        form = (LayerDataObjectForm)ConstructorUtils.invokeConstructor(
+        form = (DataObjectLayerForm)ConstructorUtils.invokeConstructor(
           formClass, args);
       } catch (Throwable e) {
         LoggerFactory.getLogger(DataObjectLayerFormFactory.class).error(
@@ -30,7 +30,7 @@ public class DataObjectLayerFormFactory {
       }
     }
     if (form == null) {
-      form = new LayerDataObjectForm(layer);
+      form = new DataObjectLayerForm(layer);
     }
     form.setObject(object);
     return form;

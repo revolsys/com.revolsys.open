@@ -58,7 +58,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> editingObjects = new LinkedHashSet<DataObject>();
 
-  private Set<Object> deletedObjectIds = new LinkedHashSet<Object>();
+  private Set<DataObject> deletedObjects = new LinkedHashSet<DataObject>();
 
   private Set<DataObject> newObjects = new LinkedHashSet<DataObject>();
 
@@ -78,6 +78,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public AbstractDataObjectLayer() {
     this("");
+  }
+
+  @Override
+  public int getNewObjectCount() {
+    return newObjects.size();
   }
 
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
@@ -104,7 +109,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void addModifiedObject(final DataObject object) {
-    modifiedObjects.add(object);
+    synchronized (modifiedObjects) {
+      modifiedObjects.add(object);
+    }
+  }
+
+  protected void removeModifiedObject(final DataObject object) {
+    synchronized (modifiedObjects) {
+      modifiedObjects.remove(object);
+    }
   }
 
   @Override
@@ -159,7 +172,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void clearChanges() {
     newObjects = new LinkedHashSet<DataObject>();
     modifiedObjects = new LinkedHashSet<DataObject>();
-    deletedObjectIds = new LinkedHashSet<Object>();
+    deletedObjects = new LinkedHashSet<DataObject>();
     editingObjects.clear();
   }
 
@@ -200,18 +213,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     synchronized (editSync) {
       unselectObjects(objects);
       for (final DataObject object : objects) {
-        if (isLayerObject(object)) {
-          if (!newObjects.remove(object)) {
-            final Object id = object.getIdValue();
-            modifiedObjects.remove(id);
-            deletedObjectIds.add(id);
-          }
-          object.setState(DataObjectState.Deleted);
-        }
-
+        deleteObject(object);
       }
     }
     fireObjectsChanged();
+  }
+
+  protected void deleteObject(final DataObject object) {
+    if (isLayerObject(object)) {
+      if (!newObjects.remove(object)) {
+        modifiedObjects.remove(object);
+        deletedObjects.add(object);
+        selectedObjects.remove(object);
+      }
+      object.setState(DataObjectState.Deleted);
+    }
   }
 
   @Override
@@ -252,8 +268,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getMetaData().getDataObjectStore();
   }
 
-  public Set<Object> getDeletedObjectIds() {
-    return deletedObjectIds;
+  public Set<DataObject> getDeletedObjects() {
+    return deletedObjects;
   }
 
   @Override
@@ -270,8 +286,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new LinkedHashSet<DataObject>(modifiedObjects);
   }
 
-  public Set<DataObject> getNewObjects() {
-    return newObjects;
+  public List<DataObject> getNewObjects() {
+    return new ArrayList<DataObject>(newObjects);
   }
 
   @Override
@@ -351,17 +367,37 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return !isReadOnly() && isEditable() && canEditObjects;
   }
 
+  @Override
   public boolean isDeleted(final DataObject object) {
-    if (isLayerObject(object)) {
-      final Object id = object.getIdValue();
-      return deletedObjectIds.contains(id);
-    } else {
-      return false;
-    }
+    return deletedObjects.contains(object);
   }
 
   public boolean isEditing(final DataObject object) {
     return editingObjects.contains(object);
+  }
+
+  public boolean isNew(final DataObject object) {
+    return newObjects.contains(object);
+  }
+
+  public int getChangeCount() {
+    synchronized (editSync) {
+      int changeCount = 0;
+      changeCount += newObjects.size();
+      changeCount += modifiedObjects.size();
+      changeCount += deletedObjects.size();
+      return changeCount;
+    }
+  }
+
+  public List<DataObject> getChanges() {
+    synchronized (editSync) {
+      List<DataObject> objects = new ArrayList<DataObject>();
+      objects.addAll(newObjects);
+      objects.addAll(modifiedObjects);
+      objects.addAll(deletedObjects);
+      return objects;
+    }
   }
 
   @Override
@@ -372,7 +408,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           return true;
         } else if (!modifiedObjects.isEmpty()) {
           return true;
-        } else if (!deletedObjectIds.isEmpty()) {
+        } else if (!deletedObjects.isEmpty()) {
           return true;
         } else {
           return false;
@@ -405,6 +441,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public boolean isModified(final DataObject object) {
+    return modifiedObjects.contains(object);
+  }
+
+  @Override
   public boolean isSelected(final DataObject object) {
     if (object == null) {
       return false;
@@ -431,8 +472,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (source instanceof LayerDataObject) {
       final LayerDataObject dataObject = (LayerDataObject)source;
       if (dataObject.getLayer() == this) {
-        if (dataObject.getState() == DataObjectState.Modified) {
+        DataObjectState state = dataObject.getState();
+        if (state == DataObjectState.Modified) {
           addModifiedObject(dataObject);
+        } else if (state == DataObjectState.Persisted) {
+          removeModifiedObject(dataObject);
         }
       }
     }
@@ -616,13 +660,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void unselectObjects(final DataObject... objects) {
-    unselectObjects(Arrays.asList(objects));
-  }
-
-  @Override
   public void unselectObjects(final Collection<? extends DataObject> objects) {
     selectedObjects.removeAll(objects);
     fireSelected();
+  }
+
+  @Override
+  public void unselectObjects(final DataObject... objects) {
+    unselectObjects(Arrays.asList(objects));
   }
 }

@@ -170,6 +170,28 @@ public final class CollectionUtil {
     }
   }
 
+  public static Long getLong(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.longValue();
+    } else {
+      final String stringValue = value.toString();
+      if (StringUtils.hasText(stringValue)) {
+        try {
+          return Long.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+  }
+
   public static <K, V> List<V> getNotNull(final Map<K, V> map,
     final Collection<K> keys) {
     final List<V> values = new ArrayList<V>();

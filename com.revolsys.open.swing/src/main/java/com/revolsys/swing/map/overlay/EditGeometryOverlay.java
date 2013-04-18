@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -108,7 +109,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     map.addMapOverlay(this);
   }
 
-  protected void actionAddGeometryCompleted() {
+  protected void actionGeometryCompleted() {
     if (isGeometryValid()) {
       try {
         firstPoint = null;
@@ -119,11 +120,13 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
           object = layer.createObject();
           if (object != null) {
             object.setGeometryValue(geometry);
-            mode = "edit";
           }
         }
         fireActionPerformed(completedAction, "Geometry Complete");
       } finally {
+        object = null;
+        mode = null;
+        restoreCursor();
       }
     }
   }
@@ -265,10 +268,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       xorGeometry = null;
       event.consume();
       if (DataTypes.POINT.equals(geometryDataType)) {
-        actionAddGeometryCompleted();
+        actionGeometryCompleted();
       }
       if (event.getClickCount() == 2) {
-        actionAddGeometryCompleted();
+        actionGeometryCompleted();
       }
       repaint();
     }
@@ -376,8 +379,13 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     }
   }
 
-  private void saveCursor() {
-    cursor = getParent().getCursor();
+  private void saveCursor(Cursor cursor) {
+    restoreCursor();
+    if (cursor != null) {
+      Container parent = getParent();
+      this.cursor = parent.getCursor();
+      parent.setCursor(cursor);
+    }
   }
 
   /**
@@ -406,8 +414,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         this.layer = layer;
         this.geometryFactory = metaData.getGeometryFactory();
         this.geometryDataType = geometryAttribute.getType();
-        saveCursor();
-        getParent().setCursor(addNodeCursor);
+        saveCursor(addNodeCursor);
       }
     }
   }

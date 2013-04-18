@@ -15,10 +15,12 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
-      return row.getXML(name);
+      synchronized (getDataStore()) {
+        return row.getXML(name);
+      }
     }
   }
 
@@ -31,12 +33,14 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        row.setNull(name);
+        getDataStore().setNull(row, name);
       }
       return null;
     } else {
       final String string = value.toString();
-      row.setXML(name, string);
+      synchronized (getDataStore()) {
+        row.setXML(name, string);
+      }
       return string;
     }
   }

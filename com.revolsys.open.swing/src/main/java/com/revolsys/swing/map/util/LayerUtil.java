@@ -23,7 +23,6 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
@@ -35,6 +34,7 @@ import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.form.DataObjectForm;
 import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerFactory;
@@ -97,7 +97,6 @@ public class LayerUtil {
       dataObjectLayer.addNewRecord();
     }
   }
-
 
   @SuppressWarnings("unchecked")
   public static <T extends Layer> T getLayer(
@@ -237,8 +236,14 @@ public class LayerUtil {
           String title;
           if (object.getState() == DataObjectState.New) {
             title = "Add NEW " + layer.getName();
+          } else if (layer.isCanEditObjects()) {
+            title = "Edit " + layer.getName() + " #" + id;
           } else {
-            title = "Edit " + layer.getName() + "#" + id;
+            title = "View " + layer.getName() + " #" + id;
+            if (form instanceof DataObjectForm) {
+              DataObjectForm dataObjectForm = (DataObjectForm)form;
+              dataObjectForm.setEditable(false);
+            }
           }
           window = new JFrame(title);
           window.add(new JScrollPane(form));
@@ -249,7 +254,7 @@ public class LayerUtil {
           forms.put(object, window);
           window.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
               forms.remove(object);
             }
           });
@@ -309,11 +314,23 @@ public class LayerUtil {
       GeometryFactory geometryFactory = project.getGeometryFactory();
       BoundingBox boundingBox = layer.getBoundingBox()
         .convert(geometryFactory)
-        .expandPercent(0.1);
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
-      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-      boundingBox = boundingBox.intersection(areaBoundingBox);
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public static void zoomToObject(DataObject object) {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      Project project = layer.getProject();
+      GeometryFactory geometryFactory = project.getGeometryFactory();
+      BoundingBox boundingBox = BoundingBox.getBoundingBox(geometryFactory,
+        object)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
+
       project.setViewBoundingBox(boundingBox);
     }
   }

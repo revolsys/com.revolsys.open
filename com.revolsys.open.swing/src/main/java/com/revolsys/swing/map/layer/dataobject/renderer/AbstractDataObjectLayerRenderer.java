@@ -96,7 +96,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public boolean isVisible(final DataObject object) {
-    return filter.accept(object) && !getLayer().isHidden(object);
+    return filter.accept(object);
   }
 
   @Override
@@ -118,7 +118,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final List<DataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final DataObject object : objects) {
-      if (isVisible(object)) {
+      if (isVisible(object) && !layer.isHidden(object)) {
         renderObject(viewport, graphics, visibleArea, layer, object);
       }
     }

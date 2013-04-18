@@ -15,8 +15,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
 
   private static final String[] AXIS_NAMES = {
-
-    "X", "Y", "Z", "M"
+    "#", "X", "Y", "Z", "M"
   };
 
   private Geometry geometry;
@@ -40,7 +39,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return geometryFactory.getNumAxis();
+    return geometryFactory.getNumAxis() + 1;
   }
 
   @Override
@@ -63,11 +62,15 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final Coordinates coordinates = getCoordinates(rowIndex);
-    if (coordinates == null) {
-      return "-";
+    if (columnIndex == 0) {
+      return rowIndex;
     } else {
-      return coordinates.getValue(columnIndex);
+      final Coordinates coordinates = getCoordinates(rowIndex);
+      if (coordinates == null) {
+        return "-";
+      } else {
+        return coordinates.getValue(columnIndex - 1);
+      }
     }
   }
 

@@ -31,7 +31,6 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -47,6 +46,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
+import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.BinaryAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.DateAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.DoubleAttribute;
@@ -90,9 +90,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     + ".CatalogPath";
 
   private static void addFieldTypeAttributeConstructor(
-    final FieldType fieldType, final Class<? extends Attribute> attributeClass) {
+    final FieldType fieldType,
+    final Class<? extends AbstractFileGdbAttribute> attributeClass) {
     try {
-      final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
+      final Constructor<? extends AbstractFileGdbAttribute> constructor = attributeClass.getConstructor(Field.class);
       ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
       LOG.error("No public constructor for ESRI type " + fieldType, e);
@@ -234,7 +235,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private boolean createMissingTables = true;
 
-  private static final Map<FieldType, Constructor<? extends Attribute>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends Attribute>>();
+  private static final Map<FieldType, Constructor<? extends AbstractFileGdbAttribute>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbAttribute>>();
 
   static {
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeInteger,
@@ -268,7 +269,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private Resource template;
 
-  private final Set<Table> tablesToClose = new HashSet<Table>();
+  private final Map<String, Table> tablesToClose = new HashMap<String, Table>();
 
   private final Set<EnumRows> enumRowsToClose = new HashSet<EnumRows>();
 
@@ -326,9 +327,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     for (final EnumRows rows : new ArrayList<EnumRows>(enumRowsToClose)) {
       closeEnumRows(rows);
     }
-    for (final Table table : new ArrayList<Table>(tablesToClose)) {
-      closeTable(table);
+    for (final Table table : tablesToClose.values()) {
+      doCloseTable(table);
     }
+    tablesToClose.clear();
     if (geodatabase != null) {
       geodatabase.delete();
       geodatabase = null;
@@ -347,7 +349,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // return new FileGdbReader(this);
   // }
 
-  public void closeEnumRows(EnumRows rows) {
+  public synchronized void closeEnumRows(EnumRows rows) {
     if (rows != null) {
       if (enumRowsToClose.remove(rows)) {
         try {
@@ -362,6 +364,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected synchronized void closeTable(final Table table) {
+    // TODO add reference counting before actually closing the table
+
+  }
+
+  private void doCloseTable(final Table table) {
     try {
       tablesToClose.remove(table);
       if (geodatabase != null) {
@@ -444,7 +451,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
 
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, sql.toString(), boundingBox, query,query.getOffset(),
+      typePath, sql.toString(), boundingBox, query, query.getOffset(),
       query.getLimit());
     return iterator;
   }
@@ -574,24 +581,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
     }
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
-    final Table table;
     try {
-      table = geodatabase.createTable(tableDefinition, schemaPath);
-      tablesToClose.add(table);
+      Table table = geodatabase.createTable(tableDefinition, schemaPath);
+      final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
+        schemaPath, tableDefinition);
+      addMetaData(metaData);
+      tablesToClose.put(metaData.getPath(), table);
+      return metaData;
+
     } catch (final Throwable t) {
       if (LOG.isDebugEnabled()) {
         LOG.debug(tableDefinition);
       }
       throw new RuntimeException("Unable to create table "
         + deTable.getCatalogPath(), t);
-    }
-    try {
-      final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
-        schemaPath, tableDefinition);
-      addMetaData(metaData);
-      return metaData;
-    } finally {
-      closeTable(table);
     }
   }
 
@@ -659,11 +662,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       for (final Field field : deTable.getFields()) {
         final String fieldName = field.getName();
         final FieldType type = field.getType();
-        final Constructor<? extends Attribute> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
+        final Constructor<? extends AbstractFileGdbAttribute> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
         if (attributeConstructor != null) {
           try {
-            final Attribute attribute = JavaBeanUtil.invokeConstructor(
+            final AbstractFileGdbAttribute attribute = JavaBeanUtil.invokeConstructor(
               attributeConstructor, field);
+            attribute.setDataStore(this);
             metaData.addAttribute(attribute);
             if (attribute instanceof GlobalIdAttribute) {
               metaData.setIdAttributeName(fieldName);
@@ -714,8 +718,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       final String path = typePath.replaceAll("/", "\\\\");
       try {
-        final Table table = geodatabase.openTable(path);
-        tablesToClose.add(table);
+
+        Table table = tablesToClose.get(typePath);
+        if (table == null) {
+          table = geodatabase.openTable(path);
+          tablesToClose.put(typePath, table);
+        }
         return table;
       } catch (final RuntimeException e) {
         throw new RuntimeException("Unable to open table " + typePath, e);
@@ -909,7 +917,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     if (metaData == null) {
       throw new IllegalArgumentException("Cannot find table " + typePath);
     } else {
-       final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
         typePath, boundingBox);
       final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
         iterator);
@@ -924,14 +932,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return query(typePath, boundingBox);
   }
 
-  public EnumRows search(final Table table, final String fields,
+  public synchronized EnumRows search(final Table table, final String fields,
     final String whereClause, final boolean recycling) {
     final EnumRows rows = table.search(fields, whereClause, recycling);
     enumRowsToClose.add(rows);
     return rows;
   }
 
-  public EnumRows search(final Table table, final String fields,
+  public synchronized EnumRows search(final Table table, final String fields,
     final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
     final EnumRows rows = table.search(fields, whereClause, boundingBox,
@@ -982,5 +990,45 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   public synchronized void update(final DataObject object) {
     getWriter().write(object);
+  }
+
+  protected synchronized Row nextRow(EnumRows rows) {
+    return rows.next();
+  }
+
+  protected synchronized void deletedRow(Table table, Row row) {
+    table.deleteRow(row);
+  }
+
+  protected synchronized void closeRow(Row row) {
+    row.delete();
+  }
+
+  protected synchronized void freeWriteLock(Table table) {
+    table.freeWriteLock();
+  }
+
+  protected synchronized void updateRow(Table table, Row row) {
+    table.updateRow(row);
+  }
+
+  protected synchronized void insertRow(Table table, Row row) {
+    table.insertRow(row);
+  }
+
+  protected synchronized Row createRowObject(Table table) {
+    return table.createRowObject();
+  }
+
+  protected synchronized void setWriteLock(Table table) {
+    table.setWriteLock();
+  }
+
+  public synchronized void setNull(Row row, String name) {
+    row.setNull(name);
+  }
+
+  public synchronized boolean isNull(Row row, String name) {
+    return row.isNull(name);
   }
 }

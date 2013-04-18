@@ -27,6 +27,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
@@ -131,14 +132,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
 
   public static void reverse(final DataObject object) {
     final DirectionalAttributes property = getProperty(object);
-    final DataObject reverse = property.getReverse(object);
-    final DataObjectMetaData metaData = object.getMetaData();
-    for (final String attributeName : metaData.getAttributeNames()) {
-      if (attributeName != metaData.getIdAttributeName()) {
-        final Object value = reverse.getValue(attributeName);
-        object.setValue(attributeName, value);
-      }
-    }
+    property.reverseAttributesAndGeometry(object);
   }
 
   private final Map<String, String> endAttributeNamePairs = new HashMap<String, String>();
@@ -524,9 +518,9 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  protected Object getDirectionalAttributeValue(final DataObject object,
-    final String attributeName) {
-    final Object value = object.getValue(attributeName);
+  protected Object getDirectionalAttributeValue(
+    final Map<String, ? extends Object> object, final String attributeName) {
+    final Object value = object.get(attributeName);
 
     final Map<Object, Object> valueMap = directionalAttributeValues.get(attributeName);
     if (valueMap != null) {
@@ -751,29 +745,61 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
 
   public DataObject getReverse(final DataObject object) {
     final DataObject reverse = object.clone();
-
-    final LineString line = object.getGeometryValue();
-    if (line != null) {
-      final LineString reverseLine = LineStringUtil.reverse(line);
-      reverse.setGeometryValue(reverseLine);
-    }
-
-    for (final Entry<String, String> pair : reverseAttributeNameMap.entrySet()) {
-      final String fromAttributeName = pair.getKey();
-      final String toAttributeName = pair.getValue();
-      final Object toValue = object.get(toAttributeName);
-      reverse.setValue(fromAttributeName, toValue);
-    }
-    for (final String attributeName : directionalAttributeValues.keySet()) {
-      final Object value = getDirectionalAttributeValue(object, attributeName);
-      reverse.setValue(attributeName, value);
-    }
-
+    reverseAttributesAndGeometry(reverse);
     return reverse;
   }
 
   public String getReverseAttributeName(final String attributeName) {
     return reverseAttributeNameMap.get(attributeName);
+  }
+
+  public Map<String, Object> getReverseAttributes(
+    final Map<String, Object> object) {
+    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
+      object);
+    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    if (geometryAttributeName != null) {
+      for (final Entry<String, String> pair : reverseAttributeNameMap.entrySet()) {
+        final String fromAttributeName = pair.getKey();
+        final String toAttributeName = pair.getValue();
+        final Object toValue = object.get(toAttributeName);
+        reverse.put(fromAttributeName, toValue);
+      }
+      for (final String attributeName : directionalAttributeValues.keySet()) {
+        final Object value = getDirectionalAttributeValue(object, attributeName);
+        reverse.put(attributeName, value);
+      }
+    }
+    return reverse;
+  }
+
+  public Map<String, Object> getReverseAttributesAndGeometry(
+    final Map<String, Object> object) {
+    final Map<String, Object> reverse = getReverseAttributes(object);
+    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    if (geometryAttributeName != null) {
+      final Geometry geometry = getReverseLine(object);
+      reverse.put(geometryAttributeName, geometry);
+    }
+    return reverse;
+  }
+
+  public Map<String, Object> getReverseGeometry(final Map<String, Object> object) {
+    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
+      object);
+    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    if (geometryAttributeName != null) {
+      final Geometry geometry = getReverseLine(object);
+      reverse.put(geometryAttributeName, geometry);
+    }
+    return reverse;
+  }
+
+  protected Geometry getReverseLine(final Map<String, Object> object) {
+    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    final LineString line = (LineString)object.get(geometryAttributeName);
+    final LineString reverseLine = LineStringUtil.reverse(line);
+    return reverseLine;
   }
 
   public Map<String, String> getSideAttributeNamePairs() {
@@ -786,6 +812,11 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
 
   public Set<String> getStartAttributeNames() {
     return startAttributeNames;
+  }
+
+  public boolean hasDirectionalAttributes() {
+    return !directionalAttributeValues.isEmpty()
+      || !reverseAttributeNameMap.isEmpty();
   }
 
   public boolean hasDirectionalAttributeValues(final String attributeName) {
@@ -820,6 +851,22 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
 
   public boolean isStartAttribute(final String attributeName) {
     return startAttributeNames.contains(attributeName);
+  }
+
+  public void reverseAttributes(final Map<String, Object> object) {
+    final Map<String, Object> reverseAttributes = getReverseAttributes(object);
+    object.putAll(reverseAttributes);
+  }
+
+  public void reverseAttributesAndGeometry(final Map<String, Object> object) {
+    final Map<String, Object> reverseAttributes = getReverseAttributesAndGeometry(object);
+    object.putAll(reverseAttributes);
+  }
+
+  public void reverseGeometry(final Map<String, Object> object) {
+    final Map<String, Object> reverseAttributes = getReverseGeometry(object);
+    object.putAll(reverseAttributes);
+
   }
 
   public void setDirectionalAttributeValues(

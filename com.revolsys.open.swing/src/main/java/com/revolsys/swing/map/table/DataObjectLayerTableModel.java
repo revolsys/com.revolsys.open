@@ -2,6 +2,7 @@ package com.revolsys.swing.map.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,6 +23,8 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.table.predicate.DeletedPredicate;
+import com.revolsys.swing.map.table.predicate.NewPredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
@@ -55,6 +58,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       layer, attributeNames, attributeTitles);
     final DataObjectRowTable table = new DataObjectRowTable(model);
 
+    ModifiedPredicate.add(table);
+    NewPredicate.add(table);
+    DeletedPredicate.add(table);
+    
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);
     final TableColumnModel columnModel = table.getColumnModel();
@@ -69,10 +76,25 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return table;
   }
 
+  public String getMode() {
+    return mode;
+  }
+
   private SwingWorker<?, ?> loadObjectsWorker;
 
   private Map<Integer, List<DataObject>> pageCache = new LruMap<Integer, List<DataObject>>(
     5);
+
+  public static final String MODE_ALL = "all";
+
+  public static final String MODE_SELECTED = "selected";
+
+  public static final String MODE_CHANGES = "changes";
+
+  private static final List<String> MODES = Arrays.asList(MODE_ALL,
+    MODE_SELECTED, MODE_CHANGES);
+
+  private String mode = MODE_ALL;
 
   private final int pageSize = 40;
 
@@ -123,54 +145,88 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
-  public DataObject getObject(final int row) {
-    synchronized (pageCache) {
-      final int pageNumber = (row / pageSize);
-      final int recordNumber = (row % pageSize);
-      final List<DataObject> page = pageCache.get(pageNumber);
-      if (page == null) {
-        loadingPageNumbers.add(pageNumber);
-        if (loadObjectsWorker == null) {
-          loadObjectsWorker = SwingWorkerManager.execute("Loading records "
-            + getTypeName(), this, "loadPages");
-        }
-        return null;
+  public DataObject getObject(int row) {
+    DataObjectLayer layer = getLayer();
+    if (mode.equals(MODE_SELECTED)) {
+      List<DataObject> selectedObjects = layer.getSelectedObjects();
+      if (row < selectedObjects.size()) {
+        return selectedObjects.get(row);
       } else {
-        if (recordNumber < page.size()) {
-          final DataObject object = page.get(recordNumber);
-          return object;
-        } else {
+        fireTableDataChanged();
+        return null;
+      }
+    } else if (mode.equals(MODE_CHANGES)) {
+      List<DataObject> changes = layer.getChanges();
+      if (row < changes.size()) {
+        return changes.get(row);
+      } else {
+        fireTableDataChanged();
+        return null;
+      }
+    } else {
+      int newObjectCount = layer.getNewObjectCount();
+      if (row < newObjectCount) {
+        return layer.getNewObjects().get(row);
+      } else {
+        row -= newObjectCount;
+      }
+      synchronized (pageCache) {
+        final int pageNumber = (row / pageSize);
+        final int recordNumber = (row % pageSize);
+        final List<DataObject> page = pageCache.get(pageNumber);
+        if (page == null) {
+          loadingPageNumbers.add(pageNumber);
+          if (loadObjectsWorker == null) {
+            loadObjectsWorker = SwingWorkerManager.execute("Loading records "
+              + getTypeName(), this, "loadPages");
+          }
           return null;
+        } else {
+          if (recordNumber < page.size()) {
+            final DataObject object = page.get(recordNumber);
+            return object;
+          } else {
+            return null;
+          }
         }
       }
+    }
+  }
+
+  public void setMode(String mode) {
+    if (MODES.contains(mode)) {
+      if (!mode.equals(this.mode)) {
+        this.mode = mode;
+        fireTableDataChanged();
+      }
+    } else {
+      throw new IllegalArgumentException("Unsupported mode");
     }
   }
 
   @Override
   public int getRowCount() {
     synchronized (sync) {
-      if (!countLoaded) {
-        if (rowCountWorker == null) {
-          rowCountWorker = SwingWorkerManager.execute("Query row count "
-            + layer.getName(), this, "updateRowCount");
-        }
-        return 0;
+      if (mode.equals(MODE_SELECTED)) {
+        return layer.getSelectionCount();
+      } else if (mode.equals(MODE_CHANGES)) {
+        return layer.getChangeCount();
       } else {
-        return rowCount;
+        if (!countLoaded) {
+          if (rowCountWorker == null) {
+            rowCountWorker = SwingWorkerManager.execute("Query row count "
+              + layer.getName(), this, "updateRowCount");
+          }
+          return 0;
+        } else {
+          return rowCount + getLayer().getNewObjectCount();
+        }
       }
     }
   }
 
   public String getTypeName() {
     return getMetaData().getPath();
-  }
-
-  public boolean isSelected(final int row) {
-    final DataObject object = getObject(row);
-    if (object != null) {
-      return layer.isSelected(object);
-    }
-    return false;
   }
 
   public void loadPages() {
@@ -195,7 +251,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
           loadingPageNumbers.remove(pageNumber);
         }
         fireTableRowsUpdated(pageNumber * pageSize,
-          Math.min(rowCount, (pageNumber + 1) * pageSize - 1));
+          Math.min(getRowCount(), (pageNumber + 1) * pageSize - 1));
       }
     }
   }
@@ -203,7 +259,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == layer) {
-      String propertyName = e.getPropertyName();
+      final String propertyName = e.getPropertyName();
       if (propertyName.equals("query")) {
         refresh();
       } else if (propertyName.equals("editable")) {

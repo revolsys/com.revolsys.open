@@ -21,6 +21,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     }
     return super.isEnabled();
   }
+
   public void setEnableCheck(EnableCheck enableCheck) {
     if (this.enableCheck != null) {
       this.enableCheck.removePropertyChangeListener("enabled", enabledListener);
@@ -28,15 +29,15 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     this.enableCheck = enableCheck;
     if (this.enableCheck != null) {
       this.enableCheck.addPropertyChangeListener("enabled", enabledListener);
+      enableCheck.isEnabled();
     }
-    enableCheck.isEnabled();
   }
 
   public EnableCheck getEnableCheck() {
     return enableCheck;
   }
 
-  public  Icon getIcon() {
+  public Icon getIcon() {
     return (Icon)getValue(Action.SMALL_ICON);
   }
 

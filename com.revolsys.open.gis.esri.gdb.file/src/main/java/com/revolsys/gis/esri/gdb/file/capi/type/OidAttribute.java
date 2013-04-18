@@ -14,12 +14,15 @@ public class OidAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (row.isNull(name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
-      return row.getOid();
+      synchronized (getDataStore()) {
+        return row.getOid();
+      }
     }
   }
+
   @Override
   public int getMaxStringLength() {
     return 10;
@@ -27,9 +30,11 @@ public class OidAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public void setPostInsertValue(final DataObject object, final Row row) {
-    final int oid = row.getOid();
-    final String name = getName();
-    object.setValue(name, oid);
+    synchronized (getDataStore()) {
+      final int oid = row.getOid();
+      final String name = getName();
+      object.setValue(name, oid);
+    }
   }
 
   @Override

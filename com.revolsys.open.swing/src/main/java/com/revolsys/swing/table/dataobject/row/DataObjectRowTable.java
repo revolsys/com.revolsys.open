@@ -6,36 +6,32 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.SortableTableCellHeaderRenderer;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectRowTable extends JTable implements MouseListener {
+public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
   public DataObjectRowTable(final DataObjectRowTableModel model) {
     super(model);
-    setModel(model);
-    setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    setAutoCreateColumnsFromModel(false);
+    setSortable(false);
 
     final DataObjectMetaData metaData = model.getMetaData();
 
     final DataObjectRowTableCellRenderer cellRenderer = new DataObjectRowTableCellRenderer();
-
-    final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();
-    tableHeader.setReorderingAllowed(false);
-    tableHeader.setDefaultRenderer(headerRenderer);
 
     final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
@@ -51,12 +47,13 @@ public class DataObjectRowTable extends JTable implements MouseListener {
         final int attributeLength = Math.min(
           Math.max(columnName.length(), attribute.getMaxStringLength()), 40) + 2;
         final StringBuffer text = new StringBuffer(attributeLength);
-        for (int j = 0; j < attributeLength; j++) {
+        for (int j = 0; j < attributeLength + 2; j++) {
           text.append('X');
         }
 
-        final Component c = headerRenderer.getTableCellRendererComponent(null,
-          text.toString(), false, false, 0, 0);
+        final Component c = tableHeader.getDefaultRenderer()
+          .getTableCellRendererComponent(null, text.toString(), false, false,
+            0, 0);
         column.setMinWidth(c.getMinimumSize().width);
         column.setMaxWidth(c.getMaximumSize().width);
         column.setPreferredWidth(c.getPreferredSize().width);
@@ -73,23 +70,19 @@ public class DataObjectRowTable extends JTable implements MouseListener {
   }
 
   public DataObjectMetaData getMetaData() {
-    final DataObjectRowTableModel model = getModel();
+    final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
     return model.getMetaData();
-  }
-
-  @Override
-  public DataObjectRowTableModel getModel() {
-    return (DataObjectRowTableModel)super.getModel();
   }
 
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (e.getSource() == getTableHeader()) {
-      final DataObjectRowTableModel model = getModel();
+      final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
-        final Class<?> attributeClass = metaData.getAttributeClass(column);
+        int index = convertColumnIndexToModel(column);
+        final Class<?> attributeClass = metaData.getAttributeClass(index);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
           model.setSortOrder(column);
         }
@@ -115,6 +108,15 @@ public class DataObjectRowTable extends JTable implements MouseListener {
 
   @Override
   public void tableChanged(final TableModelEvent e) {
+    TableModel model = getModel();
+    if (model instanceof DataObjectLayerTableModel) {
+      DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
+      if (layerModel.getMode().equals(DataObjectLayerTableModel.MODE_ALL)) {
+        setSortable(false);
+      } else {
+        setSortable(true);
+      }
+    }
     super.tableChanged(e);
     if (tableHeader != null) {
       tableHeader.resizeAndRepaint();
