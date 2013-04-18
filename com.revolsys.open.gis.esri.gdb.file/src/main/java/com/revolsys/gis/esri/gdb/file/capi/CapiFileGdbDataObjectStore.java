@@ -116,7 +116,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public int getRowCount(Query query) {
+  public synchronized int getRowCount(Query query) {
     String typePath = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
     if (metaData == null) {
@@ -144,6 +144,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       int count = 0;
       for (Row row = rows.next(); row != null; row = rows.next()) {
         count++;
+        row.delete();
       }
       return count;
     } finally {
