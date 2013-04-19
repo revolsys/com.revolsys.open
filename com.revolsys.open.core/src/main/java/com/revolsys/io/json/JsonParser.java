@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -103,6 +105,10 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
             if (parser.next() == EventType.colon) {
               if (parser.hasNext()) {
                 final Object value = getValue(parser);
+                if (value instanceof EventType) {
+                  throw new IllegalStateException("Exepecting a value, not:"
+                    + value);
+                }
                 map.put(key, value);
               }
             }
@@ -193,6 +199,23 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   @SuppressWarnings("unchecked")
   public static <V> V read(final String in) {
     return (V)read(new StringReader(in));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(final Object in) {
+    Reader reader;
+    if (in instanceof Clob) {
+      try {
+        reader = ((Clob)in).getCharacterStream();
+      } catch (SQLException e) {
+        throw new RuntimeException("Unable to read clob", e);
+      }
+    } else if (in instanceof Reader) {
+      reader = (Reader)in;
+    } else {
+      reader = new StringReader(in.toString());
+    }
+    return (V)read(reader);
   }
 
   /**

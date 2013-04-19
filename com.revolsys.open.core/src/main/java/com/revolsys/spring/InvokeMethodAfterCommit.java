@@ -12,12 +12,14 @@ public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
 
   public static <V> void invoke(final Object object, final String methodName,
     final Object... args) {
-    final InvokeMethodAfterCommit synchronization = new InvokeMethodAfterCommit(
-      object, methodName, args);
-    if (TransactionSynchronizationManager.isSynchronizationActive()) {
-      TransactionSynchronizationManager.registerSynchronization(synchronization);
-    } else {
-      synchronization.afterCommit();
+    if (object != null) {
+      final InvokeMethodAfterCommit synchronization = new InvokeMethodAfterCommit(
+        object, methodName, args);
+      if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        TransactionSynchronizationManager.registerSynchronization(synchronization);
+      } else {
+        synchronization.afterCommit();
+      }
     }
   }
 

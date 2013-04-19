@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
+import com.revolsys.gis.data.io.DataObjectWriterFactory;
+
 public class IoFactoryRegistry {
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
@@ -223,6 +225,17 @@ public class IoFactoryRegistry {
     this.factories.clear();
     for (final IoFactory factory : factories) {
       addFactory(factory);
+    }
+  }
+
+  public static String getFileExtension(String resultFormat) {
+    final IoFactoryRegistry ioFactory = getInstance();
+    final DataObjectWriterFactory writerFactory = ioFactory.getFactoryByMediaType(
+      DataObjectWriterFactory.class, resultFormat);
+    if (writerFactory == null) {
+      return null;
+    } else {
+      return writerFactory.getFileExtension(resultFormat);
     }
   }
 }
