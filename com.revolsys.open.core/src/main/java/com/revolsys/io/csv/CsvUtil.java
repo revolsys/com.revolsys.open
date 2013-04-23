@@ -2,10 +2,13 @@ package com.revolsys.io.csv;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.revolsys.converter.string.StringConverterRegistry;
 
 public final class CsvUtil {
   /**
@@ -56,6 +59,29 @@ public final class CsvUtil {
   }
 
   private CsvUtil() {
+  }
+
+  /*
+   * Replaces whitespace with spaces
+   */
+  public static void writeColumns(StringWriter out,
+    Collection<? extends Object> columns, char fieldSeparator,
+    char recordSeparator) {
+    boolean first = true;
+    for (Object value : columns) {
+      if (first) {
+        first = false;
+      } else {
+        out.write(fieldSeparator);
+      }
+      if (value != null) {
+        String text = StringConverterRegistry.toString(value);
+        text = text.replaceAll("\\s", " ");
+
+        out.write(text);
+      }
+    }
+    out.write(recordSeparator);
   }
 
 }

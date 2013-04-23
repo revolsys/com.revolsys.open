@@ -75,9 +75,9 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-   if (zoomBoxFirstPoint != null) {
+    if (zoomBoxFirstPoint != null) {
       zoomBoxDrag(event);
-    } else {
+    } else if (panning) {
       panDrag(event);
     }
   }
@@ -97,9 +97,10 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   @Override
   public void mousePressed(final MouseEvent event) {
     final boolean shiftDown = event.isShiftDown();
+    int modifiers = event.getModifiers();
     if (shiftDown) {
       zoomBoxStart(event);
-    } else {
+    } else if (modifiers == MouseEvent.BUTTON1_MASK) {
       panStart(event);
     }
   }

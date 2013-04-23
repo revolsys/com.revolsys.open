@@ -1,10 +1,7 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -65,7 +62,7 @@ public class TiledImageLayerRenderer extends
           }
         }
       }
-    } else {
+    } else if (!"loading".equals(evt.getPropertyName())){
       synchronized (cachedTiles) {
         cachedTiles.clear();
       }
@@ -85,9 +82,10 @@ public class TiledImageLayerRenderer extends
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final AbstractTiledImageLayer layer) {
     synchronized (cachedTiles) {
-      if (viewport.getScale() != scale) {
+      double viewportScale = viewport.getScale();
+      if (viewportScale != scale) {
         cachedTiles.clear();
-        this.scale = viewport.getScale();
+        this.scale = viewportScale;
       }
     }
     for (MapTile mapTile : getLayer().getOverlappingEnvelopes(viewport)) {
@@ -125,7 +123,9 @@ public class TiledImageLayerRenderer extends
               double scaleFactor = imageScreenWidth / imageWidth;
 
               graphics.scale(scaleFactor, scaleFactor);
-              graphics.drawImage(image, 0, 0, null);
+              if (!graphics.drawImage(image, 0, 0, null)) {
+                System.out.println("Not drawn");
+              }
             } finally {
               graphics.setTransform(transform);
             }
@@ -140,5 +140,8 @@ public class TiledImageLayerRenderer extends
       imageLoading.remove(mapTile);
     }
     viewport.update();
+    getLayer().getPropertyChangeSupport().firePropertyChange("loading", false,
+      true);
   }
+
 }

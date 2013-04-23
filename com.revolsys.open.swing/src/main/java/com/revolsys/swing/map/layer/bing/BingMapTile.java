@@ -31,4 +31,27 @@ public class BingMapTile extends MapTile {
     Image image = client.getMapImage(imagerySet, mapLayer, quadKey);
     return image;
   }
+
+  @Override
+  public int hashCode() {
+    return quadKey.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof BingMapTile) {
+      BingMapTile tile = (BingMapTile)obj;
+      if (tile.layer == layer) {
+        if (tile.quadKey.equals(quadKey)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return layer + " " + quadKey;
+  }
 }

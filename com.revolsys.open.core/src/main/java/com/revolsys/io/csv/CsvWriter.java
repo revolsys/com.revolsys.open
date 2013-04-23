@@ -3,7 +3,7 @@ package com.revolsys.io.csv;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.List;
+import java.util.Collection;
 
 import com.revolsys.io.FileUtil;
 
@@ -35,7 +35,7 @@ public class CsvWriter {
     out.flush();
   }
 
-  public void write(final List<? extends Object> values) {
+  public void write(final Collection<? extends Object> values) {
     write(values.toArray());
   }
 

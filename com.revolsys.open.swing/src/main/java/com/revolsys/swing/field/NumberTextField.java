@@ -8,13 +8,15 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.jdesktop.swingx.JXTextField;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.menu.PopupMenu;
 
-public class NumberTextField extends JTextField implements DocumentListener,
+public class NumberTextField extends JXTextField implements DocumentListener,
   FocusListener, ValidatingField {
 
   private static final long serialVersionUID = 1L;
@@ -155,6 +157,7 @@ public class NumberTextField extends JTextField implements DocumentListener,
     setHorizontalAlignment(RIGHT);
     getDocument().addDocumentListener(this);
     addFocusListener(this);
+    new PopupMenu().addToTextComponent(this);
   }
 
   @Override

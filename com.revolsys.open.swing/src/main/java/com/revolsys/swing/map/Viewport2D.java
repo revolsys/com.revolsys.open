@@ -1,9 +1,11 @@
 package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -463,4 +465,5 @@ public class Viewport2D {
     double y = point.getY();
     return toModelPoint(x, y);
   }
+
 }

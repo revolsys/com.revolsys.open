@@ -9,9 +9,11 @@ import java.awt.MenuContainer;
 import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.util.Date;
 
+import javax.swing.ComboBoxEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -20,13 +22,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.JXTextArea;
+import org.jdesktop.swingx.JXTextField;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.springframework.util.StringUtils;
 
@@ -42,6 +45,7 @@ import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.PreferencesUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -68,6 +72,15 @@ public class SwingUtil {
     return fileChooser;
   }
 
+  public static DataFlavor createDataFlavor(String mimeType) {
+    try {
+      return new DataFlavor(mimeType);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException("Cannot create data flavor for "
+        + mimeType, e);
+    }
+  }
+
   public static void saveFileChooserDirectory(Class<?> preferencesClass,
     String preferenceName, JFileChooser fileChooser) {
     File currentDirectory = fileChooser.getCurrentDirectory();
@@ -78,7 +91,7 @@ public class SwingUtil {
   @SuppressWarnings("unchecked")
   public static <T extends JComponent> T createField(
     final DataObjectMetaData metaData, final String fieldName,
-    final boolean enabled) {
+    final boolean editable) {
     JComponent field;
     final Attribute attribute = metaData.getAttribute(fieldName);
     if (attribute == null) {
@@ -88,40 +101,29 @@ public class SwingUtil {
       final int length = attribute.getLength();
       final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
       final DataType type = attribute.getType();
-      int size = length;
-      if (size == 0) {
-        size = 10;
-      } else if (size > 50) {
-        size = 50;
+      int columns = length;
+      if (columns == 0) {
+        columns = 10;
+      } else if (columns > 50) {
+        columns = 50;
       }
-      if (!enabled) {
-        field = new JTextField(size);
-        field.setEnabled(false);
+      if (!editable) {
+        JXTextField textField = createTextField(columns);
+        textField.setEditable(false);
+        field = textField;
       } else if (codeTable != null) {
-        final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
-          !required);
-        if (comboBox.getModel().getSize() > 0) {
-          comboBox.setSelectedIndex(0);
-        }
-        final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
-          codeTable);
-        AutoCompleteDecorator.decorate(comboBox, stringConverter);
-        field = comboBox;
+        field = createComboBox(codeTable, required);
       } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
         final int scale = attribute.getScale();
         NumberTextField numberTextField = new NumberTextField(type, length,
           scale);
         field = numberTextField;
       } else if (type.equals(DataTypes.DATE)) {
-        final JXDatePicker captureDateField = new JXDatePicker();
-        captureDateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
-          "yyyy/MMM/dd");
-        field = captureDateField;
+        field = createDateField();
       } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
         field = new JLabelWithObject();
       } else {
-        final JTextField textField = new JTextField(size);
-        field = textField;
+        field = createTextField(columns);
       }
       if (field instanceof JTextField) {
         JTextField textField = (JTextField)field;
@@ -132,6 +134,48 @@ public class SwingUtil {
       }
     }
     return (T)field;
+  }
+
+  public static JComboBox createComboBox(final CodeTable codeTable,
+    final boolean required) {
+    final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
+      !required);
+    if (comboBox.getModel().getSize() > 0) {
+      comboBox.setSelectedIndex(0);
+    }
+    final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
+      codeTable);
+    AutoCompleteDecorator.decorate(comboBox, stringConverter);
+    ComboBoxEditor editor = comboBox.getEditor();
+    Component editorComponent = editor.getEditorComponent();
+    if (editorComponent instanceof JTextComponent) {
+      JTextComponent textComponent = (JTextComponent)editorComponent;
+      PopupMenu.createPopupMenu(textComponent);
+    }
+    return comboBox;
+  }
+
+  public static JComponent createDateField() {
+    final JXDatePicker dateField = new JXDatePicker();
+    dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
+      "yyyy/MMM/dd");
+    PopupMenu.createPopupMenu(dateField.getEditor());
+    return dateField;
+  }
+
+  public static JXTextField createTextField(int columns) {
+    JXTextField textField = new JXTextField();
+    textField.setColumns(columns);
+    PopupMenu.createPopupMenu(textField);
+    return textField;
+  }
+
+  public static JXTextArea createTextArea(int rows, int columns) {
+    JXTextArea textField = new JXTextArea();
+    textField.setRows(rows);
+    textField.setColumns(columns);
+    PopupMenu.createPopupMenu(textField);
+    return textField;
   }
 
   @SuppressWarnings("unchecked")

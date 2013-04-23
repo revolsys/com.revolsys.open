@@ -83,8 +83,6 @@ public interface DataObjectLayer extends Layer {
 
   List<DataObject> query(Query query);
 
-  void setEditingObjects(BoundingBox boundingBox);
-
   void setEditingObjects(Collection<? extends DataObject> objects);
 
   void setSelectedObjects(BoundingBox boundingBox);

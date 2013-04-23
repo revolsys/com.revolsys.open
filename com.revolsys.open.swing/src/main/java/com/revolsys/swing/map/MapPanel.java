@@ -96,7 +96,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public MapPanel() {
     super(new BorderLayout());
     this.baseMapLayers = project.addLayerGroup("Base Maps");
-    project.addPropertyChangeListener(this);
     project.setProperty(MAP_PANEL, this);
 
     toolBar = new ToolBar();
@@ -115,11 +114,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     layeredPane.setBorder(new MapRulerBorder(viewport));
 
-    baseMapOverlay = new LayerRendererOverlay(viewport);
+    baseMapOverlay = new LayerRendererOverlay(this);
     layeredPane.add(baseMapOverlay, new Integer(0));
     baseMapOverlay.addPropertyChangeListener("layer", this);
 
-    map = new LayerRendererOverlay(viewport, project);
+    map = new LayerRendererOverlay(this, project);
     layeredPane.add(map, new Integer(1));
 
     project.addPropertyChangeListener("viewBoundingBox",
@@ -131,6 +130,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           setBoundingBox(boundingBox);
         }
       });
+    baseMapLayers.addPropertyChangeListener(this);
+    project.addPropertyChangeListener(this);
 
     addStandardButtons();
 
@@ -178,6 +179,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
     layeredPane.add(overlay, new Integer(zIndex));
+    if (overlay instanceof PropertyChangeListener) {
+      PropertyChangeListener listener = (PropertyChangeListener)overlay;
+      addPropertyChangeListener(listener);
+    }
   }
 
   public void addMapOverlay(final JComponent overlay) {
@@ -331,9 +336,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           baseMapOverlay.setLayer(layer);
         }
       }
-    } else {
-      repaint();
     }
+    repaint();
   }
 
   public synchronized void setBaseMapLayer(final Layer layer) {

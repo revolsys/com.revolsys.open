@@ -11,6 +11,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
@@ -24,6 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.GroupLayout;
@@ -36,6 +39,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.TransferHandler;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
@@ -79,6 +83,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectForm extends JPanel implements FocusListener,
   CellEditorListener {
+
   private static final long serialVersionUID = 1L;
 
   private DataObjectMapTableModel allAttributes;
@@ -138,6 +143,20 @@ public class DataObjectForm extends JPanel implements FocusListener,
     super(new BorderLayout());
     setMetaData(metaData);
     addToolBar();
+
+    ActionMap map = getActionMap();
+    map.put("copy", TransferHandler.getCopyAction());
+    map.put("paste", TransferHandler.getPasteAction());
+
+    DataObjectFormTransferHandler transferHandler = new DataObjectFormTransferHandler(
+      this);
+    setTransferHandler(transferHandler);
+  }
+
+  public void pasteValues(Map<String, Object> map) {
+    Map<String, Object> values = getValues();
+    values.putAll(map);
+    setValues(values);
   }
 
   public ToolBar getToolBar() {
@@ -386,10 +405,22 @@ public class DataObjectForm extends JPanel implements FocusListener,
     toolBar.addButton("record", "Save Changes", "table_save", editable, this,
       "saveChanges");
 
+    // Cut, Copy Paste
+    // TODO enable checks
+
+    toolBar.addButton("dnd", "Copy", "page_copy", editable, this,
+      "dataTransferCopy");
+    toolBar.addButton("dnd", "Paste", "paste_plain", editable, this,
+      "dataTransferPaste");
+
+    // Zoom
+
     if (hasGeometry) {
       toolBar.addButtonTitleIcon("zoom", "Zoom to Object", "magnifier", this,
         "actionZoomToObject");
     }
+
+    // Geometry manipulation
 
     if (hasGeometry) {
       DataType geometryDataType = geometryAttribute.getType();
@@ -408,6 +439,27 @@ public class DataObjectForm extends JPanel implements FocusListener,
       }
     }
     return toolBar;
+  }
+
+  public void dataTransferCut() {
+
+  }
+
+  public void dataTransferCopy() {
+    invokeAction("copy");
+  }
+
+  public void dataTransferPaste() {
+    invokeAction("paste");
+  }
+
+  protected void invokeAction(String actionName) {
+    Action action = getActionMap().get(actionName);
+    if (action != null) {
+      ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
+        null);
+      action.actionPerformed(event);
+    }
   }
 
   public void reverseAttributes() {
@@ -774,7 +826,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
       } else if (field instanceof JTextArea) {
         final JTextArea textField = (JTextArea)field;
         String string;
-        if (textField.isEnabled()) {
+        if (textField.isEditable() && textField.isEnabled()) {
           if (value == null) {
             string = "";
           } else {

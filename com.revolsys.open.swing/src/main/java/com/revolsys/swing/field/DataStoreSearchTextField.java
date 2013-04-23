@@ -33,6 +33,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
+import com.revolsys.swing.menu.PopupMenu;
 
 public class DataStoreSearchTextField extends JXSearchField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
@@ -77,6 +78,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
     setEditable(true);
     setSearchMode(SearchMode.REGULAR);
+    PopupMenu.createPopupMenu(this);
   }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,

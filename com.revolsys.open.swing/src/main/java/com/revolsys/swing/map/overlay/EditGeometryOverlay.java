@@ -26,6 +26,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.graph.geometry.GeometryGraph;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -68,6 +69,11 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private GeometryFactory geometryFactory;
 
+  private Point mouseOverVertexPoint;
+
+  private static final MarkerStyle MOUSE_OVER_VERTEX_STYLE = MarkerStyle.marker(
+    "ellipse", 10, new Color(0, 0, 255), 1, new Color(0, 0, 255));
+
   private static final MarkerStyle XOR_POINT_STYLE = MarkerStyle.marker(
     "ellipse", 10, new Color(0, 0, 255), 1, new Color(0, 0, 255));
 
@@ -104,9 +110,8 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     this.project = map.getProject();
     this.geometryFactory = viewport.getGeometryFactory();
 
-    project.addPropertyChangeListener(this);
-
     map.addMapOverlay(this);
+    addPropertyChangeListener(map);
   }
 
   protected void actionGeometryCompleted() {
@@ -364,12 +369,15 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);
     final String propertyName = event.getPropertyName();
-    if ("editable".equals(propertyName)) {
+    if ("editable".equals(propertyName) || "visible".equals(propertyName)) {
       updateSelectableLayers();
-      repaint();
-    }
-    repaint();
 
+    }
+    if (event.getSource() == layer) {
+      if (isEditable(layer)) {
+        setEditingObject(null, null);
+      }
+    }
   }
 
   private void restoreCursor() {
@@ -433,11 +441,40 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   }
 
+  private GeometryGraph graph;
+
   @Override
   public void selectObjects(BoundingBox boundingBox) {
+    clearEditingObjects(project);
     for (final DataObjectLayer layer : getEditableLayers()) {
-      layer.setEditingObjects(boundingBox);
+      if (layer.getMetaData().getGeometryAttributeIndex() != -1) {
+        List<DataObject> objects = layer.getDataObjects(boundingBox);
+        if (!objects.isEmpty()) {
+          DataObject selectedObject = objects.get(0);
+          layer.setEditingObjects(Collections.singleton(selectedObject));
+          setEditingObject(layer, selectedObject);
+          return;
+        }
+      }
     }
+    setEditingObject(null, null);
+  }
+
+  public void setEditingObject(DataObjectLayer layer, DataObject object) {
+    // TODO what if we are in the middle of editing?
+    this.layer = layer;
+    DataObject oldValue = this.object;
+    this.object = object;
+    if (object == null) {
+      this.geometry = null;
+      points = null;
+    } else {
+      this.geometry = object.getGeometryValue();
+      points = null;
+    }
+    mode = "edit";
+    firstPoint = null;
+    firePropertyChange("object", oldValue, object);
   }
 
   public List<DataObjectLayer> getEditableLayers() {
@@ -454,6 +491,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected boolean isEditable(DataObjectLayer dataObjectLayer) {
-    return dataObjectLayer.isCanEditObjects();
+    return dataObjectLayer.isVisible() && dataObjectLayer.isCanEditObjects();
   }
 }

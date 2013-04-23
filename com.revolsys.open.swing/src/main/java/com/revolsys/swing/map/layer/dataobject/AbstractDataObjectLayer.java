@@ -557,12 +557,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void setEditingObjects(final BoundingBox boundingBox) {
-    final List<DataObject> objects = getDataObjects(boundingBox);
-    setEditingObjects(objects);
-  }
-
-  @Override
   public void setEditingObjects(
     final Collection<? extends DataObject> editingObjects) {
     this.editingObjects = new LinkedHashSet<DataObject>();
