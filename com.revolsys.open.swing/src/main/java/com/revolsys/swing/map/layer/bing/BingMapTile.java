@@ -14,7 +14,7 @@ public class BingMapTile extends MapTile {
   private BingLayer layer;
 
   public BingMapTile(BingLayer layer, int zoomLevel, int tileX, int tileY) {
-    super(BingClient.getBoundingBox(zoomLevel, tileX, tileY));
+    super(BingClient.getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
     this.layer = layer;
     this.quadKey = BingClient.getQuadKey(zoomLevel, tileX, tileY);
   }

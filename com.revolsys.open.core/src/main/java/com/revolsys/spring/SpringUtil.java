@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Pattern;
 
+import org.apache.commons.jexl.util.GetExecutor;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
@@ -129,6 +130,23 @@ public class SpringUtil {
     }
   }
 
+  public static File getOrDownloadFile(final Resource resource) {
+    try {
+      return resource.getFile();
+    } catch (final IOException e) {
+      if (resource.exists()) {
+        String baseName = getBaseName(resource);
+        String fileNameExtension = getFileNameExtension(resource);
+        File file = FileUtil.createTempFile(baseName, fileNameExtension);
+        FileUtil.copy(getInputStream(resource), file);
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource "
+          + resource, e);
+      }
+    }
+  }
+
   public static File getFileOrCreateTempFile(final Resource resource) {
     try {
       if (resource instanceof FileSystemResource) {
@@ -219,7 +237,7 @@ public class SpringUtil {
 
   public static Resource getResourceWithExtension(final Resource resource,
     final String extension) {
-    final String baseName = FileUtil.getBaseName(resource.getFilename());
+    final String baseName = getBaseName(resource);
     final String newFileName = baseName + "." + extension;
     try {
       return resource.createRelative(newFileName);
@@ -227,6 +245,19 @@ public class SpringUtil {
       throw new RuntimeException("Unable to get resource " + newFileName, e);
     }
 
+  }
+
+  public static String getFileNameExtension(final Resource resource) {
+    return FileUtil.getFileNameExtension(resource.getFilename());
+  }
+
+  public static String getBaseName(final Resource resource) {
+    return FileUtil.getBaseName(resource.getFilename());
+  }
+
+  public static String getString(final Resource resource) {
+    final Reader reader = getReader(resource);
+    return FileUtil.getString(reader);
   }
 
   public static URL getUrl(final Resource resource) {

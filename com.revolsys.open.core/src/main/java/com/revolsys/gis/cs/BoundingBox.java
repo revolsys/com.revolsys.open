@@ -4,6 +4,7 @@ import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
+import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -509,6 +510,14 @@ public class BoundingBox extends Envelope implements Cloneable {
     return aspectRatio;
   }
 
+  public Point getBottomLeftPoint() {
+    return getGeometryFactory().createPoint(getMinX(), getMinY());
+  }
+
+  public Point getBottomRightPoint() {
+    return getGeometryFactory().createPoint(getMaxX(), getMinY());
+  }
+
   public double getCentreX() {
     return getMinX() + (getWidth() / 2);
   }
@@ -537,7 +546,12 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public Measure<Length> getHeightLength() {
     final double height = getHeight();
-    return Measure.valueOf(height, getCoordinateSystem().getLengthUnit());
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return Measure.valueOf(height, SI.METRE);
+    } else {
+      return Measure.valueOf(height, coordinateSystem.getLengthUnit());
+    }
   }
 
   public String getId() {
@@ -625,6 +639,14 @@ public class BoundingBox extends Envelope implements Cloneable {
       getMaxX(), getMinY());
   }
 
+  public Point getTopLeftPoint() {
+    return getGeometryFactory().createPoint(getMinX(), getMaxY());
+  }
+
+  public Point getTopRightPoint() {
+    return getGeometryFactory().createPoint(getMaxX(), getMaxY());
+  }
+
   public LineSegment getWestLine() {
     return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
       getMinX(), getMaxY());
@@ -632,7 +654,12 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public Measure<Length> getWidthLength() {
     final double width = getWidth();
-    return Measure.valueOf(width, getCoordinateSystem().getLengthUnit());
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return Measure.valueOf(width, SI.METRE);
+    } else {
+      return Measure.valueOf(width, coordinateSystem.getLengthUnit());
+    }
   }
 
   private void initIfNotNull() {

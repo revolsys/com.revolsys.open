@@ -84,15 +84,13 @@ public class SelectFeaturesOverlay extends JComponent implements
     vertexStyle = MarkerStyle.marker("ellipse", 6, new Color(0, 0, 0, 127), 1,
       transparentColor);
 
-    boxOutlineColor = new Color(color.getRed() / 2 , color.getGreen() / 2
-      , color.getBlue() / 2);
+    boxOutlineColor = new Color(color.getRed() / 2, color.getGreen() / 2,
+      color.getBlue() / 2);
     boxFillColor = ColorUtil.setAlpha(boxOutlineColor, 127);
 
     this.map = map;
     this.viewport = map.getViewport();
     this.project = map.getProject();
-
-    project.addPropertyChangeListener(this);
 
     map.addMapOverlay(this);
     updateSelectableLayers();
@@ -323,7 +321,7 @@ public class SelectFeaturesOverlay extends JComponent implements
   public List<DataObjectLayer> getSelectableLayers() {
     return selectableLayers;
   }
-  
+
   protected void updateSelectableLayers(final LayerGroup group,
     final List<DataObjectLayer> selectableLayers) {
     for (final Layer layer : group.getLayers()) {

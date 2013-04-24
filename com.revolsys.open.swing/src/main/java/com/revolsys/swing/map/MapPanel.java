@@ -182,7 +182,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (overlay instanceof PropertyChangeListener) {
       PropertyChangeListener listener = (PropertyChangeListener)overlay;
       addPropertyChangeListener(listener);
+      project.addPropertyChangeListener(listener);
+      baseMapLayers.addPropertyChangeListener(listener);
     }
+    overlay.addPropertyChangeListener(this);
   }
 
   public void addMapOverlay(final JComponent overlay) {

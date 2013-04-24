@@ -1,9 +1,9 @@
 package com.revolsys.gis.cs;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.springframework.core.io.Resource;
+
+import com.revolsys.io.FileUtil;
+import com.revolsys.spring.SpringUtil;
+
 public class WktCsParser {
   private int index = 0;
 
@@ -19,17 +24,20 @@ public class WktCsParser {
 
   private final String value;
 
-  public WktCsParser(final InputStream in) throws IOException {
-    final StringBuffer value = new StringBuffer();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-      value.append(line);
-    }
-    this.value = value.toString();
+  public WktCsParser(final InputStream in) {
+    this(new InputStreamReader(in));
+  }
+
+  public WktCsParser(Reader reader) {
+    this(FileUtil.getString(reader));
   }
 
   public WktCsParser(final String value) {
     this.value = value;
+  }
+
+  public WktCsParser(Resource resource) {
+    this(SpringUtil.getString(resource));
   }
 
   public CoordinateSystem parse() {

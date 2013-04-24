@@ -47,6 +47,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
@@ -69,6 +70,7 @@ public class LayerUtil {
     addLayerFactory(GridLayer.FACTORY);
     addLayerFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     addLayerFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
+    addLayerFactory(GeoReferencedImageLayer.FACTORY);
 
     addLayerTablePanelFactory(DataObjectLayerTableModel.FACTORY);
     addLayerTablePanelFactory(DataObjectListLayerTableModel.FACTORY);

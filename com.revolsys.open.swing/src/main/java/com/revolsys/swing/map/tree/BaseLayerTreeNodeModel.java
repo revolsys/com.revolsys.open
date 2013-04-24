@@ -38,8 +38,11 @@ public class BaseLayerTreeNodeModel extends
   public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
     super.setObjectTreeModel(objectTreeModel);
     MenuFactory abstractLayerMenu = objectTreeModel.getMenu(AbstractLayer.class);
-    abstractLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(false));
     abstractLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(true));
+    abstractLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(false));
+    abstractLayerMenu.addMenuItem("zoom", new InvokeMethodAction(
+      "Zoom to Layer", "Zoom to Layer", SilkIconLoader.getIcon("magnifier"),
+      LayerUtil.class, "zoomToLayer"));
 
     MenuFactory gridLayerMenu = objectTreeModel.getMenu(GridLayer.class);
     gridLayerMenu.addMenuItem("zoom", new ZoomToMapSheet());
@@ -77,10 +80,10 @@ public class BaseLayerTreeNodeModel extends
     dataObjectLayerMenu.addMenuItem("edit", TreeItemRunnable.createAction(
       "Add New Record", "table_row_insert", canAdd, "addNewRecord"));
 
-    dataObjectLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(
-      false));
     dataObjectLayerMenu.addComponentFactory("scale",
       new SetLayerScaleMenu(true));
+    dataObjectLayerMenu.addComponentFactory("scale", new SetLayerScaleMenu(
+      false));
 
   }
 

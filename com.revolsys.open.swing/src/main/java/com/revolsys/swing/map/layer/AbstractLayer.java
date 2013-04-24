@@ -36,9 +36,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean selectSupported = true;
 
-  private long maximumScale = Long.MAX_VALUE;
+  private long maximumScale = 0;
 
-  private long minimumScale = 0;
+  private long minimumScale = Long.MAX_VALUE;
 
   private boolean visible = true;
 
@@ -206,7 +206,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isVisible(final double scale) {
     if (isVisible()) {
       long longScale = (long)scale;
-      if (getMinimumScale() <= longScale && longScale <= getMaximumScale()) {
+      if (getMinimumScale() >= longScale && longScale >= getMaximumScale()) {
         return true;
       }
     }

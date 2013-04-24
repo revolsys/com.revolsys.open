@@ -13,10 +13,55 @@ import java.util.Map;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
+import com.revolsys.swing.map.layer.raster.GeoTiffImage;
+import com.vividsolutions.jts.geom.Point;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
   PropertyChangeListener {
+
+  public static void render(final Viewport2D viewport,
+    final Graphics2D graphics, final GeoReferencedImage geoReferencedImage) {
+    if (geoReferencedImage != null) {
+      final Image image = geoReferencedImage.getImage();
+      if (image != null) {
+        final int imageWidth = geoReferencedImage.getImageWidth();
+        final int imageHeight = geoReferencedImage.getImageHeight();
+        if (imageWidth != -1 && imageHeight != -1) {
+          BoundingBox boundingBox = geoReferencedImage.getBoundingBox();
+
+          if (boundingBox != null) {
+            // TODO better projection
+            GeometryFactory geometryFactory = viewport.getGeometryFactory();
+            BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
+
+            Point point = geometryFactory.copy(boundingBox.getTopLeftPoint());
+            final double minX = point.getX();
+            final double maxY = point.getY();
+
+            // TODO project
+            final AffineTransform transform = graphics.getTransform();
+            try {
+              final double[] location = viewport.toViewCoordinates(minX, maxY);
+              final double screenX = location[0];
+              final double screenY = location[1];
+              graphics.translate(screenX, screenY);
+              final double imageScreenWidth = viewport.toDisplayValue(projectedBoundingBox.getWidthLength());
+              final double imageScreenHeight = viewport.toDisplayValue(projectedBoundingBox.getHeightLength());
+
+              final double xScaleFactor = imageScreenWidth / imageWidth;
+              final double yScaleFactor = imageScreenHeight / imageHeight;
+              graphics.scale(xScaleFactor, yScaleFactor);
+              graphics.drawImage(image, 0, 0, null);
+            } finally {
+              graphics.setTransform(transform);
+            }
+          }
+        }
+      }
+    }
+  }
 
   private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
 
@@ -39,7 +84,7 @@ public class TiledImageLayerRenderer extends
           cachedTiles.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
-          BoundingBox boundingBox = mapTile.getBoundingBox();
+          final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
             || !newBoundingBox.intersects(boundingBox)) {
@@ -53,7 +98,7 @@ public class TiledImageLayerRenderer extends
           imageLoading.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
-          BoundingBox boundingBox = mapTile.getBoundingBox();
+          final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
             || !newBoundingBox.intersects(boundingBox)) {
@@ -62,7 +107,7 @@ public class TiledImageLayerRenderer extends
           }
         }
       }
-    } else if (!"loading".equals(evt.getPropertyName())){
+    } else if (!"loading".equals(evt.getPropertyName())) {
       synchronized (cachedTiles) {
         cachedTiles.clear();
       }
@@ -82,13 +127,13 @@ public class TiledImageLayerRenderer extends
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final AbstractTiledImageLayer layer) {
     synchronized (cachedTiles) {
-      double viewportScale = viewport.getScale();
+      final double viewportScale = viewport.getScale();
       if (viewportScale != scale) {
         cachedTiles.clear();
         this.scale = viewportScale;
       }
     }
-    for (MapTile mapTile : getLayer().getOverlappingEnvelopes(viewport)) {
+    for (final MapTile mapTile : getLayer().getOverlappingEnvelopes(viewport)) {
       if (mapTile != null) {
         MapTile cachedTile = null;
 
@@ -103,34 +148,7 @@ public class TiledImageLayerRenderer extends
 
           }
         }
-        Image image = cachedTile.getImage();
-        if (image != null) {
-          int imageWidth = image.getWidth(null);
-          if (imageWidth != -1) {
-            BoundingBox boundingBox = mapTile.getBoundingBox();
-            double minX = boundingBox.getMinX();
-            double maxY = boundingBox.getMaxY();
-
-            // TODO project
-            AffineTransform transform = graphics.getTransform();
-            try {
-              final double[] location = viewport.toViewCoordinates(minX, maxY);
-              final double screenX = location[0];
-              final double screenY = location[1];
-              graphics.translate(screenX, screenY);
-              double imageScreenWidth = viewport.toDisplayValue(boundingBox.getWidthLength());
-
-              double scaleFactor = imageScreenWidth / imageWidth;
-
-              graphics.scale(scaleFactor, scaleFactor);
-              if (!graphics.drawImage(image, 0, 0, null)) {
-                System.out.println("Not drawn");
-              }
-            } finally {
-              graphics.setTransform(transform);
-            }
-          }
-        }
+        render(viewport, graphics, cachedTile);
       }
     }
   }

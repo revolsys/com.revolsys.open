@@ -761,13 +761,17 @@ public final class FileUtil {
   }
 
   public static String getString(final InputStream in) {
+    final Reader reader = new InputStreamReader(in);
+    return getString(reader);
+  }
+
+  public static String getString(final Reader reader) {
     try {
-      final Reader reader = new InputStreamReader(in);
       final StringWriter out = new StringWriter();
       copy(reader, out);
       return out.toString();
     } finally {
-      closeSilent(in);
+      closeSilent(reader);
     }
   }
 
@@ -797,4 +801,5 @@ public final class FileUtil {
    */
   private FileUtil() {
   }
+
 }

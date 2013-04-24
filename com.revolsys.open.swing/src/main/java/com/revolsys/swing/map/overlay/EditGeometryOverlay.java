@@ -109,9 +109,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     this.viewport = map.getViewport();
     this.project = map.getProject();
     this.geometryFactory = viewport.getGeometryFactory();
-
-    map.addMapOverlay(this);
-    addPropertyChangeListener(map);
   }
 
   protected void actionGeometryCompleted() {
@@ -120,7 +117,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         firstPoint = null;
         previousPoint = null;
         xorGeometry = null;
-        points = new ListCoordinatesList(2);
+        points.clear();
         if ("add".equals(mode)) {
           object = layer.createObject();
           if (object != null) {
@@ -445,7 +442,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void selectObjects(BoundingBox boundingBox) {
-    clearEditingObjects(project);
+   
     for (final DataObjectLayer layer : getEditableLayers()) {
       if (layer.getMetaData().getGeometryAttributeIndex() != -1) {
         List<DataObject> objects = layer.getDataObjects(boundingBox);
@@ -461,16 +458,17 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   public void setEditingObject(DataObjectLayer layer, DataObject object) {
+    clearEditingObjects(project);
     // TODO what if we are in the middle of editing?
     this.layer = layer;
     DataObject oldValue = this.object;
     this.object = object;
     if (object == null) {
       this.geometry = null;
-      points = null;
+      points.clear();
     } else {
       this.geometry = object.getGeometryValue();
-      points = null;
+      points.clear();
     }
     mode = "edit";
     firstPoint = null;

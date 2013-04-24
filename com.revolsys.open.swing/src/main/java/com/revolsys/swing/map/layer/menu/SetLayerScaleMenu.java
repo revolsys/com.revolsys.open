@@ -44,9 +44,9 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
   public JMenu createComponent() {
     String name;
     if (min) {
-      name = "Minimum Display Scale";
+      name = "Hide zoomed out beyond (minimum) scale";
     } else {
-      name = "Maximum Display Scale";
+      name = "Hide zoomed in beyond (maximum) scale";
     }
     JMenu menu = new JMenu(name);
     Layer layer = ObjectTree.getMouseClickItem();

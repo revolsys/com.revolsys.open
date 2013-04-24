@@ -2,52 +2,55 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.image.BufferedImage;
 
-import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 
 public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
 
   private LayerRendererOverlay overlay;
 
-  private BufferedImage image;
+  private GeoReferencedImage referencedImage;
 
   public LayerRendererOverlaySwingWorker(
-    LayerRendererOverlay layerRendererOverlay) {
+    LayerRendererOverlay layerRendererOverlay, GeoReferencedImage image) {
     this.overlay = layerRendererOverlay;
+    this.referencedImage = image;
   }
 
   @Override
   protected Void doInBackground() throws Exception {
     try {
-      Viewport2D viewport = overlay.getViewport();
-      int width = viewport.getViewWidthPixels();
-      int height = viewport.getViewHeightPixels();
-      BufferedImage image = new BufferedImage(width, height,
-        BufferedImage.TYPE_INT_ARGB);
-
-      JComponent parent = (JComponent)overlay.getParent();
-      Graphics2D graphics = (Graphics2D)image.getGraphics();
-      Insets insets = parent.getInsets();
-//      graphics.translate(-insets.left, -insets.top);
       Layer layer = overlay.getLayer();
-      if (layer != null && layer.isVisible()) {
-        LayerRenderer<Layer> renderer = layer.getRenderer();
-        if (renderer != null) {
-          renderer.render(viewport, graphics);
+      if (layer != null) {
+        Project project = overlay.getProject();
+        int imageWidth = referencedImage.getImageWidth();
+        int imageHeight = referencedImage.getImageHeight();
+        if (imageWidth > 0 && imageHeight > 0 && project != null) {
+          BoundingBox boundingBox = referencedImage.getBoundingBox();
+          ImageViewport viewport = new ImageViewport(project, imageWidth,
+            imageHeight, boundingBox);
+
+          Graphics2D graphics = viewport.getGraphics();
+          if (layer != null && layer.isVisible()) {
+            LayerRenderer<Layer> renderer = layer.getRenderer();
+            if (renderer != null) {
+              renderer.render(viewport, graphics);
+            }
+          }
+          graphics.dispose();
+          Image image = viewport.getImage();
+          this.referencedImage.setImage(image);
         }
       }
-      graphics.dispose();
-      this.image = image;
-
       return null;
     } catch (final Throwable t) {
       LoggerFactory.getLogger(getClass()).error("Unable to paint", t);
@@ -55,8 +58,8 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
     }
   }
 
-  public BufferedImage getImage() {
-    return image;
+  public GeoReferencedImage getReferencedImage() {
+    return referencedImage;
   }
 
   @Override
