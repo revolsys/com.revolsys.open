@@ -51,14 +51,14 @@ public class LayerDataObject extends ArrayDataObject {
     if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
       DataObjectLayer layer = getLayer();
       DataObjectState state = getState();
-      if (state == DataObjectState.Initalizing) {
+      if (DataObjectState.Initalizing.equals(state)) {
         // Allow modification on initialization
-      } else if (state == DataObjectState.New) {
+      } else if (DataObjectState.New.equals(state)) {
         if (!layer.isCanAddObjects()) {
           throw new IllegalStateException(
             "Adding new objects is not supported for layer " + layer);
         }
-      } else if (state == DataObjectState.Deleted) {
+      } else if (DataObjectState.Deleted.equals(state)) {
         throw new IllegalStateException(
           "Cannot edit a deleted object for layer " + layer);
       } else {
@@ -84,11 +84,12 @@ public class LayerDataObject extends ArrayDataObject {
         }
       }
       super.setValue(index, value);
-      PropertyChangeEvent event = new PropertyChangeEvent(this, attributeName,
-        oldValue, value);
-      layer.propertyChange(event);
+      if (!DataObjectState.Initalizing.equals(state)) {
+        PropertyChangeEvent event = new PropertyChangeEvent(this,
+          attributeName, oldValue, value);
+        layer.propertyChange(event);
+      }
     }
 
   }
-
 }

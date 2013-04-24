@@ -79,12 +79,6 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public Query createBoundingBoxQuery(final Query query,
-    final BoundingBox boundingBox) {
-    return dataStore.createBoundingBoxQuery(query, boundingBox);
-  }
-
-  @Override
   public <T> T createPrimaryIdValue(final String typePath) {
     return dataStore.createPrimaryIdValue(typePath);
   }

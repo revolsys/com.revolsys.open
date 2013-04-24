@@ -126,7 +126,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
             query.setWhereClause(whereClause);
           } else {
             query = new Query(metaData);
-            query = dataStore.createBoundingBoxQuery(query, boundingBox);
+            query.setBoundingBox(boundingBox);
           }
           addQuery(query);
         }

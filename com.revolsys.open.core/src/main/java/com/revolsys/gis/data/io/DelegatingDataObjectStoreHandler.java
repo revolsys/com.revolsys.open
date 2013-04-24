@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 public class DelegatingDataObjectStoreHandler implements InvocationHandler {
   public static <T extends DataObjectStore> T create(final String label,
     final Class<T> interfaceClass, final T dataStore) {
@@ -31,7 +33,12 @@ public class DelegatingDataObjectStoreHandler implements InvocationHandler {
       label, config);
     final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
       handler);
-    proxyStore.initialize();
+    try {
+      proxyStore.initialize();
+    } catch (Throwable t) {
+      LoggerFactory.getLogger(DelegatingDataObjectStoreHandler.class).error(
+        "Unable to initialize data store " + label, t);
+    }
     return proxyStore;
   }
 

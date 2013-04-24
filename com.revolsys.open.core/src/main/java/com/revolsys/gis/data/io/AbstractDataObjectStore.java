@@ -179,11 +179,6 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public Query createBoundingBoxQuery(final Query query,
-    final BoundingBox boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
   public AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     throw new UnsupportedOperationException();

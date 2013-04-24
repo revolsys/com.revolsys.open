@@ -25,6 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.action.file.Exit;
 import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.map.util.LayerUtil;
@@ -129,6 +130,12 @@ public class ProjectFrame extends JFrame {
       "tasks", "Background Tasks", panel);
   }
 
+  protected void addLogPanel() {
+    final JPanel panel = Log4jTableModel.createPanel();
+    DockingFramesUtil.addDockable(project, MapPanel.MAP_TABLE_WORKING_AREA,
+      "log4j", "Logging", panel);
+  }
+
   protected void addWorkingAreas() {
     addControlWorkingArea();
     addTableWorkingArea();
@@ -162,7 +169,8 @@ public class ProjectFrame extends JFrame {
     addTableOfContents();
 
     addTasksPanel();
-
+    addLogPanel();
+    
     addLayers();
 
     createMenuBar();

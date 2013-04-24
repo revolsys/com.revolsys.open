@@ -197,41 +197,4 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  @Override
-  public Query createBoundingBoxQuery(final Query query,
-    final BoundingBox boundingBox) {
-    Query boundingBoxQuery = query.clone();
-    final String typePath = boundingBoxQuery.getTypeName();
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unable to  find table " + typePath);
-    } else {
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      final String geometryColumnName = geometryAttribute.getName();
-      GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-      final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-      final double x1 = projectedBoundingBox.getMinX();
-      final double y1 = projectedBoundingBox.getMinY();
-      final double x2 = projectedBoundingBox.getMaxX();
-      final double y2 = projectedBoundingBox.getMaxY();
-
-      String whereClause = boundingBoxQuery.getWhereClause();
-      final StringBuffer where = new StringBuffer();
-      if (StringUtils.hasText(whereClause)) {
-        where.append("(");
-        where.append(whereClause);
-        where.append(") AND ");
-      }
-      where.append(" SDO_RELATE(");
-      where.append(geometryColumnName);
-      where.append(",");
-      where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
-      where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-      boundingBoxQuery.setWhereClause(where.toString());
-      boundingBoxQuery.addParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
-      return boundingBoxQuery;
-    }
-  }
 }

@@ -60,6 +60,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     return statement.executeQuery();
   }
 
+  protected void setQuery(Query query) {
+    this.query = query;
+  }
+
   private Connection connection;
 
   private final int currentQueryIndex = -1;
@@ -133,7 +137,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   @Override
   protected void doInit() {
-    this.resultSet = getResultSet(query);
+    this.resultSet = getResultSet();
   }
 
   protected String getErrorMessage() {
@@ -178,7 +182,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     }
   }
 
-  protected ResultSet getResultSet(final Query query) {
+  protected ResultSet getResultSet() {
     final String tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {

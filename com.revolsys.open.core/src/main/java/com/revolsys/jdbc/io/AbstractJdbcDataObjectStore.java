@@ -165,10 +165,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public AbstractIterator<DataObject> createIterator(Query query,
     final Map<String, Object> properties) {
-    final BoundingBox boundingBox = query.getBoundingBox();
-    if (boundingBox != null) {
-      query = createBoundingBoxQuery(query, boundingBox);
-    }
     return new JdbcQueryIterator(this, query, properties);
   }
 
@@ -722,7 +718,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   public DataObjectStoreQueryReader query(final String typePath,
     final BoundingBox boundingBox) {
 
-    final Query query = createBoundingBoxQuery(new Query(typePath), boundingBox);
+    final Query query = new Query(typePath);
+    query.setBoundingBox(boundingBox);
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;

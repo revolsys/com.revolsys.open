@@ -40,7 +40,6 @@ public class LayerRendererOverlay extends JComponent implements
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
     setLayer(layer);
-    mapPanel.addPropertyChangeListener(this);
     viewport.addPropertyChangeListener(this);
     addPropertyChangeListener(mapPanel);
   }
@@ -72,8 +71,8 @@ public class LayerRendererOverlay extends JComponent implements
         BoundingBox boundingBox = viewport.getBoundingBox();
         int viewWidthPixels = viewport.getViewWidthPixels();
         int viewHeightPixels = viewport.getViewHeightPixels();
-        GeoReferencedImage loadImage = new MapTile(boundingBox, viewWidthPixels,
-          viewHeightPixels);
+        GeoReferencedImage loadImage = new MapTile(boundingBox,
+          viewWidthPixels, viewHeightPixels);
         imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
         SwingWorkerManager.execute(imageWorker);
       }
@@ -85,7 +84,9 @@ public class LayerRendererOverlay extends JComponent implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
-    redraw();
+    if (!(e.getSource() instanceof MapPanel)) {
+      redraw();
+    }
   }
 
   public void redraw() {

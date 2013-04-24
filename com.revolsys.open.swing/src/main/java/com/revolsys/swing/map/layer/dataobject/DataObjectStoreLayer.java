@@ -29,6 +29,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
@@ -313,7 +314,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public List<DataObject> query(final Query query) {
+  public List<DataObject> query(Query query) {
     query.setProperty("dataObjectFactory", this);
     final Reader<DataObject> reader = dataStore.query(query);
     try {
