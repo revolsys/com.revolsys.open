@@ -7,13 +7,10 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -23,14 +20,10 @@ import javax.swing.SwingUtilities;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.Viewport2D;
 import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
-public class ZoomOverlay extends JComponent implements MouseListener,
-  MouseMotionListener, MouseWheelListener, KeyListener {
-
-  private final MapPanel map;
+public class ZoomOverlay extends AbstractOverlay {
 
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
 
@@ -40,18 +33,33 @@ public class ZoomOverlay extends JComponent implements MouseListener,
 
   private Rectangle2D zoomBox;
 
-  private Cursor cursor;
-
   private boolean panning;
-
-  private final Viewport2D viewport;
 
   private BufferedImage panImage;
 
   public ZoomOverlay(final MapPanel map) {
-    this.map = map;
-    this.viewport = map.getViewport();
-    map.addMapOverlay(this);
+    super(map);
+  }
+
+  @Override
+  public void keyPressed(final KeyEvent e) {
+    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      clearMapCursor();
+      panning = false;
+      panFirstPoint = null;
+      panImage = null;
+      zoomBox = null;
+      zoomBoxFirstPoint = null;
+      repaint();
+    }
+  }
+
+  @Override
+  public void keyReleased(final KeyEvent e) {
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
   }
 
   @Override
@@ -66,8 +74,8 @@ public class ZoomOverlay extends JComponent implements MouseListener,
         numSteps = 1;
       }
       if (numSteps != 0) {
-        final Point mapPoint = viewport.toModelPoint(x, y);
-        map.zoom(mapPoint, numSteps);
+        final Point mapPoint = getViewport().toModelPoint(x, y);
+        getMap().zoom(mapPoint, numSteps);
         event.consume();
       }
     }
@@ -97,10 +105,10 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   @Override
   public void mousePressed(final MouseEvent event) {
     final boolean shiftDown = event.isShiftDown();
-    int modifiers = event.getModifiers();
+    final int modifiers = event.getModifiers();
     if (shiftDown) {
       zoomBoxStart(event);
-    } else if (modifiers == MouseEvent.BUTTON1_MASK) {
+    } else if (modifiers == InputEvent.BUTTON1_MASK) {
       panStart(event);
     }
   }
@@ -123,8 +131,8 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     }
     final int x = event.getX();
     final int y = event.getY();
-    final Point mapPoint = viewport.toModelPoint(x, y);
-    map.zoom(mapPoint, numSteps);
+    final Point mapPoint = getViewport().toModelPoint(x, y);
+    getMap().zoom(mapPoint, numSteps);
     event.consume();
   }
 
@@ -147,14 +155,14 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     if (panFirstPoint == null) {
       panStart(event);
     }
-    java.awt.Point p = event.getPoint();
+    final java.awt.Point p = event.getPoint();
     final int dx = (int)(p.getX() - panFirstPoint.getX());
     final int dy = (int)(p.getY() - panFirstPoint.getY());
 
-    Container parent = getParent();
-    Graphics2D graphics = (Graphics2D)getGraphics();
-    int width = viewport.getViewWidthPixels();
-    int height = viewport.getViewHeightPixels();
+    final Container parent = getParent();
+    final Graphics2D graphics = (Graphics2D)getGraphics();
+    final int width = getViewport().getViewWidthPixels();
+    final int height = getViewport().getViewHeightPixels();
     graphics.setColor(Color.WHITE);
     graphics.fillRect(0, 0, width, height);
     graphics.drawImage(panImage, dx, dy, parent);
@@ -162,53 +170,41 @@ public class ZoomOverlay extends JComponent implements MouseListener,
   }
 
   public void panFinish(final MouseEvent event) {
-    java.awt.Point point = event.getPoint();
-    final Point fromPoint = viewport.toModelPoint(panFirstPoint);
-    final Point toPoint = viewport.toModelPoint(point);
+    final java.awt.Point point = event.getPoint();
+    final Point fromPoint = getViewport().toModelPoint(panFirstPoint);
+    final Point toPoint = getViewport().toModelPoint(point);
 
     final double deltaX = fromPoint.getX() - toPoint.getX();
     final double deltaY = fromPoint.getY() - toPoint.getY();
 
-    BoundingBox boundingBox = viewport.getBoundingBox();
-    BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
-    map.setBoundingBox(newBoundingBox);
+    final BoundingBox boundingBox = getViewport().getBoundingBox();
+    final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
+    getMap().setBoundingBox(newBoundingBox);
 
     panFirstPoint = null;
     panning = false;
-    restoreCursor();
+    clearMapCursor();
     panImage = null;
     getParent().repaint();
     event.consume();
   }
 
   public void panStart(final MouseEvent event) {
-    int width = viewport.getViewWidthPixels();
-    int height = viewport.getViewHeightPixels();
-    JComponent parent = (JComponent)getParent();
+    final int width = getViewport().getViewWidthPixels();
+    final int height = getViewport().getViewHeightPixels();
+    final JComponent parent = (JComponent)getParent();
     panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    Graphics2D graphics = (Graphics2D)panImage.getGraphics();
-    Insets insets = parent.getInsets();
+    final Graphics2D graphics = (Graphics2D)panImage.getGraphics();
+    final Insets insets = parent.getInsets();
     graphics.translate(-insets.left, -insets.top);
     graphics.setColor(Color.WHITE);
     graphics.fillRect(insets.left, insets.top, width, height);
     parent.paintComponents(graphics);
     graphics.dispose();
     panning = true;
-    saveCursor();
-    getParent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+    setMapCursor(new Cursor(Cursor.HAND_CURSOR));
     panFirstPoint = event.getPoint();
     event.consume();
-  }
-
-  private void restoreCursor() {
-    if (cursor != null) {
-      getParent().setCursor(cursor);
-      cursor = null;
-    }
-  }
-
-  private void saveCursor() {
-    cursor = getParent().getCursor();
   }
 
   public void zoomBoxDrag(final MouseEvent event) {
@@ -237,50 +233,28 @@ public class ZoomOverlay extends JComponent implements MouseListener,
     // Convert first point to envelope top left in map coords.
     final int minX = (int)zoomBox.getMinX();
     final int minY = (int)zoomBox.getMinY();
-    final Point topLeft = viewport.toModelPoint(minX, minY);
+    final Point topLeft = getViewport().toModelPoint(minX, minY);
 
     // Convert second point to envelope bottom right in map coords.
     final int maxX = (int)zoomBox.getMaxX();
     final int maxY = (int)zoomBox.getMaxY();
-    final Point bottomRight = viewport.toModelPoint(maxX, maxY);
+    final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
-    final GeometryFactory geometryFactory = map.getGeometryFactory();
+    final GeometryFactory geometryFactory = getMap().getGeometryFactory();
     final BoundingBox extent = new BoundingBox(geometryFactory, topLeft.getX(),
       topLeft.getY(), bottomRight.getX(), bottomRight.getY());
-    map.setBoundingBox(extent);
+    getMap().setBoundingBox(extent);
 
     zoomBoxFirstPoint = null;
     zoomBox = null;
-    restoreCursor();
+    clearMapCursor();
     event.consume();
   }
 
   public void zoomBoxStart(final MouseEvent event) {
-    saveCursor();
-    getParent().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    setMapCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
     zoomBoxFirstPoint = event.getPoint();
     zoomBox = new Rectangle2D.Double();
     event.consume();
-  }
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-      restoreCursor();
-      panning = false;
-      panFirstPoint = null;
-      panImage = null;
-      zoomBox = null;
-      zoomBoxFirstPoint = null;
-      repaint();
-    }
-  }
-
-  @Override
-  public void keyReleased(KeyEvent e) {
-  }
-
-  @Override
-  public void keyTyped(KeyEvent e) {
   }
 }

@@ -20,7 +20,6 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
 
   public LoadingWorker(final DataObjectStoreLayer layer,
     final BoundingBox viewportBoundingBox) {
-    super();
     this.layer = layer;
     this.viewportBoundingBox = viewportBoundingBox;
 
@@ -59,6 +58,7 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     try {
       if (!isCancelled()) {
         DataObjectQuadTree index = get();
+        
         layer.setIndex(viewportBoundingBox, index);
       }
     } catch (final CancellationException e) {

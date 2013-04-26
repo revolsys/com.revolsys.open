@@ -6,19 +6,12 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.color.ColorUtil;
@@ -28,7 +21,6 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -41,27 +33,16 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("serial")
-public class SelectFeaturesOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener, KeyListener {
+public class SelectFeaturesOverlay extends AbstractOverlay {
 
   private static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
     }, 0f);
 
-  private List<DataObjectLayer> selectableLayers = new ArrayList<DataObjectLayer>();
-
-  private final Project project;
-
-  private final MapPanel map;
-
-  private final Viewport2D viewport;
-
   private Double selectBox;
 
   private java.awt.Point selectBoxFirstPoint;
-
-  private Cursor cursor;
 
   private final GeometryStyle highlightStyle;
 
@@ -78,6 +59,7 @@ public class SelectFeaturesOverlay extends JComponent implements
   }
 
   protected SelectFeaturesOverlay(final MapPanel map, final Color color) {
+    super(map);
     final Color transparentColor = ColorUtil.setAlpha(color, 127);
     highlightStyle = GeometryStyle.polygon(color, 3, transparentColor);
     outlineStyle = GeometryStyle.line(new Color(0, 0, 0, 255));
@@ -87,17 +69,27 @@ public class SelectFeaturesOverlay extends JComponent implements
     boxOutlineColor = new Color(color.getRed() / 2, color.getGreen() / 2,
       color.getBlue() / 2);
     boxFillColor = ColorUtil.setAlpha(boxOutlineColor, 127);
-
-    this.map = map;
-    this.viewport = map.getViewport();
-    this.project = map.getProject();
-
-    map.addMapOverlay(this);
-    updateSelectableLayers();
   }
 
-  public boolean hasSelectableLayers() {
-    return !this.selectableLayers.isEmpty();
+  public GeometryStyle getHighlightStyle() {
+    return highlightStyle;
+  }
+
+  public GeometryStyle getOutlineStyle() {
+    return outlineStyle;
+  }
+
+  protected Collection<DataObject> getSelectedObjects(
+    final DataObjectLayer layer) {
+    return layer.getSelectedObjects();
+  }
+
+  public MarkerStyle getVertexStyle() {
+    return vertexStyle;
+  }
+
+  protected boolean isSelectable(final DataObjectLayer dataObjectLayer) {
+    return dataObjectLayer.isSelectable();
   }
 
   public boolean isSelectEvent(final MouseEvent event) {
@@ -111,7 +103,7 @@ public class SelectFeaturesOverlay extends JComponent implements
   @Override
   public void keyPressed(final KeyEvent e) {
     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-      restoreCursor();
+      clearMapCursor();
       selectBox = null;
       selectBoxFirstPoint = null;
       repaint();
@@ -128,20 +120,18 @@ public class SelectFeaturesOverlay extends JComponent implements
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if (hasSelectableLayers()) {
-      if (event.getClickCount() == 1 && isSelectEvent(event)) {
-        final int x = event.getX();
-        final int y = event.getY();
-        final double[] location = viewport.toModelCoordinates(x, y);
-        final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-        BoundingBox boundingBox = new BoundingBox(geometryFactory, location[0],
-          location[1]);
-        final double modelUnitsPerViewUnit = viewport.getModelUnitsPerViewUnit();
-        boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-        SwingWorkerManager.execute("Select objects", this, "selectObjects",
-          boundingBox);
-        event.consume();
-      }
+    if (event.getClickCount() == 1 && isSelectEvent(event)) {
+      final int x = event.getX();
+      final int y = event.getY();
+      final double[] location = getViewport().toModelCoordinates(x, y);
+      final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
+      BoundingBox boundingBox = new BoundingBox(geometryFactory, location[0],
+        location[1]);
+      final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
+      boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
+      SwingWorkerManager.execute("Select objects", this, "selectObjects",
+        boundingBox);
+      event.consume();
     }
   }
 
@@ -167,10 +157,8 @@ public class SelectFeaturesOverlay extends JComponent implements
 
   @Override
   public void mousePressed(final MouseEvent event) {
-    if (hasSelectableLayers()) {
-      if (isSelectEvent(event)) {
-        selectBoxStart(event);
-      }
+    if (isSelectEvent(event)) {
+      selectBoxStart(event);
     }
   }
 
@@ -184,19 +172,12 @@ public class SelectFeaturesOverlay extends JComponent implements
   @Override
   public void paintComponent(final Graphics graphics) {
     final Graphics2D graphics2d = (Graphics2D)graphics;
-    for (final DataObjectLayer layer : selectableLayers) {
-      for (final DataObject object : getSelectedObjects(layer)) {
-        if (object != null && layer.isVisible(object)) {
-          final Geometry geometry = object.getGeometryValue();
-          MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
-            geometry, vertexStyle);
-          GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
-            highlightStyle);
-          GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
-            outlineStyle);
-        }
-      }
-    }
+    Project layerGroup = getProject();
+    paint(graphics2d, layerGroup);
+    paintSelectBox(graphics2d);
+  }
+
+  protected void paintSelectBox(final Graphics2D graphics2d) {
     if (selectBox != null) {
       graphics2d.setColor(boxOutlineColor);
       graphics2d.setStroke(BOX_STROKE);
@@ -206,47 +187,38 @@ public class SelectFeaturesOverlay extends JComponent implements
     }
   }
 
-  public GeometryStyle getOutlineStyle() {
-    return outlineStyle;
-  }
-
-  public GeometryStyle getHighlightStyle() {
-    return highlightStyle;
-  }
-
-  public MarkerStyle getVertexStyle() {
-    return vertexStyle;
-  }
-
-  protected Collection<DataObject> getSelectedObjects(
-    final DataObjectLayer layer) {
-    return layer.getSelectedObjects();
+  protected void paint(final Graphics2D graphics2d, LayerGroup layerGroup) {
+    for (final Layer layer : layerGroup.getLayers()) {
+      if (layer instanceof LayerGroup) {
+        LayerGroup childGroup = (LayerGroup)layer;
+        paint(graphics2d, childGroup);
+      } else if (layer instanceof DataObjectLayer) {
+        DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+        for (final DataObject object : getSelectedObjects(dataObjectLayer)) {
+          if (object != null && dataObjectLayer.isVisible(object)) {
+            final Geometry geometry = object.getGeometryValue();
+            MarkerStyleRenderer.renderMarkerVertices(getViewport(), graphics2d,
+              geometry, vertexStyle);
+            GeometryStyleRenderer.renderGeometry(getViewport(), graphics2d,
+              geometry, highlightStyle);
+            GeometryStyleRenderer.renderOutline(getViewport(), graphics2d,
+              geometry, outlineStyle);
+          }
+        }
+      }
+    }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     if ("layers".equals(propertyName)) {
-      updateSelectableLayers();
       repaint();
     } else if ("selectable".equals(propertyName)) {
-      updateSelectableLayers();
       repaint();
     } else if ("visible".equals(propertyName)) {
-      updateSelectableLayers();
       repaint();
     }
-  }
-
-  private void restoreCursor() {
-    if (cursor != null) {
-      setCursor(cursor);
-      cursor = null;
-    }
-  }
-
-  private void saveCursor() {
-    cursor = getCursor();
   }
 
   public void selectBoxDrag(final MouseEvent event) {
@@ -273,20 +245,20 @@ public class SelectFeaturesOverlay extends JComponent implements
     // Convert first point to envelope top left in map coords.
     final int minX = (int)selectBox.getMinX();
     final int minY = (int)selectBox.getMinY();
-    final Point topLeft = viewport.toModelPoint(minX, minY);
+    final Point topLeft = getViewport().toModelPoint(minX, minY);
 
     // Convert second point to envelope bottom right in map coords.
     final int maxX = (int)selectBox.getMaxX();
     final int maxY = (int)selectBox.getMaxY();
-    final Point bottomRight = viewport.toModelPoint(maxX, maxY);
+    final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
-    final GeometryFactory geometryFactory = map.getGeometryFactory();
+    final GeometryFactory geometryFactory = getMap().getGeometryFactory();
     final BoundingBox boundingBox = new BoundingBox(geometryFactory,
       topLeft.getX(), topLeft.getY(), bottomRight.getX(), bottomRight.getY());
 
     selectBoxFirstPoint = null;
     selectBox = null;
-    restoreCursor();
+    clearMapCursor();
     repaint();
     SwingWorkerManager.execute("Select objects", this, "selectObjects",
       boundingBox);
@@ -294,51 +266,29 @@ public class SelectFeaturesOverlay extends JComponent implements
   }
 
   public void selectBoxStart(final MouseEvent event) {
-    saveCursor();
-    setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    setMapCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
     selectBoxFirstPoint = event.getPoint();
     selectBox = new Rectangle2D.Double();
     event.consume();
   }
 
   public void selectObjects(final BoundingBox boundingBox) {
-    for (final DataObjectLayer layer : selectableLayers) {
-      layer.setSelectedObjects(boundingBox);
-    }
+    Project project = getProject();
+    selectObjects(project, boundingBox);
   }
 
-  protected void updateSelectableLayers() {
-    final List<DataObjectLayer> selectableLayers = new ArrayList<DataObjectLayer>();
-    updateSelectableLayers(project, selectableLayers);
-    this.selectableLayers = selectableLayers;
-    if (selectableLayers.isEmpty()) {
-      setEnabled(false);
-    } else {
-      setEnabled(true);
-    }
-  }
-
-  public List<DataObjectLayer> getSelectableLayers() {
-    return selectableLayers;
-  }
-
-  protected void updateSelectableLayers(final LayerGroup group,
-    final List<DataObjectLayer> selectableLayers) {
+  private void selectObjects(final LayerGroup group, BoundingBox boundingBox) {
+    double scale = getViewport().getScale();
     for (final Layer layer : group.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        updateSelectableLayers(childGroup, selectableLayers);
+        selectObjects(childGroup, boundingBox);
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-        if (isSelectable(dataObjectLayer)) {
-          selectableLayers.add(dataObjectLayer);
+        if (dataObjectLayer.isSelectable(scale)) {
+          dataObjectLayer.setSelectedObjects(boundingBox);
         }
       }
     }
-
-  }
-
-  protected boolean isSelectable(final DataObjectLayer dataObjectLayer) {
-    return dataObjectLayer.isSelectable();
   }
 }

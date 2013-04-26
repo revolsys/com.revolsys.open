@@ -38,6 +38,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
+    mouseMoved(e);
   }
 
   @Override

@@ -14,7 +14,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * Nodes a set of {@link SegmentString}s using a index based
  * on {@link MonotoneChain}s and a {@link SpatialIndex}.
  * The {@link SpatialIndex} used should be something that supports
- * envelope (range) queries efficiently (such as a {@link Quadtree}
+ * envelope (range) queries efficiently (such as a {@link LineSegmentQuadTree}
  * or {@link STRtree} (which is the default index provided).
  *
  * @version 1.7

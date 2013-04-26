@@ -229,7 +229,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      return index.queryIntersects(polygon);
+      List<DataObject> objects = index.queryIntersects(polygon);
+      return objects;
     }
   }
 
@@ -356,6 +357,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     synchronized (sync) {
       if (loadedBoundingBox == loadingBoundingBox) {
         this.index = index;
+        List<DataObject> newObjects = getNewObjects();
+        index.insert(newObjects);
         clearLoading(loadedBoundingBox);
       }
     }
@@ -364,8 +367,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
-    final List<DataObject> objects = getObjects(boundingBox);
-    setSelectedObjects(objects);
+    if (isSelectable()) {
+      final List<DataObject> objects = getObjects(boundingBox);
+      setSelectedObjects(objects);
+    }
   }
 
   @Override

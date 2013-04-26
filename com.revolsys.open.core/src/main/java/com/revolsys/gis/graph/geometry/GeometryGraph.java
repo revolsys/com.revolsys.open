@@ -399,4 +399,10 @@ public class GeometryGraph extends Graph<LineSegment> {
     }
     return true;
   }
+
+  public void addEdge(Node<LineSegment> fromNode, Node<LineSegment> toNode) {
+    LineSegment lineSegment = new LineSegment(fromNode, toNode);
+    addEdge(lineSegment, fromNode, toNode);
+  }
+
 }

@@ -1,9 +1,7 @@
 package com.revolsys.swing.map.overlay;
 
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -33,6 +31,10 @@ public class LayerRendererOverlay extends JComponent implements
 
   private GeoReferencedImage image;
 
+  private final Object loadSync = new Object();
+
+  private LayerRendererOverlaySwingWorker imageWorker;
+
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
   }
@@ -56,11 +58,13 @@ public class LayerRendererOverlay extends JComponent implements
     return layer;
   }
 
+  public Project getProject() {
+    return layer.getProject();
+  }
+
   public Viewport2D getViewport() {
     return viewport;
   }
-
-  private Object loadSync = new Object();
 
   @Override
   public void paintComponent(final Graphics g) {
@@ -68,10 +72,10 @@ public class LayerRendererOverlay extends JComponent implements
     synchronized (loadSync) {
       image = this.image;
       if (image == null) {
-        BoundingBox boundingBox = viewport.getBoundingBox();
-        int viewWidthPixels = viewport.getViewWidthPixels();
-        int viewHeightPixels = viewport.getViewHeightPixels();
-        GeoReferencedImage loadImage = new MapTile(boundingBox,
+        final BoundingBox boundingBox = viewport.getBoundingBox();
+        final int viewWidthPixels = viewport.getViewWidthPixels();
+        final int viewHeightPixels = viewport.getViewHeightPixels();
+        final GeoReferencedImage loadImage = new MapTile(boundingBox,
           viewWidthPixels, viewHeightPixels);
         imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
         SwingWorkerManager.execute(imageWorker);
@@ -79,8 +83,6 @@ public class LayerRendererOverlay extends JComponent implements
     }
     TiledImageLayerRenderer.render(viewport, (Graphics2D)g, image);
   }
-
-  private LayerRendererOverlaySwingWorker imageWorker;
 
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
@@ -100,6 +102,18 @@ public class LayerRendererOverlay extends JComponent implements
     }
   }
 
+  public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {
+    synchronized (loadSync) {
+      if (this.imageWorker == imageWorker) {
+        this.image = imageWorker.getReferencedImage();
+        if (image != null) {
+          this.imageWorker = null;
+        }
+        firePropertyChange("imageLoaded", false, true);
+      }
+    }
+  }
+
   public void setLayer(final Layer layer) {
     final Layer old = this.layer;
     if (old != layer) {
@@ -113,21 +127,5 @@ public class LayerRendererOverlay extends JComponent implements
       redraw();
       firePropertyChange("layer", old, layer);
     }
-  }
-
-  public void setImage(LayerRendererOverlaySwingWorker imageWorker) {
-    synchronized (loadSync) {
-      if (this.imageWorker == imageWorker) {
-        this.image = imageWorker.getReferencedImage();
-        if (image != null) {
-          this.imageWorker = null;
-        }
-        firePropertyChange("imageLoaded", false, true);
-      }
-    }
-  }
-
-  public Project getProject() {
-    return layer.getProject();
   }
 }

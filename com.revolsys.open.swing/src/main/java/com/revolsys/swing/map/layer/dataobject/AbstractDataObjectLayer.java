@@ -106,6 +106,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void addEditingObject(final DataObject object) {
     editingObjects.add(object);
+    fireObjectsChanged();
   }
 
   protected void addModifiedObject(final DataObject object) {
@@ -179,6 +180,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearEditingObjects() {
     this.editingObjects.clear();
+    fireObjectsChanged();
   }
 
   @Override
@@ -421,11 +423,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isHidden(final DataObject object) {
-    if (isDeleted(object)) {
+    if (isCanDeleteObjects() && isDeleted(object)) {
       return true;
     } else if (isSelected(object)) {
       return true;
-    } else if (isEditing(object)) {
+    } else if ((isCanAddObjects() || isCanEditObjects()) && isEditing(object)) {
       return true;
     } else {
       return false;
@@ -527,6 +529,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       synchronized (editSync) {
         if (editable == false) {
+          getPropertyChangeSupport().firePropertyChange("preEditable", false,
+            true);
           if (isHasChanges()) {
             final Integer result = InvokeMethodCallable.invokeAndWait(
               JOptionPane.class,
@@ -563,6 +567,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     for (final DataObject object : editingObjects) {
       addEditingObject(object);
     }
+    fireObjectsChanged();
   }
 
   @Override
@@ -611,8 +616,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
-    final List<DataObject> objects = getDataObjects(boundingBox);
-    setSelectedObjects(objects);
+    if (isSelectable()) {
+      final List<DataObject> objects = getDataObjects(boundingBox);
+      setSelectedObjects(objects);
+    }
   }
 
   @Override

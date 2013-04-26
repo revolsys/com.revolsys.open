@@ -71,7 +71,7 @@ public class MCIndexSegmentSetMutualIntersector extends
 
   /*
    * The {@link SpatialIndex} used should be something that supports envelope
-   * (range) queries efficiently (such as a {@link Quadtree} or {@link STRtree}.
+   * (range) queries efficiently (such as a {@link LineSegmentQuadTree} or {@link STRtree}.
    */
   private final SpatialIndex index = new STRtree();
 

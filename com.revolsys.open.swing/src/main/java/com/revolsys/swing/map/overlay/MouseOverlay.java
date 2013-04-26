@@ -19,7 +19,7 @@ import javax.swing.JLayeredPane;
 public class MouseOverlay extends JComponent implements MouseListener,
   MouseMotionListener, MouseWheelListener, KeyListener {
 
-  public MouseOverlay(JLayeredPane pane) {
+  public MouseOverlay(final JLayeredPane pane) {
     setFocusable(true);
     pane.add(this, new Integer(Integer.MAX_VALUE));
     addMouseListener(this);
@@ -29,11 +29,11 @@ public class MouseOverlay extends JComponent implements MouseListener,
   }
 
   private List<Component> getOverlays() {
-    List<Component> overlays = new ArrayList<Component>();
-    Container parent = getParent();
+    final List<Component> overlays = new ArrayList<Component>();
+    final Container parent = getParent();
     if (parent instanceof JLayeredPane) {
-      JLayeredPane layeredPane = (JLayeredPane)parent;
-      for (Component component : layeredPane.getComponents()) {
+      final JLayeredPane layeredPane = (JLayeredPane)parent;
+      for (final Component component : layeredPane.getComponents()) {
         if (component.isEnabled() && !(component instanceof MouseOverlay)) {
           overlays.add(component);
         }
@@ -43,130 +43,10 @@ public class MouseOverlay extends JComponent implements MouseListener,
   }
 
   @Override
-  public void mouseWheelMoved(MouseWheelEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseWheelListener) {
-        MouseWheelListener listener = (MouseWheelListener)overlay;
-        listener.mouseWheelMoved(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseDragged(MouseEvent e) {
-    requestFocusInWindow(true);
-   for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseMotionListener) {
-        MouseMotionListener listener = (MouseMotionListener)overlay;
-        listener.mouseDragged(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseMoved(MouseEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseMotionListener) {
-        MouseMotionListener listener = (MouseMotionListener)overlay;
-        listener.mouseMoved(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseClicked(MouseEvent e) {
-    requestFocusInWindow(true);
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        MouseListener listener = (MouseListener)overlay;
-        listener.mouseClicked(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mousePressed(MouseEvent e) {
-    requestFocusInWindow(true);
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        MouseListener listener = (MouseListener)overlay;
-        listener.mousePressed(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseReleased(MouseEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        MouseListener listener = (MouseListener)overlay;
-        listener.mouseReleased(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseEntered(MouseEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        MouseListener listener = (MouseListener)overlay;
-        listener.mouseEntered(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseExited(MouseEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        MouseListener listener = (MouseListener)overlay;
-        listener.mouseExited(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void keyTyped(KeyEvent e) {
-    for (Component overlay : getOverlays()) {
+  public void keyPressed(final KeyEvent e) {
+    for (final Component overlay : getOverlays()) {
       if (overlay instanceof KeyListener) {
-        KeyListener listener = (KeyListener)overlay;
-        listener.keyTyped(e);
-        if (e.isConsumed()) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-    for (Component overlay : getOverlays()) {
-      if (overlay instanceof KeyListener) {
-        KeyListener listener = (KeyListener)overlay;
+        final KeyListener listener = (KeyListener)overlay;
         listener.keyPressed(e);
         if (e.isConsumed()) {
           return;
@@ -176,11 +56,131 @@ public class MouseOverlay extends JComponent implements MouseListener,
   }
 
   @Override
-  public void keyReleased(KeyEvent e) {
-    for (Component overlay : getOverlays()) {
+  public void keyReleased(final KeyEvent e) {
+    for (final Component overlay : getOverlays()) {
       if (overlay instanceof KeyListener) {
-        KeyListener listener = (KeyListener)overlay;
+        final KeyListener listener = (KeyListener)overlay;
         listener.keyReleased(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof KeyListener) {
+        final KeyListener listener = (KeyListener)overlay;
+        listener.keyTyped(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseClicked(final MouseEvent e) {
+    requestFocusInWindow(true);
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseListener) {
+        final MouseListener listener = (MouseListener)overlay;
+        listener.mouseClicked(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseDragged(final MouseEvent e) {
+    requestFocusInWindow(true);
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseMotionListener) {
+        final MouseMotionListener listener = (MouseMotionListener)overlay;
+        listener.mouseDragged(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseListener) {
+        final MouseListener listener = (MouseListener)overlay;
+        listener.mouseEntered(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseListener) {
+        final MouseListener listener = (MouseListener)overlay;
+        listener.mouseExited(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseMoved(final MouseEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseMotionListener) {
+        final MouseMotionListener listener = (MouseMotionListener)overlay;
+        listener.mouseMoved(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mousePressed(final MouseEvent e) {
+    requestFocusInWindow(true);
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseListener) {
+        final MouseListener listener = (MouseListener)overlay;
+        listener.mousePressed(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseListener) {
+        final MouseListener listener = (MouseListener)overlay;
+        listener.mouseReleased(e);
+        if (e.isConsumed()) {
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void mouseWheelMoved(final MouseWheelEvent e) {
+    for (final Component overlay : getOverlays()) {
+      if (overlay instanceof MouseWheelListener) {
+        final MouseWheelListener listener = (MouseWheelListener)overlay;
+        listener.mouseWheelMoved(e);
         if (e.isConsumed()) {
           return;
         }

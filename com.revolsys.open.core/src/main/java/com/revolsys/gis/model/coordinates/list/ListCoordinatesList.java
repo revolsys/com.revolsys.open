@@ -81,9 +81,7 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   }
 
   public void remove(final int index) {
-    for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
-      coordinates.remove(index * numAxis);
-    }
+    coordinates.remove(index);
   }
 
   @Override

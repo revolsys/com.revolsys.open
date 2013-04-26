@@ -45,6 +45,7 @@ import com.revolsys.gis.graph.event.NodeEventListenerList;
 import com.revolsys.gis.graph.filter.IsPointOnLineEdgeFilter;
 import com.revolsys.gis.graph.visitor.DeleteEdgeVisitor;
 import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
+import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -57,6 +58,7 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.vividsolutions.jts.geom.Envelope;
@@ -289,6 +291,11 @@ public class Graph<T> {
     } else {
       return getNode(nodeId);
     }
+  }
+
+  public List<Node<T>> findNodes(BoundingBox boundingBox) {
+    boundingBox = boundingBox.convert(getGeometryFactory());
+    return NodeWithinBoundingBoxVisitor.getNodes(this, boundingBox);
   }
 
   /**
@@ -956,6 +963,10 @@ public class Graph<T> {
 
   public void remove(final Node<T> node) {
     if (!node.isRemoved()) {
+      final ArrayList<Edge<T>> edges = new ArrayList<Edge<T>>(node.getEdges());
+      for (final Edge<T> edge : edges) {
+        remove(edge);
+      }
       nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
       final int nodeId = node.getId();
       nodesById.remove(nodeId);
@@ -964,11 +975,8 @@ public class Graph<T> {
       if (nodeIndex != null) {
         nodeIndex.remove(node);
       }
-      final ArrayList<Edge<T>> edges = new ArrayList<Edge<T>>(node.getEdges());
+
       node.remove();
-      for (final Edge<T> edge : edges) {
-        remove(edge);
-      }
     }
   }
 

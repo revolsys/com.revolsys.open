@@ -187,9 +187,16 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return readOnly;
   }
 
-  @Override
+  public boolean isEditable(double scale) {
+    return isVisible(scale) && isEditable();
+  }
+
+  public boolean isSelectable(double scale) {
+    return isVisible(scale) && isSelectable();
+  }
+
   public boolean isSelectable() {
-    return visible && selectable;
+    return isSelectSupported() && isVisible() && selectable;
   }
 
   @Override
@@ -245,9 +252,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setEditable(final boolean editable) {
-      final boolean old = isEditable();
-      this.editable = editable;
-      propertyChangeSupport.firePropertyChange("editable", old, isEditable());
+    final boolean old = isEditable();
+    this.editable = editable;
+    propertyChangeSupport.firePropertyChange("editable", old, isEditable());
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {

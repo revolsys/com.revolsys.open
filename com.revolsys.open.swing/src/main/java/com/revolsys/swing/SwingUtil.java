@@ -10,6 +10,7 @@ import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Date;
 
@@ -25,6 +26,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXDatePicker;
@@ -331,5 +333,10 @@ public class SwingUtil {
       return null;
     }
 
+  }
+
+  public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
+    int modifiers = event.getModifiers();
+    return SwingUtilities.isLeftMouseButton(event) && MouseEvent.BUTTON1_MASK == modifiers;
   }
 }

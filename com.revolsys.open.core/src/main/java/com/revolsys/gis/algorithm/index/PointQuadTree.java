@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -12,12 +13,28 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   private PointQuadTreeNode<T> root;
 
+  private GeometryFactory geometryFactory;
+
+  public PointQuadTree() {
+  }
+
+  public PointQuadTree(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public boolean contains(final Coordinates point) {
     if (root == null) {
       return false;
     } else {
       return root.contains(point);
     }
+  }
+
+  public List<T> findWithin(BoundingBox boundingBox) {
+    if (geometryFactory != null) {
+      boundingBox = boundingBox.convert(geometryFactory);
+    }
+    return findWithin((Envelope)boundingBox);
   }
 
   public List<T> findWithin(final Envelope envelope) {

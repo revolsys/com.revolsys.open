@@ -38,6 +38,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   boolean isEditable();
 
+  boolean isEditable(double scale);
+
   boolean isQueryable();
 
   boolean isQuerySupported();
@@ -45,6 +47,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   boolean isReadOnly();
 
   boolean isSelectable();
+
+  boolean isSelectable(double scale);
 
   boolean isSelectSupported();
 

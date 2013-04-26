@@ -16,12 +16,13 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 
 public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
 
-  private LayerRendererOverlay overlay;
+  private final LayerRendererOverlay overlay;
 
-  private GeoReferencedImage referencedImage;
+  private final GeoReferencedImage referencedImage;
 
   public LayerRendererOverlaySwingWorker(
-    LayerRendererOverlay layerRendererOverlay, GeoReferencedImage image) {
+    final LayerRendererOverlay layerRendererOverlay,
+    final GeoReferencedImage image) {
     this.overlay = layerRendererOverlay;
     this.referencedImage = image;
   }
@@ -29,25 +30,25 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
   @Override
   protected Void doInBackground() throws Exception {
     try {
-      Layer layer = overlay.getLayer();
+      final Layer layer = overlay.getLayer();
       if (layer != null) {
-        Project project = overlay.getProject();
-        int imageWidth = referencedImage.getImageWidth();
-        int imageHeight = referencedImage.getImageHeight();
+        final Project project = overlay.getProject();
+        final int imageWidth = referencedImage.getImageWidth();
+        final int imageHeight = referencedImage.getImageHeight();
         if (imageWidth > 0 && imageHeight > 0 && project != null) {
-          BoundingBox boundingBox = referencedImage.getBoundingBox();
-          ImageViewport viewport = new ImageViewport(project, imageWidth,
+          final BoundingBox boundingBox = referencedImage.getBoundingBox();
+          final ImageViewport viewport = new ImageViewport(project, imageWidth,
             imageHeight, boundingBox);
 
-          Graphics2D graphics = viewport.getGraphics();
+          final Graphics2D graphics = viewport.getGraphics();
           if (layer != null && layer.isVisible()) {
-            LayerRenderer<Layer> renderer = layer.getRenderer();
+            final LayerRenderer<Layer> renderer = layer.getRenderer();
             if (renderer != null) {
               renderer.render(viewport, graphics);
             }
           }
           graphics.dispose();
-          Image image = viewport.getImage();
+          final Image image = viewport.getImage();
           this.referencedImage.setImage(image);
         }
       }
@@ -58,12 +59,12 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
     }
   }
 
-  public GeoReferencedImage getReferencedImage() {
-    return referencedImage;
-  }
-
   @Override
   protected void done() {
     overlay.setImage(this);
+  }
+
+  public GeoReferencedImage getReferencedImage() {
+    return referencedImage;
   }
 }
