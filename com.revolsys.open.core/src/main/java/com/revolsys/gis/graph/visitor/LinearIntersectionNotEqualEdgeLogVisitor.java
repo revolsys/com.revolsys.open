@@ -8,7 +8,6 @@ import com.revolsys.filter.NotFilter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
-import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -18,6 +17,7 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
 import com.revolsys.util.ObjectProcessor;
+import com.revolsys.visitor.AbstractVisitor;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LinearIntersectionNotEqualEdgeLogVisitor extends

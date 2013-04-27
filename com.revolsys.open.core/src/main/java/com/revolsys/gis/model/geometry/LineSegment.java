@@ -16,6 +16,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class LineSegment extends AbstractCoordinatesList {
@@ -358,6 +359,17 @@ public class LineSegment extends AbstractCoordinatesList {
     return coordinates1.getX() == coordinates2.getY();
   }
 
+  public boolean isWithinDistance(final Coordinates point,
+    final double maxDistance) {
+    final double distance = distance(point);
+    return distance <= maxDistance;
+  }
+
+  public boolean isWithinDistance(final Point point, final double maxDistance) {
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    return isWithinDistance(coordinates, maxDistance);
+  }
+
   public int orientationIndex(final LineSegment seg) {
     final int orient0 = CoordinatesUtil.orientationIndex(coordinates1,
       coordinates2, seg.coordinates1);
@@ -414,8 +426,8 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates project(final Coordinates p) {
-    return LineSegmentUtil.project(coordinates1, coordinates2,
-      projectionFactor(p));
+    double projectionFactor = projectionFactor(p);
+    return LineSegmentUtil.project(coordinates1, coordinates2, projectionFactor);
   }
 
   public double projectionFactor(final Coordinates p) {

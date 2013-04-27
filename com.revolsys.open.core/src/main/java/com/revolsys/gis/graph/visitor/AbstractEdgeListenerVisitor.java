@@ -1,12 +1,12 @@
 package com.revolsys.gis.graph.visitor;
 
-import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.EdgeEventListener;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.graph.event.NodeEventListenerList;
+import com.revolsys.visitor.AbstractVisitor;
 
 public abstract class AbstractEdgeListenerVisitor<T> extends
   AbstractVisitor<Edge<T>> {

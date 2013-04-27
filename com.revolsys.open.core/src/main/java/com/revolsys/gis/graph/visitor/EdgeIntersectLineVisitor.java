@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
+import com.revolsys.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Dimension;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.IntersectionMatrix;

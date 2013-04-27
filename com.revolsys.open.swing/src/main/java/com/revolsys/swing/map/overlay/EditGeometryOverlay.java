@@ -5,16 +5,18 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +51,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -76,7 +79,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private GeometryFactory geometryFactory;
 
-  private Point mouseOverVertexPoint;
+  private Geometry mouseOverGeometry;
 
   private static final MarkerStyle XOR_POINT_STYLE = MarkerStyle.marker(
     "ellipse", 6, new Color(0, 0, 255), 1, new Color(0, 0, 255));
@@ -103,7 +106,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private int[] mouseOverVertexId;
 
-  private boolean movingNode;
+  private IndexedLineSegment mouseOverSegment;
 
   private PointQuadTree<int[]> vertices;
 
@@ -184,8 +187,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected void clearMouseOverVertex() {
+    xorGeometry = null;
     mouseOverVertexId = null;
-    mouseOverVertexPoint = null;
+    mouseOverSegment = null;
+    mouseOverGeometry = null;
     repaint();
   }
 
@@ -231,8 +236,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         graphics.setXORMode(Color.WHITE);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-            XOR_POINT_STYLE);
+          Point2D screenPoint = viewport.toViewPoint(point);
+
+          double x = screenPoint.getX() - hotspotPixels;
+          double y = screenPoint.getY() - hotspotPixels;
+          int diameter = 2 * hotspotPixels;
+          Shape shape = new Ellipse2D.Double(x, y, diameter, diameter);
+
+          graphics.setPaint(new Color(0, 0, 255));
+          graphics.fill(shape);
+
         } else {
           GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
             XOR_LINE_STYLE);
@@ -270,16 +283,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   protected Point getPoint(final MouseEvent event) {
     final Point point = getViewportPoint(event);
     return geometryFactory.copy(point);
-  }
-
-  @Override
-  protected Collection<DataObject> getSelectedObjects(
-    final DataObjectLayer layer) {
-    if ("add".equals(mode)) {
-      return Collections.emptyList();
-    } else {
-      return layer.getEditingObjects();
-    }
   }
 
   protected Point getViewportPoint(final MouseEvent event) {
@@ -355,14 +358,15 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_BACK_SPACE) {
       if (mouseOverVertexId != null) {
-
         setGeometry(GeometryEditUtil.deleteVertex(geometry, mouseOverVertexId));
         clearMouseOverVertex();
         repaint();
       }
     } else if (keyCode == KeyEvent.VK_ESCAPE) {
-      if (movingNode) {
-        moveNodeFinish(null);
+      if (mouseOverVertexId != null) {
+        vertexMoveFinish(null);
+      } else if (mouseOverSegment != null) {
+        vertexAddFinish(null);
       }
     }
   }
@@ -406,36 +410,43 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (movingNode) {
-      final Graphics2D graphics = (Graphics2D)getGraphics();
-      drawXorGeometry(graphics, xorGeometry);
-
-      final Point point = getPoint(event);
-
-      // TODO same clipping as is done on the add vertex geometry
-      final List<LineString> pointsList = new ArrayList<LineString>();
-      final Coordinates previousPoint = GeometryEditUtil.getCoordinatesOffset(
-        geometry, mouseOverVertexId, -1);
-      if (previousPoint != null) {
-        pointsList.add(createXorLine(
-          geometryFactory.createPoint(previousPoint), point));
-      }
-      final Coordinates nextPoint = GeometryEditUtil.getCoordinatesOffset(
-        geometry, mouseOverVertexId, 1);
-      if (nextPoint != null) {
-        pointsList.add(createXorLine(geometryFactory.createPoint(nextPoint),
-          point));
-      }
-      if (pointsList.isEmpty()) {
-        xorGeometry = point;
-      } else {
-        xorGeometry = geometryFactory.createMultiLineString(pointsList);
-      }
-
-      drawXorGeometry(graphics, xorGeometry);
+    if (mouseOverVertexId != null) {
+      drawVertexXor(event, mouseOverVertexId, -1, 1);
+    } else if (mouseOverSegment != null) {
+      int[] index = mouseOverSegment.getIndex();
+      drawVertexXor(event, index, 0, 1);
     } else {
       super.mouseDragged(event);
     }
+  }
+
+  private void drawVertexXor(final MouseEvent event, int[] vertexIndex,
+    int previousPointOffset, int nextPointOffset) {
+    final Graphics2D graphics = (Graphics2D)getGraphics();
+
+    final Point point = getPoint(event);
+
+    drawXorGeometry(graphics, xorGeometry);
+    final List<LineString> pointsList = new ArrayList<LineString>();
+    final Coordinates previousPoint = GeometryEditUtil.getCoordinatesOffset(
+      geometry, vertexIndex, previousPointOffset);
+    if (previousPoint != null) {
+      pointsList.add(createXorLine(geometryFactory.createPoint(previousPoint),
+        point));
+    }
+    final Coordinates nextPoint = GeometryEditUtil.getCoordinatesOffset(
+      geometry, vertexIndex, nextPointOffset);
+    if (nextPoint != null) {
+      pointsList.add(createXorLine(geometryFactory.createPoint(nextPoint),
+        point));
+    }
+    if (pointsList.isEmpty()) {
+      xorGeometry = point;
+    } else {
+      xorGeometry = geometryFactory.createMultiLineString(pointsList);
+    }
+
+    drawXorGeometry(graphics, xorGeometry);
   }
 
   @Override
@@ -456,7 +467,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
       final Point point = getPoint(event);
 
-      updateMouseOverVertexPoint(graphics, event);
+      updateMouseOverGeometry(graphics, event);
 
       if ("add".equals(mode)) {
         drawXorGeometry(graphics, xorGeometry);
@@ -485,13 +496,12 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       }
     } else if ("edit".equals(mode)) {
       if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
-        if (mouseOverVertexId != null) {
+        if (mouseOverVertexId != null || mouseOverSegment != null) {
           repaint();
-          setMapCursor(addNodeCursor);
-          movingNode = true;
           event.consume();
+          return;
         }
-        return;
+
       }
     }
     super.mousePressed(event);
@@ -499,14 +509,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (movingNode) {
-      moveNodeFinish(event);
+    if (mouseOverVertexId != null) {
+      vertexMoveFinish(event);
+    } else if (mouseOverSegment != null) {
+      vertexAddFinish(event);
     } else {
       super.mouseReleased(event);
     }
   }
 
-  protected void moveNodeFinish(final MouseEvent event) {
+  protected void vertexMoveFinish(final MouseEvent event) {
     try {
       if (event != null) {
         final Point point = getPoint(event);
@@ -516,7 +528,23 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       }
     } finally {
       clearMapCursor();
-      movingNode = false;
+      clearMouseOverVertex();
+    }
+  }
+
+  protected void vertexAddFinish(final MouseEvent event) {
+    try {
+      if (event != null) {
+        final Point point = getPoint(event);
+        Coordinates coordinates = CoordinatesUtil.get(point);
+        int[] index = mouseOverSegment.getIndex();
+        final Geometry newGeometry = GeometryEditUtil.insertVertex(geometry,
+          coordinates, index);
+        setGeometry(newGeometry);
+      }
+    } finally {
+      clearMapCursor();
+      clearMouseOverVertex();
     }
   }
 
@@ -575,11 +603,18 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
           if (metaData != null) {
             if (metaData.getGeometryAttributeIndex() != -1) {
               final List<DataObject> objects = dataObjectLayer.getDataObjects(boundingBox);
-              if (!objects.isEmpty()) {
-                final DataObject selectedObject = objects.get(0);
-                dataObjectLayer.setEditingObjects(Collections.singleton(selectedObject));
-                setEditingObject(dataObjectLayer, selectedObject);
-                return true;
+              for (DataObject object : objects) {
+                Geometry geometry = object.getGeometryValue();
+                if (geometry != null) {
+                  Polygon selectPolygon = boundingBox.toPolygon(1);
+                  if (getViewport().getGeometryFactory()
+                    .project(geometry)
+                    .intersects(selectPolygon)) {
+                    dataObjectLayer.setEditingObjects(Collections.singleton(object));
+                    setEditingObject(dataObjectLayer, object);
+                    return true;
+                  }
+                }
               }
             }
           }
@@ -621,8 +656,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     this.geometry = geometry;
     points.clear();
     xorGeometry = null;
-    mouseOverVertexPoint = null;
+    mouseOverGeometry = null;
     mouseOverVertexId = null;
+    mouseOverSegment = null;
     if (geometry == null) {
       vertices = null;
       lineSegments = null;
@@ -635,19 +671,80 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     repaint();
   }
 
-  private void updateMouseOverVertexPoint(final Graphics2D graphics,
+  private void updateMouseOverGeometry(final Graphics2D graphics,
     final MouseEvent event) {
-    Point currentPoint = null;
+    Geometry currentGeometry = getCloseVertex(event);
+    if (currentGeometry == null) {
+      currentGeometry = getCloseSegment(event);
+    }
+    drawXorGeometry(graphics, mouseOverGeometry);
+    mouseOverGeometry = currentGeometry;
+    drawXorGeometry(graphics, mouseOverGeometry);
+    if (mouseOverGeometry == null) {
+      clearMapCursor();
+    } else {
+      setMapCursor(addNodeCursor);
+    }
+  }
+
+  private Geometry getCloseSegment(MouseEvent event) {
+    final Point point = getPoint(event);
+    final double maxDistance = getDistance(event);
+
+    final BoundingBox boundingBox = BoundingBox.getBoundingBox(point).expand(
+      maxDistance);
+
+    Coordinates coordinates = CoordinatesUtil.get(point);
+
+    List<IndexedLineSegment> segments = lineSegments.query(boundingBox,
+      "isWithinDistance", point, maxDistance);
+    if (segments.isEmpty()) {
+      mouseOverSegment = null;
+      return null;
+    } else {
+      double closestDistance = Double.MAX_VALUE;
+      IndexedLineSegment closestSegment = null;
+      for (IndexedLineSegment segment : segments) {
+        double distance = segment.distance(coordinates);
+        if (distance < closestDistance) {
+          closestSegment = segment;
+          closestDistance = distance;
+        }
+      }
+      mouseOverSegment = closestSegment;
+      GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+      Coordinates viewportCoordinates = CoordinatesUtil.get(viewportGeometryFactory.project(point));
+      LineSegment segment = closestSegment.convert(viewportGeometryFactory);
+      Coordinates pointOnLine = segment.project(viewportCoordinates);
+      return viewportGeometryFactory.createPoint(pointOnLine);
+    }
+  }
+
+  private int hotspotPixels = 3;
+
+  private double getDistance(MouseEvent event) {
+    int x = event.getX();
+    int y = event.getY();
+    Point p1 = geometryFactory.project(viewport.toModelPoint(x, y));
+    Point p2 = geometryFactory.project(viewport.toModelPoint(x + hotspotPixels,
+      y + hotspotPixels));
+
+    return p1.distance(p2);
+  }
+
+  private Geometry getCloseVertex(final MouseEvent event) {
+    Geometry currentPoint = null;
     Coordinates currentCoordinates = null;
-    if (mouseOverVertexPoint != null) {
-      currentCoordinates = CoordinatesUtil.get(mouseOverVertexPoint);
+    if (mouseOverVertexId != null && mouseOverGeometry instanceof Point) {
+      currentPoint = (Point)mouseOverGeometry;
+      currentCoordinates = CoordinatesUtil.get(mouseOverGeometry);
     }
     mouseOverVertexId = null;
     if (vertices != null) {
-      final Point viewportPoint = getViewportPoint(event);
-      final double maxViewDistance = viewport.getModelUnitsPerViewUnit() * 10;
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(viewportPoint)
-        .expand(maxViewDistance);
+      final Point point = getPoint(event);
+      final double maxDistance = getDistance(event);
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(point).expand(
+        maxDistance);
 
       final List<int[]> closeVertices = vertices.findWithin(boundingBox);
       Collections.sort(closeVertices, new Comparator<int[]>() {
@@ -672,12 +769,11 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         }
       });
       if (!closeVertices.isEmpty()) {
-        final Point modelPoint = geometryFactory.copy(viewportPoint);
         double minDistance = Double.MAX_VALUE;
         for (final int[] vertexIndex : closeVertices) {
           final Coordinates vertex = GeometryEditUtil.getCoordinates(geometry,
             vertexIndex);
-          final double distance = vertex.distance(CoordinatesUtil.get(modelPoint));
+          final double distance = vertex.distance(CoordinatesUtil.get(point));
           if (distance < minDistance) {
             mouseOverVertexId = vertexIndex;
             minDistance = distance;
@@ -688,11 +784,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         }
       }
     }
-    if (currentPoint == null) {
-      // TODO mouse over for line segments
-    }
-    drawXorGeometry(graphics, mouseOverVertexPoint);
-    mouseOverVertexPoint = currentPoint;
-    drawXorGeometry(graphics, mouseOverVertexPoint);
+    return currentPoint;
   }
 }

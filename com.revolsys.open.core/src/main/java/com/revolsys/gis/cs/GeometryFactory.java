@@ -777,6 +777,11 @@ public class GeometryFactory extends
     return coordinatesPrecisionModel.makeZPrecise(value);
   }
 
+  /**
+   * Project the geometry if it is in a different coordinate system
+   * @param geometry
+   * @return
+   */
   public <G extends Geometry> G project(final G geometry) {
     return GeometryProjectionUtil.perform(geometry, this);
   }

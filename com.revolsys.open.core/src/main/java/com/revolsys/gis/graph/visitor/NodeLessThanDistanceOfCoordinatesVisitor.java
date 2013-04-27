@@ -6,10 +6,10 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
   Visitor<Node<T>> {

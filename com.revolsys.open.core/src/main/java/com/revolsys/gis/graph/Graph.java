@@ -31,8 +31,6 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
-import com.revolsys.gis.data.visitor.FilterListVisitor;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
@@ -58,9 +56,9 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
+import com.revolsys.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -502,11 +500,11 @@ public class Graph<T> {
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator, final Envelope envelope) {
-    final FilterListVisitor<Edge<T>> results = new FilterListVisitor<Edge<T>>(
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
       filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
-    final List<Edge<T>> targetEdges = results.getResults();
+    final List<Edge<T>> targetEdges = results.getList();
     if (comparator == null) {
       Collections.sort(targetEdges);
     } else {
@@ -524,11 +522,11 @@ public class Graph<T> {
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final Envelope envelope) {
-    final FilterListVisitor<Edge<T>> results = new FilterListVisitor<Edge<T>>(
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
       filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
-    final List<Edge<T>> edges = results.getResults();
+    final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
 
@@ -669,11 +667,11 @@ public class Graph<T> {
 
   public List<Node<T>> getNodes(final Filter<Node<T>> filter,
     final Comparator<Node<T>> comparator, final Envelope envelope) {
-    final FilterListVisitor<Node<T>> results = new FilterListVisitor<Node<T>>(
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(
       filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     nodeIndex.visit(envelope, results);
-    final List<Node<T>> nodes = results.getResults();
+    final List<Node<T>> nodes = results.getList();
     if (comparator == null) {
       Collections.sort(nodes);
     } else {

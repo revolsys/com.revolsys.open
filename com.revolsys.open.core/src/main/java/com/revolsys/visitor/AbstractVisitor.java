@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.visitor;
+package com.revolsys.visitor;
 
 import java.util.Comparator;
 
@@ -13,6 +13,22 @@ public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>,
   private Filter<T> filter;
 
   private Comparator<T> comparator;
+
+  public AbstractVisitor() {
+  }
+
+  public AbstractVisitor(final Comparator<T> comparator) {
+    this.comparator = comparator;
+  }
+
+  public AbstractVisitor(final Filter<T> filter) {
+    this.filter = filter;
+  }
+
+  public AbstractVisitor(final Filter<T> filter, final Comparator<T> comparator) {
+    this.filter = filter;
+    this.comparator = comparator;
+  }
 
   @Override
   public Comparator<T> getComparator() {

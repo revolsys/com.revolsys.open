@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.data.visitor.CreateListVisitor;
+import com.revolsys.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractPointSpatialIndex<T> implements

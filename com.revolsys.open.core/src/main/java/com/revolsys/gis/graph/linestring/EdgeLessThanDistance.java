@@ -6,15 +6,15 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
-import com.revolsys.gis.data.visitor.NestedVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.visitor.CreateListVisitor;
+import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeLessThanDistance extends NestedVisitor<Edge<LineSegment>>
+public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   implements Filter<Edge<LineSegment>> {
   public static List<Edge<LineSegment>> getEdges(
     final Graph<LineSegment> graph, final LineSegment lineSegment,

@@ -6,16 +6,16 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
-import com.revolsys.gis.data.visitor.NestedVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.visitor.CreateListVisitor;
+import com.revolsys.visitor.DelegatingVisitor;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
+public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
   Filter<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Coordinates point, final double maxDistance) {

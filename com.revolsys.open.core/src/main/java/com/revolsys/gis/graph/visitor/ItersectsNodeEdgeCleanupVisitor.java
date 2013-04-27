@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -22,6 +21,7 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.util.ObjectProcessor;
+import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {

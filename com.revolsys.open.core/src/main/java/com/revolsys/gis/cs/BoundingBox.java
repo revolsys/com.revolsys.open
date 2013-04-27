@@ -175,7 +175,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   private double minZ;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
   public BoundingBox() {
     this(4326);
@@ -342,6 +342,10 @@ public class BoundingBox extends Envelope implements Cloneable {
    */
   public BoundingBox(final int srid) {
     this.geometryFactory = GeometryFactory.getFactory(srid);
+  }
+
+  public BoundingBox(Envelope envelope) {
+    super(envelope);
   }
 
   public BoundingBox clipToCoordinateSystem() {

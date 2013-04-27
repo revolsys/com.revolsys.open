@@ -101,4 +101,8 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   public int size() {
     return coordinates.size();
   }
+
+  public void add(int index, Coordinates point) {
+    coordinates.add(index, point);
+  }
 }

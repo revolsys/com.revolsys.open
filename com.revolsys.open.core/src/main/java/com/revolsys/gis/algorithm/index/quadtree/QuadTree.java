@@ -3,10 +3,15 @@ package com.revolsys.gis.algorithm.index.quadtree;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.filter.Filter;
+import com.revolsys.filter.InvokeMethodFilter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.visitor.CreateListVisitor;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.visitor.CreateListVisitor;
+import com.revolsys.visitor.SingleObjectVisitor;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class QuadTree<T> {
   private GeometryFactory geometryFactory;
@@ -80,10 +85,30 @@ public class QuadTree<T> {
   }
 
   public List<T> query(BoundingBox boundingBox) {
-    boundingBox = convertBoundingBox(boundingBox);
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
     query(boundingBox, visitor);
     return visitor.getList();
+  }
+
+  public List<T> query(Envelope envelope) {
+    return query(new BoundingBox(envelope));
+  }
+
+  public void query(Envelope envelope, Visitor<T> visitor) {
+    query(new BoundingBox(envelope), visitor);
+  }
+
+  public List<T> query(BoundingBox boundingBox, Filter<T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<T>(filter);
+    query(boundingBox, visitor);
+    return visitor.getList();
+  }
+
+  public List<T> query(BoundingBox boundingBox, String methodName,
+    Object... parameters) {
+    InvokeMethodFilter<T> filter = new InvokeMethodFilter<T>(methodName,
+      parameters);
+    return query(boundingBox, filter);
   }
 
   private BoundingBox convertBoundingBox(BoundingBox boundingBox) {
@@ -93,9 +118,29 @@ public class QuadTree<T> {
     return boundingBox;
   }
 
+  public List<T> queryEnvelope(final BoundingBox boundingBox) {
+    return query(boundingBox);
+  }
+
+  public List<T> queryEnvelope(final Geometry geometry) {
+    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    return query(boundingBox);
+  }
+
   public void query(BoundingBox boundingBox, final Visitor<T> visitor) {
     boundingBox = convertBoundingBox(boundingBox);
     root.visit(boundingBox, visitor);
+  }
+
+  public T queryFirst(final Geometry geometry, final Filter<T> filter) {
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    return queryFirst(boundingBox, filter);
+  }
+
+  public T queryFirst(final BoundingBox boundingBox, final Filter<T> filter) {
+    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<T>(filter);
+    query(boundingBox, visitor);
+    return visitor.getObject();
   }
 
   public List<T> queryAll() {
