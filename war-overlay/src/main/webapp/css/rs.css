@@ -621,6 +621,10 @@ div.simpleDataTable>div>table.data>tbody>tr:last-child>:last-child {
   border-bottom-right-radius: 6px;
 }
 
+table.dataTable {
+  max-width:100%;
+}
+
 table.dataTable>tbody {
   border-left: 1px solid #aed0ea;
   border-right: 1px solid #aed0ea;
@@ -631,7 +635,7 @@ table.dataTable>tbody>tr.odd {
 }
 
 table.dataTable thead th,table.dataTable tbody td {
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 2px 3px 2px 3px;
 }
 
 table.dataTable tbody td {

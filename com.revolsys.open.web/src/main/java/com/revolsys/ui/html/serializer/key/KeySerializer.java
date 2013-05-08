@@ -28,4 +28,6 @@ public interface KeySerializer extends ObjectWithProperties {
   void serialize(XmlWriter out, Object object);
 
   String toString(Object object);
+
+  String getWidth();
 }

@@ -19,6 +19,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Point;
 
@@ -275,7 +276,7 @@ public class Viewport2D {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null) {
-      GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
       if (!convertedBoundingBox.isNull()) {
         final BoundingBox oldBoundingBox = this.boundingBox;
@@ -318,6 +319,7 @@ public class Viewport2D {
         }
         final Measurable<Length> modelWidth = getModelWidthLength();
         scale = getScale(getViewHeightLength(), modelWidth);
+        project.setViewBoundingBox(convertedBoundingBox);
         propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
           convertedBoundingBox);
         propertyChangeSupport.firePropertyChange("scale", oldScale, scale);
@@ -339,7 +341,7 @@ public class Viewport2D {
   }
 
   public void setScale(final double scale) {
-    double oldValue = getScale();
+    final double oldValue = getScale();
     propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
   }
 
@@ -427,6 +429,12 @@ public class Viewport2D {
     return (Point)geometryFactory.createGeometry(point);
   }
 
+  public Point toModelPoint(final java.awt.Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return toModelPoint(x, y);
+  }
+
   public double[] toViewCoordinates(final double... modelCoordinates) {
     final double[] ordinates = new double[2];
     final AffineTransform transform = getModelToScreenTransform();
@@ -438,6 +446,12 @@ public class Viewport2D {
     }
   }
 
+  public Point2D toViewPoint(final Coordinates point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return toViewPoint(x, y);
+  }
+
   public Point2D toViewPoint(final double x, final double y) {
     final double[] coordinates = toViewCoordinates(x, y);
     final double viewX = coordinates[0];
@@ -446,22 +460,13 @@ public class Viewport2D {
   }
 
   public Point2D toViewPoint(Point point) {
-    point = (Point)geometryFactory.project(point);
+    point = geometryFactory.project(point);
     final double x = point.getX();
     final double y = point.getY();
-    final double[] coordinates = toViewCoordinates(x, y);
-    final double viewX = coordinates[0];
-    final double viewY = coordinates[1];
-    return new Point2D.Double(viewX, viewY);
+    return toViewPoint(x, y);
   }
 
   public void update() {
-  }
-
-  public Point toModelPoint(java.awt.Point point) {
-    double x = point.getX();
-    double y = point.getY();
-    return toModelPoint(x, y);
   }
 
 }

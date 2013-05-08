@@ -27,6 +27,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -376,5 +379,19 @@ public final class JavaBeanUtil {
    * Construct a new JavaBeanUtil.
    */
   private JavaBeanUtil() {
+  }
+
+  public static List<Method >getMethods(final Class<?> clazz) {
+    final Method[] methods = clazz.getMethods();
+    Arrays.sort(methods, new Comparator<Method>() {
+      @Override
+      public int compare(Method method1, Method method2) {
+        String name1 = method1.getName().replaceAll("^(set|get|is)", "").toLowerCase();
+        String name2 = method2.getName().replaceAll("^(set|get|is)", "").toLowerCase();
+        int nameCompare = name1.compareTo(name2);
+        return nameCompare;
+      }
+    });
+    return Arrays.asList(methods);
   }
 }

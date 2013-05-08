@@ -14,6 +14,7 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
@@ -205,6 +206,10 @@ public class BoundingBox extends Envelope implements Cloneable {
     this(GeometryFactory.getFactory(0), x, y);
   }
 
+  public BoundingBox(final Envelope envelope) {
+    super(envelope);
+  }
+
   public BoundingBox(final Geometry geometry) {
     this(GeometryFactory.getFactory(geometry), geometry.getEnvelopeInternal());
   }
@@ -344,10 +349,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
-  public BoundingBox(Envelope envelope) {
-    super(envelope);
-  }
-
   public BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -435,11 +436,15 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox expandPercent(final double factor) {
-    if (factor == 0 || isNull()) {
+    return expandPercent(factor, factor);
+  }
+
+  public BoundingBox expandPercent(final double factorX, final double factorY) {
+    if (isNull()) {
       return this;
     } else {
-      final double deltaX = getWidth() * factor / 2;
-      final double deltaY = getHeight() * factor / 2;
+      final double deltaX = getWidth() * factorX / 2;
+      final double deltaY = getHeight() * factorY / 2;
       return expand(deltaX, deltaY);
     }
   }
@@ -537,6 +542,33 @@ public class BoundingBox extends Envelope implements Cloneable {
    */
   public CoordinateSystem getCoordinateSystem() {
     return geometryFactory.getCoordinateSystem();
+  }
+
+  public CoordinatesList getCornerPoints() {
+    final double minX = getMinX();
+    final double maxX = getMaxX();
+    final double minY = getMinY();
+    final double maxY = getMaxY();
+    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxX,
+      maxX, maxY);
+  }
+
+  public Coordinates getCornerPoint(int index) {
+    final double minX = getMinX();
+    final double maxX = getMaxX();
+    final double minY = getMinY();
+    final double maxY = getMaxY();
+    index = index % 4;
+    switch (index) {
+      case 0:
+        return new DoubleCoordinates(maxX, minY);
+      case 1:
+        return new DoubleCoordinates(minX, minY);
+      case 2:
+        return new DoubleCoordinates(minX, maxY);
+      default:
+        return new DoubleCoordinates(maxX, maxY);
+    }
   }
 
   public LineSegment getEastLine() {

@@ -11,8 +11,16 @@ import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class GridLayer extends AbstractLayer {
+
+  static {
+    MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
+    menu.addMenuItem("zoom", new ZoomToMapSheet());
+  }
+
   public static final LayerFactory<GridLayer> FACTORY = new InvokeMethodLayerFactory<GridLayer>(
     "grid", "Grid", GridLayer.class, "create");
 

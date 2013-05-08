@@ -29,18 +29,26 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public MenuFactory() {
   }
 
+  public void addCheckboxMenuItem(final String groupName, final Action action,
+    final EnableCheck itemChecked) {
+    final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
+      itemChecked, action);
+    addComponentFactory(groupName, factory);
+
+  }
+
   public void addComponent(final Component component) {
     addComponent("default", component);
+  }
+
+  public void addComponent(final String groupName, final Component component) {
+    addComponentFactory(groupName, new ComponentComponentFactory(component));
   }
 
   public void addComponentFactory(final String groupName,
     final ComponentFactory<?> factory) {
     final List<ComponentFactory<?>> factories = getGroup(groupName);
     factories.add(factory);
-  }
-
-  public void addComponent(final String groupName, final Component component) {
-    addComponentFactory(groupName, new ComponentComponentFactory(component));
   }
 
   public void addGroup(final String groupName) {
@@ -63,9 +71,21 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   public void addMenuItem(final String groupName, final Action action) {
+    if (action == this) {
+      throw new RuntimeException("Cannot recursively add");
+    }
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
       action);
     addComponentFactory(groupName, factory);
+  }
+
+  public void addMenuItem(final String groupName, final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
+      object, methodName, parameters);
+    action.setEnableCheck(enableCheck);
+    addComponentFactory(groupName, action);
   }
 
   public void addMenuItem(final String groupName, final String name,
@@ -77,13 +97,12 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     addComponentFactory(groupName, action);
   }
 
-  public void addMenuItem(final String groupName, final String name,
-    final String title, final Icon icon, EnableCheck enableCheck,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
-      object, methodName, parameters);
-    action.setEnableCheck(enableCheck);
-    addComponentFactory(groupName, action);
+  public void addMenuItemTitleIcon(final String groupName, final String title,
+    final String iconName, final EnableCheck enableCheck, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    addMenuItem(groupName, title, title, icon, enableCheck, object, methodName,
+      parameters);
   }
 
   public void addMenuItemTitleIcon(final String groupName, final String title,
@@ -93,12 +112,20 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     addMenuItem(groupName, title, title, icon, object, methodName, parameters);
   }
 
-  public void addMenuItemTitleIcon(final String groupName, final String title,
-    final String iconName, EnableCheck enableCheck, final Object object,
-    final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    addMenuItem(groupName, title, title, icon, enableCheck, object, methodName,
-      parameters);
+  @Override
+  public MenuFactory clone() {
+    final MenuFactory clone = new MenuFactory();
+    for (final String groupName : groupNames) {
+      for (final ComponentFactory<?> factory : groups.get(groupName)) {
+        final ComponentFactory<?> cloneFactory = factory.clone();
+        clone.addComponentFactory(groupName, cloneFactory);
+      }
+    }
+    return clone;
+  }
+
+  @Override
+  public void close(final Component component) {
   }
 
   @Override
@@ -114,13 +141,19 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
           menu.addSeparator();
         }
         for (final ComponentFactory<?> factory : factories) {
-          Component component = factory.createComponent();
+          final Component component = factory.createComponent();
           menu.add(component);
         }
       }
     }
     return menu;
   }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
 
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(name);
@@ -134,7 +167,7 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
           menu.addSeparator();
         }
         for (final ComponentFactory<?> factory : factories) {
-          Component component = factory.createComponent();
+          final Component component = factory.createComponent();
           menu.add(component);
         }
       }
@@ -147,19 +180,11 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     if (factories == null) {
       factories = new ArrayList<ComponentFactory<?>>();
       groups.put(groupName, factories);
-      groupNames.add(groupName);
+      if (!groupNames.contains(groupName)) {
+        groupNames.add(groupName);
+      }
     }
     return factories;
-  }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
-  @Override
-  public void close(Component component) {
   }
 
   @Override
@@ -169,7 +194,7 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public String getName() {
-    return null;
+    return name;
   }
 
   @Override
@@ -177,17 +202,10 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     return null;
   }
 
-  public void addCheckboxMenuItem(String groupName,
-    Action action, EnableCheck itemChecked) {
-    final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
-      itemChecked, action);
-    addComponentFactory(groupName, factory);
-   
+  public void addGroup(int index, String groupName) {
+    if (!groupNames.contains(groupName)) {
+      groupNames.add(index, groupName);
+    }
+
   }
-
-  // public void setGroupEnabled(final String groupName, final boolean enabled)
-  // {
-  // groups.setGroupEnabled(groupName, enabled);
-  // }
-
 }

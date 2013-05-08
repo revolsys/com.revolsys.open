@@ -13,11 +13,23 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
+import com.revolsys.swing.map.util.LayerUtil;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
   implements Layer, PropertyChangeListener {
   private static final AtomicLong ID_GEN = new AtomicLong();
+
+  static {
+    MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
+    menu.addMenuItemTitleIcon("zoom", "Zoom to Layer", "magnifier",
+      LayerUtil.class, "zoomToLayer");
+    menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
+    menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
+  }
 
   private boolean editable = false;
 

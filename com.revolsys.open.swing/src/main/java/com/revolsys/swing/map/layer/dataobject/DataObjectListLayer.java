@@ -166,9 +166,17 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public List<DataObject> getObjects() {
-    return new ArrayList<DataObject>(objects);
+    ArrayList<DataObject> returnObjects = new ArrayList<DataObject>(objects);
+    return returnObjects;
   }
 
+  @Override
+  public DataObject createObject() {
+    DataObject object = super.createObject();
+    this.objects.add(object);
+    fireObjectsChanged();
+    return object;
+  }
   @Override
   public List<DataObject> getObjects(Geometry geometry, final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);

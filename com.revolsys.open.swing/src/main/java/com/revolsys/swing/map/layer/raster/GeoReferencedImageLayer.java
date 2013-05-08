@@ -9,11 +9,24 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class GeoReferencedImageLayer extends AbstractLayer {
 
   public static final LayerFactory<GeoReferencedImageLayer> FACTORY = new InvokeMethodLayerFactory<GeoReferencedImageLayer>(
-    "geoReferencedImage", "Geo-referenced Image", GeoReferencedImageLayer.class, "create");
+    "geoReferencedImage", "Geo-referenced Image",
+    GeoReferencedImageLayer.class, "create");
+
+  static {
+    MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
+      "arrow_out", null, "fitToViewport"));
+
+  }
 
   public static GeoReferencedImageLayer create(
     final Map<String, Object> properties) {
@@ -24,10 +37,35 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       Resource imageResource = SpringUtil.getResource(url);
       GeoReferencedImage image = new GeoTiffImage(imageResource);
-      
+
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(image);
       layer.setProperties(properties);
       return layer;
+    }
+  }
+
+  public void fitToViewport() {
+    BoundingBox oldValue = image.getBoundingBox();
+    Project project = getProject();
+    if (project != null) {
+      BoundingBox viewBoundingBox = project.getViewBoundingBox();
+      if (!viewBoundingBox.isNull()) {
+        double viewRatio = viewBoundingBox.getAspectRatio();
+        double imageRatio = image.getImageAspectRatio();
+        BoundingBox boundingBox;
+        if (viewRatio > imageRatio) {
+          boundingBox = viewBoundingBox.expandPercent(-1
+            + (imageRatio / viewRatio), 0.0);
+        } else if (viewRatio < imageRatio) {
+          boundingBox = viewBoundingBox.expandPercent(0.0, -1
+            + (viewRatio / imageRatio));
+        } else {
+          boundingBox = viewBoundingBox;
+        }
+        image.setBoundingBox(boundingBox);
+        getPropertyChangeSupport().firePropertyChange("boundingBox", oldValue,
+          boundingBox);
+      }
     }
   }
 
@@ -35,11 +73,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public GeoReferencedImageLayer(GeoReferencedImage image) {
     setRenderer(new GeoReferencedImageLayerRenderer(this));
-    setReadOnly(true);
     setSelectSupported(false);
     setQuerySupported(false);
     setImage(image);
     setGeometryFactory(image.getGeometryFactory());
+  }
+
+  public GeoReferencedImageLayer(String name, GeoReferencedImage image) {
+    this(image);
+    setName(name);
   }
 
   @Override

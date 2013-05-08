@@ -11,6 +11,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.tree.ObjectTree;
+import com.revolsys.util.ExceptionUtil;
 
 public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
   private static final double[] SCALES = {
@@ -19,25 +20,23 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
     1000.0
   };
 
-  private boolean min;
+  private final boolean min;
 
-  public SetLayerScaleMenu(boolean min) {
+  public SetLayerScaleMenu(final boolean min) {
     this.min = min;
   }
 
-  public void setScale(double scale) {
-    Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      if (min) {
-        layer.setMinimumScale((long)scale);
-      } else {
-        layer.setMaximumScale((long)scale);
-      }
+  @Override
+  public SetLayerScaleMenu clone() {
+    try {
+      return (SetLayerScaleMenu)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
     }
   }
 
   @Override
-  public void close(Component component) {
+  public void close(final Component component) {
   }
 
   @Override
@@ -48,8 +47,8 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
     } else {
       name = "Hide zoomed in beyond (maximum) scale";
     }
-    JMenu menu = new JMenu(name);
-    Layer layer = ObjectTree.getMouseClickItem();
+    final JMenu menu = new JMenu(name);
+    final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
       double layerScale;
       if (min) {
@@ -60,17 +59,17 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
           layerScale = 0;
         }
       }
-      for (double scale : SCALES) {
+      for (final double scale : SCALES) {
         String label;
         if (scale == 0) {
           label = "Unlimited";
         } else {
           label = MapScale.formatScale(scale);
         }
-        InvokeMethodAction action = new InvokeMethodAction(label, this,
+        final InvokeMethodAction action = new InvokeMethodAction(label, this,
           "setScale", scale);
-        JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
-        boolean selected = scale == layerScale;
+        final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
+        final boolean selected = scale == layerScale;
         menuItem.setSelected(selected);
         menu.add(menuItem);
       }
@@ -91,6 +90,17 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
   @Override
   public String getToolTip() {
     return null;
+  }
+
+  public void setScale(final double scale) {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      if (min) {
+        layer.setMinimumScale((long)scale);
+      } else {
+        layer.setMaximumScale((long)scale);
+      }
+    }
   }
 
 }

@@ -63,15 +63,17 @@ public class LoggingEventPanel extends JPanel {
 
     addLabel("Stack Trace");
     String[] stack = event.getThrowableStrRep();
-    JXTextArea textArea = SwingUtil.createTextArea(Math.min(20, stack.length),
-      80);
-    textArea.setEditable(false);
-    for (String trace : stack) {
-      textArea.append(trace);
-      textArea.append("\n");
+    if (stack != null) {
+      JXTextArea textArea = SwingUtil.createTextArea(
+        Math.min(20, stack.length), 80);
+      textArea.setEditable(false);
+      for (String trace : stack) {
+        textArea.append(trace);
+        textArea.append("\n");
+      }
+      add(new JScrollPane(textArea));
+      textArea.setCaretPosition(0);
     }
-    add(new JScrollPane(textArea));
-    textArea.setCaretPosition(0);
     GroupLayoutUtil.makeColumns(this, 2);
   }
 

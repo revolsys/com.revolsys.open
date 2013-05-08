@@ -31,6 +31,8 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.list.LayerGroupListModel;
+import com.revolsys.swing.map.listener.FileDropTargetListener;
+import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
@@ -93,6 +95,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private int zoomHistoryIndex = -1;
 
+  private FileDropTargetListener fileDropListener;
+
   public MapPanel() {
     super(new BorderLayout());
     this.baseMapLayers = project.addLayerGroup("Base Maps");
@@ -140,6 +144,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     addStatusBar();
 
     zoomToWorld();
+
+    fileDropListener = new FileDropTargetListener(this);
+  }
+
+  public FileDropTargetListener getFileDropListener() {
+    return fileDropListener;
   }
 
   public void addBaseMap(final Layer layer) {
@@ -198,6 +208,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new SelectFeaturesOverlay(this);
     new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(layeredPane);
+    new EditGeoReferencedImageOverlay(this);
   }
 
   private void addPointerLocation(final String title, final int srid,

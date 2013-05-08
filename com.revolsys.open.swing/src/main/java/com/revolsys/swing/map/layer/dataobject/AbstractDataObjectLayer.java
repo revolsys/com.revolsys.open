@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.beans.InvokeMethodCallable;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -27,6 +28,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
+import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -34,8 +37,13 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.util.LayerUtil;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
@@ -50,6 +58,38 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         LayerUtil.showForm(layer, object);
       }
     }
+  }
+
+  static {
+    MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    menu.addGroup(0,"table");
+    menu.addGroup(2,"edit");
+
+    menu.addMenuItem("table", new InvokeMethodAction("View Attributes",
+      "View Attributes", SilkIconLoader.getIcon("table_go"), LayerUtil.class,
+      "showViewAttributes"));
+
+    menu.addMenuItem("zoom", new InvokeMethodAction("Zoom to Selected",
+      "Zoom to Selected", SilkIconLoader.getIcon("magnifier_zoom_selected"),
+      LayerUtil.class, "zoomToLayerSelected"));
+
+    EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
+    EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly", false);
+    EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
+
+    menu.addCheckboxMenuItem("edit", new InvokeMethodAction("Editable",
+      "Editable", SilkIconLoader.getIcon("pencil"), readonly, LayerUtil.class,
+      "toggleEditable"), editable);
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
+      "table_save", hasChanges, "saveChanges"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
+      "table_cancel", hasChanges, "cancelChanges"));
+
+    EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
+      "table_row_insert", canAdd, "addNewRecord"));
   }
 
   private DataObjectMetaData metaData;

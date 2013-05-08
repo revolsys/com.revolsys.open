@@ -5,10 +5,13 @@ import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
@@ -47,7 +50,10 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.raster.GeoJpegImage;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
+import com.revolsys.swing.map.layer.raster.GeoTiffImage;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
@@ -196,22 +202,44 @@ public class LayerUtil {
       } else if ("rglayer".equals(extension)) {
         loadLayer(firstGroup, file);
       } else {
-        DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(new FileSystemResource(
-          file));
-        try {
-          DataObjectMetaData metaData = reader.getMetaData();
-          GeometryFactory geometryFactory = metaData.getGeometryFactory();
-          BoundingBox boundingBox = new BoundingBox(geometryFactory);
-          DataObjectListLayer layer = new DataObjectListLayer(metaData);
-          for (DataObject object : reader) {
-            Geometry geometry = object.getGeometryValue();
-            boundingBox = boundingBox.expandToInclude(geometry);
-            layer.add(object);
+        FileSystemResource resource = new FileSystemResource(file);
+        List<String> readerFileSuffixes = new ArrayList<String>(
+          Arrays.asList(ImageIO.getReaderFileSuffixes()));
+        readerFileSuffixes.add("tif");
+        readerFileSuffixes.add("tiff");
+        if (readerFileSuffixes.contains(extension)) {
+
+          GeoReferencedImage image;
+          // TODO factories
+          if (Arrays.asList("jpg", "jpeg").contains(extension)) {
+            image = new GeoJpegImage(resource);
+          } else if (Arrays.asList("tif", "tiff").contains(extension)) {
+            image = new GeoTiffImage(resource);
+          } else {
+            image = new GeoReferencedImage(resource);
           }
-          layer.setBoundingBox(boundingBox);
+
+          GeoReferencedImageLayer layer = new GeoReferencedImageLayer(FileUtil.getBaseName(file),image);
           firstGroup.add(layer);
-        } finally {
-          reader.close();
+        } else {
+          DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+          if (reader != null) {
+            try {
+              DataObjectMetaData metaData = reader.getMetaData();
+              GeometryFactory geometryFactory = metaData.getGeometryFactory();
+              BoundingBox boundingBox = new BoundingBox(geometryFactory);
+              DataObjectListLayer layer = new DataObjectListLayer(metaData);
+              for (DataObject object : reader) {
+                Geometry geometry = object.getGeometryValue();
+                boundingBox = boundingBox.expandToInclude(geometry);
+                layer.add(object);
+              }
+              layer.setBoundingBox(boundingBox);
+              firstGroup.add(layer);
+            } finally {
+              reader.close();
+            }
+          }
         }
       }
     }

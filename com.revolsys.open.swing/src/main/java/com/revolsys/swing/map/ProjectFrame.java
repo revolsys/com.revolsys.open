@@ -24,7 +24,6 @@ import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.action.file.Exit;
-import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
@@ -111,7 +110,7 @@ public class ProjectFrame extends JFrame {
 
     final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
     tocPanel = new ObjectTreePanel(project, model);
-
+    mapPanel.getFileDropListener().addDropTarget(tocPanel);
     panel.add(tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
@@ -170,7 +169,7 @@ public class ProjectFrame extends JFrame {
 
     addTasksPanel();
     addLogPanel();
-    
+
     addLayers();
 
     createMenuBar();

@@ -106,9 +106,6 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
       viewport.setUseModelCoordinates(true, graphics);
       final Paint paint = graphics.getPaint();
       try {
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_ON);
-
         style.setLineStyle(viewport, graphics);
         graphics.draw(shape);
       } finally {
@@ -147,7 +144,9 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final BoundingBox visibleArea,
     final DataObjectLayer layer, final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    renderGeometry(viewport, graphics, geometry, style);
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+   renderGeometry(viewport, graphics, geometry, style);
   }
 
   public void setStyle(final GeometryStyle style) {

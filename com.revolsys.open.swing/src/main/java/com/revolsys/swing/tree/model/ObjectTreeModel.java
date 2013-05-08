@@ -22,7 +22,6 @@ import com.revolsys.beans.ClassRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.StringTreeNodeModel;
@@ -30,47 +29,46 @@ import com.revolsys.swing.tree.model.node.StringTreeNodeModel;
 public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   TreeExpansionListener, PropertyChangeListener {
 
+  private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<MenuFactory>();
+
+  public static MenuFactory getMenu(final Class<?> layerClass) {
+    if (layerClass == null) {
+      return new MenuFactory();
+    } else {
+      synchronized (CLASS_MENUS) {
+        MenuFactory menu = CLASS_MENUS.get(layerClass);
+        if (menu == null) {
+          Class<?> superClass = layerClass.getSuperclass();
+          MenuFactory parentMenu = getMenu(superClass);
+          menu = parentMenu.clone();
+          CLASS_MENUS.put(layerClass, menu);
+        }
+        return menu;
+      }
+    }
+  }
+
   private final ClassRegistry<ObjectTreeNodeModel<Object, Object>> classNodeModels = new ClassRegistry<ObjectTreeNodeModel<Object, Object>>();
 
   private final TreeEventSupport eventHandler = new TreeEventSupport();
 
-  private Object root;
-
   private final Map<TreePath, Boolean> initialized = new WeakHashMap<TreePath, Boolean>();
 
+  private final Map<Object, MenuFactory> objectMenus = new WeakHashMap<Object, MenuFactory>();
+
   private final Map<Object, TreePath> objectPathMap = new WeakHashMap<Object, TreePath>();
+
+  private Object root;
 
   public ObjectTreeModel() {
     addNodeModel(new StringTreeNodeModel());
     addNodeModel(new ListObjectTreeNodeModel());
   }
 
-  private final ClassRegistry<MenuFactory> classMenus = new ClassRegistry<MenuFactory>();
-
-  private final Map<Object, MenuFactory> objectMenus = new WeakHashMap<Object, MenuFactory>();
-
-  public MenuFactory getMenu(final Class<?> layerClass) {
-    synchronized (classMenus) {
-      MenuFactory menu = classMenus.get(layerClass);
-      if (menu == null) {
-        menu = new MenuFactory();
-        classMenus.put(layerClass, menu);
-      }
-      return menu;
-    }
-  }
-
-  public MenuFactory getMenu(final Object object) {
-    synchronized (objectMenus) {
-      MenuFactory popupMenu = objectMenus.get(object);
-      if (popupMenu != null) {
-        return popupMenu;
-      }
-    }
-    Class<?> clazz = object.getClass();
-    synchronized (classMenus) {
-      return classMenus.find(clazz);
-    }
+  public ObjectTreeModel(final Object root) {
+    this();
+    this.root = root;
+    objectPathMap.put(root, new TreePath(root));
   }
 
   public void addMenuItem(final Class<?> clazz, final JMenuItem menuItem) {
@@ -82,24 +80,6 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final JMenuItem menuItem) {
     final MenuFactory menu = getMenu(clazz);
     menu.addComponent(groupName, menuItem);
-  }
-
-  public MenuFactory getObjectMenu(final Object object) {
-    MenuFactory menu;
-    synchronized (objectMenus) {
-      menu = objectMenus.get(object);
-      if (menu == null) {
-        menu = new MenuFactory();
-        objectMenus.put(object, menu);
-      }
-    }
-    return menu;
-  }
-
-  public ObjectTreeModel(final Object root) {
-    this();
-    this.root = root;
-    objectPathMap.put(root, new TreePath(root));
   }
 
   public void addNodeModel(final Class<?> clazz,
@@ -193,6 +173,19 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     }
   }
 
+  public MenuFactory getMenu(final Object object) {
+    synchronized (objectMenus) {
+      final MenuFactory popupMenu = objectMenus.get(object);
+      if (popupMenu != null) {
+        return popupMenu;
+      }
+    }
+    final Class<?> clazz = object.getClass();
+    synchronized (CLASS_MENUS) {
+      return CLASS_MENUS.find(clazz);
+    }
+  }
+
   public ObjectTreeNodeModel<Object, Object> getNodeModel(final Class<?> clazz) {
     final ObjectTreeNodeModel<Object, Object> model = classNodeModels.find(clazz);
     if (model == null) {
@@ -235,6 +228,18 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       }
       return parentNodeModel;
     }
+  }
+
+  public MenuFactory getObjectMenu(final Object object) {
+    MenuFactory menu;
+    synchronized (objectMenus) {
+      menu = objectMenus.get(object);
+      if (menu == null) {
+        menu = new MenuFactory();
+        objectMenus.put(object, menu);
+      }
+    }
+    return menu;
   }
 
   public TreePath getPath(final Object source) {

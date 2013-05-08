@@ -16,6 +16,8 @@ public abstract class AbstractKeySerializer extends
 
   private String key;
 
+  private String width;
+
   public AbstractKeySerializer() {
   }
 
@@ -28,14 +30,7 @@ public abstract class AbstractKeySerializer extends
     setLabel(label);
   }
 
-  public String getLabel() {
-    return label;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
+  @Override
   public String getKey() {
     if (StringUtils.hasText(key)) {
       return key;
@@ -44,8 +39,22 @@ public abstract class AbstractKeySerializer extends
     }
   }
 
+  @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
   public String getName() {
     return name;
+  }
+
+  public String getWidth() {
+    return width;
+  }
+
+  public void setKey(final String key) {
+    this.key = key;
   }
 
   public void setLabel(final String label) {
@@ -59,10 +68,14 @@ public abstract class AbstractKeySerializer extends
     }
   }
 
+  public void setWidth(final String width) {
+    this.width = width;
+  }
+
   @Override
-  public String toString(Object object) {
-    StringWriter out = new StringWriter();
-    XmlWriter xmlOut = new XmlWriter(out);
+  public String toString(final Object object) {
+    final StringWriter out = new StringWriter();
+    final XmlWriter xmlOut = new XmlWriter(out);
     serialize(xmlOut, object);
     xmlOut.flush();
     xmlOut.close();

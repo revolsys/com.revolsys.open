@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 
@@ -31,7 +33,13 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
 
   public String getBodyCssClass(final int row, final int col) {
     final KeySerializer serializer = getSerializer(col);
-    return serializer.getName();
+    if (serializer != null) {
+      String name = serializer.getName();
+      if (StringUtils.hasText(name)) {
+        return name.replaceAll("\\.", "_");
+      }
+    }
+    return "";
   }
 
   public int getBodyRowCount() {
@@ -43,7 +51,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   public String getFooterCssClass(final int row, final int col) {
-    return null;
+    return "";
   }
 
   public int getFooterRowCount() {
@@ -53,10 +61,12 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   public String getHeaderCssClass(final int col) {
     if (col < colCount) {
       final KeySerializer serializer = getSerializer(col);
-      return serializer.getName();
-    } else {
-      return "";
+      String name = serializer.getName();
+      if (StringUtils.hasText(name)) {
+        return name.replaceAll("\\.", "_");
+      }
     }
+    return "";
   }
 
   public KeySerializer getSerializer(final int col) {

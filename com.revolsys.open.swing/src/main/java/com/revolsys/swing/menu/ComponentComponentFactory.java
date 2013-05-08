@@ -5,21 +5,31 @@ import java.awt.Component;
 import javax.swing.Icon;
 
 import com.revolsys.swing.component.ComponentFactory;
+import com.revolsys.util.ExceptionUtil;
 
 public class ComponentComponentFactory implements ComponentFactory<Component> {
-  private Component component;
+  private final Component component;
 
-  public ComponentComponentFactory(Component component) {
+  public ComponentComponentFactory(final Component component) {
     this.component = component;
+  }
+
+  @Override
+  public ComponentComponentFactory clone() {
+    try {
+      return (ComponentComponentFactory)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void close(final Component component) {
   }
 
   @Override
   public Component createComponent() {
     return component;
-  }
-
-  @Override
-  public void close(Component component) {
   }
 
   @Override
@@ -36,4 +46,5 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
   public String getToolTip() {
     return null;
   }
+
 }

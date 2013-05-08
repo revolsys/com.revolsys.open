@@ -390,6 +390,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     } else {
       tableParams.put("sScrollY", scrollY);
     }
+    tableParams.put("sScrollX", "100%");
     tableParams.put("iDisplayLength", 50);
     tableParams.put("aaSorting", getListSortOrder(pageName));
 
@@ -431,7 +432,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (visible != null) {
         columnDef.put("bVisible", visible);
       }
-      final String width = serializer.getProperty("width");
+      final String width = serializer.getWidth();
       if (width != null) {
         columnDef.put("sWidth", width);
       }
@@ -471,6 +472,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     scriptBody.append(scrollYPercent);
     scriptBody.append(");\n");
     scriptBody.append("});");
+    scriptBody.append("$(window).bind('resize', function () {table.fnAdjustColumnSizing();} );");
     script.setContent(scriptBody.toString());
     final ElementContainer container = new ElementContainer(tableView, script);
 

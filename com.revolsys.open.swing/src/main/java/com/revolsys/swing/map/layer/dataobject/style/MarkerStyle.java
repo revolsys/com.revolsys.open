@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -48,8 +49,20 @@ public class MarkerStyle {
   public static MarkerStyle marker(final String markerName,
     final double markerSize, final Color lineColor, final double lineWidth,
     final Color fillColor) {
+    ShapeMarker marker = new ShapeMarker(markerName);
+    return marker(marker, markerSize, lineColor, fillColor);
+  }
+
+  public static MarkerStyle marker(final Shape shape, final double markerSize,
+    final Color lineColor, final double lineWidth, final Color fillColor) {
+    ShapeMarker marker = new ShapeMarker(shape);
+    return marker(marker, markerSize, lineColor, fillColor);
+  }
+
+  protected static MarkerStyle marker(ShapeMarker marker,
+    final double markerSize, final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
-    style.setMarker(new ShapeMarker(markerName));
+    style.setMarker(marker);
     style.setMarkerWidth(markerSize);
     style.setMarkerHeight(markerSize);
     style.setMarkerLineColor(lineColor);

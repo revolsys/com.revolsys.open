@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.raster;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.spring.SpringUtil;
 import com.sun.media.jai.codec.ImageCodec;
 
 public class GeoTiffImage extends GeoReferencedImage {
@@ -92,10 +90,7 @@ public class GeoTiffImage extends GeoReferencedImage {
   }
 
   public GeoTiffImage(final Resource imageResource) {
-    final File file = SpringUtil.getOrDownloadFile(imageResource);
-    final RenderedOp image = JAI.create("fileload", file.getAbsolutePath());
-    setImage(image.getAsBufferedImage());
-    loadImageMetaData(imageResource, image);
+    super(imageResource);
   }
 
   private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
@@ -168,8 +163,8 @@ public class GeoTiffImage extends GeoReferencedImage {
 
     final int imageHeight = getImageHeight();
     final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1,
-      y1, x2, y2);
+    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
+      x2, y2);
     setBoundingBox(boundingBox);
   }
 

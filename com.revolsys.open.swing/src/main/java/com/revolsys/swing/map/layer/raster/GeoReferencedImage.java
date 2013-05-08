@@ -2,8 +2,13 @@ package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Image;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -26,6 +31,8 @@ public class GeoReferencedImage {
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
+  private RenderedOp jaiImage;
+
   public GeoReferencedImage() {
   }
 
@@ -36,8 +43,11 @@ public class GeoReferencedImage {
     this.imageHeight = imageHeight;
   }
 
-  public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+  public GeoReferencedImage(final Resource imageResource) {
+    final File file = SpringUtil.getOrDownloadFile(imageResource);
+    jaiImage = JAI.create("fileload", file.getAbsolutePath());
+    setImage(jaiImage.getAsBufferedImage());
+    loadImageMetaData(imageResource, jaiImage);
   }
 
   @Override
@@ -57,8 +67,22 @@ public class GeoReferencedImage {
     return geometryFactory.getCoordinateSystem();
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   public Image getImage() {
     return image;
+  }
+
+  public double getImageAspectRatio() {
+    final int imageWidth = getImageWidth();
+    final int imageHeight = getImageHeight();
+    if (imageWidth > 0 && imageHeight > 0) {
+      return (double)imageWidth / imageHeight;
+    } else {
+      return 0;
+    }
   }
 
   public int getImageHeight() {
@@ -82,6 +106,10 @@ public class GeoReferencedImage {
 
   public Image loadImage() {
     return image;
+  }
+
+  protected void loadImageMetaData(final Resource imageResource,
+    final RenderedOp jaiImage) {
   }
 
   protected void loadProjectionFile(final Resource resource) {
@@ -122,11 +150,12 @@ public class GeoReferencedImage {
           reader.close();
         }
       } catch (final IOException e) {
-        throw new RuntimeException(
-          "Error reading TIFF world file " + worldFile, e);
+        LoggerFactory.getLogger(getClass()).error(
+          "Error reading world file " + worldFile, e);
       }
     } else {
-      throw new IllegalArgumentException("Cannot find world file " + worldFile);
+      LoggerFactory.getLogger(getClass()).error(
+        "Cannot find world file " + worldFile);
     }
   }
 
@@ -152,5 +181,9 @@ public class GeoReferencedImage {
 
   protected void setImageWidth(final int imageWidth) {
     this.imageWidth = imageWidth;
+  }
+
+  public void setJaiImage(final RenderedOp jaiImage) {
+    this.jaiImage = jaiImage;
   }
 }

@@ -15,8 +15,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.TiledImageLayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
@@ -71,6 +71,7 @@ public class LayerRendererOverlay extends JComponent implements
     GeoReferencedImage image;
     synchronized (loadSync) {
       image = this.image;
+
       if (image == null) {
         final BoundingBox boundingBox = viewport.getBoundingBox();
         final int viewWidthPixels = viewport.getViewWidthPixels();
@@ -81,7 +82,7 @@ public class LayerRendererOverlay extends JComponent implements
         SwingWorkerManager.execute(imageWorker);
       }
     }
-    TiledImageLayerRenderer.render(viewport, (Graphics2D)g, image);
+    GeoReferencedImageLayerRenderer.render(viewport, (Graphics2D)g, image);
   }
 
   @Override

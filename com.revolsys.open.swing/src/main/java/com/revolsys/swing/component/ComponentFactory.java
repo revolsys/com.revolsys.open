@@ -4,15 +4,17 @@ import java.awt.Component;
 
 import javax.swing.Icon;
 
-public interface ComponentFactory<T extends Component> {
+public interface ComponentFactory<T extends Component> extends Cloneable {
 
-  public abstract void close(Component component);
+  void close(Component component);
 
-  public abstract T createComponent();
+  T createComponent();
 
-  public abstract Icon getIcon();
+  Icon getIcon();
 
-  public abstract String getName();
+  String getName();
 
-  public abstract String getToolTip();
+  String getToolTip();
+  
+  ComponentFactory<?> clone();
 }

@@ -9,6 +9,7 @@ import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
+import com.revolsys.util.ExceptionUtil;
 
 public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
@@ -24,6 +25,15 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
     Action action) {
     this(action);
     this.checkBoxSelectedCheck = checkBoxSelectedCheck;
+  }
+
+  @Override
+  public ActionMainMenuItemFactory clone() {
+    try {
+      return (ActionMainMenuItemFactory)super.clone();
+    } catch (CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
   }
 
   @Override
