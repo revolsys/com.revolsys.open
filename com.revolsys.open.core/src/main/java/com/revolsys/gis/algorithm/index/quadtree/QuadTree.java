@@ -111,13 +111,6 @@ public class QuadTree<T> {
     return query(boundingBox, filter);
   }
 
-  private BoundingBox convertBoundingBox(BoundingBox boundingBox) {
-    if (geometryFactory != null) {
-      boundingBox = boundingBox.convert(geometryFactory);
-    }
-    return boundingBox;
-  }
-
   public List<T> queryEnvelope(final BoundingBox boundingBox) {
     return query(boundingBox);
   }
@@ -128,7 +121,7 @@ public class QuadTree<T> {
   }
 
   public void query(BoundingBox boundingBox, final Visitor<T> visitor) {
-    boundingBox = convertBoundingBox(boundingBox);
+    boundingBox = boundingBox.convert(geometryFactory);
     root.visit(boundingBox, visitor);
   }
 

@@ -384,7 +384,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     if (this.geometryFactory == null || geometryFactory == null
       || this.geometryFactory.equals(geometryFactory) || isNull()) {
-      return new BoundingBox(this);
+      return this;
     } else {
       final Polygon polygon = toPolygon();
       final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
@@ -394,7 +394,7 @@ public class BoundingBox extends Envelope implements Cloneable {
         final Envelope envelope = projectedPolygon.getEnvelopeInternal();
         return new BoundingBox(geometryFactory, envelope);
       } else {
-        return new BoundingBox(this);
+        return this;
       }
     }
   }

@@ -25,6 +25,14 @@ public class GeoReferencedImageLayerRenderer extends
     final BoundingBox boundingBox) {
     if (geoReferencedImage != null) {
       final Image image = geoReferencedImage.getImage();
+      render(viewport, graphics, geoReferencedImage, image, boundingBox);
+    }
+  }
+
+  public static void render(final Viewport2D viewport,
+    final Graphics2D graphics, final GeoReferencedImage geoReferencedImage,
+    final Image image, final BoundingBox boundingBox) {
+    if (geoReferencedImage != null) {
       if (image != null) {
         final int imageWidth = geoReferencedImage.getImageWidth();
         final int imageHeight = geoReferencedImage.getImageHeight();

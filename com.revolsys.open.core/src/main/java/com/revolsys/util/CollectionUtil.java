@@ -35,6 +35,19 @@ public final class CollectionUtil {
     append(string, values, ",");
   }
 
+  public static float[] toFloatArray(double[] doubleArray) {
+    if (doubleArray == null) {
+      return null;
+    } else {
+      int size = doubleArray.length;
+      float[] floatArray = new float[size];
+      for (int i = 0; i < size; i++) {
+        floatArray[i] = (float)doubleArray[i];
+      }
+      return floatArray;
+    }
+  }
+
   public static void append(final StringBuffer buffer,
     final Collection<? extends Object> values, final String separator) {
     boolean first = true;

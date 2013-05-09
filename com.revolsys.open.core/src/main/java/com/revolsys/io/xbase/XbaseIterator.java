@@ -329,13 +329,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       final char fieldType = (char)in.read();
       in.skipBytes(4);
       int length = in.read();
-      in.skipBytes(15);
+      int decimalCount = in.read();
+      in.skipBytes(14);
       b = in.read();
       final DataType dataType = DATA_TYPES.get(fieldType);
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      metaData.addAttribute(fieldName.toString(), dataType, length, -1, true);
+      metaData.addAttribute(fieldName.toString(), dataType, length,
+        decimalCount, true);
     }
     if (mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;

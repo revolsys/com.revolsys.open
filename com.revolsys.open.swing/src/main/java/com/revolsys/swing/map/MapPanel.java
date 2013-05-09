@@ -362,36 +362,41 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public void setBoundingBox(final BoundingBox boundingBox) {
+  public void setBoundingBox(BoundingBox boundingBox) {
+    BoundingBox oldBoundingBox = getBoundingBox();
+
     final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
     final boolean zoomNextEnabled = isZoomNextEnabled();
-    viewport.setBoundingBox(boundingBox);
+    BoundingBox resizedBoundingBox = viewport.setBoundingBox(boundingBox);
+    project.setViewBoundingBox(resizedBoundingBox);
     setScale(viewport.getScale());
     synchronized (zoomHistory) {
-      BoundingBox currentBoundingBox = null;
-      if (zoomHistoryIndex > -1) {
-        currentBoundingBox = zoomHistory.get(zoomHistoryIndex);
-        if (!currentBoundingBox.equals(boundingBox)) {
-          while (zoomHistory.size() > zoomHistoryIndex + 1) {
-            zoomHistory.removeLast();
-          }
-          for (int i = zoomHistory.size() - 1; i > zoomHistoryIndex; i++) {
-            zoomHistory.remove(i);
-          }
-          zoomHistory.add(boundingBox);
-          zoomHistoryIndex = zoomHistory.size() - 1;
-          if (zoomHistory.size() > 50) {
-            zoomHistory.removeFirst();
+      if (updateZoomHistory) {
+        BoundingBox currentBoundingBox = null;
+        if (zoomHistoryIndex > -1) {
+          currentBoundingBox = zoomHistory.get(zoomHistoryIndex);
+          if (!currentBoundingBox.equals(resizedBoundingBox)) {
+            while (zoomHistory.size() > zoomHistoryIndex + 1) {
+              zoomHistory.removeLast();
+            }
+            for (int i = zoomHistory.size() - 1; i > zoomHistoryIndex; i++) {
+              zoomHistory.remove(i);
+            }
+            zoomHistory.add(resizedBoundingBox);
+            zoomHistoryIndex = zoomHistory.size() - 1;
+            if (zoomHistory.size() > 50) {
+              zoomHistory.removeFirst();
 
-            zoomHistoryIndex--;
+              zoomHistoryIndex--;
+            }
           }
+        } else {
+          zoomHistory.add(resizedBoundingBox);
+          zoomHistoryIndex = 0;
         }
-      } else {
-        zoomHistory.add(boundingBox);
-        zoomHistoryIndex = 0;
       }
-
     }
+    firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
     firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
       isZoomPreviousEnabled());
     firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
@@ -417,25 +422,32 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
+  private boolean updateZoomHistory = true;
+
   private void setZoomHistoryIndex(int zoomHistoryIndex) {
     synchronized (zoomHistory) {
-      final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
-      final boolean zoomNextEnabled = isZoomNextEnabled();
-      final int zoomHistorySize = zoomHistory.size();
-      if (zoomHistoryIndex < 1) {
-        zoomHistoryIndex = 0;
-      } else if (zoomHistoryIndex >= zoomHistorySize) {
-        zoomHistoryIndex = zoomHistorySize - 2;
-      }
-      this.zoomHistoryIndex = zoomHistoryIndex;
-      final BoundingBox boundingBox = zoomHistory.get(zoomHistoryIndex);
-      viewport.setBoundingBox(boundingBox);
+      updateZoomHistory = false;
+      try {
+        final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
+        final boolean zoomNextEnabled = isZoomNextEnabled();
+        final int zoomHistorySize = zoomHistory.size();
+        if (zoomHistoryIndex < 1) {
+          zoomHistoryIndex = 0;
+        } else if (zoomHistoryIndex >= zoomHistorySize) {
+          zoomHistoryIndex = zoomHistorySize - 2;
+        }
+        this.zoomHistoryIndex = zoomHistoryIndex;
+        final BoundingBox boundingBox = zoomHistory.get(zoomHistoryIndex);
+        viewport.setBoundingBox(boundingBox);
 
-      project.setViewBoundingBox(boundingBox);
-      firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
-        isZoomPreviousEnabled());
-      firePropertyChange("zoomNextEnabled", zoomNextEnabled,
-        isZoomNextEnabled());
+        project.setViewBoundingBox(boundingBox);
+        firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
+          isZoomPreviousEnabled());
+        firePropertyChange("zoomNextEnabled", zoomNextEnabled,
+          isZoomNextEnabled());
+      } finally {
+        updateZoomHistory = true;
+      }
     }
   }
 

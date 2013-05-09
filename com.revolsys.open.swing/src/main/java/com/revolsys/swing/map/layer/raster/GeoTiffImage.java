@@ -18,6 +18,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.sun.media.jai.codec.ImageCodec;
 
+@SuppressWarnings("deprecation")
 public class GeoTiffImage extends GeoReferencedImage {
   static {
     try {

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.tree.renderer;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -134,6 +135,9 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     return new ImageIcon(newImage);
+  }
+
+  public LayerTreeCellRenderer() {
   }
 
   @Override

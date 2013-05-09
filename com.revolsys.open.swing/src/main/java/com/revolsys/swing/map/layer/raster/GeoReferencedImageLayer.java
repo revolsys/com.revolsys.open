@@ -98,6 +98,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
+  public void setBoundingBox(BoundingBox boundingBox) {
+    image.setBoundingBox(boundingBox);
+  }
+
   public void setImage(GeoReferencedImage image) {
     this.image = image;
   }

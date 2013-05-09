@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
@@ -59,23 +60,33 @@ public class AbstractOverlay extends JComponent implements
     setMapCursor(Cursor.getDefaultCursor());
   }
 
+  public Graphics2D getGraphics() {
+    return (Graphics2D)super.getGraphics();
+  }
+
   protected double getDistance(MouseEvent event) {
     int x = event.getX();
     int y = event.getY();
-    Point p1 = getGeometryFactory().project(viewport.toModelPoint(x, y));
-    Point p2 = getGeometryFactory().project(viewport.toModelPoint(x
+    GeometryFactory geometryFactory = getGeometryFactory();
+    Point p1 = geometryFactory.project(viewport.toModelPoint(x, y));
+    Point p2 = geometryFactory.project(viewport.toModelPoint(x
       + getHotspotPixels(), y + getHotspotPixels()));
 
     return p1.distance(p2);
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {
-    if (xorGeometry != null) {
+    Geometry geometry = xorGeometry;
+    drawXorGeometry(graphics, geometry);
+  }
+
+  protected void drawXorGeometry(final Graphics2D graphics, Geometry geometry) {
+    if (geometry != null) {
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);
-        if (xorGeometry instanceof Point) {
-          final Point point = (Point)xorGeometry;
+        if (geometry instanceof Point) {
+          final Point point = (Point)geometry;
           final Point2D screenPoint = viewport.toViewPoint(point);
 
           final double x = screenPoint.getX() - getHotspotPixels();
@@ -86,7 +97,7 @@ public class AbstractOverlay extends JComponent implements
           graphics.setPaint(new Color(0, 0, 255));
           graphics.fill(shape);
         } else {
-          GeometryStyleRenderer.renderGeometry(viewport, graphics, xorGeometry,
+          GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
             XOR_LINE_STYLE);
         }
       } finally {
@@ -177,6 +188,15 @@ public class AbstractOverlay extends JComponent implements
 
   public void setXorGeometry(final Geometry xorGeometry) {
     this.xorGeometry = xorGeometry;
+  }
+
+  @Override
+  protected void paintComponent(Graphics graphics) {
+    paintComponent((Graphics2D)graphics);
+  }
+
+  protected void paintComponent(Graphics2D graphics) {
+    super.paintComponent(graphics);
   }
 
   protected void setXorGeometry(final Graphics2D graphics,

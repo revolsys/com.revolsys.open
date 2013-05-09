@@ -75,6 +75,10 @@ public class GeoReferencedImage {
     return image;
   }
 
+  public RenderedOp getJaiImage() {
+    return jaiImage;
+  }
+
   public double getImageAspectRatio() {
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
