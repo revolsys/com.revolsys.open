@@ -24,7 +24,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
     menu.addMenuItemTitleIcon("zoom", "Zoom to Layer", "magnifier",
       LayerUtil.class, "zoomToLayer");
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
@@ -65,16 +65,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public AbstractLayer() {
   }
 
-  public BoundingBox getSelectedBoundingBox() {
-    GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBox(geometryFactory);
-  }
-
-  @Override
-  public int compareTo(Layer layer) {
-    return getName().compareTo(layer.getName());
-  }
-
   public AbstractLayer(final String name) {
     this.name = name;
   }
@@ -97,6 +87,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public int compareTo(final Layer layer) {
+    return getName().compareTo(layer.getName());
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return new BoundingBox();
   }
@@ -104,7 +99,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     if (visible || !visibleLayersOnly) {
-      GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory();
       return new BoundingBox(geometryFactory);
     } else {
       return getBoundingBox();
@@ -180,8 +175,19 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public BoundingBox getSelectedBoundingBox() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return new BoundingBox(geometryFactory);
+  }
+
+  @Override
   public boolean isEditable() {
     return editable;
+  }
+
+  @Override
+  public boolean isEditable(final double scale) {
+    return isVisible(scale) && isEditable();
   }
 
   @Override
@@ -199,16 +205,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return readOnly;
   }
 
-  public boolean isEditable(double scale) {
-    return isVisible(scale) && isEditable();
-  }
-
-  public boolean isSelectable(double scale) {
-    return isVisible(scale) && isSelectable();
-  }
-
+  @Override
   public boolean isSelectable() {
     return isSelectSupported() && isVisible() && selectable;
+  }
+
+  @Override
+  public boolean isSelectable(final double scale) {
+    return isVisible(scale) && isSelectable();
   }
 
   @Override
@@ -224,7 +228,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isVisible(final double scale) {
     if (isVisible()) {
-      long longScale = (long)scale;
+      final long longScale = (long)scale;
       if (getMinimumScale() >= longScale && longScale >= getMaximumScale()) {
         return true;
       }
@@ -354,7 +358,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.readOnly = readOnly;
   }
 
-  protected void setRenderer(final LayerRenderer<? extends Layer> renderer) {
+  public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
     this.renderer = renderer;
   }
 

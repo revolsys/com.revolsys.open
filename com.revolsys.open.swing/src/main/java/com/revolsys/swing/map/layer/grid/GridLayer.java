@@ -17,7 +17,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 public class GridLayer extends AbstractLayer {
 
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
     menu.addMenuItem("zoom", new ZoomToMapSheet());
   }
 

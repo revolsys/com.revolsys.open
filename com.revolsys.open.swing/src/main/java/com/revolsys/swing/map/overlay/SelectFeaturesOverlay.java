@@ -169,31 +169,13 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     }
   }
 
-  @Override
-  public void paintComponent(final Graphics graphics) {
-    final Graphics2D graphics2d = (Graphics2D)graphics;
-    Project layerGroup = getProject();
-    paint(graphics2d, layerGroup);
-    paintSelectBox(graphics2d);
-  }
-
-  protected void paintSelectBox(final Graphics2D graphics2d) {
-    if (selectBox != null) {
-      graphics2d.setColor(boxOutlineColor);
-      graphics2d.setStroke(BOX_STROKE);
-      graphics2d.draw(selectBox);
-      graphics2d.setPaint(boxFillColor);
-      graphics2d.fill(selectBox);
-    }
-  }
-
-  protected void paint(final Graphics2D graphics2d, LayerGroup layerGroup) {
+  protected void paint(final Graphics2D graphics2d, final LayerGroup layerGroup) {
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
-        LayerGroup childGroup = (LayerGroup)layer;
+        final LayerGroup childGroup = (LayerGroup)layer;
         paint(graphics2d, childGroup);
       } else if (layer instanceof DataObjectLayer) {
-        DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+        final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         for (final DataObject object : getSelectedObjects(dataObjectLayer)) {
           if (object != null && dataObjectLayer.isVisible(object)) {
             final Geometry geometry = object.getGeometryValue();
@@ -206,6 +188,24 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
           }
         }
       }
+    }
+  }
+
+  @Override
+  public void paintComponent(final Graphics graphics) {
+    final Graphics2D graphics2d = (Graphics2D)graphics;
+    final Project layerGroup = getProject();
+    paint(graphics2d, layerGroup);
+    paintSelectBox(graphics2d);
+  }
+
+  protected void paintSelectBox(final Graphics2D graphics2d) {
+    if (selectBox != null) {
+      graphics2d.setColor(boxOutlineColor);
+      graphics2d.setStroke(BOX_STROKE);
+      graphics2d.draw(selectBox);
+      graphics2d.setPaint(boxFillColor);
+      graphics2d.fill(selectBox);
     }
   }
 
@@ -273,12 +273,13 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   }
 
   public void selectObjects(final BoundingBox boundingBox) {
-    Project project = getProject();
+    final Project project = getProject();
     selectObjects(project, boundingBox);
   }
 
-  private void selectObjects(final LayerGroup group, BoundingBox boundingBox) {
-    double scale = getViewport().getScale();
+  private void selectObjects(final LayerGroup group,
+    final BoundingBox boundingBox) {
+    final double scale = getViewport().getScale();
     for (final Layer layer : group.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;

@@ -13,7 +13,7 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
   public MultiEnableCheck() {
   }
 
-  public MultiEnableCheck(Collection<EnableCheck> enableChecks) {
+  public MultiEnableCheck(final Collection<EnableCheck> enableChecks) {
     setEnableChecks(enableChecks);
   }
 
@@ -21,14 +21,14 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
     return enableChecks;
   }
 
-  public void setEnableChecks(Collection<EnableCheck> enableChecks) {
-    this.enableChecks = new ArrayList<EnableCheck>(enableChecks);
-    isEnabled();
-  }
-
   @Override
   public Iterator<EnableCheck> iterator() {
     return enableChecks.iterator();
+  }
+
+  public void setEnableChecks(final Collection<EnableCheck> enableChecks) {
+    this.enableChecks = new ArrayList<EnableCheck>(enableChecks);
+    isEnabled();
   }
 
   @Override

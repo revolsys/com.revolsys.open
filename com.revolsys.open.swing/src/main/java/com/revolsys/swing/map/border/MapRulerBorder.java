@@ -320,10 +320,10 @@ public class MapRulerBorder extends AbstractBorder {
     paintHorizontalRuler(g, boundingBox, displayUnit, steps, x, y, width,
       height, false);
 
-    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width,
-      height, true);
-    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width,
-      height, false);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height,
+      true);
+    paintVerticalRuler(g, boundingBox, displayUnit, steps, x, y, width, height,
+      false);
 
   }
 
@@ -342,13 +342,13 @@ public class MapRulerBorder extends AbstractBorder {
         textX = labelHeight;
         line = boundingBox.getWestLine();
       } else {
-        g.translate(width-rulerSize, -rulerSize);
+        g.translate(width - rulerSize, -rulerSize);
         textX = rulerSize - 3;
         line = boundingBox.getEastLine();
       }
       line = line.convert(rulerGeometryFactory);
 
-      g.setClip(0, rulerSize *2, rulerSize, height- 2*rulerSize);
+      g.setClip(0, rulerSize * 2, rulerSize, height - 2 * rulerSize);
 
       final double mapSize = boundingBox.getHeight();
       final double viewSize = viewport.getViewHeightPixels();
@@ -390,12 +390,11 @@ public class MapRulerBorder extends AbstractBorder {
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
               barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
               found = true;
-              AffineTransform transform2 = g.getTransform();
+              final AffineTransform transform2 = g.getTransform();
               try {
-                g.translate(textX, height- pixel -3);
-                g.rotate(-Math.PI/2);
-              drawLabel(g, 0, 0, displayUnit, displayValue,
-                scaleUnit);
+                g.translate(textX, height - pixel - 3);
+                g.rotate(-Math.PI / 2);
+                drawLabel(g, 0, 0, displayUnit, displayValue, scaleUnit);
               } finally {
                 g.setTransform(transform2);
               }
@@ -404,9 +403,10 @@ public class MapRulerBorder extends AbstractBorder {
           }
 
           if (left) {
-            g.drawLine(rulerSize - 1 - barSize, height-pixel, rulerSize - 1, height-pixel);
+            g.drawLine(rulerSize - 1 - barSize, height - pixel, rulerSize - 1,
+              height - pixel);
           } else {
-            g.drawLine(0, height-pixel, barSize, height-pixel);
+            g.drawLine(0, height - pixel, barSize, height - pixel);
           }
 
         }
@@ -417,7 +417,6 @@ public class MapRulerBorder extends AbstractBorder {
       g.setClip(clip);
     }
   }
-
 
   public void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
     this.rulerGeometryFactory = rulerGeometryFactory;

@@ -57,7 +57,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     this.objectTreeNodeModels.addAll(Arrays.asList(objectTreeNodeModels));
     if (objectTreeModel != null) {
-      for (ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
+      for (final ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
         nodeModel.setObjectTreeModel(objectTreeModel);
       }
     }
@@ -106,7 +106,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public MenuFactory getMenu(final NODE node) {
-    if (node == null || objectTreeModel ==null) {
+    if (node == null || objectTreeModel == null) {
       return null;
     } else {
       return objectTreeModel.getMenu(node);
@@ -194,7 +194,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
     if (this.objectTreeModel != objectTreeModel) {
       this.objectTreeModel = objectTreeModel;
-      for (ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
+      for (final ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
         nodeModel.setObjectTreeModel(objectTreeModel);
       }
     }

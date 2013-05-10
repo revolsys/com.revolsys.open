@@ -9,27 +9,32 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class BingMapTile extends MapTile {
 
-  private String quadKey;
+  private final String quadKey;
 
-  private BingLayer layer;
+  private final BingLayer layer;
 
-  public BingMapTile(BingLayer layer, int zoomLevel, int tileX, int tileY) {
+  public BingMapTile(final BingLayer layer, final int zoomLevel,
+    final int tileX, final int tileY) {
     super(BingClient.getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
     this.layer = layer;
     this.quadKey = BingClient.getQuadKey(zoomLevel, tileX, tileY);
   }
 
-  public String getQuadKey() {
-    return quadKey;
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof BingMapTile) {
+      final BingMapTile tile = (BingMapTile)obj;
+      if (tile.layer == layer) {
+        if (tile.quadKey.equals(quadKey)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
-  @Override
-  public Image loadImage() {
-    final BingClient client = layer.getClient();
-    ImagerySet imagerySet = layer.getImagerySet();
-    MapLayer mapLayer = layer.getMapLayer();
-    Image image = client.getMapImage(imagerySet, mapLayer, quadKey);
-    return image;
+  public String getQuadKey() {
+    return quadKey;
   }
 
   @Override
@@ -38,16 +43,12 @@ public class BingMapTile extends MapTile {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof BingMapTile) {
-      BingMapTile tile = (BingMapTile)obj;
-      if (tile.layer == layer) {
-        if (tile.quadKey.equals(quadKey)) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public Image loadImage() {
+    final BingClient client = layer.getClient();
+    final ImagerySet imagerySet = layer.getImagerySet();
+    final MapLayer mapLayer = layer.getMapLayer();
+    final Image image = client.getMapImage(imagerySet, mapLayer, quadKey);
+    return image;
   }
 
   @Override

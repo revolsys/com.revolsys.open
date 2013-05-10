@@ -3,8 +3,6 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,18 +36,6 @@ public class TextStyle {
 
   private String textName = "";
 
-  public String getTextName() {
-    return textName;
-  }
-
-  public void setTextName(String textName) {
-    if (textName == null) {
-      this.textName = "";
-    } else {
-      this.textName = textName;
-    }
-  }
-
   private String textFaceName = "Arial";
 
   private Measure<Length> textSizeMeasure = GeometryStyle.TEN_PIXELS;
@@ -64,37 +50,9 @@ public class TextStyle {
 
   private Measure<Length> textDy = GeometryStyle.ZERO_PIXEL;
 
-  public Measure<Length> getTextDeltaX() {
-    return textDx;
-  }
+  private long lastScale = 0;
 
-  public Measure<Length> getTextDeltaY() {
-    return textDy;
-  }
-
-  public void setTextHaloRadius(double textHaloRadius) {
-    setTextHaloRadiusMeasure(Measure.valueOf(textHaloRadius, NonSI.PIXEL));
-  }
-
-  public void setTextHaloRadiusMeasure(Measure<Length> textHaloRadius) {
-    this.textHaloRadiusMeasure = textHaloRadius;
-  }
-
-  public void setTextDx(final double textDx) {
-    setTextDeltaX(Measure.valueOf(textDx, NonSI.PIXEL));
-  }
-
-  public void setTextDy(final double textDy) {
-    setTextDeltY(Measure.valueOf(textDy, NonSI.PIXEL));
-  }
-
-  public void setTextDeltaX(final Measure<Length> textDx) {
-    this.textDx = GeometryStyle.getWithDefault(textDx, GeometryStyle.ZERO_PIXEL);
-  }
-
-  public void setTextDeltY(final Measure<Length> textDy) {
-    this.textDy = GeometryStyle.getWithDefault(textDy, GeometryStyle.ZERO_PIXEL);
-  }
+  private Font font;
 
   public TextStyle() {
   }
@@ -117,6 +75,14 @@ public class TextStyle {
     return textAlign;
   }
 
+  public Measure<Length> getTextDeltaX() {
+    return textDx;
+  }
+
+  public Measure<Length> getTextDeltaY() {
+    return textDy;
+  }
+
   public String getTextFaceName() {
     return textFaceName;
   }
@@ -131,6 +97,10 @@ public class TextStyle {
 
   public Measure<Length> getTextHaloRadiusMeasure() {
     return textHaloRadiusMeasure;
+  }
+
+  public String getTextName() {
+    return textName;
   }
 
   public int getTextOpacity() {
@@ -161,6 +131,22 @@ public class TextStyle {
     }
   }
 
+  public void setTextDeltaX(final Measure<Length> textDx) {
+    this.textDx = MarkerStyle.getWithDefault(textDx, MarkerStyle.ZERO_PIXEL);
+  }
+
+  public void setTextDeltY(final Measure<Length> textDy) {
+    this.textDy = MarkerStyle.getWithDefault(textDy, MarkerStyle.ZERO_PIXEL);
+  }
+
+  public void setTextDx(final double textDx) {
+    setTextDeltaX(Measure.valueOf(textDx, NonSI.PIXEL));
+  }
+
+  public void setTextDy(final double textDy) {
+    setTextDeltY(Measure.valueOf(textDy, NonSI.PIXEL));
+  }
+
   public void setTextFaceName(final String textFaceName) {
     this.textFaceName = textFaceName;
   }
@@ -182,14 +168,30 @@ public class TextStyle {
     }
   }
 
+  public void setTextHaloRadius(final double textHaloRadius) {
+    setTextHaloRadiusMeasure(Measure.valueOf(textHaloRadius, NonSI.PIXEL));
+  }
+
+  public void setTextHaloRadiusMeasure(final Measure<Length> textHaloRadius) {
+    this.textHaloRadiusMeasure = textHaloRadius;
+  }
+
+  public void setTextName(final String textName) {
+    if (textName == null) {
+      this.textName = "";
+    } else {
+      this.textName = textName;
+    }
+  }
+
   public void setTextOpacity(final int textOpacity) {
     if (textOpacity < 0 || textOpacity > 255) {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.textOpacity = textOpacity;
-      this.textFill = GeometryStyle.getColorWithOpacity(textFill,
+      this.textFill = MarkerStyle.getColorWithOpacity(textFill,
         this.textOpacity);
-      this.textHaloFill = GeometryStyle.getColorWithOpacity(textHaloFill,
+      this.textHaloFill = MarkerStyle.getColorWithOpacity(textHaloFill,
         this.textOpacity);
     }
   }
@@ -211,16 +213,13 @@ public class TextStyle {
   }
 
   public void setTextSizeMeasure(final Measure<Length> textSize) {
-    this.textSizeMeasure = GeometryStyle.getWithDefault(textSize,
-      GeometryStyle.TEN_PIXELS);
+    this.textSizeMeasure = MarkerStyle.getWithDefault(textSize,
+      MarkerStyle.TEN_PIXELS);
   }
 
-  private long lastScale = 0;
-
-  private Font font;
-
-  public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    long scale = (long)viewport.getScale();
+  public synchronized void setTextStyle(final Viewport2D viewport,
+    final Graphics2D graphics) {
+    final long scale = (long)viewport.getScale();
     if (font == null || lastScale != scale) {
       lastScale = scale;
       final int style = 0;

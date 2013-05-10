@@ -35,8 +35,8 @@ public class GeoNamesBoundingBoxLayerWorker extends
       "Geo Names", GeoNamesBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = SilkIconLoader.getImage("world");
-    ImageMarker marker = new ImageMarker(image);
-    MarkerStyle style = new MarkerStyle();
+    final ImageMarker marker = new ImageMarker(image);
+    final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
     layer.setRenderer(new MarkerStyleRenderer(layer, style));
     layer.setProperties(properties);

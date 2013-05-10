@@ -160,7 +160,7 @@ public class ZoomOverlay extends AbstractOverlay {
     final int dy = (int)(p.getY() - panFirstPoint.getY());
 
     final Container parent = getParent();
-    final Graphics2D graphics = (Graphics2D)getGraphics();
+    final Graphics2D graphics = getGraphics();
     final int width = getViewport().getViewWidthPixels();
     final int height = getViewport().getViewHeightPixels();
     graphics.setColor(Color.WHITE);

@@ -51,6 +51,13 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     factories.add(factory);
   }
 
+  public void addGroup(final int index, final String groupName) {
+    if (!groupNames.contains(groupName)) {
+      groupNames.add(index, groupName);
+    }
+
+  }
+
   public void addGroup(final String groupName) {
     getGroup(groupName);
   }
@@ -128,6 +135,12 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public void close(final Component component) {
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   @Override
   public JMenu createComponent() {
     final JMenu menu = new JMenu(name);
@@ -148,12 +161,6 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     }
     return menu;
   }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
 
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(name);
@@ -200,12 +207,5 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   @Override
   public String getToolTip() {
     return null;
-  }
-
-  public void addGroup(int index, String groupName) {
-    if (!groupNames.contains(groupName)) {
-      groupNames.add(index, groupName);
-    }
-
   }
 }

@@ -46,6 +46,8 @@ public class AbstractOverlay extends JComponent implements
 
   private final int hotspotPixels = 3;
 
+  private GeometryFactory geometryFactory;
+
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
     this.viewport = map.getViewport();
@@ -54,33 +56,17 @@ public class AbstractOverlay extends JComponent implements
     map.addMapOverlay(this);
   }
 
-  private GeometryFactory geometryFactory;
-
   protected void clearMapCursor() {
     setMapCursor(Cursor.getDefaultCursor());
   }
 
-  public Graphics2D getGraphics() {
-    return (Graphics2D)super.getGraphics();
-  }
-
-  protected double getDistance(MouseEvent event) {
-    int x = event.getX();
-    int y = event.getY();
-    GeometryFactory geometryFactory = getGeometryFactory();
-    Point p1 = geometryFactory.project(viewport.toModelPoint(x, y));
-    Point p2 = geometryFactory.project(viewport.toModelPoint(x
-      + getHotspotPixels(), y + getHotspotPixels()));
-
-    return p1.distance(p2);
-  }
-
   protected void drawXorGeometry(final Graphics2D graphics) {
-    Geometry geometry = xorGeometry;
+    final Geometry geometry = xorGeometry;
     drawXorGeometry(graphics, geometry);
   }
 
-  protected void drawXorGeometry(final Graphics2D graphics, Geometry geometry) {
+  protected void drawXorGeometry(final Graphics2D graphics,
+    final Geometry geometry) {
     if (geometry != null) {
       final Paint paint = graphics.getPaint();
       try {
@@ -104,6 +90,26 @@ public class AbstractOverlay extends JComponent implements
         graphics.setPaint(paint);
       }
     }
+  }
+
+  protected double getDistance(final MouseEvent event) {
+    final int x = event.getX();
+    final int y = event.getY();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point p1 = geometryFactory.project(viewport.toModelPoint(x, y));
+    final Point p2 = geometryFactory.project(viewport.toModelPoint(x
+      + getHotspotPixels(), y + getHotspotPixels()));
+
+    return p1.distance(p2);
+  }
+
+  protected GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  @Override
+  public Graphics2D getGraphics() {
+    return (Graphics2D)super.getGraphics();
   }
 
   public int getHotspotPixels() {
@@ -177,7 +183,20 @@ public class AbstractOverlay extends JComponent implements
   }
 
   @Override
+  protected void paintComponent(final Graphics graphics) {
+    paintComponent((Graphics2D)graphics);
+  }
+
+  protected void paintComponent(final Graphics2D graphics) {
+    super.paintComponent(graphics);
+  }
+
+  @Override
   public void propertyChange(final PropertyChangeEvent event) {
+  }
+
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   protected void setMapCursor(final Cursor cursor) {
@@ -190,27 +209,10 @@ public class AbstractOverlay extends JComponent implements
     this.xorGeometry = xorGeometry;
   }
 
-  @Override
-  protected void paintComponent(Graphics graphics) {
-    paintComponent((Graphics2D)graphics);
-  }
-
-  protected void paintComponent(Graphics2D graphics) {
-    super.paintComponent(graphics);
-  }
-
   protected void setXorGeometry(final Graphics2D graphics,
     final Geometry xorGeometry) {
     drawXorGeometry(graphics);
     this.xorGeometry = xorGeometry;
     drawXorGeometry(graphics);
-  }
-
-  protected GeometryFactory getGeometryFactory() {
-    return geometryFactory;
-  }
-
-  protected void setGeometryFactory(GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
   }
 }

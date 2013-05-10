@@ -21,7 +21,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     GeoReferencedImageLayer.class, "create");
 
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
       "arrow_out", null, "fitToViewport"));
@@ -35,8 +35,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       throw new IllegalArgumentException(
         "A geo referenced image layer requires a url.");
     } else {
-      Resource imageResource = SpringUtil.getResource(url);
-      GeoReferencedImage image = new GeoTiffImage(imageResource);
+      final Resource imageResource = SpringUtil.getResource(url);
+      final GeoReferencedImage image = new GeoTiffImage(imageResource);
 
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(image);
       layer.setProperties(properties);
@@ -44,14 +44,30 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
+  private GeoReferencedImage image;
+
+  public GeoReferencedImageLayer(final GeoReferencedImage image) {
+    setRenderer(new GeoReferencedImageLayerRenderer(this));
+    setSelectSupported(false);
+    setQuerySupported(false);
+    setImage(image);
+    setGeometryFactory(image.getGeometryFactory());
+  }
+
+  public GeoReferencedImageLayer(final String name,
+    final GeoReferencedImage image) {
+    this(image);
+    setName(name);
+  }
+
   public void fitToViewport() {
-    BoundingBox oldValue = image.getBoundingBox();
-    Project project = getProject();
+    final BoundingBox oldValue = image.getBoundingBox();
+    final Project project = getProject();
     if (project != null) {
-      BoundingBox viewBoundingBox = project.getViewBoundingBox();
+      final BoundingBox viewBoundingBox = project.getViewBoundingBox();
       if (!viewBoundingBox.isNull()) {
-        double viewRatio = viewBoundingBox.getAspectRatio();
-        double imageRatio = image.getImageAspectRatio();
+        final double viewRatio = viewBoundingBox.getAspectRatio();
+        final double imageRatio = image.getImageAspectRatio();
         BoundingBox boundingBox;
         if (viewRatio > imageRatio) {
           boundingBox = viewBoundingBox.expandPercent(-1
@@ -69,21 +85,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
-  private GeoReferencedImage image;
-
-  public GeoReferencedImageLayer(GeoReferencedImage image) {
-    setRenderer(new GeoReferencedImageLayerRenderer(this));
-    setSelectSupported(false);
-    setQuerySupported(false);
-    setImage(image);
-    setGeometryFactory(image.getGeometryFactory());
-  }
-
-  public GeoReferencedImageLayer(String name, GeoReferencedImage image) {
-    this(image);
-    setName(name);
-  }
-
   @Override
   public BoundingBox getBoundingBox() {
     return getImage().getBoundingBox();
@@ -98,15 +99,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
-  public void setBoundingBox(BoundingBox boundingBox) {
+  public GeoReferencedImage getImage() {
+    return image;
+  }
+
+  public void setBoundingBox(final BoundingBox boundingBox) {
     image.setBoundingBox(boundingBox);
   }
 
-  public void setImage(GeoReferencedImage image) {
+  public void setImage(final GeoReferencedImage image) {
     this.image = image;
-  }
-
-  public GeoReferencedImage getImage() {
-    return image;
   }
 }

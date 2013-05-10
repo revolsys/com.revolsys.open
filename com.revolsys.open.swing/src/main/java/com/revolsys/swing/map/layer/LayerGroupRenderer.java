@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.swing.map.Viewport2D;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
-  public LayerGroupRenderer(LayerGroup layer) {
+  public LayerGroupRenderer(final LayerGroup layer) {
     super("group", layer);
   }
 

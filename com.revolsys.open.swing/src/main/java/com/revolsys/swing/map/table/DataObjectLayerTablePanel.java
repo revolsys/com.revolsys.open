@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.table;
 
+import java.awt.event.MouseEvent;
+
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 
@@ -7,6 +9,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -20,14 +23,15 @@ import com.vividsolutions.jts.geom.Geometry;
 @SuppressWarnings("serial")
 public class DataObjectLayerTablePanel extends TablePanel {
 
-  private DataObjectLayer layer;
+  private final DataObjectLayer layer;
 
-  public DataObjectLayerTablePanel(DataObjectLayer layer, JTable table) {
+  public DataObjectLayerTablePanel(final DataObjectLayer layer,
+    final JTable table) {
     super(table);
     this.layer = layer;
-    MenuFactory menu = getMenu();
-    DataObjectMetaData metaData = layer.getMetaData();
-    boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
+    final MenuFactory menu = getMenu();
+    final DataObjectMetaData metaData = layer.getMetaData();
+    final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
     if (hasGeometry) {
       menu.addMenuItemTitleIcon("zoom", "Zoom to Record",
         "magnifier_zoom_selected", this, "zoomToRecord");
@@ -36,75 +40,83 @@ public class DataObjectLayerTablePanel extends TablePanel {
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit", this,
       "editRecord");
 
-    ObjectPropertyEnableCheck canDeleteObjectsEnableCheck = new ObjectPropertyEnableCheck(
+    final ObjectPropertyEnableCheck canDeleteObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canDeleteObjects");
     menu.addMenuItemTitleIcon("record", "Delete Record", "table_delete",
       canDeleteObjectsEnableCheck, this, "deleteRecord");
 
-    ToolBar toolBar = getToolBar();
+    final ToolBar toolBar = getToolBar();
 
-    ObjectPropertyEnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
+    final ObjectPropertyEnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canAddObjects");
     toolBar.addButton("record", "Add New Record", "table_row_insert",
       canAddObjectsEnableCheck, layer, "addNewRecord");
 
     // Filter buttons
-    DataObjectLayerTableModel tableModel = getTableModel();
+    final DataObjectLayerTableModel tableModel = getTableModel();
 
-    JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
+    final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
       "filter_group", "Show All Records", "filter_delete", tableModel,
       "setMode", DataObjectLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
-    ObjectPropertyEnableCheck selectableEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "selectable");
+    final ObjectPropertyEnableCheck selectableEnableCheck = new ObjectPropertyEnableCheck(
+      layer, "selectionCount", 0, true);
     toolBar.addToggleButton("filter_group", "Show Only Selected Records",
       "filter_selected", selectableEnableCheck, tableModel, "setMode",
       DataObjectLayerTableModel.MODE_SELECTED);
 
-    ObjectPropertyEnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
+    final ObjectPropertyEnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
     toolBar.addToggleButton("filter_group", "Show Only Changed Records",
       "filter_changes", editableEnableCheck, tableModel, "setMode",
       DataObjectLayerTableModel.MODE_CHANGES);
   }
 
+  public void deleteRecord() {
+    final DataObject object = getEventRowObject();
+    layer.deleteObjects(object);
+  }
+
+  public void editRecord() {
+    final DataObject object = getEventRowObject();
+    LayerUtil.showForm(layer, object);
+  }
+
+  protected DataObject getEventRowObject() {
+    final DataObjectRowTableModel model = getTableModel();
+    final int row = getEventRow();
+    final DataObject object = model.getObject(row);
+    return object;
+  }
+
   public DataObjectLayer getLayer() {
     return layer;
   }
 
+  public DataObjectLayerTableModel getTableModel() {
+    final JTable table = getTable();
+    return (DataObjectLayerTableModel)table.getModel();
+  }
+
+  @Override
+  public void mouseClicked(final MouseEvent e) {
+    super.mouseClicked(e);
+    if (SwingUtil.isLeftButtonAndNoModifiers(e) && e.getClickCount() == 2) {
+      editRecord();
+    }
+  }
+
   public void zoomToRecord() {
-    DataObject object = getEventRowObject();
-    Project project = layer.getProject();
-    Geometry geometry = object.getGeometryValue();
+    final DataObject object = getEventRowObject();
+    final Project project = layer.getProject();
+    final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry)
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry)
         .convert(geometryFactory)
         .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
-  }
-
-  public void editRecord() {
-    DataObject object = getEventRowObject();
-    LayerUtil.showForm(layer, object);
-  }
-
-  public void deleteRecord() {
-    DataObject object = getEventRowObject();
-    layer.deleteObjects(object);
-  }
-
-  protected DataObject getEventRowObject() {
-    DataObjectRowTableModel model = getTableModel();
-    int row = getEventRow();
-    DataObject object = model.getObject(row);
-    return object;
-  }
-
-  public DataObjectLayerTableModel getTableModel() {
-    JTable table = getTable();
-    return (DataObjectLayerTableModel)table.getModel();
   }
 }

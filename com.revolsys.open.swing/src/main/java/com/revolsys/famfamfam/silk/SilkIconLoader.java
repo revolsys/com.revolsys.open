@@ -24,7 +24,8 @@ public class SilkIconLoader {
     return getCursor(imageName, delta, delta);
   }
 
-  public static Cursor getCursor(final String imageName, final int dx, int dy) {
+  public static Cursor getCursor(final String imageName, final int dx,
+    final int dy) {
     final Image image = getImage(imageName);
     if (image == null) {
       return null;

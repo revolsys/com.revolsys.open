@@ -113,7 +113,8 @@ public class PopupMenu extends JPopupMenu implements MouseListener {
     synchronized (textComponent) {
       addMenuItem("dataTransfer", "Cut", "cut", textComponent, "cut");
       addMenuItem("dataTransfer", "Copy", "page_copy", textComponent, "copy");
-      addMenuItem("dataTransfer", "Paste", "paste_plain", textComponent, "paste");
+      addMenuItem("dataTransfer", "Paste", "paste_plain", textComponent,
+        "paste");
 
       textComponent.setDragEnabled(true);
       textComponent.addMouseListener(this);

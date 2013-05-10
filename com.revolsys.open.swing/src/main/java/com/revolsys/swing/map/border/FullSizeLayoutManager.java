@@ -8,60 +8,60 @@ import java.awt.LayoutManager;
 
 public class FullSizeLayoutManager implements LayoutManager {
   @Override
-  public void removeLayoutComponent(Component comp) {
+  public void addLayoutComponent(final String name, final Component comp) {
   }
 
   @Override
-  public Dimension preferredLayoutSize(Container parent) {
-    int maxWidth = 0;
-    int maxHeight = 0;
-    for (Component component : parent.getComponents()) {
-      Dimension minimum = component.getPreferredSize();
-      int width = minimum.width;
-      if (width > maxWidth) {
-        maxWidth = width;
-      }
-      int height = minimum.height;
-      if (height > maxHeight) {
-        maxHeight = height;
-      }
-    }
-
-    return new Dimension(maxWidth, maxHeight);
-  }
-
-  @Override
-  public Dimension minimumLayoutSize(Container parent) {
-    int maxWidth = 0;
-    int maxHeight = 0;
-    for (Component component : parent.getComponents()) {
-      Dimension minimum = component.getMinimumSize();
-      int width = minimum.width;
-      if (width > maxWidth) {
-        maxWidth = width;
-      }
-      int height = minimum.height;
-      if (height > maxHeight) {
-        maxHeight = height;
-      }
-    }
-
-    return new Dimension(maxWidth, maxHeight);
-  }
-
-  @Override
-  public void layoutContainer(Container parent) {
-    Insets insets = parent.getInsets();
-    int x = insets.top;
-    int y = insets.left;
-    int width = parent.getWidth() - insets.right - x;
-    int height = parent.getHeight() - insets.bottom - y;
-    for (Component component : parent.getComponents()) {
+  public void layoutContainer(final Container parent) {
+    final Insets insets = parent.getInsets();
+    final int x = insets.top;
+    final int y = insets.left;
+    final int width = parent.getWidth() - insets.right - x;
+    final int height = parent.getHeight() - insets.bottom - y;
+    for (final Component component : parent.getComponents()) {
       component.setBounds(x, y, width, height);
     }
   }
 
   @Override
-  public void addLayoutComponent(String name, Component comp) {
+  public Dimension minimumLayoutSize(final Container parent) {
+    int maxWidth = 0;
+    int maxHeight = 0;
+    for (final Component component : parent.getComponents()) {
+      final Dimension minimum = component.getMinimumSize();
+      final int width = minimum.width;
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
+      final int height = minimum.height;
+      if (height > maxHeight) {
+        maxHeight = height;
+      }
+    }
+
+    return new Dimension(maxWidth, maxHeight);
+  }
+
+  @Override
+  public Dimension preferredLayoutSize(final Container parent) {
+    int maxWidth = 0;
+    int maxHeight = 0;
+    for (final Component component : parent.getComponents()) {
+      final Dimension minimum = component.getPreferredSize();
+      final int width = minimum.width;
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
+      final int height = minimum.height;
+      if (height > maxHeight) {
+        maxHeight = height;
+      }
+    }
+
+    return new Dimension(maxWidth, maxHeight);
+  }
+
+  @Override
+  public void removeLayoutComponent(final Component comp) {
   }
 }

@@ -31,14 +31,15 @@ public class LayerRendererTreeCellRenderer extends DefaultTreeCellRenderer {
 
   private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
 
-  private static Icon getIcon(final Component component, final LayerRenderer<?> renderer) {
+  private static Icon getIcon(final Component component,
+    final LayerRenderer<?> renderer) {
     final List<Icon> icons = new ArrayList<Icon>();
     if (renderer.isVisible()) {
       icons.add(VISIBLE_ICON);
     } else {
       icons.add(VISIBLE_DISABLED_ICON);
     }
-   
+
     if (icons.isEmpty()) {
       return null;
     } else if (icons.size() == 1) {

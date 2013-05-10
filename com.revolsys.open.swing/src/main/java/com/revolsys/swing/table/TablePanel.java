@@ -53,7 +53,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-
+    setEventRow(e);
   }
 
   @Override
@@ -66,17 +66,21 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    setEventRow(e);
     if (e.isPopupTrigger()) {
-      final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
       final JPopupMenu popupMenu = menu.createJPopupMenu();
-      eventRow = table.rowAtPoint(e.getPoint());
+      final Component component = e.getComponent();
       popupMenu.show(component, x, y);
     }
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+  }
+
+  protected void setEventRow(final MouseEvent e) {
+    eventRow = table.rowAtPoint(e.getPoint());
   }
 }

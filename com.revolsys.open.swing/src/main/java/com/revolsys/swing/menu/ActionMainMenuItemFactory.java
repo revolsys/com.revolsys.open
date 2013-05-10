@@ -21,8 +21,8 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
     this.action = action;
   }
 
-  public ActionMainMenuItemFactory(EnableCheck checkBoxSelectedCheck,
-    Action action) {
+  public ActionMainMenuItemFactory(final EnableCheck checkBoxSelectedCheck,
+    final Action action) {
     this(action);
     this.checkBoxSelectedCheck = checkBoxSelectedCheck;
   }
@@ -31,7 +31,7 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   public ActionMainMenuItemFactory clone() {
     try {
       return (ActionMainMenuItemFactory)super.clone();
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
   }
@@ -44,7 +44,7 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public JMenuItem createComponent() {
     if (checkBoxSelectedCheck != null) {
-      JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
+      final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
       menuItem.setSelected(checkBoxSelectedCheck.isEnabled());
       return menuItem;
     } else {

@@ -31,6 +31,10 @@ public class DataStoreQueryListModel implements ListModel {
 
   private final List<Query> queries = new ArrayList<Query>();
 
+  private DataObject selectedItem;
+
+  private String searchText = "";
+
   public DataStoreQueryListModel(final DataObjectStore dataStore,
     final String displayAttributeName, final List<Query> queries) {
     this.dataStore = dataStore;
@@ -73,13 +77,11 @@ public class DataStoreQueryListModel implements ListModel {
     return listDataListeners.getListeners(ListDataListener.class);
   }
 
-  private DataObject selectedItem;
-
   public List<DataObject> getObjects() {
     return objects;
   }
 
-  protected List<DataObject> getObjects( String searchParam) {
+  protected List<DataObject> getObjects(String searchParam) {
     final Map<String, DataObject> allObjects = new TreeMap<String, DataObject>();
     for (Query query : queries) {
       if (allObjects.size() < 10) {
@@ -115,6 +117,10 @@ public class DataStoreQueryListModel implements ListModel {
     return new ArrayList<DataObject>(allObjects.values());
   }
 
+  public String getSearchText() {
+    return searchText;
+  }
+
   public DataObject getSelectedItem() {
     return selectedItem;
   }
@@ -129,8 +135,6 @@ public class DataStoreQueryListModel implements ListModel {
     listDataListeners.remove(ListDataListener.class, l);
   }
 
-  private String searchText = "";
-
   public void setSearchText(final String searchText) {
     if (StringUtils.hasText(searchText)) {
       if (!this.searchText.equalsIgnoreCase(searchText)) {
@@ -144,9 +148,5 @@ public class DataStoreQueryListModel implements ListModel {
       fireContentsChanged(this, 0, objects.size());
       selectedItem = null;
     }
-  }
-
-  public String getSearchText() {
-    return searchText;
   }
 }

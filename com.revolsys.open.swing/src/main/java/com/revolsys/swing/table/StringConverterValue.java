@@ -9,7 +9,7 @@ public class StringConverterValue implements StringValue {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public String getString(Object value) {
+  public String getString(final Object value) {
     if (value == null) {
       return "-";
     } else {

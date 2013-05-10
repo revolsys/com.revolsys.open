@@ -39,7 +39,7 @@ public class DataObjectLayerListSelectionModel extends
   public boolean isSelectedIndex(final int index) {
     final DataObject object = model.getObject(index);
     if (object != null) {
-      DataObjectLayer layer = model.getLayer();
+      final DataObjectLayer layer = model.getLayer();
       return layer.isSelected(object);
     }
     return false;

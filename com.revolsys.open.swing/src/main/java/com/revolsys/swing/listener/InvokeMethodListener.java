@@ -58,11 +58,6 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
     invokeMethod();
   }
 
-  @Override
-  public void propertyChange(PropertyChangeEvent evt) {
-    invokeMethod();
-  }
-
   protected void invokeMethod() {
     if (invokeLater) {
       SwingUtilities.invokeLater(this);
@@ -72,17 +67,22 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
   }
 
   @Override
+  public void itemStateChanged(final ItemEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent evt) {
+    invokeMethod();
+  }
+
+  @Override
   public void removeUpdate(final DocumentEvent e) {
     invokeMethod();
   }
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    invokeMethod();
-  }
-
-  @Override
-  public void itemStateChanged(ItemEvent e) {
     invokeMethod();
   }
 }

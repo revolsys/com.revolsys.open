@@ -82,26 +82,21 @@ public class LayerUtil {
     addLayerTablePanelFactory(DataObjectListLayerTableModel.FACTORY);
   }
 
-  public static void addLayerFactory(LayerFactory<?> factory) {
-    String typeName = factory.getTypeName();
+  public static void addLayerFactory(final LayerFactory<?> factory) {
+    final String typeName = factory.getTypeName();
     LAYER_FACTORIES.put(typeName, factory);
   }
 
-  public static void addLayerTablePanelFactory(LayerTablePanelFactory factory) {
-    Class<? extends Layer> layerClass = factory.getLayerClass();
+  public static void addLayerTablePanelFactory(
+    final LayerTablePanelFactory factory) {
+    final Class<? extends Layer> layerClass = factory.getLayerClass();
     LAYER_TABLE_FACTORIES.put(layerClass, factory);
-  }
-
-  public static void toggleEditable() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    boolean editable = layer.isEditable();
-    layer.setEditable(!editable);
   }
 
   public static void addNewRecord() {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer instanceof DataObjectLayer) {
-      DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+      final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
       dataObjectLayer.addNewRecord();
     }
   }
@@ -111,7 +106,7 @@ public class LayerUtil {
     final Map<String, Object> properties) {
     if (properties != null) {
       final String typeName = (String)properties.get("type");
-      LayerFactory<?> layerFactory = getLayerFactory(typeName);
+      final LayerFactory<?> layerFactory = getLayerFactory(typeName);
       if (layerFactory == null) {
         LoggerFactory.getLogger(LayerUtil.class).error(
           "No layer factory for " + typeName);
@@ -126,9 +121,9 @@ public class LayerUtil {
     return LAYER_FACTORIES.get(typeName);
   }
 
-  public static Component getLayerTablePanel(Layer layer) {
-    Class<? extends Layer> layerClass = layer.getClass();
-    LayerTablePanelFactory factory = getLayerTablePanelFactory(layerClass);
+  public static Component getLayerTablePanel(final Layer layer) {
+    final Class<? extends Layer> layerClass = layer.getClass();
+    final LayerTablePanelFactory factory = getLayerTablePanelFactory(layerClass);
     if (factory != null) {
       return factory.createPanel(layer);
     }
@@ -142,11 +137,11 @@ public class LayerUtil {
     } else {
       LayerTablePanelFactory factory = LAYER_TABLE_FACTORIES.get(layerClass);
       if (factory == null) {
-        Class<?> superclass = layerClass.getSuperclass();
+        final Class<?> superclass = layerClass.getSuperclass();
         factory = getLayerTablePanelFactory(superclass);
         if (factory == null) {
-          Class<?>[] interfaces = layerClass.getInterfaces();
-          for (Class<?> interfaceClass : interfaces) {
+          final Class<?>[] interfaces = layerClass.getInterfaces();
+          for (final Class<?> interfaceClass : interfaces) {
             factory = getLayerTablePanelFactory(interfaceClass);
             if (factory != null) {
               return factory;
@@ -159,7 +154,7 @@ public class LayerUtil {
   }
 
   public static void loadLayer(final LayerGroup group, final File file) {
-    Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
+    final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
       file.getParentFile()));
 
     try {
@@ -168,7 +163,7 @@ public class LayerUtil {
       if (layer != null) {
         group.add(layer);
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       LoggerFactory.getLogger(LayerUtil.class).error(
         "Cannot load layer from " + file, t);
     } finally {
@@ -192,18 +187,18 @@ public class LayerUtil {
     }
   }
 
-  public static void openFile(File file) {
-    Project project = Project.get();
+  public static void openFile(final File file) {
+    final Project project = Project.get();
     if (project != null) {
-      LayerGroup firstGroup = project.getLayerGroups().get(0);
-      String extension = FileUtil.getFileNameExtension(file);
+      final LayerGroup firstGroup = project.getLayerGroups().get(0);
+      final String extension = FileUtil.getFileNameExtension(file);
       if ("rgmap".equals(extension)) {
         loadLayerGroup(firstGroup, file);
       } else if ("rglayer".equals(extension)) {
         loadLayer(firstGroup, file);
       } else {
-        FileSystemResource resource = new FileSystemResource(file);
-        List<String> readerFileSuffixes = new ArrayList<String>(
+        final FileSystemResource resource = new FileSystemResource(file);
+        final List<String> readerFileSuffixes = new ArrayList<String>(
           Arrays.asList(ImageIO.getReaderFileSuffixes()));
         readerFileSuffixes.add("tif");
         readerFileSuffixes.add("tiff");
@@ -219,18 +214,20 @@ public class LayerUtil {
             image = new GeoReferencedImage(resource);
           }
 
-          GeoReferencedImageLayer layer = new GeoReferencedImageLayer(FileUtil.getBaseName(file),image);
+          final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+            FileUtil.getBaseName(file), image);
           firstGroup.add(layer);
         } else {
-          DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+          final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
           if (reader != null) {
             try {
-              DataObjectMetaData metaData = reader.getMetaData();
-              GeometryFactory geometryFactory = metaData.getGeometryFactory();
+              final DataObjectMetaData metaData = reader.getMetaData();
+              final GeometryFactory geometryFactory = metaData.getGeometryFactory();
               BoundingBox boundingBox = new BoundingBox(geometryFactory);
-              DataObjectListLayer layer = new DataObjectListLayer(metaData);
-              for (DataObject object : reader) {
-                Geometry geometry = object.getGeometryValue();
+              final DataObjectListLayer layer = new DataObjectListLayer(
+                metaData);
+              for (final DataObject object : reader) {
+                final Geometry geometry = object.getGeometryValue();
                 boundingBox = boundingBox.expandToInclude(geometry);
                 layer.add(object);
               }
@@ -246,22 +243,23 @@ public class LayerUtil {
 
   }
 
-  public static void openFiles(List<File> files) {
-    for (File file : files) {
+  public static void openFiles(final List<File> files) {
+    for (final File file : files) {
       openFile(file);
     }
   }
 
-  public static void showForm(DataObjectLayer layer, final DataObject object) {
+  public static void showForm(final DataObjectLayer layer,
+    final DataObject object) {
     synchronized (forms) {
       Window window = forms.get(object);
       if (window == null) {
-        Project project = layer.getProject();
+        final Project project = layer.getProject();
         if (project == null) {
           return;
         } else {
-          Object id = object.getIdValue();
-          Component form = DataObjectLayerFormFactory.createFormComponent(
+          final Object id = object.getIdValue();
+          final Component form = DataObjectLayerFormFactory.createFormComponent(
             layer, object);
           String title;
           if (object.getState() == DataObjectState.New) {
@@ -271,7 +269,7 @@ public class LayerUtil {
           } else {
             title = "View " + layer.getName() + " #" + id;
             if (form instanceof DataObjectForm) {
-              DataObjectForm dataObjectForm = (DataObjectForm)form;
+              final DataObjectForm dataObjectForm = (DataObjectForm)form;
               dataObjectForm.setEditable(false);
             }
           }
@@ -284,7 +282,7 @@ public class LayerUtil {
           forms.put(object, window);
           window.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
               forms.remove(object);
             }
           });
@@ -303,10 +301,10 @@ public class LayerUtil {
         dockable = layer.getProperty("TableView");
       }
       if (dockable == null) {
-        Project project = layer.getProject();
+        final Project project = layer.getProject();
 
-        Component component = LayerUtil.getLayerTablePanel(layer);
-        String id = layer.getClass().getName() + "." + layer.getId();
+        final Component component = LayerUtil.getLayerTablePanel(layer);
+        final String id = layer.getClass().getName() + "." + layer.getId();
         dockable = DockingFramesUtil.addDockable(project,
           MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
 
@@ -337,27 +335,19 @@ public class LayerUtil {
     }
   }
 
+  public static void toggleEditable() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    final boolean editable = layer.isEditable();
+    layer.setEditable(!editable);
+  }
+
   public static void zoomToLayer() {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
-      Project project = layer.getProject();
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = layer.getBoundingBox()
+      final Project project = layer.getProject();
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = layer.getBoundingBox()
         .convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
-
-      project.setViewBoundingBox(boundingBox);
-    }
-  }
-
-  public static void zoomToObject(DataObject object) {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      Project project = layer.getProject();
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = BoundingBox.getBoundingBox(geometryFactory,
-        object)
         .expandPercent(0.1)
         .clipToCoordinateSystem();
 
@@ -368,11 +358,25 @@ public class LayerUtil {
   public static void zoomToLayerSelected() {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
-      Project project = layer.getProject();
-      GeometryFactory geometryFactory = project.getGeometryFactory();
-      BoundingBox boundingBox = layer.getSelectedBoundingBox()
+      final Project project = layer.getProject();
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = layer.getSelectedBoundingBox()
         .convert(geometryFactory)
         .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public static void zoomToObject(final DataObject object) {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      final Project project = layer.getProject();
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
+        geometryFactory, object)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
+
       project.setViewBoundingBox(boundingBox);
     }
   }

@@ -38,7 +38,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
     final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
-    DataObjectRowTable table = new DataObjectRowTable(model);
+    final DataObjectRowTable table = new DataObjectRowTable(model);
 
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);
@@ -48,7 +48,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
       column.setCellRenderer(cellRenderer);
     }
-    
+
     table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
     layer.addPropertyChangeListener("selected",
       new InvokeMethodPropertyChangeListener(table, "repaint"));

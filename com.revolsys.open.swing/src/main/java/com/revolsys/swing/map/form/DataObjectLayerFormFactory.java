@@ -12,19 +12,19 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 public class DataObjectLayerFormFactory {
   public static final String FORM_CLASS_NAME = "formClassName";
 
-  public static JComponent createFormComponent(DataObjectLayer layer,
-    DataObject object) {
-    String formClassName = layer.getProperty(FORM_CLASS_NAME);
+  public static JComponent createFormComponent(final DataObjectLayer layer,
+    final DataObject object) {
+    final String formClassName = layer.getProperty(FORM_CLASS_NAME);
     DataObjectLayerForm form = null;
     if (StringUtils.hasText(formClassName)) {
       try {
-        Class<?> formClass = Class.forName(formClassName);
-        Object[] args = {
+        final Class<?> formClass = Class.forName(formClassName);
+        final Object[] args = {
           layer
         };
         form = (DataObjectLayerForm)ConstructorUtils.invokeConstructor(
           formClass, args);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LoggerFactory.getLogger(DataObjectLayerFormFactory.class).error(
           "Unable to create form " + formClassName, e);
       }

@@ -45,18 +45,6 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
     setAttributeTitles(attributeTitles);
   }
 
-  public void setAttributeTitles(List<String> columnIndexTitles) {
-    this.attributeTitles = new ArrayList<String>(columnIndexTitles);
-  }
-
-  public List<String> getAttributeTitles() {
-    return attributeTitles;
-  }
-
-  public void setAttributeNames(final List<String> attributeNames) {
-    this.attributeNames = new ArrayList<String>(attributeNames);
-  }
-
   public void clearSortedColumns() {
     synchronized (sortedColumns) {
       sortedColumns.clear();
@@ -71,13 +59,17 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public String getAttributeName(final int columnIndex) {
-    String attributeName = attributeNames.get(columnIndex);
-    int index = attributeName.indexOf('.');
+    final String attributeName = attributeNames.get(columnIndex);
+    final int index = attributeName.indexOf('.');
     if (index == -1) {
       return attributeName;
     } else {
       return attributeName.substring(0, index);
     }
+  }
+
+  public List<String> getAttributeTitles() {
+    return attributeTitles;
   }
 
   public Attribute getColumnAttribute(final int columnIndex) {
@@ -98,7 +90,7 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   @Override
   public int getColumnCount() {
-    int numColumns = attributeNames.size();
+    final int numColumns = attributeNames.size();
     return numColumns;
   }
 
@@ -153,6 +145,14 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   public boolean isEditable() {
     return editable;
+  }
+
+  public void setAttributeNames(final List<String> attributeNames) {
+    this.attributeNames = new ArrayList<String>(attributeNames);
+  }
+
+  public void setAttributeTitles(final List<String> columnIndexTitles) {
+    this.attributeTitles = new ArrayList<String>(columnIndexTitles);
   }
 
   public void setEditable(final boolean editable) {

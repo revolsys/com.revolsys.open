@@ -13,7 +13,6 @@ import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.event.CDockableLocationEvent;
 import bibliothek.gui.dock.common.event.CDockableLocationListener;
-import bibliothek.gui.dock.common.intern.CControlAccess;
 import bibliothek.gui.dock.common.location.CExternalizedLocation;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
@@ -39,18 +38,18 @@ public class DockingFramesUtil {
       dockable.addCDockableLocationListener(new CDockableLocationListener() {
 
         @Override
-        public void changed(CDockableLocationEvent event) {
-          CLocation newLocation = event.getNewLocation();
+        public void changed(final CDockableLocationEvent event) {
+          final CLocation newLocation = event.getNewLocation();
           if (newLocation != null
             && newLocation.getClass() == CExternalizedLocation.class) {
-            CExternalizedLocation externalLocation = (CExternalizedLocation)newLocation;
-            CLocation oldLocation = event.getOldLocation();
+            final CExternalizedLocation externalLocation = (CExternalizedLocation)newLocation;
+            final CLocation oldLocation = event.getOldLocation();
             if (oldLocation == null
               || oldLocation.getClass() != CExternalizedLocation.class) {
 
-              Dimension size = component.getPreferredSize();
-              int x = externalLocation.getX();
-              int y = externalLocation.getY();
+              final Dimension size = component.getPreferredSize();
+              final int x = externalLocation.getX();
+              final int y = externalLocation.getY();
               dockable.setLocation(CLocation.external(x, y, size.width + 20,
                 size.height + 60));
             }
@@ -62,9 +61,9 @@ public class DockingFramesUtil {
   }
 
   public static DefaultSingleCDockable addDockable(
-    final Object workingAreaObject, String workingAreaName, final String id,
-    final String title, final Component component) {
-    CWorkingArea workingArea = getCWorkingArea(workingAreaObject,
+    final Object workingAreaObject, final String workingAreaName,
+    final String id, final String title, final Component component) {
+    final CWorkingArea workingArea = getCWorkingArea(workingAreaObject,
       workingAreaName);
     if (workingArea == null) {
       throw new IllegalArgumentException("Cannot find working area "
@@ -83,7 +82,7 @@ public class DockingFramesUtil {
   }
 
   public static CWorkingArea createCWorkingArea(final CControl control,
-    final Object object, final String name, CLocation location) {
+    final Object object, final String name, final CLocation location) {
     final CWorkingArea workingArea = createCWorkingArea(control, object, name);
     if (location != null) {
       workingArea.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
@@ -93,6 +92,10 @@ public class DockingFramesUtil {
     }
     workingArea.setVisible(true);
     return workingArea;
+  }
+
+  public static CControl getCControl(final Object object) {
+    return OBJECT_CONTROLS.get(object);
   }
 
   public static CWorkingArea getCWorkingArea(final Object object,
@@ -106,6 +109,10 @@ public class DockingFramesUtil {
     }
   }
 
+  public static void setCControl(final Object object, final CControl control) {
+    OBJECT_CONTROLS.put(object, control);
+  }
+
   public static void setCWorkingArea(final Object object, final String name,
     final CWorkingArea workingArea) {
     Map<String, CWorkingArea> workingAreas = OBJECT_WORKING_AREAS.get(object);
@@ -114,17 +121,9 @@ public class DockingFramesUtil {
       OBJECT_WORKING_AREAS.put(object, workingAreas);
     }
     workingAreas.put(name, workingArea);
-    CControl control = workingArea.getControl().getOwner();
+    final CControl control = workingArea.getControl().getOwner();
     setCControl(object, control);
 
-  }
-
-  public static void setCControl(final Object object, final CControl control) {
-    OBJECT_CONTROLS.put(object, control);
-  }
-
-  public static CControl getCControl(final Object object) {
-    return OBJECT_CONTROLS.get(object);
   }
 
   public static void setFlapSizes(final CControl control) {

@@ -29,16 +29,6 @@ public class BaseLayerTreeNodeModel extends
     return model;
   }
 
-  @Override
-  protected List<LayerRenderer<Layer>> getChildren(AbstractLayer node) {
-    LayerRenderer<Layer> renderer = node.getRenderer();
-    if (renderer == null) {
-      return Collections.emptyList();
-    } else {
-      return Collections.singletonList(renderer);
-    }
-  }
-
   private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(LayerRenderer.class);
 
   private final String name;
@@ -60,11 +50,21 @@ public class BaseLayerTreeNodeModel extends
   }
 
   @Override
+  protected List<LayerRenderer<Layer>> getChildren(final AbstractLayer node) {
+    final LayerRenderer<Layer> renderer = node.getRenderer();
+    if (renderer == null) {
+      return Collections.emptyList();
+    } else {
+      return Collections.singletonList(renderer);
+    }
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     if (source instanceof ObjectTree) {
       final ObjectTree tree = (ObjectTree)source;
-      int clickCount = e.getClickCount();
+      final int clickCount = e.getClickCount();
       if (clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
         final int x = e.getX();
         final int y = e.getY();

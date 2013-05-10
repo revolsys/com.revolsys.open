@@ -21,11 +21,11 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   private AbstractDataObjectLayerRenderer renderer;
 
   public ScaleMultipleRenderer(final DataObjectLayer layer,
-    LayerRenderer<?> parent, final Map<String, Object> style) {
+    final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("scaleStyle", layer, parent, style);
   }
 
-  private AbstractDataObjectLayerRenderer getRenderer(Viewport2D viewport) {
+  private AbstractDataObjectLayerRenderer getRenderer(final Viewport2D viewport) {
     final long scale = (long)viewport.getScale();
     if (scale == lastScale) {
       if (renderer.isVisible(scale)) {
@@ -45,7 +45,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public boolean isVisible(DataObject object) {
+  public boolean isVisible(final DataObject object) {
     if (super.isVisible(object)) {
       if (renderer != null) {
         return renderer.isVisible(object);
@@ -57,35 +57,37 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final DataObjectLayer layer) {
-    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       renderer.render(viewport, graphics, layer);
     }
   }
 
   @Override
-  // NOTE: Needed for multiple styles
-  protected void renderObjects(Viewport2D viewport, Graphics2D graphics,
-    DataObjectLayer layer, List<DataObject> objects) {
-    BoundingBox visibleArea = viewport.getBoundingBox();
-    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+  // NOTE: Needed for filter styles
+  protected void renderObject(final Viewport2D viewport,
+    final Graphics2D graphics, final BoundingBox visibleArea,
+    final DataObjectLayer layer, final DataObject object) {
+    final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      for (DataObject object : objects) {
-        if (isVisible(object)) {
-          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
-        }
+      if (isVisible(object)) {
+        renderer.renderObject(viewport, graphics, visibleArea, layer, object);
       }
     }
   }
 
   @Override
-  // NOTE: Needed for filter styles
-  protected void renderObject(Viewport2D viewport, Graphics2D graphics,
-    BoundingBox visibleArea, DataObjectLayer layer, DataObject object) {
-    AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+  // NOTE: Needed for multiple styles
+  protected void renderObjects(final Viewport2D viewport,
+    final Graphics2D graphics, final DataObjectLayer layer,
+    final List<DataObject> objects) {
+    final BoundingBox visibleArea = viewport.getBoundingBox();
+    final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      if (isVisible(object)) {
-        renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+      for (final DataObject object : objects) {
+        if (isVisible(object)) {
+          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+        }
       }
     }
   }

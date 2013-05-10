@@ -115,111 +115,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  @Override
-  public synchronized int getRowCount(Query query) {
-    String typePath = query.getTypeName();
-    DataObjectMetaData metaData = query.getMetaData();
-    if (metaData == null) {
-      typePath = query.getTypeName();
-      metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Type name does not exist "
-          + typePath);
-      }
-    } else {
-      typePath = metaData.getPath();
-    }
-    final StringBuffer whereClause = getWhereClause(query);
-
-    StringBuffer sql = new StringBuffer();
-    sql.append("SELECT OBJECTID FROM ");
-    sql.append(JdbcUtils.getTableName(typePath));
-    if (whereClause.length() > 0) {
-      sql.append(" WHERE ");
-      sql.append(whereClause);
-    }
-
-    EnumRows rows = getGeodatabase().query(sql.toString(), false);
-    try {
-      int count = 0;
-      for (Row row = rows.next(); row != null; row = rows.next()) {
-        count++;
-        row.delete();
-      }
-      return count;
-    } finally {
-      rows.Close();
-    }
-  }
-
-  protected StringBuffer getWhereClause(Query query) {
-    String where = query.getWhereClause();
-    if (where == null) {
-      where = "";
-    }
-    final List<Object> parameters = query.getParameters();
-
-    final StringBuffer whereClause = new StringBuffer();
-    if (parameters.isEmpty()) {
-      if (where.indexOf('?') > -1) {
-        throw new IllegalArgumentException(
-          "No arguments specified for a where clause with placeholders: "
-            + where);
-      } else {
-        whereClause.append(where);
-      }
-    } else {
-      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-      int i = 0;
-      while (matcher.find()) {
-        if (i >= parameters.size()) {
-          throw new IllegalArgumentException(
-            "Not enough arguments for where clause with placeholders: " + where);
-        }
-        final Object argument = parameters.get(i);
-        matcher.appendReplacement(whereClause, "");
-        if (argument instanceof Number) {
-          whereClause.append(argument);
-        } else {
-          whereClause.append("'");
-          whereClause.append(StringConverterRegistry.toString(argument)
-            .replaceAll("'", "''"));
-          whereClause.append("'");
-        }
-        i++;
-      }
-      matcher.appendTail(whereClause);
-    }
-    Map<String, Object> filter = query.getFilter();
-    if (!filter.isEmpty()) {
-      if (whereClause.length() > 0) {
-        whereClause.insert(0, '(');
-        whereClause.append(')');
-      }
-      for (Entry<String, Object> entry : filter.entrySet()) {
-        if (whereClause.length() > 0) {
-          whereClause.append(" AND ");
-        }
-        whereClause.append(entry.getKey());
-        Object value = entry.getValue();
-        if (value == null) {
-          whereClause.append(" IS NULL");
-        } else {
-          whereClause.append(" = ");
-          if (value instanceof Number) {
-            whereClause.append(value);
-          } else {
-            whereClause.append("'");
-            whereClause.append(StringConverterRegistry.toString(value)
-              .replaceAll("'", "''"));
-            whereClause.append("'");
-          }
-        }
-      }
-    }
-    return whereClause;
-  }
-
   private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
@@ -322,6 +217,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     addMetaData(metaData);
   }
 
+  public synchronized void alterDomain(final CodedValueDomain domain) {
+    final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
+    geodatabase.alterDomain(domainDefinition);
+  }
+
   @Override
   @PreDestroy
   public synchronized void close() {
@@ -339,17 +239,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     super.close();
   }
 
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
-
   public synchronized void closeEnumRows(EnumRows rows) {
     if (rows != null) {
       if (enumRowsToClose.remove(rows)) {
@@ -364,21 +253,24 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
+
+  protected synchronized void closeRow(final Row row) {
+    row.delete();
+  }
+
   protected synchronized void closeTable(final Table table) {
     // TODO add reference counting before actually closing the table
 
-  }
-
-  private void doCloseTable(final Table table) {
-    try {
-      tablesToClose.remove(table);
-      if (geodatabase != null) {
-        geodatabase.closeTable(table);
-        table.delete();
-      }
-    } catch (final Throwable e) {
-      LOG.error("Unable to close table", e);
-    }
   }
 
   public synchronized void createDomain(final Domain domain) {
@@ -412,7 +304,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       typePath = metaData.getPath();
     }
     final BoundingBox boundingBox = query.getBoundingBox();
-    Map<String, Boolean> orderBy = query.getOrderBy();
+    final Map<String, Boolean> orderBy = query.getOrderBy();
     final StringBuffer whereClause = getWhereClause(query);
     StringBuffer sql = new StringBuffer();
     if (orderBy.isEmpty()) {
@@ -430,7 +322,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           .iterator(); iterator.hasNext();) {
           final Entry<String, Boolean> entry = iterator.next();
           final String column = entry.getKey();
-          DataType dataType = metaData.getAttributeType(column);
+          final DataType dataType = metaData.getAttributeType(column);
           // TODO at the moment only numbers are supported
           if (dataType != null
             && Number.class.isAssignableFrom(dataType.getJavaClass())) {
@@ -488,6 +380,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         return null;
       }
     }
+  }
+
+  protected synchronized Row createRowObject(final Table table) {
+    return table.createRowObject();
   }
 
   private DataObjectStoreSchema createSchema(final DETable table) {
@@ -583,7 +479,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
     try {
-      Table table = geodatabase.createTable(tableDefinition, schemaPath);
+      final Table table = geodatabase.createTable(tableDefinition, schemaPath);
       final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
         schemaPath, tableDefinition);
       addMetaData(metaData);
@@ -614,12 +510,32 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  protected synchronized void deletedRow(final Table table, final Row row) {
+    table.deleteRow(row);
+  }
+
   @Override
   public synchronized void deleteGeodatabase() {
     close();
     if (new File(fileName).exists()) {
       EsriFileGdb.DeleteGeodatabase(fileName);
     }
+  }
+
+  private void doCloseTable(final Table table) {
+    try {
+      tablesToClose.remove(table);
+      if (geodatabase != null) {
+        geodatabase.closeTable(table);
+        table.delete();
+      }
+    } catch (final Throwable e) {
+      LOG.error("Unable to close table", e);
+    }
+  }
+
+  protected synchronized void freeWriteLock(final Table table) {
+    table.freeWriteLock();
   }
 
   public synchronized String getDefaultSchema() {
@@ -632,10 +548,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public synchronized String getFileName() {
     return fileName;
-  }
-
-  protected synchronized Geodatabase getGeodatabase() {
-    return geodatabase;
   }
 
   @Override
@@ -713,6 +625,43 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  @Override
+  public synchronized int getRowCount(final Query query) {
+    String typePath = query.getTypeName();
+    DataObjectMetaData metaData = query.getMetaData();
+    if (metaData == null) {
+      typePath = query.getTypeName();
+      metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Type name does not exist "
+          + typePath);
+      }
+    } else {
+      typePath = metaData.getPath();
+    }
+    final StringBuffer whereClause = getWhereClause(query);
+
+    final StringBuffer sql = new StringBuffer();
+    sql.append("SELECT OBJECTID FROM ");
+    sql.append(JdbcUtils.getTableName(typePath));
+    if (whereClause.length() > 0) {
+      sql.append(" WHERE ");
+      sql.append(whereClause);
+    }
+
+    final EnumRows rows = query(sql.toString(), false);
+    try {
+      int count = 0;
+      for (Row row = rows.next(); row != null; row = rows.next()) {
+        count++;
+        row.delete();
+      }
+      return count;
+    } finally {
+      rows.Close();
+    }
+  }
+
   protected synchronized Table getTable(final String typePath) {
     if (getMetaData(typePath) == null) {
       return null;
@@ -736,6 +685,75 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return template;
   }
 
+  protected StringBuffer getWhereClause(final Query query) {
+    String where = query.getWhereClause();
+    if (where == null) {
+      where = "";
+    }
+    final List<Object> parameters = query.getParameters();
+
+    final StringBuffer whereClause = new StringBuffer();
+    if (parameters.isEmpty()) {
+      if (where.indexOf('?') > -1) {
+        throw new IllegalArgumentException(
+          "No arguments specified for a where clause with placeholders: "
+            + where);
+      } else {
+        whereClause.append(where);
+      }
+    } else {
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      int i = 0;
+      while (matcher.find()) {
+        if (i >= parameters.size()) {
+          throw new IllegalArgumentException(
+            "Not enough arguments for where clause with placeholders: " + where);
+        }
+        final Object argument = parameters.get(i);
+        matcher.appendReplacement(whereClause, "");
+        if (argument instanceof Number) {
+          whereClause.append(argument);
+        } else {
+          whereClause.append("'");
+          whereClause.append(StringConverterRegistry.toString(argument)
+            .replaceAll("'", "''"));
+          whereClause.append("'");
+        }
+        i++;
+      }
+      matcher.appendTail(whereClause);
+    }
+    final Map<String, Object> filter = query.getFilter();
+    if (!filter.isEmpty()) {
+      if (whereClause.length() > 0) {
+        whereClause.insert(0, '(');
+        whereClause.append(')');
+      }
+      for (final Entry<String, Object> entry : filter.entrySet()) {
+        if (whereClause.length() > 0) {
+          whereClause.append(" AND ");
+        }
+        whereClause.append(entry.getKey());
+        final Object value = entry.getValue();
+        if (value == null) {
+          whereClause.append(" IS NULL");
+        } else {
+          whereClause.append(" = ");
+          if (value instanceof Number) {
+            whereClause.append(value);
+          } else {
+            whereClause.append("'");
+            whereClause.append(StringConverterRegistry.toString(value)
+              .replaceAll("'", "''"));
+            whereClause.append("'");
+          }
+        }
+      }
+    }
+    return whereClause;
+  }
+
+  @Override
   public synchronized Writer<DataObject> getWriter() {
     Writer<DataObject> writer = getSharedAttribute("writer");
     if (writer == null) {
@@ -816,12 +834,29 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     getWriter().write(object);
   }
 
+  protected synchronized void insertRow(final Table table, final Row row) {
+    table.insertRow(row);
+  }
+
   public synchronized boolean isCreateMissingDataStore() {
     return createMissingDataStore;
   }
 
+  // @Override
+  // public synchronized Reader<DataObject> query(final String typePath) {
+  // final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+  // typePath);
+  // final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
+  // iterator);
+  // return reader;
+  // }
+
   public synchronized boolean isCreateMissingTables() {
     return createMissingTables;
+  }
+
+  public synchronized boolean isNull(final Row row, final String name) {
+    return row.isNull(name);
   }
 
   @Override
@@ -902,19 +937,18 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     addChildSchema("\\");
   }
 
-  // @Override
-  // public synchronized Reader<DataObject> query(final String typePath) {
-  // final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-  // typePath);
-  // final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-  // iterator);
-  // return reader;
-  // }
+  protected synchronized Row nextRow(final EnumRows rows) {
+    return rows.next();
+  }
+
+  public synchronized EnumRows query(final String sql, final boolean recycling) {
+    return geodatabase.query(sql, recycling);
+  }
 
   @Override
   public synchronized Reader<DataObject> query(final String typePath,
-    BoundingBox boundingBox) {
-    DataObjectMetaData metaData = getMetaData(typePath);
+    final BoundingBox boundingBox) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       throw new IllegalArgumentException("Cannot find table " + typePath);
     } else {
@@ -984,8 +1018,16 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     this.fileName = fileName;
   }
 
+  public synchronized void setNull(final Row row, final String name) {
+    row.setNull(name);
+  }
+
   public synchronized void setTemplate(final Resource template) {
     this.template = template;
+  }
+
+  protected synchronized void setWriteLock(final Table table) {
+    table.setWriteLock();
   }
 
   @Override
@@ -993,43 +1035,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     getWriter().write(object);
   }
 
-  protected synchronized Row nextRow(EnumRows rows) {
-    return rows.next();
-  }
-
-  protected synchronized void deletedRow(Table table, Row row) {
-    table.deleteRow(row);
-  }
-
-  protected synchronized void closeRow(Row row) {
-    row.delete();
-  }
-
-  protected synchronized void freeWriteLock(Table table) {
-    table.freeWriteLock();
-  }
-
-  protected synchronized void updateRow(Table table, Row row) {
+  protected synchronized void updateRow(final Table table, final Row row) {
     table.updateRow(row);
-  }
-
-  protected synchronized void insertRow(Table table, Row row) {
-    table.insertRow(row);
-  }
-
-  protected synchronized Row createRowObject(Table table) {
-    return table.createRowObject();
-  }
-
-  protected synchronized void setWriteLock(Table table) {
-    table.setWriteLock();
-  }
-
-  public synchronized void setNull(Row row, String name) {
-    row.setNull(name);
-  }
-
-  public synchronized boolean isNull(Row row, String name) {
-    return row.isNull(name);
   }
 }

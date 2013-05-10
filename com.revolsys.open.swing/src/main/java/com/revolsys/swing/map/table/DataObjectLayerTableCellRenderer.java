@@ -32,8 +32,8 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int column) {
-    DataObjectLayer layer = model.getLayer();
-    DataObject object = model.getObject(row);
+    final DataObjectLayer layer = model.getLayer();
+    final DataObject object = model.getObject(row);
     final boolean selected = layer.isSelected(object);
     final DataObjectMetaData metaData = model.getMetaData();
     final String attributeName = model.getAttributeName(column);
@@ -62,7 +62,7 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
       hasValue = true;
       text = "...";
     }
-    boolean isNew = layer.isNew(object);
+    final boolean isNew = layer.isNew(object);
     if (isNew && !hasValue) {
       if (metaData.getIdAttributeIndex() == column) {
         text = "NEW";
@@ -73,18 +73,18 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
     final Component component = super.getTableCellRendererComponent(table,
       text, selected, hasFocus, row, column);
 
-    boolean valid = !required || hasValue;
+    final boolean valid = !required || hasValue;
 
     setColors(component, row, selected, valid, getBackground(), Color.RED,
       Color.LIGHT_GRAY, WebColors.DarkSalmon, Color.WHITE, Color.PINK);
     if (layer.isModified(object)) {
       if (object instanceof LayerDataObject) {
-        LayerDataObject layerDataObject = (LayerDataObject)object;
+        final LayerDataObject layerDataObject = (LayerDataObject)object;
         if (layerDataObject.isModified(attributeName)) {
           if (selected) {
             component.setBackground(WebColors.Green);
           } else {
-            boolean even = row % 2 == 0;
+            final boolean even = row % 2 == 0;
             if (even) {
               component.setBackground(WebColors.GreenYellow);
             } else {
@@ -98,10 +98,10 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
   }
 
   protected void setColors(final Component component, final int row,
-    final boolean selected, boolean valid, Color selectedBackground,
-    Color invalidSelectedBackground, Color oddBackground,
-    Color invalidOddBackground, Color evenBackground,
-    Color invalidEvenBackground) {
+    final boolean selected, final boolean valid,
+    final Color selectedBackground, final Color invalidSelectedBackground,
+    final Color oddBackground, final Color invalidOddBackground,
+    final Color evenBackground, final Color invalidEvenBackground) {
     if (selected) {
       if (valid) {
         component.setBackground(selectedBackground);
@@ -111,7 +111,7 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
         component.setForeground(Color.WHITE);
       }
     } else {
-      boolean even = row % 2 == 0;
+      final boolean even = row % 2 == 0;
       if (even) {
         if (valid) {
           component.setBackground(evenBackground);

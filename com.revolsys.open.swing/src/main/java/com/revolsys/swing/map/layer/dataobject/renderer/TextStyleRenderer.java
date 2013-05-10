@@ -68,11 +68,11 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     return label.toString().trim();
   }
 
-  public static CoordinatesWithOrientation getTextLocation(Viewport2D viewport,
-    final Geometry geometry, final TextStyle style) {
-    GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+  public static CoordinatesWithOrientation getTextLocation(
+    final Viewport2D viewport, final Geometry geometry, final TextStyle style) {
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
-      GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
       Coordinates point = null;
 
@@ -100,7 +100,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
               geometryFactory, viewportGeometryFactory);
             final Coordinates p2 = ProjectionFactory.convert(
               points.get(index - 1), geometryFactory, viewportGeometryFactory);
-            double angle = Math.toDegrees(p2.angle2d(point));
+            final double angle = Math.toDegrees(p2.angle2d(point));
             orientation += angle;
           } else {
             index = Integer.parseInt(argument);
@@ -111,7 +111,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
               geometryFactory, viewportGeometryFactory);
             final Coordinates p2 = ProjectionFactory.convert(
               points.get(index + 1), geometryFactory, viewportGeometryFactory);
-            double angle = Math.toDegrees(point.angle2d(p2));
+            final double angle = Math.toDegrees(point.angle2d(p2));
             orientation += angle;
           }
 
@@ -131,22 +131,22 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
                   viewportGeometryFactory);
                 point = LineSegmentUtil.midPoint(viewportGeometryFactory, p1,
                   p2);
-                double angle = Math.toDegrees(p1.angle2d(p2));
+                final double angle = Math.toDegrees(p1.angle2d(p2));
                 orientation += angle;
               }
               currentLength += segmentLength;
             }
           }
-        } else {  
-         if (geometry instanceof Point) {
-          point = CoordinatesUtil.get((Point)geometry);
-         } else if (geometry instanceof LineString) {
-           point = CoordinatesUtil.get((LineString)geometry);
-         } else if (geometry instanceof Polygon) {
-           point = CoordinatesUtil.get(geometry.getCentroid());
-        }
-          point = ProjectionFactory.convert(point,
-            geometryFactory, viewportGeometryFactory);
+        } else {
+          if (geometry instanceof Point) {
+            point = CoordinatesUtil.get(geometry);
+          } else if (geometry instanceof LineString) {
+            point = CoordinatesUtil.get(geometry);
+          } else if (geometry instanceof Polygon) {
+            point = CoordinatesUtil.get(geometry.getCentroid());
+          }
+          point = ProjectionFactory.convert(point, geometryFactory,
+            viewportGeometryFactory);
         }
 
         if (point != null && viewport.getBoundingBox().contains(point)) {
@@ -165,7 +165,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
       final CoordinatesWithOrientation point = getTextLocation(viewport,
         geometry, style);
       if (point != null) {
-        double orientation = point.getOrientation();
+        final double orientation = point.getOrientation();
         final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
         final Paint paint = graphics.getPaint();
         viewport.setUseModelCoordinates(true, graphics);
@@ -189,15 +189,16 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
           double dx = 0;
           double dy = 0;
-          
+
           final Measure<Length> textDx = style.getTextDeltaX();
           dx += viewport.toDisplayValue(textDx);
-          
+
           final Measure<Length> textDy = style.getTextDeltaY();
           dy += viewport.toDisplayValue(textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
-          Rectangle2D bounds = fontMetrics.getStringBounds(label, graphics);
+          final Rectangle2D bounds = fontMetrics.getStringBounds(label,
+            graphics);
           final double width = bounds.getWidth();
           final double height = bounds.getHeight();
           dy += fontMetrics.getDescent();
@@ -218,11 +219,11 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           graphics.translate(dx, dy);
           graphics.scale(1, -1);
           if (Math.abs(orientation) > 90) {
-            graphics.rotate(Math.PI, width / 2, -height/4 );
+            graphics.rotate(Math.PI, width / 2, -height / 4);
           }
           graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-         final double textHaloRadius = viewport.toDisplayValue(style.getTextHaloRadiusMeasure());
+          final double textHaloRadius = viewport.toDisplayValue(style.getTextHaloRadiusMeasure());
           if (textHaloRadius > 0) {
             final Stroke savedStroke = graphics.getStroke();
             final Stroke outlineStroke = new BasicStroke((float)textHaloRadius,
@@ -238,10 +239,11 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             graphics.setStroke(savedStroke);
           }
 
-          double pixel = viewport.getModelUnitsPerViewUnit();
-          graphics.setColor(new Color(223,223,233,127));
-         graphics.fill(new Rectangle2D.Double(bounds.getX()-pixel, bounds.getY(), width+2*pixel, height));
-          
+          final double pixel = viewport.getModelUnitsPerViewUnit();
+          graphics.setColor(new Color(223, 223, 233, 127));
+          graphics.fill(new Rectangle2D.Double(bounds.getX() - pixel,
+            bounds.getY(), width + 2 * pixel, height));
+
           graphics.setColor(style.getTextFill());
           graphics.drawString(label, (float)0, (float)0);
           graphics.setTransform(savedTransform);
@@ -256,17 +258,17 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private TextStyle style;
 
-  public TextStyleRenderer(DataObjectLayer layer, TextStyle style) {
-    super("textStyle", layer);
-    this.style = style;
-  }
-
   public TextStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
     super("textStyle", layer, parent, textStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(textStyle);
     this.style = new TextStyle(style);
+  }
+
+  public TextStyleRenderer(final DataObjectLayer layer, final TextStyle style) {
+    super("textStyle", layer);
+    this.style = style;
   }
 
   public TextStyle getStyle() {

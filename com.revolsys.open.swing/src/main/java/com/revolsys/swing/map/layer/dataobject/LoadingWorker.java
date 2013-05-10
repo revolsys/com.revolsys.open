@@ -16,7 +16,7 @@ import com.revolsys.gis.data.query.Query;
 public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
   private final BoundingBox viewportBoundingBox;
 
-  private DataObjectStoreLayer layer;
+  private final DataObjectStoreLayer layer;
 
   public LoadingWorker(final DataObjectStoreLayer layer,
     final BoundingBox viewportBoundingBox) {
@@ -34,15 +34,28 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     if (query != null) {
       query = query.clone();
       query.setBoundingBox(queryBoundingBox);
-      final List<DataObject> reader = layer.query(query);
-      for (final DataObject object : reader) {
-        if (isCancelled()) {
-          return null;
-        }
-        index.insert(object);
-      }
-    }
+      final List<DataObject> objects = layer.query(query);
+      index.insertAll(objects);
+   }
     return index;
+  }
+
+  @Override
+  protected void done() {
+    try {
+      if (!isCancelled()) {
+        final DataObjectQuadTree index = get();
+
+        layer.setIndex(viewportBoundingBox, index);
+      }
+    } catch (final CancellationException e) {
+      layer.clearLoading(viewportBoundingBox);
+    } catch (final Throwable t) {
+      final String typePath = layer.getTypePath();
+      LoggerFactory.getLogger(getClass())
+        .error("Unable to load " + typePath, t);
+      layer.clearLoading(viewportBoundingBox);
+    }
   }
 
   public DataObjectStoreLayer getLayer() {
@@ -54,26 +67,8 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
   }
 
   @Override
-  protected void done() {
-    try {
-      if (!isCancelled()) {
-        DataObjectQuadTree index = get();
-        
-        layer.setIndex(viewportBoundingBox, index);
-      }
-    } catch (final CancellationException e) {
-      layer.clearLoading(viewportBoundingBox);
-    } catch (final Throwable t) {
-      String typePath = layer.getTypePath();
-      LoggerFactory.getLogger(getClass())
-        .error("Unable to load " + typePath, t);
-      layer.clearLoading(viewportBoundingBox);
-    }
-  }
-
-  @Override
   public String toString() {
-    String typePath = layer.getTypePath();
+    final String typePath = layer.getTypePath();
     return "Loading: " + typePath;
   }
 }

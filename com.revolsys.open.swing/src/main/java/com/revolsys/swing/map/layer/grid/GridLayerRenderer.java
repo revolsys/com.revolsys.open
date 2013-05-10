@@ -22,9 +22,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class GridLayerRenderer extends  AbstractLayerRenderer<GridLayer> {
+public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
-  public GridLayerRenderer(GridLayer layer) {
+  public GridLayerRenderer(final GridLayer layer) {
     super("grid", layer);
   }
 

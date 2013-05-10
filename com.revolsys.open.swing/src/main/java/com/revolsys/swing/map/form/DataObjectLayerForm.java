@@ -10,9 +10,11 @@ public class DataObjectLayerForm extends DataObjectForm {
   public DataObjectLayerForm(final DataObjectLayer layer) {
     super(layer.getMetaData());
     this.layer = layer;
-    DataObjectMetaData metaData = layer.getMetaData();
+    final DataObjectMetaData metaData = layer.getMetaData();
     addTabAllAttributes();
-    getAllAttributes().setEditable(layer.isEditable());
+    final boolean editable = layer.isEditable();
+    setEditable(editable);
+    getAllAttributes().setEditable(editable);
     if (metaData.getGeometryAttributeName() != null) {
       addTabGeometry();
     }

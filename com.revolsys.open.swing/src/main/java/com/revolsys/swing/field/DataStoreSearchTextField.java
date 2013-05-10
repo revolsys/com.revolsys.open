@@ -155,6 +155,20 @@ public class DataStoreSearchTextField extends JXSearchField implements
     intervalAdded(e);
   }
 
+  public boolean isTextSameAsSelected() {
+    if (selectedItem == null) {
+      return false;
+    } else {
+      final String text = getText();
+      if (StringUtils.hasText(text)) {
+        final String value = selectedItem.getString(displayAttributeName);
+        return text.equalsIgnoreCase(value);
+      } else {
+        return false;
+      }
+    }
+  }
+
   @Override
   public void keyPressed(final KeyEvent e) {
     final int keyCode = e.getKeyCode();
@@ -191,7 +205,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
           }
         }
         if (listModel.getSelectedItem() != null) {
-          JButton findButton = getFindButton();
+          final JButton findButton = getFindButton();
           findButton.doClick();
           setText("");
         }
@@ -258,7 +272,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   protected void search() {
     if (selectedItem != null) {
-      DataObject oldValue = selectedItem;
+      final DataObject oldValue = selectedItem;
       selectedItem = null;
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
         oldValue, ItemEvent.DESELECTED));
@@ -278,20 +292,6 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public void setText(final String text) {
     super.setText(text);
     search();
-  }
-
-  public boolean isTextSameAsSelected() {
-    if (selectedItem == null) {
-      return false;
-    } else {
-      String text = getText();
-      if (StringUtils.hasText(text)) {
-        String value = selectedItem.getString(displayAttributeName);
-        return text.equalsIgnoreCase(value);
-      } else {
-        return false;
-      }
-    }
   }
 
   private void showMenu() {

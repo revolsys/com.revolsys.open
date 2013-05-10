@@ -134,7 +134,6 @@ public class ColorChooserPanel extends ValuePanel<Color> {
     return color;
   }
 
-
   public Number getOpacity() {
     return getColor().getAlpha() / 255F;
   }

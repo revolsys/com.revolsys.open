@@ -54,11 +54,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
 
-  public static MapPanel get(Layer layer) {
+  public static MapPanel get(final Layer layer) {
     if (layer == null) {
       return null;
     } else {
-      Project project = layer.getProject();
+      final Project project = layer.getProject();
       if (project == null) {
         return null;
       } else {
@@ -95,7 +95,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private int zoomHistoryIndex = -1;
 
-  private FileDropTargetListener fileDropListener;
+  private final FileDropTargetListener fileDropListener;
+
+  private boolean updateZoomHistory = true;
 
   public MapPanel() {
     super(new BorderLayout());
@@ -148,10 +150,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     fileDropListener = new FileDropTargetListener(this);
   }
 
-  public FileDropTargetListener getFileDropListener() {
-    return fileDropListener;
-  }
-
   public void addBaseMap(final Layer layer) {
     if (layer != null) {
       baseMapLayers.add(layer);
@@ -178,8 +176,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       new PropertyChangeListener() {
 
         @Override
-        public void propertyChange(PropertyChangeEvent event) {
-          Layer layer = (Layer)event.getNewValue();
+        public void propertyChange(final PropertyChangeEvent event) {
+          final Layer layer = (Layer)event.getNewValue();
           if (layer != null) {
             comboBox.setSelectedItem(layer);
           }
@@ -190,7 +188,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
     layeredPane.add(overlay, new Integer(zIndex));
     if (overlay instanceof PropertyChangeListener) {
-      PropertyChangeListener listener = (PropertyChangeListener)overlay;
+      final PropertyChangeListener listener = (PropertyChangeListener)overlay;
       addPropertyChangeListener(listener);
       project.addPropertyChangeListener(listener);
       baseMapLayers.addPropertyChangeListener(listener);
@@ -293,6 +291,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return viewport.getBoundingBox();
   }
 
+  public FileDropTargetListener getFileDropListener() {
+    return fileDropListener;
+  }
+
   public GeometryFactory getGeometryFactory() {
     return project.getGeometryFactory();
   }
@@ -337,7 +339,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    Object source = event.getSource();
+    final Object source = event.getSource();
     if (source == viewport) {
       if ("scale".equals(event.getPropertyName())) {
         final double scale = viewport.getScale();
@@ -362,12 +364,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public void setBoundingBox(BoundingBox boundingBox) {
-    BoundingBox oldBoundingBox = getBoundingBox();
+  public void setBoundingBox(final BoundingBox boundingBox) {
+    final BoundingBox oldBoundingBox = getBoundingBox();
 
     final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
     final boolean zoomNextEnabled = isZoomNextEnabled();
-    BoundingBox resizedBoundingBox = viewport.setBoundingBox(boundingBox);
+    final BoundingBox resizedBoundingBox = viewport.setBoundingBox(boundingBox);
     project.setViewBoundingBox(resizedBoundingBox);
     setScale(viewport.getScale());
     synchronized (zoomHistory) {
@@ -421,8 +423,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       repaint();
     }
   }
-
-  private boolean updateZoomHistory = true;
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {
     synchronized (zoomHistory) {
@@ -508,8 +508,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
    * 
    * @param boudingBox
    */
-  public void zoomTo(BoundingBox boudingBox) {
-    GeometryFactory geometryFactory = getGeometryFactory();
+  public void zoomTo(final BoundingBox boudingBox) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = boudingBox.convert(geometryFactory)
       .expandPercent(0.1);
     setBoundingBox(boundingBox);
@@ -525,7 +525,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Geometry convertedGeometry = getGeometryFactory().copy(geometry);
-      BoundingBox boudingBox = BoundingBox.getBoundingBox(convertedGeometry);
+      final BoundingBox boudingBox = BoundingBox.getBoundingBox(convertedGeometry);
       zoomTo(boudingBox);
     }
   }
@@ -538,7 +538,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomToSelected() {
-    BoundingBox boundingBox = project.getSelectedBoundingBox();
+    final BoundingBox boundingBox = project.getSelectedBoundingBox();
     if (!boundingBox.isNull()) {
       zoomTo(boundingBox);
     }

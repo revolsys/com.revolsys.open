@@ -118,10 +118,12 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
     }
   }
 
+  @Override
   public boolean isCheckBox() {
     return checkBox;
   }
 
+  @Override
   protected void setCheckBox(final boolean checkBox) {
     this.checkBox = checkBox;
   }

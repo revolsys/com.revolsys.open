@@ -11,7 +11,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.Viewport2D;
 
-public  class TileLoaderProcess extends SwingWorker<Image, Void> {
+public class TileLoaderProcess extends SwingWorker<Image, Void> {
   private Viewport2D viewport;
 
   private TiledImageLayerRenderer renderer;
@@ -19,6 +19,18 @@ public  class TileLoaderProcess extends SwingWorker<Image, Void> {
   private MapTile mapTile;
 
   private double scale;
+
+  @Override
+  protected Image doInBackground() throws Exception {
+    final MapTile mapTile = getMapTile();
+    try {
+      final Image image = mapTile.loadImage();
+      return image;
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Unable to load " + mapTile, e);
+      return null;
+    }
+  }
 
   @Override
   protected void done() {
@@ -41,12 +53,12 @@ public  class TileLoaderProcess extends SwingWorker<Image, Void> {
     return null;
   }
 
-  public MapTile getMapTile() {
-    return mapTile;
-  }
-
   public BoundingBox getBoundingBox() {
     return mapTile.getBoundingBox();
+  }
+
+  public MapTile getMapTile() {
+    return mapTile;
   }
 
   public TiledImageLayerRenderer getRenderer() {
@@ -60,19 +72,7 @@ public  class TileLoaderProcess extends SwingWorker<Image, Void> {
   public Viewport2D getViewport() {
     return viewport;
   }
-  
 
-  @Override
-  protected Image doInBackground() throws Exception {
-    MapTile mapTile = getMapTile();
-    try {
-      Image image = mapTile.loadImage();
-      return image;
-    } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to load " + mapTile, e);
-      return null;
-    }
-  }
   @Override
   public String toString() {
     return "Loading map tile " + getMapTile();

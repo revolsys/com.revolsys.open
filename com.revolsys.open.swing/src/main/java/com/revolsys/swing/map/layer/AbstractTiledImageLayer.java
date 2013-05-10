@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer;
 import java.util.List;
 
 import com.revolsys.swing.map.Viewport2D;
+
 public abstract class AbstractTiledImageLayer extends AbstractLayer {
 
   public AbstractTiledImageLayer() {
@@ -21,7 +22,7 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
   public abstract List<MapTile> getOverlappingEnvelopes(
     final Viewport2D viewport);
 
-  public  TileLoaderProcess getTileLoaderProcess() {
+  public TileLoaderProcess getTileLoaderProcess() {
     return new TileLoaderProcess();
   }
 

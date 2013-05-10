@@ -7,10 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
 import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.io.esri.gdb.xml.model.Domain;
-import com.revolsys.io.esri.gdb.xml.model.EsriGdbXmlSerializer;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private final CodedValueDomain domain;
@@ -40,9 +38,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   private Object createValue(final String name) {
     synchronized (dataStore) {
       final Object id = domain.addCodedValue(name);
-      final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
-      final Geodatabase geodatabase = dataStore.getGeodatabase();
-      geodatabase.alterDomain(domainDefinition);
+      dataStore.alterDomain(domain);
       LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }

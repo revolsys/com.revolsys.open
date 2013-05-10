@@ -11,24 +11,25 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 public class TreeItemRunnable extends InvokeMethodRunnable {
 
   public static InvokeMethodAction createAction(final CharSequence name,
-    final String iconName, EnableCheck enableCheck, String methodName,
-    Object... parameters) {
-    ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    return createAction(name, icon, enableCheck, methodName, parameters);
-  }
-
-  public static InvokeMethodAction createAction(final CharSequence name,
-    final Icon icon, EnableCheck enableCheck, String methodName,
-    Object... parameters) {
-    TreeItemRunnable runnable = new TreeItemRunnable(methodName, parameters);
-    InvokeMethodAction action = new InvokeMethodAction(name, name.toString(),
-      icon, true, runnable);
+    final Icon icon, final EnableCheck enableCheck, final String methodName,
+    final Object... parameters) {
+    final TreeItemRunnable runnable = new TreeItemRunnable(methodName,
+      parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name,
+      name.toString(), icon, true, runnable);
     action.setEnableCheck(enableCheck);
 
     return action;
   }
 
-  protected TreeItemRunnable(String methodName, Object[] parameters) {
+  public static InvokeMethodAction createAction(final CharSequence name,
+    final String iconName, final EnableCheck enableCheck,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    return createAction(name, icon, enableCheck, methodName, parameters);
+  }
+
+  protected TreeItemRunnable(final String methodName, final Object[] parameters) {
     super(methodName, parameters);
   }
 

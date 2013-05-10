@@ -11,15 +11,15 @@ public enum MarkerStyleProperty {
   /** */
   marker_file("marker-file"),
   /** */
-  marker_opacity("marker-opacity",DataTypes.DOUBLE),
+  marker_opacity("marker-opacity", DataTypes.DOUBLE),
   /** */
-  marker_fill_opacity("marker-fill-opacity",DataTypes.DOUBLE),
+  marker_fill_opacity("marker-fill-opacity", DataTypes.DOUBLE),
   /** */
   marker_line_color("marker-line-color", DataTypes.COLOR),
   /** */
   marker_line_width("marker-line-width", DataTypes.DOUBLE),
   /** */
-  marker_line_opacity("marker-line-opacity",DataTypes.DOUBLE),
+  marker_line_opacity("marker-line-opacity", DataTypes.DOUBLE),
   /** */
   marker_placement("marker-placement"),
   /** */
@@ -31,7 +31,7 @@ public enum MarkerStyleProperty {
   /** */
   marker_fill("marker-fill", DataTypes.COLOR),
   /** */
-  marker_allow_overlap("marker-allow-overlap",DataTypes.BOOLEAN),
+  marker_allow_overlap("marker-allow-overlap", DataTypes.BOOLEAN),
   /** */
   marker_ignore_placement("marker-ignore-placement"),
   /** */
@@ -41,7 +41,7 @@ public enum MarkerStyleProperty {
   /** */
   marker_transform("marker-transform"),
   /** */
-  marker_clip("marker-clip",DataTypes.BOOLEAN),
+  marker_clip("marker-clip", DataTypes.BOOLEAN),
   /** */
   marker_smooth("marker-smooth", DataTypes.DOUBLE),
   /** */
@@ -58,7 +58,6 @@ public enum MarkerStyleProperty {
   /** */
   MARKER_DY("marker-dy");
   ;
-  
 
   private static final Map<String, MarkerStyleProperty> propertiesByLabel = new LinkedHashMap<String, MarkerStyleProperty>();
 
@@ -79,7 +78,7 @@ public enum MarkerStyleProperty {
 
   private String propertyName;
 
-   private MarkerStyleProperty(final String label) {
+  private MarkerStyleProperty(final String label) {
     this(label, DataTypes.STRING);
   }
 

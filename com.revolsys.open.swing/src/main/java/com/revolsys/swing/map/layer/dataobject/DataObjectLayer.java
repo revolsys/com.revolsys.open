@@ -29,27 +29,27 @@ public interface DataObjectLayer extends Layer {
 
   void deleteObjects(DataObject... object);
 
+  int getChangeCount();
+
+  List<DataObject> getChanges();
+
   List<DataObject> getDataObjects(BoundingBox boundingBox);
 
   DataObjectStore getDataStore();
 
   Set<DataObject> getEditingObjects();
 
-  List<DataObject> getChanges();
-
-  int getChangeCount();
-
   DataObjectMetaData getMetaData();
+
+  int getNewObjectCount();
+
+  List<DataObject> getNewObjects();
 
   DataObject getObject(int row);
 
   List<DataObject> getObjects();
 
   List<DataObject> getObjects(Geometry geometry, double distance);
-
-  List<DataObject> getNewObjects();
-
-  int getNewObjectCount();
 
   Query getQuery();
 

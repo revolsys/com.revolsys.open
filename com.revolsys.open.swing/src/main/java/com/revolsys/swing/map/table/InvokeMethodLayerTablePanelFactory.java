@@ -17,8 +17,9 @@ public class InvokeMethodLayerTablePanelFactory implements
 
   private final String methodName;
 
-  public InvokeMethodLayerTablePanelFactory(final Class<? extends Layer> layerClass,
-    final Object object, final String methodName) {
+  public InvokeMethodLayerTablePanelFactory(
+    final Class<? extends Layer> layerClass, final Object object,
+    final String methodName) {
     this.layerClass = layerClass;
     this.object = object;
     this.methodName = methodName;
@@ -43,6 +44,7 @@ public class InvokeMethodLayerTablePanelFactory implements
     }
   }
 
+  @Override
   public Class<? extends Layer> getLayerClass() {
     return layerClass;
   }

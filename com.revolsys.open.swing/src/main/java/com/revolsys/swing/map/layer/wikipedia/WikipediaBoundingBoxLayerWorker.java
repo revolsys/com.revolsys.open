@@ -36,8 +36,8 @@ public class WikipediaBoundingBoxLayerWorker extends
       "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = SilkIconLoader.getImage("wikipedia");
-    ImageMarker marker = new ImageMarker(image);
-    MarkerStyle style = new MarkerStyle();
+    final ImageMarker marker = new ImageMarker(image);
+    final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
     layer1.setRenderer(new MarkerStyleRenderer(layer1, style));
     final DataObjectBoundingBoxLayer layer = layer1;
@@ -51,8 +51,8 @@ public class WikipediaBoundingBoxLayerWorker extends
       "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = SilkIconLoader.getImage("wikipedia");
-    ImageMarker marker = new ImageMarker(image);
-    MarkerStyle style = new MarkerStyle();
+    final ImageMarker marker = new ImageMarker(image);
+    final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
     layer.setRenderer(new MarkerStyleRenderer(layer, style));
     return layer;
@@ -110,11 +110,6 @@ public class WikipediaBoundingBoxLayerWorker extends
   }
 
   @Override
-  public String toString() {
-    return "Load Wikipedia Articles";
-  }
-
-  @Override
   protected void done() {
     try {
       final DataObjectQuadTree index = get();
@@ -122,5 +117,10 @@ public class WikipediaBoundingBoxLayerWorker extends
     } catch (final Throwable e) {
       layer.setIndex(boundingBox, null);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Load Wikipedia Articles";
   }
 }

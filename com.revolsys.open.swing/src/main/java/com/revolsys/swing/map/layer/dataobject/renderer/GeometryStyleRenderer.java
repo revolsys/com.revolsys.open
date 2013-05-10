@@ -21,26 +21,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
-  private GeometryStyle style;
-
-  public static final void renderPolygon(final Viewport2D viewport,
-    final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
-    final Shape shape = getShape(viewport, style, polygon);
-    if (shape != null) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(true, graphics);
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setFillStyle(viewport, graphics);
-        graphics.fill(shape);
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(shape);
-      } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-        graphics.setPaint(paint);
-      }
-    }
-  }
   public static Shape getShape(final Viewport2D viewport,
     final GeometryStyle style, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
@@ -76,6 +56,24 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
+  public static final void renderLineString(final Viewport2D viewport,
+    final Graphics2D graphics, final LineString lineString,
+    final GeometryStyle style) {
+    final Shape shape = getShape(viewport, style, lineString);
+    if (shape != null) {
+      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+      viewport.setUseModelCoordinates(true, graphics);
+      final Paint paint = graphics.getPaint();
+      try {
+        style.setLineStyle(viewport, graphics);
+        graphics.draw(shape);
+      } finally {
+        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+        graphics.setPaint(paint);
+      }
+    }
+  }
+
   public static final void renderOutline(final Viewport2D viewport,
     final Graphics2D graphics, final Geometry geometry,
     final GeometryStyle style) {
@@ -97,15 +95,17 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
       }
     }
   }
-  public static final void renderLineString(final Viewport2D viewport,
-    final Graphics2D graphics, final LineString lineString,
-    final GeometryStyle style) {
-    final Shape shape = getShape(viewport, style, lineString);
+
+  public static final void renderPolygon(final Viewport2D viewport,
+    final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
+    final Shape shape = getShape(viewport, style, polygon);
     if (shape != null) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
       viewport.setUseModelCoordinates(true, graphics);
       final Paint paint = graphics.getPaint();
       try {
+        style.setFillStyle(viewport, graphics);
+        graphics.fill(shape);
         style.setLineStyle(viewport, graphics);
         graphics.draw(shape);
       } finally {
@@ -115,21 +115,26 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
+  private GeometryStyle style;
+
   public GeometryStyleRenderer(final DataObjectLayer layer) {
-    this(layer,new GeometryStyle());
+    this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer,final GeometryStyle style) {
-    this(layer,null,style);
+  public GeometryStyleRenderer(final DataObjectLayer layer,
+    final GeometryStyle style) {
+    this(layer, null, style);
   }
-  public GeometryStyleRenderer(final DataObjectLayer layer,final LayerRenderer<?> parent,final GeometryStyle style) {
-    super("geometryStyle", layer,parent);
+
+  public GeometryStyleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent, final GeometryStyle style) {
+    super("geometryStyle", layer, parent);
     this.style = style;
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer, LayerRenderer<?> parent,
-    final Map<String, Object> geometryStyle) {
-    super("geometryStyle", layer,parent, geometryStyle);
+  public GeometryStyleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
+    super("geometryStyle", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(geometryStyle);
     this.style = new GeometryStyle(style);
@@ -146,7 +151,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Geometry geometry = object.getGeometryValue();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
-   renderGeometry(viewport, graphics, geometry, style);
+    renderGeometry(viewport, graphics, geometry, style);
   }
 
   public void setStyle(final GeometryStyle style) {

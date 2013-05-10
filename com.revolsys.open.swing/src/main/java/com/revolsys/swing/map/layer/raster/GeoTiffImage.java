@@ -95,13 +95,13 @@ public class GeoTiffImage extends GeoReferencedImage {
   }
 
   private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
-    Map<Integer, Object> geoKeys = getGeoKeys(directory);
+    final Map<Integer, Object> geoKeys = getGeoKeys(directory);
     Short coordinateSystemId = (Short)geoKeys.get(PROJECTED_CS_TYPE_GEO_KEY);
     if (coordinateSystemId == null) {
       coordinateSystemId = (Short)geoKeys.get(GEOGRAPHIC_TYPE_GEO_KEY);
     }
     if (coordinateSystemId != null) {
-      GeometryFactory geometryFactory = GeometryFactory.getFactory(coordinateSystemId);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(coordinateSystemId);
       setGeometryFactory(geometryFactory);
     }
 
@@ -155,20 +155,7 @@ public class GeoTiffImage extends GeoReferencedImage {
     }
   }
 
-  public void setBoundingBox(final double x1, final double y1,
-    final double pixelWidth, final double pixelHeight) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-
-    final int imageWidth = getImageWidth();
-    final double x2 = x1 + pixelWidth * imageWidth;
-
-    final int imageHeight = getImageHeight();
-    final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
-      x2, y2);
-    setBoundingBox(boundingBox);
-  }
-
+  @Override
   protected void loadImageMetaData(final Resource resource,
     final RenderedOp image) {
     final Object tiffDirectory = image.getProperty("tiff.directory");
@@ -182,5 +169,19 @@ public class GeoTiffImage extends GeoReferencedImage {
         loadWorldFile(resource, "tfw");
       }
     }
+  }
+
+  public void setBoundingBox(final double x1, final double y1,
+    final double pixelWidth, final double pixelHeight) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+
+    final int imageWidth = getImageWidth();
+    final double x2 = x1 + pixelWidth * imageWidth;
+
+    final int imageHeight = getImageHeight();
+    final double y2 = y1 - pixelHeight * imageHeight;
+    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
+      x2, y2);
+    setBoundingBox(boundingBox);
   }
 }

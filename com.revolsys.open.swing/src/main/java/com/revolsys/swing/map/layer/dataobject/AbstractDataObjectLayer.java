@@ -33,11 +33,9 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -49,21 +47,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer, DataObjectFactory {
 
-  public static void actionCompleteAddNewRecord(
-    final EditGeometryOverlay overlay) {
-    synchronized (overlay) {
-      final DataObjectLayer layer = overlay.getLayer();
-      final DataObject object = overlay.getObject();
-      if (object != null) {
-        LayerUtil.showForm(layer, object);
-      }
-    }
-  }
-
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
-    menu.addGroup(0,"table");
-    menu.addGroup(2,"edit");
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    menu.addGroup(0, "table");
+    menu.addGroup(2, "edit");
 
     menu.addMenuItem("table", new InvokeMethodAction("View Attributes",
       "View Attributes", SilkIconLoader.getIcon("table_go"), LayerUtil.class,
@@ -73,9 +60,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       "Zoom to Selected", SilkIconLoader.getIcon("magnifier_zoom_selected"),
       LayerUtil.class, "zoomToLayerSelected"));
 
-    EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
-    EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly", false);
-    EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
+    final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
+    final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
+      false);
+    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
 
     menu.addCheckboxMenuItem("edit", new InvokeMethodAction("Editable",
       "Editable", SilkIconLoader.getIcon("pencil"), readonly, LayerUtil.class,
@@ -87,9 +75,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
       "table_cancel", hasChanges, "cancelChanges"));
 
-    EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
+    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
       "table_row_insert", canAdd, "addNewRecord"));
+  }
+
+  public static void actionCompleteAddNewRecord(
+    final EditGeometryOverlay overlay) {
+    synchronized (overlay) {
+      final DataObjectLayer layer = overlay.getLayer();
+      final DataObject object = overlay.getObject();
+      if (object != null) {
+        LayerUtil.showForm(layer, object);
+      }
+    }
   }
 
   private DataObjectMetaData metaData;
@@ -120,11 +119,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     this("");
   }
 
-  @Override
-  public int getNewObjectCount() {
-    return newObjects.size();
-  }
-
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
@@ -152,12 +146,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void addModifiedObject(final DataObject object) {
     synchronized (modifiedObjects) {
       modifiedObjects.add(object);
-    }
-  }
-
-  protected void removeModifiedObject(final DataObject object) {
-    synchronized (modifiedObjects) {
-      modifiedObjects.remove(object);
     }
   }
 
@@ -250,17 +238,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
-  public void deleteObjects(final Collection<? extends DataObject> objects) {
-    synchronized (editSync) {
-      unselectObjects(objects);
-      for (final DataObject object : objects) {
-        deleteObject(object);
-      }
-    }
-    fireObjectsChanged();
-  }
-
   protected void deleteObject(final DataObject object) {
     if (isLayerObject(object)) {
       if (!newObjects.remove(object)) {
@@ -270,6 +247,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
       object.setState(DataObjectState.Deleted);
     }
+  }
+
+  @Override
+  public void deleteObjects(final Collection<? extends DataObject> objects) {
+    synchronized (editSync) {
+      unselectObjects(objects);
+      for (final DataObject object : objects) {
+        deleteObject(object);
+      }
+    }
+    fireObjectsChanged();
   }
 
   @Override
@@ -289,11 +277,35 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final boolean selected = !selectedObjects.isEmpty();
     getPropertyChangeSupport().firePropertyChange("selected", !selected,
       selected);
+    getPropertyChangeSupport().firePropertyChange("selectionCount", -1,
+      selectedObjects.size());
   }
 
   @Override
   public BoundingBox getBoundingBox() {
     return boundingBox;
+  }
+
+  @Override
+  public int getChangeCount() {
+    synchronized (editSync) {
+      int changeCount = 0;
+      changeCount += newObjects.size();
+      changeCount += modifiedObjects.size();
+      changeCount += deletedObjects.size();
+      return changeCount;
+    }
+  }
+
+  @Override
+  public List<DataObject> getChanges() {
+    synchronized (editSync) {
+      final List<DataObject> objects = new ArrayList<DataObject>();
+      objects.addAll(newObjects);
+      objects.addAll(modifiedObjects);
+      objects.addAll(deletedObjects);
+      return objects;
+    }
   }
 
   public CoordinateSystem getCoordinateSystem() {
@@ -328,6 +340,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new LinkedHashSet<DataObject>(modifiedObjects);
   }
 
+  @Override
+  public int getNewObjectCount() {
+    return newObjects.size();
+  }
+
+  @Override
   public List<DataObject> getNewObjects() {
     return new ArrayList<DataObject>(newObjects);
   }
@@ -418,30 +436,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return editingObjects.contains(object);
   }
 
-  public boolean isNew(final DataObject object) {
-    return newObjects.contains(object);
-  }
-
-  public int getChangeCount() {
-    synchronized (editSync) {
-      int changeCount = 0;
-      changeCount += newObjects.size();
-      changeCount += modifiedObjects.size();
-      changeCount += deletedObjects.size();
-      return changeCount;
-    }
-  }
-
-  public List<DataObject> getChanges() {
-    synchronized (editSync) {
-      List<DataObject> objects = new ArrayList<DataObject>();
-      objects.addAll(newObjects);
-      objects.addAll(modifiedObjects);
-      objects.addAll(deletedObjects);
-      return objects;
-    }
-  }
-
   @Override
   public boolean isHasChanges() {
     if (isEditable()) {
@@ -488,6 +482,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public boolean isNew(final DataObject object) {
+    return newObjects.contains(object);
+  }
+
+  @Override
   public boolean isSelected(final DataObject object) {
     if (object == null) {
       return false;
@@ -500,7 +499,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public boolean isVisible(final DataObject object) {
     if (isVisible()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer();
-      if (renderer.isVisible(object)) {
+      if (renderer != null && renderer.isVisible(object)) {
         return true;
       }
     }
@@ -514,7 +513,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (source instanceof LayerDataObject) {
       final LayerDataObject dataObject = (LayerDataObject)source;
       if (dataObject.getLayer() == this) {
-        DataObjectState state = dataObject.getState();
+        final DataObjectState state = dataObject.getState();
         if (state == DataObjectState.Modified) {
           addModifiedObject(dataObject);
         } else if (state == DataObjectState.Persisted) {
@@ -527,6 +526,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public List<DataObject> query(final Query query) {
     throw new UnsupportedOperationException("Query not currently supported");
+  }
+
+  protected void removeModifiedObject(final DataObject object) {
+    synchronized (modifiedObjects) {
+      modifiedObjects.remove(object);
+    }
   }
 
   public boolean saveChanges() {
@@ -623,6 +628,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setGeometryFactory(metaData.getGeometryFactory());
     if (metaData.getGeometryAttributeIndex() == -1) {
       setSelectSupported(false);
+      setRenderer(null);
     }
   }
 
@@ -647,11 +653,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Query oldValue = this.query;
     this.query = query;
     getPropertyChangeSupport().firePropertyChange("query", oldValue, query);
-  }
-
-  @Override
-  public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
-    super.setRenderer(renderer);
   }
 
   @Override

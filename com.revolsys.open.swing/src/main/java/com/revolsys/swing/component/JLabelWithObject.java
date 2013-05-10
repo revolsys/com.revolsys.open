@@ -12,7 +12,7 @@ public class JLabelWithObject extends JLabel {
     return object;
   }
 
-  public void setObject(Object object) {
+  public void setObject(final Object object) {
     this.object = object;
     setText(StringConverterRegistry.toString(object));
   }

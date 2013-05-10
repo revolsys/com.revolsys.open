@@ -8,7 +8,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.util.CaseConverter;
 
 public enum TextStyleProperty {
- 
+
   /** */
   text_name("text-name"),
   /** */
@@ -77,7 +77,7 @@ public enum TextStyleProperty {
   text_comp_op("text-comp-op")
   // Custom Extensions
   ;
- 
+
   private static final Map<String, TextStyleProperty> propertiesByLabel = new LinkedHashMap<String, TextStyleProperty>();
 
   static {

@@ -18,7 +18,6 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
 import com.revolsys.swing.SwingWorkerManager;
-import com.revolsys.swing.map.Viewport2D;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
@@ -50,7 +49,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public List<DataObject> getDataObjects(BoundingBox boundingBox) {
+  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {

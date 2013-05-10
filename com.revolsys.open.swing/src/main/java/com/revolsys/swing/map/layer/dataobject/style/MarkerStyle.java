@@ -46,20 +46,13 @@ public class MarkerStyle {
     }
   }
 
-  public static MarkerStyle marker(final String markerName,
-    final double markerSize, final Color lineColor, final double lineWidth,
-    final Color fillColor) {
-    ShapeMarker marker = new ShapeMarker(markerName);
-    return marker(marker, markerSize, lineColor, fillColor);
-  }
-
   public static MarkerStyle marker(final Shape shape, final double markerSize,
     final Color lineColor, final double lineWidth, final Color fillColor) {
-    ShapeMarker marker = new ShapeMarker(shape);
+    final ShapeMarker marker = new ShapeMarker(shape);
     return marker(marker, markerSize, lineColor, fillColor);
   }
 
-  protected static MarkerStyle marker(ShapeMarker marker,
+  protected static MarkerStyle marker(final ShapeMarker marker,
     final double markerSize, final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
@@ -70,6 +63,13 @@ public class MarkerStyle {
     style.setMarkerVerticalAlignment("middle");
     style.setMarkerFill(fillColor);
     return style;
+  }
+
+  public static MarkerStyle marker(final String markerName,
+    final double markerSize, final Color lineColor, final double lineWidth,
+    final Color fillColor) {
+    final ShapeMarker marker = new ShapeMarker(markerName);
+    return marker(marker, markerSize, lineColor, fillColor);
   }
 
   private String markerHorizontalAlignment = "auto";
@@ -235,7 +235,7 @@ public class MarkerStyle {
     this.markerFile = markerFile;
     final Pattern pattern = Pattern.compile("url\\('?([^']+)'?\\)");
     String url;
-    Matcher matcher = pattern.matcher(markerFile);
+    final Matcher matcher = pattern.matcher(markerFile);
     if (matcher.find()) {
       url = matcher.group(1);
     } else {

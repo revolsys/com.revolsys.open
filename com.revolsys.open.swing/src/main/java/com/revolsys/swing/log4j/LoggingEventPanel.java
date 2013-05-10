@@ -1,8 +1,8 @@
 package com.revolsys.swing.log4j;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Window;
@@ -33,13 +33,14 @@ public class LoggingEventPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
 
-  public static void showDialog(Component component, LoggingEvent event) {
-    Window window = SwingUtilities.getWindowAncestor(component);
-    JDialog dialog = new JDialog(window, "Application Log Details",
+  public static void showDialog(final Component component,
+    final LoggingEvent event) {
+    final Window window = SwingUtilities.getWindowAncestor(component);
+    final JDialog dialog = new JDialog(window, "Application Log Details",
       ModalityType.APPLICATION_MODAL);
     dialog.setLayout(new BorderLayout());
     dialog.add(new LoggingEventPanel(event), BorderLayout.CENTER);
-    JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttons.add(InvokeMethodAction.createButton("OK", dialog, "setVisible",
       false));
     dialog.add(buttons, BorderLayout.SOUTH);
@@ -47,27 +48,27 @@ public class LoggingEventPanel extends JPanel {
     dialog.setVisible(true);
   }
 
-  public LoggingEventPanel(LoggingEvent event) {
+  public LoggingEventPanel(final LoggingEvent event) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     setLayout(new GroupLayout(this));
-    long time = event.getTimeStamp();
-    Timestamp timestamp = new Timestamp(time);
+    final long time = event.getTimeStamp();
+    final Timestamp timestamp = new Timestamp(time);
     addField("Timestamp", timestamp);
 
-    for (String fieldName : Arrays.asList("level", "loggerName", "message",
-      "threadName")) {
+    for (final String fieldName : Arrays.asList("level", "loggerName",
+      "message", "threadName")) {
 
-      Object value = JavaBeanUtil.getValue(event, fieldName);
+      final Object value = JavaBeanUtil.getValue(event, fieldName);
       addField(fieldName, value);
     }
 
     addLabel("Stack Trace");
-    String[] stack = event.getThrowableStrRep();
+    final String[] stack = event.getThrowableStrRep();
     if (stack != null) {
-      JXTextArea textArea = SwingUtil.createTextArea(
+      final JXTextArea textArea = SwingUtil.createTextArea(
         Math.min(20, stack.length), 80);
       textArea.setEditable(false);
-      for (String trace : stack) {
+      for (final String trace : stack) {
         textArea.append(trace);
         textArea.append("\n");
       }
@@ -77,21 +78,21 @@ public class LoggingEventPanel extends JPanel {
     GroupLayoutUtil.makeColumns(this, 2);
   }
 
-  private void addField(String fieldName, Object value) {
+  private void addField(final String fieldName, final Object value) {
     addLabel(fieldName);
 
     String stringValue = StringConverterRegistry.toString(value);
     if (!StringUtils.hasText(stringValue)) {
       stringValue = "-";
     }
-    JXTextField field = SwingUtil.createTextField(Math.min(80,
+    final JXTextField field = SwingUtil.createTextField(Math.min(80,
       stringValue.length()));
     field.setEditable(false);
     field.setText(stringValue);
     add(field);
   }
 
-  private void addLabel(String fieldName) {
+  private void addLabel(final String fieldName) {
     final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(fieldName));
     label.setFont(label.getFont().deriveFont(Font.BOLD));
     add(label);

@@ -135,7 +135,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
             if (nodeModel != null) {
               final JPopupMenu menu = nodeModel.getMenu(node)
                 .createJPopupMenu();
-              int numItems = menu.getSubElements().length;
+              final int numItems = menu.getSubElements().length;
               if (menu != null && numItems > 0) {
                 mouseClickItem = node;
                 menu.show(ObjectTree.this, x, y);

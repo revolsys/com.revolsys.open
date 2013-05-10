@@ -106,7 +106,7 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
 
   private void addLineStylePanel() {
     final JPanel panel = new JPanel(new SpringLayout());
-    
+
     colorField = new ColorChooserPanel(geometryStyle.getLineColor());
     colorField.addPropertyChangeListener("color", this);
     colorField.setBorder(BorderFactory.createTitledBorder("Line Color"));
@@ -138,7 +138,7 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
     panel.add(lineCapField);
 
     SpringLayoutUtil.makeRows(panel, 0, 0, 5, 5, 2, 2);
-    JScrollPane scrollPane = new JScrollPane(panel);
+    final JScrollPane scrollPane = new JScrollPane(panel);
     add(scrollPane, BorderLayout.CENTER);
   }
 
@@ -245,12 +245,12 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
      * (float)viewport.toDisplayValue(dash); } } }
      */
     // TODO mitre limit
-    final int awtLineCap = LineCap.valueOf(this.lineCapField.getActionCommand().toString())
-      .getAwtValue();
+    final int awtLineCap = LineCap.valueOf(
+      this.lineCapField.getActionCommand().toString()).getAwtValue();
     final int lineJoin = LineJoin.valueOf(
       this.lineJoinField.getActionCommand().toString()).getAwtValue();
-    final BasicStroke basicStroke = new BasicStroke(width, awtLineCap, lineJoin,
-      1, dashArray, dashPhase);
+    final BasicStroke basicStroke = new BasicStroke(width, awtLineCap,
+      lineJoin, 1, dashArray, dashPhase);
     graphics.setStroke(basicStroke);
     graphics.draw(getLineShape());
   }

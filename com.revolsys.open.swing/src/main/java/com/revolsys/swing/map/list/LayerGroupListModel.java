@@ -20,20 +20,20 @@ public class LayerGroupListModel extends AbstractListModel implements
 
   private Layer selectedItem;
 
-  private boolean allowNull;
+  private final boolean allowNull;
 
   public LayerGroupListModel(final LayerGroup group) {
-  this(group, false);
+    this(group, false);
   }
 
-  public LayerGroupListModel(LayerGroup group, boolean allowNull) {
+  public LayerGroupListModel(final LayerGroup group, final boolean allowNull) {
     this.group = group;
     group.addPropertyChangeListener(this);
     this.allowNull = allowNull;
   }
 
   @Override
-  public Layer getElementAt( int index) {
+  public Layer getElementAt(int index) {
     if (allowNull) {
       if (index == 0) {
         return NullLayer.INSTANCE;

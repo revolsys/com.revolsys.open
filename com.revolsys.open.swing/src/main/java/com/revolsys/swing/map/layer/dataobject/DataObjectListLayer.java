@@ -122,6 +122,14 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     return objects.containsAll(c);
   }
 
+  @Override
+  public DataObject createObject() {
+    final DataObject object = super.createObject();
+    this.objects.add(object);
+    fireObjectsChanged();
+    return object;
+  }
+
   public void deleteAll() {
     final List<DataObject> oldObjects = new ArrayList<DataObject>(objects);
     objects = new ArrayList<DataObject>();
@@ -166,17 +174,11 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public List<DataObject> getObjects() {
-    ArrayList<DataObject> returnObjects = new ArrayList<DataObject>(objects);
+    final ArrayList<DataObject> returnObjects = new ArrayList<DataObject>(
+      objects);
     return returnObjects;
   }
 
-  @Override
-  public DataObject createObject() {
-    DataObject object = super.createObject();
-    this.objects.add(object);
-    fireObjectsChanged();
-    return object;
-  }
   @Override
   public List<DataObject> getObjects(Geometry geometry, final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
@@ -259,6 +261,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     return objects.set(index, element);
   }
 
+  public void setEditingObjects(final DataObject... objects) {
+    setEditingObjects(Arrays.asList(objects));
+  }
+
   public void setObjects(final Collection<DataObject> newObjects) {
     final List<DataObject> oldObjects = objects;
     objects = new ArrayList<DataObject>();
@@ -290,9 +296,5 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public <T> T[] toArray(final T[] a) {
     return objects.toArray(a);
-  }
-
-  public void setEditingObjects(DataObject... objects) {
-    setEditingObjects(Arrays.asList(objects));
   }
 }

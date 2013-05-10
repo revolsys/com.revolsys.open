@@ -29,25 +29,13 @@ public abstract class AbstractMultipleRenderer extends
     super(type, layer, parent, style);
     @SuppressWarnings("unchecked")
     final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
-    List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
+    final List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
     for (final Map<String, Object> childStyle : styles) {
       final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
         layer, this, childStyle);
       renderers.add(renderer);
     }
     setRenderers(renderers);
-  }
-
-  @Override
-  public boolean isVisible(DataObject object) {
-    if (super.isVisible(object)) {
-      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-        if( renderer.isVisible(object)) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {
@@ -70,6 +58,22 @@ public abstract class AbstractMultipleRenderer extends
     return renderers;
   }
 
+  @Override
+  public boolean isVisible(final DataObject object) {
+    if (super.isVisible(object)) {
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        if (renderer.isVisible(object)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public void removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
+    renderers.remove(renderer);
+  }
+
   public void setRenderers(
     final List<? extends AbstractDataObjectLayerRenderer> renderers) {
     this.renderers = new ArrayList<AbstractDataObjectLayerRenderer>(renderers);
@@ -87,10 +91,6 @@ public abstract class AbstractMultipleRenderer extends
       map.put("styles", renderers);
     }
     return map;
-  }
-
-  public void removeRenderer(AbstractDataObjectLayerRenderer renderer) {
-    renderers.remove(renderer);
   }
 
 }

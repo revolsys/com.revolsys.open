@@ -15,16 +15,17 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   public FilterMultipleRenderer(final DataObjectLayer layer,
-    LayerRenderer<?> parent, final Map<String, Object> style) {
+    final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("filterStyle", layer, parent, style);
   }
 
   @Override
-  protected void renderObject(Viewport2D viewport, Graphics2D graphics,
-    BoundingBox visibleArea, DataObjectLayer layer, DataObject object) {
+  protected void renderObject(final Viewport2D viewport,
+    final Graphics2D graphics, final BoundingBox visibleArea,
+    final DataObjectLayer layer, final DataObject object) {
     if (isVisible(object)) {
-      double scale = viewport.getScale();
-      for (AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      final double scale = viewport.getScale();
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         if (renderer.isVisible(object) && !layer.isHidden(object)) {
           if (renderer.isVisible(scale)) {
             renderer.renderObject(viewport, graphics, visibleArea, layer,

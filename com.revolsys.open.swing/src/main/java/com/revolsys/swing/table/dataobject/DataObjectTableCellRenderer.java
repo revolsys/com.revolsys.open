@@ -2,7 +2,6 @@ package com.revolsys.swing.table.dataobject;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -15,6 +14,7 @@ import org.jdesktop.swingx.JXTable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 import com.revolsys.util.CollectionUtil;
@@ -34,10 +34,11 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
     labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
-    labelComponent.setFont(labelComponent.getFont().deriveFont(Font.BOLD));
+    labelComponent.setFont(SwingUtil.BOLD_FONT);
     labelComponent.setOpaque(true);
 
     valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
+    valueComponent.setFont(SwingUtil.FONT);
     valueComponent.setOpaque(true);
   }
 
@@ -105,7 +106,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     return component;
   }
 
-  protected void setRowColor(final JTable table, Component component,
+  protected void setRowColor(final JTable table, final Component component,
     final int row) {
     final int[] selectedRows = table.getSelectedRows();
     boolean selected = false;

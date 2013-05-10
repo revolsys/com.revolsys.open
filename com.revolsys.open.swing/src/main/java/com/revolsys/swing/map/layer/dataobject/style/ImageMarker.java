@@ -24,11 +24,11 @@ public class ImageMarker implements Marker {
     this.image = image;
   }
 
-  public ImageMarker(Resource resource) {
-    InputStream in = SpringUtil.getInputStream(resource);
+  public ImageMarker(final Resource resource) {
+    final InputStream in = SpringUtil.getInputStream(resource);
     try {
       this.image = ImageIO.read(in);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to read file: " + resource);
     } finally {
       FileUtil.closeSilent(in);

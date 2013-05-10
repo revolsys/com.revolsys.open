@@ -53,12 +53,14 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   private Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
 
+  private Query query;
+
   public DataStoreQueryTableModel(final DataObjectMetaData metaData) {
     this(metaData.getDataObjectStore(), metaData);
   }
 
   public DataStoreQueryTableModel(final DataObjectMetaData metaData,
-    List<String> attributeNames) {
+    final List<String> attributeNames) {
     this(metaData.getDataObjectStore(), metaData);
     setAttributeNames(attributeNames);
     setAttributeTitles(attributeNames);
@@ -70,17 +72,6 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     this.dataStore = dataStore;
     setEditable(false);
     this.query = new Query(metaData);
-  }
-
-  private Query query;
-
-  public void setQuery(Query query) {
-    if (query == null) {
-      this.query = new Query(getMetaData());
-    } else {
-      this.query = query.clone();
-    }
-    createPagerWorker();
   }
 
   public void createPager() {
@@ -181,10 +172,10 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   public void loadRows() {
     try {
-      ResultPager<DataObject> pager = this.pager;
+      final ResultPager<DataObject> pager = this.pager;
       if (pager != null) {
-        Set<Integer> rowIndexes = this.loadingRowIndexes;
-        Map<Integer, DataObject> cache = this.cache;
+        final Set<Integer> rowIndexes = this.loadingRowIndexes;
+        final Map<Integer, DataObject> cache = this.cache;
         while (!rowIndexes.isEmpty()) {
           final int row = CollectionUtil.get(rowIndexes, 0);
           if (row < getRowCount()) {
@@ -209,6 +200,15 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     } finally {
       loadObjectsWorker = null;
     }
+  }
+
+  public void setQuery(final Query query) {
+    if (query == null) {
+      this.query = new Query(getMetaData());
+    } else {
+      this.query = query.clone();
+    }
+    createPagerWorker();
   }
 
   @Override

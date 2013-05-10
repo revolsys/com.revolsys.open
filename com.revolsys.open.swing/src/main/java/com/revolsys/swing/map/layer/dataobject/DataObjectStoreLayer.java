@@ -29,7 +29,6 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
@@ -91,8 +90,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void addEditingObject(DataObject object) {
-    DataObject cachedObject = getCacheObject(object);
+  public void addEditingObject(final DataObject object) {
+    final DataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {
       super.addEditingObject(cachedObject);
     }
@@ -107,8 +106,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void addSelectedObject(DataObject object) {
-    DataObject cachedObject = getCacheObject(object);
+  protected void addSelectedObject(final DataObject object) {
+    final DataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {
       super.addSelectedObject(object);
     }
@@ -133,6 +132,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     cachedObjects.clear();
   }
 
+  @Override
+  public void clearEditingObjects() {
+    synchronized (cachedObjects) {
+      super.clearEditingObjects();
+      cleanCachedObjects();
+    }
+  }
+
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
     synchronized (sync) {
       if (loadedBoundingBox == loadingBoundingBox) {
@@ -143,14 +150,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         loadingWorker = null;
       }
 
-    }
-  }
-
-  @Override
-  public void clearEditingObjects() {
-    synchronized (cachedObjects) {
-      super.clearEditingObjects();
-      cleanCachedObjects();
     }
   }
 
@@ -229,7 +228,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      List<DataObject> objects = index.queryIntersects(polygon);
+      final List<DataObject> objects = index.queryIntersects(polygon);
       return objects;
     }
   }
@@ -315,7 +314,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public List<DataObject> query(Query query) {
+  public List<DataObject> query(final Query query) {
     query.setProperty("dataObjectFactory", this);
     final Reader<DataObject> reader = dataStore.query(query);
     try {
@@ -357,7 +356,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     synchronized (sync) {
       if (loadedBoundingBox == loadingBoundingBox) {
         this.index = index;
-        List<DataObject> newObjects = getNewObjects();
+        final List<DataObject> newObjects = getNewObjects();
         index.insert(newObjects);
         clearLoading(loadedBoundingBox);
       }

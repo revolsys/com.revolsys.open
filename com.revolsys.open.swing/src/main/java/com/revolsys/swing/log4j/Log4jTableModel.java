@@ -16,7 +16,6 @@ import javax.swing.table.AbstractTableModel;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.table.BaseJxTable;
@@ -29,13 +28,13 @@ public class Log4jTableModel extends AbstractTableModel {
 
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
-    final JXTable table = createTable();
+    final BaseJxTable table = createTable();
     final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
-  public static JXTable createTable() {
+  public static BaseJxTable createTable() {
     final Log4jTableModel model = new Log4jTableModel();
     final BaseJxTable table = new BaseJxTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -61,11 +60,11 @@ public class Log4jTableModel extends AbstractTableModel {
     table.setSortOrder(0, SortOrder.DESCENDING);
     table.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mouseClicked(final MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-          int row = table.rowAtPoint(e.getPoint());
+          final int row = table.rowAtPoint(e.getPoint());
           if (row != -1) {
-            LoggingEvent loggingEvent = model.getLoggingEvent(row);
+            final LoggingEvent loggingEvent = model.getLoggingEvent(row);
             LoggingEventPanel.showDialog(table, loggingEvent);
           }
         }
@@ -92,8 +91,19 @@ public class Log4jTableModel extends AbstractTableModel {
   }
 
   @Override
-  public String getColumnName(int column) {
+  public String getColumnName(final int column) {
     return columnNames.get(column);
+  }
+
+  public LoggingEvent getLoggingEvent(final int rowIndex) {
+    LoggingEvent event;
+    final List<LoggingEvent> loggingEvents = appender.getLoggingEvents();
+    if (rowIndex < loggingEvents.size()) {
+      event = loggingEvents.get(rowIndex);
+    } else {
+      return null;
+    }
+    return event;
   }
 
   @Override
@@ -104,14 +114,14 @@ public class Log4jTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    LoggingEvent event = getLoggingEvent(rowIndex);
+    final LoggingEvent event = getLoggingEvent(rowIndex);
     if (event == null) {
       return null;
     } else {
       switch (columnIndex) {
         case 0:
-          long time = event.getTimeStamp();
-          Timestamp timestamp = new Timestamp(time);
+          final long time = event.getTimeStamp();
+          final Timestamp timestamp = new Timestamp(time);
           return timestamp;
         case 1:
           return event.getLevel();
@@ -123,17 +133,6 @@ public class Log4jTableModel extends AbstractTableModel {
           return null;
       }
     }
-  }
-
-  public LoggingEvent getLoggingEvent(final int rowIndex) {
-    LoggingEvent event;
-    List<LoggingEvent> loggingEvents = appender.getLoggingEvents();
-    if (rowIndex < loggingEvents.size()) {
-      event = loggingEvents.get(rowIndex);
-    } else {
-      return null;
-    }
-    return event;
   }
 
 }

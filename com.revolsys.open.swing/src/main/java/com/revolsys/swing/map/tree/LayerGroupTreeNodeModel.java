@@ -6,7 +6,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.tree.renderer.LayerGroupTreeCellRenderer;
-import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class LayerGroupTreeNodeModel extends

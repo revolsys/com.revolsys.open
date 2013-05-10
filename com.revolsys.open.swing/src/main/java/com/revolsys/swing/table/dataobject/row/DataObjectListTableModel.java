@@ -90,6 +90,11 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     this.propertyChangeListeners.add(propertyChangeListener);
   }
 
+  public void clear() {
+    this.objects.clear();
+    fireTableDataChanged();
+  }
+
   @Override
   @PreDestroy
   public void dispose() {
@@ -156,11 +161,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
         fireTableRowsDeleted(row, row + 1);
       }
     }
-  }
-
-  public void clear() {
-    this.objects.clear();
-    fireTableDataChanged();
   }
 
   public void removeAll(final DataObject... removedFeatures) {

@@ -36,12 +36,12 @@ public class MapTransferable implements Transferable {
     if (MAP_FLAVOR.equals(flavor)) {
       return map;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
-      StringWriter out = new StringWriter();
-      Collection<String> attributeNames = map.keySet();
+      final StringWriter out = new StringWriter();
+      final Collection<String> attributeNames = map.keySet();
       CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      Collection<Object> values = map.values();
+      final Collection<Object> values = map.values();
       CsvUtil.writeColumns(out, values, '\t', '\n');
-      String text = out.toString();
+      final String text = out.toString();
       return text;
     } else {
       throw new UnsupportedFlavorException(flavor);

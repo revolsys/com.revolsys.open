@@ -34,18 +34,11 @@ public class BaseLayerRendererTreeNodeModel extends
   }
 
   @Override
-  public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
-    super.setObjectTreeModel(objectTreeModel);
-    objectTreeModel.getMenu(GeometryStyleRenderer.class).addMenuItem("style",
-      new ChangeStyle());
-  }
-
-  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     if (source instanceof JTree) {
       final JTree tree = (JTree)source;
-      int clickCount = e.getClickCount();
+      final int clickCount = e.getClickCount();
       if (clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
         final int x = e.getX();
         final int y = e.getY();
@@ -84,6 +77,13 @@ public class BaseLayerRendererTreeNodeModel extends
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+  }
+
+  @Override
+  public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
+    super.setObjectTreeModel(objectTreeModel);
+    ObjectTreeModel.getMenu(GeometryStyleRenderer.class).addMenuItem("style",
+      new ChangeStyle());
   }
 
 }

@@ -1,6 +1,7 @@
 package com.revolsys.swing.table;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.JTable;
 import javax.swing.RowSorter;
@@ -12,7 +13,10 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 
+import com.revolsys.swing.SwingUtil;
+
 public class BaseJxTable extends JXTable {
+
   public BaseJxTable() {
     setAutoCreateRowSorter(false);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -22,16 +26,35 @@ public class BaseJxTable extends JXTable {
     final JTableHeader tableHeader = getTableHeader();
     tableHeader.setDefaultRenderer(headerRenderer);
     tableHeader.setReorderingAllowed(false);
+    setFont(SwingUtil.FONT);
   }
 
-  public BaseJxTable(TableModel model) {
+  public BaseJxTable(final TableModel model) {
     this();
     setModel(model);
 
   }
 
-  public void setModel(TableModel model) {
-    boolean createColumns = getAutoCreateColumnsFromModel();
+  @Override
+  protected void createDefaultRenderers() {
+    super.createDefaultRenderers();
+    setDefaultRenderer(Object.class, new DefaultTableRenderer(
+      new StringConverterValue()));
+
+  }
+
+  @Override
+  public RowSorter<? extends TableModel> getRowSorter() {
+    if (isSortable()) {
+      return super.getRowSorter();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public void setModel(final TableModel model) {
+    final boolean createColumns = getAutoCreateColumnsFromModel();
     if (createColumns) {
       setAutoCreateColumnsFromModel(false);
     }
@@ -48,7 +71,7 @@ public class BaseJxTable extends JXTable {
   }
 
   @Override
-  public void setSortable(boolean sortable) {
+  public void setSortable(final boolean sortable) {
     super.setSortable(sortable);
     if (sortable) {
       if (getRowSorter() == null) {
@@ -57,21 +80,5 @@ public class BaseJxTable extends JXTable {
     } else {
       setRowSorter(null);
     }
-  }
-
-  @Override
-  public RowSorter<? extends TableModel> getRowSorter() {
-    if (isSortable()) {
-      return super.getRowSorter();
-    } else {
-      return null;
-    }
-  }
-
-  protected void createDefaultRenderers() {
-    super.createDefaultRenderers();
-    setDefaultRenderer(Object.class, new DefaultTableRenderer(
-      new StringConverterValue()));
-
   }
 }

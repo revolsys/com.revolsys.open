@@ -81,7 +81,7 @@ public class GeoReferencedImageLayerRenderer extends
     if (layer.isVisible(scale)) {
       if (!layer.isEditable()) {
         final GeoReferencedImage image = layer.getImage();
-        BoundingBox boundingBox = layer.getBoundingBox();
+        final BoundingBox boundingBox = layer.getBoundingBox();
         if (boundingBox == null || boundingBox.isNull()) {
           layer.fitToViewport();
         }

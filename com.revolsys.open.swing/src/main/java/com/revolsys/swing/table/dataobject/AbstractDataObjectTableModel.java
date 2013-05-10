@@ -12,11 +12,11 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.StringNumericComparator;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.table.BaseJxTable;
 
 @SuppressWarnings("serial")
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
@@ -25,8 +25,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     "#", "Attribute", "Value"
   };
 
-  public static JXTable create(final AbstractDataObjectTableModel model) {
-    final JXTable table = new JXTable(model);
+  public static BaseJxTable create(final AbstractDataObjectTableModel model) {
+    final BaseJxTable table = new BaseJxTable(model);
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);

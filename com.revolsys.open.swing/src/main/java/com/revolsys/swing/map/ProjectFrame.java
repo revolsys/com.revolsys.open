@@ -49,7 +49,8 @@ public class ProjectFrame extends JFrame {
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
     dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
-    CEclipseTheme theme = (CEclipseTheme)dockControl.getController().getTheme();
+    final CEclipseTheme theme = (CEclipseTheme)dockControl.getController()
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -74,6 +75,12 @@ public class ProjectFrame extends JFrame {
     LayerUtil.loadLayerGroup(project, resourcesDir);
   }
 
+  protected void addLogPanel() {
+    final JPanel panel = Log4jTableModel.createPanel();
+    DockingFramesUtil.addDockable(project, MapPanel.MAP_TABLE_WORKING_AREA,
+      "log4j", "Logging", panel);
+  }
+
   protected MapPanel addMapPanel() {
     mapPanel = new MapPanel();
     project = mapPanel.getProject();
@@ -88,18 +95,6 @@ public class ProjectFrame extends JFrame {
     dockControl.addDockable(dockable);
     dockable.setVisible(true);
     return mapPanel;
-  }
-
-  public MapPanel getMapPanel() {
-    return mapPanel;
-  }
-
-  public ObjectTreePanel getTocPanel() {
-    return tocPanel;
-  }
-
-  public CControl getDockControl() {
-    return dockControl;
   }
 
   protected void addTableOfContents() {
@@ -129,12 +124,6 @@ public class ProjectFrame extends JFrame {
       "tasks", "Background Tasks", panel);
   }
 
-  protected void addLogPanel() {
-    final JPanel panel = Log4jTableModel.createPanel();
-    DockingFramesUtil.addDockable(project, MapPanel.MAP_TABLE_WORKING_AREA,
-      "log4j", "Logging", panel);
-  }
-
   protected void addWorkingAreas() {
     addControlWorkingArea();
     addTableWorkingArea();
@@ -156,8 +145,20 @@ public class ProjectFrame extends JFrame {
     return menuBar;
   }
 
+  public CControl getDockControl() {
+    return dockControl;
+  }
+
+  public MapPanel getMapPanel() {
+    return mapPanel;
+  }
+
   public Project getProject() {
     return project;
+  }
+
+  public ObjectTreePanel getTocPanel() {
+    return tocPanel;
   }
 
   protected void initUi() {

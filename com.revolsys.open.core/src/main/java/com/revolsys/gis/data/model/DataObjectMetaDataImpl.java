@@ -515,7 +515,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public String getTypeName() {
-    return PathUtil.getName(path);
+     return PathUtil.getName(path);
   }
 
   @Override

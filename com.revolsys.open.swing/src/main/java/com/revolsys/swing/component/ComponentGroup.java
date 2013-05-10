@@ -38,6 +38,15 @@ public class ComponentGroup {
     getGroup(groupName);
   }
 
+  public ButtonGroup getButtonGroup(final String groupName) {
+    ButtonGroup buttonGroup = buttonGroups.get(groupName);
+    if (buttonGroup == null) {
+      buttonGroup = new ButtonGroup();
+      buttonGroups.put(groupName, buttonGroup);
+    }
+    return buttonGroup;
+  }
+
   public List<Component> getGroup(final String groupName) {
     List<Component> components = groups.get(groupName);
     if (components == null) {
@@ -48,15 +57,6 @@ public class ComponentGroup {
     return components;
   }
 
-  public ButtonGroup getButtonGroup(final String groupName) {
-    ButtonGroup buttonGroup = buttonGroups.get(groupName);
-    if (buttonGroup == null) {
-      buttonGroup = new ButtonGroup();
-      buttonGroups.put(groupName, buttonGroup);
-    }
-    return buttonGroup;
-  }
-
   public void setGroupEnabled(final String groupName, final boolean enabled) {
     final List<Component> components = getGroup(groupName);
     for (final Component component : components) {
@@ -64,7 +64,7 @@ public class ComponentGroup {
     }
   }
 
-  public void updateComponents(JComponent container) {
+  public void updateComponents(final JComponent container) {
     container.removeAll();
     boolean first = true;
     for (final String groupName : groupNames) {
@@ -74,13 +74,13 @@ public class ComponentGroup {
           first = false;
         } else {
           if (container instanceof JMenu) {
-            JMenu menu = (JMenu)container;
+            final JMenu menu = (JMenu)container;
             menu.addSeparator();
           } else if (container instanceof JPopupMenu) {
-            JPopupMenu menu = (JPopupMenu)container;
+            final JPopupMenu menu = (JPopupMenu)container;
             menu.addSeparator();
           } else if (container instanceof JToolBar) {
-            JToolBar toolBar = (JToolBar)container;
+            final JToolBar toolBar = (JToolBar)container;
             toolBar.addSeparator();
           }
         }

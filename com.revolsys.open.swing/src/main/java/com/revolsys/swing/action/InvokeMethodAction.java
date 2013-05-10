@@ -90,8 +90,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   }
 
   public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final boolean invokeLater,
-    Runnable runnable) {
+    final Icon icon, final boolean invokeLater, final Runnable runnable) {
     this.runnable = runnable;
     this.invokeLater = invokeLater;
     if (name != null) {
@@ -117,16 +116,16 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   }
 
   public InvokeMethodAction(final CharSequence name, final String toolTip,
-    final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
-    this(name, toolTip, icon, true, object, methodName, parameters);
-  }
-
-  public InvokeMethodAction(final CharSequence name, final String toolTip,
     final Icon icon, final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
     this(name, toolTip, icon, true, object, methodName, parameters);
     setEnableCheck(enableCheck);
+  }
+
+  public InvokeMethodAction(final CharSequence name, final String toolTip,
+    final Icon icon, final Object object, final String methodName,
+    final Object... parameters) {
+    this(name, toolTip, icon, true, object, methodName, parameters);
   }
 
   public InvokeMethodAction(final Icon icon, final boolean invokeLater,
@@ -148,22 +147,27 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     }
   }
 
+  @Override
   public Integer getMnemonic() {
     return (Integer)getValue(Action.MNEMONIC_KEY);
   }
 
+  @Override
   public String getName() {
     return (String)getValue(Action.NAME);
   }
 
+  @Override
   public String getToolTip() {
     return (String)getValue(Action.SHORT_DESCRIPTION);
   }
 
+  @Override
   protected void setIcon(final Icon icon) {
     putValue(Action.SMALL_ICON, icon);
   }
 
+  @Override
   protected void setName(final String name) {
     putValue(Action.NAME, name);
   }

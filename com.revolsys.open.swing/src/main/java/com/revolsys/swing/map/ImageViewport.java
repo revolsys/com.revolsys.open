@@ -9,12 +9,12 @@ import com.revolsys.swing.map.layer.Project;
 
 public class ImageViewport extends Viewport2D {
 
-  private BufferedImage image;
+  private final BufferedImage image;
 
-  private Graphics2D graphics;
+  private final Graphics2D graphics;
 
-  public ImageViewport(Project project, int width, int height,
-    BoundingBox boundingBox) {
+  public ImageViewport(final Project project, final int width,
+    final int height, final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);
     image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     graphics = (Graphics2D)image.getGraphics();

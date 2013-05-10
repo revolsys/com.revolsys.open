@@ -7,33 +7,34 @@ import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.util.JavaBeanUtil;
 
 public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
-  private String propertyName;
+  private final String propertyName;
 
-  private Object value;
+  private final Object value;
 
-  public TreeItemPropertyEnableCheck(String propertyName) {
+  public TreeItemPropertyEnableCheck(final String propertyName) {
     this(propertyName, true);
   }
 
-  public TreeItemPropertyEnableCheck(String propertyName, Object value) {
+  public TreeItemPropertyEnableCheck(final String propertyName,
+    final Object value) {
     this.propertyName = propertyName;
     this.value = value;
   }
 
   @Override
   public boolean isEnabled() {
-    Object object = ObjectTree.getMouseClickItem();
+    final Object object = ObjectTree.getMouseClickItem();
     if (object == null) {
       return disabled();
     } else {
       try {
-        Object value = JavaBeanUtil.getValue(object, propertyName);
+        final Object value = JavaBeanUtil.getValue(object, propertyName);
         if (EqualsRegistry.equal(value, this.value)) {
           return enabled();
         } else {
           return disabled();
         }
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).debug("Enable check not valid", e);
         return disabled();
       }

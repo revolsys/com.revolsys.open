@@ -16,25 +16,14 @@ public class DataObjectFormTransferHandler extends TransferHandler {
 
   private static final long serialVersionUID = 1L;
 
-  public DataObjectFormTransferHandler(DataObjectForm form) {
+  public DataObjectFormTransferHandler(final DataObjectForm form) {
     this.form = form;
   }
 
   @Override
-  protected Transferable createTransferable(JComponent component) {
-    Map<String, Object> values = form.getValues();
-    Transferable transferable = new MapTransferable(values);
-    return transferable;
-  }
-
-  @Override
-  public int getSourceActions(JComponent component) {
-    return COPY;
-  }
-
-  @Override
-  public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-    for (DataFlavor dataFlavor : transferFlavors) {
+  public boolean canImport(final JComponent comp,
+    final DataFlavor[] transferFlavors) {
+    for (final DataFlavor dataFlavor : transferFlavors) {
       if (MapTransferable.MAP_FLAVOR.equals(dataFlavor)) {
         return true;
       }
@@ -42,15 +31,28 @@ public class DataObjectFormTransferHandler extends TransferHandler {
     return false;
   }
 
+  @Override
+  protected Transferable createTransferable(final JComponent component) {
+    final Map<String, Object> values = form.getValues();
+    final Transferable transferable = new MapTransferable(values);
+    return transferable;
+  }
+
+  @Override
+  public int getSourceActions(final JComponent component) {
+    return COPY;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
-  public boolean importData(JComponent comp, Transferable transferable) {
+  public boolean importData(final JComponent comp,
+    final Transferable transferable) {
     if (transferable.isDataFlavorSupported(MapTransferable.MAP_FLAVOR)) {
       try {
-        Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(MapTransferable.MAP_FLAVOR);
+        final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(MapTransferable.MAP_FLAVOR);
         form.pasteValues(map);
         return true;
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to paste data",
           transferable);
         return false;

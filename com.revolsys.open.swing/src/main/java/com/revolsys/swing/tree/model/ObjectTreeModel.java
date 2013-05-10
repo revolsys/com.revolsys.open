@@ -38,8 +38,8 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       synchronized (CLASS_MENUS) {
         MenuFactory menu = CLASS_MENUS.get(layerClass);
         if (menu == null) {
-          Class<?> superClass = layerClass.getSuperclass();
-          MenuFactory parentMenu = getMenu(superClass);
+          final Class<?> superClass = layerClass.getSuperclass();
+          final MenuFactory parentMenu = getMenu(superClass);
           menu = parentMenu.clone();
           CLASS_MENUS.put(layerClass, menu);
         }

@@ -7,33 +7,42 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
-  private Object object;
+  private final Object object;
 
-  private String propertyName;
+  private final String propertyName;
 
-  private Object value;
+  private final Object value;
 
-  public ObjectPropertyEnableCheck(Object object, String propertyName) {
+  private boolean inverse = false;
+
+  public ObjectPropertyEnableCheck(final Object object,
+    final String propertyName) {
     this(object, propertyName, true);
   }
 
-  public ObjectPropertyEnableCheck(Object object, String propertyName,
-    Object value) {
+  public ObjectPropertyEnableCheck(final Object object,
+    final String propertyName, final Object value) {
+    this(object, propertyName, value, false);
+  }
+
+  public ObjectPropertyEnableCheck(final Object object,
+    final String propertyName, final Object value, final boolean inverse) {
     this.object = object;
     if (object instanceof PropertyChangeSupportProxy) {
-      PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
-      PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
       // TODO how to make this a weak reference
       propertyChangeSupport.addPropertyChangeListener(propertyName, this);
     }
     this.propertyName = propertyName;
     this.value = value;
+    this.inverse = inverse;
   }
 
   @Override
   public boolean isEnabled() {
-    Object value = JavaBeanUtil.getValue(object, propertyName);
-    if (EqualsRegistry.equal(value, this.value)) {
+    final Object value = JavaBeanUtil.getValue(object, propertyName);
+    if (EqualsRegistry.equal(value, this.value) == !inverse) {
       return enabled();
     } else {
       return disabled();

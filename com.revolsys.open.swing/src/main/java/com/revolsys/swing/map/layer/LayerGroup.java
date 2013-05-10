@@ -32,17 +32,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     }
   }
 
-  public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
-    if (isVisible()) {
-      for (Layer layer : this) {
-        BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
-      }
-    }
-    return boundingBox;
-  }
-
   @Override
   public boolean add(final Layer layer) {
     synchronized (layers) {
@@ -225,6 +214,18 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return layers;
   }
 
+  @Override
+  public BoundingBox getSelectedBoundingBox() {
+    BoundingBox boundingBox = super.getSelectedBoundingBox();
+    if (isVisible()) {
+      for (final Layer layer : this) {
+        final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
+        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
+      }
+    }
+    return boundingBox;
+  }
+
   public int indexOf(final Layer layer) {
     return layers.indexOf(layer);
   }
@@ -357,6 +358,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return layers.size();
   }
 
+  public void sort() {
+    synchronized (layers) {
+      Collections.sort(layers);
+    }
+  }
+
   @Override
   public List<Layer> subList(final int fromIndex, final int toIndex) {
     return layers.subList(fromIndex, toIndex);
@@ -370,11 +377,5 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public <T> T[] toArray(final T[] a) {
     return layers.toArray(a);
-  }
-
-  public void sort() {
-    synchronized (layers) {
-      Collections.sort(layers);
-    }
   }
 }

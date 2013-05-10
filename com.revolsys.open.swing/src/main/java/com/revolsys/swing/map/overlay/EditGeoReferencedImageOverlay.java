@@ -71,21 +71,6 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     super(map);
   }
 
-  private boolean addTiePointMove(final MouseEvent event) {
-    if (layer == null || addTiePointFirstPoint == null) {
-      return false;
-    } else {
-      GeometryFactory geometryFactory = getGeometryFactory();
-      Point mousePoint = getViewportPoint(event);
-      LineString line = geometryFactory.createLineString(addTiePointFirstPoint,
-        mousePoint);
-      Graphics2D graphics = getGraphics();
-      setXorGeometry(graphics, line);
-      // TODO make into an arrow
-      return true;
-    }
-  }
-
   private boolean addTiePointFinish(final MouseEvent event) {
     if (addTiePointFirstPoint != null) {
       if (event != null) {
@@ -103,61 +88,19 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     return false;
   }
 
-  protected void updateWarpedImage() {
-    // TODO update in different thread
-    int numPoints = tiePointsModel.size();
-    if (numPoints > 2) {
-
-      int degree = 1;
-      if (numPoints < 3) {
-        degree = 0;
-      }
-      // TODO map world in image coordinates
-      float[] srcCoords = toSourceImagePoints(tiePointsImage);
-      float[] dstCoords = toDestinationImagePoints(tiePointsModel);
-      float width = image.getImageWidth();
-      float height = image.getImageHeight();
-
-      RenderedOp source = image.getJaiImage();
-      BufferedImage img = new BufferedImage(source.getWidth(),
-        source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      img.getGraphics().drawImage(source.getAsBufferedImage(), 0, 0, null);
-
-      WarpPolynomial warp = WarpPolynomial.createWarp(dstCoords, 0, srcCoords,
-        0, 2 * numPoints, 1.0F / width, 1.0F / height, width, height, degree);
-
-      ParameterBlock pb = new ParameterBlock();
-      pb.addSource(img);
-      pb.add(warp);
-      pb.add(new InterpolationNearest());
-      warpedImage = JAI.create("warp", pb);
+  private boolean addTiePointMove(final MouseEvent event) {
+    if (layer == null || addTiePointFirstPoint == null) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point mousePoint = getViewportPoint(event);
+      final LineString line = geometryFactory.createLineString(
+        addTiePointFirstPoint, mousePoint);
+      final Graphics2D graphics = getGraphics();
+      setXorGeometry(graphics, line);
+      // TODO make into an arrow
+      return true;
     }
-  }
-
-  protected float[] toDestinationImagePoints(ListCoordinatesList points) {
-    int numPoints = points.size();
-    float[] dstCoords = new float[numPoints * 2];
-    for (int i = 0; i < numPoints; i++) {
-      Coordinates modelPoint = points.get(i);
-      final double modelX = modelPoint.getX();
-      final double modelY = modelPoint.getY();
-      Coordinates imagePoint = getImagePoint(preMoveBoundingBox, modelX, modelY);
-      dstCoords[i * 2] = (float)imagePoint.getX();
-      dstCoords[i * 2 + 1] = (float)imagePoint.getY();
-    }
-    return dstCoords;
-  }
-
-  protected float[] toSourceImagePoints(ListCoordinatesList points) {
-    int numPoints = points.size();
-    float[] dstCoords = new float[numPoints * 2];
-    for (int i = 0; i < numPoints; i++) {
-      Coordinates modelPoint = points.get(i);
-      Coordinates imagePoint = getImagePoint(modelPoint);
-      dstCoords[i * 2] = (float)imagePoint.getX();
-      dstCoords[i * 2 + 1] = (float)imagePoint.getY();
-    }
-    return dstCoords;
   }
 
   private boolean addTiePointStart(final MouseEvent event) {
@@ -201,28 +144,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     imageBoundingBox = new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
   }
 
-  public GeoReferencedImageLayer getLayer() {
-    return layer;
-  }
-
-  public DoubleCoordinates getImagePoint(Point modelPoint) {
-    final double modelX = modelPoint.getX();
-    final double modelY = modelPoint.getY();
-
-    return getImagePoint(preMoveBoundingBox, modelX, modelY);
-  }
-
-  public DoubleCoordinates getImagePoint(Coordinates modelPoint) {
-    final double modelX = modelPoint.getX();
-    final double modelY = modelPoint.getY();
-
-    return getImagePoint(preMoveBoundingBox, modelX, modelY);
-  }
-
-  public DoubleCoordinates getImagePoint(BoundingBox boundingBox,
+  public DoubleCoordinates getImagePoint(final BoundingBox boundingBox,
     final double modelX, final double modelY) {
-    double modelDeltaX = modelX - boundingBox.getMinX();
-    double modelDeltaY = modelY - boundingBox.getMinY();
+    final double modelDeltaX = modelX - boundingBox.getMinX();
+    final double modelDeltaY = modelY - boundingBox.getMinY();
 
     final double modelWidth = boundingBox.getWidth();
     final double modelHeight = boundingBox.getHeight();
@@ -236,8 +161,26 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     final double imageX = imageWidth * xRatio;
     final double imageY = imageHeight * yRatio;
     // TODO if image is already warped then this location will be different!
-    DoubleCoordinates imagePoint = new DoubleCoordinates(imageX, imageY);
+    final DoubleCoordinates imagePoint = new DoubleCoordinates(imageX, imageY);
     return imagePoint;
+  }
+
+  public DoubleCoordinates getImagePoint(final Coordinates modelPoint) {
+    final double modelX = modelPoint.getX();
+    final double modelY = modelPoint.getY();
+
+    return getImagePoint(preMoveBoundingBox, modelX, modelY);
+  }
+
+  public DoubleCoordinates getImagePoint(final Point modelPoint) {
+    final double modelX = modelPoint.getX();
+    final double modelY = modelPoint.getY();
+
+    return getImagePoint(preMoveBoundingBox, modelX, modelY);
+  }
+
+  public GeoReferencedImageLayer getLayer() {
+    return layer;
   }
 
   @Override
@@ -264,6 +207,15 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
         setXorGeometry(null);
         repaint();
+      }
+    }
+  }
+
+  @Override
+  public void mouseClicked(final MouseEvent event) {
+    if (layer != null) {
+      if (addTiePointFinish(event)) {
+      } else if (addTiePointStart(event)) {
       }
     }
   }
@@ -296,15 +248,6 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         event.consume();
       } else if (moveCornerStart(event)) {
       } else if (moveImageStart(event)) {
-      }
-    }
-  }
-
-  @Override
-  public void mouseClicked(MouseEvent event) {
-    if (layer != null) {
-      if (addTiePointFinish(event)) {
-      } else if (addTiePointStart(event)) {
       }
     }
   }
@@ -496,10 +439,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         if (warpedImage == null) {
           BoundingBox boundingBox = imageBoundingBox;
           if (tiePointsModel.size() > 0) {
-            Coordinates modelPoint = tiePointsModel.get(0);
-            Coordinates imagePoint = tiePointsImage.get(0);
-            double deltaX = modelPoint.getX() - imagePoint.getX();
-            double deltaY = modelPoint.getY() - imagePoint.getY();
+            final Coordinates modelPoint = tiePointsModel.get(0);
+            final Coordinates imagePoint = tiePointsImage.get(0);
+            final double deltaX = modelPoint.getX() - imagePoint.getX();
+            final double deltaY = modelPoint.getY() - imagePoint.getY();
             boundingBox = boundingBox.move(deltaX, deltaY);
           }
           GeoReferencedImageLayerRenderer.render(viewport, graphics, image,
@@ -507,9 +450,9 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         } else {
 
           final Point point = imageBoundingBox.getTopLeftPoint();
-          double minX = point.getX();
-          double maxY = point.getY();
-          AffineTransform transform = new AffineTransform();
+          final double minX = point.getX();
+          final double maxY = point.getY();
+          final AffineTransform transform = new AffineTransform();
 
           final double[] location = viewport.toViewCoordinates(minX, maxY);
           final double screenX = location[0];
@@ -526,7 +469,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
           graphics.drawRenderedImage(warpedImage, transform);
         }
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to render image", e);
       } finally {
         graphics.setComposite(oldComposite);
@@ -546,8 +489,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       for (int i = 0; i < tiePointsModel.size(); i++) {
         final Coordinates modelPoint = tiePointsModel.get(i);
         final Coordinates imagePoint = tiePointsImage.get(i);
-        GeometryFactory geometryFactory = getGeometryFactory();
-        LineString line = geometryFactory.createLineString(imagePoint,
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final LineString line = geometryFactory.createLineString(imagePoint,
           modelPoint);
         GeometryStyleRenderer.renderLineString(viewport, graphics, line,
           GeometryStyle.line(Color.CYAN, 3));
@@ -605,5 +548,64 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       oldLayer.setEditable(false);
     }
     firePropertyChange("layer", oldLayer, layer);
+  }
+
+  protected float[] toDestinationImagePoints(final ListCoordinatesList points) {
+    final int numPoints = points.size();
+    final float[] dstCoords = new float[numPoints * 2];
+    for (int i = 0; i < numPoints; i++) {
+      final Coordinates modelPoint = points.get(i);
+      final double modelX = modelPoint.getX();
+      final double modelY = modelPoint.getY();
+      final Coordinates imagePoint = getImagePoint(preMoveBoundingBox, modelX,
+        modelY);
+      dstCoords[i * 2] = (float)imagePoint.getX();
+      dstCoords[i * 2 + 1] = (float)imagePoint.getY();
+    }
+    return dstCoords;
+  }
+
+  protected float[] toSourceImagePoints(final ListCoordinatesList points) {
+    final int numPoints = points.size();
+    final float[] dstCoords = new float[numPoints * 2];
+    for (int i = 0; i < numPoints; i++) {
+      final Coordinates modelPoint = points.get(i);
+      final Coordinates imagePoint = getImagePoint(modelPoint);
+      dstCoords[i * 2] = (float)imagePoint.getX();
+      dstCoords[i * 2 + 1] = (float)imagePoint.getY();
+    }
+    return dstCoords;
+  }
+
+  protected void updateWarpedImage() {
+    // TODO update in different thread
+    final int numPoints = tiePointsModel.size();
+    if (numPoints > 2) {
+
+      int degree = 1;
+      if (numPoints < 3) {
+        degree = 0;
+      }
+      // TODO map world in image coordinates
+      final float[] srcCoords = toSourceImagePoints(tiePointsImage);
+      final float[] dstCoords = toDestinationImagePoints(tiePointsModel);
+      final float width = image.getImageWidth();
+      final float height = image.getImageHeight();
+
+      final RenderedOp source = image.getJaiImage();
+      final BufferedImage img = new BufferedImage(source.getWidth(),
+        source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+      img.getGraphics().drawImage(source.getAsBufferedImage(), 0, 0, null);
+
+      final WarpPolynomial warp = WarpPolynomial.createWarp(dstCoords, 0,
+        srcCoords, 0, 2 * numPoints, 1.0F / width, 1.0F / height, width,
+        height, degree);
+
+      final ParameterBlock pb = new ParameterBlock();
+      pb.addSource(img);
+      pb.add(warp);
+      pb.add(new InterpolationNearest());
+      warpedImage = JAI.create("warp", pb);
+    }
   }
 }

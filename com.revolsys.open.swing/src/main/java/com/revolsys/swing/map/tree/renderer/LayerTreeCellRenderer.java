@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.tree.renderer;
 
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -46,23 +45,25 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
 
   private static Icon getIcon(final Component component, final Layer layer) {
     final List<Icon> icons = new ArrayList<Icon>();
-    if (layer.isVisible()) {
-      icons.add(VISIBLE_ICON);
-    } else {
-      icons.add(VISIBLE_DISABLED_ICON);
-    }
-    // if (layer.isQuerySupported()) {
-    // if (layer.isQueryable()) {
-    // icons.add(QUERY_ICON);
-    // } else {
-    // icons.add(QUERY_DISABLED_ICON);
-    // }
-    // }
-    if (layer.isSelectSupported()) {
-      if (layer.isSelectable()) {
-        icons.add(SELECT_ICON);
+    if (layer.getRenderer() != null) {
+      if (layer.isVisible()) {
+        icons.add(VISIBLE_ICON);
       } else {
-        icons.add(SELECT_DISABLED_ICON);
+        icons.add(VISIBLE_DISABLED_ICON);
+      }
+      // if (layer.isQuerySupported()) {
+      // if (layer.isQueryable()) {
+      // icons.add(QUERY_ICON);
+      // } else {
+      // icons.add(QUERY_DISABLED_ICON);
+      // }
+      // }
+      if (layer.isSelectSupported()) {
+        if (layer.isSelectable()) {
+          icons.add(SELECT_ICON);
+        } else {
+          icons.add(SELECT_DISABLED_ICON);
+        }
       }
     }
     if (!layer.isReadOnly()) {

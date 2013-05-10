@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 

@@ -37,6 +37,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
     DataObjectLayer.class, DataObjectLayerTableModel.class, "createPanel");
 
+  public static final String MODE_ALL = "all";
+
+  public static final String MODE_SELECTED = "selected";
+
+  public static final String MODE_CHANGES = "changes";
+
+  private static final List<String> MODES = Arrays.asList(MODE_ALL,
+    MODE_SELECTED, MODE_CHANGES);
+
   public static DataObjectLayerTablePanel createPanel(
     final DataObjectLayer layer) {
     final JTable table = createTable(layer);
@@ -61,7 +70,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     ModifiedPredicate.add(table);
     NewPredicate.add(table);
     DeletedPredicate.add(table);
-    
+
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);
     final TableColumnModel columnModel = table.getColumnModel();
@@ -76,23 +85,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return table;
   }
 
-  public String getMode() {
-    return mode;
-  }
-
   private SwingWorker<?, ?> loadObjectsWorker;
 
   private Map<Integer, List<DataObject>> pageCache = new LruMap<Integer, List<DataObject>>(
     5);
-
-  public static final String MODE_ALL = "all";
-
-  public static final String MODE_SELECTED = "selected";
-
-  public static final String MODE_CHANGES = "changes";
-
-  private static final List<String> MODES = Arrays.asList(MODE_ALL,
-    MODE_SELECTED, MODE_CHANGES);
 
   private String mode = MODE_ALL;
 
@@ -133,6 +129,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return layer;
   }
 
+  public String getMode() {
+    return mode;
+  }
+
   private Integer getNextPageNumber() {
     synchronized (sync) {
       if (loadingPageNumbers.isEmpty()) {
@@ -146,9 +146,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   @Override
   public DataObject getObject(int row) {
-    DataObjectLayer layer = getLayer();
+    final DataObjectLayer layer = getLayer();
     if (mode.equals(MODE_SELECTED)) {
-      List<DataObject> selectedObjects = layer.getSelectedObjects();
+      final List<DataObject> selectedObjects = layer.getSelectedObjects();
       if (row < selectedObjects.size()) {
         return selectedObjects.get(row);
       } else {
@@ -156,7 +156,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     } else if (mode.equals(MODE_CHANGES)) {
-      List<DataObject> changes = layer.getChanges();
+      final List<DataObject> changes = layer.getChanges();
       if (row < changes.size()) {
         return changes.get(row);
       } else {
@@ -164,7 +164,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     } else {
-      int newObjectCount = layer.getNewObjectCount();
+      final int newObjectCount = layer.getNewObjectCount();
       if (row < newObjectCount) {
         return layer.getNewObjects().get(row);
       } else {
@@ -190,17 +190,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
           }
         }
       }
-    }
-  }
-
-  public void setMode(String mode) {
-    if (MODES.contains(mode)) {
-      if (!mode.equals(this.mode)) {
-        this.mode = mode;
-        fireTableDataChanged();
-      }
-    } else {
-      throw new IllegalArgumentException("Unsupported mode");
     }
   }
 
@@ -273,6 +262,17 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       pageCache = new LruMap<Integer, List<DataObject>>(5);
       countLoaded = false;
       fireTableDataChanged();
+    }
+  }
+
+  public void setMode(final String mode) {
+    if (MODES.contains(mode)) {
+      if (!mode.equals(this.mode)) {
+        this.mode = mode;
+        fireTableDataChanged();
+      }
+    } else {
+      throw new IllegalArgumentException("Unsupported mode");
     }
   }
 

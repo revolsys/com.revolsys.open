@@ -59,12 +59,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       return null;
     } else {
       if (object instanceof com.vividsolutions.jts.geom.Geometry) {
-        com.vividsolutions.jts.geom.Geometry geometry = (com.vividsolutions.jts.geom.Geometry)object;
+        final com.vividsolutions.jts.geom.Geometry geometry = (com.vividsolutions.jts.geom.Geometry)object;
         object = geometryFactory.copy(geometry);
       }
       Geometry geometry = null;
 
-      DataType type = getType();
+      final DataType type = getType();
       if (type == DataTypes.POINT) {
         geometry = toPgPoint(object);
       } else if (type == DataTypes.LINE_STRING) {
@@ -81,7 +81,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
         geometry = toPgPoint(point);
       } else if (object instanceof Coordinates) {
-        Coordinates coordinates = (Coordinates)object;
+        final Coordinates coordinates = (Coordinates)object;
         final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
         geometry = toPgPoint(point);
       } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
@@ -137,15 +137,19 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     if (object instanceof PGgeometry) {
       final PGgeometry pgGeometry = (PGgeometry)object;
       final Geometry geometry = pgGeometry.getGeometry();
-      int type = geometry.getType();
+      final int type = geometry.getType();
       if (type == Geometry.POINT) {
         return toJtsPoint(geometryFactory, (Point)geometry);
       } else if (type == Geometry.LINESTRING) {
         return toJtsLineString(geometryFactory, (LineString)geometry);
       } else if (type == Geometry.POLYGON) {
         return toJtsPolygon(geometryFactory, (Polygon)geometry);
+      } else if (type == Geometry.MULTIPOINT) {
+        return toJtsMultiPoint(geometryFactory, (MultiPoint)geometry);
       } else if (type == Geometry.MULTILINESTRING) {
         return toJtsMultiLineString(geometryFactory, (MultiLineString)geometry);
+      } else if (type == Geometry.MULTIPOLYGON) {
+        return toJtsMultiPolygon(geometryFactory, (MultiPolygon)geometry);
       } else {
         throw new RuntimeException("Unsopported postgis geometry type " + type);
       }
@@ -157,7 +161,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
     if (object instanceof Coordinates) {
-      Coordinates coordinates = (Coordinates)object;
+      final Coordinates coordinates = (Coordinates)object;
       final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
       geometry = toPgPoint(point);
     } else if (object instanceof com.vividsolutions.jts.geom.Point) {
@@ -166,12 +170,18 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
       final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
       geometry = toPgLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
-      final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
-      geometry = toPgMultiLineString(lineString);
     } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
       final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
       geometry = toPgPolygon(polygon);
+    } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
+      final com.vividsolutions.jts.geom.MultiPoint multiPoint = (com.vividsolutions.jts.geom.MultiPoint)object;
+      geometry = toPgMultiPoint(multiPoint);
+    } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
+      final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
+      geometry = toPgMultiLineString(lineString);
+    } else if (object instanceof com.vividsolutions.jts.geom.MultiPolygon) {
+      final com.vividsolutions.jts.geom.MultiPolygon multiPolygon = (com.vividsolutions.jts.geom.MultiPolygon)object;
+      geometry = toPgMultiPolygon(multiPolygon);
     } else {
       return object;
     }
@@ -209,6 +219,34 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         lineStrings[i] = toJtsLineString(factory, line);
       }
       return factory.createMultiLineString(lineStrings);
+    }
+  }
+
+  private com.vividsolutions.jts.geom.Geometry toJtsMultiPoint(
+    final GeometryFactory factory, final MultiPoint multiPoint) {
+    List<com.vividsolutions.jts.geom.Point> points = new ArrayList<com.vividsolutions.jts.geom.Point>();
+    for (Point point : multiPoint.getPoints()) {
+      com.vividsolutions.jts.geom.Point jtsPoint = toJtsPoint(factory, point);
+      points.add(jtsPoint);
+    }
+    if (points.size() == 1) {
+      return points.get(0);
+    } else {
+      return factory.createMultiPoint(points);
+    }
+  }
+
+  private com.vividsolutions.jts.geom.Geometry toJtsMultiPolygon(
+    final GeometryFactory factory, final MultiPolygon multiPolygon) {
+    List<com.vividsolutions.jts.geom.Polygon> polygons = new ArrayList<com.vividsolutions.jts.geom.Polygon>();
+    for (Polygon polygon : multiPolygon.getPolygons()) {
+      com.vividsolutions.jts.geom.Polygon jtsPolygon = toJtsPolygon(factory, polygon);
+      polygons.add(jtsPolygon);
+    }
+    if (polygons.size() == 1) {
+      return polygons.get(0);
+    } else {
+      return factory.createMultiPolygon(polygons);
     }
   }
 
@@ -264,7 +302,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
-    int srid = lineString.getSRID();
+    final int srid = lineString.getSRID();
     pgLineString.setSrid(srid);
     return pgLineString;
   }
@@ -371,7 +409,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return pgMultiPolygon;
   }
 
-  private Point toPgPoint(com.vividsolutions.jts.geom.Point point) {
+  private Point toPgPoint(final com.vividsolutions.jts.geom.Point point) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(point);
     final int numAxis = coordinates.getNumAxis();
 

@@ -16,13 +16,13 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   public AbstractActionMainMenuItemFactory clone() {
     try {
       return (AbstractActionMainMenuItemFactory)super.clone();
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
   }
 
   @Override
-  public void close(Component component) {
+  public void close(final Component component) {
   }
 
   @Override
@@ -30,7 +30,7 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
     if (isCheckBox()) {
       return new JCheckBoxMenuItem(this);
     } else {
-      JMenuItem menuItem = new JMenuItem(this);
+      final JMenuItem menuItem = new JMenuItem(this);
 
       return menuItem;
     }

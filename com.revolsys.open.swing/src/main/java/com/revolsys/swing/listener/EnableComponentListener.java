@@ -12,14 +12,26 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
-
 public class EnableComponentListener implements ItemListener,
   ListSelectionListener, PropertyChangeListener, DocumentListener {
   private final Component component;
 
   public EnableComponentListener(final Component component) {
     this.component = component;
+  }
+
+  @Override
+  public void changedUpdate(final DocumentEvent e) {
+    if (e.getDocument().getLength() == 0) {
+      component.setEnabled(false);
+    } else {
+      component.setEnabled(true);
+    }
+  }
+
+  @Override
+  public void insertUpdate(final DocumentEvent e) {
+    changedUpdate(e);
   }
 
   @Override
@@ -44,6 +56,11 @@ public class EnableComponentListener implements ItemListener,
   }
 
   @Override
+  public void removeUpdate(final DocumentEvent e) {
+    changedUpdate(e);
+  }
+
+  @Override
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
 
@@ -53,25 +70,6 @@ public class EnableComponentListener implements ItemListener,
       } else {
         component.setEnabled(true);
       }
-    }
-  }
-
-  @Override
-  public void insertUpdate(DocumentEvent e) {
-    changedUpdate(e);
-  }
-
-  @Override
-  public void removeUpdate(DocumentEvent e) {
-    changedUpdate(e);
-  }
-
-  @Override
-  public void changedUpdate(DocumentEvent e) {
-    if (e.getDocument().getLength() == 0) {
-      component.setEnabled(false);
-    } else {
-      component.setEnabled(true);
     }
   }
 }

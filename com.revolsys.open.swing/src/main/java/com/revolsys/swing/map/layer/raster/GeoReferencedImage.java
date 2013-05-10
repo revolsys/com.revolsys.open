@@ -75,10 +75,6 @@ public class GeoReferencedImage {
     return image;
   }
 
-  public RenderedOp getJaiImage() {
-    return jaiImage;
-  }
-
   public double getImageAspectRatio() {
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
@@ -101,6 +97,10 @@ public class GeoReferencedImage {
       imageWidth = image.getWidth(null);
     }
     return imageWidth;
+  }
+
+  public RenderedOp getJaiImage() {
+    return jaiImage;
   }
 
   @Override
@@ -157,9 +157,6 @@ public class GeoReferencedImage {
         LoggerFactory.getLogger(getClass()).error(
           "Error reading world file " + worldFile, e);
       }
-    } else {
-      LoggerFactory.getLogger(getClass()).error(
-        "Cannot find world file " + worldFile);
     }
   }
 

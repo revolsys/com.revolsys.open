@@ -12,11 +12,11 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 public class LayerDataObject extends ArrayDataObject {
   private static final long serialVersionUID = 1L;
 
-  private DataObjectLayer layer;
+  private final DataObjectLayer layer;
 
   private Map<String, Object> originalValues;
 
-  public LayerDataObject(DataObjectLayer layer) {
+  public LayerDataObject(final DataObjectLayer layer) {
     super(layer.getMetaData());
     this.layer = layer;
   }
@@ -26,7 +26,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getOriginalValue(String name) {
+  public <T> T getOriginalValue(final String name) {
     if (originalValues == null) {
       return (T)getValue(name);
     } else {
@@ -34,7 +34,7 @@ public class LayerDataObject extends ArrayDataObject {
     }
   }
 
-  public boolean isModified(String name) {
+  public boolean isModified(final String name) {
     if (originalValues == null) {
       return false;
     } else {
@@ -43,14 +43,14 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   @Override
-  public synchronized void setValue(int index, Object value) {
-    DataObjectMetaData metaData = getMetaData();
-    String attributeName = metaData.getAttributeName(index);
+  public synchronized void setValue(final int index, final Object value) {
+    final DataObjectMetaData metaData = getMetaData();
+    final String attributeName = metaData.getAttributeName(index);
 
     final Object oldValue = getValue(index);
     if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
-      DataObjectLayer layer = getLayer();
-      DataObjectState state = getState();
+      final DataObjectLayer layer = getLayer();
+      final DataObjectState state = getState();
       if (DataObjectState.Initalizing.equals(state)) {
         // Allow modification on initialization
       } else if (DataObjectState.New.equals(state)) {
@@ -85,7 +85,7 @@ public class LayerDataObject extends ArrayDataObject {
       }
       super.setValue(index, value);
       if (!DataObjectState.Initalizing.equals(state)) {
-        PropertyChangeEvent event = new PropertyChangeEvent(this,
+        final PropertyChangeEvent event = new PropertyChangeEvent(this,
           attributeName, oldValue, value);
         layer.propertyChange(event);
       }

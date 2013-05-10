@@ -17,11 +17,9 @@ import com.revolsys.util.CaseConverter;
 public abstract class AbstractLayerRenderer<T extends Layer> implements
   LayerRenderer<T>, PropertyChangeListener {
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-  
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
-  }
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
+
   private final T layer;
 
   private double minimumScale = 0;
@@ -38,11 +36,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   private Map<String, Object> defaults = new HashMap<String, Object>();
 
-  @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    propertyChangeSupport.firePropertyChange(event);
-  }
-  
   public AbstractLayerRenderer(final String type, final T layer) {
     this.type = type;
     this.layer = layer;
@@ -115,6 +108,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     return parent;
   }
 
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
   public String getType() {
     return type;
   }
@@ -155,6 +152,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
   }
 
   @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    propertyChangeSupport.firePropertyChange(event);
+  }
+
+  @Override
   public final void render(final Viewport2D viewport, final Graphics2D graphics) {
     final T layer = getLayer();
     final double scale = viewport.getScale();
@@ -182,14 +184,14 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
   }
 
   public void setName(final String name) {
-    String oldName = getName();
+    final String oldName = getName();
     if (StringUtils.hasText(name)) {
       this.name = name;
     } else {
       this.name = CaseConverter.toCapitalizedWords(type);
     }
     propertyChangeSupport.firePropertyChange("name", oldName, this.name);
-      }
+  }
 
   @Override
   public void setVisible(final boolean visible) {
@@ -197,6 +199,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.visible = visible;
     propertyChangeSupport.firePropertyChange("visible", oldVisible, visible);
   }
+
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", type);

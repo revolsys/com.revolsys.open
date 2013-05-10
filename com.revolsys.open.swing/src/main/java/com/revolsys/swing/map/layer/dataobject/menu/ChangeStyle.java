@@ -19,19 +19,19 @@ public class ChangeStyle extends AbstractAction {
   }
 
   @Override
-  public void actionPerformed(ActionEvent event) {
-    Object source = event.getSource();
+  public void actionPerformed(final ActionEvent event) {
+    final Object source = event.getSource();
     Window window;
     if (source instanceof Component) {
-      Component component = (Component)source;
+      final Component component = (Component)source;
       window = SwingUtilities.getWindowAncestor(component);
     } else {
       window = null;
     }
 
-    GeometryStyleRenderer renderer = TreeUtil.getFirstSelectedNode(source,
-      GeometryStyleRenderer.class);
-    GeometryStyle geometryStyle = renderer.getStyle();
+    final GeometryStyleRenderer renderer = TreeUtil.getFirstSelectedNode(
+      source, GeometryStyleRenderer.class);
+    final GeometryStyle geometryStyle = renderer.getStyle();
     LineStylePanel.showDialog(window, geometryStyle);
   }
 }

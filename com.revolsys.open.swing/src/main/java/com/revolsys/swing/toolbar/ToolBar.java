@@ -32,6 +32,23 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
+  public JButton addButton(final String groupName, final Action action) {
+    final JButton button = createButton(action);
+    button.setAction(action);
+    groups.addComponent(this, groupName, button);
+    return button;
+  }
+
+  public JButton addButton(final String groupName, final String title,
+    final String iconName, final EnableCheck enableCheck, final Object object,
+    final String methodName, final Object... parameters) {
+    final Icon icon = SilkIconLoader.getIcon(iconName);
+    final InvokeMethodAction action = new InvokeMethodAction(null, title, icon,
+      enableCheck, object, methodName, parameters);
+
+    return addButton(groupName, action);
+  }
+
   public JButton addButton(final String groupName, final String name,
     final String title, final Icon icon, final Object object,
     final String methodName, final Object... parameters) {
@@ -39,23 +56,6 @@ public class ToolBar extends JToolBar {
       object, methodName, parameters);
 
     return addButton(groupName, action);
-  }
-
-  public JButton addButton(final String groupName, final String title,
-    final String iconName, EnableCheck enableCheck, final Object object,
-    final String methodName, final Object... parameters) {
-    Icon icon = SilkIconLoader.getIcon(iconName);
-    final InvokeMethodAction action = new InvokeMethodAction(null, title, icon,
-      enableCheck, object, methodName, parameters);
-
-    return addButton(groupName, action);
-  }
-
-  public JButton addButton(final String groupName, final Action action) {
-    final JButton button = createButton(action);
-    button.setAction(action);
-    groups.addComponent(this, groupName, button);
-    return button;
   }
 
   public JButton addButtonTitleIcon(final String groupName, final String title,
@@ -79,9 +79,17 @@ public class ToolBar extends JToolBar {
   }
 
   public JToggleButton addToggleButton(final String groupName,
+    final String title, final String iconName, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    return addToggleButton(groupName, iconName, title, icon, enableCheck,
+      object, methodName, parameters);
+  }
+
+  public JToggleButton addToggleButton(final String groupName,
     final String name, final String title, final Icon icon,
-    EnableCheck enableCheck, final Object object, final String methodName,
-    final Object... parameters) {
+    final EnableCheck enableCheck, final Object object,
+    final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
       object, methodName, parameters);
     action.setEnableCheck(enableCheck);
@@ -99,14 +107,6 @@ public class ToolBar extends JToolBar {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
     return addToggleButton(groupName, iconName, title, icon, null, object,
       methodName, parameters);
-  }
-
-  public JToggleButton addToggleButton(final String groupName,
-    final String title, final String iconName, EnableCheck enableCheck,
-    final Object object, final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    return addToggleButton(groupName, iconName, title, icon, enableCheck,
-      object, methodName, parameters);
   }
 
   protected JButton createButton(final Action action) {

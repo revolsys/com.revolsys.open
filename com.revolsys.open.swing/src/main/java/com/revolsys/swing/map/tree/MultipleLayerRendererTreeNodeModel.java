@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.tree;
 
 import java.awt.Rectangle;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
@@ -58,7 +57,7 @@ public class MultipleLayerRendererTreeNodeModel
     final Object source = e.getSource();
     if (source instanceof JTree) {
       final JTree tree = (JTree)source;
-      int clickCount = e.getClickCount();
+      final int clickCount = e.getClickCount();
       if (clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
         final int x = e.getX();
         final int y = e.getY();

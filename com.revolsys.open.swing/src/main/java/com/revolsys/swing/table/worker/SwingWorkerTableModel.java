@@ -12,25 +12,25 @@ import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.table.BaseJxTable;
 
 @SuppressWarnings("serial")
 public class SwingWorkerTableModel extends AbstractTableModel {
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
-    final JXTable table = SwingWorkerTableModel.createTable();
+    final BaseJxTable table = SwingWorkerTableModel.createTable();
     final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
-  public static JXTable createTable() {
+  public static BaseJxTable createTable() {
     final SwingWorkerTableModel model = new SwingWorkerTableModel();
-    final JXTable table = new JXTable(model);
+    final BaseJxTable table = new BaseJxTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);
 

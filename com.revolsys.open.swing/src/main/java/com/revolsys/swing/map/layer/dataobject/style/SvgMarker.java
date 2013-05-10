@@ -25,7 +25,7 @@ public class SvgMarker implements Marker {
     if (resource != null) {
       try {
         shape = new SVGUniverse().getDiagram(resource.getURI());
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new IllegalArgumentException("Cannot get URI for " + resource, e);
       }
     }
@@ -68,13 +68,13 @@ public class SvgMarker implements Marker {
     graphics.translate(dx, dy);
 
     // TODO scale image
-    
+
     try {
       shape.render(graphics);
-    } catch (SVGException e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to render",e);
+    } catch (final SVGException e) {
+      LoggerFactory.getLogger(getClass()).error("Unable to render", e);
     }
-     graphics.setTransform(savedTransform);
+    graphics.setTransform(savedTransform);
   }
 
   @Override

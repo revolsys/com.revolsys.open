@@ -9,7 +9,6 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -18,7 +17,6 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.table.SortableTableCellHeaderRenderer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectRowTable extends BaseJxTable implements MouseListener {
@@ -81,7 +79,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
-        int index = convertColumnIndexToModel(column);
+        final int index = convertColumnIndexToModel(column);
         final Class<?> attributeClass = metaData.getAttributeClass(index);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
           model.setSortOrder(column);
@@ -108,9 +106,9 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    TableModel model = getModel();
+    final TableModel model = getModel();
     if (model instanceof DataObjectLayerTableModel) {
-      DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
+      final DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
       if (layerModel.getMode().equals(DataObjectLayerTableModel.MODE_ALL)) {
         setSortable(false);
       } else {

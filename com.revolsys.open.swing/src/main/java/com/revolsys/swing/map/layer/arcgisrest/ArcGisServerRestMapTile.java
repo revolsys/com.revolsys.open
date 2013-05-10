@@ -7,22 +7,26 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestMapTile extends MapTile {
 
-  private MapServer mapServer;
+  private final MapServer mapServer;
 
-  private int zoomLevel;
+  private final int zoomLevel;
 
-  private int tileX;
+  private final int tileX;
 
-  private int tileY;
+  private final int tileY;
 
-  public ArcGisServerRestMapTile(MapServer mapServer, int zoomLevel, int tileX,
-    int tileY) {
+  public ArcGisServerRestMapTile(final MapServer mapServer,
+    final int zoomLevel, final int tileX, final int tileY) {
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY),
       mapServer.getTileInfo().getWidth(), mapServer.getTileInfo().getHeight());
     this.mapServer = mapServer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
     this.tileY = tileY;
+  }
+
+  public MapServer getMapServer() {
+    return mapServer;
   }
 
   public int getTileX() {
@@ -37,12 +41,9 @@ public class ArcGisServerRestMapTile extends MapTile {
     return zoomLevel;
   }
 
-  public MapServer getMapServer() {
-    return mapServer;
-  }
-
+  @Override
   public Image loadImage() {
-    Image image = mapServer.getTileImage(zoomLevel, tileX, tileY);
+    final Image image = mapServer.getTileImage(zoomLevel, tileX, tileY);
     return image;
   }
 }

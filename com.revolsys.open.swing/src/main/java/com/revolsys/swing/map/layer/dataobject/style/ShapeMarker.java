@@ -44,20 +44,6 @@ public class ShapeMarker implements Marker {
     return path;
   }
 
-  /**
-   * Get a solid arrow shape pointing right for the size of the graphic.
-   * 
-   * @return The shape.
-   */
-  public static Shape solidArrow(final double size) {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(0, size);
-    path.lineTo(size, size * .5);
-    path.lineTo(0, 0);
-    path.closePath();
-    return path;
-  }
-
   public static Shape circle(final double size) {
     return new Ellipse2D.Double(0, 0, size, size);
   }
@@ -76,6 +62,20 @@ public class ShapeMarker implements Marker {
     path.lineTo(0, size / 3);
     path.lineTo(0, size * 2 / 3);
     path.lineTo(size / 3, size * 2 / 3);
+    path.closePath();
+    return path;
+  }
+
+  /**
+   * Get a solid arrow shape pointing right for the size of the graphic.
+   * 
+   * @return The shape.
+   */
+  public static Shape solidArrow(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, size);
+    path.lineTo(size, size * .5);
+    path.lineTo(0, 0);
     path.closePath();
     return path;
   }

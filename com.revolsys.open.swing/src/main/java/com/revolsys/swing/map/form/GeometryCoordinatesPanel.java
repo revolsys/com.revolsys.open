@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
 public class GeometryCoordinatesPanel extends JPanel {
-  private GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
+  private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
 
   public GeometryCoordinatesPanel() {
     super(new BorderLayout());
@@ -22,7 +22,7 @@ public class GeometryCoordinatesPanel extends JPanel {
     add(scrollPane, BorderLayout.EAST);
   }
 
-  public void setGeometry(Geometry geometry) {
+  public void setGeometry(final Geometry geometry) {
     model.setGeometry(geometry);
   }
 }

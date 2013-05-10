@@ -29,24 +29,26 @@ public class ZoomToMapSheet extends AbstractAction {
   @Override
   public void actionPerformed(final ActionEvent e) {
     final Object source = e.getSource();
-    GridLayer layer = TreeUtil.getFirstSelectedNode(source, GridLayer.class);
-    Project project = layer.getProject();
+    final GridLayer layer = TreeUtil.getFirstSelectedNode(source,
+      GridLayer.class);
+    final Project project = layer.getProject();
     if (project != null) {
       final RectangularMapGrid grid = layer.getGrid();
-      String gridName = grid.getName();
-      String preferenceName = CaseConverter.toCapitalizedWords(gridName)
+      final String gridName = grid.getName();
+      final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
         + "MapSheet";
       String mapSheet = PreferencesUtil.getString(getClass(), preferenceName);
       mapSheet = JOptionPane.showInputDialog("Enter name of the" + gridName
         + " map sheet to zoom to", mapSheet);
       if (StringUtils.hasText(mapSheet)) {
         try {
-          RectangularMapTile mapTile = grid.getTileByName(mapSheet);
+          final RectangularMapTile mapTile = grid.getTileByName(mapSheet);
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           project.setViewBoundingBox(boundingBox);
-        } catch (Throwable t) {
-          String message = "Invalid map sheet " + mapSheet +" for " + gridName;
-          LoggerFactory.getLogger(getClass()).error(message,e);
+        } catch (final Throwable t) {
+          final String message = "Invalid map sheet " + mapSheet + " for "
+            + gridName;
+          LoggerFactory.getLogger(getClass()).error(message, e);
           JOptionPane.showMessageDialog((Component)e.getSource(), message);
         } finally {
           PreferencesUtil.setString(getClass(), preferenceName, mapSheet);

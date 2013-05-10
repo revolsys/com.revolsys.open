@@ -5,17 +5,17 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 
-public class ActionEnabledPropertyChangeListener implements PropertyChangeListener{
+public class ActionEnabledPropertyChangeListener implements
+  PropertyChangeListener {
 
-  private Action action;
-  
-  
-  public ActionEnabledPropertyChangeListener(Action action) {
-     this.action = action;
+  private final Action action;
+
+  public ActionEnabledPropertyChangeListener(final Action action) {
+    this.action = action;
   }
 
-
-  public void propertyChange(PropertyChangeEvent event) {
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
     if (Boolean.TRUE == event.getNewValue()) {
       action.setEnabled(true);
     } else {

@@ -6,6 +6,8 @@ import javax.swing.Icon;
 
 public interface ComponentFactory<T extends Component> extends Cloneable {
 
+  ComponentFactory<?> clone();
+
   void close(Component component);
 
   T createComponent();
@@ -15,6 +17,4 @@ public interface ComponentFactory<T extends Component> extends Cloneable {
   String getName();
 
   String getToolTip();
-  
-  ComponentFactory<?> clone();
 }

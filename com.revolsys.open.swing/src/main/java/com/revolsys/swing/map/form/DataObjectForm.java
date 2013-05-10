@@ -48,7 +48,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXTable;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -71,6 +70,7 @@ import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.util.LayerUtil;
+import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectMapTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
@@ -134,6 +134,8 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   private Map<String, Object> values = new HashMap<String, Object>();
 
+  private boolean editable = true;
+
   public DataObjectForm(final DataObject object) {
     this(object.getMetaData());
     setObject(object);
@@ -144,23 +146,18 @@ public class DataObjectForm extends JPanel implements FocusListener,
     setMetaData(metaData);
     addToolBar();
 
-    ActionMap map = getActionMap();
+    final ActionMap map = getActionMap();
     map.put("copy", TransferHandler.getCopyAction());
     map.put("paste", TransferHandler.getPasteAction());
 
-    DataObjectFormTransferHandler transferHandler = new DataObjectFormTransferHandler(
+    final DataObjectFormTransferHandler transferHandler = new DataObjectFormTransferHandler(
       this);
     setTransferHandler(transferHandler);
+    setFont(SwingUtil.FONT);
   }
 
-  public void pasteValues(Map<String, Object> map) {
-    Map<String, Object> values = getValues();
-    values.putAll(map);
-    setValues(values);
-  }
-
-  public ToolBar getToolBar() {
-    return toolBar;
+  public void actionZoomToObject() {
+    LayerUtil.zoomToObject(getObject());
   }
 
   protected void addDoubleField(final String fieldName, final int length,
@@ -177,19 +174,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
       field = new JScrollPane(textArea);
     }
     container.add(field);
-  }
-
-  protected DataObject updateDataObject() {
-    DataObject object = getObject();
-    if (isEditable()) {
-      Map<String, Object> values = getValues();
-      object.setValues(values);
-    }
-    return object;
-  }
-
-  public void saveChanges() {
-    updateDataObject();
   }
 
   public void addField(final String fieldName, final JComponent field) {
@@ -220,11 +204,28 @@ public class DataObjectForm extends JPanel implements FocusListener,
     addField(fieldName, field);
   }
 
+  protected void addPanel(final JPanel container, final String title,
+    final List<String> fieldNames) {
+    final JPanel panel = new JPanel();
+    container.add(panel);
+
+    final GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
+
+    panel.setBorder(BorderFactory.createTitledBorder(title));
+
+    for (final String fieldName : fieldNames) {
+      addLabelledField(panel, fieldName);
+    }
+
+    GroupLayoutUtil.makeColumns(panel, 2);
+  }
+
   public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
     this.readOnlyFieldNames.addAll(readOnlyFieldNames);
-    for (Entry<String, JComponent> entry : fields.entrySet()) {
-      String name = entry.getKey();
-      JComponent field = entry.getValue();
+    for (final Entry<String, JComponent> entry : fields.entrySet()) {
+      final String name = entry.getKey();
+      final JComponent field = entry.getValue();
       if (this.readOnlyFieldNames.contains(name)) {
         field.setEnabled(false);
       } else {
@@ -267,7 +268,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     allAttributes = new DataObjectMapTableModel(getMetaData(), getValues(),
       true);
     allAttributes.setReadOnlyFieldNames(getReadOnlyFieldNames());
-    final JXTable table = AbstractDataObjectTableModel.create(allAttributes);
+    final BaseJxTable table = AbstractDataObjectTableModel.create(allAttributes);
     table.setRowFilter(new ExcludeGeometryRowFilter());
     final TableColumnModel columnModel = table.getColumnModel();
     final DataObjectMetaData metaData = getMetaData();
@@ -279,7 +280,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
         final boolean even = row % 2 == 0;
 
         final String fieldName = (String)table.getValueAt(row, 1);
-        boolean isIdField = fieldName.equals(metaData.getIdAttributeName());
+        final boolean isIdField = fieldName.equals(metaData.getIdAttributeName());
         if (isIdField) {
           if (value == null) {
             value = "NEW";
@@ -381,27 +382,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
-  public void actionZoomToObject() {
-    LayerUtil.zoomToObject(getObject());
-  }
-
-  private boolean editable = true;
-
-  public void setEditable(boolean editable) {
-    this.editable = editable;
-  }
-
-  public boolean isEditable() {
-    return editable;
-  }
-
   public ToolBar addToolBar() {
     toolBar = new ToolBar();
     add(toolBar, BorderLayout.NORTH);
-    DataObjectMetaData metaData = getMetaData();
-    Attribute geometryAttribute = metaData.getGeometryAttribute();
-    boolean hasGeometry = geometryAttribute != null;
-    EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
+    final DataObjectMetaData metaData = getMetaData();
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final boolean hasGeometry = geometryAttribute != null;
+    final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
     toolBar.addButton("record", "Save Changes", "table_save", editable, this,
       "saveChanges");
 
@@ -423,7 +410,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     // Geometry manipulation
 
     if (hasGeometry) {
-      DataType geometryDataType = geometryAttribute.getType();
+      final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         toolBar.addButton("geometry", "Reverse Geometry", "line_reverse",
@@ -441,46 +428,16 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return toolBar;
   }
 
-  public void dataTransferCut() {
-
-  }
-
   public void dataTransferCopy() {
     invokeAction("copy");
   }
 
+  public void dataTransferCut() {
+
+  }
+
   public void dataTransferPaste() {
     invokeAction("paste");
-  }
-
-  protected void invokeAction(String actionName) {
-    Action action = getActionMap().get(actionName);
-    if (action != null) {
-      ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
-        null);
-      action.actionPerformed(event);
-    }
-  }
-
-  public void reverseAttributes() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    Map<String, Object> values = getValues();
-    property.reverseAttributes(values);
-    setValues(values);
-  }
-
-  public void reverseGeometry() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    Map<String, Object> values = getValues();
-    property.reverseGeometry(values);
-    setValues(values);
-  }
-
-  public void reverseAttributesAndGeometry() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    Map<String, Object> values = getValues();
-    property.reverseAttributesAndGeometry(values);
-    setValues(values);
   }
 
   @Override
@@ -637,7 +594,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
       final Object value = getFieldValue(name);
       values.put(name, value);
     }
-    String geometryAttributeName = getMetaData().getGeometryAttributeName();
+    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
     if (geometryAttributeName != null) {
       values.put(geometryAttributeName, object.getGeometryValue());
     }
@@ -649,7 +606,8 @@ public class DataObjectForm extends JPanel implements FocusListener,
     title = title.replaceAll(" Code$", "");
     title = title.replaceAll(" Ind$", "");
     final JLabel label = new JLabel(title);
-    label.setFont(label.getFont().deriveFont(Font.BOLD));
+    label.setFont(SwingUtil.BOLD_FONT);
+    label.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     return label;
   }
 
@@ -659,11 +617,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public DataObject getObject() {
     return object;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T getValue(final String name) {
-    return (T)values.get(name);
   }
 
   @SuppressWarnings("unchecked")
@@ -683,12 +636,48 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return tabs;
   }
 
+  public ToolBar getToolBar() {
+    return toolBar;
+  }
+
   public DataObjectMetaDataUiBuilderRegistry getUiBuilderRegistry() {
     return uiBuilderRegistry;
   }
 
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(final String name) {
+    return (T)values.get(name);
+  }
+
+  public Map<String, Object> getValues() {
+    final Map<String, Object> values = new LinkedHashMap<String, Object>(
+      this.values);
+    for (final String fieldName : fields.keySet()) {
+      Object value = getFieldValue(fieldName);
+      if (value instanceof String) {
+        final String string = (String)value;
+        value = string.trim();
+      }
+      values.put(fieldName, value);
+    }
+    return values;
+  }
+
   public boolean hasOriginalValue(final String name) {
     return getMetaData().hasAttribute(name);
+  }
+
+  protected void invokeAction(final String actionName) {
+    final Action action = getActionMap().get(actionName);
+    if (action != null) {
+      final ActionEvent event = new ActionEvent(this,
+        ActionEvent.ACTION_PERFORMED, null);
+      action.actionPerformed(event);
+    }
+  }
+
+  public boolean isEditable() {
+    return editable;
   }
 
   public boolean isFieldsValid() {
@@ -704,8 +693,47 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return fieldValidationEnabled;
   }
 
+  public void pasteValues(final Map<String, Object> map) {
+    final Map<String, Object> values = getValues();
+    values.putAll(map);
+    setValues(values);
+  }
+
+  protected void postValidate() {
+
+  }
+
+  public void reverseAttributes() {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+    final Map<String, Object> values = getValues();
+    property.reverseAttributes(values);
+    setValues(values);
+  }
+
+  public void reverseAttributesAndGeometry() {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+    final Map<String, Object> values = getValues();
+    property.reverseAttributesAndGeometry(values);
+    setValues(values);
+  }
+
+  public void reverseGeometry() {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+    final Map<String, Object> values = getValues();
+    property.reverseGeometry(values);
+    setValues(values);
+  }
+
+  public void saveChanges() {
+    updateDataObject();
+  }
+
   protected void setDataStore(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
+  }
+
+  public void setEditable(final boolean editable) {
+    this.editable = editable;
   }
 
   protected void setFieldInvalid(final String fieldName, final String message) {
@@ -728,30 +756,8 @@ public class DataObjectForm extends JPanel implements FocusListener,
       }
       fieldValidMap.put(fieldName, false);
     }
-    boolean valid = false;
+    final boolean valid = false;
     setTabValid(fieldName, valid);
-  }
-
-  protected void setTabValid(final String fieldName, boolean valid) {
-    final JComponent field = getField(fieldName);
-    Component panel = field;
-    Component component = field.getParent();
-    while (component != tabs && component != null) {
-      panel = component;
-      component = component.getParent();
-    }
-    final int index = tabs.indexOfComponent(panel);
-    if (index != -1) {
-      final String title = tabs.getTitleAt(index);
-      tabValid.put(title, valid);
-      if (valid == Boolean.TRUE) {
-        tabs.setForegroundAt(index, null);
-        tabs.setBackgroundAt(index, null);
-      } else {
-        tabs.setForegroundAt(index, Color.RED);
-        tabs.setBackgroundAt(index, Color.PINK);
-      }
-    }
   }
 
   protected void setFieldInvalidToolTip(final String fieldName,
@@ -859,9 +865,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
     if (StringUtils.hasText(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);
     }
-    for (Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : metaData.getAttributes()) {
       if (attribute.isRequired()) {
-        String name = attribute.getName();
+        final String name = attribute.getName();
         addRequiredFieldNames(name);
       }
 
@@ -878,21 +884,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     updateReadOnlyFields();
   }
 
-  protected void updateReadOnlyFields() {
-    for (Entry<String, JComponent> entry : fields.entrySet()) {
-      String name = entry.getKey();
-      JComponent field = entry.getValue();
-      if (readOnlyFieldNames.contains(name)) {
-        field.setEnabled(false);
-      } else {
-        field.setEnabled(true);
-      }
-    }
-    if (allAttributes != null) {
-      allAttributes.setReadOnlyFieldNames(readOnlyFieldNames);
-    }
-  }
-
   public void setReadOnlyFieldNames(final String... readOnlyFieldNames) {
     setReadOnlyFieldNames(Arrays.asList(readOnlyFieldNames));
   }
@@ -905,6 +896,28 @@ public class DataObjectForm extends JPanel implements FocusListener,
     for (int i = 0; i < tabs.getTabCount(); i++) {
       final String tabName = tabs.getTitleAt(i);
       tabValid.put(tabName, true);
+    }
+  }
+
+  protected void setTabValid(final String fieldName, final boolean valid) {
+    final JComponent field = getField(fieldName);
+    Component panel = field;
+    Component component = field.getParent();
+    while (component != tabs && component != null) {
+      panel = component;
+      component = component.getParent();
+    }
+    final int index = tabs.indexOfComponent(panel);
+    if (index != -1) {
+      final String title = tabs.getTitleAt(index);
+      tabValid.put(title, valid);
+      if (valid == Boolean.TRUE) {
+        tabs.setForegroundAt(index, null);
+        tabs.setBackgroundAt(index, null);
+      } else {
+        tabs.setForegroundAt(index, Color.RED);
+        tabs.setBackgroundAt(index, Color.PINK);
+      }
     }
   }
 
@@ -932,17 +945,28 @@ public class DataObjectForm extends JPanel implements FocusListener,
     validateFields();
   }
 
-  public Map<String, Object> getValues() {
-    Map<String, Object> values = new LinkedHashMap<String, Object>(this.values);
-    for (final String fieldName : fields.keySet()) {
-      Object value = getFieldValue(fieldName);
-      if (value instanceof String) {
-        final String string = (String)value;
-        value = string.trim();
-      }
-      values.put(fieldName, value);
+  protected DataObject updateDataObject() {
+    final DataObject object = getObject();
+    if (isEditable()) {
+      final Map<String, Object> values = getValues();
+      object.setValues(values);
     }
-    return values;
+    return object;
+  }
+
+  protected void updateReadOnlyFields() {
+    for (final Entry<String, JComponent> entry : fields.entrySet()) {
+      final String name = entry.getKey();
+      final JComponent field = entry.getValue();
+      if (readOnlyFieldNames.contains(name)) {
+        field.setEnabled(false);
+      } else {
+        field.setEnabled(true);
+      }
+    }
+    if (allAttributes != null) {
+      allAttributes.setReadOnlyFieldNames(readOnlyFieldNames);
+    }
   }
 
   protected void updateTabsValid() {
@@ -991,27 +1015,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
       postValidate();
     }
     updateTabsValid();
-  }
-
-  protected void postValidate() {
-
-  }
-
-  protected void addPanel(final JPanel container, final String title,
-    final List<String> fieldNames) {
-    final JPanel panel = new JPanel();
-    container.add(panel);
-
-    final GroupLayout layout = new GroupLayout(panel);
-    panel.setLayout(layout);
-
-    panel.setBorder(BorderFactory.createTitledBorder(title));
-
-    for (final String fieldName : fieldNames) {
-      addLabelledField(panel, fieldName);
-    }
-
-    GroupLayoutUtil.makeColumns(panel, 2);
   }
 
 }

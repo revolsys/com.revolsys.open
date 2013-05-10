@@ -119,7 +119,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     synchronized (dataStore) {
       if (boundingBox == null) {
         if (whereClause.startsWith("SELECT *")) {
-          rows = dataStore.getGeodatabase().query(whereClause, false);
+          rows = dataStore.query(whereClause, false);
         } else {
           rows = dataStore.search(table, fields, whereClause, true);
         }
