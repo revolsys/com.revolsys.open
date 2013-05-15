@@ -255,7 +255,7 @@ public class LayerUtil {
       Window window = forms.get(object);
       if (window == null) {
         final Project project = layer.getProject();
-        if (project == null) {
+        if (project == null || object == null) {
           return;
         } else {
           final Object id = object.getIdValue();

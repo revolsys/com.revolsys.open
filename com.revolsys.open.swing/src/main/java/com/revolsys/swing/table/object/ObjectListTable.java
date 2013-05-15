@@ -51,4 +51,8 @@ public class ObjectListTable extends BaseJxTable {
       tableHeader.resizeAndRepaint();
     }
   }
+
+  public void setObjects(List<? extends Object> objects) {
+    getObjectListTableModel().setObjects(objects);
+  }
 }

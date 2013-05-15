@@ -640,25 +640,57 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       typePath = metaData.getPath();
     }
     final StringBuffer whereClause = getWhereClause(query);
+    BoundingBox boundingBox = query.getBoundingBox();
 
-    final StringBuffer sql = new StringBuffer();
-    sql.append("SELECT OBJECTID FROM ");
-    sql.append(JdbcUtils.getTableName(typePath));
-    if (whereClause.length() > 0) {
-      sql.append(" WHERE ");
-      sql.append(whereClause);
-    }
-
-    final EnumRows rows = query(sql.toString(), false);
-    try {
-      int count = 0;
-      for (Row row = rows.next(); row != null; row = rows.next()) {
-        count++;
-        row.delete();
+    if (boundingBox == null) {
+      final StringBuffer sql = new StringBuffer();
+      sql.append("SELECT OBJECTID FROM ");
+      sql.append(JdbcUtils.getTableName(typePath));
+      if (whereClause.length() > 0) {
+        sql.append(" WHERE ");
+        sql.append(whereClause);
       }
-      return count;
-    } finally {
-      rows.Close();
+
+      final EnumRows rows = query(sql.toString(), false);
+      try {
+        int count = 0;
+        for (Row row = rows.next(); row != null; row = rows.next()) {
+          count++;
+          row.delete();
+        }
+        return count;
+      } finally {
+        rows.Close();
+      }
+    } else {
+      GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
+      if (geometryAttribute == null || boundingBox.isNull()) {
+        return 0;
+      } else {
+        final StringBuffer sql = new StringBuffer();
+        sql.append("SELECT " + geometryAttribute.getName() + " FROM ");
+        sql.append(JdbcUtils.getTableName(typePath));
+        if (whereClause.length() > 0) {
+          sql.append(" WHERE ");
+          sql.append(whereClause);
+        }
+
+        final EnumRows rows = query(sql.toString(), false);
+        try {
+          int count = 0;
+          for (Row row = rows.next(); row != null; row = rows.next()) {
+            Geometry geometry = (Geometry)geometryAttribute.getValue(row);
+            BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
+            if (geometryBoundingBox.intersects(boundingBox)) {
+              count++;
+            }
+            row.delete();
+          }
+          return count;
+        } finally {
+          rows.Close();
+        }
+      }
     }
   }
 
@@ -938,7 +970,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected synchronized Row nextRow(final EnumRows rows) {
-    return rows.next();
+    if (rows == null) {
+      return null;
+    } else {
+      return rows.next();
+    }
   }
 
   public synchronized EnumRows query(final String sql, final boolean recycling) {
@@ -977,10 +1013,16 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public synchronized EnumRows search(final Table table, final String fields,
     final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
-    final EnumRows rows = table.search(fields, whereClause, boundingBox,
-      recycling);
-    enumRowsToClose.add(rows);
-    return rows;
+    try {
+      final EnumRows rows = table.search(fields, whereClause, boundingBox,
+        recycling);
+      enumRowsToClose.add(rows);
+      return rows;
+    } catch (Exception e) {
+      LOG.error("ERROR executing query SELECT " + fields + " WHERE "
+        + whereClause + " AND " + boundingBox, e);
+      return null;
+    }
   }
 
   @Override

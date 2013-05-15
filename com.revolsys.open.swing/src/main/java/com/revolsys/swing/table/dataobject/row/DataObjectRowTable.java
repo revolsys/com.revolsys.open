@@ -109,10 +109,12 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     final TableModel model = getModel();
     if (model instanceof DataObjectLayerTableModel) {
       final DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
-      if (layerModel.getMode().equals(DataObjectLayerTableModel.MODE_ALL)) {
-        setSortable(false);
-      } else {
+      String mode = layerModel.getAttributeFilterMode();
+      List<String> sortableModes = layerModel.getSortableModes();
+      if (sortableModes.contains(mode)) {
         setSortable(true);
+      } else {
+        setSortable(false);
       }
     }
     super.tableChanged(e);

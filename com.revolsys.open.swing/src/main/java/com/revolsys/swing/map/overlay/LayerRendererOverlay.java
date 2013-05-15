@@ -88,7 +88,10 @@ public class LayerRendererOverlay extends JComponent implements
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
     if (!(e.getSource() instanceof MapPanel)) {
-      redraw();
+      String propertyName = e.getPropertyName();
+      if (!propertyName.equals("selected") && !propertyName.equals("selectionCount")) {
+        redraw();
+      }
     }
   }
 

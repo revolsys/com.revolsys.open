@@ -32,6 +32,10 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
+  public void removeComponent(String groupName, int index) {
+    groups.removeComponent(this, groupName, index);
+  }
+
   public JButton addButton(final String groupName, final Action action) {
     final JButton button = createButton(action);
     button.setAction(action);
@@ -78,15 +82,15 @@ public class ToolBar extends JToolBar {
     groups.addGroup(groupName);
   }
 
-  public JToggleButton addToggleButton(final String groupName,
+  public JToggleButton addToggleButton(final String groupName, int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    return addToggleButton(groupName, iconName, title, icon, enableCheck,
-      object, methodName, parameters);
+    return addToggleButton(groupName, index, iconName, title, icon,
+      enableCheck, object, methodName, parameters);
   }
 
-  public JToggleButton addToggleButton(final String groupName,
+  public JToggleButton addToggleButton(final String groupName, int index,
     final String name, final String title, final Icon icon,
     final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
@@ -95,18 +99,18 @@ public class ToolBar extends JToolBar {
     action.setEnableCheck(enableCheck);
 
     final JToggleButton button = createToggleButton(action);
-    groups.addComponent(this, groupName, button);
+    groups.addComponent(this, groupName, index, button);
     final ButtonGroup buttonGroup = getButtonGroup(groupName);
     buttonGroup.add(button);
     return button;
   }
 
   public JToggleButton addToggleButtonTitleIcon(final String groupName,
-    final String title, final String iconName, final Object object,
+    int index, final String title, final String iconName, final Object object,
     final String methodName, final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    return addToggleButton(groupName, iconName, title, icon, null, object,
-      methodName, parameters);
+    return addToggleButton(groupName, index, iconName, title, icon, null,
+      object, methodName, parameters);
   }
 
   protected JButton createButton(final Action action) {
@@ -145,6 +149,11 @@ public class ToolBar extends JToolBar {
 
   public void setGroupEnabled(final String groupName, final boolean enabled) {
     groups.setGroupEnabled(groupName, enabled);
+  }
+
+  public void removeGroup(String groupName) {
+    groups.removeGroup(this, groupName);
+
   }
 
 }

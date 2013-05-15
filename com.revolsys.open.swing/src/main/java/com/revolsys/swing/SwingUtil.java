@@ -45,6 +45,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.component.CodeTableLabel;
 import com.revolsys.swing.component.JLabelWithObject;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
@@ -218,6 +219,9 @@ public class SwingUtil {
     if (component instanceof JLabelWithObject) {
       final JLabelWithObject label = (JLabelWithObject)component;
       return (V)label.getObject();
+    } else if (component instanceof CodeTableLabel) {
+      final CodeTableLabel label = (CodeTableLabel)component;
+      return (V)label.getValue();
     } else if (component instanceof JXDatePicker) {
       final JXDatePicker dateField = (JXDatePicker)component;
       return (V)dateField.getDate();
@@ -293,6 +297,9 @@ public class SwingUtil {
     } else if (field instanceof JXDatePicker) {
       final JXDatePicker dateField = (JXDatePicker)field;
       dateField.setDate((Date)value);
+    } else if (field instanceof CodeTableLabel) {
+      final CodeTableLabel label = (CodeTableLabel)field;
+      label.setValue(value);
     } else if (field instanceof JLabel) {
       final JLabel label = (JLabel)field;
       String string;

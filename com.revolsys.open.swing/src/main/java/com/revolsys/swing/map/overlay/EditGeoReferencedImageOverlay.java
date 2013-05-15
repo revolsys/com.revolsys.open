@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -28,7 +29,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.WebColors;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;

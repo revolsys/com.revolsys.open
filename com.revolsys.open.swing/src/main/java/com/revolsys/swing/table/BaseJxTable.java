@@ -12,6 +12,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.SwingUtil;
 
@@ -33,6 +34,13 @@ public class BaseJxTable extends JXTable {
     this();
     setModel(model);
 
+  }
+
+  public void setColumnWidth(int i, int width) {
+    TableColumnExt column = getColumnExt(i);
+    column.setMinWidth(width);
+    column.setWidth(width);
+    column.setMaxWidth(width);
   }
 
   @Override

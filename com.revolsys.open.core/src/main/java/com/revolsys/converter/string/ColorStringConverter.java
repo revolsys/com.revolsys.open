@@ -1,9 +1,14 @@
 package com.revolsys.converter.string;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import com.revolsys.awt.WebColors;
+import com.revolsys.util.ExceptionUtil;
 
 public class ColorStringConverter implements StringConverter<Color> {
 
@@ -44,12 +49,7 @@ public class ColorStringConverter implements StringConverter<Color> {
     return new Color(red, green, blue, opacity);
   }
 
-  @Override
-  public Class<Color> getConvertedClass() {
-    return Color.class;
-  }
-
-  private Color getRgbaColor(final String string) {
+  public static Color getRgbaColor(final String string) {
     try {
       final String[] values = string.replaceAll("[^0-9,.]", "").split(",");
       final int red = Integer.valueOf(values[0]);
@@ -59,13 +59,13 @@ public class ColorStringConverter implements StringConverter<Color> {
       final Color color = new Color(red, green, blue, alpha);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Not a valid CSS color " + string, e);
-      return null;
+      LoggerFactory.getLogger(WebColors.class).error(
+        "Not a valid rgba color " + string, e);
+      return Color.BLACK;
     }
   }
 
-  private Color getRgbColor(final String string) {
+  public static Color getRgbColor(final String string) {
     try {
       final String[] values = string.replaceAll("[^0-9,]", "").split(",");
       final int red = Integer.valueOf(values[0]);
@@ -74,10 +74,34 @@ public class ColorStringConverter implements StringConverter<Color> {
       final Color color = new Color(red, green, blue, 255);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Not a valid CSS color " + string, e);
-      return null;
+      LoggerFactory.getLogger(WebColors.class).error(
+        "Not a valid rgb color " + string, e);
+      return Color.BLACK;
     }
+  }
+
+  public static Color getWebColor(final String colorName) {
+    if (StringUtils.hasText(colorName)) {
+      for (final Field field : WebColors.class.getFields()) {
+        final String fieldName = field.getName();
+        if (Modifier.isStatic(field.getModifiers())
+          && Modifier.isPublic(field.getModifiers())) {
+          if (fieldName.equalsIgnoreCase(colorName)) {
+            try {
+              return (Color)field.get(WebColors.class);
+            } catch (final Throwable e) {
+              ExceptionUtil.throwUncheckedException(e);
+            }
+          }
+        }
+      }
+    }
+    return Color.BLACK;
+  }
+
+  @Override
+  public Class<Color> getConvertedClass() {
+    return Color.class;
   }
 
   @Override
@@ -101,18 +125,23 @@ public class ColorStringConverter implements StringConverter<Color> {
   public Color toObject(final String string) {
     if (StringUtils.hasText(string)) {
       if (string.startsWith("#")) {
-        // TODO hex
-        return null;
+        return getColor(string);
       } else if (string.startsWith("rgb(")) {
         return getRgbColor(string);
       } else if (string.startsWith("rgba(")) {
         return getRgbaColor(string);
       } else {
-        LoggerFactory.getLogger(getClass()).error(
-          "Not a valid CSS color " + string);
+        final Color color = getWebColor(string);
+        if (color == null) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Not a valid color " + string);
+          return Color.BLACK;
+        } else {
+          return color;
+        }
       }
     }
-    return null;
+    return Color.BLACK;
   }
 
   @Override

@@ -18,12 +18,15 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import com.revolsys.collection.LruMap;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.table.predicate.DeletedPredicate;
+import com.revolsys.swing.map.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.table.predicate.NewPredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -41,10 +44,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static final String MODE_SELECTED = "selected";
 
-  public static final String MODE_CHANGES = "changes";
-
-  private static final List<String> MODES = Arrays.asList(MODE_ALL,
-    MODE_SELECTED, MODE_CHANGES);
+  public static final String MODE_EDITS = "edits";
 
   public static DataObjectLayerTablePanel createPanel(
     final DataObjectLayer layer) {
@@ -85,12 +85,19 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return table;
   }
 
+  private boolean filterByBoundingBox;
+
+  private List<String> attributeFilterModes = Arrays.asList(MODE_ALL,
+    MODE_SELECTED, MODE_EDITS);
+
+  private List<String> sortableModes = Arrays.asList(MODE_SELECTED, MODE_EDITS);
+
   private SwingWorker<?, ?> loadObjectsWorker;
 
   private Map<Integer, List<DataObject>> pageCache = new LruMap<Integer, List<DataObject>>(
     5);
 
-  private String mode = MODE_ALL;
+  private String attributeFilterMode = MODE_ALL;
 
   private final int pageSize = 40;
 
@@ -125,16 +132,32 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     setEditable(false);
   }
 
+  public String getAttributeFilterMode() {
+    return attributeFilterMode;
+  }
+
+  protected int getCachedRowCount() {
+    if (!countLoaded) {
+      if (rowCountWorker == null) {
+        rowCountWorker = SwingWorkerManager.execute(
+          "Query row count " + layer.getName(), this, "updateRowCount");
+      }
+      return 0;
+    } else {
+      return rowCount + getLayer().getNewObjectCount();
+    }
+  }
+
   public DataObjectLayer getLayer() {
     return layer;
   }
 
-  public String getMode() {
-    return mode;
+  protected List<DataObject> getLayerObjects(final Query query) {
+    return layer.query(query);
   }
 
   private Integer getNextPageNumber() {
-    synchronized (sync) {
+    synchronized (getSync()) {
       if (loadingPageNumbers.isEmpty()) {
         loadObjectsWorker = null;
         return null;
@@ -145,9 +168,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
-  public DataObject getObject(int row) {
-    final DataObjectLayer layer = getLayer();
-    if (mode.equals(MODE_SELECTED)) {
+  public DataObject getObject(final int row) {
+    if (attributeFilterMode.equals(MODE_SELECTED)) {
+      final DataObjectLayer layer = getLayer();
       final List<DataObject> selectedObjects = layer.getSelectedObjects();
       if (row < selectedObjects.size()) {
         return selectedObjects.get(row);
@@ -155,7 +178,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         fireTableDataChanged();
         return null;
       }
-    } else if (mode.equals(MODE_CHANGES)) {
+    } else if (attributeFilterMode.equals(MODE_EDITS)) {
+      final DataObjectLayer layer = getLayer();
       final List<DataObject> changes = layer.getChanges();
       if (row < changes.size()) {
         return changes.get(row);
@@ -164,58 +188,115 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     } else {
-      final int newObjectCount = layer.getNewObjectCount();
-      if (row < newObjectCount) {
-        return layer.getNewObjects().get(row);
+      return loadLayerObjects(row);
+    }
+  }
+
+  public Map<String, Boolean> getOrderBy() {
+    return orderBy;
+  }
+
+  protected DataObject getPageRecord(final int pageNumber,
+    final int recordNumber) {
+    synchronized (pageCache) {
+      final List<DataObject> page = pageCache.get(pageNumber);
+      if (page == null) {
+        loadingPageNumbers.add(pageNumber);
+        if (loadObjectsWorker == null) {
+          loadObjectsWorker = SwingWorkerManager.execute("Loading records "
+            + getTypeName(), this, "loadPages");
+        }
+        return null;
       } else {
-        row -= newObjectCount;
-      }
-      synchronized (pageCache) {
-        final int pageNumber = (row / pageSize);
-        final int recordNumber = (row % pageSize);
-        final List<DataObject> page = pageCache.get(pageNumber);
-        if (page == null) {
-          loadingPageNumbers.add(pageNumber);
-          if (loadObjectsWorker == null) {
-            loadObjectsWorker = SwingWorkerManager.execute("Loading records "
-              + getTypeName(), this, "loadPages");
-          }
-          return null;
+        if (recordNumber < page.size()) {
+          final DataObject object = page.get(recordNumber);
+          return object;
         } else {
-          if (recordNumber < page.size()) {
-            final DataObject object = page.get(recordNumber);
-            return object;
-          } else {
-            return null;
-          }
+          return null;
         }
       }
     }
+  }
+
+  public int getPageSize() {
+    return pageSize;
   }
 
   @Override
   public int getRowCount() {
-    synchronized (sync) {
-      if (mode.equals(MODE_SELECTED)) {
+    synchronized (getSync()) {
+      if (attributeFilterMode.equals(MODE_SELECTED)) {
         return layer.getSelectionCount();
-      } else if (mode.equals(MODE_CHANGES)) {
+      } else if (attributeFilterMode.equals(MODE_EDITS)) {
         return layer.getChangeCount();
       } else {
-        if (!countLoaded) {
-          if (rowCountWorker == null) {
-            rowCountWorker = SwingWorkerManager.execute("Query row count "
-              + layer.getName(), this, "updateRowCount");
-          }
-          return 0;
-        } else {
-          return rowCount + getLayer().getNewObjectCount();
-        }
+        return getCachedRowCount();
       }
     }
   }
 
+  public List<String> getSortableModes() {
+    return sortableModes;
+  }
+
+  protected Object getSync() {
+    return sync;
+  }
+
   public String getTypeName() {
     return getMetaData().getPath();
+  }
+
+  public boolean isFilterByBoundingBox() {
+    return filterByBoundingBox;
+  }
+
+  protected DataObject loadLayerObjects(int row) {
+    final DataObjectLayer layer = getLayer();
+    final int newObjectCount = layer.getNewObjectCount();
+    if (row < newObjectCount) {
+      return layer.getNewObjects().get(row);
+    } else {
+      row -= newObjectCount;
+    }
+    final int pageSize = getPageSize();
+    final int pageNumber = (row / pageSize);
+    final int recordNumber = (row % pageSize);
+    return getPageRecord(pageNumber, recordNumber);
+  }
+
+  protected int loadLayerRowCount() {
+    final Query query = layer.getQuery();
+    if (query == null) {
+      return 0;
+    } else {
+      return layer.getRowCount(query);
+    }
+  }
+
+  protected List<DataObject> loadPage(final int pageNumber) {
+    final Query query = getFilterQuery();
+    query.setOrderBy(orderBy);
+    query.setOffset(pageSize * pageNumber);
+    query.setLimit(pageSize);
+    final List<DataObject> objects = getLayerObjects(query);
+    return objects;
+  }
+
+  protected Query getFilterQuery() {
+    Query query = layer.getQuery();
+    if (query == null) {
+      return null;
+    } else {
+      query = query.clone();
+      query.setOrderBy(orderBy);
+      if (filterByBoundingBox) {
+        Project project = layer.getProject();
+        BoundingBox viewBoundingBox = project.getViewBoundingBox();
+        query.setBoundingBox(viewBoundingBox);
+      }
+      return query;
+    }
   }
 
   public void loadPages() {
@@ -224,17 +305,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (pageNumber == null) {
         return;
       } else {
-        synchronized (sync) {
+        synchronized (getSync()) {
           final Map<Integer, List<DataObject>> pageCache = this.pageCache;
-          final Query query = layer.getQuery();
           final List<DataObject> objects;
-          if (query == null) {
+          if (layer.getQuery() == null) {
             objects = Collections.emptyList();
           } else {
-            query.setOrderBy(orderBy);
-            query.setLimit(pageSize);
-            query.setOffset(pageSize * pageNumber);
-            objects = layer.query(query);
+            objects = loadPage(pageNumber);
           }
           pageCache.put(pageNumber, objects);
           loadingPageNumbers.remove(pageNumber);
@@ -258,22 +335,42 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected void refresh() {
-    synchronized (sync) {
+    synchronized (getSync()) {
+      if (loadObjectsWorker != null) {
+        loadObjectsWorker.cancel(true);
+        loadObjectsWorker = null;
+      }
+      loadingPageNumbers.clear();
+      rowCount = 0;
       pageCache = new LruMap<Integer, List<DataObject>>(5);
       countLoaded = false;
       fireTableDataChanged();
     }
   }
 
-  public void setMode(final String mode) {
-    if (MODES.contains(mode)) {
-      if (!mode.equals(this.mode)) {
-        this.mode = mode;
-        fireTableDataChanged();
+  public void setAttributeFilterMode(final String mode) {
+
+    if (attributeFilterModes.contains(mode)) {
+      if (!mode.equals(this.attributeFilterMode)) {
+        this.attributeFilterMode = mode;
+        refresh();
       }
-    } else {
-      throw new IllegalArgumentException("Unsupported mode");
     }
+  }
+
+  public void setFilterByBoundingBox(final boolean filterByBoundingBox) {
+    if (this.filterByBoundingBox != filterByBoundingBox) {
+      this.filterByBoundingBox = filterByBoundingBox;
+      refresh();
+    }
+  }
+
+  protected void setModes(final String... modes) {
+    this.attributeFilterModes = Arrays.asList(modes);
+  }
+
+  protected void setSortableModes(final String... sortableModes) {
+    this.sortableModes = Arrays.asList(sortableModes);
   }
 
   @Override
@@ -289,7 +386,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       orderBy = Collections.emptyMap();
     }
-    synchronized (sync) {
+    synchronized (getSync()) {
       this.orderBy = orderBy;
       refresh();
     }
@@ -297,19 +394,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public void updateRowCount() {
-    final Query query = layer.getQuery();
-    final int rowCount;
-    if (query == null) {
-      rowCount = 0;
-    } else {
-      rowCount = layer.getRowCount(query);
-    }
-    synchronized (sync) {
+    final int rowCount = loadLayerRowCount();
+    synchronized (getSync()) {
       this.rowCount = rowCount;
       countLoaded = true;
       rowCountWorker = null;
       fireTableDataChanged();
     }
   }
-
 }

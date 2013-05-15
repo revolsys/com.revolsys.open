@@ -18,6 +18,7 @@ import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.EndianOutputStream;
 import com.revolsys.io.EndianInput;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 import com.revolsys.io.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
@@ -181,6 +182,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         }
       } catch (final IOException e) {
         throw new RuntimeException(e);
+      } finally {
+        FileUtil.closeSilent(in);
       }
     }
   }

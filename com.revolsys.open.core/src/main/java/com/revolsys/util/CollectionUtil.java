@@ -35,19 +35,6 @@ public final class CollectionUtil {
     append(string, values, ",");
   }
 
-  public static float[] toFloatArray(double[] doubleArray) {
-    if (doubleArray == null) {
-      return null;
-    } else {
-      int size = doubleArray.length;
-      float[] floatArray = new float[size];
-      for (int i = 0; i < size; i++) {
-        floatArray[i] = (float)doubleArray[i];
-      }
-      return floatArray;
-    }
-  }
-
   public static void append(final StringBuffer buffer,
     final Collection<? extends Object> values, final String separator) {
     boolean first = true;
@@ -180,6 +167,16 @@ public final class CollectionUtil {
       } else {
         return null;
       }
+    }
+  }
+
+  public static Integer getInteger(final Map<String, Object> object,
+    final String name, final Integer defaultValue) {
+    final Integer value = getInteger(object, name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
     }
   }
 
@@ -364,6 +361,19 @@ public final class CollectionUtil {
       }
     }
     return list;
+  }
+
+  public static float[] toFloatArray(final double[] doubleArray) {
+    if (doubleArray == null) {
+      return null;
+    } else {
+      final int size = doubleArray.length;
+      final float[] floatArray = new float[size];
+      for (int i = 0; i < size; i++) {
+        floatArray[i] = (float)doubleArray[i];
+      }
+      return floatArray;
+    }
   }
 
   public static Map<String, Object> toMap(final Preferences preferences) {

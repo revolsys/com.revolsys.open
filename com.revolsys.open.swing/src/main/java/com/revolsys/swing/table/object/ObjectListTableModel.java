@@ -212,12 +212,6 @@ public class ObjectListTableModel extends AbstractTableModel implements
     add(toIndex, object);
   }
 
-  public void setAll(final List<? extends Object> objects) {
-    this.objects.clear();
-    this.objects.addAll(objects);
-    fireTableDataChanged();
-  }
-
   public void setEditable(final boolean editable) {
     this.editable = editable;
   }
@@ -225,7 +219,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
   /**
    * @param objects the objects to set
    */
-  public void setObjects(final List<Object> objects) {
+  public void setObjects(final List<? extends Object> objects) {
     this.objects.clear();
     if (objects != null) {
       this.objects.addAll(objects);

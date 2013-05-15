@@ -9,11 +9,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.swing.WebColors;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;

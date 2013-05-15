@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -64,6 +63,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
+import com.revolsys.swing.component.CodeTableLabel;
 import com.revolsys.swing.component.JLabelWithObject;
 import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
@@ -176,7 +176,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     container.add(field);
   }
 
-  public void addField(final String fieldName, final JComponent field) {
+  public JComponent addField(final String fieldName, final JComponent field) {
     if (field instanceof JTextField) {
       final JTextField textField = (JTextField)field;
       final int preferedWidth = textField.getPreferredSize().width;
@@ -187,6 +187,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     field.addFocusListener(this);
     fields.put(fieldName, field);
     fieldToNameMap.put(field, fieldName);
+    return field;
   }
 
   public void addLabelledField(final Container container, final String fieldName) {
@@ -788,8 +789,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
     fieldInValidMessage.remove(field);
   }
 
-  protected void setFieldValidationEnabled(final boolean fieldValidationEnabled) {
+  protected boolean setFieldValidationEnabled(
+    final boolean fieldValidationEnabled) {
+    boolean oldValue = this.fieldValidationEnabled;
     this.fieldValidationEnabled = fieldValidationEnabled;
+    return oldValue;
   }
 
   public void setFieldValue(final String fieldName, final Object value) {
@@ -804,6 +808,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
       } else if (field instanceof NumberTextField) {
         final NumberTextField numberField = (NumberTextField)field;
         numberField.setFieldValue((Number)value);
+      } else if (field instanceof CodeTableLabel) {
+        final CodeTableLabel label = (CodeTableLabel)field;
+        label.setValue(value);
       } else if (field instanceof DateTextField) {
         final DateTextField dateField = (DateTextField)field;
         dateField.setFieldValue((Date)value);
@@ -922,7 +929,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void setValues(final Map<String, Object> values) {
-    fieldValidationEnabled = false;
+    boolean validationEnabled = setFieldValidationEnabled(false);
     try {
       this.values = new LinkedHashMap<String, Object>();
       if (values != null) {
@@ -932,7 +939,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
         }
       }
     } finally {
-      fieldValidationEnabled = true;
+      setFieldValidationEnabled(validationEnabled);
     }
     final String geometryAttributeName = metaData.getGeometryAttributeName();
     if (StringUtils.hasText(geometryAttributeName)) {

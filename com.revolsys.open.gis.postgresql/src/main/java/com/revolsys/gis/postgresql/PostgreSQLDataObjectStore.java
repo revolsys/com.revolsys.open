@@ -63,6 +63,41 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
+  public int getRowCount(Query query) {
+    BoundingBox boundingBox = query.getBoundingBox();
+    if (boundingBox != null) {
+      final String typePath = query.getTypeName();
+      final DataObjectMetaData metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Unable to  find table " + typePath);
+      } else {
+        query = query.clone();
+        query.setAttributeNames("count(*))");
+        String whereClause = query.getWhereClause();
+        final String geometryAttributeName = metaData.getGeometryAttributeName();
+        if (StringUtils.hasText(whereClause)) {
+          whereClause = "(" + whereClause + ") AND " + geometryAttributeName
+            + " && ?";
+        } else {
+          whereClause = geometryAttributeName + " && ?";
+        }
+        query.setWhereClause(whereClause);
+        GeometryFactory geometryFactory = metaData.getGeometryFactory();
+        boundingBox = boundingBox.convert(geometryFactory);
+        final double x1 = boundingBox.getMinX();
+        final double y1 = boundingBox.getMinY();
+        final double x2 = boundingBox.getMaxX();
+        final double y2 = boundingBox.getMaxY();
+
+        final PGbox box = new PGbox(x1, y1, x2, y2);
+        query.addParameter(box);
+      }
+    }
+
+    return super.getRowCount(query);
+  }
+  
+  @Override
   public ResultPager<DataObject> page(Query query) {
     return new PostgreSQLJdbcQueryResultPager(this, getProperties(), query);
   }

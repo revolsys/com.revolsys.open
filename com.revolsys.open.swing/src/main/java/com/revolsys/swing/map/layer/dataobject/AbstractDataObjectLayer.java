@@ -288,13 +288,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public int getChangeCount() {
-    synchronized (editSync) {
-      int changeCount = 0;
-      changeCount += newObjects.size();
-      changeCount += modifiedObjects.size();
-      changeCount += deletedObjects.size();
-      return changeCount;
-    }
+    int changeCount = 0;
+    changeCount += newObjects.size();
+    changeCount += modifiedObjects.size();
+    changeCount += deletedObjects.size();
+    return changeCount;
   }
 
   @Override

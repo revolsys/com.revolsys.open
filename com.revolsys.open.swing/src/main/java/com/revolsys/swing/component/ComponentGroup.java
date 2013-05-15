@@ -1,6 +1,7 @@
 package com.revolsys.swing.component;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,26 @@ public class ComponentGroup {
     final Component component) {
     final List<Component> components = getGroup(groupName);
     components.add(component);
+    updateComponents(container);
+  }
+
+  public void addComponent(final JComponent container, final String groupName,
+    int index, final Component component) {
+    final List<Component> components = getGroup(groupName);
+    if (index < 0) {
+      components.add(component);
+    } else {
+      components.add(index, component);
+    }
+    updateComponents(container);
+  }
+
+  public void removeComponent(final JComponent container,
+    final String groupName, int index) {
+    final List<Component> components = getGroup(groupName);
+    if (index < components.size()) {
+      components.remove(index);
+    }
     updateComponents(container);
   }
 
@@ -88,6 +109,14 @@ public class ComponentGroup {
           container.add(component);
         }
       }
+    }
+  }
+
+  public void removeGroup(Container container, String groupName) {
+    buttonGroups.remove(groupName);
+    groupNames.remove(groupName);
+    for (Component component : groups.remove(groupName)) {
+      container.remove(component);
     }
   }
 }
