@@ -19,7 +19,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
-public class GeoTiffImage extends GeoReferencedImage {
+public class TiffImage extends GeoReferencedImage {
   static {
     try {
       final OperationRegistry reg = JAI.getDefaultInstance()
@@ -90,7 +90,7 @@ public class GeoTiffImage extends GeoReferencedImage {
     return geoKeys;
   }
 
-  public GeoTiffImage(final Resource imageResource) {
+  public TiffImage(final Resource imageResource) {
     super(imageResource);
   }
 

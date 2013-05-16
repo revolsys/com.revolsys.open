@@ -4,9 +4,9 @@ import javax.media.jai.RenderedOp;
 
 import org.springframework.core.io.Resource;
 
-public class GeoJpegImage extends GeoReferencedImage {
+public class JpegImage extends GeoReferencedImage {
 
-  public GeoJpegImage(final Resource imageResource) {
+  public JpegImage(final Resource imageResource) {
     super(imageResource);
   }
 

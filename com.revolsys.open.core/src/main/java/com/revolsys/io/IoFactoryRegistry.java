@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
 
@@ -59,14 +60,20 @@ public class IoFactoryRegistry {
           properties.load(resourceUrl.openStream());
           final String factoryClassNames = properties.getProperty("com.revolsys.io.IoFactory.factoryClassNames");
           for (final String factoryClassName : factoryClassNames.split(",")) {
-            final Class<?> factoryClass = Class.forName(factoryClassName.trim());
-            if (IoFactory.class.isAssignableFrom(factoryClass)) {
-              @SuppressWarnings("unchecked")
-              final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
-              addFactory(factory);
-            } else {
-              LOG.error(factoryClassName + " is not a subclass of "
-                + IoFactory.class);
+            if (StringUtils.hasText(factoryClassName)) {
+              try {
+                final Class<?> factoryClass = Class.forName(factoryClassName.trim());
+                if (IoFactory.class.isAssignableFrom(factoryClass)) {
+                  @SuppressWarnings("unchecked")
+                  final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
+                  addFactory(factory);
+                } else {
+                  LOG.error(factoryClassName + " is not a subclass of "
+                    + IoFactory.class);
+                }
+              } catch (Throwable e) {
+                LOG.error("Unable to load: " + factoryClassName, e);
+              }
             }
           }
         } catch (final Throwable e) {
@@ -124,7 +131,7 @@ public class IoFactoryRegistry {
 
   @SuppressWarnings("unchecked")
   public synchronized <F extends IoFactory> Set<F> getFactories(
-    final Class<F> factoryClass) {
+    final Class<? extends F> factoryClass) {
     Set<IoFactory> factories = classFactories.get(factoryClass);
     if (factories == null) {
       factories = new LinkedHashSet<IoFactory>();

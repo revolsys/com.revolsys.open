@@ -6,12 +6,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -53,10 +51,9 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
-import com.revolsys.swing.map.layer.raster.GeoJpegImage;
+import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.layer.raster.GeoTiffImage;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
@@ -233,25 +230,13 @@ public class LayerUtil {
         loadLayer(layerGroup, file);
       } else {
         final FileSystemResource resource = new FileSystemResource(file);
-        final List<String> readerFileSuffixes = new ArrayList<String>(
-          Arrays.asList(ImageIO.getReaderFileSuffixes()));
-        readerFileSuffixes.add("tif");
-        readerFileSuffixes.add("tiff");
-        if (readerFileSuffixes.contains(extension)) {
 
-          GeoReferencedImage image;
-          // TODO factories
-          if (Arrays.asList("jpg", "jpeg").contains(extension)) {
-            image = new GeoJpegImage(resource);
-          } else if (Arrays.asList("tif", "tiff").contains(extension)) {
-            image = new GeoTiffImage(resource);
-          } else {
-            image = new GeoReferencedImage(resource);
-          }
-
+        GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(resource);
+        if (image != null) {
           final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
             FileUtil.getBaseName(file), image);
           layerGroup.add(layer);
+          layer.setEditable(true);
         } else {
           final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
           if (reader != null) {
