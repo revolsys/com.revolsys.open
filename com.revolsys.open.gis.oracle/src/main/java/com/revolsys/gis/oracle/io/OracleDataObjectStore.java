@@ -222,7 +222,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         } else if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
           where.append(" SDE.ST_ENVINTERSECTS(");
           where.append(geometryColumnName);
-          where.append(", ?, ?, ?, ?)");
+          where.append(", ?, ?, ?, ?) = 1");
           query.addParameters(x1, y1, x2, y2);
         } else {
           throw new IllegalArgumentException("Unbown geometry attribute :"
