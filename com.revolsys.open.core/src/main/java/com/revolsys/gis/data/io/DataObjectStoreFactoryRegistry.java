@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -20,15 +18,15 @@ public class DataObjectStoreFactoryRegistry {
       "classpath*:META-INF/com.revolsys.gis.dataStore.sf.xml");
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataObjectStoreFactoryRegistry.class);
-
+  @SuppressWarnings("unchecked")
   public static <T extends DataObjectStore> T createDataObjectStore(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final DataObjectStoreFactory factory = getDataStoreFactory(url);
     return (T)factory.createDataObjectStore(connectionProperties);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends DataObjectStore> T createDataObjectStore(
     final String url) {
     final DataObjectStoreFactory factory = getDataStoreFactory(url);

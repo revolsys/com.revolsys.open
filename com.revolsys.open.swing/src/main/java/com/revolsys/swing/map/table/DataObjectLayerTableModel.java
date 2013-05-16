@@ -20,6 +20,7 @@ import javax.swing.table.TableColumnModel;
 import com.revolsys.collection.LruMap;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
@@ -49,11 +50,20 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static DataObjectLayerTablePanel createPanel(
     final DataObjectLayer layer) {
     final JTable table = createTable(layer);
-    return new DataObjectLayerTablePanel(layer, table);
+    if (table == null) {
+      return null;
+    } else {
+      return new DataObjectLayerTablePanel(layer, table);
+    }
   }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer) {
-    return createTable(layer, layer.getMetaData().getAttributeNames());
+    DataObjectMetaData metaData = layer.getMetaData();
+    if (metaData == null) {
+      return null;
+    } else {
+      return createTable(layer, metaData.getAttributeNames());
+    }
   }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer,

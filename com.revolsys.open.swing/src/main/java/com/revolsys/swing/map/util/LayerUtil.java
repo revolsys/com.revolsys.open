@@ -325,34 +325,35 @@ public class LayerUtil {
         final Project project = layer.getProject();
 
         final Component component = LayerUtil.getLayerTablePanel(layer);
-        final String id = layer.getClass().getName() + "." + layer.getId();
-        dockable = DockingFramesUtil.addDockable(project,
-          MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
+        if (component != null) {
+          final String id = layer.getClass().getName() + "." + layer.getId();
+          dockable = DockingFramesUtil.addDockable(project,
+            MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
 
-        dockable.setCloseable(true);
-        layer.setProperty("TableView", dockable);
-        dockable.addCDockableStateListener(new CDockableStateListener() {
-          @Override
-          public void extendedModeChanged(final CDockable dockable,
-            final ExtendedMode mode) {
-          }
+          dockable.setCloseable(true);
+          layer.setProperty("TableView", dockable);
+          dockable.addCDockableStateListener(new CDockableStateListener() {
+            @Override
+            public void extendedModeChanged(final CDockable dockable,
+              final ExtendedMode mode) {
+            }
 
-          @Override
-          public void visibilityChanged(final CDockable dockable) {
-            final boolean visible = dockable.isVisible();
-            if (!visible) {
-              dockable.getControl()
-                .getOwner()
-                .remove((SingleCDockable)dockable);
-              synchronized (layer) {
-                layer.setProperty("TableView", null);
+            @Override
+            public void visibilityChanged(final CDockable dockable) {
+              final boolean visible = dockable.isVisible();
+              if (!visible) {
+                dockable.getControl()
+                  .getOwner()
+                  .remove((SingleCDockable)dockable);
+                synchronized (layer) {
+                  layer.setProperty("TableView", null);
+                }
               }
             }
-          }
-        });
+          });
+          dockable.toFront();
+        }
       }
-
-      dockable.toFront();
     }
   }
 

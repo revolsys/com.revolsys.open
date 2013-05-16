@@ -76,8 +76,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
       config.remove("productName");
       try {
         if (config.get("url") == null) {
-          LOG.error("No URL set for " + connectionName);
-          preferences.removeNode();
+          return null;
         } else {
           dataStore = DelegatingDataObjectStoreHandler.create(connectionName,
             config);
