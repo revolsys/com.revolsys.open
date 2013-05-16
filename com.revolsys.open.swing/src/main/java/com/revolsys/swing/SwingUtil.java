@@ -45,11 +45,10 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.swing.component.CodeTableLabel;
-import com.revolsys.swing.component.JLabelWithObject;
+import com.revolsys.swing.component.ObjectLabelField;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
-import com.revolsys.swing.field.DateTextField;
+import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.CollectionUtil;
@@ -150,7 +149,7 @@ public class SwingUtil {
       } else if (type.equals(DataTypes.DATE)) {
         field = createDateField();
       } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
-        field = new JLabelWithObject();
+        field = new ObjectLabelField();
       } else {
         field = createTextField(columns);
       }
@@ -214,20 +213,16 @@ public class SwingUtil {
 
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   public static <V> V getValue(final JComponent component) {
-    if (component instanceof JLabelWithObject) {
-      final JLabelWithObject label = (JLabelWithObject)component;
-      return (V)label.getObject();
-    } else if (component instanceof CodeTableLabel) {
-      final CodeTableLabel label = (CodeTableLabel)component;
-      return (V)label.getValue();
+    if (component instanceof Field) {
+      final Field field = (Field)component;
+      return (V)field.getFieldValue();
     } else if (component instanceof JXDatePicker) {
       final JXDatePicker dateField = (JXDatePicker)component;
       return (V)dateField.getDate();
-    } else if (component instanceof NumberTextField) {
-      final NumberTextField numberField = (NumberTextField)component;
-      return (V)numberField.getFieldValue();
     } else if (component instanceof JTextComponent) {
       final JTextComponent textComponent = (JTextComponent)component;
       final String text = textComponent.getText();
@@ -283,23 +278,17 @@ public class SwingUtil {
     PreferencesUtil.setString(preferencesClass, preferenceName, path);
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   public static void setFieldValue(final JComponent field,
     final String fieldName, final Object value) {
-    if (field instanceof JLabelWithObject) {
-      final JLabelWithObject label = (JLabelWithObject)field;
-      label.setObject(value);
-    } else if (field instanceof NumberTextField) {
-      final NumberTextField numberField = (NumberTextField)field;
-      numberField.setFieldValue((Number)value);
-    } else if (field instanceof DateTextField) {
-      final DateTextField dateField = (DateTextField)field;
-      dateField.setFieldValue((Date)value);
+    if (field instanceof Field) {
+      final Field fieldObject = (Field)field;
+      fieldObject.setFieldValue(value);
     } else if (field instanceof JXDatePicker) {
       final JXDatePicker dateField = (JXDatePicker)field;
       dateField.setDate((Date)value);
-    } else if (field instanceof CodeTableLabel) {
-      final CodeTableLabel label = (CodeTableLabel)field;
-      label.setValue(value);
     } else if (field instanceof JLabel) {
       final JLabel label = (JLabel)field;
       String string;

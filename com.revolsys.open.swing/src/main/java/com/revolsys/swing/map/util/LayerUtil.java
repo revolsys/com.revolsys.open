@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ import com.revolsys.swing.map.layer.bing.BingLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
+import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.raster.GeoJpegImage;
@@ -187,15 +190,47 @@ public class LayerUtil {
     }
   }
 
-  public static void openFile(final File file) {
+  public static LayerGroup getCurrentLayerGroup() {
     final Project project = Project.get();
     if (project != null) {
-      final LayerGroup firstGroup = project.getLayerGroups().get(0);
+      List<LayerGroup> groups = project.getLayerGroups();
+      if (groups.isEmpty()) {
+        return project;
+      } else {
+        return groups.get(0);
+      }
+    }
+    return null;
+  }
+
+  public static void addLayer(Layer layer) {
+    if (layer != null) {
+      final LayerGroup layerGroup = getCurrentLayerGroup();
+      if (layerGroup == null) {
+        LoggerFactory.getLogger(LayerUtil.class).error(
+          "Cannot find project to open file:" + layer);
+      } else {
+        layerGroup.add(layer);
+      }
+    }
+  }
+
+  public static void openFile(final File file) {
+    final LayerGroup layerGroup = getCurrentLayerGroup();
+    openFile(layerGroup, file);
+
+  }
+
+  public static void openFile(final LayerGroup layerGroup, final File file) {
+    if (layerGroup == null) {
+      LoggerFactory.getLogger(LayerUtil.class).error(
+        "Cannot find project to open file:" + file);
+    } else {
       final String extension = FileUtil.getFileNameExtension(file);
       if ("rgmap".equals(extension)) {
-        loadLayerGroup(firstGroup, file);
+        loadLayerGroup(layerGroup, file);
       } else if ("rglayer".equals(extension)) {
-        loadLayer(firstGroup, file);
+        loadLayer(layerGroup, file);
       } else {
         final FileSystemResource resource = new FileSystemResource(file);
         final List<String> readerFileSuffixes = new ArrayList<String>(
@@ -216,7 +251,7 @@ public class LayerUtil {
 
           final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
             FileUtil.getBaseName(file), image);
-          firstGroup.add(layer);
+          layerGroup.add(layer);
         } else {
           final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
           if (reader != null) {
@@ -226,13 +261,15 @@ public class LayerUtil {
               BoundingBox boundingBox = new BoundingBox(geometryFactory);
               final DataObjectListLayer layer = new DataObjectListLayer(
                 metaData);
+              GeometryStyleRenderer renderer = layer.getRenderer();
+              renderer.setStyle(GeometryStyle.createStyle());
               for (final DataObject object : reader) {
                 final Geometry geometry = object.getGeometryValue();
                 boundingBox = boundingBox.expandToInclude(geometry);
                 layer.add(object);
               }
               layer.setBoundingBox(boundingBox);
-              firstGroup.add(layer);
+              layerGroup.add(layer);
             } finally {
               reader.close();
             }
@@ -240,7 +277,6 @@ public class LayerUtil {
         }
       }
     }
-
   }
 
   public static void openFiles(final List<File> files) {
@@ -353,6 +389,37 @@ public class LayerUtil {
 
       project.setViewBoundingBox(boundingBox);
     }
+  }
+
+  public static void deleteLayer() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      int confirm = JOptionPane.showConfirmDialog(MapPanel.get(layer),
+        "Delete the layer and any child layers? This action cannot be undone.",
+        "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+      if (confirm == JOptionPane.OK_OPTION) {
+        deleteLayer(layer);
+      }
+    }
+  }
+
+  public static void deleteLayer(final Layer layer) {
+    if (layer instanceof LayerGroup) {
+      LayerGroup layerGroup = (LayerGroup)layer;
+      for (Layer childLayer : new ArrayList<Layer>(layerGroup)) {
+        deleteLayer(childLayer);
+      }
+    }
+    // TODO all this should be done by listeners
+    Window window = forms.remove(layer);
+    if (window != null) {
+      window.setVisible(false);
+    }
+    DefaultSingleCDockable dockable = layer.getProperty("TableView");
+    if (dockable != null) {
+      dockable.setVisible(false);
+    }
+    layer.delete();
   }
 
   public static void zoomToLayerSelected() {

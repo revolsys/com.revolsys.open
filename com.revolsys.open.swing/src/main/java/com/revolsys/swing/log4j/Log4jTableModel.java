@@ -62,7 +62,8 @@ public class Log4jTableModel extends AbstractTableModel {
       @Override
       public void mouseClicked(final MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-          final int row = table.rowAtPoint(e.getPoint());
+          int row = table.rowAtPoint(e.getPoint());
+          row = table.convertRowIndexToModel(row);
           if (row != -1) {
             final LoggingEvent loggingEvent = model.getLoggingEvent(row);
             LoggingEventPanel.showDialog(table, loggingEvent);

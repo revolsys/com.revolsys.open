@@ -16,7 +16,8 @@ import org.springframework.util.StringUtils;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 
-public class DirectoryNameField extends JPanel implements ValidatingField {
+public class DirectoryNameField extends JPanel implements
+  ValidatingField<String> {
   private static final long serialVersionUID = -8433151755294925911L;
 
   private final JTextField directoryName = new JTextField(70);
@@ -87,6 +88,12 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getFieldValue() {
+    return (T)directoryName.getText();
+  }
+
   @Override
   public boolean isFieldValid() {
 
@@ -106,5 +113,10 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
 
   public void setDirectoryPath(final String directoryPath) {
     directoryName.setText(directoryPath);
+  }
+
+  @Override
+  public void setFieldValue(final String fieldValue) {
+    setDirectoryPath(fieldValue);
   }
 }

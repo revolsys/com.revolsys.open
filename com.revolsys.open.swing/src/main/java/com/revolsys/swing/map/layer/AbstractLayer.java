@@ -29,6 +29,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       LayerUtil.class, "zoomToLayer");
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
+
+    menu.addMenuItemTitleIcon("layer", "Delete", "delete", LayerUtil.class,
+      "deleteLayer");
   }
 
   private boolean editable = false;
@@ -248,11 +251,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void remove() {
+  public void delete() {
     if (layerGroup != null) {
       layerGroup.remove(this);
       layerGroup = null;
     }
+    getPropertyChangeSupport().firePropertyChange("deleted", false, true);
   }
 
   @Override

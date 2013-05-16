@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.geometry.util;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
@@ -160,6 +162,70 @@ public class GeometryEditUtil {
       }
       return index;
     }
+  }
+
+  public static Map<int[], Coordinates> getIndexOfVertices(final Geometry geometry) {
+    Map<int[], Coordinates> pointIndexes = new LinkedHashMap<int[], Coordinates>();
+    if (geometry == null || geometry.isEmpty()) {
+    } else {
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        final Coordinates coordinates = CoordinatesUtil.get(point);
+        pointIndexes.put(new int[] {
+          0
+        }, coordinates);
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        final CoordinatesList points = CoordinatesListUtil.get(line);
+        for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+          Coordinates point = points.get(pointIndex).cloneCoordinates();
+          add(pointIndexes, point, pointIndex);
+        }
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+        for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+          final CoordinatesList points = rings.get(ringIndex);
+          for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+            Coordinates point = points.get(pointIndex).cloneCoordinates();
+            add(pointIndexes, point, ringIndex, pointIndex);
+          }
+        }
+      } else {
+        for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+          final Geometry part = geometry.getGeometryN(partIndex);
+          if (part instanceof Point) {
+            final Point point = (Point)part;
+            final Coordinates coordinates = CoordinatesUtil.get(point);
+            add(pointIndexes, coordinates, partIndex, 0);
+          } else if (part instanceof LineString) {
+            final LineString line = (LineString)part;
+            final CoordinatesList points = CoordinatesListUtil.get(line);
+            for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+              Coordinates point = points.get(pointIndex).cloneCoordinates();
+              add(pointIndexes, point, partIndex, pointIndex);
+            }
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+            for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+              final CoordinatesList points = rings.get(ringIndex);
+              for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+                Coordinates point = points.get(pointIndex).cloneCoordinates();
+                add(pointIndexes, point, partIndex, ringIndex, pointIndex);
+              }
+            }
+          }
+        }
+      }
+
+    }
+    return pointIndexes;
+  }
+
+  protected static void add(Map<int[], Coordinates> pointIndexes,
+    Coordinates point, int... index) {
+    pointIndexes.put(index, point);
   }
 
   @SuppressWarnings("unchecked")

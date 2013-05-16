@@ -1,6 +1,6 @@
 package com.revolsys.swing.field;
 
-public interface ValidatingField {
+public interface ValidatingField<V> extends Field<V> {
 
   String getFieldValidationMessage();
 

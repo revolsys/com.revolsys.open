@@ -30,10 +30,7 @@ public class FileDropTargetListener implements DropTargetListener,
 
   private static final Logger LOG = Logger.getLogger(FileDropTargetListener.class);
 
-  private final MapPanel map;
-
   public FileDropTargetListener(final MapPanel map) {
-    this.map = map;
     addDropTarget(map);
   }
 

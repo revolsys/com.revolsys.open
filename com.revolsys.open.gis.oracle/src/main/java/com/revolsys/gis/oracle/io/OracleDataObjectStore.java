@@ -175,10 +175,17 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       addAttributeAdder("CLOB", clobAdder);
     }
   }
-  
 
   @Override
   public int getRowCount(Query query) {
+    Query bboxQuery = addBoundingBoxFilter(query);
+    if (bboxQuery != query) {
+      query.setAttributeNames("count(*))");
+    }
+    return super.getRowCount(query);
+  }
+
+  protected Query addBoundingBoxFilter(Query query) {
     BoundingBox boundingBox = query.getBoundingBox();
     if (boundingBox != null) {
       final String typePath = query.getTypeName();
@@ -187,7 +194,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         throw new IllegalArgumentException("Unable to  find table " + typePath);
       } else {
         query = query.clone();
-        query.setAttributeNames("count(*))");
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         final String geometryColumnName = geometryAttribute.getName();
         GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
@@ -206,17 +212,26 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
           where.append(whereClause);
           where.append(") AND ");
         }
-        where.append(" SDO_RELATE(");
-        where.append(geometryColumnName);
-        where.append(",");
-        where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
-        where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
+        if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+          where.append(" SDO_RELATE(");
+          where.append(geometryColumnName);
+          where.append(",");
+          where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
+          where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
+          query.addParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
+        } else if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
+          where.append(" SDE.ST_ENVINTERSECTS(");
+          where.append(geometryColumnName);
+          where.append(", ?, ?, ?, ?)");
+          query.addParameters(x1, y1, x2, y2);
+        } else {
+          throw new IllegalArgumentException("Unbown geometry attribute :"
+            + geometryAttribute);
+        }
         query.setWhereClause(where.toString());
-        query.addParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
       }
     }
-
-    return super.getRowCount(query);
+    return query;
   }
 
   @Override

@@ -3,11 +3,14 @@ package com.revolsys.swing.map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
@@ -19,6 +22,9 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
+import com.revolsys.gis.data.io.DataObjectStoreConnections;
+import com.revolsys.gis.wms.WmsConnectionManager;
+import com.revolsys.io.FileSystemConnectionManager;
 import com.revolsys.io.FileUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -30,7 +36,12 @@ import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
+import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionsModel;
+import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
 public class ProjectFrame extends JFrame {
@@ -59,6 +70,35 @@ public class ProjectFrame extends JFrame {
     DockingFramesUtil.setFlapSizes(dockControl);
 
     initUi();
+  }
+
+  protected void addCatalogPanel() {
+    /*
+     * final ObjectTreeModel model = new ObjectTreeModel(connectionManagers);
+     * final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel();
+     * listModel.addObjectTreeNodeModels(new DataObjectStoreConnectionsModel(),
+     * new FileSystemConnectionManagerModel()); model.addNodeModel(listModel);
+     * final ObjectTree tree = new ObjectTree(model);
+     * tree.setRootVisible(false); tree.setShowsRootHandles(true);
+     */
+
+    final List<Object> connectionManagers = new ArrayList<Object>();
+
+    connectionManagers.add(DataObjectStoreConnections.get());
+    connectionManagers.add(FileSystemConnectionManager.get());
+    /* connectionManagers.add(WmsConnectionManager.get()); */
+
+    final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
+      new DataObjectStoreConnectionsModel(),
+      new FileSystemConnectionManagerModel());
+    final ObjectTreePanel catalogPanel = new ObjectTreePanel(
+      connectionManagers, listModel);
+    final Project project = getProject();
+    DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
+      "catalog", "Catalog", catalogPanel);
+
+    ((DefaultSingleCDockable)getDockControl().getSingleDockable("toc")).toFront();
+
   }
 
   protected void addControlWorkingArea() {
@@ -97,7 +137,7 @@ public class ProjectFrame extends JFrame {
     return mapPanel;
   }
 
-  protected void addTableOfContents() {
+  protected DefaultSingleCDockable addTableOfContents() {
     final JPanel panel = new JPanel(new BorderLayout());
 
     final ToolBar toolBar = new ToolBar();
@@ -105,11 +145,11 @@ public class ProjectFrame extends JFrame {
 
     final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
     tocPanel = new ObjectTreePanel(project, model);
-    mapPanel.getFileDropListener().addDropTarget(tocPanel);
     panel.add(tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
     tableOfContents.toFront();
+    return tableOfContents;
   }
 
   protected void addTableWorkingArea() {
@@ -166,7 +206,9 @@ public class ProjectFrame extends JFrame {
 
     addWorkingAreas();
 
-    addTableOfContents();
+    DefaultSingleCDockable toc = addTableOfContents();
+    addCatalogPanel();
+    toc.toFront();
 
     addTasksPanel();
     addLogPanel();

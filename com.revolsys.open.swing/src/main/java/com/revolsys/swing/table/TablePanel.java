@@ -2,6 +2,7 @@ package com.revolsys.swing.table;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -81,6 +82,8 @@ public class TablePanel extends JPanel implements MouseListener {
   }
 
   protected void setEventRow(final MouseEvent e) {
-    eventRow = table.rowAtPoint(e.getPoint());
+    Point point = e.getPoint();
+    eventRow = table.rowAtPoint(point);
+    eventRow = table.convertRowIndexToModel(eventRow);
   }
 }

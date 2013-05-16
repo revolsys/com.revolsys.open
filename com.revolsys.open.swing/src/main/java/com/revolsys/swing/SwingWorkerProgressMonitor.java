@@ -63,6 +63,18 @@ public class SwingWorkerProgressMonitor {
     return tasks;
   }
 
+  public ProgressMonitor getProgress() {
+    return progress;
+  }
+
+  public boolean isCancelled() {
+    if (progress == null) {
+      return true;
+    } else {
+      return progress.isCanceled();
+    }
+  }
+
   public SwingWorker<?, ?> add(final String description, final Object object,
     final String backgroundMethodName,
     final Collection<? extends Object> backgrounMethodParameters,

@@ -15,7 +15,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -63,9 +62,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
-import com.revolsys.swing.component.CodeTableLabel;
-import com.revolsys.swing.component.JLabelWithObject;
-import com.revolsys.swing.field.DateTextField;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -602,6 +598,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return values;
   }
 
+  public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
+    return geometryCoordinatesPanel;
+  }
+
   protected JLabel getLabel(final String fieldName) {
     String title = CaseConverter.toCapitalizedWords(fieldName);
     title = title.replaceAll(" Code$", "");
@@ -791,7 +791,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   protected boolean setFieldValidationEnabled(
     final boolean fieldValidationEnabled) {
-    boolean oldValue = this.fieldValidationEnabled;
+    final boolean oldValue = this.fieldValidationEnabled;
     this.fieldValidationEnabled = fieldValidationEnabled;
     return oldValue;
   }
@@ -802,62 +802,21 @@ public class DataObjectForm extends JPanel implements FocusListener,
     if (oldValue == null & value != null
       || !EqualsRegistry.equal(value, oldValue)) {
       final JComponent field = getField(fieldName);
-      if (field instanceof JLabelWithObject) {
-        final JLabelWithObject label = (JLabelWithObject)field;
-        label.setObject(value);
-      } else if (field instanceof NumberTextField) {
-        final NumberTextField numberField = (NumberTextField)field;
-        numberField.setFieldValue((Number)value);
-      } else if (field instanceof CodeTableLabel) {
-        final CodeTableLabel label = (CodeTableLabel)field;
-        label.setValue(value);
-      } else if (field instanceof DateTextField) {
-        final DateTextField dateField = (DateTextField)field;
-        dateField.setFieldValue((Date)value);
-      } else if (field instanceof JXDatePicker) {
-        final JXDatePicker dateField = (JXDatePicker)field;
-        dateField.setDate((Date)value);
-      } else if (field instanceof JTextField) {
-        final JTextField textField = (JTextField)field;
-        String string;
-        if (textField.isEnabled()) {
-          if (value == null) {
-            string = "";
-          } else {
-            string = StringConverterRegistry.toString(value);
-          }
-        } else {
+      SwingUtil.setFieldValue(field, fieldName, value);
+      if (!field.isEnabled()) {
+        if (field instanceof JTextComponent) {
+          final JTextComponent textField = (JTextComponent)field;
+          String string;
           disabledFieldValues.put(fieldName, value);
           if (value == null) {
             string = "";
           } else {
             string = getCodeValue(fieldName, value);
           }
-          textField.setColumns(Math.max(string.length(), 1));
+          textField.setText(string);
         }
-        textField.setText(string);
-      } else if (field instanceof JTextArea) {
-        final JTextArea textField = (JTextArea)field;
-        String string;
-        if (textField.isEditable() && textField.isEnabled()) {
-          if (value == null) {
-            string = "";
-          } else {
-            string = StringConverterRegistry.toString(value);
-          }
-        } else {
-          string = getCodeValue(fieldName, value);
-        }
-        textField.setText(string);
-      } else if (field instanceof JComboBox) {
-        final JComboBox comboField = (JComboBox)field;
-        comboField.setSelectedItem(value);
       }
-      final Container parent = field.getParent();
-      if (parent != null) {
-        parent.getLayout().layoutContainer(parent);
-        field.revalidate();
-      }
+
       validateFields();
     }
     if (allAttributes != null) {
@@ -929,7 +888,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void setValues(final Map<String, Object> values) {
-    boolean validationEnabled = setFieldValidationEnabled(false);
+    final boolean validationEnabled = setFieldValidationEnabled(false);
     try {
       this.values = new LinkedHashMap<String, Object>();
       if (values != null) {
@@ -990,6 +949,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
+  @SuppressWarnings("rawtypes")
   protected void validateFields() {
     if (isFieldValidationEnabled()) {
       setTabsValid();

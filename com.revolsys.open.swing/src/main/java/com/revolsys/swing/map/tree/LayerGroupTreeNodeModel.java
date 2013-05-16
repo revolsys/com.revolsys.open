@@ -41,4 +41,8 @@ public class LayerGroupTreeNodeModel extends
     parent.remove(layer);
     return true;
   }
+  @Override
+  public boolean isLeaf(LayerGroup node) {
+    return false;
+  }
 }

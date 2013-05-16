@@ -58,7 +58,7 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   void refresh();
 
-  void remove();
+  void delete();
 
   void removePropertyChangeListener(final PropertyChangeListener listener);
 

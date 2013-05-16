@@ -16,7 +16,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
 
 public class NumberTextField extends JXTextField implements DocumentListener,
-  FocusListener, ValidatingField {
+  FocusListener, ValidatingField<Number> {
 
   private static final long serialVersionUID = 1L;
 
@@ -178,8 +178,9 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     return fieldValidationMessage;
   }
 
-  public Number getFieldValue() {
-    return fieldValue;
+  @SuppressWarnings("unchecked")
+  public <T> T getFieldValue() {
+    return (T)fieldValue;
   }
 
   public int getLength() {

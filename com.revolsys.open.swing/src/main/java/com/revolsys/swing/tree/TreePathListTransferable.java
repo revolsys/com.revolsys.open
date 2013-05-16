@@ -14,13 +14,19 @@ import javax.swing.tree.TreePath;
 public class TreePathListTransferable implements Transferable {
 
   public static final DataFlavor FLAVOR;
+
+  public static final DataFlavor[] FLAVORS;
   static {
     try {
-      FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType);
+      String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=\""
+        + TreePathListTransferable.class.getName() + "\"";
+      FLAVOR = new DataFlavor(mimeType);
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException("Flavour not supported");
     }
-
+    FLAVORS = new DataFlavor[] {
+      FLAVOR
+    };
   }
 
   private final List<TreePath> paths;
@@ -35,7 +41,7 @@ public class TreePathListTransferable implements Transferable {
     this(Arrays.asList(paths));
   }
 
-  public List<TreePath> getPaths() {
+  protected List<TreePath> getPaths() {
     return paths;
   }
 
@@ -51,21 +57,20 @@ public class TreePathListTransferable implements Transferable {
 
   @Override
   public DataFlavor[] getTransferDataFlavors() {
-    return new DataFlavor[] {
-      FLAVOR
-    };
+    return FLAVORS;
   }
 
   @Override
   public boolean isDataFlavorSupported(final DataFlavor flavor) {
-    return FLAVOR.equals(flavor);
+    boolean supported = FLAVOR.equals(flavor);
+    return supported;
   }
 
-  public boolean isSameParent(final TreePath path) {
+  protected boolean isSameParent(final TreePath path) {
     return sameParent.containsKey(path);
   }
 
-  public void setSameParent(final TreePath path) {
+  protected void setSameParent(final TreePath path) {
     sameParent.put(path, Boolean.TRUE);
   }
 

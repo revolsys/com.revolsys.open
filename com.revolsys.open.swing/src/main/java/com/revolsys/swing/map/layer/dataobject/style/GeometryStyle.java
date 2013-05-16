@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,12 +12,34 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
+import org.jdesktop.swingx.color.ColorUtil;
+
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryStyle extends MarkerStyle {
+
+  private static int colorIndex = -1;
+
+  public static final List<Color> COLORS = Arrays.asList(WebColors.Maroon,
+    WebColors.Olive, WebColors.Green, WebColors.Teal, WebColors.Navy,
+    WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
+    WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
+
+  public static GeometryStyle createStyle() {
+    GeometryStyle style = new GeometryStyle();
+    Color color;
+    synchronized (COLORS) {
+      colorIndex = (colorIndex + 1) % COLORS.size();
+      color = COLORS.get(colorIndex);
+    }
+    style.setLineColor(color);
+    style.setPolygonFill(ColorUtil.setAlpha(color, 127));
+    return style;
+  }
 
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();

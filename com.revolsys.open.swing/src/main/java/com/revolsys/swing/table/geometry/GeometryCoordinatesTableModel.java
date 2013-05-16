@@ -1,28 +1,41 @@
 package com.revolsys.swing.table.geometry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.geometry.GeometryCollection;
+import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
 
-  private static final String[] AXIS_NAMES = {
-    "#", "X", "Y", "Z", "M"
-  };
+  private List<String> axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
 
   private Geometry geometry;
 
   private GeometryFactory geometryFactory;
 
-  private List<Coordinates> coordinatesList;;
+  private int columnCount = 0;
+
+  private Map<int[], Coordinates> vertexIndexMap = Collections.emptyMap();
+
+  private List<int[]> vertexIndices = Collections.emptyList();
+
+  private int numAxis;
+
+  private int numIndexItems;
 
   public GeometryCoordinatesTableModel() {
     this(null);
@@ -32,6 +45,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     setGeometry(geometry);
   }
 
+  public int getNumAxis() {
+    return numAxis;
+  }
+
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     return Double.class;
@@ -39,16 +56,25 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return geometryFactory.getNumAxis() + 1;
+    return columnCount;
+  }
+
+  public int getNumIndexItems() {
+    return numIndexItems;
   }
 
   @Override
   public String getColumnName(final int column) {
-    return AXIS_NAMES[column];
+    return axisNames.get(column);
   }
 
   private Coordinates getCoordinates(final int rowIndex) {
-    return coordinatesList.get(rowIndex);
+    final int[] vertexIndex = getVertexIndex(rowIndex);
+    if (vertexIndex == null) {
+      return null;
+    } else {
+      return vertexIndexMap.get(vertexIndex);
+    }
   }
 
   public Geometry getGeometry() {
@@ -57,43 +83,72 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return coordinatesList.size();
+    return vertexIndices.size();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (columnIndex == 0) {
-      return rowIndex;
-    } else {
-      final Coordinates coordinates = getCoordinates(rowIndex);
-      if (coordinates == null) {
-        return "-";
+    if (columnIndex < numIndexItems) {
+      int[] vertexIndex = getVertexIndex(rowIndex);
+      if (vertexIndex.length == numIndexItems) {
+        return vertexIndex[columnIndex];
       } else {
-        return coordinates.getValue(columnIndex - 1);
+        if (columnIndex == 0) {
+          return vertexIndex[0];
+        } else if (columnIndex == 2) {
+          return vertexIndex[1];
+        } else {
+          return 0;
+        }
       }
+    } else {
+      final int axisIndex = columnIndex - numIndexItems;
+      final Coordinates point = getCoordinates(rowIndex);
+      if (point != null) {
+        final double coordinate = point.getValue(axisIndex);
+        if (!Double.isNaN(coordinate)) {
+          return coordinate;
+        }
+      }
+      return 0;
     }
+  }
+
+  public int[] getVertexIndex(final int rowIndex) {
+    return vertexIndices.get(rowIndex);
   }
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    coordinatesList = new ArrayList<Coordinates>();
     if (geometry == null) {
       this.geometryFactory = GeometryFactory.getFactory();
+      this.vertexIndexMap = Collections.emptyMap();
+      this.vertexIndices = Collections.emptyList();
     } else {
-      this.geometryFactory = GeometryFactory.getFactory(geometry);
-      final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(geometry);
-      boolean first = true;
-      for (final CoordinatesList points : pointsList) {
-        if (first) {
-          first = false;
-        } else {
-          coordinatesList.add(null);
-        }
-        for (final Coordinates point : points) {
-          coordinatesList.add(point);
-        }
-      }
+      this.vertexIndexMap = GeometryEditUtil.getIndexOfVertices(geometry);
+      this.vertexIndices = new ArrayList<int[]>(vertexIndexMap.keySet());
     }
+    numAxis = geometryFactory.getNumAxis();
+    if (geometry instanceof Polygon) {
+      axisNames = Arrays.asList("R", "#", "X", "Y", "Z", "M");
+      numIndexItems = 2;
+    } else if (geometry instanceof MultiPoint) {
+      axisNames = Arrays.asList("P", "#", "X", "Y", "Z", "M");
+      numIndexItems = 2;
+    } else if (geometry instanceof MultiLineString) {
+      axisNames = Arrays.asList("P", "#", "X", "Y", "Z", "M");
+      numIndexItems = 2;
+    } else if (geometry instanceof MultiPolygon) {
+      axisNames = Arrays.asList("P", "R", "#", "X", "Y", "Z", "M");
+      numIndexItems = 3;
+    } else if (geometry instanceof GeometryCollection) {
+      axisNames = Arrays.asList("P", "R", "#", "X", "Y", "Z", "M");
+      numIndexItems = 3;
+    } else {
+      axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
+      numIndexItems = 1;
+    }
+    columnCount = numAxis + numIndexItems;
     fireTableStructureChanged();
   }
 

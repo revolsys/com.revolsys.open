@@ -60,6 +60,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     return statement.executeQuery();
   }
 
+  public JdbcDataObjectStore getDataStore() {
+    return dataStore;
+  }
+
   protected void setQuery(Query query) {
     this.query = query;
   }

@@ -9,8 +9,16 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.swing.map.action.AddFileLayerAction;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
+
+  static {
+    MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
+    menu.addMenuItem("layer", new AddFileLayerAction());
+  }
 
   private List<Layer> layers = new ArrayList<Layer>();
 
@@ -283,7 +291,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   @Override
-  public void remove() {
+  public void delete() {
     synchronized (layers) {
       int index = 0;
       for (final Iterator<Layer> iterator = layers.iterator(); iterator.hasNext();) {
@@ -294,10 +302,10 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
         final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
         propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
           null);
-        layer.remove();
+        layer.delete();
         index++;
       }
-      super.remove();
+      super.delete();
     }
   }
 
