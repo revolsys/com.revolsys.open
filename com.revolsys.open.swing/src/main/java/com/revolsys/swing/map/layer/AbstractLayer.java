@@ -363,7 +363,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
+    if (this.renderer != null) {
+      this.renderer.getPropertyChangeSupport().removePropertyChangeListener(this);
+    }
     this.renderer = renderer;
+    if (renderer != null) {
+      renderer.getPropertyChangeSupport().addPropertyChangeListener(this);
+    }
   }
 
   @Override

@@ -19,6 +19,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
@@ -30,6 +31,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.component.TogglePanel;
 import com.revolsys.swing.component.ValuePanel;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.listener.InvokeMethodChangeListener;
@@ -99,14 +101,16 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
     preview.setBorder(BorderFactory.createEtchedBorder());
     add(preview, BorderLayout.EAST);
 
-    setPreferredSize(new Dimension(355, 150));
-    setMinimumSize(new Dimension(355, 150));
+    setPreferredSize(new Dimension(355, 170));
+    setMinimumSize(new Dimension(355, 170));
 
   }
 
   private void addLineStylePanel() {
-    final JPanel panel = new JPanel(new SpringLayout());
-
+    final JPanel panel = new JPanel();
+    GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
+    
     colorField = new ColorChooserPanel(geometryStyle.getLineColor());
     colorField.addPropertyChangeListener("color", this);
     colorField.setBorder(BorderFactory.createTitledBorder("Line Color"));
@@ -137,7 +141,7 @@ public class LineStylePanel extends ValuePanel<GeometryStyle> implements
     lineCapField.setBorder(BorderFactory.createTitledBorder("Line Cap"));
     panel.add(lineCapField);
 
-    SpringLayoutUtil.makeRows(panel, 0, 0, 5, 5, 2, 2);
+    GroupLayoutUtil.makeColumns(panel, 2);
     final JScrollPane scrollPane = new JScrollPane(panel);
     add(scrollPane, BorderLayout.CENTER);
   }

@@ -79,11 +79,4 @@ public class BaseLayerRendererTreeNodeModel extends
   public void mouseReleased(final MouseEvent e) {
   }
 
-  @Override
-  public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
-    super.setObjectTreeModel(objectTreeModel);
-    ObjectTreeModel.getMenu(GeometryStyleRenderer.class).addMenuItem("style",
-      new ChangeStyle());
-  }
-
 }

@@ -41,6 +41,11 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
+  @Override
+  public GeometryStyle clone() {
+    return (GeometryStyle)super.clone();
+  }
+
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);

@@ -33,5 +33,6 @@ public class ChangeStyle extends AbstractAction {
       source, GeometryStyleRenderer.class);
     final GeometryStyle geometryStyle = renderer.getStyle();
     LineStylePanel.showDialog(window, geometryStyle);
+    renderer.setStyle(geometryStyle);
   }
 }

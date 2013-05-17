@@ -21,7 +21,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
-public class MarkerStyle {
+public class MarkerStyle implements Cloneable {
 
   public static final ShapeMarker ELLIPSE = new ShapeMarker("ellipse");
 
@@ -43,6 +43,15 @@ public class MarkerStyle {
       return defaultValue;
     } else {
       return value;
+    }
+  }
+
+  @Override
+  public MarkerStyle clone() {
+    try {
+      return (MarkerStyle)super.clone();
+    } catch (CloneNotSupportedException e) {
+      return null;
     }
   }
 
