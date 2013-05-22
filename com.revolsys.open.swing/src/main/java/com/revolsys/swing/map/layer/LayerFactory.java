@@ -9,4 +9,5 @@ public interface LayerFactory<T extends Layer> {
   String getDescription();
 
   String getTypeName();
+
 }

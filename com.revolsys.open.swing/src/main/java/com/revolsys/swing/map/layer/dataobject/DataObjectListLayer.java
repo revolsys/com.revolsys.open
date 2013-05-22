@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.awt.Component;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.swing.JTable;
+
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -16,6 +19,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
+import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
@@ -46,6 +51,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     final List<DataObject> objects) {
     this(metaData);
     addAllObjects(objects);
+  }
+
+  @Override
+  public Component createTablePanel() {
+    final JTable table = DataObjectListLayerTableModel.createTable(this);
+    return new DataObjectLayerTablePanel(this, table);
   }
 
   public DataObjectListLayer(final String name,

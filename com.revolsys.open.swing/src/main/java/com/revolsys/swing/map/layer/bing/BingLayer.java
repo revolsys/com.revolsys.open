@@ -2,10 +2,8 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.bing.BingClient;
 import com.revolsys.gis.bing.ImagerySet;
@@ -16,46 +14,15 @@ import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.Project;
 
 public class BingLayer extends AbstractTiledImageLayer {
 
-  public static final LayerFactory<BingLayer> FACTORY = new InvokeMethodLayerFactory<BingLayer>(
-    "bing", "Bing Tiles", BingLayer.class, "create");
-
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
-
-  public static BingLayer create(final Map<String, Object> properties) {
-    ImagerySet imagerySet = ImagerySet.Road;
-    final String imagerySetName = (String)properties.remove("imagerySet");
-    if (StringUtils.hasText(imagerySetName)) {
-      try {
-        imagerySet = ImagerySet.valueOf(imagerySetName);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(BingLayer.class).error(
-          "Unknown Bing imagery set " + imagerySetName, e);
-      }
-    }
-    MapLayer mapLayer = null;
-    final String mapLayerName = (String)properties.remove("mapLayer");
-    if (StringUtils.hasText(mapLayerName)) {
-      try {
-        mapLayer = MapLayer.valueOf(mapLayerName);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(BingLayer.class).error(
-          "Unknown Bing map layer " + mapLayerName, e);
-      }
-    }
-    final BingLayer layer = new BingLayer(imagerySet, mapLayer);
-    layer.setProperties(properties);
-    return layer;
-  }
 
   private BingClient client;
 

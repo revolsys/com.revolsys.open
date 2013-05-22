@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.dataobject;
 
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,9 +21,6 @@ import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreConnections;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.data.io.DelegatingDataObjectStoreHandler;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -33,46 +29,11 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingWorkerManager;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.transaction.InvokeMethodInTransaction;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
-
-  public static final LayerFactory<DataObjectStoreLayer> FACTORY = new InvokeMethodLayerFactory<DataObjectStoreLayer>(
-    "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
-
-  public static DataObjectStoreLayer create(final Map<String, Object> properties) {
-    @SuppressWarnings("unchecked")
-    final Map<String, String> connectionProperties = (Map<String, String>)properties.get("connectionProperties");
-    if (connectionProperties == null) {
-      throw new IllegalArgumentException(
-        "A data store layer requires a connectionProperties entry with a name or url, username, and password.");
-    } else {
-      String name = (String)connectionProperties.get("name");
-      DataObjectStore dataStore;
-      if (StringUtils.hasText(name)) {
-        DataObjectStoreConnections connections = DataObjectStoreConnections.get();
-        dataStore = connections.getDataObjectStore(name);
-        if (dataStore == null) {
-          connections.createConnection(name, connectionProperties);
-          dataStore = connections.getDataObjectStore(name);
-        }
-        if (dataStore instanceof Proxy) {
-          DelegatingDataObjectStoreHandler handler = (DelegatingDataObjectStoreHandler)Proxy.getInvocationHandler(dataStore);
-          dataStore = handler.getDataStore();
-        }
-      } else {
-        dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
-      }
-      dataStore.initialize();
-      final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
-      layer.setProperties(properties);
-      return layer;
-    }
-  }
 
   private BoundingBox boundingBox = new BoundingBox();
 

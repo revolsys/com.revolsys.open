@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -24,16 +23,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
-
-  public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
-    DataObjectListLayer.class, DataObjectListLayerTableModel.class,
-    "createPanel");
-
-  public static DataObjectLayerTablePanel createPanel(
-    final DataObjectListLayer layer) {
-    final JTable table = createTable(layer);
-    return new DataObjectLayerTablePanel(layer, table);
-  }
 
   public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
     final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(

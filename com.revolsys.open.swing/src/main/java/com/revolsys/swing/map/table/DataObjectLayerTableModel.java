@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
@@ -38,24 +37,11 @@ import com.revolsys.util.CollectionUtil;
 public class DataObjectLayerTableModel extends DataObjectRowTableModel
   implements SortableTableModel, PropertyChangeListener {
 
-  public static final LayerTablePanelFactory FACTORY = new InvokeMethodLayerTablePanelFactory(
-    DataObjectLayer.class, DataObjectLayerTableModel.class, "createPanel");
-
   public static final String MODE_ALL = "all";
 
   public static final String MODE_SELECTED = "selected";
 
   public static final String MODE_EDITS = "edits";
-
-  public static DataObjectLayerTablePanel createPanel(
-    final DataObjectLayer layer) {
-    final JTable table = createTable(layer);
-    if (table == null) {
-      return null;
-    } else {
-      return new DataObjectLayerTablePanel(layer, table);
-    }
-  }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer) {
     DataObjectMetaData metaData = layer.getMetaData();

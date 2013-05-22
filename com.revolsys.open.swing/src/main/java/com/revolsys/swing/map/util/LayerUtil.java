@@ -1,6 +1,10 @@
 package com.revolsys.swing.map.util;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,9 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -35,6 +43,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectForm;
 import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
@@ -42,11 +51,11 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
-import com.revolsys.swing.map.layer.bing.BingLayer;
+import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayerFactory;
+import com.revolsys.swing.map.layer.bing.BingLayerFactory;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
+import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayerFactory;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
@@ -55,9 +64,6 @@ import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
-import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
-import com.revolsys.swing.map.table.LayerTablePanelFactory;
 import com.revolsys.swing.tree.ObjectTree;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -67,30 +73,31 @@ public class LayerUtil {
 
   private static final Map<String, LayerFactory<?>> LAYER_FACTORIES = new HashMap<String, LayerFactory<?>>();
 
-  private static final Map<Class<? extends Layer>, LayerTablePanelFactory> LAYER_TABLE_FACTORIES = new HashMap<Class<? extends Layer>, LayerTablePanelFactory>();
-
   static {
-    addLayerFactory(DataObjectStoreLayer.FACTORY);
-    addLayerFactory(ArcGisServerRestLayer.FACTORY);
-    addLayerFactory(BingLayer.FACTORY);
+    addLayerFactory(new DataObjectStoreLayerFactory());
+    addLayerFactory(new ArcGisServerRestLayerFactory());
+    addLayerFactory(new BingLayerFactory());
     addLayerFactory(GridLayer.FACTORY);
     addLayerFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     addLayerFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
     addLayerFactory(GeoReferencedImageLayer.FACTORY);
+  }
 
-    addLayerTablePanelFactory(DataObjectLayerTableModel.FACTORY);
-    addLayerTablePanelFactory(DataObjectListLayerTableModel.FACTORY);
+  public static void addLayer(final Layer layer) {
+    if (layer != null) {
+      final LayerGroup layerGroup = getCurrentLayerGroup();
+      if (layerGroup == null) {
+        LoggerFactory.getLogger(LayerUtil.class).error(
+          "Cannot find project to open file:" + layer);
+      } else {
+        layerGroup.add(layer);
+      }
+    }
   }
 
   public static void addLayerFactory(final LayerFactory<?> factory) {
     final String typeName = factory.getTypeName();
     LAYER_FACTORIES.put(typeName, factory);
-  }
-
-  public static void addLayerTablePanelFactory(
-    final LayerTablePanelFactory factory) {
-    final Class<? extends Layer> layerClass = factory.getLayerClass();
-    LAYER_TABLE_FACTORIES.put(layerClass, factory);
   }
 
   public static void addNewRecord() {
@@ -99,6 +106,50 @@ public class LayerUtil {
       final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
       dataObjectLayer.addNewRecord();
     }
+  }
+
+  public static void deleteLayer() {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    if (layer != null) {
+      final int confirm = JOptionPane.showConfirmDialog(MapPanel.get(layer),
+        "Delete the layer and any child layers? This action cannot be undone.",
+        "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+      if (confirm == JOptionPane.OK_OPTION) {
+        deleteLayer(layer);
+      }
+    }
+  }
+
+  public static void deleteLayer(final Layer layer) {
+    if (layer instanceof LayerGroup) {
+      final LayerGroup layerGroup = (LayerGroup)layer;
+      for (final Layer childLayer : new ArrayList<Layer>(layerGroup)) {
+        deleteLayer(childLayer);
+      }
+    }
+    // TODO all this should be done by listeners
+    final Window window = forms.remove(layer);
+    if (window != null) {
+      window.setVisible(false);
+    }
+    final DefaultSingleCDockable dockable = layer.getProperty("TableView");
+    if (dockable != null) {
+      dockable.setVisible(false);
+    }
+    layer.delete();
+  }
+
+  public static LayerGroup getCurrentLayerGroup() {
+    final Project project = Project.get();
+    if (project != null) {
+      final List<LayerGroup> groups = project.getLayerGroups();
+      if (groups.isEmpty()) {
+        return project;
+      } else {
+        return groups.get(0);
+      }
+    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")
@@ -111,7 +162,8 @@ public class LayerUtil {
         LoggerFactory.getLogger(LayerUtil.class).error(
           "No layer factory for " + typeName);
       } else {
-        return (T)layerFactory.createLayer(properties);
+        final Layer layer = layerFactory.createLayer(properties);
+        return (T)layer;
       }
     }
     return null;
@@ -121,35 +173,11 @@ public class LayerUtil {
     return LAYER_FACTORIES.get(typeName);
   }
 
-  public static Component getLayerTablePanel(final Layer layer) {
-    final Class<? extends Layer> layerClass = layer.getClass();
-    final LayerTablePanelFactory factory = getLayerTablePanelFactory(layerClass);
-    if (factory != null) {
-      return factory.createPanel(layer);
-    }
-    return null;
-  }
-
-  public static LayerTablePanelFactory getLayerTablePanelFactory(
-    final Class<?> layerClass) {
-    if (layerClass == null) {
+  public static Component getLayerTablePanel(final DataObjectLayer layer) {
+    if (layer == null) {
       return null;
     } else {
-      LayerTablePanelFactory factory = LAYER_TABLE_FACTORIES.get(layerClass);
-      if (factory == null) {
-        final Class<?> superclass = layerClass.getSuperclass();
-        factory = getLayerTablePanelFactory(superclass);
-        if (factory == null) {
-          final Class<?>[] interfaces = layerClass.getInterfaces();
-          for (final Class<?> interfaceClass : interfaces) {
-            factory = getLayerTablePanelFactory(interfaceClass);
-            if (factory != null) {
-              return factory;
-            }
-          }
-        }
-      }
-      return factory;
+      return layer.createTablePanel();
     }
   }
 
@@ -187,31 +215,6 @@ public class LayerUtil {
     }
   }
 
-  public static LayerGroup getCurrentLayerGroup() {
-    final Project project = Project.get();
-    if (project != null) {
-      List<LayerGroup> groups = project.getLayerGroups();
-      if (groups.isEmpty()) {
-        return project;
-      } else {
-        return groups.get(0);
-      }
-    }
-    return null;
-  }
-
-  public static void addLayer(Layer layer) {
-    if (layer != null) {
-      final LayerGroup layerGroup = getCurrentLayerGroup();
-      if (layerGroup == null) {
-        LoggerFactory.getLogger(LayerUtil.class).error(
-          "Cannot find project to open file:" + layer);
-      } else {
-        layerGroup.add(layer);
-      }
-    }
-  }
-
   public static void openFile(final File file) {
     final LayerGroup layerGroup = getCurrentLayerGroup();
     openFile(layerGroup, file);
@@ -231,7 +234,7 @@ public class LayerUtil {
       } else {
         final FileSystemResource resource = new FileSystemResource(file);
 
-        GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(resource);
+        final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(resource);
         if (image != null) {
           final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
             FileUtil.getBaseName(file), image);
@@ -246,7 +249,7 @@ public class LayerUtil {
               BoundingBox boundingBox = new BoundingBox(geometryFactory);
               final DataObjectListLayer layer = new DataObjectListLayer(
                 metaData);
-              GeometryStyleRenderer renderer = layer.getRenderer();
+              final GeometryStyleRenderer renderer = layer.getRenderer();
               renderer.setStyle(GeometryStyle.createStyle());
               for (final DataObject object : reader) {
                 final Geometry geometry = object.getGeometryValue();
@@ -314,8 +317,32 @@ public class LayerUtil {
 
   }
 
-  public static void showViewAttributes() {
+  public static void showProperties() {
     final Layer layer = ObjectTree.getMouseClickItem();
+    showProperties(layer);
+  }
+
+  public static void showProperties(final Layer layer) {
+    if (layer != null) {
+      final JTabbedPane panel = layer.createPropertiesPanel();
+      final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
+      final JDialog dialog = new JDialog(window, layer.getName()
+        + " Properties", ModalityType.APPLICATION_MODAL);
+      dialog.setLayout(new BorderLayout());
+      dialog.add(panel, BorderLayout.CENTER);
+
+      final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+      buttons.add(InvokeMethodAction.createButton("OK", dialog, "setVisible",
+        false));
+      dialog.add(buttons, BorderLayout.SOUTH);
+      dialog.setMinimumSize(new Dimension(200, 100));
+      dialog.pack();
+      dialog.setVisible(true);
+    }
+  }
+
+  public static void showViewAttributes() {
+    final DataObjectLayer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
       DefaultSingleCDockable dockable;
       synchronized (layer) {
@@ -324,7 +351,7 @@ public class LayerUtil {
       if (dockable == null) {
         final Project project = layer.getProject();
 
-        final Component component = LayerUtil.getLayerTablePanel(layer);
+        final Component component = layer.createTablePanel();
         if (component != null) {
           final String id = layer.getClass().getName() + "." + layer.getId();
           dockable = DockingFramesUtil.addDockable(project,
@@ -375,37 +402,6 @@ public class LayerUtil {
 
       project.setViewBoundingBox(boundingBox);
     }
-  }
-
-  public static void deleteLayer() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      int confirm = JOptionPane.showConfirmDialog(MapPanel.get(layer),
-        "Delete the layer and any child layers? This action cannot be undone.",
-        "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-      if (confirm == JOptionPane.OK_OPTION) {
-        deleteLayer(layer);
-      }
-    }
-  }
-
-  public static void deleteLayer(final Layer layer) {
-    if (layer instanceof LayerGroup) {
-      LayerGroup layerGroup = (LayerGroup)layer;
-      for (Layer childLayer : new ArrayList<Layer>(layerGroup)) {
-        deleteLayer(childLayer);
-      }
-    }
-    // TODO all this should be done by listeners
-    Window window = forms.remove(layer);
-    if (window != null) {
-      window.setVisible(false);
-    }
-    DefaultSingleCDockable dockable = layer.getProperty("TableView");
-    if (dockable != null) {
-      dockable.setVisible(false);
-    }
-    layer.delete();
   }
 
   public static void zoomToLayerSelected() {

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,8 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
+import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -88,6 +92,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (object != null) {
         LayerUtil.showForm(layer, object);
       }
+    }
+  }
+
+  public Component createTablePanel() {
+    final JTable table = DataObjectLayerTableModel.createTable(this);
+    if (table == null) {
+      return null;
+    } else {
+      return new DataObjectLayerTablePanel(this, table);
     }
   }
 

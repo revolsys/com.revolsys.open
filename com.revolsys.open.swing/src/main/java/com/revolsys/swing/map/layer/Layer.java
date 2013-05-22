@@ -1,6 +1,9 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Component;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.JTabbedPane;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
@@ -21,6 +24,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   GeometryFactory getGeometryFactory();
 
   long getId();
+
+  JTabbedPane createPropertiesPanel();
 
   LayerGroup getLayerGroup();
 

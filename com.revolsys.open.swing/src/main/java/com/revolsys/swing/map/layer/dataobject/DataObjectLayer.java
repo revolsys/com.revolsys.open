@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.awt.Component;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,8 @@ public interface DataObjectLayer extends Layer {
   void deleteObjects(DataObject... object);
 
   int getChangeCount();
+
+  Component createTablePanel();
 
   List<DataObject> getChanges();
 

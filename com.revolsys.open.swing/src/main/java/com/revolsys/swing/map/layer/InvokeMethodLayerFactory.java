@@ -7,12 +7,8 @@ import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodLayerFactory<T extends Layer> implements
-  LayerFactory<T> {
-
-  private final String description;
-
-  private final String typeName;
+public class InvokeMethodLayerFactory<T extends Layer> extends
+  AbstractLayerFactory<T> {
 
   private final Object object;
 
@@ -20,8 +16,7 @@ public class InvokeMethodLayerFactory<T extends Layer> implements
 
   public InvokeMethodLayerFactory(final String typeName,
     final String description, final Object object, final String methodName) {
-    this.typeName = typeName;
-    this.description = description;
+   super(typeName,description);
     this.object = object;
     this.methodName = methodName;
   }
@@ -43,20 +38,5 @@ public class InvokeMethodLayerFactory<T extends Layer> implements
     } catch (final InvocationTargetException e) {
       return ExceptionUtil.throwCauseException(e);
     }
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public String getTypeName() {
-    return typeName;
-  }
-
-  @Override
-  public String toString() {
-    return description;
   }
 }

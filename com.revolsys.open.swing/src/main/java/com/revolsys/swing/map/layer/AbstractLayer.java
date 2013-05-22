@@ -6,6 +6,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.JTabbedPane;
+
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
@@ -32,6 +34,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
     menu.addMenuItemTitleIcon("layer", "Delete", "delete", LayerUtil.class,
       "deleteLayer");
+    menu.addMenuItemTitleIcon("layer", "Properties", "delete", LayerUtil.class,
+      "showProperties");
+  }
+
+  public JTabbedPane createPropertiesPanel(Layer layer) {
+    return new JTabbedPane();
   }
 
   private boolean editable = false;
@@ -95,6 +103,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public void delete() {
+    if (layerGroup != null) {
+      layerGroup.remove(this);
+      layerGroup = null;
+    }
+    getPropertyChangeSupport().firePropertyChange("deleted", false, true);
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return new BoundingBox();
   }
@@ -121,6 +138,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public long getId() {
     return id;
+  }
+
+  @Override
+  public JTabbedPane createPropertiesPanel() {
+    return new JTabbedPane();
   }
 
   @Override
@@ -251,15 +273,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void delete() {
-    if (layerGroup != null) {
-      layerGroup.remove(this);
-      layerGroup = null;
-    }
-    getPropertyChangeSupport().firePropertyChange("deleted", false, true);
-  }
-
-  @Override
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
     propertyChangeSupport.removePropertyChangeListener(listener);
   }
@@ -364,7 +377,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
     if (this.renderer != null) {
-      this.renderer.getPropertyChangeSupport().removePropertyChangeListener(this);
+      this.renderer.getPropertyChangeSupport().removePropertyChangeListener(
+        this);
     }
     this.renderer = renderer;
     if (renderer != null) {
