@@ -91,6 +91,8 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           } else {
             this.in = new LittleEndianRandomAccessFile(file, "r");
           }
+        } catch (final IllegalArgumentException e) {
+          this.in = new EndianInputStream(resource.getInputStream());
         } catch (final FileNotFoundException e) {
           this.in = new EndianInputStream(resource.getInputStream());
         }

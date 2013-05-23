@@ -13,8 +13,10 @@ import java.util.Set;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -189,96 +191,6 @@ public class GeometryFactory extends
     }
   }
 
-  public static LineString[] toLineStringArray(final GeometryFactory factory,
-    final Collection<?> lines) {
-    final LineString[] lineStrings = new LineString[lines.size()];
-    final Iterator<?> iterator = lines.iterator();
-    for (int i = 0; i < lines.size(); i++) {
-      final Object value = iterator.next();
-      if (value instanceof LineString) {
-        final LineString lineString = (LineString)value;
-        lineStrings[i] = lineString;
-      } else if (value instanceof CoordinatesList) {
-        final CoordinatesList coordinates = (CoordinatesList)value;
-        lineStrings[i] = factory.createLineString(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        final CoordinateSequence coordinates = (CoordinateSequence)value;
-        lineStrings[i] = factory.createLineString(coordinates);
-      } else if (value instanceof double[]) {
-        final double[] points = (double[])value;
-        lineStrings[i] = factory.createLineString(points);
-      }
-    }
-    return lineStrings;
-  }
-
-  public static MultiPolygon toMultiPolygon(
-    final GeometryFactory geometryFactory, final Collection<?> polygons) {
-    final Polygon[] polygonArray = toPolygonArray(geometryFactory, polygons);
-    return geometryFactory.createMultiPolygon(polygonArray);
-  }
-
-  public static MultiPolygon toMultiPolygon(final List<Polygon> polygons) {
-    final GeometryFactory geometryFactory;
-    if (polygons.isEmpty()) {
-      geometryFactory = GeometryFactory.getFactory();
-    } else {
-      geometryFactory = getFactory(polygons.get(0));
-    }
-    return toMultiPolygon(geometryFactory, polygons);
-  }
-
-  public static MultiPolygon toMultiPolygon(final Polygon... polygons) {
-    return toMultiPolygon(Arrays.asList(polygons));
-  }
-
-  public static Point[] toPointArray(final GeometryFactory factory,
-    final Collection<?> points) {
-    final Point[] pointArray = new Point[points.size()];
-    int i = 0;
-    for (final Object value : points) {
-      if (value instanceof Point) {
-        final Point point = (Point)value;
-        pointArray[i] = point;
-      } else if (value instanceof Coordinates) {
-        final Coordinates coordinates = (Coordinates)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      } else if (value instanceof Coordinate) {
-        final Coordinate coordinate = (Coordinate)value;
-        pointArray[i] = factory.createPoint(coordinate);
-      } else if (value instanceof CoordinatesList) {
-        final CoordinatesList coordinates = (CoordinatesList)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        final CoordinateSequence coordinates = (CoordinateSequence)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      } else if (value instanceof double[]) {
-        final double[] coordinates = (double[])value;
-        pointArray[i] = factory.createPoint(coordinates);
-      }
-      i++;
-    }
-    return pointArray;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static Polygon[] toPolygonArray(final GeometryFactory factory,
-    final Collection<?> polygonList) {
-    final Polygon[] polygons = new Polygon[polygonList.size()];
-    int i = 0;
-    for (final Object value : polygonList) {
-      if (value instanceof Polygon) {
-        final Polygon polygon = (Polygon)value;
-        polygons[i] = polygon;
-      } else if (value instanceof List) {
-        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
-        polygons[i] = factory.createPolygon(coordinateList);
-      }
-      i++;
-    }
-    return polygons;
-  }
-
   private final CoordinatesPrecisionModel coordinatesPrecisionModel;
 
   private final CoordinateSystem coordinateSystem;
@@ -323,9 +235,40 @@ public class GeometryFactory extends
     return newPoint;
   }
 
-  public CoordinatesList createCoordinatesList(
-    final Collection<Coordinates> points) {
-    return new DoubleCoordinatesList(numAxis, points);
+  public CoordinatesList createCoordinatesList(final Collection<?> points) {
+    if (points == null || points.isEmpty()) {
+      return null;
+    } else {
+      final int numPoints = points.size();
+      final int numAxis = getNumAxis();
+      final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+        numPoints, numAxis);
+      int i = 0;
+      for (final Object object : points) {
+        Coordinates point;
+        if (object instanceof Coordinates) {
+          point = (Coordinates)object;
+        } else if (object instanceof Point) {
+          point = CoordinatesUtil.get((Point)object);
+        } else if (object instanceof double[]) {
+          point = new DoubleCoordinates((double[])object);
+        } else if (object instanceof Coordinate) {
+          point = new CoordinateCoordinates((Coordinate)object);
+        } else if (object instanceof CoordinatesList) {
+          final CoordinatesList coordinates = (CoordinatesList)object;
+          point = coordinates.get(0);
+        } else if (object instanceof CoordinateSequence) {
+          final CoordinateSequence coordinates = (CoordinateSequence)object;
+          point = new CoordinateCoordinates(coordinates.getCoordinate(0));
+        } else {
+          throw new IllegalArgumentException("Unexepected data type: " + object);
+        }
+
+        coordinatesList.setPoint(i, point);
+        i++;
+      }
+      return coordinatesList;
+    }
   }
 
   public CoordinatesList createCoordinatesList(final Coordinates... points) {
@@ -494,6 +437,11 @@ public class GeometryFactory extends
     }
   }
 
+  public LinearRing createLinearRing(final Collection<?> points) {
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return createLinearRing(coordinatesList);
+  }
+
   public LinearRing createLinearRing(final CoordinatesList points) {
     points.makePrecise(coordinatesPrecisionModel);
     return super.createLinearRing(points);
@@ -510,32 +458,19 @@ public class GeometryFactory extends
     return createLinearRing(newPoints);
   }
 
-  public LinearRing createLinearRing(final List<Coordinates> points) {
-    if (points == null || points.isEmpty()) {
-      return createLinearRing((CoordinateSequence)null);
-    } else {
-      CoordinatesList coordinatesList;
-      final int numPoints = points.size();
-      if (numPoints == 0) {
-        coordinatesList = null;
-      } else {
-        final Coordinates point0 = points.get(0);
-        final byte numAxis = point0.getNumAxis();
-
-        coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
-        for (int i = 0; i < numPoints; i++) {
-          final Coordinates point = points.get(i);
-          coordinatesList.setPoint(i, point);
-        }
-      }
-      return createLinearRing(coordinatesList);
-    }
+  public LinearRing createLinearRing(final Object... points) {
+    return createLinearRing(Arrays.asList(points));
   }
 
   public LineString createLineString() {
     final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
       getNumAxis());
     return createLineString(points);
+  }
+
+  public LineString createLineString(final Collection<?> points) {
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return createLineString(coordinatesList);
   }
 
   public LineString createLineString(final Coordinates... points) {
@@ -562,35 +497,12 @@ public class GeometryFactory extends
     return createLineString(newPoints);
   }
 
-  public LineString createLineString(final List<Coordinates> points) {
-    if (points == null || points.isEmpty()) {
-      return createLineString((CoordinateSequence)null);
-    } else {
-      CoordinatesList coordinatesList;
-      final int numPoints = points.size();
-      if (numPoints == 0) {
-        coordinatesList = null;
-      } else {
-        final Coordinates point0 = points.get(0);
-        final byte numAxis = point0.getNumAxis();
-
-        coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
-        for (int i = 0; i < numPoints; i++) {
-          final Coordinates point = points.get(i);
-          coordinatesList.setPoint(i, point);
-        }
-      }
-      return createLineString(coordinatesList);
-    }
-  }
-
-  public LineString createLineString(final Point... points) {
-    final CoordinatesList coordinatesList = CoordinatesListUtil.get(points);
-    return createLineString(coordinatesList);
+  public LineString createLineString(final Object... points) {
+    return createLineString(Arrays.asList(points));
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
-    final LineString[] lineArray = toLineStringArray(this, lines);
+    final LineString[] lineArray = toLineStringArray(lines);
     return createMultiLineString(lineArray);
   }
 
@@ -600,19 +512,30 @@ public class GeometryFactory extends
   }
 
   public MultiPoint createMultiPoint(final Collection<?> points) {
-    final Point[] pointArray = toPointArray(this, points);
-    return createMultiPoint(pointArray);
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return createMultiPoint(coordinatesList);
   }
 
-  public MultiPoint createMultiPoint(final CoordinatesList points) {
-    if (points != null) {
-      points.makePrecise(coordinatesPrecisionModel);
+  public MultiPoint createMultiPoint(final CoordinatesList coordinatesList) {
+    if (coordinatesList != null) {
+      coordinatesList.makePrecise(coordinatesPrecisionModel);
+    }
+    Point[] points = new Point[coordinatesList.size()];
+    for (int i = 0; i < points.length; i++) {
+      Coordinates coordinates = coordinatesList.get(i);
+      Point point = createPoint(coordinates);
+      points[i] = point;
     }
     return super.createMultiPoint(points);
   }
 
+  public MultiPoint createMultiPoint(final Object... points) {
+    return createMultiPoint(Arrays.asList(points));
+  }
+
   public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
-    return toMultiPolygon(this, polygons);
+    final Polygon[] polygonArray = toPolygonArray(polygons);
+    return createMultiPolygon(polygonArray);
   }
 
   public Point createPoint() {
@@ -678,6 +601,10 @@ public class GeometryFactory extends
       }
       return createPolygon(exteriorRing, interiorRings);
     }
+  }
+
+  public Polygon createPolygon(final Object... rings) {
+    return createPolygon(Arrays.asList(rings));
   }
 
   public Polygon createPolygon(final Polygon polygon) {
@@ -784,6 +711,45 @@ public class GeometryFactory extends
    */
   public <G extends Geometry> G project(final G geometry) {
     return GeometryProjectionUtil.perform(geometry, this);
+  }
+
+  public LineString[] toLineStringArray(final Collection<?> lines) {
+    final LineString[] lineStrings = new LineString[lines.size()];
+    final Iterator<?> iterator = lines.iterator();
+    for (int i = 0; i < lines.size(); i++) {
+      final Object value = iterator.next();
+      if (value instanceof LineString) {
+        final LineString lineString = (LineString)value;
+        lineStrings[i] = lineString;
+      } else if (value instanceof CoordinatesList) {
+        final CoordinatesList coordinates = (CoordinatesList)value;
+        lineStrings[i] = createLineString(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        final CoordinateSequence coordinates = (CoordinateSequence)value;
+        lineStrings[i] = createLineString(coordinates);
+      } else if (value instanceof double[]) {
+        final double[] points = (double[])value;
+        lineStrings[i] = createLineString(points);
+      }
+    }
+    return lineStrings;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Polygon[] toPolygonArray(final Collection<?> polygonList) {
+    final Polygon[] polygons = new Polygon[polygonList.size()];
+    int i = 0;
+    for (final Object value : polygonList) {
+      if (value instanceof Polygon) {
+        final Polygon polygon = (Polygon)value;
+        polygons[i] = polygon;
+      } else if (value instanceof List) {
+        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
+        polygons[i] = createPolygon(coordinateList);
+      }
+      i++;
+    }
+    return polygons;
   }
 
   @Override

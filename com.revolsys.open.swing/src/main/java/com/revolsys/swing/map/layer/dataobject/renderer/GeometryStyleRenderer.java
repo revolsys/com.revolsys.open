@@ -51,8 +51,8 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry part = geometry.getGeometryN(i);
-      if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
+      if (part instanceof Point) {
+        final Point point = (Point)part;
         MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
       } else if (part instanceof LineString) {
         final LineString lineString = (LineString)part;

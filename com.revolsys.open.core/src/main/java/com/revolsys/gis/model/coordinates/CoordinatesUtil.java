@@ -137,7 +137,7 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates get(final Geometry geometry) {
-    if (geometry.isEmpty()) {
+    if (geometry == null || geometry.isEmpty()) {
       return null;
     } else {
       final CoordinatesList points = CoordinatesListUtil.get(geometry);

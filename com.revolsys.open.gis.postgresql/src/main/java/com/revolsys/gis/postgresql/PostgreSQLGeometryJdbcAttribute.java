@@ -364,8 +364,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final com.vividsolutions.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
       if (subGeometry instanceof com.vividsolutions.jts.geom.Point) {
-        final com.vividsolutions.jts.geom.Point line = (com.vividsolutions.jts.geom.Point)subGeometry;
-        final Point pgPoint = toPgPoint(line);
+        final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)subGeometry;
+        final Point pgPoint = toPgPoint(point);
         pgPoints.add(pgPoint);
       } else {
         throw new RuntimeException("Geometry must contain only Points not a "

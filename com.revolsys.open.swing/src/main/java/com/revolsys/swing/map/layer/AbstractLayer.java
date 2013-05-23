@@ -32,9 +32,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
-    menu.addMenuItemTitleIcon("layer", "Delete", "delete", LayerUtil.class,
+    menu.addMenuItemTitleIcon("layer", "Delete Layer", "delete", LayerUtil.class,
       "deleteLayer");
-    menu.addMenuItemTitleIcon("layer", "Properties", "delete", LayerUtil.class,
+    menu.addMenuItemTitleIcon("layer", "Layer Properties", "information", LayerUtil.class,
       "showProperties");
   }
 

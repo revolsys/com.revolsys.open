@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.raster;
 
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -36,11 +37,16 @@ public class GeoReferencedImageLayer extends AbstractLayer {
         "A geo referenced image layer requires a url.");
     } else {
       final Resource imageResource = SpringUtil.getResource(url);
-      final GeoReferencedImage image = new TiffImage(imageResource);
+      if (imageResource.exists()) {
+        final GeoReferencedImage image = new TiffImage(imageResource);
 
-      final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(image);
-      layer.setProperties(properties);
-      return layer;
+        final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(image);
+        layer.setProperties(properties);
+        return layer;
+      } else {
+        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error("Image does not exist:" + imageResource);
+        return null;
+      }
     }
   }
 
