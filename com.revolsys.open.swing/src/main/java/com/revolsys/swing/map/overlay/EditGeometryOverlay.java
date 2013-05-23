@@ -63,8 +63,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private Geometry geometry;
 
-  private Point firstPoint;
-
   private Point previousPoint;
 
   private DataType geometryDataType;
@@ -252,8 +250,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
       / length, 0);
     Point point = viewportGeometryFactory.createPoint(newC1);
-    point = getGeometryFactory().copy(point);
-    return getGeometryFactory().createLineString(c0, point);
+    GeometryFactory geometryFactory = getGeometryFactory();
+    point = geometryFactory.copy(point);
+    return geometryFactory.createLineString(c0, point);
   }
 
   private void drawVertexXor(final MouseEvent event, final int[] vertexIndex,
@@ -553,7 +552,8 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
             setXorGeometry(graphics, createXorLine(firstPoint, point));
           } else if (DataTypes.LINE_STRING.equals(geometryDataType)
             || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-            setXorGeometry(graphics, createXorLine(CoordinatesUtil.get(previousPoint), point));
+            setXorGeometry(graphics,
+              createXorLine(CoordinatesUtil.get(previousPoint), point));
           } else {
             setXorGeometry(
               graphics,
@@ -696,7 +696,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     setGeometry(geometry);
 
     mode = "edit";
-    firstPoint = null;
     firePropertyChange("object", oldValue, object);
   }
 

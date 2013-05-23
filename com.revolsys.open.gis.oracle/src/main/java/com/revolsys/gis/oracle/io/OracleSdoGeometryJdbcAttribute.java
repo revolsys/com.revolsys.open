@@ -529,6 +529,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         switch ((int)type) {
           case 1003:
             if (exteriorRing != null) {
+              // TODO convert to array of rings
               final Polygon polygon = geometryFactory.createPolygon(
                 exteriorRing, GeometryFactory.toLinearRingArray(interiorRings));
               polygons.add(polygon);

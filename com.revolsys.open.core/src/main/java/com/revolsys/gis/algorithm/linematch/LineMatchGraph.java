@@ -299,15 +299,12 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       }
       createLine(lines, coordinates);
     }
-    final LineString[] lineArray = com.vividsolutions.jts.geom.GeometryFactory.toLineStringArray(lines);
-    return geometryFactory.createMultiLineString(lineArray);
-
+    return geometryFactory.createMultiLineString(lines);
   }
 
   public MultiLineString getMatchedLines(final int index1, final int index2) {
     final List<LineString> lines = getMatchedLinesList(index1, index2);
-    final LineString[] lineArray = com.vividsolutions.jts.geom.GeometryFactory.toLineStringArray(lines);
-    return geometryFactory.createMultiLineString(lineArray);
+    return geometryFactory.createMultiLineString(lines);
 
   }
 
@@ -443,8 +440,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       }
       createLine(lines, coordinates);
     }
-    final LineString[] lineArray = com.vividsolutions.jts.geom.GeometryFactory.toLineStringArray(lines);
-    return geometryFactory.createMultiLineString(lineArray);
+    return geometryFactory.createMultiLineString(lines);
 
   }
 

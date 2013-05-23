@@ -502,7 +502,7 @@ public class GeometryFactory extends
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
-    final LineString[] lineArray = toLineStringArray(lines);
+    final LineString[] lineArray = getLineStringArray(lines);
     return createMultiLineString(lineArray);
   }
 
@@ -534,7 +534,7 @@ public class GeometryFactory extends
   }
 
   public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
-    final Polygon[] polygonArray = toPolygonArray(polygons);
+    final Polygon[] polygonArray = getPolygonArray(polygons);
     return createMultiPolygon(polygonArray);
   }
 
@@ -713,7 +713,7 @@ public class GeometryFactory extends
     return GeometryProjectionUtil.perform(geometry, this);
   }
 
-  public LineString[] toLineStringArray(final Collection<?> lines) {
+  public LineString[] getLineStringArray(final Collection<?> lines) {
     final LineString[] lineStrings = new LineString[lines.size()];
     final Iterator<?> iterator = lines.iterator();
     for (int i = 0; i < lines.size(); i++) {
@@ -736,7 +736,7 @@ public class GeometryFactory extends
   }
 
   @SuppressWarnings("unchecked")
-  public Polygon[] toPolygonArray(final Collection<?> polygonList) {
+  public Polygon[] getPolygonArray(final Collection<?> polygonList) {
     final Polygon[] polygons = new Polygon[polygonList.size()];
     int i = 0;
     for (final Object value : polygonList) {

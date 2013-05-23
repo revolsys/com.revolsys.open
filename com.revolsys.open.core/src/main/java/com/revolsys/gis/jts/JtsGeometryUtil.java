@@ -1480,7 +1480,6 @@ public final class JtsGeometryUtil {
   }
 
   public static Geometry unionAll(final List<Geometry> geometries) {
-    com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
     final GeometryFactory factory = GeometryFactory.getFactory(geometries.get(0));
     final Geometry geometry = factory.createGeometry(geometries);
     if (geometry.getNumGeometries() == 1) {
