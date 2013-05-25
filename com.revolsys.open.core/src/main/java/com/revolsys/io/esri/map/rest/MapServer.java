@@ -1,6 +1,6 @@
 package com.revolsys.io.esri.map.rest;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -84,7 +84,7 @@ public class MapServer extends Service {
     return getList(TableDescription.class, "tables");
   }
 
-  public Image getTileImage(final int zoomLevel, final int tileX,
+  public BufferedImage getTileImage(final int zoomLevel, final int tileX,
     final int tileY) {
     final String url = getTileUrl(zoomLevel, tileX, tileY);
     try {
@@ -141,14 +141,25 @@ public class MapServer extends Service {
   public int getZoomLevel(final double metresPerPixel) {
     final TileInfo tileInfo = getTileInfo();
     final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
-    final Integer minLevel = levelOfDetails.get(0).getLevel();
+    LevelOfDetail previousLevel = levelOfDetails.get(0);
     for (final LevelOfDetail levelOfDetail : levelOfDetails) {
-      final double zoomLevelMetresPerPixel = levelOfDetail.getResolution();
-      if (metresPerPixel > zoomLevelMetresPerPixel) {
-        final Integer level = levelOfDetail.getLevel();
-        return Math.max(level, minLevel);
+      final double levelMetresPerPixel = levelOfDetail.getResolution();
+      if (metresPerPixel > levelMetresPerPixel) {
+        if (levelOfDetail == previousLevel) {
+          return levelOfDetail.getLevel();
+        } else {
+          final double previousLevelMetresPerPixel = previousLevel.getResolution();
+          double range = levelMetresPerPixel - previousLevelMetresPerPixel;
+          double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
+          if (ratio < 0.8) {
+            return previousLevel.getLevel();
+          } else {
+            return levelOfDetail.getLevel();
+          }
+        }
       }
+      previousLevel = levelOfDetail;
     }
-    return levelOfDetails.get(levelOfDetails.size() - 1).getLevel();
+    return previousLevel.getLevel();
   }
 }

@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.bing;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import com.revolsys.gis.bing.BingClient;
 import com.revolsys.gis.bing.ImagerySet;
@@ -15,9 +15,9 @@ public class BingMapTile extends MapTile {
 
   public BingMapTile(final BingLayer layer, final int zoomLevel,
     final int tileX, final int tileY) {
-    super(BingClient.getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
+    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
     this.layer = layer;
-    this.quadKey = BingClient.getQuadKey(zoomLevel, tileX, tileY);
+    this.quadKey = layer.getClient().getQuadKey(zoomLevel, tileX, tileY);
   }
 
   @Override
@@ -43,11 +43,11 @@ public class BingMapTile extends MapTile {
   }
 
   @Override
-  public Image loadImage() {
+  public BufferedImage loadImage() {
     final BingClient client = layer.getClient();
     final ImagerySet imagerySet = layer.getImagerySet();
     final MapLayer mapLayer = layer.getMapLayer();
-    final Image image = client.getMapImage(imagerySet, mapLayer, quadKey);
+    final BufferedImage image = client.getMapImage(imagerySet, mapLayer, quadKey);
     return image;
   }
 

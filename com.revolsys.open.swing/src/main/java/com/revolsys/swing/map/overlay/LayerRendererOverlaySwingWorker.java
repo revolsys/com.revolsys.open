@@ -1,7 +1,7 @@
 package com.revolsys.swing.map.overlay;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import javax.swing.SwingWorker;
 
@@ -48,7 +48,7 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
             }
           }
           graphics.dispose();
-          final Image image = viewport.getImage();
+          final BufferedImage image = viewport.getImage();
           this.referencedImage.setImage(image);
         }
       }

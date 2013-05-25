@@ -166,8 +166,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public DataObject getObject(final int row) {
     if (attributeFilterMode.equals(MODE_SELECTED)) {
-      final DataObjectLayer layer = getLayer();
-      final List<DataObject> selectedObjects = layer.getSelectedObjects();
+      final List<DataObject> selectedObjects = getSelectedObjects();
       if (row < selectedObjects.size()) {
         return selectedObjects.get(row);
       } else {
@@ -186,6 +185,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       return loadLayerObjects(row);
     }
+  }
+
+  protected List<DataObject> getSelectedObjects() {
+    final DataObjectLayer layer = getLayer();
+    final List<DataObject> selectedObjects = layer.getSelectedObjects();
+    return selectedObjects;
   }
 
   public Map<String, Boolean> getOrderBy() {

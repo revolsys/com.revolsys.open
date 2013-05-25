@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
-import javax.media.jai.RenderedOp;
+import javax.media.jai.PlanarImage;
 
 import org.libtiff.jai.codec.XTIFF;
 import org.libtiff.jai.codec.XTIFFDirectory;
@@ -157,7 +157,7 @@ public class TiffImage extends GeoReferencedImage {
 
   @Override
   protected void loadImageMetaData(final Resource resource,
-    final RenderedOp image) {
+    final PlanarImage image) {
     final Object tiffDirectory = image.getProperty("tiff.directory");
     if (tiffDirectory == null) {
       throw new IllegalArgumentException(

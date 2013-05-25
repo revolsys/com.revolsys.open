@@ -96,7 +96,11 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public boolean isVisible(final DataObject object) {
-    return filter.accept(object);
+    try {
+      return filter.accept(object);
+    } catch (Throwable e) {
+      return false;
+    }
   }
 
   @Override

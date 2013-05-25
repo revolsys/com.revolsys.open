@@ -1,13 +1,15 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.vividsolutions.jts.geom.Point;
 
 public class GeoReferencedImageLayerRenderer extends
@@ -24,38 +26,32 @@ public class GeoReferencedImageLayerRenderer extends
     final Graphics2D graphics, final GeoReferencedImage geoReferencedImage,
     final BoundingBox boundingBox) {
     if (geoReferencedImage != null) {
-      final Image image = geoReferencedImage.getImage();
+      final BufferedImage image = geoReferencedImage.getImage();
       render(viewport, graphics, geoReferencedImage, image, boundingBox);
     }
   }
 
   public static void render(final Viewport2D viewport,
     final Graphics2D graphics, final GeoReferencedImage geoReferencedImage,
-    final Image image, final BoundingBox boundingBox) {
+    BufferedImage image, final BoundingBox boundingBox) {
     if (geoReferencedImage != null) {
       if (image != null) {
         final int imageWidth = geoReferencedImage.getImageWidth();
         final int imageHeight = geoReferencedImage.getImageHeight();
         if (imageWidth != -1 && imageHeight != -1) {
-
           if (boundingBox != null && !boundingBox.isNull()) {
-            // TODO better projection
-            final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-            final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-            final Point point = geometryFactory.copy(boundingBox.getTopLeftPoint());
+            final Point point = boundingBox.getTopLeftPoint();
             final double minX = point.getX();
             final double maxY = point.getY();
 
-            // TODO project
             final AffineTransform transform = graphics.getTransform();
             try {
               final double[] location = viewport.toViewCoordinates(minX, maxY);
               final double screenX = location[0];
               final double screenY = location[1];
               graphics.translate(screenX, screenY);
-              final double imageScreenWidth = viewport.toDisplayValue(projectedBoundingBox.getWidthLength());
-              final double imageScreenHeight = viewport.toDisplayValue(projectedBoundingBox.getHeightLength());
+              final double imageScreenWidth = viewport.toDisplayValue(boundingBox.getWidthLength());
+              final double imageScreenHeight = viewport.toDisplayValue(boundingBox.getHeightLength());
 
               final double xScaleFactor = imageScreenWidth / imageWidth;
               final double yScaleFactor = imageScreenHeight / imageHeight;

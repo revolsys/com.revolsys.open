@@ -1,11 +1,13 @@
 package com.revolsys.swing.map.layer.raster;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ public class GeoReferencedImage {
 
   private BoundingBox boundingBox;
 
-  private Image image;
+  private BufferedImage image;
 
   private int imageWidth = -1;
 
@@ -31,7 +33,7 @@ public class GeoReferencedImage {
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
-  private RenderedOp jaiImage;
+  private PlanarImage jaiImage;
 
   public GeoReferencedImage() {
   }
@@ -71,7 +73,7 @@ public class GeoReferencedImage {
     return geometryFactory;
   }
 
-  public Image getImage() {
+  public BufferedImage getImage() {
     return image;
   }
 
@@ -87,19 +89,22 @@ public class GeoReferencedImage {
 
   public int getImageHeight() {
     if (imageHeight == -1) {
-      imageHeight = image.getHeight(null);
+      imageHeight = image.getHeight();
     }
     return imageHeight;
   }
 
   public int getImageWidth() {
     if (imageWidth == -1) {
-      imageWidth = image.getWidth(null);
+      imageWidth = image.getWidth();
     }
     return imageWidth;
   }
 
-  public RenderedOp getJaiImage() {
+  public PlanarImage getJaiImage() {
+    if (jaiImage == null && image != null) {
+      jaiImage = PlanarImage.wrapRenderedImage(image);
+    }
     return jaiImage;
   }
 
@@ -108,12 +113,12 @@ public class GeoReferencedImage {
     return boundingBox.hashCode();
   }
 
-  public Image loadImage() {
+  public BufferedImage loadImage() {
     return image;
   }
 
   protected void loadImageMetaData(final Resource imageResource,
-    final RenderedOp jaiImage) {
+    final PlanarImage jaiImage) {
   }
 
   protected void loadProjectionFile(final Resource resource) {
@@ -172,7 +177,7 @@ public class GeoReferencedImage {
     this.geometryFactory = geometryFactory;
   }
 
-  public void setImage(final Image image) {
+  public void setImage(final BufferedImage image) {
     this.image = image;
   }
 

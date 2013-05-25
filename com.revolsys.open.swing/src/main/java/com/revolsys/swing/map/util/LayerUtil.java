@@ -60,6 +60,7 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayerFactory;
 import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
@@ -77,6 +78,7 @@ public class LayerUtil {
     addLayerFactory(new DataObjectStoreLayerFactory());
     addLayerFactory(new ArcGisServerRestLayerFactory());
     addLayerFactory(new BingLayerFactory());
+    addLayerFactory(new OpenStreetMapLayerFactory());
     addLayerFactory(GridLayer.FACTORY);
     addLayerFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     addLayerFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);

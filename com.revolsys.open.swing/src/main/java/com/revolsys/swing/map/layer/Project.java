@@ -18,7 +18,7 @@ public class Project extends LayerGroup {
     Project.project = new WeakReference<Project>(project);
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory(3857);
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005); //  3857
 
   private final LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 

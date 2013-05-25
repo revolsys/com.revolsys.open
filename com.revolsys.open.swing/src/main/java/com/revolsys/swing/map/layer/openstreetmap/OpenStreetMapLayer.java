@@ -1,61 +1,35 @@
-package com.revolsys.swing.map.layer.bing;
+package com.revolsys.swing.map.layer.openstreetmap;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.bing.BingClient;
-import com.revolsys.gis.bing.ImagerySet;
-import com.revolsys.gis.bing.MapLayer;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
 
-public class BingLayer extends AbstractTiledImageLayer {
+public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
 
-  private BingClient client;
+  private OpenStreetMapClient client;
 
-  private ImagerySet imagerySet;
-
-  private MapLayer mapLayer;
-
-  public BingLayer() {
-    this(ImagerySet.Road);
+  public OpenStreetMapLayer() {
+    this(new OpenStreetMapClient());
   }
 
-  public BingLayer(final BingClient client, final ImagerySet imagerySet) {
-    this(client, imagerySet, null);
+  public OpenStreetMapLayer(final String serverUrl) {
+    this(new OpenStreetMapClient(serverUrl));
   }
 
-  public BingLayer(final BingClient client, final ImagerySet imagerySet,
-    final MapLayer mapLayer) {
+  public OpenStreetMapLayer(OpenStreetMapClient client) {
     this.client = client;
-    this.imagerySet = imagerySet;
-    this.mapLayer = mapLayer;
-    setName("Bing " + imagerySet);
-    setVisible(true);
-  }
-
-  public BingLayer(final ImagerySet imagerySet) {
-    this(new BingClient(), imagerySet);
-  }
-
-  public BingLayer(final ImagerySet imagerySet, final MapLayer mapLayer) {
-    this(new BingClient(), imagerySet, mapLayer);
-  }
-
-  public BingLayer(final String bingMapKey, final ImagerySet imagerySet) {
-    this(new BingClient(bingMapKey), imagerySet);
   }
 
   @Override
@@ -63,16 +37,8 @@ public class BingLayer extends AbstractTiledImageLayer {
     return MAX_BOUNDING_BOX;
   }
 
-  public BingClient getClient() {
+  public OpenStreetMapClient getClient() {
     return client;
-  }
-
-  public ImagerySet getImagerySet() {
-    return imagerySet;
-  }
-
-  public MapLayer getMapLayer() {
-    return mapLayer;
   }
 
   @Override
@@ -97,7 +63,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          tiles.add(new BingMapTile(this, zoomLevel, tileX, tileY));
+          tiles.add(new OpenStreetMapTile(this, zoomLevel, tileX, tileY));
         }
       }
 
@@ -114,28 +80,6 @@ public class BingLayer extends AbstractTiledImageLayer {
     } else {
       return true;
     }
-  }
-
-  public void setClient(final BingClient client) {
-    this.client = client;
-    ExecutorServiceFactory.getExecutorService().execute(
-      new InvokeMethodRunnable(this, "init"));
-  }
-
-  public void setImagerySet(final ImagerySet imagerySet) {
-    this.imagerySet = imagerySet;
-  }
-
-  public void setImagerySet(final String imagerySet) {
-    this.imagerySet = ImagerySet.valueOf(imagerySet);
-  }
-
-  public void setMapLayer(final MapLayer mapLayer) {
-    this.mapLayer = mapLayer;
-  }
-
-  public void setMapLayer(final String mapLayer) {
-    this.mapLayer = MapLayer.valueOf(mapLayer);
   }
 
 }

@@ -197,6 +197,10 @@ public class GeometryFactory extends
 
   private int numAxis = 2;
 
+  public static final GeometryFactory WORLD_MERCATOR = getFactory(3857);
+
+  public static final GeometryFactory WGS84 = getFactory(4326);
+
   protected GeometryFactory(final int crsId, final int numAxis,
     final double scaleXY, final double scaleZ) {
     super(PrecisionModelUtil.getPrecisionModel(scaleXY), crsId,

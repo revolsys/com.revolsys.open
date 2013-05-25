@@ -92,12 +92,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     if (!super.isVisible()) {
       return false;
     } else {
-      final Project project = getProject();
-      final int srid = project.getGeometryFactory().getSRID();
-      if (srid == geometryFactory.getSRID()) {
-        return true;
-      }
-      return false;
+      return true;
     }
   }
 

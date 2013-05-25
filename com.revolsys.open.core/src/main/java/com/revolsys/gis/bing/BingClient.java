@@ -1,6 +1,7 @@
 package com.revolsys.gis.bing;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -25,9 +26,6 @@ import com.revolsys.util.UriTemplate;
 import com.revolsys.util.UrlUtil;
 
 public class BingClient {
-  public static final GeometryFactory WORLD_MERCATOR = GeometryFactory.getFactory(3857);
-
-  public static final GeometryFactory WGS84 = GeometryFactory.getFactory(4326);
 
   private static final double[] METRES_PER_PIXEL = {
     78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849,
@@ -35,34 +33,33 @@ public class BingClient {
     4.7773, 2.3887, 1.1943, 0.5972, 0.2986, 0.1493, 0.0746
   };
 
-  public static BoundingBox getBoundingBox(final int zoomLevel,
-    final int tileX, final int tileY) {
-    final double y1 = BingClient.getLatitude(zoomLevel, tileY);
-    final double y2 = BingClient.getLatitude(zoomLevel, tileY + 1);
-    final double x1 = BingClient.getLongitude(zoomLevel, tileX);
-    final double x2 = BingClient.getLongitude(zoomLevel, tileX + 1);
-    return new BoundingBox(WGS84, x1, y1, x2, y2).convert(WORLD_MERCATOR);
+  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX,
+    final int tileY) {
+    final double y1 = getLatitude(zoomLevel, tileY);
+    final double y2 = getLatitude(zoomLevel, tileY + 1);
+    final double x1 = getLongitude(zoomLevel, tileX);
+    final double x2 = getLongitude(zoomLevel, tileX + 1);
+    return new BoundingBox(GeometryFactory.WGS84, x1, y1, x2, y2).convert(GeometryFactory.WORLD_MERCATOR);
   }
 
-  public static double getLatitude(final int zoomLevel, final int tileY) {
+  public double getLatitude(final int zoomLevel, final int tileY) {
     final double mapSize = getMapSizePixels(zoomLevel);
     final double y = 0.5 - tileY * 256 / mapSize;
 
     return 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
   }
 
-  public static double getLongitude(final int zoomLevel, final int tileX) {
+  public double getLongitude(final int zoomLevel, final int tileX) {
     final double mapSize = getMapSizePixels(zoomLevel);
     final double x = tileX * 256 / mapSize - 0.5;
     return 360 * x;
   }
 
-  public static int getMapSizePixels(final int zoomLevel) {
+  public int getMapSizePixels(final int zoomLevel) {
     return 256 << zoomLevel;
   }
 
-  public static String getQuadKey(final int zoomLevel, final int tileX,
-    final int tileY) {
+  public String getQuadKey(final int zoomLevel, final int tileX, final int tileY) {
     final StringBuilder quadKey = new StringBuilder();
     for (int i = zoomLevel; i > 0; i--) {
       char digit = '0';
@@ -79,17 +76,17 @@ public class BingClient {
     return quadKey.toString();
   }
 
-  public static int getTileX(final int zoomLevel, final double longitude) {
+  public int getTileX(final int zoomLevel, final double longitude) {
+    double ratio = (longitude + 180) / 360;
+    int tileX = (int)Math.floor(ratio * (1 << zoomLevel));
 
-    final double ratio = (longitude + 180) / 360;
-    int tileX = (int)Math.floor(ratio * Math.pow(2, zoomLevel));
     if (ratio >= 1) {
       tileX--;
     }
     return tileX;
   }
 
-  public static int getTileY(final int zoomLevel, final double latitude) {
+  public int getTileY(final int zoomLevel, final double latitude) {
     final double sinLatitude = Math.sin(latitude * Math.PI / 180);
     final int tileY = (int)Math.floor((0.5 - Math.log((1 + sinLatitude)
       / (1 - sinLatitude))
@@ -98,7 +95,7 @@ public class BingClient {
     return tileY;
   }
 
-  public static int getZoomLevel(final double metresPerPixel) {
+  public int getZoomLevel(final double metresPerPixel) {
     for (int i = 0; i < METRES_PER_PIXEL.length; i++) {
       final double zoomLevelMetresPerPixel = METRES_PER_PIXEL[i];
       if (metresPerPixel > zoomLevelMetresPerPixel) {
@@ -151,7 +148,7 @@ public class BingClient {
       parameters);
   }
 
-  public Image getMapImage(final ImagerySet imagerySet,
+  public BufferedImage getMapImage(final ImagerySet imagerySet,
     final MapLayer mapLayer, final String quadKey) {
     final String url = getMapUrl(imagerySet, mapLayer, quadKey);
     try {
@@ -178,6 +175,7 @@ public class BingClient {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer,
     final String quadKey) {
     if (imagerySet == null) {

@@ -1,8 +1,12 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +16,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.vividsolutions.jts.geom.Point;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
@@ -87,7 +92,7 @@ public class TiledImageLayerRenderer extends
         this.scale = viewportScale;
       }
     }
-    for (final MapTile mapTile : getLayer().getOverlappingEnvelopes(viewport)) {
+    for (final MapTile mapTile : layer.getOverlappingEnvelopes(viewport)) {
       if (mapTile != null) {
         MapTile cachedTile = null;
 
@@ -96,7 +101,7 @@ public class TiledImageLayerRenderer extends
           if (cachedTile == null) {
             cachedTile = mapTile;
             cachedTiles.put(cachedTile, cachedTile);
-            final TileLoaderProcess process = getLayer().getTileLoaderProcess();
+            final TileLoaderProcess process = layer.getTileLoaderProcess();
             imageLoading.put(cachedTile, process);
             process.execute(viewport, scale, cachedTile, this);
 
@@ -111,9 +116,65 @@ public class TiledImageLayerRenderer extends
     synchronized (imageLoading) {
       imageLoading.remove(mapTile);
     }
-    viewport.update();
-    getLayer().getPropertyChangeSupport().firePropertyChange("loading", false,
-      true);
-  }
 
+    BoundingBox imageBoundingBox = mapTile.getBoundingBox();
+    GeometryFactory imageGeometryFactory = imageBoundingBox.getGeometryFactory();
+    GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    int imageSrid = imageGeometryFactory.getSRID();
+    if (imageSrid > 0 && imageSrid != viewGeometryFactory.getSRID()) {
+      BufferedImage image = mapTile.getImage();
+      double minX = imageBoundingBox.getMinX();
+      double minY = imageBoundingBox.getMinY();
+      int imageWidth = mapTile.getImageWidth();
+      int imageHeight = mapTile.getImageHeight();
+      double width = imageBoundingBox.getWidth();
+      double height = imageBoundingBox.getHeight();
+      double pixelWidth = width / imageWidth;
+      double pixelHeight = height / imageHeight;
+
+      BoundingBox newImageBoundingBox = imageBoundingBox.convert(viewGeometryFactory);
+
+      double newMinX = newImageBoundingBox.getMinX();
+      double newMaxX = newImageBoundingBox.getMaxX();
+      double newMinY = newImageBoundingBox.getMinY();
+      double newMaxY = newImageBoundingBox.getMaxY();
+      double newPixelSize = viewport.getModelUnitsPerViewUnit();
+      int newImageWidth = (int)((newMaxX - newMinX) / newPixelSize);
+      int newImageHeight = (int)((newMaxY - newMinY) / newPixelSize);
+
+      final BufferedImage newImage = new BufferedImage(newImageWidth,
+        newImageHeight, BufferedImage.TYPE_INT_ARGB);
+      for (int i = 0; i < newImageWidth; i++) {
+        double newImageX = newMinX + i * newPixelSize;
+        for (int j = 0; j < newImageHeight; j++) {
+          double newImageY = newMaxY - j * newPixelSize;
+          Point newImagePoint = viewGeometryFactory.createPoint(newImageX,
+            newImageY);
+          Point imagePoint = imageGeometryFactory.copy(newImagePoint);
+          double imageX = imagePoint.getX();
+          double imageY = imagePoint.getY();
+          int imageI = (int)((imageX - minX) / pixelWidth);
+          int imageJ = imageHeight - (int)((imageY - minY) / pixelHeight);
+          if (imageI > -1 && imageI < imageWidth) {
+            if (imageJ > -1 && imageJ < imageHeight) {
+              int rgb = image.getRGB(imageI, imageJ);
+              if (rgb != -1) {
+                // TODO better interpolation
+                newImage.setRGB(i, j, rgb);
+              }
+            }
+          }
+        }
+      }
+
+      MapTile viewMapTile = new MapTile(newImageBoundingBox, newImageWidth,
+        newImageHeight);
+      viewMapTile.setImage(newImage);
+      cachedTiles.put(mapTile, viewMapTile);
+    }
+    AbstractTiledImageLayer layer = getLayer();
+    PropertyChangeSupport propertyChangeSupport = layer.getPropertyChangeSupport();
+    propertyChangeSupport.firePropertyChange("loading", false, true);
+    viewport.update();
+  }
 }

@@ -233,7 +233,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public Coordinates get(final int i) {
-    return new CoordinatesListCoordinates(this, i);
+    if (i >= 0 && i < size()) {
+      return new CoordinatesListCoordinates(this, i);
+    } else {
+      return null;
+    }
   }
 
   @Override

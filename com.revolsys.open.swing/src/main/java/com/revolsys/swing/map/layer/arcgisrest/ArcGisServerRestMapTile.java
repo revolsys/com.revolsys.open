@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.arcgisrest;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -42,8 +42,13 @@ public class ArcGisServerRestMapTile extends MapTile {
   }
 
   @Override
-  public Image loadImage() {
-    final Image image = mapServer.getTileImage(zoomLevel, tileX, tileY);
+  public BufferedImage loadImage() {
+    final BufferedImage image = mapServer.getTileImage(zoomLevel, tileX, tileY);
     return image;
+  }
+
+  @Override
+  public String toString() {
+    return mapServer.getMapName() + " " + zoomLevel + "/" + tileX + "/" + tileY;
   }
 }

@@ -32,6 +32,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
@@ -63,9 +64,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private Geometry geometry;
 
-  private Point previousPoint;
-
   private DataType geometryDataType;
+
+  private DataType geometryPartDataType;
 
   private DataObjectLayer layer;
 
@@ -99,7 +100,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   protected void actionGeometryCompleted() {
     if (isGeometryValid()) {
       try {
-        previousPoint = null;
         setXorGeometry(null);
         if ("add".equals(mode)) {
           if (layer != null) {
@@ -143,27 +143,47 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         GeometryFactory geometryFactory = metaData.getGeometryFactory();
         this.setGeometryFactory(geometryFactory);
         this.geometry = geometryFactory.createEmptyGeometry();
-        this.geometryDataType = geometryAttribute.getType();
+        setGeometryDataType(geometryAttribute.getType());
         this.vertices = new PointQuadTree<int[]>();
         this.lineSegments = new QuadTree<IndexedLineSegment>();
         setMapCursor(addNodeCursor);
 
         if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING).contains(
           geometryDataType)) {
-          appendVertexGeometryIndex = new int[0];
+          geometryPartIndex = new int[0];
         } else if (Arrays.asList(DataTypes.MULTI_POINT,
           DataTypes.MULTI_LINE_STRING, DataTypes.POLYGON).contains(
           geometryDataType)) {
-          appendVertexGeometryIndex = new int[] {
+          geometryPartIndex = new int[] {
             0
           };
         } else {
-          appendVertexGeometryIndex = new int[] {
+          geometryPartIndex = new int[] {
             0, 0
           };
         }
       }
     }
+  }
+
+  protected void setGeometryDataType(DataType dataType) {
+    this.geometryDataType = dataType;
+    if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(
+      geometryDataType)) {
+      geometryPartDataType = DataTypes.POINT;
+    } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING)
+      .contains(geometryDataType)) {
+      geometryPartDataType = DataTypes.LINE_STRING;
+    } else if (Arrays.asList(DataTypes.POLYGON, DataTypes.MULTI_POLYGON)
+      .contains(geometryDataType)) {
+      geometryPartDataType = DataTypes.POLYGON;
+    } else {
+      geometryPartDataType = DataTypes.GEOMETRY;
+    }
+  }
+
+  public DataType getGeometryPartDataType() {
+    return geometryPartDataType;
   }
 
   private void clearEditingObjects(final LayerGroup layerGroup) {
@@ -188,11 +208,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   /** Index to the part of the geometry that new points should be added too. */
-  private int[] appendVertexGeometryIndex = {};
+  private int[] geometryPartIndex = {};
 
-  // TODO indexes may get switched for clockwise vs not and when vertices are
-  // moved
-  protected Geometry createGeometry(Point newPoint) {
+  protected Geometry appendVertex(Point newPoint) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     Geometry geometry = this.geometry;
     if (geometry.isEmpty()) {
@@ -203,7 +221,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         geometry = geometryFactory.createMultiPoint(point, newPoint);
       } else {
         geometry = GeometryEditUtil.appendVertex(geometry, newPoint,
-          appendVertexGeometryIndex);
+          geometryPartIndex);
       }
     } else if (DataTypes.LINE_STRING.equals(geometryDataType)
       || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
@@ -213,7 +231,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       } else if (geometry instanceof LineString) {
         LineString line = (LineString)geometry;
         geometry = GeometryEditUtil.appendVertex(line, newPoint,
-          appendVertexGeometryIndex);
+          geometryPartIndex);
       } // TODO MultiLineString
     } else if (DataTypes.POLYGON.equals(geometryDataType)
       || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
@@ -229,7 +247,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       } else if (geometry instanceof Polygon) {
         Polygon polygon = (Polygon)geometry;
         geometry = GeometryEditUtil.appendVertex(polygon, newPoint,
-          appendVertexGeometryIndex);
+          geometryPartIndex);
       }
       // TODO MultiPolygon
       // TODO Rings
@@ -242,15 +260,15 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected LineString createXorLine(final Coordinates c0, final Point p1) {
+    GeometryFactory geometryFactory = getGeometryFactory();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final Coordinates c1 = CoordinatesUtil.get(viewportGeometryFactory.copy(p1));
-    final LineSegment line = new LineSegment(viewportGeometryFactory, c0, c1);
+    final Coordinates c1 = CoordinatesUtil.get(p1);
+    LineSegment line = new LineSegment(geometryFactory, c0, c1).convert(viewportGeometryFactory);
     final double length = line.getLength();
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
     final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
       / length, 0);
     Point point = viewportGeometryFactory.createPoint(newC1);
-    GeometryFactory geometryFactory = getGeometryFactory();
     point = geometryFactory.copy(point);
     return geometryFactory.createLineString(c0, point);
   }
@@ -258,26 +276,57 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   private void drawVertexXor(final MouseEvent event, final int[] vertexIndex,
     final int previousPointOffset, final int nextPointOffset) {
     final Graphics2D graphics = getGraphics();
-
-    final Point point = getPoint(event);
-
-    final List<LineString> pointsList = new ArrayList<LineString>();
-    final Coordinates previousPoint = GeometryEditUtil.getCoordinatesOffset(
-      geometry, vertexIndex, previousPointOffset);
-    if (previousPoint != null) {
-      pointsList.add(createXorLine(previousPoint, point));
-    }
-    final Coordinates nextPoint = GeometryEditUtil.getCoordinatesOffset(
-      geometry, vertexIndex, nextPointOffset);
-    if (nextPoint != null) {
-      pointsList.add(createXorLine(nextPoint, point));
-    }
-    if (pointsList.isEmpty()) {
-      setXorGeometry(graphics, point);
+    Geometry xorGeometry = null;
+    if (DataTypes.GEOMETRY.equals(geometryPartDataType)) {
+    } else if (DataTypes.POINT.equals(geometryPartDataType)) {
     } else {
-      setXorGeometry(graphics,
-        getGeometryFactory().createMultiLineString(pointsList));
+      final Point point = getPoint(event);
+
+      CoordinatesList points = GeometryEditUtil.getPoints(geometry, vertexIndex);
+      int pointIndex = vertexIndex[vertexIndex.length - 1];
+      int previousPointIndex = pointIndex + previousPointOffset;
+      int nextPointIndex = pointIndex + nextPointOffset;
+      Coordinates previousPoint = null;
+      Coordinates nextPoint = null;
+
+      int numPoints = points.size();
+      if (DataTypes.LINE_STRING.equals(geometryPartDataType)) {
+        if (numPoints > 1) {
+          previousPoint = points.get(previousPointIndex);
+          nextPoint = points.get(nextPointIndex);
+        }
+      } else if (DataTypes.POLYGON.equals(geometryPartDataType)) {
+        if (numPoints == 2) {
+          previousPoint = points.get(previousPointIndex);
+          nextPoint = points.get(nextPointIndex);
+        } else if (numPoints > 3) {
+          while (previousPointIndex < 0) {
+            previousPointIndex += numPoints - 1;
+          }
+          previousPointIndex = previousPointIndex % (numPoints - 1);
+          previousPoint = points.get(previousPointIndex);
+
+          while (nextPointIndex < 0) {
+            nextPointIndex += numPoints - 1;
+          }
+          nextPointIndex = nextPointIndex % (numPoints - 1);
+          nextPoint = points.get(nextPointIndex);
+        }
+      }
+
+      final List<LineString> pointsList = new ArrayList<LineString>();
+      if (previousPoint != null) {
+        pointsList.add(createXorLine(previousPoint, point));
+      }
+      if (nextPoint != null) {
+        pointsList.add(createXorLine(nextPoint, point));
+      }
+      if (!pointsList.isEmpty()) {
+        GeometryFactory geometryFactory = getGeometryFactory();
+        xorGeometry = geometryFactory.createMultiLineString(pointsList);
+      }
     }
+    setXorGeometry(graphics, xorGeometry);
   }
 
   protected void fireActionPerformed(final ActionListener listener,
@@ -362,13 +411,15 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         for (final int[] vertexIndex : closeVertices) {
           final Coordinates vertex = GeometryEditUtil.getVertex(geometry,
             vertexIndex);
-          final double distance = vertex.distance(CoordinatesUtil.get(point));
-          if (distance < minDistance) {
-            mouseOverVertexId = vertexIndex;
-            minDistance = distance;
-            if (currentPoint == null || currentCoordinates == null
-              || !currentCoordinates.equals(vertex)) {
-              currentPoint = getGeometryFactory().createPoint(vertex);
+          if (vertex != null) {
+            final double distance = vertex.distance(CoordinatesUtil.get(point));
+            if (distance < minDistance) {
+              mouseOverVertexId = vertexIndex;
+              minDistance = distance;
+              if (currentPoint == null || currentCoordinates == null
+                || !currentCoordinates.equals(vertex)) {
+                currentPoint = getGeometryFactory().createPoint(vertex);
+              }
             }
           }
         }
@@ -471,20 +522,24 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       } else if (mouseOverSegment != null) {
         vertexAddFinish(null);
       }
+    } else if (keyCode == KeyEvent.VK_CONTROL) {
+      if (!"add".equals(mode)) {
+        clearMouseOverVertex();
+      }
     }
   }
 
   protected void modeAddMouseClick(final MouseEvent event) {
     if (SwingUtilities.isLeftMouseButton(event)) {
-      if ("add".equals(mode)) {
+      if (event.isControlDown() || "add".equals(mode)) {
         final Point point = getPoint(event);
         if (geometry.isEmpty()) {
-          previousPoint = point;
-          geometry = createGeometry(point);
+          geometry = appendVertex(point);
         } else {
-          if (!point.equals(previousPoint)) {
-            geometry = createGeometry(point);
-            previousPoint = point;
+          Coordinates previousPoint = GeometryEditUtil.getVertex(geometry,
+            geometryPartIndex, -1);
+          if (!CoordinatesUtil.get(point).equals(previousPoint)) {
+            geometry = appendVertex(point);
           }
         }
 
@@ -503,8 +558,8 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if ((mouseOverVertexId == null && mouseOverSegment == null)
-      && "add".equals(mode)) {
+    if (event.isControlDown()
+      || ((mouseOverVertexId == null && mouseOverSegment == null) && "add".equals(mode))) {
       modeAddMouseClick(event);
     }
   }
@@ -540,26 +595,34 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       final Point point = getPoint(event);
 
       if (!updateMouseOverGeometry(graphics, event)) {
-        if ("add".equals(mode)) {
+        if ("add".equals(mode) || event.isControlDown()) {
           setMapCursor(addNodeCursor);
           Coordinates firstPoint = GeometryEditUtil.getVertex(geometry,
-            appendVertexGeometryIndex, 0);
-          if (firstPoint == null
-            || Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(
-              geometryDataType)) {
-            setXorGeometry(graphics, null);
-          } else if (previousPoint == null) {
-            setXorGeometry(graphics, createXorLine(firstPoint, point));
-          } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-            || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-            setXorGeometry(graphics,
-              createXorLine(CoordinatesUtil.get(previousPoint), point));
+            geometryPartIndex, 0);
+          Geometry xorGeometry = null;
+          if (DataTypes.POINT.equals(geometryPartDataType)) {
+          } else if (DataTypes.LINE_STRING.equals(geometryPartDataType)) {
+            Coordinates previousPoint = GeometryEditUtil.getVertex(geometry,
+              geometryPartIndex, -1);
+            if (previousPoint != null) {
+              xorGeometry = createXorLine(previousPoint, point);
+            }
+          } else if (DataTypes.POLYGON.equals(geometryPartDataType)) {
+            Coordinates previousPoint = GeometryEditUtil.getVertex(geometry,
+              geometryPartIndex, -1);
+            if (previousPoint != null) {
+              if (previousPoint.equals(firstPoint)) {
+                xorGeometry = createXorLine(previousPoint, point);
+              } else {
+                GeometryFactory geometryFactory = getGeometryFactory();
+                xorGeometry = geometryFactory.createLineString(previousPoint,
+                  point, firstPoint);
+              }
+            }
           } else {
-            setXorGeometry(
-              graphics,
-              getGeometryFactory().createLineString(previousPoint, point,
-                firstPoint));
+
           }
+          setXorGeometry(graphics, xorGeometry);
         }
       }
     }
@@ -688,8 +751,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       final DataObjectMetaData metaData = layer.getMetaData();
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       if (geometryAttribute != null) {
-        geometryDataType = geometryAttribute.getType();
+        setGeometryDataType(geometryAttribute.getType());
         geometry = object.getGeometryValue();
+      } else {
+        setGeometryDataType(DataTypes.GEOMETRY);
       }
       layer.setEditingObjects(Collections.singletonList(object));
     }

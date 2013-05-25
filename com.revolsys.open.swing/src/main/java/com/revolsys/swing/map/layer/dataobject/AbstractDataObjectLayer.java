@@ -636,10 +636,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
-    setGeometryFactory(metaData.getGeometryFactory());
-    if (metaData.getGeometryAttributeIndex() == -1) {
-      setSelectSupported(false);
-      setRenderer(null);
+    if (metaData != null) {
+      setGeometryFactory(metaData.getGeometryFactory());
+      if (metaData.getGeometryAttributeIndex() == -1) {
+        setSelectSupported(false);
+        setRenderer(null);
+      }
     }
   }
 

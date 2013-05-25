@@ -119,4 +119,10 @@ public class AbstractMapWrapper {
     this.values = values;
   }
 
+  @Override
+  public String toString() {
+    String name = getClass().getName();
+    name = name.substring(name.indexOf('.') + 1);
+    return name + getValues();
+  }
 }

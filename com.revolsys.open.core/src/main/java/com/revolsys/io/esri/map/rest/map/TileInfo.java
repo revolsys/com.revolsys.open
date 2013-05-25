@@ -54,10 +54,8 @@ public class TileInfo extends AbstractMapWrapper {
   }
 
   public double getModelValue(final int zoomLevel, final int pixels) {
-    final double pixelSize = getPixelSize();
     final LevelOfDetail levelOfDetail = getLevelOfDetail(zoomLevel);
-    final Double scale = levelOfDetail.getScale();
-    final double modelValue = pixels * pixelSize * scale;
+    final double modelValue = pixels * levelOfDetail.getResolution();
     return modelValue;
   }
 
@@ -112,5 +110,4 @@ public class TileInfo extends AbstractMapWrapper {
       originY = CollectionUtil.getDoubleValue(origin, "y");
     }
   }
-
 }

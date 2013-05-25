@@ -15,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.WarpPolynomial;
 import javax.swing.SwingUtilities;
@@ -594,7 +595,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       final float width = image.getImageWidth();
       final float height = image.getImageHeight();
 
-      final RenderedOp source = image.getJaiImage();
+      final PlanarImage source = image.getJaiImage();
       final BufferedImage img = new BufferedImage(source.getWidth(),
         source.getHeight(), BufferedImage.TYPE_INT_ARGB);
       img.getGraphics().drawImage(source.getAsBufferedImage(), 0, 0, null);

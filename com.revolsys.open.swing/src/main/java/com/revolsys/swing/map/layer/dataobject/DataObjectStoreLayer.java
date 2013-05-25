@@ -359,17 +359,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   public void setTypePath(final String typePath) {
     this.typePath = typePath;
+    setName(PathUtil.getName(typePath));
     if (StringUtils.hasText(typePath)) {
       final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
       if (metaData != null) {
-        setName(PathUtil.getName(typePath));
 
         setMetaData(metaData);
         query = new Query(metaData);
         return;
       }
     }
-    setName("Type not found " + typePath);
     setMetaData(null);
     query = null;
   }

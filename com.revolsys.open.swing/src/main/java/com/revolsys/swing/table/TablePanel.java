@@ -84,6 +84,8 @@ public class TablePanel extends JPanel implements MouseListener {
   protected void setEventRow(final MouseEvent e) {
     Point point = e.getPoint();
     eventRow = table.rowAtPoint(point);
-    eventRow = table.convertRowIndexToModel(eventRow);
+    if (eventRow > -1) {
+      eventRow = table.convertRowIndexToModel(eventRow);
+    }
   }
 }

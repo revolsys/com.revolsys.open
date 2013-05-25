@@ -24,7 +24,7 @@ public class ImageViewport extends Viewport2D {
     return graphics;
   }
 
-  public Image getImage() {
+  public BufferedImage getImage() {
     return image;
   }
 }
