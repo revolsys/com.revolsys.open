@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.slf4j.LoggerFactory;
@@ -32,14 +33,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
-    menu.addMenuItemTitleIcon("layer", "Delete Layer", "delete", LayerUtil.class,
-      "deleteLayer");
-    menu.addMenuItemTitleIcon("layer", "Layer Properties", "information", LayerUtil.class,
-      "showProperties");
-  }
-
-  public JTabbedPane createPropertiesPanel(Layer layer) {
-    return new JTabbedPane();
+    menu.addMenuItemTitleIcon("layer", "Delete Layer", "delete",
+      LayerUtil.class, "deleteLayer");
+    menu.addMenuItemTitleIcon("layer", "Layer Properties", "information",
+      LayerUtil.class, "showProperties");
   }
 
   private boolean editable = false;
@@ -142,7 +139,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public JTabbedPane createPropertiesPanel() {
-    return new JTabbedPane();
+    JTabbedPane tabs = new JTabbedPane();
+    createPropertiesTabGeneral(tabs);
+    return tabs;
+  }
+
+  public JPanel createPropertiesTabGeneral(JTabbedPane tabs) {
+    JPanel panel = new JPanel();
+    tabs.addTab("General", panel);
+    return panel;
   }
 
   @Override

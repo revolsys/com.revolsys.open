@@ -79,7 +79,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
       final SpatialReference spatialReference = spatialReferences.getSpatialReference(esriSrid);
 
       final Attribute attribute = new ArcSdeOracleStGeometryJdbcAttribute(name,
-        dataType, length, scale, required, null, spatialReference, dimension);
+        dataType, required, null, spatialReference, dimension);
 
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(

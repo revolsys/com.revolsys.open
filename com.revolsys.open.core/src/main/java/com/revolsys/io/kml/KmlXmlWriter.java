@@ -3,12 +3,15 @@ package com.revolsys.io.kml;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
@@ -30,6 +33,54 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
     writer.writeGeometry(geometry);
     writer.close();
+  }
+
+  public static double getLookAtRange(final BoundingBox boundingBox) {
+    if (boundingBox.isNull()) {
+      return 1000;
+    } else {
+      double centreX = boundingBox.getCentreX();
+      double centreY = boundingBox.getCentreY();
+      final double width = boundingBox.getWidth();
+      final double height = boundingBox.getHeight();
+      final double maxSize = Math.toRadians(Math.max(width, height));
+      final double dist = Kml22Constants.EARTH_RADIUS * Math.sin(maxSize / 2);
+
+      double minX = boundingBox.getMinX();
+      double maxX = boundingBox.getMaxX();
+      double minY = boundingBox.getMinY();
+      double maxY = boundingBox.getMaxY();
+
+      double maxMetres = 0;
+
+      for (double y : new double[] {
+        minY, centreY, maxY
+      }) {
+        final double widthMetres = GeographicCoordinateSystem.distanceMetres(
+          minX, y, maxX, y);
+        if (widthMetres > maxMetres) {
+          maxMetres = widthMetres;
+        }
+      }
+      for (double x : new double[] {
+        minX, centreX, maxX
+      }) {
+        final double heightMetres = GeographicCoordinateSystem.distanceMetres(
+          x, minY, x, maxY);
+        if (heightMetres > maxMetres) {
+          maxMetres = heightMetres;
+        }
+      }
+
+      double lookAtScale = 1.1;
+      double lookAtRange = maxMetres / Math.tan(Math.toRadians(45))
+        * lookAtScale;
+      lookAtRange = Math.ceil(lookAtRange / 1000) * 1000;
+      if (lookAtRange < 1000) {
+        lookAtRange = 1000;
+      }
+      return lookAtRange;
+    }
   }
 
   public KmlXmlWriter(final OutputStream out) {

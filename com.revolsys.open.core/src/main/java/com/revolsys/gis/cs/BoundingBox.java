@@ -164,14 +164,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
-  private double maxX = -1;
-
-  private double minX = 0;
-
-  private double maxY = -1;
-
-  private double minY = 0;
-
   private double maxZ;
 
   private double minZ;
@@ -698,12 +690,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
-  private void initIfNotNull() {
-    if (maxX != -1 && minX != 0 && maxY != -1 && minY != 0) {
-      init(minX, maxX, minY, maxY);
-    }
-  }
-
   public BoundingBox intersection(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isNull() || convertedBoundingBox.isNull()
@@ -750,16 +736,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     this.geometryFactory = geometryFactory;
   }
 
-  public void setMaxX(final double maxX) {
-    this.maxX = maxX;
-    initIfNotNull();
-  }
-
-  public void setMaxY(final double maxY) {
-    this.maxY = maxY;
-    initIfNotNull();
-  }
-
   public void setMaxZ(final double maxZ) {
     if (isNull()) {
       this.minZ = maxZ;
@@ -771,16 +747,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (maxZ > this.maxZ) {
       this.maxZ = maxZ;
     }
-  }
-
-  public void setMinX(final double minX) {
-    this.minX = minX;
-    initIfNotNull();
-  }
-
-  public void setMinY(final double minY) {
-    this.minY = minY;
-    initIfNotNull();
   }
 
   public void setMinZ(final double minZ) {

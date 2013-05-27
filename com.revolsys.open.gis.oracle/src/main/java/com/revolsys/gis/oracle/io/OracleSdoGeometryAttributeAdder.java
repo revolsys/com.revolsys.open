@@ -156,8 +156,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
         + columnName, e);
     }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
-      dataType, sqlType, length, scale, required, null, geometryFactory,
-      dimension);
+      dataType, sqlType, required, null, geometryFactory, dimension);
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));

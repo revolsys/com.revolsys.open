@@ -3,6 +3,7 @@ package com.revolsys.swing.map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
+import java.net.ResponseCache;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
@@ -23,9 +23,9 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.gis.data.io.DataObjectStoreConnections;
-import com.revolsys.gis.wms.WmsConnectionManager;
 import com.revolsys.io.FileSystemConnectionManager;
 import com.revolsys.io.FileUtil;
+import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
@@ -36,15 +36,16 @@ import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionsModel;
 import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
 public class ProjectFrame extends JFrame {
+  static {
+    ResponseCache.setDefault(new FileResponseCache());
+  }
 
   private ObjectTreePanel tocPanel;
 

@@ -8,11 +8,14 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   Kml22Constants {
@@ -124,6 +127,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       writer.cdata(description);
       writer.endTag(DESCRIPTION);
     }
+    writeLookAt(object.getGeometryValue());
     if (StringUtils.hasText(styleUrl)) {
       writer.element(STYLE_URL, styleUrl);
     } else if (StringUtils.hasText(defaultStyleUrl)) {
@@ -173,6 +177,18 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     writer.endTag();
   }
 
+  private void writeLookAt(Geometry geometry) {
+    if (geometry != null) {
+      GeometryFactory geometryFactory = GeometryFactory.WGS84;
+      Geometry projectedGeometry = geometryFactory.copy(geometry);
+      BoundingBox boundingBox = BoundingBox.getBoundingBox(projectedGeometry);
+         Point centre = geometryFactory.createPoint(boundingBox.getCentreX(), boundingBox.getCentreY());
+      
+      double range = KmlXmlWriter.getLookAtRange(boundingBox);
+      writeLookAt(centre, range);
+    }
+  }
+
   private void writeHeader() {
     opened = true;
     writer.startDocument();
@@ -194,11 +210,32 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
         writer.element(DESCRIPTION, description);
       }
       writer.element(OPEN, 1);
+      Point point = getProperty(LOOK_AT_POINT_PROPERTY);
+      if (point != null) {
+        Number range = getProperty(LOOK_AT_RANGE_PROPERTY);
+        writeLookAt(point, range);
+      }
       final String style = getProperty(STYLE_PROPERTY);
       if (StringUtils.hasText(style)) {
         writer.write(style);
       }
 
     }
+  }
+
+  public void writeLookAt(Point point, Number range) {
+    if (range == null) {
+      range = 1000;
+    }
+    writer.startTag(LOOK_AT);
+    point = GeometryFactory.WGS84.copy(point);
+    writer.element(LONGITUDE, point.getX());
+    writer.element(LATITUDE, point.getY());
+    writer.element(ALTITUDE, 0);
+    writer.element(HEADING, 0);
+    writer.element(TILT, 0);
+    writer.element(RANGE, range);
+    writer.element(ALTITUDE_MODE, "absolute");
+    writer.endTag(LOOK_AT);
   }
 }

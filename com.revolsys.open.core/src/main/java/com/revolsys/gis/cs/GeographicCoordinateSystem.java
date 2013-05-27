@@ -1,5 +1,6 @@
 package com.revolsys.gis.cs;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,18 +11,27 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
+  public static final double EARTH_RADIUS = 6378137;
 
-  public double distanceMetres(double lat1, double lon1, double lat2,
-    double lon2) {
-    double RADIUS = 63781370; 
-    double latDistance = Math.toRadians(lat2 - lat1);
-    double dLon = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(latDistance / 2)
-      * Math.sin(latDistance / 2)
-      + Math.cos(Math.toRadians(lat1) * Math.cos(Math.toRadians(lat2))
-        * Math.sin(dLon / 2) * Math.sin(dLon / 2));
-    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return RADIUS * c;
+  public static double distanceMetres(double lon1, double lat1, double lon2,
+    double lat2) {
+    double lon1Radians = Math.toRadians(lon1);
+    double lon2Radians = Math.toRadians(lon2);
+    double width = lon2Radians - lon1Radians;
+
+    double lat1Radians = Math.toRadians(lat1);
+    double lat2Radians = Math.toRadians(lat2);
+
+    double height = lat2Radians - lat1Radians;
+
+    double sinHeightOver2 = Math.sin(height / 2);
+    double sinWidthOver2 = Math.sin(width / 2);
+    double distance = 2
+      * EARTH_RADIUS
+      * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
+        + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2
+        * sinWidthOver2));
+    return distance;
   }
 
   /**

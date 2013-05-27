@@ -1,7 +1,7 @@
 package com.revolsys.swing.table;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.RowSorter;
@@ -17,6 +17,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.swing.SwingUtil;
 
 public class BaseJxTable extends JXTable {
+  private static final long serialVersionUID = 1L;
 
   public BaseJxTable() {
     setAutoCreateRowSorter(false);
@@ -88,5 +89,43 @@ public class BaseJxTable extends JXTable {
     } else {
       setRowSorter(null);
     }
+  }
+
+  public void resizeColumnsToContent() {
+    TableModel model = getModel();
+    int columnCount = getColumnCount();
+    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+      TableColumnExt column = getColumnExt(columnIndex);
+
+      TableCellRenderer headerRenderer = column.getHeaderRenderer();
+      String columnName = model.getColumnName(columnIndex);
+      int maxPreferedWidth = getPreferedSize(headerRenderer, String.class,
+        columnName);
+
+      for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
+        Object value = model.getValueAt(rowIndex, columnIndex);
+        if (value != null) {
+          TableCellRenderer renderer = column.getCellRenderer();
+          Class<?> columnClass = model.getColumnClass(columnIndex);
+          int width = getPreferedSize(renderer, columnClass, value);
+          if (width > maxPreferedWidth) {
+            maxPreferedWidth = width;
+          }
+        }
+      }
+      column.setMinWidth(maxPreferedWidth + 5);
+      column.setPreferredWidth(maxPreferedWidth + 5);
+    }
+  }
+
+  public int getPreferedSize(TableCellRenderer renderer, Class<?> columnClass,
+    Object value) {
+    if (renderer == null) {
+      renderer = getDefaultRenderer(columnClass);
+    }
+    Component comp = renderer.getTableCellRendererComponent(this, value, false,
+      false, 0, -1);
+    int width = comp.getPreferredSize().width;
+    return width;
   }
 }

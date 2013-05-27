@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -12,6 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
@@ -41,8 +45,10 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
+import com.revolsys.swing.map.table.DataObjectMetaDataTableModel;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -95,6 +101,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
+  public JTabbedPane createPropertiesPanel() {
+    JTabbedPane propertiesPanel = super.createPropertiesPanel();
+    
+    DataObjectMetaData metaData = getMetaData();
+    BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
+    
+    JPanel fieldPanel = new JPanel(new BorderLayout());
+    JScrollPane fieldScroll = new JScrollPane(fieldTable);
+    fieldPanel.add(fieldScroll, BorderLayout.CENTER);
+    propertiesPanel.addTab("Fields", fieldPanel);
+    
+    return propertiesPanel;
+  }
+  
   public Component createTablePanel() {
     final JTable table = DataObjectLayerTableModel.createTable(this);
     if (table == null) {

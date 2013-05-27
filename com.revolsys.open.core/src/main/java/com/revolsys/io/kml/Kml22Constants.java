@@ -3,59 +3,66 @@ package com.revolsys.io.kml;
 import javax.xml.namespace.QName;
 
 public interface Kml22Constants {
-  String FILE_EXTENSION = "kml";
-
-  String MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
-
-  String FORMAT_DESCRIPTION = "KML";
-
-  int COORDINATE_SYSTEM_ID = 4326;
 
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
 
+  QName ALTITUDE = new QName(KML_NS_URI, "altitude");
+
+  QName ALTITUDE_MODE = new QName(KML_NS_URI, "altitudeMode");
+
   QName COLOR = new QName(KML_NS_URI, "color");
-
-  QName VISIBLITY = new QName(KML_NS_URI, "visibility");
-
-  QName SCALE = new QName(KML_NS_URI, "scale");
 
   QName COLOR_MODE = new QName(KML_NS_URI, "colorMode");
 
-  QName LABEL_STYLE = new QName(KML_NS_URI, "LabelStyle");
-
-  QName ICON_STYLE = new QName(KML_NS_URI, "IconStyle");
-
-  QName FILL = new QName(KML_NS_URI, "fill");
-
-  QName POLY_STYLE = new QName(KML_NS_URI, "PolyStyle");
+  int COORDINATE_SYSTEM_ID = 4326;
 
   QName COORDINATES = new QName(KML_NS_URI, "coordinates");
 
-  QName DESCRIPTION = new QName(KML_NS_URI, "description");
-
   QName DATA = new QName(KML_NS_URI, "Data");
 
+  QName DESCRIPTION = new QName(KML_NS_URI, "description");
+
   QName DOCUMENT = new QName(KML_NS_URI, "Document");
+
+  String DOCUMENT_DESCRIPTION_PROPERTY = "kmlDocumentDescription";
+
+  String DOCUMENT_NAME_PROPERTY = "kmlDocumentName";
+
+  double EARTH_RADIUS = 6378137;
 
   QName EAST = new QName(KML_NS_URI, "east");
 
   QName EXTENDED_DATA = new QName(KML_NS_URI, "ExtendedData");
 
+  String FILE_EXTENSION = "kml";
+
+  QName FILL = new QName(KML_NS_URI, "fill");
+
+  QName FOLDER = new QName(KML_NS_URI, "Folder");
+
+  String FORMAT_DESCRIPTION = "KML";
+
   QName GROUND_OVERLAY = new QName(KML_NS_URI, "GroundOverlay");
+
+  QName HEADING = new QName(KML_NS_URI, "heading");
 
   QName HREF = new QName(KML_NS_URI, "href");
 
   QName ICON = new QName(KML_NS_URI, "Icon");
 
+  QName ICON_STYLE = new QName(KML_NS_URI, "IconStyle");
+
   QName INNER_BOUNDARY_IS = new QName(KML_NS_URI, "innerBoundaryIs");
 
   QName KML = new QName(KML_NS_URI, "kml");
 
-  QName FOLDER = new QName(KML_NS_URI, "Folder");
+  QName LABEL_STYLE = new QName(KML_NS_URI, "LabelStyle");
 
   QName LAT_LON_ALT_BOX = new QName(KML_NS_URI, "LatLonAltBox");
 
   QName LAT_LON_BOX = new QName(KML_NS_URI, "LatLonBox");
+
+  QName LATITUDE = new QName(KML_NS_URI, "latitude");
 
   QName LINE_STRING = new QName(KML_NS_URI, "LineString");
 
@@ -65,9 +72,19 @@ public interface Kml22Constants {
 
   QName LOD = new QName(KML_NS_URI, "Lod");
 
+  QName LONGITUDE = new QName(KML_NS_URI, "longitude");
+
+  QName LOOK_AT = new QName(KML_NS_URI, "LookAt");
+
+  String LOOK_AT_POINT_PROPERTY = "kmlLookAtPoint";
+
+  String LOOK_AT_RANGE_PROPERTY = "kmlLookAtRange";
+
   QName MAX_LINES = new QName("maxLines");
 
   QName MAX_LOD_PIXELS = new QName(KML_NS_URI, "maxLodPixels");
+
+  String MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
 
   QName MIN_LOD_PIXELS = new QName(KML_NS_URI, "minLodPixels");
 
@@ -79,43 +96,49 @@ public interface Kml22Constants {
 
   QName NORTH = new QName(KML_NS_URI, "north");
 
+  QName OPEN = new QName(KML_NS_URI, "open");
+
   QName OUTER_BOUNDARY_IS = new QName(KML_NS_URI, "outerBoundaryIs");
 
   QName PLACEMARK = new QName(KML_NS_URI, "Placemark");
 
+  String PLACEMARK_DESCRIPTION_PROPERTY = "kmlPlacemarkDescription";
+
+  String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "kmlPlaceMarkNameAttribute";
+
   QName POINT = new QName(KML_NS_URI, "Point");
+
+  QName POLY_STYLE = new QName(KML_NS_URI, "PolyStyle");
 
   QName POLYGON = new QName(KML_NS_URI, "Polygon");
 
+  QName RANGE = new QName(KML_NS_URI, "range");
+
   QName REGION = new QName(KML_NS_URI, "Region");
+
+  QName SCALE = new QName(KML_NS_URI, "scale");
 
   QName SNIPPET = new QName(KML_NS_URI, "Snippet");
 
+  String SNIPPET_PROPERTY = "kmlSnippet";
+
   QName SOUTH = new QName(KML_NS_URI, "south");
+
+  QName STYLE = new QName(KML_NS_URI, "Style");
+
+  String STYLE_PROPERTY = "kmlStyle";
 
   QName STYLE_URL = new QName(KML_NS_URI, "styleUrl");
 
-  QName STYLE = new QName(KML_NS_URI, "Style");
+  String STYLE_URL_PROPERTY = "kmlStyleUrl";
+
+  QName TILT = new QName(KML_NS_URI, "tilt");
 
   QName VALUE = new QName(KML_NS_URI, "value");
 
   QName VIEW_REFRESH_MODE = new QName(KML_NS_URI, "viewRefreshMode");
 
+  QName VISIBLITY = new QName(KML_NS_URI, "visibility");
+
   QName WEST = new QName(KML_NS_URI, "west");
-
-  QName OPEN = new QName(KML_NS_URI, "open");
-
-  String PLACEMARK_DESCRIPTION_PROPERTY = "kmlPlacemarkDescription";
-
-  String DOCUMENT_DESCRIPTION_PROPERTY = "kmlDocumentDescription";
-
-  String DOCUMENT_NAME_PROPERTY = "kmlDocumentName";
-
-  String STYLE_PROPERTY = "kmlStyle";
-
-  String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "kmlPlaceMarkNameAttribute";
-
-  String SNIPPET_PROPERTY = "kmlSnippet";
-
-  String STYLE_URL_PROPERTY = "kmlStyleUrl";
 }

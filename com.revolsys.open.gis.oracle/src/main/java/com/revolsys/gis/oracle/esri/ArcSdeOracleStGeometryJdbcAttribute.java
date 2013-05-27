@@ -43,10 +43,9 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   private GeometryFactory geometryFactory;
 
   public ArcSdeOracleStGeometryJdbcAttribute(final String name,
-    final DataType type, final int length, final int scale,
-    final boolean required, final Map<String, Object> properties,
+    final DataType type, final boolean required, final Map<String, Object> properties,
     final SpatialReference spatialReference, final int dimension) {
-    super(name, type, -1, length, scale, required, properties);
+    super(name, type, -1, 0, 0, required, properties);
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
     this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
@@ -58,8 +57,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   @Override
   public ArcSdeOracleStGeometryJdbcAttribute clone() {
     return new ArcSdeOracleStGeometryJdbcAttribute(getName(), getType(),
-      getLength(), getScale(), isRequired(), getProperties(), spatialReference,
-      dimension);
+      isRequired(), getProperties(), spatialReference, dimension);
   }
 
   @Override
