@@ -39,17 +39,13 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     if (boundingBox.isNull()) {
       return 1000;
     } else {
-      double centreX = boundingBox.getCentreX();
-      double centreY = boundingBox.getCentreY();
-      final double width = boundingBox.getWidth();
-      final double height = boundingBox.getHeight();
-      final double maxSize = Math.toRadians(Math.max(width, height));
-      final double dist = Kml22Constants.EARTH_RADIUS * Math.sin(maxSize / 2);
-
       double minX = boundingBox.getMinX();
       double maxX = boundingBox.getMaxX();
+      double centreX = boundingBox.getCentreX();
+
       double minY = boundingBox.getMinY();
       double maxY = boundingBox.getMaxY();
+      double centreY = boundingBox.getCentreY();
 
       double maxMetres = 0;
 
@@ -72,8 +68,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         }
       }
 
-      double lookAtScale = 1.1;
-      double lookAtRange = maxMetres / Math.tan(Math.toRadians(45))
+      double lookAtScale = 1.2;
+      double lookAtRange = maxMetres /2 / Math.tan(Math.toRadians(25))
         * lookAtScale;
       lookAtRange = Math.ceil(lookAtRange / 1000) * 1000;
       if (lookAtRange < 1000) {
