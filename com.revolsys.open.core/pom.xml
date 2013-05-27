@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>com.revolsys.open.parent</artifactId>
 		<groupId>com.revolsys.open</groupId>
-		<version>TRUNK-SNAPSHOT</version>
+		<version>2013.05.26.RELEASE</version>
 	</parent>
 	<artifactId>com.revolsys.open.core</artifactId>
 	<name>RS Core</name>
