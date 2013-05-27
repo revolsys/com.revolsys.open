@@ -35,7 +35,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     writer.close();
   }
 
-  public static double getLookAtRange(final BoundingBox boundingBox) {
+  public static long getLookAtRange(final BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return 1000;
     } else {
@@ -69,13 +69,9 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       }
 
       double lookAtScale = 1.2;
-      double lookAtRange = maxMetres /2 / Math.tan(Math.toRadians(25))
+      double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
         * lookAtScale;
-      lookAtRange = Math.ceil(lookAtRange / 1000) * 1000;
-      if (lookAtRange < 1000) {
-        lookAtRange = 1000;
-      }
-      return lookAtRange;
+      return (long)Math.ceil(lookAtRange);
     }
   }
 

@@ -43,9 +43,12 @@ public class DataObjectReaderHttpMessageConverter extends
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private List<String> requestAttributeNames = Arrays.asList(
-    IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,Kml22Constants.LOOK_AT_POINT_PROPERTY,Kml22Constants.LOOK_AT_RANGE_PROPERTY,
-    IoConstants.JSONP_PROPERTY, IoConstants.TITLE_PROPERTY,
-    IoConstants.DESCRIPTION_PROPERTY);
+    IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
+    Kml22Constants.LOOK_AT_POINT_PROPERTY,
+    Kml22Constants.LOOK_AT_RANGE_PROPERTY,
+    Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY,
+    Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY, IoConstants.JSONP_PROPERTY,
+    IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
 
   private GeometryFactory geometryFactory;
 

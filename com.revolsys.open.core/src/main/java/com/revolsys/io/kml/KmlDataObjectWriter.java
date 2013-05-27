@@ -182,9 +182,11 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       GeometryFactory geometryFactory = GeometryFactory.WGS84;
       Geometry projectedGeometry = geometryFactory.copy(geometry);
       BoundingBox boundingBox = BoundingBox.getBoundingBox(projectedGeometry);
-         Point centre = geometryFactory.createPoint(boundingBox.getCentreX(), boundingBox.getCentreY());
-      
-      double range = KmlXmlWriter.getLookAtRange(boundingBox);
+      Point centre = geometryFactory.createPoint(boundingBox.getCentreX(),
+        boundingBox.getCentreY());
+
+      long range = KmlXmlWriter.getLookAtRange(boundingBox);
+   
       writeLookAt(centre, range);
     }
   }
@@ -213,7 +215,10 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       Point point = getProperty(LOOK_AT_POINT_PROPERTY);
       if (point != null) {
         Number range = getProperty(LOOK_AT_RANGE_PROPERTY);
-        writeLookAt(point, range);
+        if (range == null) {
+          range = 1000;
+        }
+        writeLookAt(point, range.longValue());
       }
       final String style = getProperty(STYLE_PROPERTY);
       if (StringUtils.hasText(style)) {
@@ -223,10 +228,20 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
   }
 
-  public void writeLookAt(Point point, Number range) {
-    if (range == null) {
-      range = 1000;
+  public void writeLookAt(Point point, long range) {
+    Number minRange = getProperty(Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY);
+    if (minRange != null) {
+      if (range < minRange.doubleValue()) {
+        range = minRange.longValue();
+      }
     }
+    Number maxRange = getProperty(Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY);
+    if (maxRange != null) {
+      if (range > maxRange.doubleValue()) {
+        range = maxRange.longValue();
+      }
+    }
+    
     writer.startTag(LOOK_AT);
     point = GeometryFactory.WGS84.copy(point);
     writer.element(LONGITUDE, point.getX());

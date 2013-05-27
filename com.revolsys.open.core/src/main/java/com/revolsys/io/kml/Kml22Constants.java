@@ -80,6 +80,10 @@ public interface Kml22Constants {
 
   String LOOK_AT_RANGE_PROPERTY = "kmlLookAtRange";
 
+  String LOOK_AT_MIN_RANGE_PROPERTY = "kmlLookAtMinRange";
+
+  String LOOK_AT_MAX_RANGE_PROPERTY = "kmlLookAtMaxRange";
+
   QName MAX_LINES = new QName("maxLines");
 
   QName MAX_LOD_PIXELS = new QName(KML_NS_URI, "maxLodPixels");
