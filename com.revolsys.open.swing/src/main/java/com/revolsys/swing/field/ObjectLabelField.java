@@ -1,4 +1,4 @@
-package com.revolsys.swing.component;
+package com.revolsys.swing.field;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import javax.swing.border.BevelBorder;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.swing.field.Field;
 import com.revolsys.util.CollectionUtil;
 
 public class ObjectLabelField extends JLabel implements Field<Object> {
@@ -22,14 +21,26 @@ public class ObjectLabelField extends JLabel implements Field<Object> {
 
   private final CodeTable codeTable;
 
-  public ObjectLabelField() {
-    this(null);
+  private String fieldName;
+
+  @Override
+  public String getFieldName() {
+    return fieldName;
   }
 
-  public ObjectLabelField(final CodeTable codeTable) {
+  public ObjectLabelField() {
+    this(null, null);
+  }
+
+  public ObjectLabelField(String fieldName) {
+    this(fieldName, null);
+  }
+
+  public ObjectLabelField(String fieldName, final CodeTable codeTable) {
     setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createBevelBorder(BevelBorder.LOWERED),
       BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+    this.fieldName = fieldName;
     this.codeTable = codeTable;
   }
 

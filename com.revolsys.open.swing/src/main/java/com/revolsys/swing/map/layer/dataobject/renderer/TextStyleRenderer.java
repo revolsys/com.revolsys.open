@@ -191,10 +191,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           double dy = 0;
 
           final Measure<Length> textDx = style.getTextDeltaX();
-          dx += viewport.toDisplayValue(textDx);
+          dx += Viewport2D.toDisplayValue(viewport,textDx);
 
           final Measure<Length> textDy = style.getTextDeltaY();
-          dy += viewport.toDisplayValue(textDy);
+          dy += Viewport2D.toDisplayValue(viewport,textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
           final Rectangle2D bounds = fontMetrics.getStringBounds(label,
@@ -223,7 +223,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
           graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-          final double textHaloRadius = viewport.toDisplayValue(style.getTextHaloRadiusMeasure());
+          final double textHaloRadius = Viewport2D.toDisplayValue(viewport,style.getTextHaloRadiusMeasure());
           if (textHaloRadius > 0) {
             final Stroke savedStroke = graphics.getStroke();
             final Stroke outlineStroke = new BasicStroke((float)textHaloRadius,

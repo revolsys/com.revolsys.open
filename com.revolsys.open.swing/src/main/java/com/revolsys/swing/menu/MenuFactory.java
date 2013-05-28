@@ -51,6 +51,12 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     factories.add(factory);
   }
 
+  public void addComponentFactory(final String groupName, int index,
+    final ComponentFactory<?> factory) {
+    final List<ComponentFactory<?>> factories = getGroup(groupName);
+    factories.add(index, factory);
+  }
+
   public void addGroup(final int index, final String groupName) {
     if (!groupNames.contains(groupName)) {
       groupNames.add(index, groupName);
@@ -89,10 +95,18 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public void addMenuItem(final String groupName, final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = createMenuItem(name, title, icon,
+      enableCheck, object, methodName, parameters);
+    addComponentFactory(groupName, action);
+  }
+
+  public InvokeMethodAction createMenuItem(final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
       object, methodName, parameters);
     action.setEnableCheck(enableCheck);
-    addComponentFactory(groupName, action);
+    return action;
   }
 
   public void addMenuItem(final String groupName, final String name,
@@ -116,7 +130,27 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    addMenuItem(groupName, title, title, icon, object, methodName, parameters);
+    InvokeMethodAction menuItem = createMenuItem(title, title, icon, null,
+      object, methodName, parameters);
+    addComponentFactory(groupName, menuItem);
+  }
+
+  public void addMenuItem(final String groupName, int index,
+    final String title, final String iconName, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    InvokeMethodAction menuItem = createMenuItem(title, title, icon,
+      enableCheck, object, methodName, parameters);
+    addComponentFactory(groupName, index, menuItem);
+  }
+
+  public void addMenuItem(final String groupName, int index,
+    final String title, final String iconName, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    InvokeMethodAction menuItem = createMenuItem(title, title, icon, null,
+      object, methodName, parameters);
+    addComponentFactory(groupName, index, menuItem);
   }
 
   @Override

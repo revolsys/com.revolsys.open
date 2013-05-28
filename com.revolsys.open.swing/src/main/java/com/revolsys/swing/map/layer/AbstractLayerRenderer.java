@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.CaseConverter;
 
@@ -41,6 +42,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.layer = layer;
     propertyChangeSupport.addPropertyChangeListener(layer);
     this.name = CaseConverter.toCapitalizedWords(type);
+  }
+
+  @Override
+  public <V extends ValueField<?>> V createStylePanel() {
+    return null;
   }
 
   public AbstractLayerRenderer(final String type, final T layer,

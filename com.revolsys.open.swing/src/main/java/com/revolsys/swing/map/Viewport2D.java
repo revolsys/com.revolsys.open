@@ -74,6 +74,15 @@ public class Viewport2D {
     }
   }
 
+  public static double toDisplayValue(final Viewport2D viewport,
+    final Measure<Length> measure) {
+    if (viewport == null) {
+      return measure.getValue().doubleValue();
+    } else {
+      return viewport.toDisplayValue(measure);
+    }
+  }
+
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = new BoundingBox();
 
@@ -391,15 +400,6 @@ public class Viewport2D {
       }
     }
     return convertedValue;
-  }
-
-  public double toDisplayValue(final Viewport2D viewport,
-    final Measure<Length> value) {
-    if (viewport == null) {
-      return value.getValue().doubleValue();
-    } else {
-      return viewport.toDisplayValue(value);
-    }
   }
 
   public double[] toModelCoordinates(final double... viewCoordinates) {

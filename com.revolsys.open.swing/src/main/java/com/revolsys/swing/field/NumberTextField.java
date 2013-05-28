@@ -20,6 +20,13 @@ public class NumberTextField extends JXTextField implements DocumentListener,
 
   private static final long serialVersionUID = 1L;
 
+  private String fieldName;
+
+  @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();

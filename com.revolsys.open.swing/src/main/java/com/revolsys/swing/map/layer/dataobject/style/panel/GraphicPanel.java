@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.layer.dataobject.style.panel;
 
-import com.revolsys.swing.component.ValuePanel;
+import com.revolsys.swing.component.ValueField;
 
-public class GraphicPanel extends ValuePanel<Object>
+public class GraphicPanel extends ValueField<Object>
 // implements PropertyChangeListener
 {
   // /**

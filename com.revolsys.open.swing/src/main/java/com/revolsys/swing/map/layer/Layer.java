@@ -1,14 +1,12 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Component;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.JTabbedPane;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer> {
@@ -25,7 +23,7 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   long getId();
 
-  JTabbedPane createPropertiesPanel();
+  TabbedValuePanel<Layer> createPropertiesPanel();
 
   LayerGroup getLayerGroup();
 

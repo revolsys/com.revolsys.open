@@ -11,10 +11,10 @@ import javax.measure.unit.NonSI;
 import javax.swing.JComboBox;
 import javax.swing.SpringLayout;
 
-import com.revolsys.swing.component.ValuePanel;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 
-public class DashField extends ValuePanel<List<Measure<Length>>> implements
+public class DashField extends ValueField<List<Measure<Length>>> implements
   ItemListener {
 
   /**
@@ -36,7 +36,7 @@ public class DashField extends ValuePanel<List<Measure<Length>>> implements
 
   public DashField(final List<Measure<Length>> dash) {
     setLayout(new SpringLayout());
-    setValue(dash);
+    setFieldValue(dash);
     this.dash = dash;
 
     dashField = new JComboBox(new Object[] {
@@ -69,6 +69,6 @@ public class DashField extends ValuePanel<List<Measure<Length>>> implements
   @Override
   public void save() {
     final List<Measure<Length>> dash = getDash();
-    setValue(dash);
+    setFieldValue(dash);
   }
 }

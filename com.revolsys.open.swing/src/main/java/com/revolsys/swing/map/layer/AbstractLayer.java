@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -138,15 +138,16 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public JTabbedPane createPropertiesPanel() {
-    JTabbedPane tabs = new JTabbedPane();
-    createPropertiesTabGeneral(tabs);
-    return tabs;
+  public TabbedValuePanel<Layer> createPropertiesPanel() {
+    TabbedValuePanel<Layer> tabPanel = new TabbedValuePanel<Layer>("Layer "
+      + this + " Properties", this);
+    createPropertiesTabGeneral(tabPanel);
+    return tabPanel;
   }
 
-  public JPanel createPropertiesTabGeneral(JTabbedPane tabs) {
+  public JPanel createPropertiesTabGeneral(TabbedValuePanel<Layer> tabPanel) {
     JPanel panel = new JPanel();
-    tabs.addTab("General", panel);
+    tabPanel.addTab("General", panel);
     return panel;
   }
 

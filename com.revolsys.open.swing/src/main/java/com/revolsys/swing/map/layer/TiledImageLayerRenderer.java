@@ -1,8 +1,6 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

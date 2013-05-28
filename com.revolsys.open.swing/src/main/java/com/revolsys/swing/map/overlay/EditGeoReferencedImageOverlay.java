@@ -459,8 +459,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           final double screenX = location[0];
           final double screenY = location[1];
           transform.translate(screenX, screenY);
-          final double imageScreenWidth = viewport.toDisplayValue(getImageBoundingBox().getWidthLength());
-          final double imageScreenHeight = viewport.toDisplayValue(getImageBoundingBox().getHeightLength());
+          final double imageScreenWidth = Viewport2D.toDisplayValue(viewport,getImageBoundingBox().getWidthLength());
+          final double imageScreenHeight = Viewport2D.toDisplayValue(viewport,getImageBoundingBox().getHeightLength());
 
           final int imageWidth = image.getImageWidth();
           final int imageHeight = image.getImageHeight();

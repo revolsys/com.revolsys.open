@@ -11,8 +11,7 @@ import javax.swing.SpringLayout;
 
 import com.revolsys.swing.layout.SpringLayoutUtil;
 
-public class TogglePanel extends ValuePanel<CharSequence> implements
-  ItemListener {
+public class TogglePanel extends ValueField<String> implements ItemListener {
   /**
    * 
    */
@@ -20,14 +19,19 @@ public class TogglePanel extends ValuePanel<CharSequence> implements
 
   private final ButtonGroup group;
 
-  public TogglePanel(final CharSequence value, final Action... actions) {
+  public TogglePanel(final String value, final Action... actions) {
     this(value, null, actions);
   }
 
-  public TogglePanel(final CharSequence value, final Dimension dimension,
+  public TogglePanel(final String value, final Dimension dimension,
     final Action... actions) {
-    super(new SpringLayout());
-    setValue(value);
+    this(null, value, dimension, actions);
+  }
+
+  public TogglePanel(String fieldName, final String value,
+    final Dimension dimension, final Action... actions) {
+    super(fieldName, value);
+    setLayout(new SpringLayout());
     group = new ButtonGroup();
     for (final Action action : actions) {
       final JToggleButton button = new JToggleButton(action);
@@ -45,7 +49,7 @@ public class TogglePanel extends ValuePanel<CharSequence> implements
     SpringLayoutUtil.makeColumns(this, getComponentCount(), 0, 0, 5, 0);
   }
 
-  public CharSequence getActionCommand() {
+  public String getActionCommand() {
     return group.getSelection().getActionCommand();
   }
 
@@ -53,6 +57,7 @@ public class TogglePanel extends ValuePanel<CharSequence> implements
   public void itemStateChanged(final ItemEvent e) {
     if (e.getStateChange() == ItemEvent.SELECTED) {
       firePropertyChange("actionCommand", null, getActionCommand());
+      setFieldValue(getActionCommand());
     }
 
   }
@@ -60,6 +65,6 @@ public class TogglePanel extends ValuePanel<CharSequence> implements
   @Override
   public void save() {
     super.save();
-    setValue(getActionCommand());
+    setFieldValue(getActionCommand());
   }
 }

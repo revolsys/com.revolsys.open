@@ -13,30 +13,55 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.field.Field;
+import com.revolsys.util.CaseConverter;
 
 @SuppressWarnings("serial")
-public class ValuePanel<T> extends JPanel {
+public class ValueField<V> extends JPanel implements Field<V> {
   private String title;
 
-  private T value;
+  private V fieldValue;
 
-  public ValuePanel() {
+  private String fieldName;
+
+  @Override
+  public String getFieldName() {
+    return fieldName;
   }
 
-  public ValuePanel(final boolean isDoubleBuffered) {
+  public ValueField(String fieldName, V fieldValue) {
+    setFieldName(fieldName);
+    setFieldValue(fieldValue);
+    setTitle(CaseConverter.toCapitalizedWords(fieldName));
+  }
+
+  public ValueField() {
+  }
+
+  public ValueField(final boolean isDoubleBuffered) {
     super(isDoubleBuffered);
   }
 
-  public ValuePanel(final LayoutManager layout) {
+  public ValueField(final LayoutManager layout) {
     super(layout);
   }
 
-  public ValuePanel(final LayoutManager layout, final boolean isDoubleBuffered) {
+  public ValueField(final LayoutManager layout, final boolean isDoubleBuffered) {
     super(layout, isDoubleBuffered);
   }
 
+  public void setFieldName(String fieldName) {
+    this.fieldName = fieldName;
+  }
+
   public void cancel() {
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public void cancel(final JDialog dialog) {
@@ -44,8 +69,9 @@ public class ValuePanel<T> extends JPanel {
     dialog.setVisible(false);
   }
 
-  public T getValue() {
-    return value;
+  @SuppressWarnings("unchecked")
+  public <T> T getFieldValue() {
+    return (T)fieldValue;
   }
 
   public void save() {
@@ -55,8 +81,8 @@ public class ValuePanel<T> extends JPanel {
   private void save(final Container container) {
     final Component[] components = container.getComponents();
     for (final Component component : components) {
-      if (component instanceof ValuePanel<?>) {
-        final ValuePanel<?> valuePanel = (ValuePanel<?>)component;
+      if (component instanceof ValueField<?>) {
+        final ValueField<?> valuePanel = (ValueField<?>)component;
         valuePanel.save();
       } else if (component instanceof Container) {
         final Container childContainer = (Container)component;
@@ -71,13 +97,16 @@ public class ValuePanel<T> extends JPanel {
     dialog.setVisible(false);
   }
 
-  public void setValue(final T value) {
-    final T oldValue = this.value;
-    this.value = value;
-    firePropertyChange("value", oldValue, value);
+  public void setFieldValue(final V value) {
+    final V oldValue = this.fieldValue;
+    this.fieldValue = value;
+    firePropertyChange("fieldValue", oldValue, value);
+    if (StringUtils.hasText(fieldName)) {
+      firePropertyChange(fieldName, oldValue, value);
+    }
   }
 
-  public T showDialog(final Component component) {
+  public V showDialog(final Component component) {
     Window window;
     if (component == null) {
       window = null;
@@ -103,6 +132,10 @@ public class ValuePanel<T> extends JPanel {
     dialog.pack();
     dialog.setVisible(true);
 
-    return getValue();
+    return getFieldValue();
+  }
+
+  public String getTitle() {
+    return title;
   }
 }

@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
@@ -36,9 +35,12 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -88,6 +90,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
       "table_row_insert", canAdd, "addNewRecord"));
+
+    menu.addMenuItem("layer", 0, "Layer Style", "palette",
+      LayerUtil.class, "showProperties", "Style");
+
   }
 
   public static void actionCompleteAddNewRecord(
@@ -102,20 +108,25 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public JTabbedPane createPropertiesPanel() {
-    JTabbedPane propertiesPanel = super.createPropertiesPanel();
-    
+  public TabbedValuePanel<Layer> createPropertiesPanel() {
+    TabbedValuePanel<Layer> propertiesPanel = super.createPropertiesPanel();
+
     DataObjectMetaData metaData = getMetaData();
     BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
-    
+
     JPanel fieldPanel = new JPanel(new BorderLayout());
     JScrollPane fieldScroll = new JScrollPane(fieldTable);
     fieldPanel.add(fieldScroll, BorderLayout.CENTER);
     propertiesPanel.addTab("Fields", fieldPanel);
-    
+
+    LayerRenderer<? extends Layer> renderer = getRenderer();
+    ValueField<?> stylePanel = renderer.createStylePanel();
+    if (stylePanel != null) {
+      propertiesPanel.addTab(stylePanel);
+    }
     return propertiesPanel;
   }
-  
+
   public Component createTablePanel() {
     final JTable table = DataObjectLayerTableModel.createTable(this);
     if (table == null) {

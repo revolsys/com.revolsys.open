@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject.style.panel;
 
-public class WellKnownMarkGraphicSymbolPanel extends FillPanel {
+public class WellKnownMarkGraphicSymbolPanel {
   // /**
   // *
   // */

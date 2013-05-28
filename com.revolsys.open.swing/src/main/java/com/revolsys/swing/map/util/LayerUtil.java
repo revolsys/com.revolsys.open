@@ -1,10 +1,6 @@
 package com.revolsys.swing.map.util;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -14,12 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
@@ -43,7 +36,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectForm;
 import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
@@ -324,22 +317,21 @@ public class LayerUtil {
     showProperties(layer);
   }
 
-  public static void showProperties(final Layer layer) {
-    if (layer != null) {
-      final JTabbedPane panel = layer.createPropertiesPanel();
-      final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
-      final JDialog dialog = new JDialog(window, layer.getName()
-        + " Properties", ModalityType.APPLICATION_MODAL);
-      dialog.setLayout(new BorderLayout());
-      dialog.add(panel, BorderLayout.CENTER);
+  public static void showProperties(String tabName) {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    showProperties(layer, tabName);
+  }
 
-      final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      buttons.add(InvokeMethodAction.createButton("OK", dialog, "setVisible",
-        false));
-      dialog.add(buttons, BorderLayout.SOUTH);
-      dialog.setMinimumSize(new Dimension(200, 100));
-      dialog.pack();
-      dialog.setVisible(true);
+  public static void showProperties(final Layer layer) {
+    showProperties(layer, null);
+  }
+
+  public static void showProperties(final Layer layer, String tabName) {
+    if (layer != null) {
+      final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
+      final TabbedValuePanel<Layer> panel = layer.createPropertiesPanel();
+         panel.setSelectdTab(tabName);
+      panel.showDialog(window);
     }
   }
 

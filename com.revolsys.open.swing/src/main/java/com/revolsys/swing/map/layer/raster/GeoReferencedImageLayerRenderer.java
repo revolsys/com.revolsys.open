@@ -50,8 +50,8 @@ public class GeoReferencedImageLayerRenderer extends
               final double screenX = location[0];
               final double screenY = location[1];
               graphics.translate(screenX, screenY);
-              final double imageScreenWidth = viewport.toDisplayValue(boundingBox.getWidthLength());
-              final double imageScreenHeight = viewport.toDisplayValue(boundingBox.getHeightLength());
+              final double imageScreenWidth = Viewport2D.toDisplayValue(viewport,boundingBox.getWidthLength());
+              final double imageScreenHeight = Viewport2D.toDisplayValue(viewport,boundingBox.getHeightLength());
 
               final double xScaleFactor = imageScreenWidth / imageWidth;
               final double yScaleFactor = imageScreenHeight / imageHeight;

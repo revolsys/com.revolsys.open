@@ -2,6 +2,7 @@ package com.revolsys.swing.layout;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.LayoutManager;
 import java.awt.MenuContainer;
 import java.awt.MenuItem;
 import java.awt.Window;
@@ -52,7 +53,12 @@ public class SpringLayoutUtil {
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);
 
-    final SpringLayout layout = (SpringLayout)container.getLayout();
+    LayoutManager layout = container.getLayout();
+    if (!(layout instanceof SpringLayout)) {
+      layout = new SpringLayout();
+      container.setLayout(layout);
+    }
+    final SpringLayout springLayout = (SpringLayout)layout;
     final Component[] components = container.getComponents();
     if (components.length > 0) {
       final Spring[] columnWidths = new Spring[numColumns];
@@ -66,7 +72,7 @@ public class SpringLayoutUtil {
       }
       for (int i = 0; i < components.length; i++) {
         final Component component = components[i];
-        final Constraints componentConstraints = layout.getConstraints(component);
+        final Constraints componentConstraints = springLayout.getConstraints(component);
         final Spring width = componentConstraints.getWidth();
         final Spring height = componentConstraints.getHeight();
         final int column = i % numColumns;
@@ -88,7 +94,7 @@ public class SpringLayoutUtil {
         rowY[i] = Spring.sum(rowY[i - 1],
           Spring.sum(yPadSpring, rowHeights[i - 1]));
       }
-      final Constraints containerConstraints = layout.getConstraints(container);
+      final Constraints containerConstraints = springLayout.getConstraints(container);
       containerConstraints.setWidth(Spring.sum(columnX[numColumns - 1],
         Spring.sum(columnWidths[numColumns - 1], initialXSpring)));
       containerConstraints.setHeight(Spring.sum(rowY[numRows - 1],
@@ -96,7 +102,7 @@ public class SpringLayoutUtil {
 
       for (int i = 0; i < components.length; i++) {
         final Component component = components[i];
-        final Constraints componentConstraints = layout.getConstraints(component);
+        final Constraints componentConstraints = springLayout.getConstraints(component);
         final int column = i % numColumns;
         final int row = (int)Math.floor((double)i / numColumns);
         componentConstraints.setX(columnX[column]);
@@ -188,13 +194,12 @@ public class SpringLayoutUtil {
   public static void makeGrid(final Container parent, final int rows,
     final int cols, final int initialX, final int initialY, final int xPad,
     final int yPad) {
-    SpringLayout layout;
-    try {
-      layout = (SpringLayout)parent.getLayout();
-    } catch (final ClassCastException exc) {
-      System.err.println("The first argument to makeGrid must use SpringLayout.");
-      return;
+    LayoutManager layout = parent.getLayout();
+    if (!(layout instanceof SpringLayout)) {
+      layout = new SpringLayout();
+      parent.setLayout(layout);
     }
+    SpringLayout springLayout = (SpringLayout)parent.getLayout();
 
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);
@@ -204,12 +209,12 @@ public class SpringLayoutUtil {
 
     // Calculate Springs that are the max of the width/height so that all
     // cells have the same size.
-    Spring maxWidthSpring = layout.getConstraints(parent.getComponent(0))
+    Spring maxWidthSpring = springLayout.getConstraints(parent.getComponent(0))
       .getWidth();
-    Spring maxHeightSpring = layout.getConstraints(parent.getComponent(0))
+    Spring maxHeightSpring = springLayout.getConstraints(parent.getComponent(0))
       .getWidth();
     for (int i = 1; i < max; i++) {
-      final SpringLayout.Constraints cons = layout.getConstraints(parent.getComponent(i));
+      final SpringLayout.Constraints cons = springLayout.getConstraints(parent.getComponent(i));
 
       maxWidthSpring = Spring.max(maxWidthSpring, cons.getWidth());
       maxHeightSpring = Spring.max(maxHeightSpring, cons.getHeight());
@@ -218,7 +223,7 @@ public class SpringLayoutUtil {
     // Apply the new width/height Spring. This forces all the
     // components to have the same size.
     for (int i = 0; i < max; i++) {
-      final SpringLayout.Constraints cons = layout.getConstraints(parent.getComponent(i));
+      final SpringLayout.Constraints cons = springLayout.getConstraints(parent.getComponent(i));
 
       cons.setWidth(maxWidthSpring);
       cons.setHeight(maxHeightSpring);
@@ -229,7 +234,7 @@ public class SpringLayoutUtil {
     SpringLayout.Constraints lastCons = null;
     SpringLayout.Constraints lastRowCons = null;
     for (int i = 0; i < max; i++) {
-      final SpringLayout.Constraints cons = layout.getConstraints(parent.getComponent(i));
+      final SpringLayout.Constraints cons = springLayout.getConstraints(parent.getComponent(i));
       if (i % cols == 0) { // start of new row
         lastRowCons = lastCons;
         cons.setX(initialXSpring);
@@ -248,7 +253,7 @@ public class SpringLayoutUtil {
     }
 
     // Set the parent's size.
-    final SpringLayout.Constraints pCons = layout.getConstraints(parent);
+    final SpringLayout.Constraints pCons = springLayout.getConstraints(parent);
     pCons.setConstraint(
       SpringLayout.SOUTH,
       Spring.sum(Spring.constant(yPad),

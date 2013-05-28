@@ -8,8 +8,7 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.panel.LineStylePanel;
+import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
 import com.revolsys.swing.tree.TreeUtil;
 
 public class ChangeStyle extends AbstractAction {
@@ -31,8 +30,9 @@ public class ChangeStyle extends AbstractAction {
 
     final GeometryStyleRenderer renderer = TreeUtil.getFirstSelectedNode(
       source, GeometryStyleRenderer.class);
-    final GeometryStyle geometryStyle = renderer.getStyle();
-    LineStylePanel.showDialog(window, geometryStyle);
-    renderer.setStyle(geometryStyle);
+    if (renderer != null) {
+      GeometryStylePanel panel = renderer.createStylePanel();
+      panel.showDialog(window);
+    }
   }
 }

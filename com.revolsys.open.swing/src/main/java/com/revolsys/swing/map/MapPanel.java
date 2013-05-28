@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
@@ -14,6 +13,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+
+import org.jdesktop.swingx.JXStatusBar;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -85,7 +86,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private SelectMapScale selectMapScale;
 
-  private final JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+  private final JXStatusBar statusBar = new JXStatusBar();
 
   private final ToolBar toolBar;
 
@@ -317,7 +318,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return scale;
   }
 
-  public JPanel getStatusBar() {
+  public JXStatusBar getStatusBar() {
     return statusBar;
   }
 

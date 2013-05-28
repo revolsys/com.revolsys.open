@@ -229,7 +229,7 @@ public class TextStyle {
       // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
       // style += Font.ITALIC;
       // }
-      final double fontSize = viewport.toDisplayValue(textSizeMeasure);
+      final double fontSize = Viewport2D.toDisplayValue(viewport,textSizeMeasure);
       font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
     }
     graphics.setFont(font);

@@ -50,7 +50,6 @@ public class LoggingEventPanel extends JPanel {
 
   public LoggingEventPanel(final LoggingEvent event) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    setLayout(new GroupLayout(this));
     final long time = event.getTimeStamp();
     final Timestamp timestamp = new Timestamp(time);
     addField("Timestamp", timestamp);

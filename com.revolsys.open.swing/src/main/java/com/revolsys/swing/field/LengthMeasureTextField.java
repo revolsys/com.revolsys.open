@@ -1,6 +1,5 @@
-package com.revolsys.swing.map.layer.dataobject.style.panel;
+package com.revolsys.swing.field;
 
-import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
@@ -10,14 +9,20 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 
-import com.revolsys.swing.component.ValuePanel;
-import com.revolsys.swing.listener.InvokeMethodActionListener;
+import org.springframework.util.StringUtils;
 
-public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
+import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.listener.InvokeMethodActionListener;
+import com.revolsys.swing.listener.InvokeMethodListener;
+
+public class LengthMeasureTextField extends ValueField<Measure<Length>>
   implements ItemListener {
   /**
    * 
@@ -26,7 +31,7 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
 
   private Number number;
 
-  private final JTextField valueField;
+  private final NumberTextField valueField;
 
   private Unit<Length> unit;
 
@@ -34,25 +39,34 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
 
   public LengthMeasureTextField(final Measure<Length> value,
     final Unit<Length> unit) {
-    super(new FlowLayout());
-    this.number = value.getValue();
-    setValue(value);
-    valueField = new JFormattedTextField(new DecimalFormat("###0"));
-    valueField.setColumns(4);
+    this(null, value, unit);
+  }
+
+  public LengthMeasureTextField(String fieldName, final Measure<Length> value) {
+    this(fieldName, value, value.getUnit());
+  }
+
+  public LengthMeasureTextField(String fieldName, final Measure<Length> value,
+    final Unit<Length> unit) {
+    super(fieldName, value);
+    valueField = new NumberTextField(DataTypes.DOUBLE, 6, 2);
     if (value == null) {
-      valueField.setText("0");
+      this.number = 0;
       if (unit == null) {
         this.unit = NonSI.PIXEL;
       } else {
         this.unit = unit;
       }
     } else {
+      this.number = value.getValue();
       this.unit = value.getUnit();
-      valueField.setText(String.valueOf(value.intValue(this.unit)));
     }
+    valueField.setFieldValue(this.number);
+    InvokeMethodListener updateNumberListener = new InvokeMethodListener(this,
+      "updateNumber");
+    valueField.addFocusListener(updateNumberListener);
     add(valueField);
-    valueField.addActionListener(new InvokeMethodActionListener(this,
-      "updateNumber"));
+    valueField.addActionListener(updateNumberListener);
 
     unitField = new JComboBox(new Object[] {
       NonSI.PIXEL, SI.METRE, SI.KILOMETRE, NonSI.FOOT, NonSI.MILE
@@ -60,6 +74,7 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
     unitField.addItemListener(this);
     unitField.setSelectedItem(unit);
     add(unitField);
+    GroupLayoutUtil.makeColumns(this, 2);
   }
 
   public Measure<Length> getLength() {
@@ -79,6 +94,7 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
     return this.unit;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void itemStateChanged(final ItemEvent e) {
     if (e.getSource() == unitField && e.getStateChange() == ItemEvent.SELECTED) {
@@ -89,7 +105,6 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
   @Override
   public void save() {
     updateNumber();
-    setValue(Measure.valueOf(number.doubleValue(), unit));
   }
 
   @Override
@@ -103,6 +118,7 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
     this.number = value.doubleValue();
     valueField.setText(value.toString());
     firePropertyChange("number", oldValue, number);
+    setFieldValue(Measure.valueOf(number.doubleValue(), unit));
   }
 
   public void setText(final CharSequence text) {
@@ -118,15 +134,15 @@ public class LengthMeasureTextField extends ValuePanel<Measure<Length>>
     this.unit = unit;
     unitField.setSelectedItem(this.unit);
     firePropertyChange("unit", oldValue, this.unit);
-
+    setFieldValue(Measure.valueOf(number.doubleValue(), unit));
   }
 
   public void updateNumber() {
-    final String text = valueField.getText();
-    if (text == null) {
-      setNumber(0.0);
+    final Number number = valueField.getFieldValue();
+    if (number == null) {
+      setNumber(0);
     } else {
-      setNumber(Integer.parseInt(text));
+      setNumber(number);
     }
   }
 }

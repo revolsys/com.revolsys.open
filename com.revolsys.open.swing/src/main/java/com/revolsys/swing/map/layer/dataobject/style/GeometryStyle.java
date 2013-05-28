@@ -76,7 +76,7 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
-  private LineCap lineCap = LineCap.BUTT;
+  private LineCap lineCap = LineCap.ROUND;
 
   private boolean lineClip = true;
 
@@ -88,7 +88,7 @@ public class GeometryStyle extends MarkerStyle {
 
   private GammaMethod lineGammaMethod = GammaMethod.power;
 
-  private LineJoin lineJoin = LineJoin.MITER;
+  private LineJoin lineJoin = LineJoin.ROUND;
 
   private float lineMiterlimit = 4;
 
@@ -130,8 +130,12 @@ public class GeometryStyle extends MarkerStyle {
     }
   }
 
-  public LineCap getLineCap() {
+  public LineCap getLineCapEnum() {
     return lineCap;
+  }
+
+  public String getLineCap() {
+    return lineCap.toString();
   }
 
   public Color getLineColor() {
@@ -231,12 +235,12 @@ public class GeometryStyle extends MarkerStyle {
     // }
   }
 
-  public void setLineCap(final LineCap lineCap) {
+  public void setLineCapEnum(final LineCap lineCap) {
     this.lineCap = lineCap;
   }
 
   public void setLineCap(final String lineCap) {
-    setLineCap(LineCap.valueOf(lineCap.toUpperCase()));
+    setLineCapEnum(LineCap.valueOf(lineCap.toUpperCase()));
   }
 
   public void setLineClip(final boolean lineClip) {
@@ -308,7 +312,7 @@ public class GeometryStyle extends MarkerStyle {
     final Color color = getLineColor();
     graphics.setColor(color);
 
-    final float width = (float)viewport.toDisplayValue(lineWidth);
+    final float width = (float)Viewport2D.toDisplayValue(viewport, lineWidth);
 
     final float dashPhase = 0;
     /*
@@ -333,10 +337,11 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineWidth(final double lineWidth) {
-    this.lineWidth = Measure.valueOf(lineWidth, NonSI.PIXEL);
+    Measure<Length> measure = Measure.valueOf(lineWidth, NonSI.PIXEL);
+    setLineWidthMeasure(measure);
   }
 
-  public void setLineWidth(final Measure<Length> lineWidth) {
+  public void setLineWidthMeasure(final Measure<Length> lineWidth) {
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
   }
 

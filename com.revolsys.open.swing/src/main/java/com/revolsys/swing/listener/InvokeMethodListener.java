@@ -2,6 +2,8 @@ package com.revolsys.swing.listener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
@@ -17,7 +19,7 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodListener extends InvokeMethodRunnable implements
   ActionListener, DocumentListener, ListSelectionListener, ItemListener,
-  PropertyChangeListener {
+  PropertyChangeListener, FocusListener {
 
   private final boolean invokeLater;
 
@@ -83,6 +85,16 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void focusGained(FocusEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void focusLost(FocusEvent e) {
     invokeMethod();
   }
 }

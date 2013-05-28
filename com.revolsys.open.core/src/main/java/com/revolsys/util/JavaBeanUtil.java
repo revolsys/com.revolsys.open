@@ -356,7 +356,7 @@ public final class JavaBeanUtil {
    */
   public static void setProperty(final Object object,
     final String propertyName, final Object value) {
-    if (object != null) {
+    if (object != null && StringUtils.hasText(propertyName)) {
       try {
         BeanUtils.setProperty(object, propertyName, value);
       } catch (final IllegalAccessException e) {

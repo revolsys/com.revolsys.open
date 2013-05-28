@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -85,7 +84,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
-        dataType, length, scale, required, null, srid, numAxis, geometryFactory);
+        dataType, required, null, srid, numAxis, geometryFactory);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

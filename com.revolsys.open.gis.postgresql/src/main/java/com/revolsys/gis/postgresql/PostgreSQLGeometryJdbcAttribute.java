@@ -37,10 +37,10 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private final int numAxis;
 
   public PostgreSQLGeometryJdbcAttribute(final String name,
-    final DataType type, final int length, final int scale,
-    final boolean required, final Map<String, Object> properties,
-    final int srid, final int numAxis, final GeometryFactory geometryFactory) {
-    super(name, type, -1, length, scale, required, properties);
+    final DataType type, final boolean required, final Map<String, Object> properties,
+    final int srid, final int numAxis,
+    final GeometryFactory geometryFactory) {
+    super(name, type, -1, 0, 0, required, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
@@ -50,8 +50,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   @Override
   public JdbcAttribute clone() {
     return new PostgreSQLGeometryJdbcAttribute(getName(), getType(),
-      getLength(), getScale(), isRequired(), getProperties(), srid, numAxis,
-      geometryFactory);
+      isRequired(), getProperties(), srid, numAxis, geometryFactory);
   }
 
   public Object getInsertUpdateValue(Object object) throws SQLException {

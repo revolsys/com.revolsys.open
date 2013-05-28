@@ -19,11 +19,15 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.dataobject.style.marker.AbstractMarker;
+import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
+import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
+import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
 import com.revolsys.util.JavaBeanUtil;
 
 public class MarkerStyle implements Cloneable {
 
-  public static final ShapeMarker ELLIPSE = new ShapeMarker("ellipse");
+  public static final AbstractMarker ELLIPSE = new ShapeMarker("ellipse");
 
   public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10,
     NonSI.PIXEL);
@@ -57,11 +61,11 @@ public class MarkerStyle implements Cloneable {
 
   public static MarkerStyle marker(final Shape shape, final double markerSize,
     final Color lineColor, final double lineWidth, final Color fillColor) {
-    final ShapeMarker marker = new ShapeMarker(shape);
+    final AbstractMarker marker = new ShapeMarker(shape);
     return marker(marker, markerSize, lineColor, fillColor);
   }
 
-  protected static MarkerStyle marker(final ShapeMarker marker,
+  protected static MarkerStyle marker(final AbstractMarker marker,
     final double markerSize, final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
@@ -77,7 +81,7 @@ public class MarkerStyle implements Cloneable {
   public static MarkerStyle marker(final String markerName,
     final double markerSize, final Color lineColor, final double lineWidth,
     final Color fillColor) {
-    final ShapeMarker marker = new ShapeMarker(markerName);
+    final AbstractMarker marker = new ShapeMarker(markerName);
     return marker(marker, markerSize, lineColor, fillColor);
   }
 
@@ -180,7 +184,11 @@ public class MarkerStyle implements Cloneable {
     return markerLineOpacity;
   }
 
-  public Measure<Length> getMarkerLineWidth() {
+  public double getMarkerLineWidth() {
+    return markerLineWidth.doubleValue(NonSI.PIXEL);
+  }
+
+  public Measure<Length> getMarkerLineWidthMeasure() {
     return markerLineWidth;
   }
 
@@ -347,14 +355,20 @@ public class MarkerStyle implements Cloneable {
       return false;
     } else {
       graphics.setColor(color);
-      final float width = (float)viewport.toDisplayValue(markerLineWidth);
+      final float width = (float)Viewport2D.toDisplayValue(viewport,
+        markerLineWidth);
       final BasicStroke basicStroke = new BasicStroke(width);
       graphics.setStroke(basicStroke);
       return true;
     }
   }
 
-  public void setMarkerLineWidth(final Measure<Length> markerLineWidth) {
+  public void setMarkerLineWidth(double markerLineWidth) {
+    Measure<Length> measure = Measure.valueOf(markerLineWidth, NonSI.PIXEL);
+    setMarkerLineWidthMeasure(measure);
+  }
+
+  public void setMarkerLineWidthMeasure(final Measure<Length> markerLineWidth) {
     this.markerLineWidth = getWithDefault(markerLineWidth, ONE_PIXEL);
   }
 

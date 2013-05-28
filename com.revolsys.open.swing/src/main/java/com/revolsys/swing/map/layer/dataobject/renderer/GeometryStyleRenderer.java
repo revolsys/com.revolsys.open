@@ -9,11 +9,13 @@ import java.util.Map;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.menu.ChangeStyle;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -165,6 +167,11 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   public void setStyle(final GeometryStyle style) {
     this.style = style;
     getPropertyChangeSupport().firePropertyChange("style", null, style);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends ValueField<?>> V createStylePanel() {
+    return (V)new GeometryStylePanel(this);
   }
 
 }

@@ -1,5 +1,6 @@
 package com.revolsys.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -45,12 +46,14 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.swing.component.ObjectLabelField;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
+import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
+import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.PreferencesUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -61,7 +64,7 @@ public class SwingUtil {
   public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
 
   public static JLabel addLabel(final Container container, final String text) {
-    final JLabel label = new JLabel(text);
+    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(text));
     label.setFont(BOLD_FONT);
     container.add(label);
     return label;
@@ -108,7 +111,7 @@ public class SwingUtil {
     }
   }
 
-  public static JComponent createDateField() {
+  public static JXDatePicker createDateField() {
     final JXDatePicker dateField = new JXDatePicker();
     dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
       "yyyy/MMM/dd");
@@ -149,7 +152,7 @@ public class SwingUtil {
       } else if (type.equals(DataTypes.DATE)) {
         field = createDateField();
       } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
-        field = new ObjectLabelField();
+        field = new ObjectLabelField(fieldName);
       } else {
         field = createTextField(columns);
       }
@@ -356,5 +359,44 @@ public class SwingUtil {
     frame.setSize(size);
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends JComponent> T createField(Class<?> fieldClass,
+    String fieldName, Object fieldValue) {
+    JComponent field;
+    if (Number.class.isAssignableFrom(fieldClass)) {
+      final NumberTextField numberTextField = new NumberTextField(
+        DataTypes.DOUBLE, 10, 2);
+      if (fieldValue instanceof Number) {
+        Number number = (Number)fieldValue;
+        numberTextField.setFieldValue(number);
+      }
+      field = numberTextField;
+    } else if (Date.class.isAssignableFrom(fieldClass)) {
+      JXDatePicker dateField = createDateField();
+      if (fieldValue instanceof Date) {
+        Date date = (Date)fieldValue;
+        dateField.setDate(date);
+      }
+      field = dateField;
+    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
+      ObjectLabelField objectField = new ObjectLabelField(fieldName);
+      objectField.setFieldValue(fieldValue);
+      field = objectField;
+    } else if (Color.class.isAssignableFrom(fieldClass)) {
+      field = new ColorChooserField(fieldName, (Color)fieldValue);
+    } else {
+      field = createTextField(50);
+    }
+    if (field instanceof JTextField) {
+      final JTextField textField = (JTextField)field;
+      final int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+      textField.setText(StringConverterRegistry.toString(fieldValue));
+    }
+    field.setFont(FONT);
+    return (T)field;
   }
 }

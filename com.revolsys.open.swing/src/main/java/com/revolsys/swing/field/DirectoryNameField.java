@@ -24,6 +24,13 @@ public class DirectoryNameField extends JPanel implements
 
   private final JButton browseButton = new JButton();
 
+  private String fieldName;
+
+  @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
   public DirectoryNameField() {
     super(new SpringLayout());
 

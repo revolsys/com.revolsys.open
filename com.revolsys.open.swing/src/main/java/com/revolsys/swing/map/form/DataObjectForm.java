@@ -206,9 +206,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     final JPanel panel = new JPanel();
     container.add(panel);
 
-    final GroupLayout layout = new GroupLayout(panel);
-    panel.setLayout(layout);
-
     panel.setBorder(BorderFactory.createTitledBorder(title));
 
     for (final String fieldName : fieldNames) {

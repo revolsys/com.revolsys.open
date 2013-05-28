@@ -17,8 +17,8 @@ import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.ImageMarker;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
+import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.geonames.GeoNamesService;
 import com.vividsolutions.jts.geom.Point;
 
