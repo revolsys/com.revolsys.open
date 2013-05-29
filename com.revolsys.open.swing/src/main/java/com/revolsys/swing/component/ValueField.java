@@ -38,6 +38,10 @@ public class ValueField<V> extends JPanel implements Field<V> {
     setTitle(CaseConverter.toCapitalizedWords(fieldName));
   }
 
+  public ValueField(V fieldValue) {
+    this(null, fieldValue);
+  }
+
   public ValueField() {
   }
 

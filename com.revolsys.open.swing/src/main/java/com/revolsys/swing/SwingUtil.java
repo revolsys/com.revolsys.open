@@ -52,9 +52,11 @@ import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PreferencesUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -62,6 +64,21 @@ public class SwingUtil {
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
 
   public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
+
+  public static JComponent addField(final Container container,
+    final Object object, final String fieldName) {
+    return addField(container, object, fieldName, fieldName);
+  }
+
+  public static JComponent addField(final Container panel, final Object object,
+    final String fieldName, final String label) {
+    addLabel(panel, label);
+    final Object fieldValue = JavaBeanUtil.getValue(object, fieldName);
+    final JComponent field = SwingUtil.createField(fieldValue.getClass(),
+      fieldName, fieldValue);
+    panel.add(field);
+    return field;
+  }
 
   public static JLabel addLabel(final Container container, final String text) {
     final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(text));
@@ -78,10 +95,11 @@ public class SwingUtil {
       comboBox.setSelectedIndex(0);
     }
     String longestValue = "";
-    for (Entry<Object, List<Object>> codes : codeTable.getCodes().entrySet()) {
-      List<Object> values = codes.getValue();
+    for (final Entry<Object, List<Object>> codes : codeTable.getCodes()
+      .entrySet()) {
+      final List<Object> values = codes.getValue();
       if (values != null && !values.isEmpty()) {
-        String text = CollectionUtil.toString(values);
+        final String text = CollectionUtil.toString(values);
         if (text.length() > longestValue.length()) {
           longestValue = text;
         }
@@ -117,6 +135,48 @@ public class SwingUtil {
       "yyyy/MMM/dd");
     PopupMenu.createPopupMenu(dateField.getEditor());
     return dateField;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends JComponent> T createField(final Class<?> fieldClass,
+    final String fieldName, final Object fieldValue) {
+    JComponent field;
+    if (Number.class.isAssignableFrom(fieldClass)) {
+      final NumberTextField numberTextField = new NumberTextField(
+        DataTypes.DOUBLE, 10, 2);
+      if (fieldValue instanceof Number) {
+        final Number number = (Number)fieldValue;
+        numberTextField.setFieldValue(number);
+      }
+      field = numberTextField;
+    } else if (Date.class.isAssignableFrom(fieldClass)) {
+      final JXDatePicker dateField = createDateField();
+      if (fieldValue instanceof Date) {
+        final Date date = (Date)fieldValue;
+        dateField.setDate(date);
+      }
+      field = dateField;
+    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
+      final ObjectLabelField objectField = new ObjectLabelField(fieldName);
+      objectField.setFieldValue(fieldValue);
+      field = objectField;
+    } else if (Color.class.isAssignableFrom(fieldClass)) {
+      field = new ColorChooserField(fieldName, (Color)fieldValue);
+    } else {
+      final TextField textField = new TextField(fieldName, fieldValue);
+      textField.setColumns(50);
+      PopupMenu.createPopupMenu(textField);
+      field = textField;
+    }
+    if (field instanceof JTextField) {
+      final JTextField textField = (JTextField)field;
+      final int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+      textField.setText(StringConverterRegistry.toString(fieldValue));
+    }
+    field.setFont(FONT);
+    return (T)field;
   }
 
   @SuppressWarnings("unchecked")
@@ -359,44 +419,5 @@ public class SwingUtil {
     frame.setSize(size);
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends JComponent> T createField(Class<?> fieldClass,
-    String fieldName, Object fieldValue) {
-    JComponent field;
-    if (Number.class.isAssignableFrom(fieldClass)) {
-      final NumberTextField numberTextField = new NumberTextField(
-        DataTypes.DOUBLE, 10, 2);
-      if (fieldValue instanceof Number) {
-        Number number = (Number)fieldValue;
-        numberTextField.setFieldValue(number);
-      }
-      field = numberTextField;
-    } else if (Date.class.isAssignableFrom(fieldClass)) {
-      JXDatePicker dateField = createDateField();
-      if (fieldValue instanceof Date) {
-        Date date = (Date)fieldValue;
-        dateField.setDate(date);
-      }
-      field = dateField;
-    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
-      ObjectLabelField objectField = new ObjectLabelField(fieldName);
-      objectField.setFieldValue(fieldValue);
-      field = objectField;
-    } else if (Color.class.isAssignableFrom(fieldClass)) {
-      field = new ColorChooserField(fieldName, (Color)fieldValue);
-    } else {
-      field = createTextField(50);
-    }
-    if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      final int preferedWidth = textField.getPreferredSize().width;
-      textField.setMinimumSize(new Dimension(preferedWidth, 0));
-      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-      textField.setText(StringConverterRegistry.toString(fieldValue));
-    }
-    field.setFont(FONT);
-    return (T)field;
   }
 }

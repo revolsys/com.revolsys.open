@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer.bing;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.bing.BingClient;
@@ -12,8 +14,11 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class BingLayer extends AbstractTiledImageLayer {
@@ -46,6 +51,10 @@ public class BingLayer extends AbstractTiledImageLayer {
     setVisible(true);
   }
 
+  @Override
+  public ValueField<Layer> addPropertiesTabGeneral(TabbedValuePanel<Layer> tabPanel) {
+    return super.addPropertiesTabGeneral(tabPanel);
+  }
   public BingLayer(final ImagerySet imagerySet) {
     this(new BingClient(), imagerySet);
   }

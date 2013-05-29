@@ -16,7 +16,7 @@ import javax.swing.table.AbstractTableModel;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Reorderable;
 
-public class ObjectListTableModel extends AbstractTableModel implements
+public class ObjectListTableModel<T> extends AbstractTableModel implements
   Reorderable {
 
   private static final long serialVersionUID = 1L;
@@ -27,16 +27,16 @@ public class ObjectListTableModel extends AbstractTableModel implements
 
   private boolean editable;
 
-  private final List<Object> objects = new ArrayList<Object>();
+  private final List<T> objects = new ArrayList<T>();
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
-  public ObjectListTableModel(final Collection<? extends Object> objects,
+  public ObjectListTableModel(final Collection<? extends T> objects,
     final List<String> columnNames) {
     this(objects, columnNames, columnNames);
   }
 
-  public ObjectListTableModel(final Collection<? extends Object> objects,
+  public ObjectListTableModel(final Collection<? extends T> objects,
     final List<String> columnNames, final List<String> columnTitles) {
     this.objects.addAll(objects);
     this.columnNames.addAll(columnNames);
@@ -46,24 +46,24 @@ public class ObjectListTableModel extends AbstractTableModel implements
 
   public ObjectListTableModel(final List<String> columnNames,
     final List<String> columnTiList) {
-    this(Collections.emptyList(), columnNames, columnTiList);
+    this(Collections.<T>emptyList(), columnNames, columnTiList);
   }
 
   public ObjectListTableModel(final String... columnNames) {
-    this(Collections.emptyList(), Arrays.asList(columnNames),
+    this(Collections.<T>emptyList(), Arrays.asList(columnNames),
       Arrays.asList(columnNames));
     setEditable(false);
   }
 
-  public void add(final int index, final Object object) {
+  public void add(final int index, final T object) {
     objects.add(index, object);
     fireTableRowsInserted(index, index);
   }
 
-  public void add(final Object... objects) {
+  public void add(final T... objects) {
     if (objects.length > 0) {
       final int startIndex = this.objects.size();
-      for (final Object object : objects) {
+      for (final T object : objects) {
         this.objects.add(object);
       }
       final int endIndex = this.objects.size() - 1;
@@ -71,7 +71,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
     }
   }
 
-  public void addAll(final Collection<Object> objects) {
+  public void addAll(final Collection<? extends T> objects) {
     if (objects.size() > 0) {
       final int startIndex = this.objects.size();
       this.objects.addAll(objects);
@@ -123,7 +123,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
     return columnTitles.get(columnIndex);
   }
 
-  public Object getObject(final int index) {
+  public T getObject(final int index) {
     if (index < objects.size()) {
       return objects.get(index);
     } else {
@@ -134,7 +134,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
   /**
    * @return the objects
    */
-  public List<Object> getObjects() {
+  public List<T> getObjects() {
     return objects;
   }
 
@@ -207,7 +207,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
     if (fromIndex < toIndex) {
       toIndex--;
     }
-    final Object object = getObject(fromIndex);
+    final T object = getObject(fromIndex);
     removeAll(object);
     add(toIndex, object);
   }
@@ -219,7 +219,7 @@ public class ObjectListTableModel extends AbstractTableModel implements
   /**
    * @param objects the objects to set
    */
-  public void setObjects(final List<? extends Object> objects) {
+  public void setObjects(final Collection<? extends T> objects) {
     this.objects.clear();
     if (objects != null) {
       this.objects.addAll(objects);

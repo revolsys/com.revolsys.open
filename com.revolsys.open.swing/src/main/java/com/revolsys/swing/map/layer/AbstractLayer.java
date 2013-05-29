@@ -6,7 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,12 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.Field;
+import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -38,6 +43,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addMenuItemTitleIcon("layer", "Layer Properties", "information",
       LayerUtil.class, "showProperties");
   }
+
+  protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
+    this);
 
   private boolean editable = false;
 
@@ -83,6 +91,20 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     setProperties(properties);
   }
 
+  public ValueField<Layer> addPropertiesTabGeneral(
+    final TabbedValuePanel<Layer> tabPanel) {
+    final ValueField<Layer> panel = new ValueField<Layer>(this);
+    tabPanel.addTab("General", panel);
+
+    final JComponent nameField = SwingUtil.addField(panel, this, "name");
+    if (nameField instanceof Field) {
+      nameField.addPropertyChangeListener("name", beanPropertyListener);
+    }
+
+    GroupLayoutUtil.makeColumns(panel, 2);
+    return panel;
+  }
+
   @Override
   public void addPropertyChangeListener(final PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(listener);
@@ -97,6 +119,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public int compareTo(final Layer layer) {
     return getName().compareTo(layer.getName());
+  }
+
+  @Override
+  public TabbedValuePanel<Layer> createPropertiesPanel() {
+    final TabbedValuePanel<Layer> tabPanel = new TabbedValuePanel<Layer>(
+      "Layer " + this + " Properties", this);
+    addPropertiesTabGeneral(tabPanel);
+    return tabPanel;
   }
 
   @Override
@@ -135,20 +165,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public long getId() {
     return id;
-  }
-
-  @Override
-  public TabbedValuePanel<Layer> createPropertiesPanel() {
-    TabbedValuePanel<Layer> tabPanel = new TabbedValuePanel<Layer>("Layer "
-      + this + " Properties", this);
-    createPropertiesTabGeneral(tabPanel);
-    return tabPanel;
-  }
-
-  public JPanel createPropertiesTabGeneral(TabbedValuePanel<Layer> tabPanel) {
-    JPanel panel = new JPanel();
-    tabPanel.addTab("General", panel);
-    return panel;
   }
 
   @Override

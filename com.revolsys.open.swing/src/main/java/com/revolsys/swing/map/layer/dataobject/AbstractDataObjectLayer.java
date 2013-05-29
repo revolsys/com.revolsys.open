@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +39,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -91,8 +93,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
       "table_row_insert", canAdd, "addNewRecord"));
 
-    menu.addMenuItem("layer", 0, "Layer Style", "palette",
-      LayerUtil.class, "showProperties", "Style");
+    menu.addMenuItem("layer", 0, "Layer Style", "palette", LayerUtil.class,
+      "showProperties", "Style");
 
   }
 
