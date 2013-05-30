@@ -2,24 +2,25 @@ package com.revolsys.swing.map.form;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
-public class GeometryCoordinatesPanel extends JPanel implements
+public class GeometryCoordinatesPanel extends ValueField<Geometry> implements
   TableModelListener {
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
 
   private final BaseJxTable table;
 
-  public GeometryCoordinatesPanel() {
-    super(new BorderLayout());
+  public GeometryCoordinatesPanel(String fieldName) {
+    super(fieldName, null);
+    setLayout(new BorderLayout());
 
     model.addTableModelListener(this);
     table = new BaseJxTable(model);
@@ -30,7 +31,7 @@ public class GeometryCoordinatesPanel extends JPanel implements
   }
 
   public Geometry getGeometry() {
-    return model.getGeometry();
+    return getFieldValue();
   }
 
   public BaseJxTable getTable() {
@@ -38,6 +39,7 @@ public class GeometryCoordinatesPanel extends JPanel implements
   }
 
   public void setGeometry(final Geometry geometry) {
+    setFieldValue(geometry);
     model.setGeometry(geometry);
   }
 

@@ -55,6 +55,9 @@ public final class ArcSdeConstants {
     DATA_TYPE_MAP.put(POINT, DataTypes.POINT);
     DATA_TYPE_MAP.put(LINESTRING, DataTypes.LINE_STRING);
     DATA_TYPE_MAP.put(POLYGON, DataTypes.POLYGON);
+    DATA_TYPE_MAP.put(MULTI_POINT, DataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(MULTI_LINESTRING, DataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(MULTI_POLYGON, DataTypes.MULTI_POLYGON);
   }
 
   public static DataType getGeometryDataType(

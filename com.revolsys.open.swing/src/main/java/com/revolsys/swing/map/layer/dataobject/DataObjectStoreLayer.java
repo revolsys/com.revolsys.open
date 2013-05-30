@@ -69,6 +69,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  public DataObject getObjectById(Object id) {
+    return getDataStore().load(getTypePath(), id);
+  }
+
+  @Override
   public void addEditingObject(final DataObject object) {
     final DataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {

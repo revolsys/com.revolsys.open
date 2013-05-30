@@ -26,13 +26,13 @@ public interface DataObjectLayer extends Layer {
 
   DataObject createObject();
 
+  Component createTablePanel();
+
   void deleteObjects(Collection<? extends DataObject> objects);
 
   void deleteObjects(DataObject... object);
 
   int getChangeCount();
-
-  Component createTablePanel();
 
   List<DataObject> getChanges();
 
@@ -49,6 +49,8 @@ public interface DataObjectLayer extends Layer {
   List<DataObject> getNewObjects();
 
   DataObject getObject(int row);
+
+  DataObject getObjectById(Object id);
 
   List<DataObject> getObjects();
 
@@ -99,7 +101,11 @@ public interface DataObjectLayer extends Layer {
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
+  void showForm(final DataObject object);
+
   void unselectObjects(Collection<? extends DataObject> objects);
 
   void unselectObjects(DataObject... objects);
+
+  boolean isEditing(DataObject object);
 }

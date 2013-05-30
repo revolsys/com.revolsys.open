@@ -2,17 +2,22 @@ package com.revolsys.swing.map.layer.dataobject;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,6 +25,11 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -39,8 +49,9 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.listener.InvokeMethodListener;
-import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.form.DataObjectForm;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -98,43 +109,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   }
 
+  
+  @Override
+  public DataObject getObjectById(Object id) {
+    return null;
+  }
+
   public static void actionCompleteAddNewRecord(
     final EditGeometryOverlay overlay) {
     synchronized (overlay) {
       final DataObjectLayer layer = overlay.getLayer();
       final DataObject object = overlay.getObject();
       if (object != null) {
-        LayerUtil.showForm(layer, object);
+        layer.showForm(object);
       }
-    }
-  }
-
-  @Override
-  public TabbedValuePanel<Layer> createPropertiesPanel() {
-    TabbedValuePanel<Layer> propertiesPanel = super.createPropertiesPanel();
-
-    DataObjectMetaData metaData = getMetaData();
-    BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
-
-    JPanel fieldPanel = new JPanel(new BorderLayout());
-    JScrollPane fieldScroll = new JScrollPane(fieldTable);
-    fieldPanel.add(fieldScroll, BorderLayout.CENTER);
-    propertiesPanel.addTab("Fields", fieldPanel);
-
-    LayerRenderer<? extends Layer> renderer = getRenderer();
-    ValueField<?> stylePanel = renderer.createStylePanel();
-    if (stylePanel != null) {
-      propertiesPanel.addTab(stylePanel);
-    }
-    return propertiesPanel;
-  }
-
-  public Component createTablePanel() {
-    final JTable table = DataObjectLayerTableModel.createTable(this);
-    if (table == null) {
-      return null;
-    } else {
-      return new DataObjectLayerTablePanel(this, table);
     }
   }
 
@@ -161,6 +149,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected Query query;
 
   private final Object editSync = new Object();
+
+  public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  private final Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
 
   public AbstractDataObjectLayer() {
     this("");
@@ -203,7 +195,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (geometryAttribute == null) {
       final DataObject object = this.createObject();
       if (object != null) {
-        LayerUtil.showForm(this, object);
+        showForm(object);
       }
     } else {
       final MapPanel map = MapPanel.get(this);
@@ -274,6 +266,29 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  public JComponent createForm(final DataObject object) {
+    final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
+    if (StringUtils.hasText(formFactoryExpression)) {
+      try {
+        SpelExpressionParser parser = new SpelExpressionParser();
+        Expression expression = parser.parseExpression(formFactoryExpression);
+        EvaluationContext context = new StandardEvaluationContext(this);
+        context.setVariable("object", object);
+        return expression.getValue(context, JComponent.class);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to create form for " + this, e);
+        return null;
+      }
+    } else {
+      return createDefaultForm(object);
+    }
+  }
+
+  protected DataObjectLayerForm createDefaultForm(DataObject object) {
+    return new DataObjectLayerForm(this, object);
+  }
+
   @Override
   public DataObject createObject() {
     if (!isReadOnly() && isEditable() && isCanAddObjects()) {
@@ -282,6 +297,45 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       return object;
     } else {
       return null;
+    }
+  }
+
+  @Override
+  public TabbedValuePanel<Layer> createPropertiesPanel() {
+    final TabbedValuePanel<Layer> propertiesPanel = super.createPropertiesPanel();
+
+    final DataObjectMetaData metaData = getMetaData();
+    final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
+
+    final JPanel fieldPanel = new JPanel(new BorderLayout());
+    final JScrollPane fieldScroll = new JScrollPane(fieldTable);
+    fieldPanel.add(fieldScroll, BorderLayout.CENTER);
+    propertiesPanel.addTab("Fields", fieldPanel);
+
+    final LayerRenderer<? extends Layer> renderer = getRenderer();
+    final ValueField<?> stylePanel = renderer.createStylePanel();
+    if (stylePanel != null) {
+      propertiesPanel.addTab(stylePanel);
+    }
+    return propertiesPanel;
+  }
+
+  @Override
+  public Component createTablePanel() {
+    final JTable table = DataObjectLayerTableModel.createTable(this);
+    if (table == null) {
+      return null;
+    } else {
+      return new DataObjectLayerTablePanel(this, table);
+    }
+  }
+
+  @Override
+  public void delete() {
+    super.delete();
+    final Window window = forms.remove(this);
+    if (window != null) {
+      window.setVisible(false);
     }
   }
 
@@ -746,6 +800,49 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       selectedObjects.removeAll(objects);
     }
     return objects.size();
+  }
+
+  @Override
+  public void showForm(final DataObject object) {
+    if (object != null) {
+      synchronized (forms) {
+        Window window = forms.get(object);
+        if (window == null) {
+          final Object id = object.getIdValue();
+          final Component form = createForm(object);
+          if (form == null) {
+            return;
+          } else {
+            String title;
+            if (object.getState() == DataObjectState.New) {
+              title = "Add NEW " + getName();
+            } else if (isCanEditObjects()) {
+              title = "Edit " + getName() + " #" + id;
+            } else {
+              title = "View " + getName() + " #" + id;
+              if (form instanceof DataObjectForm) {
+                final DataObjectForm dataObjectForm = (DataObjectForm)form;
+                dataObjectForm.setEditable(false);
+              }
+            }
+            window = new JFrame(title);
+            window.add(new JScrollPane(form));
+            window.pack();
+            window.setLocation(50, 50);
+            // TODO smart location
+            window.setVisible(true);
+            forms.put(object, window);
+            window.addWindowListener(new WindowAdapter() {
+              @Override
+              public void windowClosing(final WindowEvent e) {
+                forms.remove(object);
+              }
+            });
+          }
+        }
+        window.requestFocus();
+      }
+    }
   }
 
   @Override

@@ -2,17 +2,13 @@ package com.revolsys.swing.map.util;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
@@ -26,20 +22,18 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.form.DataObjectForm;
-import com.revolsys.swing.map.form.DataObjectLayerFormFactory;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -62,8 +56,6 @@ import com.revolsys.swing.tree.ObjectTree;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class LayerUtil {
-
-  private static Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
 
   private static final Map<String, LayerFactory<?>> LAYER_FACTORIES = new HashMap<String, LayerFactory<?>>();
 
@@ -123,10 +115,7 @@ public class LayerUtil {
       }
     }
     // TODO all this should be done by listeners
-    final Window window = forms.remove(layer);
-    if (window != null) {
-      window.setVisible(false);
-    }
+
     final DefaultSingleCDockable dockable = layer.getProperty("TableView");
     if (dockable != null) {
       dockable.setVisible(false);
@@ -268,48 +257,8 @@ public class LayerUtil {
     }
   }
 
-  public static void showForm(final DataObjectLayer layer,
-    final DataObject object) {
-    synchronized (forms) {
-      Window window = forms.get(object);
-      if (window == null) {
-        final Project project = layer.getProject();
-        if (project == null || object == null) {
-          return;
-        } else {
-          final Object id = object.getIdValue();
-          final Component form = DataObjectLayerFormFactory.createFormComponent(
-            layer, object);
-          String title;
-          if (object.getState() == DataObjectState.New) {
-            title = "Add NEW " + layer.getName();
-          } else if (layer.isCanEditObjects()) {
-            title = "Edit " + layer.getName() + " #" + id;
-          } else {
-            title = "View " + layer.getName() + " #" + id;
-            if (form instanceof DataObjectForm) {
-              final DataObjectForm dataObjectForm = (DataObjectForm)form;
-              dataObjectForm.setEditable(false);
-            }
-          }
-          window = new JFrame(title);
-          window.add(new JScrollPane(form));
-          window.pack();
-          window.setLocation(50, 50);
-          // TODO smart location
-          window.setVisible(true);
-          forms.put(object, window);
-          window.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent e) {
-              forms.remove(object);
-            }
-          });
-        }
-      }
-      window.requestFocus();
-    }
-
+  public void showForm(final DataObjectLayer layer, final DataObject object) {
+    layer.showForm(object);
   }
 
   public static void showProperties() {
@@ -330,7 +279,7 @@ public class LayerUtil {
     if (layer != null) {
       final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
       final TabbedValuePanel<Layer> panel = layer.createPropertiesPanel();
-         panel.setSelectdTab(tabName);
+      panel.setSelectdTab(tabName);
       panel.showDialog(window);
     }
   }
@@ -415,11 +364,11 @@ public class LayerUtil {
     if (layer != null) {
       final Project project = layer.getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
+       BoundingBox boundingBox = BoundingBox.getBoundingBox(
         geometryFactory, object)
         .expandPercent(0.1)
         .clipToCoordinateSystem();
-
+    
       project.setViewBoundingBox(boundingBox);
     }
   }

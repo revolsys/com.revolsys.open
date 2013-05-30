@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer;
 import java.lang.ref.WeakReference;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 
 public class Project extends LayerGroup {
@@ -68,10 +69,23 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void setViewBoundingBox(final BoundingBox viewBoundingBox) {
+  public void setViewBoundingBox( BoundingBox viewBoundingBox) {
     if (!viewBoundingBox.isNull()) {
       final BoundingBox oldValue = this.viewBoundingBox;
-
+      if (viewBoundingBox.getWidth() == 0) {
+        if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+          viewBoundingBox=    viewBoundingBox.expand(0.000009 * 100, 0);
+        } else {
+          viewBoundingBox= viewBoundingBox.expand(100, 0);
+        }
+      }
+      if (viewBoundingBox.getHeight() == 0) {
+        if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+          viewBoundingBox=  viewBoundingBox.expand(0,0.000009 * 100);
+        } else {
+          viewBoundingBox=  viewBoundingBox.expand(0,100);
+        }
+      }
       this.viewBoundingBox = viewBoundingBox;
       getPropertyChangeSupport().firePropertyChange("viewBoundingBox",
         oldValue, viewBoundingBox);

@@ -177,7 +177,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         for (final DataObject object : getSelectedObjects(dataObjectLayer)) {
-          if (object != null && dataObjectLayer.isVisible(object)) {
+          if (object != null && dataObjectLayer.isVisible(object) && !dataObjectLayer.isEditing(object)) {
             final Geometry geometry = object.getGeometryValue();
             MarkerStyleRenderer.renderMarkerVertices(getViewport(), graphics2d,
               geometry, vertexStyle);

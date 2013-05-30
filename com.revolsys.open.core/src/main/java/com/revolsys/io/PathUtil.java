@@ -1,5 +1,9 @@
 package com.revolsys.io;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.util.StringUtils;
 
 public final class PathUtil {
@@ -35,6 +39,14 @@ public final class PathUtil {
       } else {
         return path.substring(0, index + 1);
       }
+    }
+  }
+
+  public static List<String> getPathElements(String path) {
+    if (path == null) {
+      return Collections.emptyList();
+    } else {
+      return Arrays.asList(path.replaceAll("^/*","").split("/+"));
     }
   }
 

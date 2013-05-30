@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.form;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
@@ -19,6 +20,11 @@ public class DataObjectLayerForm extends DataObjectForm {
       addTabGeometry();
     }
     // TODO mark the object as attribute editing
+  }
+
+  public DataObjectLayerForm(DataObjectLayer layer, DataObject object) {
+    this(layer);
+    setObject(object);
   }
 
   public DataObjectLayer getLayer() {

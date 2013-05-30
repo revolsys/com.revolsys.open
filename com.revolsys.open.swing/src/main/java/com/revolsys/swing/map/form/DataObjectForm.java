@@ -27,7 +27,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
-import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -363,10 +362,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   protected void addTabGeometry() {
-    if (geometryCoordinatesPanel == null
-      && metaData.getGeometryAttributeIndex() != -1) {
-      geometryCoordinatesPanel = new GeometryCoordinatesPanel();
-
+    String geometryAttributeName = metaData.getGeometryAttributeName();
+    if (geometryCoordinatesPanel == null && geometryAttributeName != null) {
+      geometryCoordinatesPanel = new GeometryCoordinatesPanel(
+        geometryAttributeName);
+      addField(geometryAttributeName, geometryCoordinatesPanel);
       final JPanel panel = new JPanel(new GridLayout(1, 1));
 
       geometryCoordinatesPanel.setBorder(BorderFactory.createTitledBorder("Coordinates"));
@@ -782,6 +782,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
       component.setForeground(textColor);
       component.setBackground(textBackgroundColor);
     }
+
     fieldValidMap.put(fieldName, true);
     fieldInValidMessage.remove(field);
   }
@@ -874,13 +875,17 @@ public class DataObjectForm extends JPanel implements FocusListener,
     if (index != -1) {
       final String title = tabs.getTitleAt(index);
       tabValid.put(title, valid);
-      if (valid == Boolean.TRUE) {
-        tabs.setForegroundAt(index, null);
-        tabs.setBackgroundAt(index, null);
-      } else {
-        tabs.setForegroundAt(index, Color.RED);
-        tabs.setBackgroundAt(index, Color.PINK);
-      }
+      setTabValid(index, valid);
+    }
+  }
+
+  protected void setTabValid(final int index, final boolean valid) {
+    if (valid == Boolean.TRUE) {
+      tabs.setForegroundAt(index, null);
+      tabs.setBackgroundAt(index, null);
+    } else {
+      tabs.setForegroundAt(index, Color.RED);
+      tabs.setBackgroundAt(index, Color.PINK);
     }
   }
 

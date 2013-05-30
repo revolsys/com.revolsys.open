@@ -13,7 +13,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
@@ -35,7 +34,7 @@ public class DataObjectLayerTablePanel extends TablePanel {
     super(table);
     this.layer = layer;
     final DataObjectLayerTableModel tableModel = getTableModel();
-  final MenuFactory menu = getMenu();
+    final MenuFactory menu = getMenu();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
     if (hasGeometry) {
@@ -54,40 +53,41 @@ public class DataObjectLayerTablePanel extends TablePanel {
     final ToolBar toolBar = getToolBar();
 
     toolBar.addComponent("count", new TableRowCount(tableModel));
-    
+
     final ObjectPropertyEnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canAddObjects");
     toolBar.addButton("record", "Add New Record", "table_row_insert",
       canAddObjectsEnableCheck, layer, "addNewRecord");
 
     // Filter buttons
-  
+
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
-      FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter",
-      tableModel, "setAttributeFilterMode", DataObjectLayerTableModel.MODE_ALL);
+      FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter", tableModel,
+      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
     final ObjectPropertyEnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
-    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
-      "Show Only Changed Records", "change_table_filter", editableEnableCheck,
-      tableModel, "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
+    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
+      "change_table_filter", editableEnableCheck, tableModel,
+      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
 
     final ObjectPropertyEnableCheck selectableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "selectionCount", 0, true);
-    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
-      "Show Only Selected Records", "filter_selected", selectableEnableCheck,
-      tableModel, "setAttributeFilterMode", DataObjectLayerTableModel.MODE_SELECTED);
+    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Selected Records",
+      "filter_selected", selectableEnableCheck, tableModel,
+      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
 
       final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(
-        FILTER_GEOMETRY, -1, "Show All Records ", "world_filter",
-        tableModel, "setFilterByBoundingBox", false);
+        FILTER_GEOMETRY, -1, "Show All Records ", "world_filter", tableModel,
+        "setFilterByBoundingBox", false);
       showAllGeometries.doClick();
 
       toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
-        "Show Records on Map", "map_filter", tableModel, "setFilterByBoundingBox", true);
+        "Show Records on Map", "map_filter", tableModel,
+        "setFilterByBoundingBox", true);
     }
   }
 
@@ -98,7 +98,7 @@ public class DataObjectLayerTablePanel extends TablePanel {
 
   public void editRecord() {
     final DataObject object = getEventRowObject();
-    LayerUtil.showForm(layer, object);
+    layer.showForm(object);
   }
 
   protected DataObject getEventRowObject() {

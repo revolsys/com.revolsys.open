@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -274,6 +275,16 @@ public class SwingUtil {
       return null;
     }
 
+  }
+
+  public static int getTabIndex(final JTabbedPane tabs, final String title) {
+    for (int i = 0; i < tabs.getTabCount(); i++) {
+      if (tabs.getTitleAt(i).equals(title)) {
+        return i;
+      }
+
+    }
+    return -1;
   }
 
   @SuppressWarnings({
