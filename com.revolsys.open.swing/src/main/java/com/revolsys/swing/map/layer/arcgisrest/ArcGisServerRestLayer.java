@@ -15,7 +15,6 @@ import com.revolsys.io.esri.map.rest.map.TileInfo;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.map.layer.Project;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   public static ArcGisServerRestLayer create(
@@ -54,11 +53,12 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public List<MapTile> getOverlappingEnvelopes(final Viewport2D viewport) {
+  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
+      double resolution = getResolution(viewport);
       final BoundingBox viewBoundingBox = viewport.getBoundingBox();
       final BoundingBox maxBoundingBox = getBoundingBox();
       final BoundingBox boundingBox = viewBoundingBox.convert(geometryFactory)
@@ -76,13 +76,15 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          tiles.add(new ArcGisServerRestMapTile(mapServer, zoomLevel, tileX,
-            tileY));
+          ArcGisServerRestMapTile tile = new ArcGisServerRestMapTile(mapServer,
+            zoomLevel, resolution, tileX, tileY);
+          tiles.add(tile);
         }
       }
 
-    } catch (final OutOfMemoryError e) {
-      LoggerFactory.getLogger(getClass()).error("Out of memory", e);
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Error getting tile envelopes",
+        e);
     }
     return tiles;
   }
@@ -94,6 +96,13 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     } else {
       return true;
     }
+  }
+
+  @Override
+  public double getResolution(Viewport2D viewport) {
+    final double metresPerPixel = viewport.getMetresPerPixel();
+    final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
+    return mapServer.getResolution(zoomLevel);
   }
 
 }

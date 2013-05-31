@@ -62,6 +62,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.field.NumberTextField;
+import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.util.LayerUtil;
@@ -153,6 +154,14 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void actionZoomToObject() {
     LayerUtil.zoomToObject(getObject());
+  }
+
+  protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
+    final DataObjectStore dataStore = getDataStore();
+    final CodeTable codeTable = dataStore.getCodeTableByColumn(fieldName);
+    final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
+    addField(fieldName, field);
+    return field;
   }
 
   protected void addDoubleField(final String fieldName, final int length,
@@ -362,7 +371,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   protected void addTabGeometry() {
-    String geometryAttributeName = metaData.getGeometryAttributeName();
+    final String geometryAttributeName = metaData.getGeometryAttributeName();
     if (geometryCoordinatesPanel == null && geometryAttributeName != null) {
       geometryCoordinatesPanel = new GeometryCoordinatesPanel(
         geometryAttributeName);
@@ -585,6 +594,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
   public Map<String, Object> getFieldValues() {
     final Map<String, Object> values = new LinkedHashMap<String, Object>();
     for (final String name : fields.keySet()) {
+      if (name.equals("INTEGRATION_ACTION_CODE")) {
+        System.out.println();
+      }
       final Object value = getFieldValue(name);
       values.put(name, value);
     }
@@ -698,7 +710,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   protected void postValidate() {
-
+    if (allAttributes != null) {
+      allAttributes.setValues(getFieldValues());
+    }
   }
 
   public void reverseAttributes() {
@@ -817,9 +831,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
       validateFields();
     }
-    if (allAttributes != null) {
-      allAttributes.setValues(getFieldValues());
-    }
   }
 
   public void setMetaData(final DataObjectMetaData metaData) {
@@ -863,6 +874,16 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
+  protected void setTabValid(final int index, final boolean valid) {
+    if (valid == Boolean.TRUE) {
+      tabs.setForegroundAt(index, null);
+      tabs.setBackgroundAt(index, null);
+    } else {
+      tabs.setForegroundAt(index, Color.RED);
+      tabs.setBackgroundAt(index, Color.PINK);
+    }
+  }
+
   protected void setTabValid(final String fieldName, final boolean valid) {
     final JComponent field = getField(fieldName);
     Component panel = field;
@@ -876,16 +897,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
       final String title = tabs.getTitleAt(index);
       tabValid.put(title, valid);
       setTabValid(index, valid);
-    }
-  }
-
-  protected void setTabValid(final int index, final boolean valid) {
-    if (valid == Boolean.TRUE) {
-      tabs.setForegroundAt(index, null);
-      tabs.setBackgroundAt(index, null);
-    } else {
-      tabs.setForegroundAt(index, Color.RED);
-      tabs.setBackgroundAt(index, Color.PINK);
     }
   }
 
@@ -909,7 +920,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
         geometryCoordinatesPanel.setGeometry(geometry);
       }
     }
-
     validateFields();
   }
 
@@ -954,36 +964,41 @@ public class DataObjectForm extends JPanel implements FocusListener,
   @SuppressWarnings("rawtypes")
   protected void validateFields() {
     if (isFieldValidationEnabled()) {
-      setTabsValid();
-      fieldsValid = true;
-      for (final String fieldName : fields.keySet()) {
-        setFieldValid(fieldName);
-      }
-      for (final Entry<String, JComponent> entry : fields.entrySet()) {
-        final String fieldName = entry.getKey();
-        final JComponent field = entry.getValue();
-        if (field instanceof ValidatingField) {
-          final ValidatingField validatingField = (ValidatingField)field;
-          if (!validatingField.isFieldValid()) {
-            final String message = validatingField.getFieldValidationMessage();
-            setFieldInvalid(fieldName, message);
+      setFieldValidationEnabled(false);
+      try {
+        setTabsValid();
+        fieldsValid = true;
+        for (final String fieldName : fields.keySet()) {
+          setFieldValid(fieldName);
+        }
+        for (final Entry<String, JComponent> entry : fields.entrySet()) {
+          final String fieldName = entry.getKey();
+          final JComponent field = entry.getValue();
+          if (field instanceof ValidatingField) {
+            final ValidatingField validatingField = (ValidatingField)field;
+            if (!validatingField.isFieldValid()) {
+              final String message = validatingField.getFieldValidationMessage();
+              setFieldInvalid(fieldName, message);
+            }
           }
         }
-      }
-      for (final String fieldName : getRequiredFieldNames()) {
-        final Object value = getFieldValue(fieldName);
-        if (value == null) {
-          setFieldInvalid(fieldName, "Required");
-        } else if (value instanceof String) {
-          final String string = (String)value;
-          if (!StringUtils.hasText(string)) {
+        for (final String fieldName : getRequiredFieldNames()) {
+          final Object value = getFieldValue(fieldName);
+          if (value == null) {
             setFieldInvalid(fieldName, "Required");
+          } else if (value instanceof String) {
+            final String string = (String)value;
+            if (!StringUtils.hasText(string)) {
+              setFieldInvalid(fieldName, "Required");
+            }
           }
         }
+        updateTabsValid();
+        postValidate();
+      } finally {
+        setFieldValidationEnabled(true);
       }
-      postValidate();
     }
-    updateTabsValid();
   }
 
 }

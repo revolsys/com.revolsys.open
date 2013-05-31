@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.swing.SwingWorker;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -66,11 +67,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this(dataStore);
     setMetaData(dataStore.getMetaData(typePath));
     setTypePath(typePath);
-  }
-
-  @Override
-  public DataObject getObjectById(Object id) {
-    return getDataStore().load(getTypePath(), id);
   }
 
   @Override
@@ -175,14 +171,35 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  protected DataObject getCacheObject(final Object id) {
+    synchronized (cachedObjects) {
+      if (id == null) {
+        return null;
+      } else {
+        DataObject object = cachedObjects.get(id);
+        if (object == null) {
+          object = getObjectById(id);
+          if (object != null) {
+            cachedObjects.put(id, object);
+          }
+        }
+        return object;
+      }
+    }
+  }
+
   private DataObject getCacheObject(final Object id, final DataObject object) {
     if (object != null && isLayerObject(object)) {
-      synchronized (cachedObjects) {
-        if (cachedObjects.containsKey(id)) {
-          return cachedObjects.get(id);
-        } else {
-          cachedObjects.put(id, object);
-          return object;
+      if (object.getState() == DataObjectState.New) {
+        return object;
+      } else {
+        synchronized (cachedObjects) {
+          if (cachedObjects.containsKey(id)) {
+            return cachedObjects.get(id);
+          } else {
+            cachedObjects.put(id, object);
+            return object;
+          }
         }
       }
     } else {
@@ -229,6 +246,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public DataObjectMetaData getMetaData() {
     return dataStore.getMetaData(typePath);
+  }
+
+  @Override
+  public DataObject getObjectById(final Object id) {
+    final DataObjectMetaData metaData = getMetaData();
+    final String idAttributeName = metaData.getIdAttributeName();
+    if (idAttributeName == null) {
+      LoggerFactory.getLogger(getClass()).error(
+        typePath + " does not have a primary key");
+      return null;
+    } else {
+      final Map<String, ? extends Object> filter = Collections.singletonMap(
+        idAttributeName, id);
+      final Query query = new Query(typePath);
+      query.setFilter(filter);
+      query.setProperty("dataObjectFactory", this);
+      final DataObjectStore dataStore = getDataStore();
+      return dataStore.queryFirst(query);
+    }
+
   }
 
   protected List<DataObject> getObjects(final BoundingBox boundingBox) {
@@ -295,6 +332,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
     return false;
+  }
+
+  public List<DataObject> query(final Map<String, ? extends Object> filter) {
+    final Query query = new Query(getMetaData());
+    query.setFilter(filter);
+    return query(query);
   }
 
   @Override

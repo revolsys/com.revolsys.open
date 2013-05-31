@@ -18,18 +18,18 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
 
-  private OpenStreetMapClient client;
+  private final OpenStreetMapClient client;
 
   public OpenStreetMapLayer() {
     this(new OpenStreetMapClient());
   }
 
-  public OpenStreetMapLayer(final String serverUrl) {
-    this(new OpenStreetMapClient(serverUrl));
+  public OpenStreetMapLayer(final OpenStreetMapClient client) {
+    this.client = client;
   }
 
-  public OpenStreetMapLayer(OpenStreetMapClient client) {
-    this.client = client;
+  public OpenStreetMapLayer(final String serverUrl) {
+    this(new OpenStreetMapClient(serverUrl));
   }
 
   @Override
@@ -42,11 +42,12 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public List<MapTile> getOverlappingEnvelopes(final Viewport2D viewport) {
+  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
+      double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
         .convert(GEOMETRY_FACTORY)
         .intersection(MAX_BOUNDING_BOX);
@@ -63,14 +64,24 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          tiles.add(new OpenStreetMapTile(this, zoomLevel, tileX, tileY));
+          OpenStreetMapTile tile = new OpenStreetMapTile(this, zoomLevel,
+            resolution, tileX, tileY);
+          tiles.add(tile);
         }
       }
 
-    } catch (final OutOfMemoryError e) {
-      LoggerFactory.getLogger(getClass()).error("Out of memory", e);
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Error getting tile envelopes",
+        e);
     }
     return tiles;
+  }
+
+  @Override
+  public double getResolution(final Viewport2D viewport) {
+    final double metresPerPixel = viewport.getMetresPerPixel();
+    final int zoomLevel = client.getZoomLevel(metresPerPixel);
+    return client.getResolution(zoomLevel);
   }
 
   @Override

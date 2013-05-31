@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +19,7 @@ import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.ProjectionImageFilter;
 
 public class GeoReferencedImage {
 
@@ -39,8 +39,15 @@ public class GeoReferencedImage {
   }
 
   public GeoReferencedImage(final BoundingBox boundingBox,
+    final BufferedImage image) {
+    this(boundingBox, image.getWidth(), image.getHeight());
+    setImage(image);
+  }
+
+  public GeoReferencedImage(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
     this.boundingBox = boundingBox;
+    this.geometryFactory = boundingBox.getGeometryFactory();
     this.imageWidth = imageWidth;
     this.imageHeight = imageHeight;
   }
@@ -75,6 +82,22 @@ public class GeoReferencedImage {
 
   public BufferedImage getImage() {
     return image;
+  }
+
+  public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
+    final double resolution) {
+    final int imageSrid = getGeometryFactory().getSRID();
+    if (imageSrid > 0 && imageSrid != coordinateSystem.getId()) {
+      final BoundingBox boundingBox = getBoundingBox();
+      final ProjectionImageFilter filter = new ProjectionImageFilter(
+        boundingBox, coordinateSystem, resolution);
+
+      final BufferedImage newImage = filter.filter(getImage());
+
+      final BoundingBox destBoundingBox = filter.getDestBoundingBox();
+      return new GeoReferencedImage(destBoundingBox, newImage);
+    }
+    return this;
   }
 
   public double getImageAspectRatio() {

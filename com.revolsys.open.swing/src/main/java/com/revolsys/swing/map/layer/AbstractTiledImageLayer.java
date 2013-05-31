@@ -19,11 +19,12 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
     setRenderer(new TiledImageLayerRenderer(this));
   }
 
-  public abstract List<MapTile> getOverlappingEnvelopes(
+  public abstract List<MapTile> getOverlappingMapTiles(
     final Viewport2D viewport);
 
-  public TileLoaderProcess getTileLoaderProcess() {
-    return new TileLoaderProcess();
+  public TileLoaderProcess createTileLoaderProcess() {
+    return new TileLoaderProcess(this);
   }
 
+  public abstract double getResolution(final Viewport2D viewport);
 }

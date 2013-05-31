@@ -5,8 +5,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.bing.ImagerySet;
-import com.revolsys.gis.bing.MapLayer;
 import com.revolsys.swing.map.layer.AbstractLayerFactory;
 
 public class BingLayerFactory extends AbstractLayerFactory<BingLayer> {

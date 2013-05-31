@@ -4,7 +4,10 @@ import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -34,12 +37,45 @@ public class LayerDataObject extends ArrayDataObject {
     }
   }
 
+  @Override
+  public boolean isModified() {
+    return originalValues != null;
+  }
+
+  public boolean isModified(final int index) {
+    if (originalValues == null) {
+      return false;
+    } else {
+      final String attributeName = getMetaData().getAttributeName(index);
+      return isModified(attributeName);
+    }
+  }
+
   public boolean isModified(final String name) {
     if (originalValues == null) {
       return false;
     } else {
       return originalValues.containsKey(name);
     }
+  }
+
+  public boolean isValid(final int index) {
+    final DataObjectMetaData metaData = getMetaData();
+    final String name = metaData.getAttributeName(index);
+    return isValid(name);
+
+  }
+
+  public boolean isValid(final String name) {
+    final Attribute attribute = getMetaData().getAttribute(name);
+    if (attribute.isRequired()) {
+      final Object value = getValue(name);
+      if (value == null
+        || ((value instanceof String) && !StringUtils.hasText((String)value))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -90,6 +126,5 @@ public class LayerDataObject extends ArrayDataObject {
         layer.propertyChange(event);
       }
     }
-
   }
 }

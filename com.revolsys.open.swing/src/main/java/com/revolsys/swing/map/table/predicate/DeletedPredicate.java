@@ -41,7 +41,8 @@ public class DeletedPredicate implements HighlightPredicate {
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final DataObject object = model.getObject(adapter.row);
+    final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+    final DataObject object = model.getObject(rowIndex);
     final DataObjectLayer layer = model.getLayer();
     return layer.isDeleted(object);
   }

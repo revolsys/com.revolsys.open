@@ -13,7 +13,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
@@ -76,8 +75,8 @@ public class LayerRendererOverlay extends JComponent implements
         final BoundingBox boundingBox = viewport.getBoundingBox();
         final int viewWidthPixels = viewport.getViewWidthPixels();
         final int viewHeightPixels = viewport.getViewHeightPixels();
-        final GeoReferencedImage loadImage = new MapTile(boundingBox,
-          viewWidthPixels, viewHeightPixels);
+        final GeoReferencedImage loadImage = new GeoReferencedImage(
+          boundingBox, viewWidthPixels, viewHeightPixels);
         imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
         SwingWorkerManager.execute(imageWorker);
       }
@@ -88,8 +87,9 @@ public class LayerRendererOverlay extends JComponent implements
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
     if (!(e.getSource() instanceof MapPanel)) {
-      String propertyName = e.getPropertyName();
-      if (!propertyName.equals("selected") && !propertyName.equals("selectionCount")) {
+      final String propertyName = e.getPropertyName();
+      if (!propertyName.equals("selected")
+        && !propertyName.equals("selectionCount")) {
         redraw();
       }
     }

@@ -36,6 +36,16 @@ public class SpringExpresssionLanguageFilter implements Filter<DataObject> {
 
   @Override
   public boolean accept(final DataObject object) {
-    return expression.getValue(context, object, Boolean.class);
+    try {
+      final Boolean value = expression.getValue(context, object, Boolean.class);
+      return value;
+    } catch (final Throwable e) {
+      return false;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return expression.getExpressionString();
   }
 }

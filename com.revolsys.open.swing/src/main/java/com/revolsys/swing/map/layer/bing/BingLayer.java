@@ -3,13 +3,8 @@ package com.revolsys.swing.map.layer.bing;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JPanel;
-
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.bing.BingClient;
-import com.revolsys.gis.bing.ImagerySet;
-import com.revolsys.gis.bing.MapLayer;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
@@ -52,9 +47,11 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public ValueField<Layer> addPropertiesTabGeneral(TabbedValuePanel<Layer> tabPanel) {
+  public ValueField<Layer> addPropertiesTabGeneral(
+    TabbedValuePanel<Layer> tabPanel) {
     return super.addPropertiesTabGeneral(tabPanel);
   }
+
   public BingLayer(final ImagerySet imagerySet) {
     this(new BingClient(), imagerySet);
   }
@@ -84,12 +81,19 @@ public class BingLayer extends AbstractTiledImageLayer {
     return mapLayer;
   }
 
+  public double getResolution(final Viewport2D viewport) {
+    final double metresPerPixel = viewport.getMetresPerPixel();
+    final int zoomLevel = client.getZoomLevel(metresPerPixel);
+    return client.getResolution(zoomLevel);
+  }
+
   @Override
-  public List<MapTile> getOverlappingEnvelopes(final Viewport2D viewport) {
+  public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
+      double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
         .convert(GEOMETRY_FACTORY)
         .intersection(MAX_BOUNDING_BOX);
@@ -106,12 +110,15 @@ public class BingLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          tiles.add(new BingMapTile(this, zoomLevel, tileX, tileY));
+          BingMapTile tile = new BingMapTile(this, zoomLevel, resolution,
+            tileX, tileY);
+          tiles.add(tile);
         }
       }
 
-    } catch (final OutOfMemoryError e) {
-      LoggerFactory.getLogger(getClass()).error("Out of memory", e);
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Error getting tile envelopes",
+        e);
     }
     return tiles;
   }

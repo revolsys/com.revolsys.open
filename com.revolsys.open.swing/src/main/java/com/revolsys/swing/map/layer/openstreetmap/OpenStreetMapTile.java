@@ -8,15 +8,16 @@ public class OpenStreetMapTile extends MapTile {
 
   private final OpenStreetMapLayer layer;
 
-  private int zoomLevel;
+  private final int zoomLevel;
 
-  private int tileX;
+  private final int tileX;
 
-  private int tileY;
+  private final int tileY;
 
   public OpenStreetMapTile(final OpenStreetMapLayer layer, final int zoomLevel,
-    final int tileX, final int tileY) {
-    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
+    final double resolution, final int tileX, final int tileY) {
+    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256,
+      resolution);
     this.layer = layer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
@@ -40,11 +41,6 @@ public class OpenStreetMapTile extends MapTile {
     return false;
   }
 
-
-  public int getZoomLevel() {
-    return zoomLevel;
-  }
-
   public int getTileX() {
     return tileX;
   }
@@ -53,20 +49,24 @@ public class OpenStreetMapTile extends MapTile {
     return tileY;
   }
 
+  public int getZoomLevel() {
+    return zoomLevel;
+  }
+
   @Override
   public int hashCode() {
     return zoomLevel + tileX + tileY;
   }
 
   @Override
-  public BufferedImage loadImage() {
+  public BufferedImage loadBuffferedImage() {
     final OpenStreetMapClient client = layer.getClient();
-   final BufferedImage image = client.getMapImage(zoomLevel, tileX, tileY);
+    final BufferedImage image = client.getMapImage(zoomLevel, tileX, tileY);
     return image;
   }
 
   @Override
   public String toString() {
-    return layer + " " + zoomLevel +"/" + tileX + "/" + tileY;
+    return layer + " " + zoomLevel + "/" + tileX + "/" + tileY;
   }
 }

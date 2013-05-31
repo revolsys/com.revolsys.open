@@ -48,7 +48,8 @@ public class OpenStreetMapClient {
   }
 
   public double getLatitude(final int zoomLevel, final int tileY) {
-    double n = Math.PI - (2.0 * Math.PI * tileY) / Math.pow(2.0, zoomLevel);
+    final double n = Math.PI - (2.0 * Math.PI * tileY)
+      / Math.pow(2.0, zoomLevel);
     return Math.toDegrees(Math.atan(Math.sinh(n)));
   }
 
@@ -77,6 +78,10 @@ public class OpenStreetMapClient {
 
   public String getMapUrl(final int zoomLevel, final int tileX, final int tileY) {
     return serverUrl + zoomLevel + "/" + tileX + "/" + tileY + ".png";
+  }
+
+  public double getResolution(final int zoomLevel) {
+    return METRES_PER_PIXEL[zoomLevel];
   }
 
   public int getTileX(final int zoomLevel, final double longitude) {

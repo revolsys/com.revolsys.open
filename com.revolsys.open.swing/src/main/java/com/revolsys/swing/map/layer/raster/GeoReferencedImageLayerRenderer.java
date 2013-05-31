@@ -4,12 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.vividsolutions.jts.geom.Point;
 
 public class GeoReferencedImageLayerRenderer extends
@@ -33,7 +30,7 @@ public class GeoReferencedImageLayerRenderer extends
 
   public static void render(final Viewport2D viewport,
     final Graphics2D graphics, final GeoReferencedImage geoReferencedImage,
-    BufferedImage image, final BoundingBox boundingBox) {
+    final BufferedImage image, final BoundingBox boundingBox) {
     if (geoReferencedImage != null) {
       if (image != null) {
         final int imageWidth = geoReferencedImage.getImageWidth();
@@ -50,8 +47,10 @@ public class GeoReferencedImageLayerRenderer extends
               final double screenX = location[0];
               final double screenY = location[1];
               graphics.translate(screenX, screenY);
-              final double imageScreenWidth = Viewport2D.toDisplayValue(viewport,boundingBox.getWidthLength());
-              final double imageScreenHeight = Viewport2D.toDisplayValue(viewport,boundingBox.getHeightLength());
+              final double imageScreenWidth = Viewport2D.toDisplayValue(
+                viewport, boundingBox.getWidthLength());
+              final double imageScreenHeight = Viewport2D.toDisplayValue(
+                viewport, boundingBox.getHeightLength());
 
               final double xScaleFactor = imageScreenWidth / imageWidth;
               final double yScaleFactor = imageScreenHeight / imageHeight;

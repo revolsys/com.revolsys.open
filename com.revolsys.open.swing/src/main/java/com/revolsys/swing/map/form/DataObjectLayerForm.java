@@ -3,6 +3,7 @@ package com.revolsys.swing.map.form;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 @SuppressWarnings("serial")
 public class DataObjectLayerForm extends DataObjectForm {
@@ -22,12 +23,24 @@ public class DataObjectLayerForm extends DataObjectForm {
     // TODO mark the object as attribute editing
   }
 
-  public DataObjectLayerForm(DataObjectLayer layer, DataObject object) {
+  public DataObjectLayerForm(final DataObjectLayer layer,
+    final DataObject object) {
     this(layer);
     setObject(object);
   }
 
   public DataObjectLayer getLayer() {
     return layer;
+  }
+
+  @Override
+  public LayerDataObject getObject() {
+    return (LayerDataObject)super.getObject();
+  }
+
+  @Override
+  public <T> T getOriginalValue(final String fieldName) {
+    final LayerDataObject object = getObject();
+    return object.getOriginalValue(fieldName);
   }
 }

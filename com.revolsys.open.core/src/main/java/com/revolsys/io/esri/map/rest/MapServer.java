@@ -162,4 +162,16 @@ public class MapServer extends Service {
     }
     return previousLevel.getLevel();
   }
+
+  public double getResolution(final int zoomLevel) {
+    final TileInfo tileInfo = getTileInfo();
+    final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
+    for (final LevelOfDetail levelOfDetail : levelOfDetails) {
+      int level = levelOfDetail.getLevel();
+      if (level == zoomLevel) {
+        return levelOfDetail.getResolution();
+      }
+    }
+    return 0;
+  }
 }

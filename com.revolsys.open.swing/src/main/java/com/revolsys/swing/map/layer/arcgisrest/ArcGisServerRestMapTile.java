@@ -16,9 +16,11 @@ public class ArcGisServerRestMapTile extends MapTile {
   private final int tileY;
 
   public ArcGisServerRestMapTile(final MapServer mapServer,
-    final int zoomLevel, final int tileX, final int tileY) {
+    final int zoomLevel, final double resolution, final int tileX,
+    final int tileY) {
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY),
-      mapServer.getTileInfo().getWidth(), mapServer.getTileInfo().getHeight());
+      mapServer.getTileInfo().getWidth(), mapServer.getTileInfo().getHeight(),
+      resolution);
     this.mapServer = mapServer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
@@ -41,10 +43,8 @@ public class ArcGisServerRestMapTile extends MapTile {
     return zoomLevel;
   }
 
-  @Override
-  public BufferedImage loadImage() {
-    final BufferedImage image = mapServer.getTileImage(zoomLevel, tileX, tileY);
-    return image;
+  protected BufferedImage loadBuffferedImage() {
+    return mapServer.getTileImage(zoomLevel, tileX, tileY);
   }
 
   @Override

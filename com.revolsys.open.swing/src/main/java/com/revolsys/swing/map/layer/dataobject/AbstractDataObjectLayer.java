@@ -109,12 +109,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   }
 
-  
-  @Override
-  public DataObject getObjectById(Object id) {
-    return null;
-  }
-
   public static void actionCompleteAddNewRecord(
     final EditGeometryOverlay overlay) {
     synchronized (overlay) {
@@ -266,13 +260,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  protected DataObjectLayerForm createDefaultForm(final DataObject object) {
+    return new DataObjectLayerForm(this, object);
+  }
+
   public JComponent createForm(final DataObject object) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (StringUtils.hasText(formFactoryExpression)) {
       try {
-        SpelExpressionParser parser = new SpelExpressionParser();
-        Expression expression = parser.parseExpression(formFactoryExpression);
-        EvaluationContext context = new StandardEvaluationContext(this);
+        final SpelExpressionParser parser = new SpelExpressionParser();
+        final Expression expression = parser.parseExpression(formFactoryExpression);
+        final EvaluationContext context = new StandardEvaluationContext(this);
         context.setVariable("object", object);
         return expression.getValue(context, JComponent.class);
       } catch (final Throwable e) {
@@ -285,14 +283,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected DataObjectLayerForm createDefaultForm(DataObject object) {
-    return new DataObjectLayerForm(this, object);
-  }
-
   @Override
   public DataObject createObject() {
     if (!isReadOnly() && isEditable() && isCanAddObjects()) {
-      final DataObject object = new LayerDataObject(this);
+      final DataObject object = createDataObject(getMetaData());
       newObjects.add(object);
       return object;
     } else {
@@ -455,6 +449,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public DataObject getObjectById(final Object id) {
+    return null;
+  }
+
+  @Override
   public List<DataObject> getObjects() {
     throw new UnsupportedOperationException();
   }
@@ -531,6 +530,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return deletedObjects.contains(object);
   }
 
+  @Override
   public boolean isEditing(final DataObject object) {
     return editingObjects.contains(object);
   }

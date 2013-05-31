@@ -11,32 +11,23 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
 public class ObjectLabelField extends JLabel implements Field<Object> {
+  private static final long serialVersionUID = 1L;
 
   private Object fieldValue;
 
-  @SuppressWarnings("unchecked")
-  public <T> T getFieldValue() {
-    return (T)fieldValue;
-  }
-
   private final CodeTable codeTable;
 
-  private String fieldName;
-
-  @Override
-  public String getFieldName() {
-    return fieldName;
-  }
+  private final String fieldName;
 
   public ObjectLabelField() {
     this(null, null);
   }
 
-  public ObjectLabelField(String fieldName) {
+  public ObjectLabelField(final String fieldName) {
     this(fieldName, null);
   }
 
-  public ObjectLabelField(String fieldName, final CodeTable codeTable) {
+  public ObjectLabelField(final String fieldName, final CodeTable codeTable) {
     setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createBevelBorder(BevelBorder.LOWERED),
       BorderFactory.createEmptyBorder(2, 5, 2, 5)));
@@ -44,7 +35,20 @@ public class ObjectLabelField extends JLabel implements Field<Object> {
     this.codeTable = codeTable;
   }
 
-  public void setFieldValue(Object object) {
+  @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T getFieldValue() {
+    Object value = fieldValue;
+    return (T)value;
+  }
+
+  @Override
+  public void setFieldValue(final Object object) {
     this.fieldValue = object;
     String text;
     if (object == null) {
@@ -61,4 +65,5 @@ public class ObjectLabelField extends JLabel implements Field<Object> {
     }
     setText(text);
   }
+
 }

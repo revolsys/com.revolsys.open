@@ -1,37 +1,67 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.swing.SwingWorkerManager;
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.gis.cs.GeometryFactory;
 
-public class TileLoaderProcess extends SwingWorker<BufferedImage, Void> {
-  private Viewport2D viewport;
-
-  private TiledImageLayerRenderer renderer;
+public class TileLoaderProcess extends SwingWorker<Void, Void> {
+  private final TiledImageLayerRenderer renderer;
 
   private MapTile mapTile;
 
-  private double scale;
+  private boolean running = true;
+
+  private final AbstractTiledImageLayer layer;
+
+  private final Queue<MapTile> mapTiles = new LinkedList<MapTile>();
+
+  private GeometryFactory geometryFactory;
+
+  private double resolution = -1;
+
+  public TileLoaderProcess(final AbstractTiledImageLayer layer) {
+    this.layer = layer;
+    this.renderer = layer.getRenderer();
+  }
+
+  public synchronized boolean addMapTiles(final double resolution,
+    final GeometryFactory geometryFactory, final List<MapTile> mapTiles) {
+    if (running) {
+      if (this.resolution < 0 || resolution == this.resolution) {
+        if (this.geometryFactory == null
+          || this.geometryFactory == geometryFactory) {
+          this.mapTiles.addAll(mapTiles);
+          this.resolution = resolution;
+          this.geometryFactory = geometryFactory;
+        }
+      }
+    }
+    return running;
+  }
 
   @Override
-  protected BufferedImage doInBackground() throws Exception {
-    final MapTile mapTile = getMapTile();
-    try {
-      final BufferedImage image = mapTile.loadImage();
-      mapTile.setImage(image);
-      renderer.setLoaded(viewport, mapTile);
-      return image;
-    } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to load " + mapTile, e);
-      return null;
+  protected Void doInBackground() throws Exception {
+    do {
+      mapTile = getNextMapTile();
+      if (mapTile != null) {
+        try {
+          mapTile.loadImage(geometryFactory);
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Unable to load " + mapTile, e);
+        }
+      }
+    } while (!isCancelled() && mapTile != null);
+    if (!isCancelled()) {
+      renderer.setLoaded();
     }
+    return null;
   }
 
   @Override
@@ -39,38 +69,16 @@ public class TileLoaderProcess extends SwingWorker<BufferedImage, Void> {
 
   }
 
-  public Image execute(final Viewport2D viewport, final double scale,
-    final MapTile mapTile, final TiledImageLayerRenderer renderer) {
-    this.viewport = viewport;
-    this.scale = scale;
-    this.mapTile = mapTile;
-    this.renderer = renderer;
-    SwingWorkerManager.execute(this);
-    return null;
-  }
-
-  public BoundingBox getBoundingBox() {
-    return mapTile.getBoundingBox();
-  }
-
-  public MapTile getMapTile() {
+  private synchronized MapTile getNextMapTile() {
+    final MapTile mapTile = mapTiles.poll();
+    if (mapTile == null) {
+      running = false;
+    }
     return mapTile;
-  }
-
-  public TiledImageLayerRenderer getRenderer() {
-    return renderer;
-  }
-
-  public double getScale() {
-    return scale;
-  }
-
-  public Viewport2D getViewport() {
-    return viewport;
   }
 
   @Override
   public String toString() {
-    return "Loading map tile " + getMapTile();
+    return "Loading map tiles for " + this.layer;
   }
 }

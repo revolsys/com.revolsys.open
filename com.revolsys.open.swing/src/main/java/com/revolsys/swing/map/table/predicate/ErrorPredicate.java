@@ -1,25 +1,20 @@
 package com.revolsys.swing.map.table.predicate;
 
+import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
-import org.jdesktop.swingx.decorator.BorderHighlighter;
+import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
-public class NewPredicate implements HighlightPredicate {
-
-  private static final Border BORDER = BorderFactory.createLineBorder(
-    WebColors.Blue, 2);
+public class ErrorPredicate implements HighlightPredicate {
 
   public static void add(final DataObjectRowTable table) {
     final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
@@ -28,13 +23,14 @@ public class NewPredicate implements HighlightPredicate {
   }
 
   public static Highlighter getHighlighter(final DataObjectLayerTableModel model) {
-    final NewPredicate predicate = new NewPredicate(model);
-    return new BorderHighlighter(predicate, BORDER);
+    final ErrorPredicate predicate = new ErrorPredicate(model);
+    return new ColorHighlighter(predicate, ColorUtil.setAlpha(Color.RED, 64),
+      Color.RED, Color.RED, Color.YELLOW);
   }
 
   private final DataObjectLayerTableModel model;
 
-  public NewPredicate(final DataObjectLayerTableModel model) {
+  public ErrorPredicate(final DataObjectLayerTableModel model) {
     this.model = model;
   }
 
@@ -43,7 +39,13 @@ public class NewPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
     final DataObject object = model.getObject(rowIndex);
-    final DataObjectLayer layer = model.getLayer();
-    return layer.isNew(object);
+    if (object instanceof LayerDataObject) {
+      final LayerDataObject layerDataObject = (LayerDataObject)object;
+      final int columnIndex = adapter.convertRowIndexToModel(adapter.column);
+      if (!layerDataObject.isValid(columnIndex)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
