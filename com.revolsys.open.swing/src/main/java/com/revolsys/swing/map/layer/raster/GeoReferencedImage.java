@@ -19,7 +19,6 @@ import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.map.layer.ProjectionImageFilter;
 
 public class GeoReferencedImage {
 
@@ -35,8 +34,7 @@ public class GeoReferencedImage {
 
   private PlanarImage jaiImage;
 
-  public GeoReferencedImage() {
-  }
+  private Resource imageResource;
 
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
@@ -57,6 +55,7 @@ public class GeoReferencedImage {
     jaiImage = JAI.create("fileload", file.getAbsolutePath());
     setImage(jaiImage.getAsBufferedImage());
     loadImageMetaData(imageResource, jaiImage);
+    this.imageResource = imageResource;
   }
 
   @Override
@@ -161,23 +160,18 @@ public class GeoReferencedImage {
       worldFileExtension);
     if (worldFile.exists()) {
       try {
-        final BufferedReader reader = SpringUtil.getBufferedReader(resource);
+        final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
         try {
-          final double xPixelSize = Double.parseDouble(reader.readLine());
+          final double pixelWidth = Double.parseDouble(reader.readLine());
           final double yRotation = Double.parseDouble(reader.readLine());
           final double xRotation = Double.parseDouble(reader.readLine());
-          final double yPixelSize = Double.parseDouble(reader.readLine());
-          final double xCoordinate = Double.parseDouble(reader.readLine());
-          final double yCoordinate = Double.parseDouble(reader.readLine());
+          final double pixelHeight = Double.parseDouble(reader.readLine());
+          // Top left
+          final double x1 = Double.parseDouble(reader.readLine());
+          final double y1 = Double.parseDouble(reader.readLine());
 
-          final double[] transformationMatrix = {
-            xPixelSize, yRotation, xRotation, yPixelSize, xCoordinate,
-            yCoordinate
-          };
-          System.out.println(transformationMatrix);
-          // setTransformationMatrix(transformationMatrix);
-          // final BoundingBox boundingBox = new
-          // BoundingBox(getCoordinateSystem());
+          // TODO rotation
+          setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         } finally {
           reader.close();
         }
@@ -188,8 +182,28 @@ public class GeoReferencedImage {
     }
   }
 
+  public void revert() {
+    if (imageResource != null) {
+      loadImageMetaData(imageResource, jaiImage);
+    }
+  }
+
   protected void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+  }
+
+  public void setBoundingBox(final double x1, final double y1,
+    final double pixelWidth, final double pixelHeight) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+
+    final int imageWidth = getImageWidth();
+    final double x2 = x1 + pixelWidth * imageWidth;
+
+    final int imageHeight = getImageHeight();
+    final double y2 = y1 - pixelHeight * imageHeight;
+    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
+      x2, y2);
+    setBoundingBox(boundingBox);
   }
 
   public void setCoordinateSystem(final CoordinateSystem coordinateSystem) {

@@ -486,7 +486,7 @@ public class BoundingBox extends Envelope implements Cloneable {
       if (y > maxY) {
         maxY = y;
       }
-      return new BoundingBox(geometryFactory, minX, minY, maxY, maxY);
+      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
     }
   }
 
@@ -536,15 +536,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     return geometryFactory.getCoordinateSystem();
   }
 
-  public CoordinatesList getCornerPoints() {
-    final double minX = getMinX();
-    final double maxX = getMaxX();
-    final double minY = getMinY();
-    final double maxY = getMaxY();
-    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxX,
-      maxX, maxY);
-  }
-
   public Coordinates getCornerPoint(int index) {
     final double minX = getMinX();
     final double maxX = getMaxX();
@@ -561,6 +552,15 @@ public class BoundingBox extends Envelope implements Cloneable {
       default:
         return new DoubleCoordinates(maxX, maxY);
     }
+  }
+
+  public CoordinatesList getCornerPoints() {
+    final double minX = getMinX();
+    final double maxX = getMaxX();
+    final double minY = getMinY();
+    final double maxY = getMaxY();
+    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxX,
+      maxX, maxY);
   }
 
   public LineSegment getEastLine() {

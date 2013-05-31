@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;

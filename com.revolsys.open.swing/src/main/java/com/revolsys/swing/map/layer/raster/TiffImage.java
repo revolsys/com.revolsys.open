@@ -14,7 +14,6 @@ import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.sun.media.jai.codec.ImageCodec;
 
@@ -169,19 +168,5 @@ public class TiffImage extends GeoReferencedImage {
         loadWorldFile(resource, "tfw");
       }
     }
-  }
-
-  public void setBoundingBox(final double x1, final double y1,
-    final double pixelWidth, final double pixelHeight) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-
-    final int imageWidth = getImageWidth();
-    final double x2 = x1 + pixelWidth * imageWidth;
-
-    final int imageHeight = getImageHeight();
-    final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
-      x2, y2);
-    setBoundingBox(boundingBox);
   }
 }

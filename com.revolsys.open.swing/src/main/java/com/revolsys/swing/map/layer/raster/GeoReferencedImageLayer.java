@@ -26,6 +26,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
       "arrow_out", null, "fitToViewport"));
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Revert to Saved",
+      "arrow_undo", null, "revert"));
 
   }
 
@@ -38,13 +40,20 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       final Resource imageResource = SpringUtil.getResource(url);
       if (imageResource.exists()) {
-        final GeoReferencedImage image = new TiffImage(imageResource);
-
-        final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(image);
-        layer.setProperties(properties);
-        return layer;
+        final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+        if (image == null) {
+          LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+            "Cannot load image:" + imageResource);
+          return null;
+        } else {
+          final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+            image);
+          layer.setProperties(properties);
+          return layer;
+        }
       } else {
-        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error("Image does not exist:" + imageResource);
+        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+          "Image does not exist:" + imageResource);
         return null;
       }
     }
@@ -66,12 +75,16 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setName(name);
   }
 
-  public void fitToViewport() {
+  public BoundingBox fitToViewport() {
     final BoundingBox oldValue = image.getBoundingBox();
     final Project project = getProject();
-    if (project != null) {
+    if (project == null) {
+      return new BoundingBox();
+    } else {
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-      if (!viewBoundingBox.isNull()) {
+      if (viewBoundingBox.isNull()) {
+        return viewBoundingBox;
+      } else {
         final double viewRatio = viewBoundingBox.getAspectRatio();
         final double imageRatio = image.getImageAspectRatio();
         BoundingBox boundingBox;
@@ -87,13 +100,18 @@ public class GeoReferencedImageLayer extends AbstractLayer {
         image.setBoundingBox(boundingBox);
         getPropertyChangeSupport().firePropertyChange("boundingBox", oldValue,
           boundingBox);
+        return boundingBox;
       }
     }
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return getImage().getBoundingBox();
+    final BoundingBox boundingBox = getImage().getBoundingBox();
+    if (boundingBox == null || boundingBox.isNull()) {
+      return fitToViewport();
+    }
+    return boundingBox;
   }
 
   @Override
@@ -107,6 +125,14 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public GeoReferencedImage getImage() {
     return image;
+  }
+
+  public void revert() {
+    final GeoReferencedImage image = getImage();
+    if (image != null) {
+      image.revert();
+      getPropertyChangeSupport().firePropertyChange("revert", false, true);
+    }
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {

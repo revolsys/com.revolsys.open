@@ -8,10 +8,11 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.beans.PropertyChangeEvent;
+import java.util.Arrays;
 
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
@@ -64,9 +65,11 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   private GeoReferencedImage image;
 
-  private RenderedOp warpedImage;
+  private GeoReferencedImage warpedImage;
 
   private Point addTiePointFirstPoint;
+
+  private BoundingBox warpedBoundingBox;
 
   public EditGeoReferencedImageOverlay(final MapPanel map) {
     super(map);
@@ -75,9 +78,19 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private boolean addTiePointFinish(final MouseEvent event) {
     if (addTiePointFirstPoint != null) {
       if (event != null) {
-        final Point mousePoint = getViewportPoint(event);
-        tiePointsImage.add(addTiePointFirstPoint);
-        tiePointsModel.add(mousePoint);
+        final Point mapPoint = getViewportPoint(event);
+        Coordinates imagePoint;
+        final int numPoints = tiePointsImage.size();
+        if (numPoints > 3) {
+          // TODO get from warp
+          imagePoint = CoordinatesUtil.get(addTiePointFirstPoint);
+        } else {
+          final double modelX = addTiePointFirstPoint.getX();
+          final double modelY = addTiePointFirstPoint.getY();
+          imagePoint = getImagePoint(imageBoundingBox, modelX, modelY);
+        }
+        tiePointsImage.add(imagePoint);
+        tiePointsModel.add(mapPoint);
         updateWarpedImage();
       }
       addTiePointFirstPoint = null;
@@ -145,6 +158,28 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     setImageBoundingBox(new BoundingBox(geometryFactory, minX, minY, maxX, maxY));
   }
 
+  protected void clear() {
+    this.addTiePointFirstPoint = null;
+    this.image = null;
+    this.imageBoundingBox = null;
+    this.layer = null;
+    this.moveCornerOppositePoint = null;
+    this.moveCornerPoint = null;
+    this.moveImageFirstPoint = null;
+    this.preMoveBoundingBox = null;
+    tiePointsImage.clear();
+    tiePointsModel.clear();
+    this.warpedImage = null;
+    this.warpedBoundingBox = null;
+  }
+
+  private BoundingBox getImageBoundingBox() {
+    if (imageBoundingBox == null) {
+      setImageBoundingBox(layer.getBoundingBox());
+    }
+    return imageBoundingBox;
+  }
+
   public DoubleCoordinates getImagePoint(final BoundingBox boundingBox,
     final double modelX, final double modelY) {
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -166,22 +201,26 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     return imagePoint;
   }
 
-  public DoubleCoordinates getImagePoint(final Coordinates modelPoint) {
-    final double modelX = modelPoint.getX();
-    final double modelY = modelPoint.getY();
-
-    return getImagePoint(preMoveBoundingBox, modelX, modelY);
-  }
-
-  public DoubleCoordinates getImagePoint(final Point modelPoint) {
-    final double modelX = modelPoint.getX();
-    final double modelY = modelPoint.getY();
-
-    return getImagePoint(preMoveBoundingBox, modelX, modelY);
-  }
-
   public GeoReferencedImageLayer getLayer() {
     return layer;
+  }
+
+  public DoubleCoordinates getModelPoint(final BoundingBox boundingBox,
+    final double imageX, final double imageY) {
+    final double imageWidth = image.getImageWidth();
+    final double imageHeight = image.getImageHeight();
+
+    final double xPercent = imageX / imageWidth;
+    final double yPercent = imageY / imageHeight;
+
+    final double modelWidth = boundingBox.getWidth();
+    final double modelHeight = boundingBox.getHeight();
+
+    final double modelX = boundingBox.getMinX() + modelWidth * xPercent;
+    final double modelY = boundingBox.getMinY() + modelHeight * yPercent;
+    // TODO if image is already warped then this location will be different!
+    final DoubleCoordinates imagePoint = new DoubleCoordinates(modelX, modelY);
+    return imagePoint;
   }
 
   @Override
@@ -331,7 +370,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         if (closestIndex == -1) {
           this.moveCornerOppositePoint = null;
         } else {
-          this.moveCornerOppositePoint = getImageBoundingBox().getCornerPoint(closestIndex + 2);
+          this.moveCornerOppositePoint = getImageBoundingBox().getCornerPoint(
+            closestIndex + 2);
         }
         switch (closestIndex) {
           case 0:
@@ -437,43 +477,33 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           AlphaComposite.SRC_OVER, .6f);
         graphics.setComposite(composite);
         // updateWarpedImage();
+        BoundingBox boundingBox = getImageBoundingBox();
         if (warpedImage == null) {
-          BoundingBox boundingBox = getImageBoundingBox();
           if (tiePointsModel.size() > 0) {
             final Coordinates modelPoint = tiePointsModel.get(0);
             final Coordinates imagePoint = tiePointsImage.get(0);
-            final double deltaX = modelPoint.getX() - imagePoint.getX();
-            final double deltaY = modelPoint.getY() - imagePoint.getY();
+            final double imageX = imagePoint.getX();
+            final double imageY = imagePoint.getY();
+            final Coordinates imageMapPoint = getModelPoint(boundingBox,
+              imageX, imageY);
+            final double deltaX = modelPoint.getX() - imageMapPoint.getX();
+            final double deltaY = modelPoint.getY() - imageMapPoint.getY();
             boundingBox = boundingBox.move(deltaX, deltaY);
           }
           GeoReferencedImageLayerRenderer.render(viewport, graphics, image,
             boundingBox);
         } else {
-
-          final Point point = getImageBoundingBox().getTopLeftPoint();
-          final double minX = point.getX();
-          final double maxY = point.getY();
-          final AffineTransform transform = new AffineTransform();
-
-          final double[] location = viewport.toViewCoordinates(minX, maxY);
-          final double screenX = location[0];
-          final double screenY = location[1];
-          transform.translate(screenX, screenY);
-          final double imageScreenWidth = Viewport2D.toDisplayValue(viewport,getImageBoundingBox().getWidthLength());
-          final double imageScreenHeight = Viewport2D.toDisplayValue(viewport,getImageBoundingBox().getHeightLength());
-
-          final int imageWidth = image.getImageWidth();
-          final int imageHeight = image.getImageHeight();
-          final double xScaleFactor = imageScreenWidth / imageWidth;
-          final double yScaleFactor = imageScreenHeight / imageHeight;
-          transform.scale(xScaleFactor, yScaleFactor);
-
-          graphics.drawRenderedImage(warpedImage, transform);
+          GeoReferencedImageLayerRenderer.render(viewport, graphics,
+            warpedImage, warpedBoundingBox);
         }
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to render image", e);
       } finally {
         graphics.setComposite(oldComposite);
+      }
+      if (warpedBoundingBox != null) {
+        GeometryStyleRenderer.renderOutline(viewport, graphics,
+          warpedBoundingBox.toPolygon(1), GeometryStyle.line(Color.BLUE, 3));
       }
       if (getImageBoundingBox() != null) {
         final Polygon imageBoundary = getImageBoundingBox().toPolygon(1);
@@ -488,12 +518,16 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           imageBoundary,
           MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));
 
-        for (int i = 0; i < tiePointsModel.size(); i++) {
+        for (int i = 1; i < tiePointsModel.size(); i++) {
           final Coordinates modelPoint = tiePointsModel.get(i);
           final Coordinates imagePoint = tiePointsImage.get(i);
+          final double imageX = imagePoint.getX();
+          final double imageY = imagePoint.getY();
+          final Coordinates imageModelPoint = getModelPoint(imageBoundingBox,
+            imageX, imageY);
           final GeometryFactory geometryFactory = getGeometryFactory();
-          final LineString line = geometryFactory.createLineString(imagePoint,
-            modelPoint);
+          final LineString line = geometryFactory.createLineString(
+            imageModelPoint, modelPoint);
           GeometryStyleRenderer.renderLineString(viewport, graphics, line,
             GeometryStyle.line(Color.CYAN, 3));
 
@@ -523,32 +557,47 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           final BoundingBox boundingBox = layer.getBoundingBox();
           setImageBoundingBox(boundingBox);
         }
+      } else if ("revert".equals(propertyName)) {
+        if (this.layer == layer) {
+          clear();
+          setLayer(layer);
+        }
+      } else if ("deleted".equals(propertyName)) {
+        if (this.layer == layer) {
+          clear();
+        }
       }
     }
   }
 
   public void setImageBoundingBox(final BoundingBox boundingBox) {
-    imageBoundingBox = boundingBox.convert(getGeometryFactory());
-    preMoveBoundingBox = this.imageBoundingBox;
+    if (boundingBox == null) {
+      setImageBoundingBox(new BoundingBox());
+    } else {
+      imageBoundingBox = boundingBox.convert(getGeometryFactory());
+      preMoveBoundingBox = this.imageBoundingBox;
+    }
   }
 
   public void setLayer(final GeoReferencedImageLayer layer) {
     final GeoReferencedImageLayer oldLayer = this.layer;
     if (oldLayer != null) {
-      oldLayer.setBoundingBox(getImageBoundingBox());
+      // TODO save tie points
+      // oldLayer.setBoundingBox(getImageBoundingBox());
     }
-    this.layer = layer;
-    setGeometryFactory(getViewport().getGeometryFactory());
-    setEnabled(layer != null);
-    if (layer != null) {
-      setImageBoundingBox(layer.getBoundingBox());
-      this.image = layer.getImage();
-    }
-    this.warpedImage = null;
-    tiePointsImage.clear();
-    tiePointsModel.clear();
-    if (oldLayer != null) {
-      oldLayer.setEditable(false);
+    if (oldLayer != layer) {
+      clear();
+      this.layer = layer;
+      final Viewport2D viewport = getViewport();
+      setGeometryFactory(viewport.getGeometryFactory());
+      setEnabled(layer != null);
+      if (layer != null) {
+        setImageBoundingBox(layer.getBoundingBox());
+        this.image = layer.getImage();
+      }
+      if (oldLayer != null) {
+        oldLayer.setEditable(false);
+      }
     }
     firePropertyChange("layer", oldLayer, layer);
   }
@@ -556,12 +605,12 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   protected float[] toDestinationImagePoints(final ListCoordinatesList points) {
     final int numPoints = points.size();
     final float[] dstCoords = new float[numPoints * 2];
+    final BoundingBox boundingBox = getImageBoundingBox();
     for (int i = 0; i < numPoints; i++) {
       final Coordinates modelPoint = points.get(i);
       final double modelX = modelPoint.getX();
       final double modelY = modelPoint.getY();
-      final Coordinates imagePoint = getImagePoint(preMoveBoundingBox, modelX,
-        modelY);
+      final Coordinates imagePoint = getImagePoint(boundingBox, modelX, modelY);
       dstCoords[i * 2] = (float)imagePoint.getX();
       dstCoords[i * 2 + 1] = (float)imagePoint.getY();
     }
@@ -570,14 +619,13 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   protected float[] toSourceImagePoints(final ListCoordinatesList points) {
     final int numPoints = points.size();
-    final float[] dstCoords = new float[numPoints * 2];
+    final float[] coords = new float[numPoints * 2];
     for (int i = 0; i < numPoints; i++) {
-      final Coordinates modelPoint = points.get(i);
-      final Coordinates imagePoint = getImagePoint(modelPoint);
-      dstCoords[i * 2] = (float)imagePoint.getX();
-      dstCoords[i * 2 + 1] = (float)imagePoint.getY();
+      final Coordinates imagePoint = points.get(i);
+      coords[i * 2] = (float)imagePoint.getX();
+      coords[i * 2 + 1] = (float)imagePoint.getY();
     }
-    return dstCoords;
+    return coords;
   }
 
   protected void updateWarpedImage() {
@@ -608,14 +656,23 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       pb.addSource(img);
       pb.add(warp);
       pb.add(new InterpolationNearest());
-      warpedImage = JAI.create("warp", pb);
+      final RenderedOp destImage = JAI.create("warp", pb);
+      final int warpedWidth = destImage.getWidth();
+      final int warpedHeight = destImage.getHeight();
+      warpedBoundingBox = new BoundingBox(getGeometryFactory());
+      for (final int x : Arrays.asList(0, warpedWidth)) {
+        for (final int y : Arrays.asList(0, warpedHeight)) {
+          final Point2D.Double destImagePoint = new Point2D.Double(x, y);
+          final Point2D sourceImagePoint = warp.mapDestPoint(destImagePoint);
+          final double sourceImageX = sourceImagePoint.getX();
+          final double sourceImageY = sourceImagePoint.getY();
+          final Coordinates modelPoint = getModelPoint(getImageBoundingBox(),
+            sourceImageX, sourceImageY);
+          warpedBoundingBox = warpedBoundingBox.expandToInclude(modelPoint);
+        }
+      }
+      final BufferedImage bufferedImage = destImage.getAsBufferedImage();
+      warpedImage = new GeoReferencedImage(warpedBoundingBox, bufferedImage);
     }
-  }
-
-  private BoundingBox getImageBoundingBox() {
-    if (imageBoundingBox == null) {
-      setImageBoundingBox(layer.getBoundingBox());
-    }
-    return imageBoundingBox;
   }
 }

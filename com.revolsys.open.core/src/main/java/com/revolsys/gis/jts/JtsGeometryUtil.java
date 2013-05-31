@@ -1182,6 +1182,19 @@ public final class JtsGeometryUtil {
     return new LineSegment(c1, c2);
   }
 
+  public static Point offset(final Point point, final double deltaX,
+    final double deltaY) {
+    final double x = point.getX();
+    final double y = point.getY();
+
+    final double newX = x + deltaX;
+    final double newY = y + deltaY;
+
+    final GeometryFactory factory = GeometryFactory.getFactory(point);
+    final Point newPoint = factory.createPoint(newX, newY);
+    return newPoint;
+  }
+
   public static Coordinate processIntersection(
     final Set<Coordinate> intersectCoords, final Coordinate intersectCoord,
     final List<Coordinate> coords1, final ListIterator<Coordinate> iterator1,

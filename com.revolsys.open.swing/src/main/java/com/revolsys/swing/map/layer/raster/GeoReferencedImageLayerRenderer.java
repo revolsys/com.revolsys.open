@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -52,10 +53,10 @@ public class GeoReferencedImageLayerRenderer extends
               final double imageScreenHeight = Viewport2D.toDisplayValue(
                 viewport, boundingBox.getHeightLength());
 
-              final double xScaleFactor = imageScreenWidth / imageWidth;
-              final double yScaleFactor = imageScreenHeight / imageHeight;
-              graphics.scale(xScaleFactor, yScaleFactor);
-              graphics.drawImage(image, 0, 0, null);
+              graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+              graphics.drawImage(image, 0, 0, (int)imageScreenWidth,
+                (int)imageScreenHeight, null);
             } finally {
               graphics.setTransform(transform);
             }
