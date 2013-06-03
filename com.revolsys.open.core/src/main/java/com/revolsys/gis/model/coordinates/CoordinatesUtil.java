@@ -313,4 +313,15 @@ public class CoordinatesUtil {
   public static Coordinate toCoordinate(final Coordinates point) {
     return new Coordinate(point.getX(), point.getY(), point.getZ());
   }
+
+  public static float[] toFloatArray(final CoordinatesList points,
+    final int numAxis) {
+    final float[] coordinates = new float[numAxis * points.size()];
+    for (int i = 0; i < points.size(); i++) {
+      for (int axis = 0; axis < numAxis; axis++) {
+        coordinates[i * numAxis + axis] = (float)points.getValue(i, axis);
+      }
+    }
+    return coordinates;
+  }
 }
