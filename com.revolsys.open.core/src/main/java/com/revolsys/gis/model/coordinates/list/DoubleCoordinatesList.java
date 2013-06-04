@@ -49,11 +49,14 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   public DoubleCoordinatesList(final int numAxis, final double... coordinates) {
+    assert numAxis > 2;
     this.numAxis = (byte)numAxis;
     this.coordinates = coordinates;
   }
 
   public DoubleCoordinatesList(final int size, final int numAxis) {
+    assert numAxis > 2;
+    assert size >= 0;
     this.coordinates = new double[size * numAxis];
     this.numAxis = (byte)numAxis;
   }

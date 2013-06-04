@@ -1,26 +1,23 @@
 package com.revolsys.gis.data.query;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.util.CollectionUtil;
 
-public class MultipleCondition implements Condition {
+public class MultipleCondition extends AbstractMultiCondition {
 
   private final String operator;
 
-  private final List<Condition> conditions;
-
-  public MultipleCondition(final String operator, Condition... conditions) {
-    this(operator, Arrays.asList(conditions));
+  public MultipleCondition(final String operator,
+    final Collection<? extends Condition> conditions) {
+    super(conditions);
+    this.operator = operator;
   }
 
-  public MultipleCondition(String operator,
-    Collection<? extends Condition> conditions) {
-    this.operator = operator;
-    this.conditions = new ArrayList<Condition>(conditions);
+  public MultipleCondition(final String operator, final Condition... conditions) {
+    this(operator, Arrays.asList(conditions));
   }
 
   @Override
@@ -28,7 +25,7 @@ public class MultipleCondition implements Condition {
     buffer.append("(");
     boolean first = true;
 
-    for (Condition condition : conditions) {
+    for (final Condition condition : getConditions()) {
       if (first) {
         first = false;
       } else {
@@ -42,8 +39,18 @@ public class MultipleCondition implements Condition {
   }
 
   @Override
+  public MultipleCondition clone() {
+    final List<Condition> conditions = cloneConditions();
+    return new MultipleCondition(operator, conditions);
+  }
+
+  public String getOperator() {
+    return operator;
+  }
+
+  @Override
   public String toString() {
-    return "(" + CollectionUtil.toString(" " + operator + " ", conditions)
+    return "(" + CollectionUtil.toString(" " + operator + " ", getConditions())
       + ")";
   }
 }

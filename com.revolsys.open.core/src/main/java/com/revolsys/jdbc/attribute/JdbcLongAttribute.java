@@ -9,6 +9,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcLongAttribute extends JdbcAttribute {
+  public JdbcLongAttribute(final String name) {
+    super(name, DataTypes.LONG, 0, 0, 0, false, null);
+  }
+
   public JdbcLongAttribute(final String name, final int sqlType,
     final int length, final boolean required,
     final Map<String, Object> properties) {

@@ -17,6 +17,8 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.MultipleCondition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
@@ -43,11 +45,97 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     super(typePath, title, pluralTitle);
   }
 
-  public DataObjectHtmlUiBuilder(final String typePath, String tableName,
-    String idPropertyName, final String title, final String pluralTitle) {
+  public DataObjectHtmlUiBuilder(final String typePath, final String tableName,
+    final String idPropertyName, final String title, final String pluralTitle) {
     super(typePath, title, pluralTitle);
     this.tableName = tableName;
     setIdPropertyName(idPropertyName);
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    final String pageName) {
+    final Map<String, Object> parameters = Collections.emptyMap();
+    return createDataTableHandler(request, pageName, parameters);
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    final String pageName, final Map<String, Object> parameters) {
+    if (isDataTableCallback(request)) {
+      return createDataTableMap(request, pageName, parameters);
+    } else {
+      final TabElementContainer tabs = new TabElementContainer();
+      addTabDataTable(tabs, this, pageName, parameters);
+      return tabs;
+    }
+  }
+
+  public Object createDataTableHandlerOrRedirect(
+    final HttpServletRequest request, final HttpServletResponse response,
+    final String pageName, final Object parentBuilder,
+    final String parentPageName, final Map<String, Object> parameters) {
+    if (isDataTableCallback(request)) {
+      return createDataTableMap(request, pageName, parameters);
+    } else {
+      return redirectToTab(parentBuilder, parentPageName, pageName);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> createDataTableMap(
+    final HttpServletRequest request, final String pageName,
+    final Map<String, Object> parameters) {
+    String search = request.getParameter("sSearch");
+    final DataObjectMetaData metaData = getDataStore().getMetaData(
+      getTableName());
+    final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
+    final Query query = Query.and(metaData, filter);
+
+    final String fromClause = (String)parameters.get("fromClause");
+    query.setFromClause(fromClause);
+
+    if (StringUtils.hasText(search)) {
+      search = search.toUpperCase();
+      final List<KeySerializer> serializers = getSerializers(pageName, "list");
+      final MultipleCondition or = Conditions.or();
+      final int numSortColumns = HttpServletUtils.getIntegerParameter(request,
+        "iColumns");
+      for (int i = 0; i < numSortColumns; i++) {
+        if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
+          final KeySerializer serializer = serializers.get(i);
+          final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+          final Class<?> columnClass = metaData.getAttributeType(columnName)
+            .getJavaClass();
+          if (columnClass != null) {
+            if (columnClass.equals(String.class)) {
+              or.add(Conditions.likeUpper("T." + columnName, search));
+            } else if (Number.class.isAssignableFrom(columnClass)) {
+              or.add(Conditions.likeNumber("T." + columnName, search));
+            } else if (Date.class.isAssignableFrom(columnClass)) {
+              or.add(Conditions.likeDate("T." + columnName, search));
+            }
+          }
+        }
+        if (!or.isEmpty()) {
+          query.and(or);
+        }
+      }
+    }
+
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
+    query.setOrderBy(orderBy);
+
+    final ResultPager<DataObject> pager = getResultPager(query);
+    try {
+      return createDataTableMap(request, pager, pageName);
+    } finally {
+      pager.close();
+    }
+  }
+
+  public Object createDataTableMap(final String pageName,
+    final Map<String, Object> parameters) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, pageName, parameters);
   }
 
   @Override
@@ -92,28 +180,29 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   protected boolean isPropertyUnique(final DataObject object,
     final String attributeName) {
-    final Query query = new Query(tableName);
     final String value = object.getValue(attributeName);
-    final Map<String, String> filter = Collections.singletonMap(attributeName,
-      value);
-    query.setFilter(filter);
     final DataObjectStore dataStore = getDataStore();
-    final Reader<DataObject> results = dataStore.query(query);
-    final List<DataObject> objects = results.read();
-    if (object.getState() == DataObjectState.New) {
-      return objects.isEmpty();
+    final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
+    if (metaData == null) {
+      return true;
     } else {
-      final Object id = object.getIdValue();
-      for (final Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
-        final DataObject matchedObject = iterator.next();
-        final Object matchedId = matchedObject.getIdValue();
-        if (EqualsRegistry.INSTANCE.equals(id, matchedId)) {
-          iterator.remove();
+      final Query query = Query.equal(metaData, attributeName, value);
+      final Reader<DataObject> results = dataStore.query(query);
+      final List<DataObject> objects = results.read();
+      if (object.getState() == DataObjectState.New) {
+        return objects.isEmpty();
+      } else {
+        final Object id = object.getIdValue();
+        for (final Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
+          final DataObject matchedObject = iterator.next();
+          final Object matchedId = matchedObject.getIdValue();
+          if (EqualsRegistry.INSTANCE.equals(id, matchedId)) {
+            iterator.remove();
+          }
         }
+        return objects.isEmpty();
       }
-      return objects.isEmpty();
     }
-
   }
 
   @Override
@@ -137,106 +226,5 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   @Override
   protected void updateObject(final DataObject object) {
     dataStore.update(object);
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Map<String, Object> parameters) {
-    if (isDataTableCallback(request)) {
-      return createDataTableMap(request, pageName, parameters);
-    } else {
-      TabElementContainer tabs = new TabElementContainer();
-      addTabDataTable(tabs, this, pageName, parameters);
-      return tabs;
-    }
-  }
-
-  public Object createDataTableHandlerOrRedirect(
-    final HttpServletRequest request, final HttpServletResponse response,
-    String pageName, Object parentBuilder, String parentPageName,
-    Map<String, Object> parameters) {
-    if (isDataTableCallback(request)) {
-      return createDataTableMap(request, pageName, parameters);
-    } else {
-      return redirectToTab(parentBuilder, parentPageName, pageName);
-    }
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName) {
-    Map<String, Object> parameters = Collections.emptyMap();
-    return createDataTableHandler(request, pageName, parameters);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Map<String, Object> createDataTableMap(
-    final HttpServletRequest request, String pageName,
-    Map<String, Object> parameters) {
-    String search = request.getParameter("sSearch");
-    DataObjectMetaData metaData = getDataStore().getMetaData(getTableName());
-    final Query query = new Query(metaData);
-
-    Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
-    if (filter != null) {
-      query.setFilter(filter);
-    }
-
-    String fromClause = (String)parameters.get("fromClause");
-    query.setFromClause(fromClause);
-
-    if (StringUtils.hasText(search)) {
-      search = search.toUpperCase();
-      List<KeySerializer> serializers = getSerializers(pageName, "list");
-      StringBuffer whereClause = new StringBuffer();
-      int numSortColumns = HttpServletUtils.getIntegerParameter(request,
-        "iColumns");
-      for (int i = 0; i < numSortColumns; i++) {
-        if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
-          if (whereClause.length() > 0) {
-            whereClause.append(" OR ");
-          }
-          KeySerializer serializer = serializers.get(i);
-          String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-          Class<?> columnClass = metaData.getAttributeType(columnName)
-            .getJavaClass();
-          if (columnClass != null) {
-            if (columnClass.equals(String.class)) {
-              whereClause.append("UPPER(T.");
-              whereClause.append(columnName);
-              whereClause.append(") LIKE ?");
-              query.addParameter("%" + search + "%");
-            } else if (Number.class.isAssignableFrom(columnClass)) {
-              whereClause.append("TO_CHAR(T.");
-              whereClause.append(columnName);
-              whereClause.append(", '9999999999999999999.9999999999999999999') LIKE ?");
-              query.addParameter("%" + search + "%");
-            } else if (Date.class.isAssignableFrom(columnClass)) {
-              whereClause.append("TO_CHAR(T.");
-              whereClause.append(columnName);
-              whereClause.append(", 'YYYY-MM-DD HH24:MI:SS') LIKE ?");
-              query.addParameter("%" + search + "%");
-            }
-          }
-        }
-        if (whereClause.length() > 0) {
-          query.setWhereClause(whereClause.toString());
-        }
-      }
-    }
-
-    final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
-    query.setOrderBy(orderBy);
-
-    final ResultPager<DataObject> pager = getResultPager(query);
-    try {
-      return createDataTableMap(request, pager, pageName);
-    } finally {
-      pager.close();
-    }
-  }
-
-  public Object createDataTableMap(String pageName,
-    Map<String, Object> parameters) {
-    HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, pageName, parameters);
   }
 }

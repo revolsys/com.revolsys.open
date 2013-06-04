@@ -202,12 +202,6 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
-  public DataObjectReader createReader(final String typePath,
-    final String query, final List<Object> parameters) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public DataObject createWithId(final DataObjectMetaData metaData) {
     final DataObject object = create(metaData);
     if (object != null) {
@@ -443,13 +437,7 @@ public abstract class AbstractDataObjectStore extends
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
       } else {
-        final StringBuffer where = new StringBuffer();
-        where.append(idAttributeName);
-        where.append(" = ?");
-
-        final Query query = new Query(typePath);
-        query.setWhereClause(where.toString());
-        query.addParameter(id);
+        final Query query = Query.equal(metaData, idAttributeName, id);
         return queryFirst(query);
       }
     }
@@ -472,14 +460,8 @@ public abstract class AbstractDataObjectStore extends
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
       } else {
-        final StringBuffer where = new StringBuffer();
-        where.append(idAttributeName);
-        where.append(" = ?");
-
-        final Query query = new Query(typePath);
+        final Query query = Query.equal(metaData, idAttributeName, id);
         query.setLockResults(true);
-        query.setWhereClause(where.toString());
-        query.addParameter(id);
         return queryFirst(query);
       }
     }

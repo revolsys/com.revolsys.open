@@ -348,7 +348,7 @@ public class SimpleNamingContext implements Context {
             this.environment);
         }
       }
-      throw new NameNotFoundException("Name ["
+      throw new NameNotFoundException("Column ["
         + this.root
         + lookupName
         + "] not bound; "

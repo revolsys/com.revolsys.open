@@ -1,7 +1,6 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.io.Statistics;
 
 public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
@@ -46,20 +46,6 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     queries.add(query);
   }
 
-  public void addQuery(final String typePath, final String query) {
-    addQuery(new Query(typePath, query));
-  }
-
-  public void addQuery(final String path, final String query,
-    final List<Object> parameters) {
-    addQuery(new Query(path, query, parameters));
-  }
-
-  public void addQuery(final String path, final String query,
-    final Object... parameters) {
-    addQuery(path, query, Arrays.asList(parameters));
-  }
-
   @Override
   @PreDestroy
   public void close() {
@@ -79,7 +65,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     if (i < queries.size()) {
       final Query query = queries.get(i);
       if (StringUtils.hasText(whereClause)) {
-        query.setWhereClause(whereClause);
+        query.and(new SqlCondition(whereClause));
       }
       if (boundingBox != null) {
         query.setBoundingBox(boundingBox);
@@ -123,7 +109,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
           Query query;
           if (boundingBox == null) {
             query = new Query(metaData);
-            query.setWhereClause(whereClause);
+            query.setWhereCondition(new SqlCondition(whereClause));
           } else {
             query = new Query(metaData);
             query.setBoundingBox(boundingBox);

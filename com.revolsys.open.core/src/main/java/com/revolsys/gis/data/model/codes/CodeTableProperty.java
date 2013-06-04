@@ -17,6 +17,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
+import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.MultipleCondition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -239,27 +241,22 @@ public class CodeTableProperty extends AbstractCodeTable implements
       loadAll();
       id = getId(values, false);
     } else {
-      final StringBuffer where = new StringBuffer();
       final Query query = new Query(typePath);
+      final MultipleCondition and = Conditions.and();
       if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
-          if (i > 0) {
-            where.append(" AND ");
-          }
-          where.append(attributeName);
           final Object value = values.get(i);
           if (value == null) {
-            where.append(" IS NULL");
+            and.add(Conditions.isNull(attributeName));
           } else {
             final Attribute attribute = metaData.getAttribute(attributeName);
-            query.addParameter(value, attribute);
-            where.append(" = ?");
+            and.add(Conditions.equal(attribute, value));
           }
           i++;
         }
       }
-      query.setWhereClause(where.toString());
+      query.setWhereCondition(and);
       final Reader<DataObject> reader = dataStore.query(query);
       try {
         addValues(reader);

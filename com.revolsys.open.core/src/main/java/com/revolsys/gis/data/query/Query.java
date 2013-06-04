@@ -2,31 +2,87 @@ package com.revolsys.gis.data.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Query extends AbstractObjectWithProperties implements Cloneable {
+  private static void addFilter(final Query query,
+    final DataObjectMetaData metaData, final Map<String, ?> filter,
+    final MultipleCondition multipleCondition) {
+    if (filter != null && !filter.isEmpty()) {
+      for (final Entry<String, ?> entry : filter.entrySet()) {
+        final String name = entry.getKey();
+        final Attribute attribute = metaData.getAttribute(name);
+        if (attribute == null) {
+          final Object value = entry.getValue();
+          if (value == null) {
+            multipleCondition.add(Conditions.isNull(name));
+          } else if (value instanceof Collection) {
+            final Collection<?> values = (Collection<?>)value;
+            multipleCondition.add(Conditions.in(name, values));
+          } else {
+            multipleCondition.add(Conditions.equal(name, value));
+          }
+        } else {
+          final Object value = entry.getValue();
+          if (value == null) {
+            multipleCondition.add(Conditions.isNull(name));
+          } else if (value instanceof Collection) {
+            final Collection<?> values = (Collection<?>)value;
+            multipleCondition.add(Conditions.in(attribute, values));
+          } else {
+            multipleCondition.add(Conditions.equal(attribute, value));
+          }
+        }
+      }
+      query.setWhereCondition(multipleCondition);
+    }
+  }
+
+  public static Query and(final DataObjectMetaData metaData,
+    final Map<String, ?> filter) {
+    final Query query = new Query(metaData);
+    final MultipleCondition and = Conditions.and();
+    addFilter(query, metaData, filter, and);
+    return query;
+  }
+
+  public static Query equal(final DataObjectMetaData metaData,
+    final String name, final Object value) {
+    final Attribute attribute = metaData.getAttribute(name);
+    if (attribute == null) {
+      return null;
+    } else {
+      final Query query = new Query(metaData);
+      final Value valueCondition = new Value(attribute, value);
+      final BinaryCondition equal = Conditions.equal(name, valueCondition);
+      query.setWhereCondition(equal);
+      return query;
+    }
+  }
+
+  public static Query or(final DataObjectMetaData metaData,
+    final Map<String, ?> filter) {
+    final Query query = new Query(metaData);
+    final MultipleCondition or = Conditions.or();
+    addFilter(query, metaData, filter, or);
+    return query;
+  }
+
   private List<String> attributeNames = Collections.emptyList();
 
   private BoundingBox boundingBox;
-
-  private final Map<String, Object> filter = new LinkedHashMap<String, Object>();
 
   private String fromClause;
 
@@ -38,8 +94,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
 
-  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
-
   private List<Object> parameters = new ArrayList<Object>();
 
   private String sql;
@@ -48,11 +102,11 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private String typePathAlias;
 
-  private String whereClause;
-
   private int offset = 0;
 
   private int limit = -1;
+
+  private Condition whereCondition;
 
   public Query() {
   }
@@ -62,90 +116,38 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.metaData = metaData;
   }
 
-  public Query(final DataObjectMetaData metaData, final String sql) {
-    this(metaData.getPath(), sql);
-    this.metaData = metaData;
-  }
-
-  public Query(final DataObjectMetaData metaData, final String sql,
-    final List<Object> parameters) {
-    this(metaData.getPath(), sql, parameters);
-    this.metaData = metaData;
-  }
-
-  public Query(final DataObjectMetaData metaData, final String sql,
-    final Object... parameters) {
-    this(metaData.getPath(), sql, Arrays.asList(parameters));
-    this.metaData = metaData;
-  }
-
-  public Query(final DataObjectStore dataStore, final String path) {
-    this(dataStore.getMetaData(path));
-  }
-
   public Query(final String typePath) {
-    this(typePath, null, Collections.emptyList());
-  }
-
-  public Query(final String typePath, final String query) {
-    this(typePath, query, Collections.emptyList());
-  }
-
-  public Query(final String typePath, final String query,
-    final List<Object> parameters) {
     this.typeName = typePath;
-    this.sql = query;
-    if (parameters != null) {
-      this.parameters.addAll(parameters);
-    }
-  }
-
-  public Query(final String typePath, final String query,
-    final Object... parameters) {
-    this(typePath, query, Arrays.asList(parameters));
-  }
-
-  public void addFilter(final String name, final Object value) {
-    filter.put(name, value);
   }
 
   public void addOrderBy(final String column, final boolean ascending) {
     orderBy.put(column, ascending);
   }
 
+  @Deprecated
   public void addParameter(final Object value) {
     parameters.add(value);
-    parameterAttributes.add(null);
   }
 
-  public void addParameter(final Object value, final Attribute attribute) {
-    addParameter(value);
-    parameterAttributes.set(parameterAttributes.size() - 1, attribute);
-  }
-
-  public void addParameter(final String name, final Object value) {
-    final Attribute attribute = metaData.getAttribute(name);
-    addParameter(value, attribute);
-  }
-
-  public void addParameters(final List<Object> parameters) {
-    for (final Object parameter : parameters) {
-      addParameter(parameter);
+  public void and(final Condition condition) {
+    final Condition whereCondition = getWhereCondition();
+    if (whereCondition == null) {
+      setWhereCondition(condition);
+    } else {
+      setWhereCondition(Conditions.and(whereCondition, condition));
     }
-  }
-
-  public void addParameters(final Object... parameters) {
-    addParameters(Arrays.asList(parameters));
   }
 
   @Override
   public Query clone() {
     try {
       final Query clone = (Query)super.clone();
-      clone.parameterAttributes = new ArrayList<Attribute>(parameterAttributes);
       clone.attributeNames = new ArrayList<String>(clone.attributeNames);
       clone.parameters = new ArrayList<Object>(parameters);
       clone.orderBy = new HashMap<String, Boolean>(orderBy);
+      if (whereCondition != null) {
+        clone.whereCondition = whereCondition.clone();
+      }
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new IllegalArgumentException(e.getMessage());
@@ -158,10 +160,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public BoundingBox getBoundingBox() {
     return boundingBox;
-  }
-
-  public Map<String, Object> getFilter() {
-    return filter;
   }
 
   public String getFromClause() {
@@ -188,14 +186,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return orderBy;
   }
 
-  public List<Attribute> getParameterAttributes() {
-    return parameterAttributes;
-  }
-
-  public int getParameterCount() {
-    return parameters.size();
-  }
-
   public List<Object> getParameters() {
     return parameters;
   }
@@ -212,8 +202,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return typePathAlias;
   }
 
-  public String getWhereClause() {
-    return whereClause;
+  public Condition getWhereCondition() {
+    return whereCondition;
   }
 
   public boolean isLockResults() {
@@ -230,13 +220,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
-  }
-
-  public void setFilter(final Map<String, ? extends Object> filter) {
-    this.filter.clear();
-    if (filter != null) {
-      this.filter.putAll(filter);
-    }
   }
 
   public void setFromClause(final String fromClause) {
@@ -283,16 +266,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     setOrderByColumns(Arrays.asList(orderBy));
   }
 
-  public void setParameters(final List<Object> parameters) {
-    this.parameters.clear();
-    this.parameterAttributes.clear();
-    addParameters(parameters);
-  }
-
-  public void setParameters(final Object... parameters) {
-    setParameters(Arrays.asList(parameters));
-  }
-
   public void setSql(final String sql) {
     this.sql = sql;
   }
@@ -305,50 +278,15 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.typePathAlias = typePathAlias;
   }
 
-  public void setWhereClause(final String whereClause) {
-    this.whereClause = whereClause;
+  public void setWhereCondition(final Condition whereCondition) {
+    this.whereCondition = whereCondition;
   }
 
   @Override
   public String toString() {
     final StringBuffer string = new StringBuffer();
     if (sql == null) {
-      string.append("SELECT ");
-      if (attributeNames.isEmpty()) {
-        string.append("*");
-      } else {
-        CollectionUtil.append(string, attributeNames, ", ");
-      }
-      string.append(" FROM ");
-      if (fromClause == null) {
-        if (typeName != null) {
-          string.append(JdbcUtils.getQualifiedTableName(typeName));
-        } else if (metaData != null) {
-          string.append(JdbcUtils.getQualifiedTableName(metaData.getPath()));
-        }
-      } else {
-        string.append(fromClause);
-      }
-      if (StringUtils.hasText(whereClause)) {
-        string.append(" WHERE ");
-        string.append(whereClause);
-      }
-      if (!orderBy.isEmpty()) {
-        string.append(" ORDER BY ");
-        for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-          .iterator(); iterator.hasNext();) {
-          final Entry<String, Boolean> entry = iterator.next();
-          final String column = entry.getKey();
-          string.append(column);
-          final Boolean ascending = entry.getValue();
-          if (!ascending) {
-            string.append(" DESC");
-          }
-          if (iterator.hasNext()) {
-            string.append(", ");
-          }
-        }
-      }
+      string.append(JdbcUtils.getSelectSql(this));
     } else {
       string.append(sql);
     }

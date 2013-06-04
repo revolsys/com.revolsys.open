@@ -16,6 +16,9 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.query.BinaryCondition;
+import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 
@@ -81,18 +84,23 @@ public class DataStoreQueryListModel implements ListModel {
     return objects;
   }
 
-  protected List<DataObject> getObjects(String searchParam) {
+  protected List<DataObject> getObjects(final String searchParam) {
     final Map<String, DataObject> allObjects = new TreeMap<String, DataObject>();
     for (Query query : queries) {
       if (allObjects.size() < 10) {
         query = query.clone();
         query.addOrderBy(displayAttributeName, true);
-        final String whereClause = query.getWhereClause();
-        if (whereClause.indexOf("LIKE") == -1) {
-          query.addParameter(searchParam);
-        } else {
-          searchParam = searchParam.toUpperCase().replaceAll("[^A-Z0-9]", "");
-          query.addParameter(searchParam + "%");
+        final Condition whereCondition = query.getWhereCondition();
+        if (whereCondition instanceof BinaryCondition) {
+          final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
+          if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
+            final String likeString = searchParam.toUpperCase().replaceAll(
+              "[^A-Z0-9]", "")
+              + "%";
+            Conditions.setValue(0, binaryCondition, likeString);
+          } else {
+            Conditions.setValue(0, binaryCondition, searchParam);
+          }
         }
         query.setLimit(10);
         final Reader<DataObject> reader = dataStore.query(query);

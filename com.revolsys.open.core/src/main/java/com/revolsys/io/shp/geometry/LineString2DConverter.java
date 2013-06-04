@@ -66,14 +66,15 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = new DoubleCoordinatesList(2, numCoords);
+        final CoordinatesList points = new DoubleCoordinatesList(numCoords, 2);
 
-        for (final int j = 0; j < numCoords; i++) {
+        for (int j = 0; j < numCoords; j++) {
           final double x = in.readLEDouble();
           points.setX(j, x);
           final double y = in.readLEDouble();
           points.setY(j, y);
         }
+        pointsList.add(points);
       }
       return geometryFactory.createMultiLineString(pointsList);
     }

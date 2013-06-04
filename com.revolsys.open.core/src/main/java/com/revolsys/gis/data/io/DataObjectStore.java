@@ -39,9 +39,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Query createQuery(final String typePath, String whereClause,
     final BoundingBox boundingBox);
 
-  DataObjectReader createReader(String typePath, String query,
-    List<Object> parameters);
-
   DataObject createWithId(DataObjectMetaData objectMetaData);
 
   Writer<DataObject> createWriter();

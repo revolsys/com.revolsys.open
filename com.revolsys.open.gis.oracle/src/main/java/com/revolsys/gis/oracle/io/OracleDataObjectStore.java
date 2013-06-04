@@ -23,6 +23,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
@@ -34,6 +35,8 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
+
+  private boolean useSchemaSequencePrefix = true;
 
   public OracleDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -52,42 +55,99 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
   }
 
-  @Override
-  public AbstractIterator<DataObject> createIterator(Query query,
-    Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(this, query, properties);
-  }
-
-  public OracleDataObjectStore(OracleDatabaseFactory databaseFactory,
-    Map<String, ? extends Object> connectionProperties) {
-    super(databaseFactory);
-    setExcludeTablePatterns(".*\\$");
-    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
-    setDataSource(dataSource);
-    setSqlPrefix("BEGIN ");
-    setSqlSuffix(";END;");
-  }
-
-  public OracleDataObjectStore(DataSource dataSource) {
+  public OracleDataObjectStore(final DataSource dataSource) {
     super(dataSource);
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
   }
 
+  public OracleDataObjectStore(final OracleDatabaseFactory databaseFactory,
+    final Map<String, ? extends Object> connectionProperties) {
+    super(databaseFactory);
+    setExcludeTablePatterns(".*\\$");
+    final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    setDataSource(dataSource);
+    setSqlPrefix("BEGIN ");
+    setSqlSuffix(";END;");
+  }
+
+  protected Query addBoundingBoxFilter(Query query) {
+    final BoundingBox boundingBox = query.getBoundingBox();
+    if (boundingBox != null) {
+      final String typePath = query.getTypeName();
+      final DataObjectMetaData metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Unable to  find table " + typePath);
+      } else {
+        query = query.clone();
+        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        final String geometryColumnName = geometryAttribute.getName();
+        final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+
+        final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
+
+        final double x1 = projectedBoundingBox.getMinX();
+        final double y1 = projectedBoundingBox.getMinY();
+        final double x2 = projectedBoundingBox.getMaxX();
+        final double y2 = projectedBoundingBox.getMaxY();
+
+        if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+          final String where = " SDO_RELATE("
+            + geometryColumnName
+            + ","
+            + "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
+          query.and(new SqlCondition(where, geometryFactory.getSRID(), x1, y1,
+            x2, y2));
+        } else if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
+          final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName
+            + ", ?, ?, ?, ?) = 1";
+          query.and(new SqlCondition(where, x1, y1, x2, y2));
+        } else {
+          throw new IllegalArgumentException("Unbown geometry attribute :"
+            + geometryAttribute);
+        }
+      }
+    }
+    return query;
+  }
+
   @Override
-  public ResultPager<DataObject> page(Query query) {
-    return new OracleJdbcQueryResultPager(this, getProperties(), query);
+  public AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(this, query, properties);
   }
 
-  private boolean useSchemaSequencePrefix = true;
-
-  public void setUseSchemaSequencePrefix(boolean useSchemaSequencePrefix) {
-    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
+  @Override
+  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    return sequenceName + ".NEXTVAL";
   }
 
-  public boolean isUseSchemaSequencePrefix() {
-    return useSchemaSequencePrefix;
+  @Override
+  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    return getNextPrimaryKey(sequenceName);
+  }
+
+  @Override
+  public Object getNextPrimaryKey(final String sequenceName) {
+    final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
+    try {
+      return JdbcUtils.selectLong(getDataSource(), getConnection(), sql);
+    } catch (final SQLException e) {
+      throw new IllegalArgumentException(
+        "Cannot create ID for " + sequenceName, e);
+    }
+  }
+
+  @Override
+  public int getRowCount(final Query query) {
+    final Query bboxQuery = addBoundingBoxFilter(query);
+    if (bboxQuery != query) {
+      query.setAttributeNames("count(*))");
+    }
+    return super.getRowCount(query);
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
@@ -96,7 +156,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     } else {
       final String typePath = metaData.getPath();
       final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-      String shortName = ShortNameProperty.getShortName(metaData);
+      final String shortName = ShortNameProperty.getShortName(metaData);
       final String sequenceName;
       if (StringUtils.hasText(shortName)) {
         if (useSchemaSequencePrefix) {
@@ -113,27 +173,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         }
       }
       return sequenceName;
-    }
-  }
-
-  @Override
-  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
-    String sequenceName = getSequenceName(metaData);
-    return sequenceName + ".NEXTVAL";
-  }
-
-  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
-    final String sequenceName = getSequenceName(metaData);
-    return getNextPrimaryKey(sequenceName);
-  }
-
-  public Object getNextPrimaryKey(final String sequenceName) {
-    final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
-    try {
-      return JdbcUtils.selectLong(getDataSource(), getConnection(), sql);
-    } catch (final SQLException e) {
-      throw new IllegalArgumentException(
-        "Cannot create ID for " + sequenceName, e);
     }
   }
 
@@ -168,70 +207,21 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
 
-      OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
+      final OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
       addAttributeAdder("BLOB", blobAdder);
 
-      OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
+      final OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
       addAttributeAdder("CLOB", clobAdder);
     }
   }
 
-  @Override
-  public int getRowCount(Query query) {
-    Query bboxQuery = addBoundingBoxFilter(query);
-    if (bboxQuery != query) {
-      query.setAttributeNames("count(*))");
-    }
-    return super.getRowCount(query);
+  public boolean isUseSchemaSequencePrefix() {
+    return useSchemaSequencePrefix;
   }
 
-  protected Query addBoundingBoxFilter(Query query) {
-    BoundingBox boundingBox = query.getBoundingBox();
-    if (boundingBox != null) {
-      final String typePath = query.getTypeName();
-      final DataObjectMetaData metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Unable to  find table " + typePath);
-      } else {
-        query = query.clone();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
-        final String geometryColumnName = geometryAttribute.getName();
-        GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-        final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-        final double x1 = projectedBoundingBox.getMinX();
-        final double y1 = projectedBoundingBox.getMinY();
-        final double x2 = projectedBoundingBox.getMaxX();
-        final double y2 = projectedBoundingBox.getMaxY();
-
-        String whereClause = query.getWhereClause();
-        final StringBuffer where = new StringBuffer();
-        if (StringUtils.hasText(whereClause)) {
-          where.append("(");
-          where.append(whereClause);
-          where.append(") AND ");
-        }
-        if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
-          where.append(" SDO_RELATE(");
-          where.append(geometryColumnName);
-          where.append(",");
-          where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
-          where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-          query.addParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
-        } else if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
-          where.append(" SDE.ST_ENVINTERSECTS(");
-          where.append(geometryColumnName);
-          where.append(", ?, ?, ?, ?) = 1");
-          query.addParameters(x1, y1, x2, y2);
-        } else {
-          throw new IllegalArgumentException("Unbown geometry attribute :"
-            + geometryAttribute);
-        }
-        query.setWhereClause(where.toString());
-      }
-    }
-    return query;
+  @Override
+  public ResultPager<DataObject> page(final Query query) {
+    return new OracleJdbcQueryResultPager(this, getProperties(), query);
   }
 
   @Override
@@ -253,6 +243,10 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         }
       }
     }
+  }
+
+  public void setUseSchemaSequencePrefix(final boolean useSchemaSequencePrefix) {
+    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
   }
 
 }

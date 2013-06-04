@@ -19,6 +19,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
@@ -47,12 +48,6 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     super(dataSource);
   }
 
-  @Override
-  public AbstractIterator<DataObject> createIterator(Query query,
-    Map<String, Object> properties) {
-    return new PostgreSQLJdbcQueryIterator(this, query, properties);
-  }
-
   public PostgreSQLDataObjectStore(
     final PostgreSQLDatabaseFactory databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
@@ -60,6 +55,35 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
 
+  }
+
+  @Override
+  public AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    return new PostgreSQLJdbcQueryIterator(this, query, properties);
+  }
+
+  @Override
+  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    return "nextval('" + sequenceName + "')";
+  }
+
+  @Override
+  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    return getNextPrimaryKey(sequenceName);
+  }
+
+  @Override
+  public Object getNextPrimaryKey(final String sequenceName) {
+    final String sql = "SELECT nextval(?)";
+    try {
+      return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
+        sequenceName);
+    } catch (final SQLException e) {
+      throw new IllegalArgumentException("Cannot create ID for " + sequenceName);
+    }
   }
 
   @Override
@@ -73,16 +97,8 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       } else {
         query = query.clone();
         query.setAttributeNames("count(*))");
-        String whereClause = query.getWhereClause();
         final String geometryAttributeName = metaData.getGeometryAttributeName();
-        if (StringUtils.hasText(whereClause)) {
-          whereClause = "(" + whereClause + ") AND " + geometryAttributeName
-            + " && ?";
-        } else {
-          whereClause = geometryAttributeName + " && ?";
-        }
-        query.setWhereClause(whereClause);
-        GeometryFactory geometryFactory = metaData.getGeometryFactory();
+        final GeometryFactory geometryFactory = metaData.getGeometryFactory();
         boundingBox = boundingBox.convert(geometryFactory);
         final double x1 = boundingBox.getMinX();
         final double y1 = boundingBox.getMinY();
@@ -90,51 +106,17 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
         final double y2 = boundingBox.getMaxY();
 
         final PGbox box = new PGbox(x1, y1, x2, y2);
-        query.addParameter(box);
+        query.and(new BinaryCondition(geometryAttributeName, "&&", box));
       }
     }
 
     return super.getRowCount(query);
   }
-  
-  @Override
-  public ResultPager<DataObject> page(Query query) {
-    return new PostgreSQLJdbcQueryResultPager(this, getProperties(), query);
-  }
-
-  @Override
-  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
-    final String sequenceName = getSequenceName(metaData);
-    return "nextval('" + sequenceName + "')";
-  }
-
-  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
-    String sequenceName = getSequenceName(metaData);
-    return getNextPrimaryKey(sequenceName);
-  }
-
-  public Object getNextPrimaryKey(final String sequenceName) {
-    final String sql = "SELECT nextval(?)";
-    try {
-      return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
-        sequenceName);
-    } catch (final SQLException e) {
-      throw new IllegalArgumentException("Cannot create ID for " + sequenceName);
-    }
-  }
-
-  public void setUseSchemaSequencePrefix(boolean useSchemaSequencePrefix) {
-    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
-  }
-
-  public boolean isUseSchemaSequencePrefix() {
-    return useSchemaSequencePrefix;
-  }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-    String shortName = ShortNameProperty.getShortName(metaData);
+    final String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName;
     if (StringUtils.hasText(shortName)) {
       if (useSchemaSequencePrefix) {
@@ -207,5 +189,18 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
+  }
+
+  public boolean isUseSchemaSequencePrefix() {
+    return useSchemaSequencePrefix;
+  }
+
+  @Override
+  public ResultPager<DataObject> page(final Query query) {
+    return new PostgreSQLJdbcQueryResultPager(this, getProperties(), query);
+  }
+
+  public void setUseSchemaSequencePrefix(final boolean useSchemaSequencePrefix) {
+    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
   }
 }

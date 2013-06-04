@@ -750,6 +750,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
     this.query = query;
@@ -783,8 +784,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (idAttributeName == null) {
       clearSelectedObjects();
     } else {
-      final Query query = new Query(metaData);
-      query.addFilter(idAttributeName, id);
+      final Query query = Query.equal(metaData, idAttributeName, id);
       final List<DataObject> objects = query(query);
       setSelectedObjects(objects);
     }

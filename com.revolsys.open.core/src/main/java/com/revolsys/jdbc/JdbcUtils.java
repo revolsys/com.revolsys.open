@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -93,6 +93,14 @@ public final class JdbcUtils {
     }
   }
 
+  public static void appendWhere(final StringBuffer sql, final Query query) {
+    final Condition where = query.getWhereCondition();
+    if (where != null && !where.isEmpty()) {
+      sql.append(" WHERE ");
+      where.appendSql(sql);
+    }
+  }
+
   public static String cleanObjectName(final String objectName) {
     return objectName.replaceAll("[^a-zA-Z\\._]", "");
   }
@@ -136,8 +144,7 @@ public final class JdbcUtils {
   public static String createSelectSql(final DataObjectMetaData metaData,
     final String tablePrefix, final String fromClause,
     final boolean lockResults, final List<String> attributeNames,
-    final Map<String, ? extends Object> filter, String where,
-    final Map<String, Boolean> orderBy) {
+    final Query query, final Map<String, Boolean> orderBy) {
     final String typePath = metaData.getPath();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
@@ -156,75 +163,7 @@ public final class JdbcUtils {
       sql.append(" ");
       sql.append(tablePrefix);
     }
-    if (filter != null && !filter.isEmpty()) {
-      final StringBuffer filterWhere = new StringBuffer();
-      boolean first = true;
-      for (final Entry<String, ?> entry : filter.entrySet()) {
-        if (first) {
-          first = false;
-        } else {
-          filterWhere.append(" AND ");
-        }
-        final String key = entry.getKey();
-        final Object value = entry.getValue();
-        if (value == null) {
-          filterWhere.append(key);
-          filterWhere.append(" IS NULL");
-        } else {
-          final Attribute attribute = metaData.getAttribute(key);
-          if (attribute instanceof JdbcAttribute) {
-            final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
-
-            if (value instanceof Collection) {
-              final Collection<?> collection = (Collection<?>)value;
-              final int size = collection.size();
-              filterWhere.append(key);
-              filterWhere.append(" IN (");
-
-              for (int i = 0; i < size; i++) {
-                if (i > 0) {
-                  filterWhere.append(", ");
-                }
-                jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
-              }
-              filterWhere.append(")");
-            } else {
-              filterWhere.append(key);
-              filterWhere.append(" = ");
-              jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
-            }
-          } else if (value instanceof Collection) {
-            final Collection<?> collection = (Collection<?>)value;
-            final int size = collection.size();
-            filterWhere.append(key);
-            filterWhere.append(" IN (");
-
-            for (int i = 0; i < size; i++) {
-              if (i > 0) {
-                filterWhere.append(", ?");
-              } else {
-                filterWhere.append("?");
-              }
-            }
-            filterWhere.append(")");
-          } else {
-            filterWhere.append(key);
-            filterWhere.append(" = ?");
-          }
-        }
-      }
-      if (filterWhere.length() > 0) {
-        if (StringUtils.hasText(where)) {
-          where = "(" + where + ") AND (" + filterWhere + ")";
-        } else {
-          where = filterWhere.toString();
-        }
-      }
-    }
-    if (StringUtils.hasText(where)) {
-      sql.append(" WHERE ");
-      sql.append(where);
-    }
+    appendWhere(sql, query);
     addOrderBy(sql, orderBy);
     if (lockResults) {
       sql.append(" FOR UPDATE");
@@ -285,53 +224,12 @@ public final class JdbcUtils {
   public static String getDeleteSql(final Query query) {
     final String tableName = query.getTypeName();
     final String dbTableName = getQualifiedTableName(tableName);
-    final DataObjectMetaData metaData = query.getMetaData();
 
     final StringBuffer sql = new StringBuffer();
     sql.append("DELETE FROM ");
     sql.append(dbTableName);
     sql.append(" T ");
-    String where = query.getWhereClause();
-    final Map<String, Object> filter = query.getFilter();
-    if (!filter.isEmpty()) {
-      final StringBuffer filterWhere = new StringBuffer();
-      boolean first = true;
-      for (final Entry<String, ?> entry : filter.entrySet()) {
-        if (first) {
-          first = false;
-        } else {
-          filterWhere.append(" AND ");
-        }
-        final String key = entry.getKey();
-        final Object value = entry.getValue();
-        if (value == null) {
-          filterWhere.append(key);
-          filterWhere.append(" IS NULL");
-        } else {
-          final Attribute attribute = metaData.getAttribute(key);
-          if (attribute instanceof JdbcAttribute) {
-            final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
-            filterWhere.append(key);
-            filterWhere.append(" = ");
-            jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
-          } else {
-            filterWhere.append(key);
-            filterWhere.append(" = ?");
-          }
-        }
-      }
-      if (filterWhere.length() > 0) {
-        if (StringUtils.hasText(where)) {
-          where = "(" + where + ") AND (" + filterWhere + ")";
-        } else {
-          where = filterWhere.toString();
-        }
-      }
-    }
-    if (StringUtils.hasText(where)) {
-      sql.append(" WHERE ");
-      sql.append(where);
-    }
+    appendWhere(sql, query);
     return sql.toString();
   }
 
@@ -391,11 +289,9 @@ public final class JdbcUtils {
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());
       final String fromClause = query.getFromClause();
-      final String where = query.getWhereClause();
-      final Map<String, ? extends Object> filter = query.getFilter();
       final boolean lockResults = query.isLockResults();
       sql = createSelectSql(metaData, "T", fromClause, lockResults,
-        attributeNames, filter, where, orderBy);
+        attributeNames, query, orderBy);
       query.setSql(sql);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
@@ -676,67 +572,21 @@ public final class JdbcUtils {
     }
   }
 
-  public static int setPreparedStatementFilterParameters(
-    final DataObjectMetaData metaData, final PreparedStatement statement,
-    int parameterIndex, final Map<String, ? extends Object> filter)
-    throws SQLException {
-    if (filter != null && !filter.isEmpty()) {
-      for (final Entry<String, ?> entry : filter.entrySet()) {
-        final String key = entry.getKey();
-        final Object value = entry.getValue();
-        if (value != null) {
-          final Attribute attribute = metaData.getAttribute(key);
-          JdbcAttribute jdbcAttribute;
-          if (attribute instanceof JdbcAttribute) {
-            jdbcAttribute = (JdbcAttribute)attribute;
-
-          } else {
-            jdbcAttribute = JdbcAttribute.createAttribute(value);
-          }
-          if (value instanceof Collection) {
-            final Collection<?> collection = (Collection<?>)value;
-            for (final Object item : collection) {
-              parameterIndex = jdbcAttribute.setPreparedStatementValue(
-                statement, parameterIndex, item);
-            }
-          } else {
-            parameterIndex = jdbcAttribute.setPreparedStatementValue(statement,
-              parameterIndex, value);
-          }
-        }
+  public static void setPreparedStatementParameters(
+    final PreparedStatement statement, final Query query) {
+    int index = 1;
+    for (final Object parameter : query.getParameters()) {
+      final JdbcAttribute attribute = JdbcAttribute.createAttribute(parameter);
+      try {
+        index = attribute.setPreparedStatementValue(statement, index, parameter);
+      } catch (final SQLException e) {
+        throw new RuntimeException("Error setting value:" + parameter, e);
       }
     }
-    return parameterIndex;
-  }
-
-  public static void setPreparedStatementFilterParameters(
-    final PreparedStatement statement, final Query query) throws SQLException {
-    final DataObjectMetaData metaData = query.getMetaData();
-    final Map<String, ? extends Object> filter = query.getFilter();
-    int parameterIndex = setPreparedStatementParameters(query, statement);
-    parameterIndex = setPreparedStatementFilterParameters(metaData, statement,
-      parameterIndex, filter);
-  }
-
-  public static int setPreparedStatementParameters(final Query query,
-    final PreparedStatement statement) throws SQLException {
-    final List<Object> parameters = query.getParameters();
-    final List<Attribute> parameterAttributes = query.getParameterAttributes();
-
-    int statementParameterIndex = 1;
-    for (int i = 0; i < parameters.size(); i++) {
-      final Attribute attribute = parameterAttributes.get(i);
-      final Object value = parameters.get(i);
-      JdbcAttribute jdbcAttribute;
-      if (attribute instanceof JdbcAttribute) {
-        jdbcAttribute = (JdbcAttribute)attribute;
-      } else {
-        jdbcAttribute = JdbcAttribute.createAttribute(value);
-      }
-      statementParameterIndex = jdbcAttribute.setPreparedStatementValue(
-        statement, statementParameterIndex, value);
+    final Condition where = query.getWhereCondition();
+    if (where != null) {
+      where.appendParameters(index, statement);
     }
-    return statementParameterIndex;
   }
 
   public static int setValue(final PreparedStatement statement,

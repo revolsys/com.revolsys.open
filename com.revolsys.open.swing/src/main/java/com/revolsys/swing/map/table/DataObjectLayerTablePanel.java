@@ -1,14 +1,20 @@
 package com.revolsys.swing.map.table;
 
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
+
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
@@ -21,7 +27,8 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
-public class DataObjectLayerTablePanel extends TablePanel {
+public class DataObjectLayerTablePanel extends TablePanel implements
+  PropertyChangeListener {
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
 
@@ -59,6 +66,10 @@ public class DataObjectLayerTablePanel extends TablePanel {
     toolBar.addButton("record", "Add New Record", "table_row_insert",
       canAddObjectsEnableCheck, layer, "addNewRecord");
 
+    final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
+      metaData);
+    attributeFilterPanel.addPropertyChangeListener(this);
+    toolBar.addComponent("search", attributeFilterPanel);
     // Filter buttons
 
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
@@ -122,6 +133,27 @@ public class DataObjectLayerTablePanel extends TablePanel {
     super.mouseClicked(e);
     if (SwingUtil.isLeftButtonAndNoModifiers(e) && e.getClickCount() == 2) {
       editRecord();
+    }
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof AttributeFilterPanel) {
+      final AttributeFilterPanel filterPanel = (AttributeFilterPanel)source;
+      // TODO allow original query
+      // TODO only update if it changed
+      final Query query = layer.getQuery();
+      final String searchAttribute = filterPanel.getSearchAttribute();
+      final String searchText = filterPanel.getSearchText();
+      if (StringUtils.hasText(searchAttribute)
+        && StringUtils.hasText(searchText)) {
+        final String likeString = "%" + searchText + "%";
+        query.setWhereCondition(Conditions.like(searchAttribute, likeString));
+      } else {
+        query.setWhereCondition(null);
+      }
+      layer.setQuery(query);
     }
   }
 

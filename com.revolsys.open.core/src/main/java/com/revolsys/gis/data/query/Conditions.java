@@ -1,49 +1,166 @@
 package com.revolsys.gis.data.query;
 
 import java.util.Arrays;
+import java.util.Collection;
+
+import com.revolsys.gis.data.model.Attribute;
 
 public class Conditions {
 
-  public static BinaryCondition between(final Object value1, final Object value2) {
-    return new BinaryCondition(value1, "BETWEEN", value2);
+  public static MultipleCondition and(final Condition... conditions) {
+    return new MultipleCondition("AND", conditions);
   }
 
-  public static BinaryCondition equal(final Object left, final Object right) {
-    return new BinaryCondition(left, "=", right);
+  public static Condition equal(final Attribute attribute, final Object value) {
+    final String name = attribute.getName();
+    final Value valueCondition = new Value(attribute, value);
+    return equal(name, valueCondition);
   }
 
-  public static BinaryCondition greaterThan(final Object left,
-    final Object right) {
-    return new BinaryCondition(left, ">", right);
+  public static Condition equal(final Condition left, final Object value) {
+    final Value valueCondition = new Value(value);
+    return equal(left, valueCondition);
   }
 
-  public static BinaryCondition greaterThanOrEqual(final Object left,
-    final Object right) {
-    return new BinaryCondition(left, ">=", right);
+  public static BinaryCondition equal(final String left, final Condition right) {
+    return new BinaryCondition(new Column(left), "=", right);
   }
 
-  public static BinaryCondition in(final Object left, final Object... right) {
-    return new BinaryCondition(left, "IN", Arrays.asList(right));
+  public static Condition equal(final String name, final Object value) {
+    final Value valueCondition = new Value(value);
+    return equal(name, valueCondition);
   }
 
-  public static Condition lessThan(final Object left, final Object right) {
-    return new BinaryCondition(left, "<", right);
+  public static BinaryCondition greaterThan(final String left,
+    final Condition right) {
+    return new BinaryCondition(new Column(left), ">", right);
   }
 
-  public static Condition lessThanOrEqual(final Object left, final Object right) {
-    return new BinaryCondition(left, "<=", right);
+  public static Condition greaterThanOrEqual(final Attribute attribute,
+    final Object value) {
+    final String name = attribute.getName();
+    final Value valueCondition = new Value(attribute, value);
+    return greaterThanOrEqual(name, valueCondition);
   }
 
-  public static Condition like(final Object left, final Object right) {
+  public static BinaryCondition greaterThanOrEqual(final String left,
+    final Condition right) {
+    return new BinaryCondition(new Column(left), ">=", right);
+  }
+
+  public static BinaryCondition in(final Attribute attribute,
+    final Collection<? extends Object> values) {
+    return new BinaryCondition(new Column(attribute.getName()), "in",
+      new CollectionValue(attribute, values));
+  }
+
+  public static BinaryCondition in(final String name,
+    final Collection<? extends Object> values) {
+    return new BinaryCondition(new Column(name), "in", new CollectionValue(
+      values));
+  }
+
+  public static Condition in(final String name, final Object... values) {
+    return in(name, Arrays.asList(values));
+  }
+
+  public static RightUnaryCondition isNotNull(final String name) {
+    return new RightUnaryCondition(new Column(name), "IS NOT NULL");
+  }
+
+  public static RightUnaryCondition isNull(final String name) {
+    return new RightUnaryCondition(new Column(name), "IS NULL");
+  }
+
+  public static Condition lessThan(final String left, final Condition right) {
+    return new BinaryCondition(new Column(left), "<", right);
+  }
+
+  public static Condition lessThan(final String left, final Object value) {
+    final Value valueCondition = new Value(value);
+    return new BinaryCondition(new Column(left), "<", valueCondition);
+  }
+
+  public static Condition lessThanOrEqual(final String left,
+    final Condition right) {
+    return new BinaryCondition(new Column(left), "<=", right);
+  }
+
+  public static Condition like(final Condition left, final Condition right) {
     return new BinaryCondition(left, "LIKE", right);
   }
 
-  public static Condition notEqual(final Object left, final Object right) {
-    return new BinaryCondition(left, "<>", right);
+  public static Condition like(final Condition left, final Object value) {
+    final Value valueCondition = new Value(value);
+    return like(left, valueCondition);
   }
 
-  public static UnaryOperator not(final Object value) {
-    return new UnaryOperator("NOT", value);
+  public static Condition like(final String left, final Condition right) {
+    return like(new Column(left), right);
   }
 
+  public static Condition like(final String name, final Object value) {
+    final Value valueCondition = new Value(value);
+    return like(name, valueCondition);
+  }
+
+  public static Condition likeDate(final String left, final String right) {
+    return like(Function.toChar(left, "YYYY-MM-DD HH24:MI:SS"), "%" + right
+      + "%");
+  }
+
+  public static Condition likeNumber(final String left, final String right) {
+    return like(
+      Function.toChar(left, "9999999999999999999.9999999999999999999"), "%"
+        + right + "%");
+  }
+
+  public static Condition likeUpper(final String left, final String right) {
+    return like(Function.upper(left), "%" + right + "%");
+  }
+
+  public static LeftUnaryCondition not(final Condition value) {
+    return new LeftUnaryCondition("NOT", value);
+  }
+
+  public static Condition notEqual(final String left, final Condition right) {
+    return new BinaryCondition(new Column(left), "<>", right);
+  }
+
+  public static MultipleCondition or(final Condition... conditions) {
+    return new MultipleCondition("OR", conditions);
+  }
+
+  public static void setValue(final int index, final Condition condition,
+    final Object value) {
+    setValueInternal(-1, index, condition, value);
+
+  }
+
+  public static int setValueInternal(int i, final int index,
+    final Condition condition, final Object value) {
+    for (final Condition subCondition : condition.getConditions()) {
+      if (subCondition instanceof Value) {
+        final Value valueCondition = (Value)subCondition;
+        i++;
+        if (i == index) {
+          valueCondition.setValue(value);
+          return i;
+        }
+        i = setValueInternal(i, index, subCondition, value);
+        if (i >= index) {
+          return i;
+        }
+      }
+    }
+    return i;
+  }
+
+  public static SqlCondition sql(final String sql) {
+    return new SqlCondition(sql);
+  }
+
+  public static SqlCondition sql(final String sql, final Object... parameters) {
+    return new SqlCondition(sql, parameters);
+  }
 }

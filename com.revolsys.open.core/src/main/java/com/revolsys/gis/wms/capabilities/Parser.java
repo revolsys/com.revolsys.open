@@ -364,7 +364,7 @@ public class Parser extends XmlProcessor {
     layer.setFixedHeight(fixedHeight);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final String tagName = parser.getName().getLocalPart();
-      if (tagName.equals("Name")) {
+      if (tagName.equals("Column")) {
         final String name = StaxUtils.getElementText(parser);
         layer.setName(name);
       } else if (tagName.equals("Title")) {
@@ -483,7 +483,7 @@ public class Parser extends XmlProcessor {
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
       final String tagName = parser.getName().getLocalPart();
-      if (tagName.equals("Name")) {
+      if (tagName.equals("Column")) {
         final String name = StaxUtils.getElementText(parser);
         service.setName(name);
       } else if (tagName.equals("Title")) {
@@ -521,7 +521,7 @@ public class Parser extends XmlProcessor {
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
       final String tagName = parser.getName().getLocalPart();
-      if (tagName.equals("Name")) {
+      if (tagName.equals("Column")) {
         final String name = StaxUtils.getElementText(parser);
         style.setName(name);
       } else if (tagName.equals("Title")) {

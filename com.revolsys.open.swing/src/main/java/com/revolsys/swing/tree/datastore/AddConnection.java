@@ -57,7 +57,7 @@ public class AddConnection extends I18nAction {
 
       final JPanel connectionPanel = new JPanel(new SpringLayout());
       panel.add(connectionPanel, BorderLayout.NORTH);
-      connectionPanel.add(new JLabel("Name:"));
+      connectionPanel.add(new JLabel("Column:"));
       nameField = new JTextField("", 50);
       connectionPanel.add(nameField);
       connectionPanel.add(new JLabel("URL:"));

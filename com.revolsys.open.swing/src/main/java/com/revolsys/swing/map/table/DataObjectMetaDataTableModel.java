@@ -12,7 +12,7 @@ import com.revolsys.swing.table.BaseJxTable;
 @SuppressWarnings("serial")
 public class DataObjectMetaDataTableModel extends AbstractTableModel {
 
-  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Name",
+  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Column",
     "Type", "Length", "Scale", "Required");
 
   private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(

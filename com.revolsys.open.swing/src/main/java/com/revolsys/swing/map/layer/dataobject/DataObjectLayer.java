@@ -74,6 +74,8 @@ public interface DataObjectLayer extends Layer {
 
   boolean isDeleted(DataObject object);
 
+  boolean isEditing(DataObject object);
+
   boolean isHasChanges();
 
   boolean isHidden(DataObject object);
@@ -89,6 +91,8 @@ public interface DataObjectLayer extends Layer {
   List<DataObject> query(Query query);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
+
+  void setQuery(Query query);
 
   void setSelectedObjects(BoundingBox boundingBox);
 
@@ -106,6 +110,4 @@ public interface DataObjectLayer extends Layer {
   void unselectObjects(Collection<? extends DataObject> objects);
 
   void unselectObjects(DataObject... objects);
-
-  boolean isEditing(DataObject object);
 }

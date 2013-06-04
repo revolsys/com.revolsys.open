@@ -22,7 +22,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
@@ -30,7 +29,6 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
-import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -45,6 +43,7 @@ import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
@@ -163,7 +162,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public AbstractIterator<DataObject> createIterator(Query query,
+  public AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     return new JdbcQueryIterator(this, query, properties);
   }
@@ -180,38 +179,10 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  protected DataObjectStoreQueryReader createReader(
-    final DataObjectMetaData metaData, final String sql,
-    final List<Object> parameters) {
-    final Query query = new Query(metaData);
-    query.setSql(sql);
-    query.setParameters(parameters);
-    return createReader(query);
-  }
-
-  protected DataObjectStoreQueryReader createReader(
-    final DataObjectMetaData metaData, final String query,
-    final Object... parameters) {
-    return createReader(metaData, query, Arrays.asList(parameters));
-  }
-
   protected DataObjectStoreQueryReader createReader(final Query query) {
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
-  }
-
-  @Override
-  public DataObjectReader createReader(final String typePath,
-    final String query, final List<Object> parameters) {
-    final DataObjectStoreQueryReader reader = createReader();
-    reader.addQuery(typePath, query, parameters);
-    return reader;
-  }
-
-  protected DataObjectReader createReader(final String typePath,
-    final String whereClause, final Object... parameters) {
-    return createReader(typePath, whereClause, Arrays.asList(parameters));
   }
 
   @Override
@@ -278,7 +249,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
-        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+
+        JdbcUtils.setPreparedStatementParameters(statement, query);
         return statement.executeUpdate();
       } finally {
         JdbcUtils.close(statement);
@@ -419,7 +391,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
-        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+        JdbcUtils.setPreparedStatementParameters(statement, query);
         final ResultSet resultSet = statement.executeQuery();
         try {
           if (resultSet.next()) {
@@ -726,31 +698,19 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
-    return query(typePath, geometry, null);
-  }
-
-  @Override
-  public Reader<DataObject> query(final String typePath, Geometry geometry,
-    final String whereClause) {
+  public Reader<DataObject> query(final String typePath, Geometry geometry) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
     geometry = ProjectionFactory.convert(geometry, geometryFactory);
 
-    final StringBuffer where = new StringBuffer();
-    if (StringUtils.hasText(whereClause)) {
-      where.append(whereClause);
-      where.append(" AND ");
-    }
     final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
     final StringBuffer qArg = new StringBuffer();
     geometryAttribute.addSelectStatementPlaceHolder(qArg);
-    where.append(intersectsFunction.toSql(geometryAttribute.getName(), qArg));
 
     final Query query = new Query(metaData);
-    query.setWhereClause(where.toString());
-    query.addParameter(geometry, geometryAttribute);
+    query.setWhereCondition(new SqlCondition(intersectsFunction.toSql(
+      geometryAttribute.getName(), qArg), geometryAttribute, geometry));
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;

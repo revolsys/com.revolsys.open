@@ -257,10 +257,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         typePath + " does not have a primary key");
       return null;
     } else {
-      final Map<String, ? extends Object> filter = Collections.singletonMap(
-        idAttributeName, id);
-      final Query query = new Query(typePath);
-      query.setFilter(filter);
+      final Query query = Query.equal(metaData, idAttributeName, id);
       query.setProperty("dataObjectFactory", this);
       final DataObjectStore dataStore = getDataStore();
       return dataStore.queryFirst(query);
@@ -335,8 +332,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   public List<DataObject> query(final Map<String, ? extends Object> filter) {
-    final Query query = new Query(getMetaData());
-    query.setFilter(filter);
+    final DataObjectMetaData metaData = getMetaData();
+    final Query query = Query.and(metaData, filter);
     return query(query);
   }
 

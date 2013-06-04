@@ -158,7 +158,7 @@ public class ClientDoclet {
       writer.attribute(HtmlUtil.ATTR_CLASS, "data");
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);
-      writer.element(HtmlUtil.TH, "Name");
+      writer.element(HtmlUtil.TH, "Column");
       writer.element(HtmlUtil.TH, "Type");
       writer.element(HtmlUtil.TH, "Default");
       writer.element(HtmlUtil.TH, "Description");

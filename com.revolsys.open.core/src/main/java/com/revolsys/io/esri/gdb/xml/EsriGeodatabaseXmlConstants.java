@@ -315,7 +315,7 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName MODEL_NAME = new QName(_NAMESPACE_URI, "ModelName", _NAMESPACE_PREFIX);
 
-  QName NAME = new QName(_NAMESPACE_URI, "Name", _NAMESPACE_PREFIX);
+  QName NAME = new QName(_NAMESPACE_URI, "Column", _NAMESPACE_PREFIX);
 
   QName NAMES = new QName(_NAMESPACE_URI, "Names", _NAMESPACE_PREFIX);
 

@@ -55,17 +55,9 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   public static ResultSet getResultSet(final DataObjectMetaData metaData,
     final PreparedStatement statement, final Query query) throws SQLException {
-    JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+    JdbcUtils.setPreparedStatementParameters(statement, query);
 
     return statement.executeQuery();
-  }
-
-  public JdbcDataObjectStore getDataStore() {
-    return dataStore;
-  }
-
-  protected void setQuery(Query query) {
-    this.query = query;
   }
 
   private Connection connection;
@@ -142,6 +134,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   @Override
   protected void doInit() {
     this.resultSet = getResultSet();
+  }
+
+  public JdbcDataObjectStore getDataStore() {
+    return dataStore;
   }
 
   protected String getErrorMessage() {
@@ -238,6 +234,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   protected String getSql(final Query query) {
     return JdbcUtils.getSelectSql(query);
+  }
+
+  protected void setQuery(final Query query) {
+    this.query = query;
   }
 
 }

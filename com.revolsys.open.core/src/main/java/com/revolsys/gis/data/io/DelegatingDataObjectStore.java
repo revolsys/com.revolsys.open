@@ -95,12 +95,6 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public DataObjectReader createReader(final String typePath,
-    final String query, final List<Object> parameters) {
-    return dataStore.createReader(typePath, query, parameters);
-  }
-
-  @Override
   public Writer<DataObject> createWriter() {
     return dataStore.createWriter();
   }

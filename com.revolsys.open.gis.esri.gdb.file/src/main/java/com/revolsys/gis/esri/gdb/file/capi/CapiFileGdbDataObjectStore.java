@@ -37,7 +37,16 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.query.BinaryCondition;
+import com.revolsys.gis.data.query.CollectionValue;
+import com.revolsys.gis.data.query.Column;
+import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.LeftUnaryCondition;
+import com.revolsys.gis.data.query.MultipleCondition;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.RightUnaryCondition;
+import com.revolsys.gis.data.query.SqlCondition;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
@@ -222,6 +231,114 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     geodatabase.alterDomain(domainDefinition);
   }
 
+  private void appendCondition(final StringBuffer buffer,
+    final Condition condition) {
+    if (condition instanceof LeftUnaryCondition) {
+      final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
+      final String operator = unaryCondition.getOperator();
+      final Condition right = unaryCondition.getCondition();
+      buffer.append(operator);
+      buffer.append(" ");
+      appendCondition(buffer, right);
+    } else if (condition instanceof RightUnaryCondition) {
+      final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
+      final Condition left = unaryCondition.getCondition();
+      final String operator = unaryCondition.getOperator();
+      appendCondition(buffer, left);
+      buffer.append(" ");
+      buffer.append(operator);
+    } else if (condition instanceof BinaryCondition) {
+      final BinaryCondition binaryCondition = (BinaryCondition)condition;
+      final Condition left = binaryCondition.getLeft();
+      final String operator = binaryCondition.getOperator();
+      final Condition right = binaryCondition.getRight();
+      appendCondition(buffer, left);
+      buffer.append(" ");
+      buffer.append(operator);
+      buffer.append(" ");
+      appendCondition(buffer, right);
+    } else if (condition instanceof MultipleCondition) {
+      final MultipleCondition multipleCondition = (MultipleCondition)condition;
+      buffer.append("(");
+      boolean first = true;
+      final String operator = multipleCondition.getOperator();
+      for (final Condition subCondition : multipleCondition.getConditions()) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(" ");
+          buffer.append(operator);
+          buffer.append(" ");
+        }
+        appendCondition(buffer, subCondition);
+      }
+      buffer.append(")");
+    } else if (condition instanceof Value) {
+      final Value valueCondition = (Value)condition;
+      final Object value = valueCondition.getValue();
+      appendValue(buffer, value);
+    } else if (condition instanceof CollectionValue) {
+      final CollectionValue collectionValue = (CollectionValue)condition;
+      final List<Object> values = collectionValue.getValues();
+      boolean first = true;
+      for (final Object value : values) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(", ");
+        }
+        appendValue(buffer, value);
+      }
+    } else if (condition instanceof Column) {
+      final Column column = (Column)condition;
+      final Object name = column.getName();
+      buffer.append(name);
+    } else if (condition instanceof SqlCondition) {
+      final SqlCondition sqlCondition = (SqlCondition)condition;
+      final String where = sqlCondition.getSql();
+      final List<Object> parameters = sqlCondition.getParameterValues();
+      if (parameters.isEmpty()) {
+        if (where.indexOf('?') > -1) {
+          throw new IllegalArgumentException(
+            "No arguments specified for a where clause with placeholders: "
+              + where);
+        } else {
+          buffer.append(where);
+        }
+      } else {
+        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+        int i = 0;
+        while (matcher.find()) {
+          if (i >= parameters.size()) {
+            throw new IllegalArgumentException(
+              "Not enough arguments for where clause with placeholders: "
+                + where);
+          }
+          final Object argument = parameters.get(i);
+          matcher.appendReplacement(buffer,
+            StringConverterRegistry.toString(argument));
+          appendValue(buffer, argument);
+          i++;
+        }
+        matcher.appendTail(buffer);
+      }
+
+    } else {
+      condition.appendSql(buffer);
+    }
+  }
+
+  public void appendValue(final StringBuffer buffer, final Object value) {
+    if (value instanceof Number) {
+      buffer.append(value);
+    } else {
+      buffer.append("'");
+      buffer.append(StringConverterRegistry.toString(value).replaceAll("'",
+        "''"));
+      buffer.append("'");
+    }
+  }
+
   @Override
   @PreDestroy
   public synchronized void close() {
@@ -239,6 +356,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     super.close();
   }
 
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
+
   public synchronized void closeEnumRows(EnumRows rows) {
     if (rows != null) {
       if (enumRowsToClose.remove(rows)) {
@@ -252,17 +380,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
     }
   }
-
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
 
   protected synchronized void closeRow(final Row row) {
     row.delete();
@@ -640,7 +757,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       typePath = metaData.getPath();
     }
     final StringBuffer whereClause = getWhereClause(query);
-    BoundingBox boundingBox = query.getBoundingBox();
+    final BoundingBox boundingBox = query.getBoundingBox();
 
     if (boundingBox == null) {
       final StringBuffer sql = new StringBuffer();
@@ -663,7 +780,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         rows.Close();
       }
     } else {
-      GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
+      final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
       if (geometryAttribute == null || boundingBox.isNull()) {
         return 0;
       } else {
@@ -679,8 +796,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         try {
           int count = 0;
           for (Row row = rows.next(); row != null; row = rows.next()) {
-            Geometry geometry = (Geometry)geometryAttribute.getValue(row);
-            BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
+            final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
+            final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
             if (geometryBoundingBox.intersects(boundingBox)) {
               count++;
             }
@@ -718,69 +835,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected StringBuffer getWhereClause(final Query query) {
-    String where = query.getWhereClause();
-    if (where == null) {
-      where = "";
-    }
-    final List<Object> parameters = query.getParameters();
-
     final StringBuffer whereClause = new StringBuffer();
-    if (parameters.isEmpty()) {
-      if (where.indexOf('?') > -1) {
-        throw new IllegalArgumentException(
-          "No arguments specified for a where clause with placeholders: "
-            + where);
-      } else {
-        whereClause.append(where);
-      }
-    } else {
-      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-      int i = 0;
-      while (matcher.find()) {
-        if (i >= parameters.size()) {
-          throw new IllegalArgumentException(
-            "Not enough arguments for where clause with placeholders: " + where);
-        }
-        final Object argument = parameters.get(i);
-        matcher.appendReplacement(whereClause, "");
-        if (argument instanceof Number) {
-          whereClause.append(argument);
-        } else {
-          whereClause.append("'");
-          whereClause.append(StringConverterRegistry.toString(argument)
-            .replaceAll("'", "''"));
-          whereClause.append("'");
-        }
-        i++;
-      }
-      matcher.appendTail(whereClause);
-    }
-    final Map<String, Object> filter = query.getFilter();
-    if (!filter.isEmpty()) {
-      if (whereClause.length() > 0) {
-        whereClause.insert(0, '(');
-        whereClause.append(')');
-      }
-      for (final Entry<String, Object> entry : filter.entrySet()) {
-        if (whereClause.length() > 0) {
-          whereClause.append(" AND ");
-        }
-        whereClause.append(entry.getKey());
-        final Object value = entry.getValue();
-        if (value == null) {
-          whereClause.append(" IS NULL");
-        } else {
-          whereClause.append(" = ");
-          if (value instanceof Number) {
-            whereClause.append(value);
-          } else {
-            whereClause.append("'");
-            whereClause.append(StringConverterRegistry.toString(value)
-              .replaceAll("'", "''"));
-            whereClause.append("'");
-          }
-        }
-      }
+    final Condition whereCondition = query.getWhereCondition();
+    if (whereCondition != null) {
+      appendCondition(whereClause, whereCondition);
     }
     return whereClause;
   }
@@ -1018,7 +1076,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         recycling);
       enumRowsToClose.add(rows);
       return rows;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.error("ERROR executing query SELECT " + fields + " WHERE "
         + whereClause + " AND " + boundingBox, e);
       return null;

@@ -61,7 +61,7 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   /**
    * Get the Data Access Object for the object's class name.
    * 
-   * @param objectClass<?>Name The object class name.
+   * @param objectClass<?>Column The object class name.
    * @return The builder.
    */
   public <V> DataAccessObject<V> getDao(final String objectClassName) {
