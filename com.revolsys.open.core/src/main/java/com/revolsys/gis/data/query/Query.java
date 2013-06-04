@@ -148,6 +148,9 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
       if (whereCondition != null) {
         clone.whereCondition = whereCondition.clone();
       }
+      if (!clone.getAttributeNames().isEmpty() || clone.whereCondition != null) {
+        clone.sql = null;
+      }
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new IllegalArgumentException(e.getMessage());

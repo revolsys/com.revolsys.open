@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class CollectionValue extends AbstractCondition {
@@ -55,6 +56,16 @@ public class CollectionValue extends AbstractCondition {
   @Override
   public CollectionValue clone() {
     return new CollectionValue(jdbcAttribute, values);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof CollectionValue) {
+      final CollectionValue condition = (CollectionValue)obj;
+      return EqualsRegistry.equal(condition.getValues(), this.getValues());
+    } else {
+      return false;
+    }
   }
 
   public List<Object> getValues() {

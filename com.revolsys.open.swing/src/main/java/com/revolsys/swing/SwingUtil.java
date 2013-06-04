@@ -355,8 +355,7 @@ public class SwingUtil {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public static void setFieldValue(final JComponent field,
-    final String fieldName, final Object value) {
+  public static void setFieldValue(final JComponent field, final Object value) {
     if (field instanceof Field) {
       final Field fieldObject = (Field)field;
       fieldObject.setFieldValue(value);

@@ -227,7 +227,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       }
     } catch (final SQLException e) {
       JdbcUtils.close(statement, resultSet);
-      throw new RuntimeException("Error executing query:" + sql, e);
+      throw JdbcUtils.getException(dataSource, connection, "Execute Query",
+        sql, e);
     }
     return resultSet;
   }

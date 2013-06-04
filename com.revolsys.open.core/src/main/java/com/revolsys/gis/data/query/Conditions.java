@@ -17,13 +17,19 @@ public class Conditions {
     return equal(name, valueCondition);
   }
 
+  private static BinaryCondition equal(final Condition left,
+    final Condition right) {
+    return new BinaryCondition(left, "=", right);
+  }
+
   public static Condition equal(final Condition left, final Object value) {
     final Value valueCondition = new Value(value);
     return equal(left, valueCondition);
   }
 
   public static BinaryCondition equal(final String left, final Condition right) {
-    return new BinaryCondition(new Column(left), "=", right);
+    final Column leftCondition = new Column(left);
+    return equal(leftCondition, right);
   }
 
   public static Condition equal(final String name, final Object value) {
@@ -104,19 +110,9 @@ public class Conditions {
     return like(name, valueCondition);
   }
 
-  public static Condition likeDate(final String left, final String right) {
-    return like(Function.toChar(left, "YYYY-MM-DD HH24:MI:SS"), "%" + right
-      + "%");
-  }
-
-  public static Condition likeNumber(final String left, final String right) {
-    return like(
-      Function.toChar(left, "9999999999999999999.9999999999999999999"), "%"
-        + right + "%");
-  }
-
   public static Condition likeUpper(final String left, final String right) {
-    return like(Function.upper(left), "%" + right + "%");
+    return like(Function.upper(new Cast(left, "varchar(4000)")),
+      ("%" + right + "%").toUpperCase());
   }
 
   public static LeftUnaryCondition not(final Condition value) {

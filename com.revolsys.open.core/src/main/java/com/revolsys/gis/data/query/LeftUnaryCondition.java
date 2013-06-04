@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class LeftUnaryCondition extends AbstractCondition {
 
   private final Condition condition;
@@ -30,6 +32,19 @@ public class LeftUnaryCondition extends AbstractCondition {
   @Override
   public LeftUnaryCondition clone() {
     return new LeftUnaryCondition(operator, condition.clone());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof LeftUnaryCondition) {
+      final LeftUnaryCondition condition = (LeftUnaryCondition)obj;
+      if (EqualsRegistry.equal(condition.getCondition(), this.getCondition())) {
+        if (EqualsRegistry.equal(condition.getOperator(), this.getOperator())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public Condition getCondition() {

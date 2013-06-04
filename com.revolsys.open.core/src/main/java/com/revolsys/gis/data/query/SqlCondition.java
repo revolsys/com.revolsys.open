@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class SqlCondition extends AbstractCondition {
@@ -93,6 +94,20 @@ public class SqlCondition extends AbstractCondition {
     return new SqlCondition(sql, parameterAttributes, parameterValues);
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof SqlCondition) {
+      final SqlCondition sqlCondition = (SqlCondition)obj;
+      if (EqualsRegistry.equal(sqlCondition.getSql(), this.getSql())) {
+        if (EqualsRegistry.equal(sqlCondition.getParameterValues(),
+          this.getParameterValues())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public List<Object> getParameterValues() {
     return parameterValues;
   }
@@ -103,6 +118,6 @@ public class SqlCondition extends AbstractCondition {
 
   @Override
   public String toString() {
-    return sql;
+    return getSql() + ": " + getParameterValues();
   }
 }

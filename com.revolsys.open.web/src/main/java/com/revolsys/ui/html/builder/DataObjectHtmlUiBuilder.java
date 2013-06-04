@@ -1,7 +1,6 @@
 package com.revolsys.ui.html.builder;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   public Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final String pageName,
     final Map<String, Object> parameters) {
-    String search = request.getParameter("sSearch");
+    final String search = request.getParameter("sSearch");
     final DataObjectMetaData metaData = getDataStore().getMetaData(
       getTableName());
     final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
@@ -94,7 +93,6 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     query.setFromClause(fromClause);
 
     if (StringUtils.hasText(search)) {
-      search = search.toUpperCase();
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
       final MultipleCondition or = Conditions.or();
       final int numSortColumns = HttpServletUtils.getIntegerParameter(request,
@@ -103,21 +101,11 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
         if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           final KeySerializer serializer = serializers.get(i);
           final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-          final Class<?> columnClass = metaData.getAttributeType(columnName)
-            .getJavaClass();
-          if (columnClass != null) {
-            if (columnClass.equals(String.class)) {
-              or.add(Conditions.likeUpper("T." + columnName, search));
-            } else if (Number.class.isAssignableFrom(columnClass)) {
-              or.add(Conditions.likeNumber("T." + columnName, search));
-            } else if (Date.class.isAssignableFrom(columnClass)) {
-              or.add(Conditions.likeDate("T." + columnName, search));
-            }
-          }
+          or.add(Conditions.likeUpper("T." + columnName, search));
         }
-        if (!or.isEmpty()) {
-          query.and(or);
-        }
+      }
+      if (!or.isEmpty()) {
+        query.and(or);
       }
     }
 

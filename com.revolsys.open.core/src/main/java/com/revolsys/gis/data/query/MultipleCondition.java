@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
 
 public class MultipleCondition extends AbstractMultiCondition {
@@ -42,6 +43,17 @@ public class MultipleCondition extends AbstractMultiCondition {
   public MultipleCondition clone() {
     final List<Condition> conditions = cloneConditions();
     return new MultipleCondition(operator, conditions);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof MultipleCondition) {
+      final MultipleCondition condition = (MultipleCondition)obj;
+      if (EqualsRegistry.equal(condition.getOperator(), getOperator())) {
+        return super.equals(obj);
+      }
+    }
+    return false;
   }
 
   public String getOperator() {

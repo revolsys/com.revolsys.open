@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class BinaryCondition extends AbstractCondition {
 
@@ -45,6 +46,21 @@ public class BinaryCondition extends AbstractCondition {
   @Override
   public BinaryCondition clone() {
     return new BinaryCondition(left.clone(), operator, right.clone());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof BinaryCondition) {
+      final BinaryCondition condition = (BinaryCondition)obj;
+      if (EqualsRegistry.equal(condition.getLeft(), this.getLeft())) {
+        if (EqualsRegistry.equal(condition.getRight(), this.getRight())) {
+          if (EqualsRegistry.equal(condition.getOperator(), this.getOperator())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   @Override

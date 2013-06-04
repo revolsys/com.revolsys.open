@@ -73,7 +73,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
           final JTextField textField = (JTextField)editorComponent;
           textField.setHorizontalAlignment(SwingConstants.LEFT);
         }
-        SwingUtil.setFieldValue(editorComponent, attributeName, value);
+        SwingUtil.setFieldValue(editorComponent, value);
       }
     } else {
       editorComponent = null;

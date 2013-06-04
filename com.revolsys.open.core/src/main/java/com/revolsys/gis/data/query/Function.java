@@ -3,11 +3,12 @@ package com.revolsys.gis.data.query;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class Function extends AbstractMultiCondition {
 
-  public static Function toChar(final String name, String format) {
-    return new Function("TO_CHAR", new Column(name), new Value(
-      format));
+  public static Function toChar(final String name, final String format) {
+    return new Function("TO_CHAR", new Column(name), new Value(format));
   }
 
   public static Function upper(final Condition condition) {
@@ -48,6 +49,21 @@ public class Function extends AbstractMultiCondition {
   @Override
   public Function clone() {
     return (Function)super.clone();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Function) {
+      final Function condition = (Function)obj;
+      if (EqualsRegistry.equal(condition.getName(), getName())) {
+        return super.equals(obj);
+      }
+    }
+    return false;
+  }
+
+  public String getName() {
+    return name;
   }
 
 }

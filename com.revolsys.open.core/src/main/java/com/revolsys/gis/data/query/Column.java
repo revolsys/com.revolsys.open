@@ -2,6 +2,8 @@ package com.revolsys.gis.data.query;
 
 import java.sql.PreparedStatement;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class Column extends AbstractCondition {
 
   private final String name;
@@ -23,6 +25,16 @@ public class Column extends AbstractCondition {
   @Override
   public Column clone() {
     return new Column(name);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Column) {
+      final Column value = (Column)obj;
+      return EqualsRegistry.equal(value.getName(), this.getName());
+    } else {
+      return false;
+    }
   }
 
   public String getName() {

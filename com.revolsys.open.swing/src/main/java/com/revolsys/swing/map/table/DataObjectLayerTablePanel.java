@@ -13,8 +13,10 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
@@ -35,6 +37,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   public static final String FILTER_ATTRIBUTE = "filter_attribute";
 
   private final DataObjectLayer layer;
+
+  private Condition searchCondition;
 
   public DataObjectLayerTablePanel(final DataObjectLayer layer,
     final JTable table) {
@@ -70,6 +74,10 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       metaData);
     attributeFilterPanel.addPropertyChangeListener(this);
     toolBar.addComponent("search", attributeFilterPanel);
+
+    toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
+      attributeFilterPanel, "clear");
+
     // Filter buttons
 
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
@@ -142,18 +150,21 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (source instanceof AttributeFilterPanel) {
       final AttributeFilterPanel filterPanel = (AttributeFilterPanel)source;
       // TODO allow original query
-      // TODO only update if it changed
       final Query query = layer.getQuery();
       final String searchAttribute = filterPanel.getSearchAttribute();
       final String searchText = filterPanel.getSearchText();
+      Condition condition;
       if (StringUtils.hasText(searchAttribute)
         && StringUtils.hasText(searchText)) {
-        final String likeString = "%" + searchText + "%";
-        query.setWhereCondition(Conditions.like(searchAttribute, likeString));
+        condition = Conditions.likeUpper(searchAttribute, searchText);
       } else {
-        query.setWhereCondition(null);
+        condition = null;
       }
-      layer.setQuery(query);
+      if (!EqualsRegistry.equal(condition, this.searchCondition)) {
+        this.searchCondition = condition;
+        query.setWhereCondition(condition);
+        layer.setQuery(query);
+      }
     }
   }
 

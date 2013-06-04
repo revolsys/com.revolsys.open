@@ -814,7 +814,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     if (oldValue == null & value != null
       || !EqualsRegistry.equal(value, oldValue)) {
       final JComponent field = getField(fieldName);
-      SwingUtil.setFieldValue(field, fieldName, value);
+      SwingUtil.setFieldValue(field, value);
       if (!field.isEnabled()) {
         if (field instanceof JTextComponent) {
           final JTextComponent textField = (JTextComponent)field;

@@ -20,7 +20,19 @@ public abstract class AbstractCondition implements Condition {
   }
 
   @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuffer string = new StringBuffer();
+    appendSql(string);
+    return string.toString();
   }
 }

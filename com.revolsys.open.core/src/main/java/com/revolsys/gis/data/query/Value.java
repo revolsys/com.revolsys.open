@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class Value extends AbstractCondition {
@@ -44,6 +45,16 @@ public class Value extends AbstractCondition {
     return new Value(jdbcAttribute, value);
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Value) {
+      final Value value = (Value)obj;
+      return EqualsRegistry.equal(value.getValue(), this.getValue());
+    } else {
+      return false;
+    }
+  }
+
   public Object getValue() {
     return value;
   }
@@ -56,4 +67,5 @@ public class Value extends AbstractCondition {
   public String toString() {
     return StringConverterRegistry.toString(value);
   }
+
 }
