@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JComponent;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
@@ -105,7 +107,7 @@ public interface DataObjectLayer extends Layer {
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
-  void showForm(final DataObject object);
+  <V extends JComponent> V showForm(final DataObject object);
 
   void unselectObjects(Collection<? extends DataObject> objects);
 

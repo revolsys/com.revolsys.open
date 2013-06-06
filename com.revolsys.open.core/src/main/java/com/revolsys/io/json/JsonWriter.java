@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public final class JsonWriter {
   private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
     "#.#########################");
@@ -196,7 +198,7 @@ public final class JsonWriter {
       charSequence(string);
       out.print('"');
     } else {
-      value(value.toString());
+      value(StringConverterRegistry.toString(value));
     }
   }
 

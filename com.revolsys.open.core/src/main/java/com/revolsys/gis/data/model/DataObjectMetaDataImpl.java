@@ -23,6 +23,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
+import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.util.AssertionFailedException;
 
@@ -515,7 +516,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public String getTypeName() {
-     return PathUtil.getName(path);
+    return PathUtil.getName(path);
   }
 
   @Override
@@ -586,6 +587,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     this.dataObjectMetaDataFactory = dataObjectMetaDataFactory;
   }
 
+  @Override
+  public void setDefaultValues(final Map<String, ? extends Object> defaultValues) {
+    this.defaultValues = new HashMap<String, Object>(defaultValues);
+  }
+
   /**
    * @param geometryAttributeIndex the geometryAttributeIndex to set
    */
@@ -630,6 +636,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();
+        if (value instanceof ValueMetaDataProperty) {
+          final ValueMetaDataProperty valueProperty = (ValueMetaDataProperty)value;
+          final String propertyName = valueProperty.getPropertyName();
+          final Object propertyValue = valueProperty.getValue();
+          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+        }
         if (value instanceof DataObjectMetaDataProperty) {
           final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
           final DataObjectMetaDataProperty clonedProperty = property.clone();

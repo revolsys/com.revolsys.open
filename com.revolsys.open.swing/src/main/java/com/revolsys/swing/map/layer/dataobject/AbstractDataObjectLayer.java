@@ -802,16 +802,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return objects.size();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void showForm(final DataObject object) {
-    if (object != null) {
+  public <V extends JComponent> V showForm(final DataObject object) {
+    if (object == null) {
+      return null;
+    } else {
       synchronized (forms) {
         Window window = forms.get(object);
         if (window == null) {
           final Object id = object.getIdValue();
           final Component form = createForm(object);
           if (form == null) {
-            return;
+            return null;
           } else {
             String title;
             if (object.getState() == DataObjectState.New) {
@@ -838,11 +841,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                 forms.remove(object);
               }
             });
+            window.requestFocus();
+            return (V)form;
           }
+        } else {
+          window.requestFocus();
+          final Component component = window.getComponent(0);
+          if (component instanceof JScrollPane) {
+            final JScrollPane scrollPane = (JScrollPane)component;
+            return (V)scrollPane.getComponent(0);
+          }
+          return null;
         }
-        window.requestFocus();
       }
     }
+
   }
 
   @Override

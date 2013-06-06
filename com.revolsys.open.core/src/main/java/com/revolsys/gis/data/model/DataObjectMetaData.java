@@ -198,6 +198,8 @@ public interface DataObjectMetaData extends ObjectWithProperties,
 
   boolean isInstanceOf(DataObjectMetaData classDefinition);
 
+  void setDefaultValues(Map<String, ? extends Object> defaultValues);
+
   void setGeometryFactory(GeometryFactory geometryFactory);
 
   /**

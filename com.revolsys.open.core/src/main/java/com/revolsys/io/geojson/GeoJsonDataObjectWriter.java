@@ -24,6 +24,8 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
 
   boolean initialized = false;
 
+  private int srid = -1;
+
   /** The writer */
   private JsonWriter out;
 
@@ -240,20 +242,16 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
     out.startObject();
     type(FEATURE);
-    if (singleObject) {
-      writeSrid();
-    }
+    final Geometry mainGeometry = object.getGeometryValue();
+    writeSrid(mainGeometry);
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
     boolean geometryWritten = false;
     out.endAttribute();
     out.label(GEOMETRY);
-    if (geometryIndex != -1) {
-      final Geometry geometry = object.getValue(geometryIndex);
-      if (geometry != null) {
-        geometryWritten = true;
-        geometry(geometry);
-      }
+    if (mainGeometry != null) {
+      geometryWritten = true;
+      geometry(mainGeometry);
     }
     if (!geometryWritten) {
       out.value(null);
@@ -309,21 +307,34 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     if (!singleObject) {
       out.startObject();
       type(FEATURE_COLLECTION);
-      writeSrid();
+      srid = writeSrid();
       out.endAttribute();
       out.label(FEATURES);
       out.startList();
     }
   }
 
-  private void writeSrid() {
+  private int writeSrid() {
     final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    return writeSrid(geometryFactory);
+  }
+
+  private void writeSrid(final Geometry geometry) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      writeSrid(geometryFactory);
+    }
+  }
+
+  protected int writeSrid(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final int srid = geometryFactory.getSRID();
-      if (srid != 0) {
+      if (srid != 0 && srid != this.srid) {
         out.endAttribute();
         srid(srid);
+        return srid;
       }
     }
+    return -1;
   }
 }

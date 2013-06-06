@@ -51,7 +51,7 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     factories.add(factory);
   }
 
-  public void addComponentFactory(final String groupName, int index,
+  public void addComponentFactory(final String groupName, final int index,
     final ComponentFactory<?> factory) {
     final List<ComponentFactory<?>> factories = getGroup(groupName);
     factories.add(index, factory);
@@ -92,21 +92,30 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     addComponentFactory(groupName, factory);
   }
 
+  public void addMenuItem(final String groupName, final int index,
+    final String title, final String iconName, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
+      enableCheck, object, methodName, parameters);
+    addComponentFactory(groupName, index, menuItem);
+  }
+
+  public void addMenuItem(final String groupName, final int index,
+    final String title, final String iconName, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
+      null, object, methodName, parameters);
+    addComponentFactory(groupName, index, menuItem);
+  }
+
   public void addMenuItem(final String groupName, final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = createMenuItem(name, title, icon,
       enableCheck, object, methodName, parameters);
     addComponentFactory(groupName, action);
-  }
-
-  public InvokeMethodAction createMenuItem(final String name,
-    final String title, final Icon icon, final EnableCheck enableCheck,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
-      object, methodName, parameters);
-    action.setEnableCheck(enableCheck);
-    return action;
   }
 
   public void addMenuItem(final String groupName, final String name,
@@ -130,27 +139,9 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    InvokeMethodAction menuItem = createMenuItem(title, title, icon, null,
-      object, methodName, parameters);
+    final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
+      null, object, methodName, parameters);
     addComponentFactory(groupName, menuItem);
-  }
-
-  public void addMenuItem(final String groupName, int index,
-    final String title, final String iconName, final EnableCheck enableCheck,
-    final Object object, final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    InvokeMethodAction menuItem = createMenuItem(title, title, icon,
-      enableCheck, object, methodName, parameters);
-    addComponentFactory(groupName, index, menuItem);
-  }
-
-  public void addMenuItem(final String groupName, int index,
-    final String title, final String iconName, final Object object,
-    final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    InvokeMethodAction menuItem = createMenuItem(title, title, icon, null,
-      object, methodName, parameters);
-    addComponentFactory(groupName, index, menuItem);
   }
 
   @Override
@@ -169,12 +160,6 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public void close(final Component component) {
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   @Override
   public JMenu createComponent() {
     final JMenu menu = new JMenu(name);
@@ -189,12 +174,20 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
         }
         for (final ComponentFactory<?> factory : factories) {
           final Component component = factory.createComponent();
-          menu.add(component);
+          if (component != null) {
+            menu.add(component);
+          }
         }
       }
     }
     return menu;
   }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
 
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(name);
@@ -209,11 +202,22 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
         }
         for (final ComponentFactory<?> factory : factories) {
           final Component component = factory.createComponent();
-          menu.add(component);
+          if (component != null) {
+            menu.add(component);
+          }
         }
       }
     }
     return menu;
+  }
+
+  public InvokeMethodAction createMenuItem(final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
+      object, methodName, parameters);
+    action.setEnableCheck(enableCheck);
+    return action;
   }
 
   public List<ComponentFactory<?>> getGroup(final String groupName) {

@@ -138,6 +138,38 @@ public final class CollectionUtil {
     }
   }
 
+  public static Double getDouble(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.doubleValue();
+    } else {
+      final String stringValue = value.toString();
+      if (StringUtils.hasText(stringValue)) {
+        try {
+          return Double.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+  }
+
+  public static Double getDouble(final Map<String, ? extends Object> object,
+    final String name, final Double defaultValue) {
+    final Double value = getDouble(object, name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   public static Double getDoubleValue(final Map<String, ? extends Object> map,
     final String name) {
     final Number value = (Number)map.get(name);
@@ -170,7 +202,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static Integer getInteger(final Map<String, Object> object,
+  public static Integer getInteger(final Map<String, ? extends Object> object,
     final String name, final Integer defaultValue) {
     final Integer value = getInteger(object, name);
     if (value == null) {

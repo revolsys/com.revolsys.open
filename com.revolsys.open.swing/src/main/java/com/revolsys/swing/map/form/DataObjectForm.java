@@ -479,7 +479,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
         if (!EqualsRegistry.equal(value, previousValue)) {
           validateFields();
           if (allAttributes != null) {
-            allAttributes.setValues(getFieldValues());
+            allAttributes.setValues(getValues());
           }
 
         }
@@ -591,22 +591,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
-  public Map<String, Object> getFieldValues() {
-    final Map<String, Object> values = new LinkedHashMap<String, Object>();
-    for (final String name : fields.keySet()) {
-      if (name.equals("INTEGRATION_ACTION_CODE")) {
-        System.out.println();
-      }
-      final Object value = getFieldValue(name);
-      values.put(name, value);
-    }
-    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
-    if (geometryAttributeName != null) {
-      values.put(geometryAttributeName, object.getGeometryValue());
-    }
-    return values;
-  }
-
   public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
     return geometryCoordinatesPanel;
   }
@@ -642,6 +626,18 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return requiredFieldNames;
   }
 
+  protected int getTabIndex(final String fieldName) {
+    final JComponent field = getField(fieldName);
+    Component panel = field;
+    Component component = field.getParent();
+    while (component != tabs && component != null) {
+      panel = component;
+      component = component.getParent();
+    }
+    final int index = tabs.indexOfComponent(panel);
+    return index;
+  }
+
   public JTabbedPane getTabs() {
     return tabs;
   }
@@ -662,13 +658,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
   public Map<String, Object> getValues() {
     final Map<String, Object> values = new LinkedHashMap<String, Object>(
       this.values);
-    for (final String fieldName : fields.keySet()) {
-      Object value = getFieldValue(fieldName);
+    for (final String name : fields.keySet()) {
+      Object value = getFieldValue(name);
       if (value instanceof String) {
         final String string = (String)value;
         value = string.trim();
       }
-      values.put(fieldName, value);
+      values.put(name, value);
     }
     return values;
   }
@@ -711,7 +707,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   protected void postValidate() {
     if (allAttributes != null) {
-      allAttributes.setValues(getFieldValues());
+      allAttributes.setValues(getValues());
     }
   }
 
@@ -746,6 +742,15 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void setEditable(final boolean editable) {
     this.editable = editable;
+  }
+
+  public void setFieldFocussed(final String fieldName) {
+    final int tabIndex = getTabIndex(fieldName);
+    if (tabIndex >= 0) {
+      tabs.setSelectedIndex(tabIndex);
+    }
+    final JComponent field = getField(fieldName);
+    field.requestFocusInWindow();
   }
 
   protected void setFieldInvalid(final String fieldName, final String message) {
@@ -885,14 +890,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   protected void setTabValid(final String fieldName, final boolean valid) {
-    final JComponent field = getField(fieldName);
-    Component panel = field;
-    Component component = field.getParent();
-    while (component != tabs && component != null) {
-      panel = component;
-      component = component.getParent();
-    }
-    final int index = tabs.indexOfComponent(panel);
+    final int index = getTabIndex(fieldName);
     if (index != -1) {
       final String title = tabs.getTitleAt(index);
       tabValid.put(title, valid);

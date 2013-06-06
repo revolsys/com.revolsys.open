@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.io.PathUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -16,8 +17,31 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
     menu.addMenuItem("layer", new AddFileLayerAction());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V extends Layer> V getLayer(LayerGroup group, final String name) {
+    for (final String path : PathUtil.getPathElements(PathUtil.getPath(name))) {
+      final Layer layer = group.getLayer(path);
+      if (layer instanceof LayerGroup) {
+        group = (LayerGroup)layer;
+      } else {
+        return null;
+      }
+    }
+
+    if (group != null) {
+      final String layerName = PathUtil.getName(name);
+
+      for (final Layer layer : group.getLayers()) {
+        if (layer.getName().equals(layerName)) {
+          return (V)layer;
+        }
+      }
+    }
+    return null;
   }
 
   private List<Layer> layers = new ArrayList<Layer>();
@@ -139,6 +163,25 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   @Override
+  public void delete() {
+    synchronized (layers) {
+      int index = 0;
+      for (final Iterator<Layer> iterator = layers.iterator(); iterator.hasNext();) {
+        final Layer layer = iterator.next();
+        iterator.remove();
+        layer.setLayerGroup(null);
+        layer.removePropertyChangeListener(this);
+        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
+          null);
+        layer.delete();
+        index++;
+      }
+      super.delete();
+    }
+  }
+
+  @Override
   public Layer get(final int index) {
     return layers.get(index);
   }
@@ -188,12 +231,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
-    for (final Layer layer : layers) {
-      if (layer.getName().equals(name)) {
-        return (V)layer;
-      }
-    }
-    return null;
+    return (V)getLayer(this, name);
   }
 
   public List<LayerGroup> getLayerGroups() {
@@ -287,25 +325,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   public void refresh() {
     for (final Layer layer : layers) {
       layer.refresh();
-    }
-  }
-
-  @Override
-  public void delete() {
-    synchronized (layers) {
-      int index = 0;
-      for (final Iterator<Layer> iterator = layers.iterator(); iterator.hasNext();) {
-        final Layer layer = iterator.next();
-        iterator.remove();
-        layer.setLayerGroup(null);
-        layer.removePropertyChangeListener(this);
-        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-        propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
-          null);
-        layer.delete();
-        index++;
-      }
-      super.delete();
     }
   }
 

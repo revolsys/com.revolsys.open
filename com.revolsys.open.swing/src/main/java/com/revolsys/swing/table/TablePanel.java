@@ -5,17 +5,26 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
 
 @SuppressWarnings("serial")
 public class TablePanel extends JPanel implements MouseListener {
+  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
+    null);
+
+  public static MouseEvent getPopupMouseEvent() {
+    return popupMouseEvent.get();
+  }
 
   private final ToolBar toolBar = new ToolBar();
 
@@ -44,8 +53,14 @@ public class TablePanel extends JPanel implements MouseListener {
     return menu;
   }
 
-  public JTable getTable() {
-    return table;
+  @SuppressWarnings("unchecked")
+  public <T extends JTable> T getTable() {
+    return (T)table;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends TableModel> T getTableModel() {
+    return (T)table.getModel();
   }
 
   public ToolBar getToolBar() {
@@ -69,6 +84,7 @@ public class TablePanel extends JPanel implements MouseListener {
   public void mousePressed(final MouseEvent e) {
     setEventRow(e);
     if (e.isPopupTrigger()) {
+      popupMouseEvent = new WeakReference<MouseEvent>(e);
       final int x = e.getX();
       final int y = e.getY();
       final JPopupMenu popupMenu = menu.createJPopupMenu();
@@ -82,7 +98,7 @@ public class TablePanel extends JPanel implements MouseListener {
   }
 
   protected void setEventRow(final MouseEvent e) {
-    Point point = e.getPoint();
+    final Point point = e.getPoint();
     eventRow = table.rowAtPoint(point);
     if (eventRow > -1) {
       eventRow = table.convertRowIndexToModel(eventRow);

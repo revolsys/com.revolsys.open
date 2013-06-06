@@ -20,13 +20,6 @@ public class NumberTextField extends JXTextField implements DocumentListener,
 
   private static final long serialVersionUID = 1L;
 
-  private String fieldName;
-
-  @Override
-  public String getFieldName() {
-    return fieldName;
-  }
-
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
@@ -126,6 +119,8 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     return length;
   }
 
+  private String fieldName;
+
   private final DataType dataType;
 
   private String fieldValidationMessage;
@@ -163,7 +158,7 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     setHorizontalAlignment(RIGHT);
     getDocument().addDocumentListener(this);
     addFocusListener(this);
-    new PopupMenu().addToTextComponent(this);
+    PopupMenu.getPopupMenuFactory(this);
   }
 
   @Override
@@ -181,10 +176,16 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
+  @Override
   public String getFieldValidationMessage() {
     return fieldValidationMessage;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
     return (T)fieldValue;
@@ -221,6 +222,7 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     validateField();
   }
 
+  @Override
   public void setFieldValue(final Number value) {
     setText(StringConverterRegistry.toString(value));
     validateField();

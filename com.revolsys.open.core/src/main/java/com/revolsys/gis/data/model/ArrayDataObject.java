@@ -2,6 +2,7 @@ package com.revolsys.gis.data.model;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
@@ -35,15 +36,17 @@ public class ArrayDataObject extends BaseDataObject {
    * @param metaData The metaData defining the object type.
    */
   public ArrayDataObject(final DataObjectMetaData metaData) {
-    super(metaData);
-    final int attributeCount = metaData.getAttributeCount();
-    attributes = new Object[attributeCount];
+    this(metaData, null);
   }
 
   public ArrayDataObject(final DataObjectMetaData metaData,
-    final DataObject object) {
-    this(metaData);
-    setValues(object);
+    final Map<String, ? extends Object> values) {
+    super(metaData);
+    final int attributeCount = metaData.getAttributeCount();
+    attributes = new Object[attributeCount];
+    setValues(metaData.getDefaultValues());
+    setValues(values);
+    setState(DataObjectState.New);
   }
 
   /**

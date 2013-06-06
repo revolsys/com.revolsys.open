@@ -116,7 +116,10 @@ public class SwingUtil {
     if (editorComponent instanceof JTextComponent) {
       final JTextField textComponent = (JTextField)editorComponent;
       textComponent.setColumns((int)(longestValue.length() * 0.8));
-      PopupMenu.createPopupMenu(textComponent);
+      final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
+      menu.addToComponent(comboBox);
+    } else {
+      PopupMenu.getPopupMenuFactory(comboBox);
     }
     return comboBox;
   }
@@ -134,7 +137,7 @@ public class SwingUtil {
     final JXDatePicker dateField = new JXDatePicker();
     dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
       "yyyy/MMM/dd");
-    PopupMenu.createPopupMenu(dateField.getEditor());
+    PopupMenu.getPopupMenuFactory(dateField.getEditor());
     return dateField;
   }
 
@@ -166,7 +169,7 @@ public class SwingUtil {
     } else {
       final TextField textField = new TextField(fieldName, fieldValue);
       textField.setColumns(50);
-      PopupMenu.createPopupMenu(textField);
+      PopupMenu.getPopupMenuFactory(textField);
       field = textField;
     }
     if (field instanceof JTextField) {
@@ -177,6 +180,7 @@ public class SwingUtil {
       textField.setText(StringConverterRegistry.toString(fieldValue));
     }
     field.setFont(FONT);
+
     return (T)field;
   }
 
@@ -247,14 +251,14 @@ public class SwingUtil {
     final JXTextArea textField = new JXTextArea();
     textField.setRows(rows);
     textField.setColumns(columns);
-    PopupMenu.createPopupMenu(textField);
+    PopupMenu.getPopupMenuFactory(textField);
     return textField;
   }
 
   public static JXTextField createTextField(final int columns) {
     final JXTextField textField = new JXTextField();
     textField.setColumns(columns);
-    PopupMenu.createPopupMenu(textField);
+    PopupMenu.getPopupMenuFactory(textField);
     return textField;
   }
 

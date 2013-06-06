@@ -1,23 +1,3 @@
-/*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk/src/main/java/com/revolsys/gis/data/model/ArrayDataObject.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2008-10-02 11:14:47 -0700 (Thu, 02 Oct 2008) $
- * $Revision: 1434 $
-
- * Copyright 2004-2007 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.gis.data.model;
 
 import java.io.IOException;
@@ -46,12 +26,6 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
-/**
- * The ArrayDataObject is an implementation of {@link DataObject} which uses an
- * array of Objects as the storage for the attribute values.
- * 
- * @author Paul Austin
- */
 public abstract class BaseDataObject extends AbstractMap<String, Object>
   implements DataObject, Cloneable, Serializable {
   /** Seialization version */
@@ -60,32 +34,15 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   /** The metaData defining the object type. */
   private transient DataObjectMetaData metaData;
 
-  protected DataObjectState state = DataObjectState.New;
+  protected DataObjectState state = DataObjectState.Initalizing;
 
   /**
-   * Construct a new ArrayDataObject as a deep clone of the attribute values.
-   * Objects can only be cloned if they have a publicly accessible
-   * {@link #clone()} method.
-   * 
-   * @param object The object to clone.
-   */
-  public BaseDataObject(final DataObject object) {
-    this(object.getMetaData(), object);
-  }
-
-  /**
-   * Construct a new empty ArrayDataObject using the metaData.
+   * Construct a new empty BaseDataObject using the metaData.
    * 
    * @param metaData The metaData defining the object type.
    */
   public BaseDataObject(final DataObjectMetaData metaData) {
     this.metaData = metaData;
-  }
-
-  public BaseDataObject(final DataObjectMetaData metaData,
-    final DataObject object) {
-    this(metaData);
-    setValues(object);
   }
 
   /**
@@ -527,6 +484,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     return value;
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void setValueByPath(final CharSequence path, final Object value) {
     final String name = path.toString();
@@ -598,10 +556,12 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   @Override
   public void setValues(final Map<String, ? extends Object> values) {
-    for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
-      final String name = defaultValue.getKey();
-      final Object value = defaultValue.getValue();
-      setValue(name, value);
+    if (values != null) {
+      for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
+        final String name = defaultValue.getKey();
+        final Object value = defaultValue.getValue();
+        setValue(name, value);
+      }
     }
   }
 

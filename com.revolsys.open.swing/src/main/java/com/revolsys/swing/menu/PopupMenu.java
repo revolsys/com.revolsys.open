@@ -3,35 +3,32 @@ package com.revolsys.swing.menu;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.component.ComponentGroup;
-
-@SuppressWarnings("serial")
-public class PopupMenu extends JPopupMenu implements MouseListener {
-  public static PopupMenu createPopupMenu(final JTextComponent textComponent) {
-    synchronized (textComponent) {
-      PopupMenu popupMenu = getPopupMenu(textComponent);
+public class PopupMenu implements MouseListener {
+  public static PopupMenu getPopupMenu(final JComponent component) {
+    synchronized (component) {
+      PopupMenu popupMenu = getPopupMenuInternal(component);
       if (popupMenu == null) {
         popupMenu = new PopupMenu();
-        popupMenu.addToTextComponent(textComponent);
+        popupMenu.addToComponent(component);
       }
       return popupMenu;
+    }
+  }
+
+  public static MenuFactory getPopupMenuFactory(final JComponent component) {
+    synchronized (component) {
+      final PopupMenu popupMenu = getPopupMenu(component);
+      return popupMenu.getMenu();
     }
 
   }
 
-  public static PopupMenu getPopupMenu(final JComponent component) {
+  private static PopupMenu getPopupMenuInternal(final JComponent component) {
     synchronized (component) {
       for (final MouseListener mouseListener : component.getMouseListeners()) {
         if (mouseListener instanceof PopupMenu) {
@@ -43,86 +40,39 @@ public class PopupMenu extends JPopupMenu implements MouseListener {
     }
   }
 
-  private final ComponentGroup groups = new ComponentGroup();
+  private final MenuFactory menu = new MenuFactory();
 
   public PopupMenu() {
   }
 
-  public PopupMenu(final String title) {
-    super(title);
-  }
+  public boolean addToComponent(final JComponent component) {
+    synchronized (component) {
+      for (final MouseListener mouseListener : component.getMouseListeners()) {
+        if (mouseListener == this) {
+          return false;
+        } else if (mouseListener instanceof PopupMenu) {
+          component.removeMouseListener(mouseListener);
+        }
+      }
+      component.addMouseListener(this);
+      if (component instanceof JTextComponent) {
+        final MenuFactory menu = getMenu();
+        final JTextComponent textComponent = (JTextComponent)component;
+        menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut", textComponent,
+          "cut");
+        menu.addMenuItemTitleIcon("dataTransfer", "Copy", "page_copy",
+          textComponent, "copy");
+        menu.addMenuItemTitleIcon("dataTransfer", "Paste", "paste_plain",
+          textComponent, "paste");
 
-  public void addComponent(final Component component) {
-    groups.addComponent(this, component);
-  }
-
-  public void addComponent(final String groupName, final Component component) {
-    groups.addComponent(this, component);
-  }
-
-  public void addGroup(final String groupName) {
-    groups.addGroup(groupName);
-  }
-
-  public JMenuItem addMenuItem(final Action action) {
-    return addMenuItem("default", action);
-  }
-
-  public JMenuItem addMenuItem(final JMenuItem menuItem) {
-    addComponent(menuItem);
-    return menuItem;
-  }
-
-  public JMenuItem addMenuItem(final String title) {
-    final JMenuItem menuItem = new JMenuItem(title);
-    return add(menuItem);
-  }
-
-  public JMenuItem addMenuItem(final String groupName, final Action action) {
-    final JMenuItem item = super.add(action);
-    addComponent(groupName, item);
-    return item;
-  }
-
-  public void addMenuItem(final String groupName, final JMenuItem menuItem) {
-    groups.addComponent(this, groupName, menuItem);
-  }
-
-  public JMenuItem addMenuItem(final String groupName, final String name,
-    final String title, final Icon icon, final Object object,
-    final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
-      object, methodName, parameters);
-
-    final JMenuItem button = createActionComponent(action);
-    button.setFocusPainted(false);
-    button.setAction(action);
-    addComponent(groupName, button);
-    return button;
-  }
-
-  public JMenuItem addMenuItem(final String groupName, final String title,
-    final String iconName, final Object object, final String methodName,
-    final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-    return addMenuItem(groupName, title, title, icon, object, methodName,
-      parameters);
-  }
-
-  public void addToTextComponent(final JTextComponent textComponent) {
-    synchronized (textComponent) {
-      addMenuItem("dataTransfer", "Cut", "cut", textComponent, "cut");
-      addMenuItem("dataTransfer", "Copy", "page_copy", textComponent, "copy");
-      addMenuItem("dataTransfer", "Paste", "paste_plain", textComponent,
-        "paste");
-
-      textComponent.setDragEnabled(true);
-      textComponent.addMouseListener(this);
+        textComponent.setDragEnabled(true);
+      }
     }
+    return true;
   }
 
-  public List<Component> getGroup(final String groupName) {
-    return groups.getGroup(groupName);
+  public MenuFactory getMenu() {
+    return menu;
   }
 
   @Override
@@ -139,20 +89,23 @@ public class PopupMenu extends JPopupMenu implements MouseListener {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      show(e.getComponent(), e.getX(), e.getY());
-    }
+    showMenu(e);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      show(e.getComponent(), e.getX(), e.getY());
-    }
+    showMenu(e);
   }
 
-  public void setGroupEnabled(final String groupName, final boolean enabled) {
-    groups.setGroupEnabled(groupName, enabled);
+  protected void showMenu(final MouseEvent e) {
+    if (e.isPopupTrigger()) {
+
+      final JPopupMenu popupMenu = menu.createJPopupMenu();
+      final Component component = e.getComponent();
+      final int x = e.getX();
+      final int y = e.getY();
+      popupMenu.show(component, x, y);
+    }
   }
 
 }

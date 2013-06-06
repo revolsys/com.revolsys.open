@@ -78,7 +78,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
     setEditable(true);
     setSearchMode(SearchMode.REGULAR);
-    PopupMenu.createPopupMenu(this);
+    PopupMenu.getPopupMenuFactory(this);
   }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
