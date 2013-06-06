@@ -37,8 +37,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private final int numAxis;
 
   public PostgreSQLGeometryJdbcAttribute(final String name,
-    final DataType type, final boolean required, final Map<String, Object> properties,
-    final int srid, final int numAxis,
+    final DataType type, final boolean required,
+    final Map<String, Object> properties, final int srid, final int numAxis,
     final GeometryFactory geometryFactory) {
     super(name, type, -1, 0, 0, required, properties);
     this.srid = srid;
@@ -223,9 +223,10 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.vividsolutions.jts.geom.Geometry toJtsMultiPoint(
     final GeometryFactory factory, final MultiPoint multiPoint) {
-    List<com.vividsolutions.jts.geom.Point> points = new ArrayList<com.vividsolutions.jts.geom.Point>();
-    for (Point point : multiPoint.getPoints()) {
-      com.vividsolutions.jts.geom.Point jtsPoint = toJtsPoint(factory, point);
+    final List<com.vividsolutions.jts.geom.Point> points = new ArrayList<com.vividsolutions.jts.geom.Point>();
+    for (final Point point : multiPoint.getPoints()) {
+      final com.vividsolutions.jts.geom.Point jtsPoint = toJtsPoint(factory,
+        point);
       points.add(jtsPoint);
     }
     if (points.size() == 1) {
@@ -237,9 +238,10 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.vividsolutions.jts.geom.Geometry toJtsMultiPolygon(
     final GeometryFactory factory, final MultiPolygon multiPolygon) {
-    List<com.vividsolutions.jts.geom.Polygon> polygons = new ArrayList<com.vividsolutions.jts.geom.Polygon>();
-    for (Polygon polygon : multiPolygon.getPolygons()) {
-      com.vividsolutions.jts.geom.Polygon jtsPolygon = toJtsPolygon(factory, polygon);
+    final List<com.vividsolutions.jts.geom.Polygon> polygons = new ArrayList<com.vividsolutions.jts.geom.Polygon>();
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
+      final com.vividsolutions.jts.geom.Polygon jtsPolygon = toJtsPolygon(
+        factory, polygon);
       polygons.add(jtsPolygon);
     }
     if (polygons.size() == 1) {
@@ -268,23 +270,26 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.vividsolutions.jts.geom.Polygon toJtsPolygon(
     final GeometryFactory factory, final Polygon polygon) {
-    final LinearRing ring = polygon.getRing(0);
-    final Point[] points = ring.getPoints();
-    final CoordinatesList coordinates = new DoubleCoordinatesList(
-      points.length, numAxis);
-    for (int i = 0; i < points.length; i++) {
-      final Point point = points[i];
-      coordinates.setValue(i, 0, point.x);
-      coordinates.setValue(i, 1, point.y);
-      if (numAxis > 2) {
-        coordinates.setOrdinate(i, 2, point.z);
-        if (numAxis > 3) {
-          coordinates.setOrdinate(i, 3, point.m);
+    final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
+    for (int ringIndex = 0; ringIndex < polygon.numRings(); ringIndex++) {
+      final LinearRing ring = polygon.getRing(ringIndex);
+      final Point[] points = ring.getPoints();
+      final CoordinatesList coordinates = new DoubleCoordinatesList(
+        points.length, numAxis);
+      for (int i = 0; i < points.length; i++) {
+        final Point point = points[i];
+        coordinates.setValue(i, 0, point.x);
+        coordinates.setValue(i, 1, point.y);
+        if (numAxis > 2) {
+          coordinates.setOrdinate(i, 2, point.z);
+          if (numAxis > 3) {
+            coordinates.setOrdinate(i, 3, point.m);
+          }
         }
       }
+      rings.add(coordinates);
     }
-    final com.vividsolutions.jts.geom.LinearRing exteriorRing = factory.createLinearRing(coordinates);
-    return factory.createPolygon(exteriorRing, null);
+    return factory.createPolygon(rings);
   }
 
   private LinearRing toPgLinearRing(

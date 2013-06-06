@@ -332,12 +332,12 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
         }
       } else {
         for (final QName propertyTagName : propertyTagNames) {
-          String proptertyName = propertyTagName.getLocalPart();
-          if (proptertyName.length() > 1
-            && Character.isLowerCase(proptertyName.charAt(1))) {
-            proptertyName = CaseConverter.toLowerFirstChar(proptertyName);
+          String propertyName = propertyTagName.getLocalPart();
+          if (propertyName.length() > 1
+            && Character.isLowerCase(propertyName.charAt(1))) {
+            propertyName = CaseConverter.toLowerFirstChar(propertyName);
           }
-          final Object value = JavaBeanUtil.getProperty(object, proptertyName);
+          final Object value = JavaBeanUtil.getProperty(object, propertyName);
           if (writeNull || value != null) {
             final Method method = getClassPropertyMethod(objectClass,
               propertyTagName);
