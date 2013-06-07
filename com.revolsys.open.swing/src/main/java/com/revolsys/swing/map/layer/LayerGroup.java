@@ -21,10 +21,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     menu.addMenuItem("layer", new AddFileLayerAction());
   }
 
-  @SuppressWarnings("unchecked")
-  public static <V extends Layer> V getLayer(LayerGroup group, final String name) {
+  private static Layer getLayer(LayerGroup group, final String name) {
     for (final String path : PathUtil.getPathElements(PathUtil.getPath(name))) {
-      final Layer layer = group.getLayer(path);
+      final Layer layer = getLayerByName(group, path);
       if (layer instanceof LayerGroup) {
         group = (LayerGroup)layer;
       } else {
@@ -35,10 +34,16 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     if (group != null) {
       final String layerName = PathUtil.getName(name);
 
-      for (final Layer layer : group.getLayers()) {
-        if (layer.getName().equals(layerName)) {
-          return (V)layer;
-        }
+      return getLayerByName(group, layerName);
+    }
+    return null;
+  }
+
+  private static Layer getLayerByName(final LayerGroup group,
+    final String layerName) {
+    for (final Layer layer : group.getLayers()) {
+      if (layer.getName().equals(layerName)) {
+        return layer;
       }
     }
     return null;

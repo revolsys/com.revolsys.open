@@ -1,7 +1,24 @@
 package com.revolsys.io;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractWriter<T> extends AbstractObjectWithProperties
   implements Writer<T> {
+
+  public static void close(final Writer<?>... writers) {
+    final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+    for (final Writer<?> writer : writers) {
+      try {
+        writer.close();
+      } catch (final RuntimeException e) {
+        exceptions.add(e);
+      }
+    }
+    if (!exceptions.isEmpty()) {
+      throw exceptions.get(0);
+    }
+  }
 
   public static <V> Writer<V> close(final Writer<V> writer) {
     if (writer != null) {

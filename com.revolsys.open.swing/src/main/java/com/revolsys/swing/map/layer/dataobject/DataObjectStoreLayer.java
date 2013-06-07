@@ -152,12 +152,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void fireObjectsChanged() {
-    refresh();
-    super.fireObjectsChanged();
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     return getCoordinateSystem().getAreaBoundingBox();
   }
@@ -373,6 +367,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       loadingBoundingBox = boundingBox;
       index = new DataObjectQuadTree();
     }
+    fireObjectsChanged();
   }
 
   protected void setIndex(final BoundingBox loadedBoundingBox,

@@ -1,12 +1,16 @@
 package com.revolsys.swing.map.form;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 @SuppressWarnings("serial")
-public class DataObjectLayerForm extends DataObjectForm {
+public class DataObjectLayerForm extends DataObjectForm implements
+  PropertyChangeListener {
   private final DataObjectLayer layer;
 
   public DataObjectLayerForm(final DataObjectLayer layer) {
@@ -20,6 +24,7 @@ public class DataObjectLayerForm extends DataObjectForm {
     if (metaData.getGeometryAttributeName() != null) {
       addTabGeometry();
     }
+    layer.addPropertyChangeListener(this);
     // TODO mark the object as attribute editing
   }
 
@@ -42,5 +47,23 @@ public class DataObjectLayerForm extends DataObjectForm {
   public <T> T getOriginalValue(final String fieldName) {
     final LayerDataObject object = getObject();
     return object.getOriginalValue(fieldName);
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == getObject()) {
+      final String propertyName = event.getPropertyName();
+      final Object value = event.getNewValue();
+      setFieldValue(propertyName, value);
+    }
+  }
+
+  @Override
+  public void removeNotify() {
+    try {
+      super.removeNotify();
+    } finally {
+      layer.removePropertyChangeListener(this);
+    }
   }
 }

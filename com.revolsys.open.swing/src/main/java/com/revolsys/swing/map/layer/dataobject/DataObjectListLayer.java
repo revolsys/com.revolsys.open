@@ -53,12 +53,6 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     addAllObjects(objects);
   }
 
-  @Override
-  public Component createTablePanel() {
-    final JTable table = DataObjectListLayerTableModel.createTable(this);
-    return new DataObjectLayerTablePanel(this, table);
-  }
-
   public DataObjectListLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
@@ -139,6 +133,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     this.objects.add(object);
     fireObjectsChanged();
     return object;
+  }
+
+  @Override
+  public Component createTablePanel() {
+    final JTable table = DataObjectListLayerTableModel.createTable(this);
+    return new DataObjectLayerTablePanel(this, table);
   }
 
   public void deleteAll() {

@@ -173,7 +173,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void addEditingObject(final DataObject object) {
     editingObjects.add(object);
-    fireObjectsChanged();
+    refresh();
   }
 
   protected void addModifiedObject(final DataObject object) {
@@ -227,7 +227,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void cancelChanges() {
     synchronized (editSync) {
       internalCancelChanges();
-      fireObjectsChanged();
+      refresh();
     }
   }
 
@@ -241,7 +241,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearEditingObjects() {
     this.editingObjects.clear();
-    fireObjectsChanged();
+    refresh();
   }
 
   @Override
@@ -352,7 +352,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         deleteObject(object);
       }
     }
-    fireObjectsChanged();
+    refresh();
   }
 
   @Override
@@ -639,7 +639,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (saved) {
         clearChanges();
       }
-      fireObjectsChanged();
+      refresh();
       return saved;
     }
   }
@@ -711,7 +711,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     for (final DataObject object : editingObjects) {
       addEditingObject(object);
     }
-    fireObjectsChanged();
+    refresh();
   }
 
   @Override

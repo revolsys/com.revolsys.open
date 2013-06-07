@@ -59,6 +59,10 @@ public class SwingWorkerManager {
 
   private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
+  public static void execute(final Runnable backgroundTask) {
+    execute(new RunnableSwingWorker(backgroundTask));
+  }
+
   public static SwingWorker<?, ?> execute(final String description,
     final Object object, final String backgroundMethodName) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(

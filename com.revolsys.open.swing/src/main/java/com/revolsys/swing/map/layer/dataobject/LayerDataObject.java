@@ -78,6 +78,14 @@ public class LayerDataObject extends ArrayDataObject {
     return true;
   }
 
+  protected void firePropertyChange(final String attributeName,
+    final Object oldValue, final Object newValue) {
+    final DataObjectLayer layer = getLayer();
+    final PropertyChangeEvent event = new PropertyChangeEvent(this,
+      attributeName, oldValue, newValue);
+    layer.propertyChange(event);
+  }
+
   @Override
   public synchronized void setValue(final int index, final Object value) {
     final DataObjectMetaData metaData = getMetaData();
@@ -121,9 +129,7 @@ public class LayerDataObject extends ArrayDataObject {
       }
       super.setValue(index, value);
       if (!DataObjectState.Initalizing.equals(state)) {
-        final PropertyChangeEvent event = new PropertyChangeEvent(this,
-          attributeName, oldValue, value);
-        layer.propertyChange(event);
+        firePropertyChange(attributeName, oldValue, value);
       }
     }
   }

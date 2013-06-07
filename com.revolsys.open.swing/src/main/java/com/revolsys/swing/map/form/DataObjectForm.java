@@ -15,6 +15,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -128,7 +129,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry = new DataObjectMetaDataUiBuilderRegistry();
 
-  private Map<String, Object> values = new HashMap<String, Object>();
+  private Map<String, Object> originalValues = Collections.emptyMap();
 
   private boolean editable = true;
 
@@ -392,8 +393,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     final boolean hasGeometry = geometryAttribute != null;
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
-    toolBar.addButton("record", "Save Changes", "table_save", editable, this,
-      "saveChanges");
 
     // Cut, Copy Paste
     // TODO enable checks
@@ -453,7 +452,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     final String name = editor.getAttributeName();
     final Object value = editor.getCellEditorValue();
     setFieldValue(name, value);
-    validateFields();
   }
 
   @Override
@@ -464,6 +462,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
       final String fieldName = getFieldName(component);
       if (fieldName != null) {
         previousValue = getFieldValue(fieldName);
+
       }
     }
   }
@@ -477,6 +476,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
       if (fieldName != null) {
         final Object value = getFieldValue(fieldName);
         if (!EqualsRegistry.equal(value, previousValue)) {
+          object.setValue(fieldName, value);
           validateFields();
           if (allAttributes != null) {
             allAttributes.setValues(getValues());
@@ -615,7 +615,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String fieldName) {
-    return (T)object.get(fieldName);
+    return (T)originalValues.get(fieldName);
   }
 
   public Set<String> getReadOnlyFieldNames() {
@@ -652,19 +652,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   @SuppressWarnings("unchecked")
   public <T> T getValue(final String name) {
-    return (T)values.get(name);
+    return (T)object.getValue(name);
   }
 
   public Map<String, Object> getValues() {
-    final Map<String, Object> values = new LinkedHashMap<String, Object>(
-      this.values);
-    for (final String name : fields.keySet()) {
-      Object value = getFieldValue(name);
-      if (value instanceof String) {
-        final String string = (String)value;
-        value = string.trim();
-      }
-      values.put(name, value);
+    final Map<String, Object> values = new LinkedHashMap<String, Object>();
+    if (object != null) {
+      values.putAll(object);
     }
     return values;
   }
@@ -713,27 +707,17 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void reverseAttributes() {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    final Map<String, Object> values = getValues();
-    property.reverseAttributes(values);
-    setValues(values);
+    property.reverseAttributes(object);
   }
 
   public void reverseAttributesAndGeometry() {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    final Map<String, Object> values = getValues();
-    property.reverseAttributesAndGeometry(values);
-    setValues(values);
+    property.reverseAttributesAndGeometry(object);
   }
 
   public void reverseGeometry() {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    final Map<String, Object> values = getValues();
-    property.reverseGeometry(values);
-    setValues(values);
-  }
-
-  public void saveChanges() {
-    updateDataObject();
+    property.reverseGeometry(object);
   }
 
   protected void setDataStore(final DataObjectStore dataStore) {
@@ -814,13 +798,14 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   public void setFieldValue(final String fieldName, final Object value) {
-    values.put(fieldName, value);
     final Object oldValue = getFieldValue(fieldName);
     if (oldValue == null & value != null
       || !EqualsRegistry.equal(value, oldValue)) {
       final JComponent field = getField(fieldName);
       SwingUtil.setFieldValue(field, value);
-      if (!field.isEnabled()) {
+      if (field.isEnabled()) {
+        object.setValue(fieldName, value);
+      } else {
         if (field instanceof JTextComponent) {
           final JTextComponent textField = (JTextComponent)field;
           String string;
@@ -833,7 +818,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
           textField.setText(string);
         }
       }
-
       validateFields();
     }
   }
@@ -856,6 +840,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void setObject(final DataObject object) {
     this.object = object;
+    this.originalValues = new HashMap<String, Object>(object);
     setValues(object);
   }
 
@@ -901,7 +886,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
   public void setValues(final Map<String, Object> values) {
     final boolean validationEnabled = setFieldValidationEnabled(false);
     try {
-      this.values = new LinkedHashMap<String, Object>();
       if (values != null) {
         for (final String fieldName : metaData.getAttributeNames()) {
           final Object value = values.get(fieldName);
@@ -919,15 +903,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
       }
     }
     validateFields();
-  }
-
-  protected DataObject updateDataObject() {
-    final DataObject object = getObject();
-    if (isEditable()) {
-      final Map<String, Object> values = getValues();
-      object.setValues(values);
-    }
-    return object;
   }
 
   protected void updateReadOnlyFields() {
