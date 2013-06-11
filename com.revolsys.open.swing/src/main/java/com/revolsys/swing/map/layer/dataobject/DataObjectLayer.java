@@ -78,6 +78,7 @@ public interface DataObjectLayer extends Layer {
 
   boolean isEditing(DataObject object);
 
+  @Override
   boolean isHasChanges();
 
   boolean isHidden(DataObject object);
@@ -91,6 +92,10 @@ public interface DataObjectLayer extends Layer {
   boolean isVisible(DataObject object);
 
   List<DataObject> query(Query query);
+
+  void revertChanges(DataObject object);
+
+  boolean saveChanges(DataObject object);
 
   void setEditingObjects(Collection<? extends DataObject> objects);
 

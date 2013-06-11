@@ -119,8 +119,12 @@ public class Conditions {
     return new LeftUnaryCondition("NOT", value);
   }
 
-  public static Condition notEqual(final String left, final Condition right) {
-    return new BinaryCondition(new Column(left), "<>", right);
+  public static Condition notEqual(final String name, final Condition right) {
+    return new BinaryCondition(new Column(name), "<>", right);
+  }
+
+  public static Condition notEqual(final String name, final Object value) {
+    return notEqual(name, new Value(value));
   }
 
   public static MultipleCondition or(final Condition... conditions) {

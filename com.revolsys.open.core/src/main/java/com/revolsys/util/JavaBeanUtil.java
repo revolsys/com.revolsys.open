@@ -52,6 +52,45 @@ import com.revolsys.gis.data.model.DataObject;
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
+  /**
+   * Clone the value if it has a clone method.
+   * 
+   * @param value The value to clone.
+   * @return The cloned value.
+   */
+  @SuppressWarnings("unchecked")
+  public static <V> V clone(final V value) {
+    if (value instanceof Cloneable) {
+      try {
+        final Class<? extends Object> valueClass = value.getClass();
+        final Method method = valueClass.getMethod("clone", new Class[0]);
+        if (method != null) {
+          return (V)method.invoke(value, new Object[0]);
+        }
+      } catch (final IllegalArgumentException e) {
+        throw e;
+      } catch (final InvocationTargetException e) {
+
+        final Throwable cause = e.getCause();
+        if (cause instanceof RuntimeException) {
+          final RuntimeException re = (RuntimeException)cause;
+          throw re;
+        } else if (cause instanceof Error) {
+          final Error ee = (Error)cause;
+          throw ee;
+        } else {
+          throw new RuntimeException(cause.getMessage(), cause);
+        }
+      } catch (final RuntimeException e) {
+        throw e;
+      } catch (final Exception e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+
+    }
+    return value;
+  }
+
   public static boolean getBooleanValue(final Object object,
     final String attributeName) {
     if (object == null) {
@@ -99,8 +138,26 @@ public final class JavaBeanUtil {
     }
   }
 
+  public static List<Method> getMethods(final Class<?> clazz) {
+    final Method[] methods = clazz.getMethods();
+    Arrays.sort(methods, new Comparator<Method>() {
+      @Override
+      public int compare(final Method method1, final Method method2) {
+        final String name1 = method1.getName()
+          .replaceAll("^(set|get|is)", "")
+          .toLowerCase();
+        final String name2 = method2.getName()
+          .replaceAll("^(set|get|is)", "")
+          .toLowerCase();
+        final int nameCompare = name1.compareTo(name2);
+        return nameCompare;
+      }
+    });
+    return Arrays.asList(methods);
+  }
+
   /**
-   * Get the value of the named propery from the object. Any exceptions are
+   * Get the value of the named property from the object. Any exceptions are
    * wrapped as runtime exceptions.
    * 
    * @param object The object.
@@ -170,6 +227,41 @@ public final class JavaBeanUtil {
     return getReadMethod(object.getClass(), name);
   }
 
+  /**
+   * Get the value of the named property from the object. Any exceptions are
+   * wrapped as runtime exceptions.
+   * 
+   * @param object The object.
+   * @param propertyName The name of the property.
+   * @return The property value.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T getSimpleProperty(final Object object,
+    final String propertyName) {
+    if (object == null) {
+      return null;
+    } else {
+      try {
+        return (T)PropertyUtils.getSimpleProperty(object, propertyName);
+      } catch (final IllegalAccessException e) {
+        throw new RuntimeException("Unable to get property " + propertyName, e);
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getCause();
+        if (t instanceof RuntimeException) {
+          throw (RuntimeException)t;
+        } else if (t instanceof Error) {
+          throw (Error)t;
+        } else {
+          throw new RuntimeException("Unable to get property " + propertyName,
+            t);
+        }
+      } catch (final NoSuchMethodException e) {
+        throw new IllegalArgumentException("Property " + propertyName
+          + " does not exist");
+      }
+    }
+  }
+
   public static String getSubName(final String name) {
     if (StringUtils.hasText(name)) {
       final int index = name.indexOf(".");
@@ -208,24 +300,28 @@ public final class JavaBeanUtil {
   }
 
   public static Object getValue(final Object object, final String key) {
-    if (object instanceof DataObject) {
-      final DataObject dataObject = (DataObject)object;
-      return dataObject.getValueByPath(key);
-    } else if (object instanceof Map) {
-      @SuppressWarnings("unchecked")
-      final Map<String, ?> map = (Map<String, ?>)object;
-      return map.get(key);
-    } else if (object instanceof Annotation) {
-      final Annotation annotation = (Annotation)object;
-      return AnnotationUtils.getValue(annotation, key);
+    if (object == null) {
+      return null;
     } else {
-      final String firstName = getFirstName(key);
-      final String subName = getSubName(key);
-      final Object value = getProperty(object, firstName);
-      if (value == null || !StringUtils.hasText(subName)) {
-        return value;
+      if (object instanceof DataObject) {
+        final DataObject dataObject = (DataObject)object;
+        return dataObject.getValueByPath(key);
+      } else if (object instanceof Map) {
+        @SuppressWarnings("unchecked")
+        final Map<String, ?> map = (Map<String, ?>)object;
+        return map.get(key);
+      } else if (object instanceof Annotation) {
+        final Annotation annotation = (Annotation)object;
+        return AnnotationUtils.getValue(annotation, key);
       } else {
-        return getValue(value, subName);
+        final String firstName = getFirstName(key);
+        final String subName = getSubName(key);
+        final Object value = getProperty(object, firstName);
+        if (value == null || !StringUtils.hasText(subName)) {
+          return value;
+        } else {
+          return getValue(value, subName);
+        }
       }
     }
   }
@@ -379,19 +475,5 @@ public final class JavaBeanUtil {
    * Construct a new JavaBeanUtil.
    */
   private JavaBeanUtil() {
-  }
-
-  public static List<Method >getMethods(final Class<?> clazz) {
-    final Method[] methods = clazz.getMethods();
-    Arrays.sort(methods, new Comparator<Method>() {
-      @Override
-      public int compare(Method method1, Method method2) {
-        String name1 = method1.getName().replaceAll("^(set|get|is)", "").toLowerCase();
-        String name2 = method2.getName().replaceAll("^(set|get|is)", "").toLowerCase();
-        int nameCompare = name1.compareTo(name2);
-        return nameCompare;
-      }
-    });
-    return Arrays.asList(methods);
   }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.util.JavaBeanUtil;
 
 public class BinaryCondition extends AbstractCondition {
 
@@ -29,23 +30,37 @@ public class BinaryCondition extends AbstractCondition {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    index = left.appendParameters(index, statement);
-    index = right.appendParameters(index, statement);
+    if (left != null) {
+      index = left.appendParameters(index, statement);
+    }
+    if (right != null) {
+      index = right.appendParameters(index, statement);
+    }
     return index;
   }
 
   @Override
   public void appendSql(final StringBuffer buffer) {
-    left.appendSql(buffer);
+    if (left == null) {
+      buffer.append("NULL");
+    } else {
+      left.appendSql(buffer);
+    }
     buffer.append(" ");
     buffer.append(operator);
     buffer.append(" ");
-    right.appendSql(buffer);
+    if (right == null) {
+      buffer.append("NULL");
+    } else {
+      right.appendSql(buffer);
+    }
   }
 
   @Override
   public BinaryCondition clone() {
-    return new BinaryCondition(left.clone(), operator, right.clone());
+    final Condition leftClone = JavaBeanUtil.clone(left);
+    final Condition rightClone = JavaBeanUtil.clone(right);
+    return new BinaryCondition(leftClone, operator, rightClone);
   }
 
   @Override

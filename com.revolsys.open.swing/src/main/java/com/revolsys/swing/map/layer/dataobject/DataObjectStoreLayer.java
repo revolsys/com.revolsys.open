@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.swing.SwingWorkerManager;
-import com.revolsys.transaction.InvokeMethodInTransaction;
+import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -50,6 +49,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private final Method saveChangesMethod;
 
+  private final Method saveObjectChangesMethod;
+
   private final Object sync = new Object();
 
   private String typePath;
@@ -60,6 +61,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       "transactionSaveChanges");
     saveChangesMethod.setAccessible(true);
 
+    saveObjectChangesMethod = ReflectionUtils.findMethod(getClass(),
+      "transactionSaveObjectChanges", DataObject.class);
+    saveObjectChangesMethod.setAccessible(true);
   }
 
   public DataObjectStoreLayer(final DataObjectStore dataStore,
@@ -123,8 +127,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
     synchronized (sync) {
       if (loadedBoundingBox == loadingBoundingBox) {
-        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-        propertyChangeSupport.firePropertyChange("loaded", false, true);
+        firePropertyChange("loaded", false, true);
         boundingBox = loadingBoundingBox;
         loadingBoundingBox = new BoundingBox();
         loadingWorker = null;
@@ -147,7 +150,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected boolean doSaveChanges() {
-
     return invokeInTransaction(saveChangesMethod);
   }
 
@@ -307,11 +309,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return typePath;
   }
 
-  protected boolean invokeInTransaction(final Method saveChangesMethod) {
+  protected boolean invokeInTransaction(final Method method,
+    final Object... args) {
     final DataObjectStore dataStore = getDataStore();
     final PlatformTransactionManager transactionManager = dataStore.getTransactionManager();
-    return (Boolean)InvokeMethodInTransaction.execute(transactionManager, this,
-      saveChangesMethod);
+    return (Boolean)TransactionUtils.invoke(transactionManager, this, method,
+      args);
   }
 
   @Override
@@ -370,6 +373,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     fireObjectsChanged();
   }
 
+  @Override
+  public boolean saveChanges(final DataObject object) {
+    return invokeInTransaction(saveObjectChangesMethod, object);
+  }
+
   protected void setIndex(final BoundingBox loadedBoundingBox,
     final DataObjectQuadTree index) {
     synchronized (sync) {
@@ -380,7 +388,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         clearLoading(loadedBoundingBox);
       }
     }
-    getPropertyChangeSupport().firePropertyChange("refresh", false, true);
+    firePropertyChange("refresh", false, true);
   }
 
   @Override
@@ -413,7 +421,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     query = null;
   }
 
-  protected boolean transactionSaveChanges() {
+  protected synchronized boolean transactionSaveChanges() {
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
       final Set<DataObject> deletedObjects = getDeletedObjects();
@@ -430,6 +438,24 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
       final Collection<DataObject> newObjects = getNewObjects();
       for (final DataObject object : newObjects) {
+        writer.write(object);
+      }
+    } finally {
+      writer.close();
+    }
+    return true;
+  }
+
+  protected synchronized boolean transactionSaveObjectChanges(
+    final DataObject object) {
+    final Writer<DataObject> writer = dataStore.createWriter();
+    try {
+      if (super.isDeleted(object)) {
+        removeDeletedObject(object);
+        object.setState(DataObjectState.Deleted);
+        writer.write(object);
+      } else if (super.isModified(object)) {
+        removeModifiedObject(object);
         writer.write(object);
       }
     } finally {

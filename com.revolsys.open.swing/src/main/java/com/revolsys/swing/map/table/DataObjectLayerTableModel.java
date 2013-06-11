@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +21,9 @@ import com.revolsys.collection.LruMap;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.Project;
@@ -44,7 +47,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public static final String MODE_EDITS = "edits";
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer) {
-    DataObjectMetaData metaData = layer.getMetaData();
+    final DataObjectMetaData metaData = layer.getMetaData();
     if (metaData == null) {
       return null;
     } else {
@@ -80,6 +83,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       new InvokeMethodPropertyChangeListener(table, "repaint"));
     return table;
   }
+
+  private Condition searchCondition;
 
   private boolean filterByBoundingBox;
 
@@ -144,6 +149,23 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
+  protected Query getFilterQuery() {
+    Query query = layer.getQuery();
+    if (query == null) {
+      return null;
+    } else {
+      query = query.clone();
+      query.and(searchCondition);
+      query.setOrderBy(orderBy);
+      if (filterByBoundingBox) {
+        final Project project = layer.getProject();
+        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+        query.setBoundingBox(viewBoundingBox);
+      }
+      return query;
+    }
+  }
+
   public DataObjectLayer getLayer() {
     return layer;
   }
@@ -185,12 +207,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       return loadLayerObjects(row);
     }
-  }
-
-  protected List<DataObject> getSelectedObjects() {
-    final DataObjectLayer layer = getLayer();
-    final List<DataObject> selectedObjects = layer.getSelectedObjects();
-    return selectedObjects;
   }
 
   public Map<String, Boolean> getOrderBy() {
@@ -236,6 +252,16 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
+  public Condition getSearchCondition() {
+    return searchCondition;
+  }
+
+  protected List<DataObject> getSelectedObjects() {
+    final DataObjectLayer layer = getLayer();
+    final List<DataObject> selectedObjects = layer.getSelectedObjects();
+    return selectedObjects;
+  }
+
   public List<String> getSortableModes() {
     return sortableModes;
   }
@@ -267,7 +293,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected int loadLayerRowCount() {
-    final Query query = layer.getQuery();
+    final Query query = getFilterQuery();
     if (query == null) {
       return 0;
     } else {
@@ -284,22 +310,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return objects;
   }
 
-  protected Query getFilterQuery() {
-    Query query = layer.getQuery();
-    if (query == null) {
-      return null;
-    } else {
-      query = query.clone();
-      query.setOrderBy(orderBy);
-      if (filterByBoundingBox) {
-        Project project = layer.getProject();
-        BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        query.setBoundingBox(viewBoundingBox);
-      }
-      return query;
-    }
-  }
-
   public void loadPages() {
     while (true) {
       final Integer pageNumber = getNextPageNumber();
@@ -309,7 +319,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         synchronized (getSync()) {
           final Map<Integer, List<DataObject>> pageCache = this.pageCache;
           final List<DataObject> objects;
-          if (layer.getQuery() == null) {
+          if (getFilterQuery() == null) {
             objects = Collections.emptyList();
           } else {
             objects = loadPage(pageNumber);
@@ -327,10 +337,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == layer) {
       final String propertyName = e.getPropertyName();
-      if (propertyName.equals("query")) {
+      if (Arrays.asList("query", "objectsChanged", "editable").contains(
+        propertyName)) {
         refresh();
-      } else if (propertyName.equals("editable")) {
-        refresh();
+      } else if (propertyName.equals("selectionCount")) {
+        if (MODE_SELECTED.equals(attributeFilterMode)) {
+          refresh();
+        }
       }
     }
   }
@@ -347,6 +360,22 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       countLoaded = false;
       fireTableDataChanged();
     }
+  }
+
+  protected void replaceCachedObject(final DataObject oldObject,
+    final DataObject newObject) {
+    synchronized (pageCache) {
+      for (final List<DataObject> objects : pageCache.values()) {
+        for (final ListIterator<DataObject> iterator = objects.listIterator(); iterator.hasNext();) {
+          final DataObject object = iterator.next();
+          if (object == oldObject) {
+            iterator.set(newObject);
+            return;
+          }
+        }
+      }
+    }
+
   }
 
   public void setAttributeFilterMode(final String mode) {
@@ -368,6 +397,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected void setModes(final String... modes) {
     this.attributeFilterModes = Arrays.asList(modes);
+  }
+
+  public void setSearchCondition(final Condition searchCondition) {
+    if (!EqualsRegistry.equal(searchCondition, this.searchCondition)) {
+      this.searchCondition = searchCondition;
+      refresh();
+    }
   }
 
   protected void setSortableModes(final String... sortableModes) {

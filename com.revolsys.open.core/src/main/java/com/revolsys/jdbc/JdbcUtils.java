@@ -292,7 +292,6 @@ public final class JdbcUtils {
       final boolean lockResults = query.isLockResults();
       sql = createSelectSql(metaData, "T", fromClause, lockResults,
         attributeNames, query, orderBy);
-      query.setSql(sql);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuffer newSql = new StringBuffer("SELECT ");
@@ -300,7 +299,6 @@ public final class JdbcUtils {
         newSql.append(" FROM ");
         newSql.append(sql.substring(14));
         sql = newSql.toString();
-        query.setSql(sql);
       }
       if (!orderBy.isEmpty()) {
         final StringBuffer buffer = new StringBuffer(sql);

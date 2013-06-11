@@ -54,7 +54,10 @@ public class DataObjectLayerForm extends DataObjectForm implements
     if (event.getSource() == getObject()) {
       final String propertyName = event.getPropertyName();
       final Object value = event.getNewValue();
-      setFieldValue(propertyName, value);
+      final DataObjectMetaData metaData = getMetaData();
+      if (metaData.hasAttribute(propertyName)) {
+        setFieldValue(propertyName, value);
+      }
     }
   }
 

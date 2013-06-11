@@ -20,8 +20,6 @@
  */
 package com.revolsys.gis.data.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,44 +41,6 @@ public final class DataObjectUtil {
 
   public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
     "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
-
-  /**
-   * Clone the value if it has a clone method.
-   * 
-   * @param value The value to clone.
-   * @return The cloned value.
-   */
-  public static Object clone(final Object value) {
-    if (value instanceof Cloneable) {
-      try {
-        final Class<? extends Object> valueClass = value.getClass();
-        final Method method = valueClass.getMethod("clone", new Class[0]);
-        if (method != null) {
-          return method.invoke(value, new Object[0]);
-        }
-      } catch (final IllegalArgumentException e) {
-        throw e;
-      } catch (final InvocationTargetException e) {
-
-        final Throwable cause = e.getCause();
-        if (cause instanceof RuntimeException) {
-          final RuntimeException re = (RuntimeException)cause;
-          throw re;
-        } else if (cause instanceof Error) {
-          final Error ee = (Error)cause;
-          throw ee;
-        } else {
-          throw new RuntimeException(cause.getMessage(), cause);
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-
-    }
-    return value;
-  }
 
   public static DataObject copy(final DataObjectMetaData metaData,
     final DataObject object) {
@@ -291,7 +251,7 @@ public final class DataObjectUtil {
         final Object oldValue = target.getValue(attributeName);
         Object newValue = source.getValue(attributeName);
         if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
-          newValue = DataObjectUtil.clone(newValue);
+          newValue = JavaBeanUtil.clone(newValue);
           target.setValue(attributeName, newValue);
         }
       }

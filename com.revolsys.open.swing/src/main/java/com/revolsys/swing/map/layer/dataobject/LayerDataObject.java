@@ -24,6 +24,14 @@ public class LayerDataObject extends ArrayDataObject {
     this.layer = layer;
   }
 
+  protected void firePropertyChange(final String attributeName,
+    final Object oldValue, final Object newValue) {
+    final DataObjectLayer layer = getLayer();
+    final PropertyChangeEvent event = new PropertyChangeEvent(this,
+      attributeName, oldValue, newValue);
+    layer.propertyChange(event);
+  }
+
   public DataObjectLayer getLayer() {
     return layer;
   }
@@ -35,6 +43,17 @@ public class LayerDataObject extends ArrayDataObject {
     } else {
       return (T)originalValues.get(name);
     }
+  }
+
+  public boolean isDeletable() {
+    if (layer.isCanDeleteObjects()) {
+      return isDeleted();
+    }
+    return false;
+  }
+
+  public boolean isDeleted() {
+    return getState() == DataObjectState.Deleted;
   }
 
   @Override
@@ -78,12 +97,18 @@ public class LayerDataObject extends ArrayDataObject {
     return true;
   }
 
-  protected void firePropertyChange(final String attributeName,
-    final Object oldValue, final Object newValue) {
-    final DataObjectLayer layer = getLayer();
-    final PropertyChangeEvent event = new PropertyChangeEvent(this,
-      attributeName, oldValue, newValue);
-    layer.propertyChange(event);
+  public void revertChanges() {
+    if (isModified() || isDeleted()) {
+      if (originalValues != null) {
+        super.setValues(originalValues);
+      }
+      originalValues = null;
+      setState(DataObjectState.Persisted);
+      final DataObjectLayer layer = getLayer();
+      layer.revertChanges(this);
+      firePropertyChange("state", DataObjectState.Modified,
+        DataObjectState.Persisted);
+    }
   }
 
   @Override

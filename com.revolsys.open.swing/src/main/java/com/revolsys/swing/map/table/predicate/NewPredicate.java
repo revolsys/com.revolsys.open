@@ -41,9 +41,13 @@ public class NewPredicate implements HighlightPredicate {
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-    final DataObject object = model.getObject(rowIndex);
-    final DataObjectLayer layer = model.getLayer();
-    return layer.isNew(object);
+    try {
+      final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+      final DataObject object = model.getObject(rowIndex);
+      final DataObjectLayer layer = model.getLayer();
+      return layer.isNew(object);
+    } catch (final IndexOutOfBoundsException e) {
+      return false;
+    }
   }
 }

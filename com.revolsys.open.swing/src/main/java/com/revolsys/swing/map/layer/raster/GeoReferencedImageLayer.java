@@ -98,8 +98,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
           boundingBox = viewBoundingBox;
         }
         image.setBoundingBox(boundingBox);
-        getPropertyChangeSupport().firePropertyChange("boundingBox", oldValue,
-          boundingBox);
+        firePropertyChange("boundingBox", oldValue, boundingBox);
         return boundingBox;
       }
     }
@@ -131,7 +130,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final GeoReferencedImage image = getImage();
     if (image != null) {
       image.revert();
-      getPropertyChangeSupport().firePropertyChange("revert", false, true);
+      firePropertyChange("revert", false, true);
     }
   }
 

@@ -146,7 +146,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
-  private final Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
+  private Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
 
   public AbstractDataObjectLayer() {
     this("");
@@ -247,7 +247,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearSelectedObjects() {
     selectedObjects = new LinkedHashSet<DataObject>();
-    getPropertyChangeSupport().firePropertyChange("selected", true, false);
+    firePropertyChange("selected", true, false);
   }
 
   @Override
@@ -327,10 +327,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void delete() {
     super.delete();
-    final Window window = forms.remove(this);
-    if (window != null) {
-      window.setVisible(false);
+    for (final Window window : forms.values()) {
+      if (window != null) {
+        window.dispose();
+      }
     }
+    this.deletedObjects = null;
+    this.editingObjects = null;
+    this.forms = null;
+    this.metaData = null;
+    this.modifiedObjects = null;
+    this.newObjects = null;
+    this.query = null;
+    this.selectedObjects = null;
+    System.gc();
   }
 
   protected void deleteObject(final DataObject object) {
@@ -360,20 +370,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     deleteObjects(Arrays.asList(objects));
   }
 
+  @Override
   protected boolean doSaveChanges() {
     return true;
   }
 
   protected void fireObjectsChanged() {
-    getPropertyChangeSupport().firePropertyChange("objectsChanged", false, true);
+    firePropertyChange("objectsChanged", false, true);
   }
 
   protected void fireSelected() {
     final boolean selected = !selectedObjects.isEmpty();
-    getPropertyChangeSupport().firePropertyChange("selected", !selected,
-      selected);
-    getPropertyChangeSupport().firePropertyChange("selectionCount", -1,
-      selectedObjects.size());
+    firePropertyChange("selected", !selected, selected);
+    firePropertyChange("selectionCount", -1, selectedObjects.size());
   }
 
   @Override
@@ -416,12 +425,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public Set<DataObject> getDeletedObjects() {
-    return deletedObjects;
+    return new LinkedHashSet<DataObject>(deletedObjects);
   }
 
   @Override
   public Set<DataObject> getEditingObjects() {
-    return editingObjects;
+    return new LinkedHashSet<DataObject>(editingObjects);
   }
 
   @Override
@@ -430,17 +439,29 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public Set<DataObject> getModifiedObjects() {
-    return new LinkedHashSet<DataObject>(modifiedObjects);
+    if (modifiedObjects == null) {
+      return Collections.emptySet();
+    } else {
+      return new LinkedHashSet<DataObject>(modifiedObjects);
+    }
   }
 
   @Override
   public int getNewObjectCount() {
-    return newObjects.size();
+    if (newObjects == null) {
+      return 0;
+    } else {
+      return newObjects.size();
+    }
   }
 
   @Override
   public List<DataObject> getNewObjects() {
-    return new ArrayList<DataObject>(newObjects);
+    if (newObjects == null) {
+      return Collections.emptyList();
+    } else {
+      return new ArrayList<DataObject>(newObjects);
+    }
   }
 
   @Override
@@ -627,12 +648,28 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     throw new UnsupportedOperationException("Query not currently supported");
   }
 
+  protected void removeDeletedObject(final DataObject object) {
+    deletedObjects.remove(object);
+  }
+
   protected void removeModifiedObject(final DataObject object) {
     synchronized (modifiedObjects) {
       modifiedObjects.remove(object);
     }
   }
 
+  @Override
+  public void revertChanges(final DataObject object) {
+    synchronized (modifiedObjects) {
+      if (isLayerObject(object)) {
+        removeModifiedObject(object);
+        deletedObjects.remove(object);
+        ((LayerDataObject)object).revertChanges();
+      }
+    }
+  }
+
+  @Override
   public boolean saveChanges() {
     synchronized (editSync) {
       final boolean saved = doSaveChanges();
@@ -644,26 +681,30 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
+  public boolean saveChanges(final DataObject object) {
+    return false;
+  }
+
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 
   public void setCanAddObjects(final boolean canAddObjects) {
     this.canAddObjects = canAddObjects;
-    getPropertyChangeSupport().firePropertyChange("canAddObjects",
-      !isCanAddObjects(), isCanAddObjects());
+    firePropertyChange("canAddObjects", !isCanAddObjects(), isCanAddObjects());
   }
 
   public void setCanDeleteObjects(final boolean canDeleteObjects) {
     this.canDeleteObjects = canDeleteObjects;
-    getPropertyChangeSupport().firePropertyChange("canDeleteObjects",
-      !isCanDeleteObjects(), isCanDeleteObjects());
+    firePropertyChange("canDeleteObjects", !isCanDeleteObjects(),
+      isCanDeleteObjects());
   }
 
   public void setCanEditObjects(final boolean canEditObjects) {
     this.canEditObjects = canEditObjects;
-    getPropertyChangeSupport().firePropertyChange("canEditObjects",
-      !isCanEditObjects(), isCanEditObjects());
+    firePropertyChange("canEditObjects", !isCanEditObjects(),
+      isCanEditObjects());
   }
 
   @Override
@@ -673,8 +714,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       synchronized (editSync) {
         if (editable == false) {
-          getPropertyChangeSupport().firePropertyChange("preEditable", false,
-            true);
+          firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
             final Integer result = InvokeMethodCallable.invokeAndWait(
               JOptionPane.class,
@@ -754,7 +794,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
     this.query = query;
-    getPropertyChangeSupport().firePropertyChange("query", oldValue, query);
+    firePropertyChange("query", oldValue, query);
   }
 
   @Override
@@ -838,6 +878,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.addWindowListener(new WindowAdapter() {
               @Override
               public void windowClosing(final WindowEvent e) {
+                form.removeNotify();
                 forms.remove(object);
               }
             });

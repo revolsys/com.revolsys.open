@@ -15,15 +15,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowPropertyEnableCheck;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowRunnable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,13 +40,13 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final DataObjectLayer layer;
 
-  private Condition searchCondition;
+  private final DataObjectLayerTableModel tableModel;
 
   public DataObjectLayerTablePanel(final DataObjectLayer layer,
     final JTable table) {
     super(table);
     this.layer = layer;
-    final DataObjectLayerTableModel tableModel = getTableModel();
+    this.tableModel = getTableModel();
     final MenuFactory menu = getMenu();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -56,16 +58,25 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit", this,
       "editRecord");
 
-    final ObjectPropertyEnableCheck canDeleteObjectsEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "canDeleteObjects");
+    final EnableCheck deletableEnableCheck = new DataObjectRowPropertyEnableCheck(
+      "deletable");
     menu.addMenuItemTitleIcon("record", "Delete Record", "table_delete",
-      canDeleteObjectsEnableCheck, this, "deleteRecord");
+      deletableEnableCheck, this, "deleteRecord");
+
+    final EnableCheck modifiedEnableCheck = new DataObjectRowPropertyEnableCheck(
+      "modified");
+    final EnableCheck deletedEnableCheck = new DataObjectRowPropertyEnableCheck(
+      "deleted");
+    final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
+      modifiedEnableCheck, deletedEnableCheck);
+    menu.addMenuItem("record", DataObjectRowRunnable.createAction(
+      "Revert Record", "arrow_undo", modifiedOrDeleted, "revertChanges"));
 
     final ToolBar toolBar = getToolBar();
 
     toolBar.addComponent("count", new TableRowCount(tableModel));
 
-    final ObjectPropertyEnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
+    final EnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canAddObjects");
     toolBar.addButton("record", "Add New Record", "table_row_insert",
       canAddObjectsEnableCheck, layer, "addNewRecord");
@@ -85,17 +96,15 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
-    final ObjectPropertyEnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
+    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
       "change_table_filter", editableEnableCheck, tableModel,
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
 
-    final ObjectPropertyEnableCheck selectableEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "selectionCount", 0, true);
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Selected Records",
-      "filter_selected", selectableEnableCheck, tableModel,
-      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_SELECTED);
+      "filter_selected", null, tableModel, "setAttributeFilterMode",
+      DataObjectLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
 
@@ -131,6 +140,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     return layer;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
   public DataObjectLayerTableModel getTableModel() {
     final JTable table = getTable();
     return (DataObjectLayerTableModel)table.getModel();
@@ -149,8 +160,6 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final Object source = event.getSource();
     if (source instanceof AttributeFilterPanel) {
       final AttributeFilterPanel filterPanel = (AttributeFilterPanel)source;
-      // TODO allow original query
-      final Query query = layer.getQuery();
       final String searchAttribute = filterPanel.getSearchAttribute();
       final String searchText = filterPanel.getSearchText();
       Condition condition;
@@ -160,11 +169,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       } else {
         condition = null;
       }
-      if (!EqualsRegistry.equal(condition, this.searchCondition)) {
-        this.searchCondition = condition;
-        query.setWhereCondition(condition);
-        layer.setQuery(query);
-      }
+      tableModel.setSearchCondition(condition);
+
     }
   }
 

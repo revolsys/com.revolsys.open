@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
 import java.awt.Component;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -94,15 +93,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public void addAllObjects(final Collection<? extends DataObject> objects) {
     final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
     addAllInternal(objects);
-    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
-      new ArrayList<DataObject>(this.objects));
+    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+      this.objects));
   }
 
   public void addObject(final DataObject object) {
     final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
     addObjectInternal(object);
-    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
-      new ArrayList<DataObject>(this.objects));
+    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+      this.objects));
   }
 
   private void addObjectInternal(final DataObject object) {
@@ -145,8 +144,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     final List<DataObject> oldObjects = new ArrayList<DataObject>(objects);
     objects = new ArrayList<DataObject>();
     index = new DataObjectQuadTree();
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    propertyChangeSupport.firePropertyChange("objects", oldObjects, objects);
+    firePropertyChange("objects", oldObjects, objects);
   }
 
   @Override
@@ -155,8 +153,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
     this.objects.removeAll(objects);
     this.index.remove(objects);
-    getPropertyChangeSupport().firePropertyChange("objects", oldValue,
-      new ArrayList<DataObject>(this.objects));
+    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+      this.objects));
   }
 
   @Override
@@ -281,8 +279,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     objects = new ArrayList<DataObject>();
     index = new DataObjectQuadTree();
     addAllObjects(newObjects);
-    getPropertyChangeSupport().firePropertyChange("objects", oldObjects,
-      objects);
+    firePropertyChange("objects", oldObjects, objects);
   }
 
   public void setObjects(final DataObject... objects) {

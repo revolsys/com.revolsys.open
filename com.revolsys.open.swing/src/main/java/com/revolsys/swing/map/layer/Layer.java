@@ -15,6 +15,10 @@ public interface Layer extends PropertyChangeSupportProxy,
   void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener);
 
+  TabbedValuePanel<Layer> createPropertiesPanel();
+
+  void delete();
+
   BoundingBox getBoundingBox();
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
@@ -22,8 +26,6 @@ public interface Layer extends PropertyChangeSupportProxy,
   GeometryFactory getGeometryFactory();
 
   long getId();
-
-  TabbedValuePanel<Layer> createPropertiesPanel();
 
   LayerGroup getLayerGroup();
 
@@ -43,6 +45,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   boolean isEditable(double scale);
 
+  boolean isHasChanges();
+
   boolean isQueryable();
 
   boolean isQuerySupported();
@@ -61,12 +65,12 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   void refresh();
 
-  void delete();
-
   void removePropertyChangeListener(final PropertyChangeListener listener);
 
   void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener);
+
+  boolean saveChanges();
 
   void setEditable(boolean editable);
 

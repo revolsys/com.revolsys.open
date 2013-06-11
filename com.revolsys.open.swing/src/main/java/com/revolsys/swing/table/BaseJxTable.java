@@ -3,6 +3,7 @@ package com.revolsys.swing.table;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.table.JTableHeader;
@@ -37,19 +38,23 @@ public class BaseJxTable extends JXTable {
 
   }
 
-  public void setColumnWidth(int i, int width) {
-    TableColumnExt column = getColumnExt(i);
-    column.setMinWidth(width);
-    column.setWidth(width);
-    column.setMaxWidth(width);
-  }
-
   @Override
   protected void createDefaultRenderers() {
     super.createDefaultRenderers();
     setDefaultRenderer(Object.class, new DefaultTableRenderer(
       new StringConverterValue()));
 
+  }
+
+  public int getPreferedSize(TableCellRenderer renderer,
+    final Class<?> columnClass, final Object value) {
+    if (renderer == null) {
+      renderer = getDefaultRenderer(columnClass);
+    }
+    final Component comp = renderer.getTableCellRendererComponent(this, value,
+      false, false, 0, -1);
+    final int width = comp.getPreferredSize().width;
+    return width;
   }
 
   @Override
@@ -59,6 +64,50 @@ public class BaseJxTable extends JXTable {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public Component prepareRenderer(final TableCellRenderer renderer,
+    final int row, final int column) {
+    try {
+      return super.prepareRenderer(renderer, row, column);
+    } catch (final IndexOutOfBoundsException e) {
+      return new JLabel("...");
+    }
+  }
+
+  public void resizeColumnsToContent() {
+    final TableModel model = getModel();
+    final int columnCount = getColumnCount();
+    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+      final TableColumnExt column = getColumnExt(columnIndex);
+
+      final TableCellRenderer headerRenderer = column.getHeaderRenderer();
+      final String columnName = model.getColumnName(columnIndex);
+      int maxPreferedWidth = getPreferedSize(headerRenderer, String.class,
+        columnName);
+
+      for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
+        final Object value = model.getValueAt(rowIndex, columnIndex);
+        if (value != null) {
+          final TableCellRenderer renderer = column.getCellRenderer();
+          final Class<?> columnClass = model.getColumnClass(columnIndex);
+          final int width = getPreferedSize(renderer, columnClass, value);
+          if (width > maxPreferedWidth) {
+            maxPreferedWidth = width;
+          }
+        }
+      }
+      column.setMinWidth(maxPreferedWidth + 5);
+      column.setPreferredWidth(maxPreferedWidth + 5);
+    }
+  }
+
+  public void setColumnWidth(final int i, final int width) {
+    final TableColumnExt column = getColumnExt(i);
+    column.setMinWidth(width);
+    column.setWidth(width);
+    column.setMaxWidth(width);
   }
 
   @Override
@@ -89,43 +138,5 @@ public class BaseJxTable extends JXTable {
     } else {
       setRowSorter(null);
     }
-  }
-
-  public void resizeColumnsToContent() {
-    TableModel model = getModel();
-    int columnCount = getColumnCount();
-    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-      TableColumnExt column = getColumnExt(columnIndex);
-
-      TableCellRenderer headerRenderer = column.getHeaderRenderer();
-      String columnName = model.getColumnName(columnIndex);
-      int maxPreferedWidth = getPreferedSize(headerRenderer, String.class,
-        columnName);
-
-      for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
-        Object value = model.getValueAt(rowIndex, columnIndex);
-        if (value != null) {
-          TableCellRenderer renderer = column.getCellRenderer();
-          Class<?> columnClass = model.getColumnClass(columnIndex);
-          int width = getPreferedSize(renderer, columnClass, value);
-          if (width > maxPreferedWidth) {
-            maxPreferedWidth = width;
-          }
-        }
-      }
-      column.setMinWidth(maxPreferedWidth + 5);
-      column.setPreferredWidth(maxPreferedWidth + 5);
-    }
-  }
-
-  public int getPreferedSize(TableCellRenderer renderer, Class<?> columnClass,
-    Object value) {
-    if (renderer == null) {
-      renderer = getDefaultRenderer(columnClass);
-    }
-    Component comp = renderer.getTableCellRendererComponent(this, value, false,
-      false, 0, -1);
-    int width = comp.getPreferredSize().width;
-    return width;
   }
 }

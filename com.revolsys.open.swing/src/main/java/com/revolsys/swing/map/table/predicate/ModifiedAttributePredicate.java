@@ -43,32 +43,35 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-    final DataObject object = model.getObject(rowIndex);
-    if (object instanceof LayerDataObject) {
-      final LayerDataObject layerObject = (LayerDataObject)object;
-      final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-      final boolean highlighted = layerObject.isModified(columnIndex);
-      if (highlighted) {
-        final DataObjectMetaData metaData = layerObject.getMetaData();
-        final String fieldName = metaData.getAttributeName(columnIndex);
-        final Object originalValue = layerObject.getOriginalValue(fieldName);
-        final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
-        String text;
-        if (originalValue == null) {
-          text = "-";
-        } else if (codeTable == null) {
-          text = StringConverterRegistry.toString(originalValue);
-        } else {
-          text = codeTable.getValue(originalValue);
-          if (text == null) {
+    try {
+      final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+      final DataObject object = model.getObject(rowIndex);
+      if (object instanceof LayerDataObject) {
+        final LayerDataObject layerObject = (LayerDataObject)object;
+        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+        final boolean highlighted = layerObject.isModified(columnIndex);
+        if (highlighted) {
+          final DataObjectMetaData metaData = layerObject.getMetaData();
+          final String fieldName = metaData.getAttributeName(columnIndex);
+          final Object originalValue = layerObject.getOriginalValue(fieldName);
+          final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
+          String text;
+          if (originalValue == null) {
             text = "-";
+          } else if (codeTable == null) {
+            text = StringConverterRegistry.toString(originalValue);
+          } else {
+            text = codeTable.getValue(originalValue);
+            if (text == null) {
+              text = "-";
+            }
           }
+          final JComponent component = adapter.getComponent();
+          component.setToolTipText(text);
         }
-        final JComponent component = adapter.getComponent();
-        component.setToolTipText(text);
+        return highlighted;
       }
-      return highlighted;
+    } catch (final IndexOutOfBoundsException e) {
     }
     return false;
   }

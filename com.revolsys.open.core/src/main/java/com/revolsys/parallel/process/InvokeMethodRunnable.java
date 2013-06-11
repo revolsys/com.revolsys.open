@@ -6,6 +6,7 @@ import java.util.Arrays;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.beanutils.MethodUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * A runnable class which will invoke a method on an object with the specified
@@ -58,10 +59,6 @@ public class InvokeMethodRunnable implements Runnable {
     this.parameters = parameters;
   }
 
-  protected void setObject(Object object) {
-    this.object = object;
-  }
-
   public Object getObject() {
     return object;
   }
@@ -72,9 +69,10 @@ public class InvokeMethodRunnable implements Runnable {
   @Override
   public void run() {
     try {
-      Object object = getObject();
+      final Object object = getObject();
       if (object == null) {
-        throw new RuntimeException("Object cannot be null " + this);
+        LoggerFactory.getLogger(getClass()).debug(
+          "Object cannot be null " + this);
       } else if (object instanceof Class<?>) {
         final Class<?> clazz = (Class<?>)object;
         MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
@@ -83,9 +81,13 @@ public class InvokeMethodRunnable implements Runnable {
       }
     } catch (final InvocationTargetException e) {
       throw new RuntimeException("Unable to invoke " + this, e.getCause());
-      } catch (final Throwable e) {
+    } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke " + this, e);
     }
+  }
+
+  protected void setObject(final Object object) {
+    this.object = object;
   }
 
   @Override

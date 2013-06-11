@@ -12,6 +12,9 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 
+import org.springframework.transaction.PlatformTransactionManager;
+
+import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
 
 public class SwingWorkerManager {
@@ -149,6 +152,13 @@ public class SwingWorkerManager {
 
   public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {
     return CollectionUtil.containsReference(RUNNING_WORKERS, worker);
+  }
+
+  public static void transactionExecute(
+    final PlatformTransactionManager transactionManager,
+    final int propagationBehavior, final Runnable runnable) {
+    execute(TransactionUtils.createRunnable(transactionManager,
+      propagationBehavior, runnable));
   }
 
   private SwingWorkerManager() {

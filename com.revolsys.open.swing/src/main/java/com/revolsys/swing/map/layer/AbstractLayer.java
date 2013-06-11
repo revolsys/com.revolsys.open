@@ -53,7 +53,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private String name;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   private GeometryFactory geometryFactory;
@@ -131,11 +131,33 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
+    firePropertyChange("deleted", false, true);
     if (layerGroup != null) {
       layerGroup.remove(this);
-      layerGroup = null;
     }
-    getPropertyChangeSupport().firePropertyChange("deleted", false, true);
+    this.geometryFactory = null;
+    this.layerGroup = null;
+    this.propertyChangeSupport = null;
+    this.renderer = null;
+  }
+
+  protected boolean doSaveChanges() {
+    return true;
+  }
+
+  protected void fireIndexedPropertyChange(final String propertyName,
+    final int index, final Object oldValue, final Object newValue) {
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
+        oldValue, newValue);
+    }
+  }
+
+  protected void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   @Override
@@ -238,6 +260,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean isHasChanges() {
+    return false;
+  }
+
+  @Override
   public boolean isQueryable() {
     return querySupported && queryable;
   }
@@ -290,30 +317,44 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void refresh() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(listener);
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.removePropertyChangeListener(listener);
+    }
   }
 
   @Override
   public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+  }
+
+  @Override
+  public boolean saveChanges() {
+    if (isHasChanges()) {
+      return doSaveChanges();
+    }
+    return true;
   }
 
   @Override
   public void setEditable(final boolean editable) {
     final boolean old = isEditable();
     this.editable = editable;
-    propertyChangeSupport.firePropertyChange("editable", old, isEditable());
+    firePropertyChange("editable", old, isEditable());
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory != this.geometryFactory) {
+      final GeometryFactory old = this.geometryFactory;
+      this.geometryFactory = geometryFactory;
+      firePropertyChange("geometryFactory", old, this.geometryFactory);
+    }
   }
 
   @Override
@@ -325,7 +366,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       }
       this.layerGroup = layerGroup;
       addPropertyChangeListener(layerGroup);
-      propertyChangeSupport.firePropertyChange("layerGroup", old, layerGroup);
+      firePropertyChange("layerGroup", old, layerGroup);
     }
   }
 

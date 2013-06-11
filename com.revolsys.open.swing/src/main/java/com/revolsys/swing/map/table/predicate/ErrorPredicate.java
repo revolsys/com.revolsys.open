@@ -37,14 +37,17 @@ public class ErrorPredicate implements HighlightPredicate {
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-    final DataObject object = model.getObject(rowIndex);
-    if (object instanceof LayerDataObject) {
-      final LayerDataObject layerDataObject = (LayerDataObject)object;
-      final int columnIndex = adapter.convertRowIndexToModel(adapter.column);
-      if (!layerDataObject.isValid(columnIndex)) {
-        return true;
+    try {
+      final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+      final DataObject object = model.getObject(rowIndex);
+      if (object instanceof LayerDataObject) {
+        final LayerDataObject layerDataObject = (LayerDataObject)object;
+        final int columnIndex = adapter.convertRowIndexToModel(adapter.column);
+        if (!layerDataObject.isValid(columnIndex)) {
+          return true;
+        }
       }
+    } catch (final IndexOutOfBoundsException e) {
     }
     return false;
   }

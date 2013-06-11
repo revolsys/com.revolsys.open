@@ -42,18 +42,21 @@ import com.revolsys.io.Writer;
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
 
-  public static void close(final DataObjectStore... dataStores) {
+  public static DataObjectStore close(final DataObjectStore... dataStores) {
     final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
     for (final DataObjectStore dataStore : dataStores) {
-      try {
-        dataStore.close();
-      } catch (final RuntimeException e) {
-        exceptions.add(e);
+      if (dataStore != null) {
+        try {
+          dataStore.close();
+        } catch (final RuntimeException e) {
+          exceptions.add(e);
+        }
       }
     }
     if (!exceptions.isEmpty()) {
       throw exceptions.get(0);
     }
+    return null;
   }
 
   private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();

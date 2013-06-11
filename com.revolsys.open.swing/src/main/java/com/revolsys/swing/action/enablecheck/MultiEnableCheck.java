@@ -1,6 +1,7 @@
 package com.revolsys.swing.action.enablecheck;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -13,8 +14,12 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
   public MultiEnableCheck() {
   }
 
-  public MultiEnableCheck(final Collection<EnableCheck> enableChecks) {
+  public MultiEnableCheck(final Collection<? extends EnableCheck> enableChecks) {
     setEnableChecks(enableChecks);
+  }
+
+  public MultiEnableCheck(final EnableCheck... enableChecks) {
+    this(Arrays.asList(enableChecks));
   }
 
   public List<EnableCheck> getEnableChecks() {
@@ -26,7 +31,8 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
     return enableChecks.iterator();
   }
 
-  public void setEnableChecks(final Collection<EnableCheck> enableChecks) {
+  public void setEnableChecks(
+    final Collection<? extends EnableCheck> enableChecks) {
     this.enableChecks = new ArrayList<EnableCheck>(enableChecks);
     isEnabled();
   }

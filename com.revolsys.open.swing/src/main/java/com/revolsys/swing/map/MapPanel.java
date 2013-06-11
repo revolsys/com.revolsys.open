@@ -80,7 +80,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private int overlayIndex = 1;
 
-  private final Project project = new Project();
+  private Project project = new Project();
 
   private double scale = 0;
 
@@ -355,6 +355,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
     repaint();
+  }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    final Project project = this.project;
+    this.project = null;
+    project.delete();
   }
 
   public synchronized void setBaseMapLayer(final Layer layer) {

@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -65,8 +64,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           && !loading) {
           loading = true;
           this.boundingBox = boundingBox;
-          getPropertyChangeSupport().firePropertyChange("visible",
-            super.isVisible(), false);
+          firePropertyChange("visible", super.isVisible(), false);
           try {
             final Constructor<?> constructor = workerClass.getConstructor(
               DataObjectBoundingBoxLayer.class, BoundingBox.class);
@@ -115,9 +113,8 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
         loading = false;
       }
     }
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    propertyChangeSupport.firePropertyChange("index", null, index);
-    propertyChangeSupport.firePropertyChange("visible", false, isVisible());
+    firePropertyChange("index", null, index);
+    firePropertyChange("visible", false, isVisible());
   }
 
 }

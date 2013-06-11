@@ -45,17 +45,19 @@ public class ZipUtil {
   public static void addDirectoryToZipFile(final ZipOutputStream zipOut,
     final File baseDirectory, final File directory) throws IOException {
     final File[] files = directory.listFiles();
-    for (int i = 0; i < files.length; i++) {
-      final File file = files[i];
-      if (file.isDirectory()) {
-        addDirectoryToZipFile(zipOut, baseDirectory, file);
-      } else {
-        final String zipEntryName = FileUtil.getRelativePath(baseDirectory,
-          file);
-        zipOut.putNextEntry(new ZipEntry(zipEntryName));
-        final InputStream in = new FileInputStream(file);
-        FileUtil.copy(in, zipOut);
-        in.close();
+    if (files != null) {
+      for (int i = 0; i < files.length; i++) {
+        final File file = files[i];
+        if (file.isDirectory()) {
+          addDirectoryToZipFile(zipOut, baseDirectory, file);
+        } else {
+          final String zipEntryName = FileUtil.getRelativePath(baseDirectory,
+            file);
+          zipOut.putNextEntry(new ZipEntry(zipEntryName));
+          final InputStream in = new FileInputStream(file);
+          FileUtil.copy(in, zipOut);
+          in.close();
+        }
       }
     }
   }
@@ -132,10 +134,13 @@ public class ZipUtil {
     }
   }
 
-  public static void zipDirectory(final File zipFile, final File directory)
-    throws IOException {
-    final OutputStream outputStream = new FileOutputStream(zipFile);
-    zipDirectory(directory, outputStream);
+  public static void zipDirectory(final File zipFile, final File directory) {
+    try {
+      final OutputStream outputStream = new FileOutputStream(zipFile);
+      zipDirectory(directory, outputStream);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to create zip file:" + zipFile, e);
+    }
   }
 
   public static void zipDirectory(final File directory,

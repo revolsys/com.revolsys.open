@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +42,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     final String layerName) {
     for (final Layer layer : group.getLayers()) {
       if (layer.getName().equals(layerName)) {
+
         return layer;
       }
     }
@@ -62,9 +62,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       if (layer != null && !layers.contains(layer)) {
         layers.add(index, layer);
         layer.setLayerGroup(this);
-        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-        propertyChangeSupport.fireIndexedPropertyChange("layers", index, null,
-          layer);
+        fireIndexedPropertyChange("layers", index, null, layer);
       }
     }
   }
@@ -150,7 +148,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   public void clear() {
     final List<Layer> oldLayers = layers;
     layers = new ArrayList<Layer>();
-    getPropertyChangeSupport().firePropertyChange("layers", oldLayers, layers);
+    firePropertyChange("layers", oldLayers, layers);
   }
 
   public boolean contains(final Layer layer) {
@@ -176,13 +174,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
         iterator.remove();
         layer.setLayerGroup(null);
         layer.removePropertyChangeListener(this);
-        final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-        propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
-          null);
+        fireIndexedPropertyChange("layers", index, layer, null);
         layer.delete();
         index++;
       }
       super.delete();
+      this.layers = null;
     }
   }
 
@@ -339,9 +336,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       final Layer layer = layers.remove(index);
       layer.setLayerGroup(null);
       layer.removePropertyChangeListener(this);
-      final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-      propertyChangeSupport.fireIndexedPropertyChange("layers", index, layer,
-        null);
+      fireIndexedPropertyChange("layers", index, layer, null);
       return layer;
     }
   }
@@ -377,6 +372,15 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     synchronized (layers) {
       return layers.retainAll(c);
     }
+  }
+
+  @Override
+  public boolean saveChanges() {
+    boolean saved = true;
+    for (final Layer layer : this) {
+      saved &= layer.saveChanges();
+    }
+    return saved;
   }
 
   @Override

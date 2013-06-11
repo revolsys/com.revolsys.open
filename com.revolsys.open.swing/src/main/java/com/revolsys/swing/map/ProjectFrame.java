@@ -51,7 +51,7 @@ public class ProjectFrame extends JFrame {
 
   private Project project;
 
-  private final CControl dockControl = new CControl(this);
+  private CControl dockControl = new CControl(this);
 
   private MapPanel mapPanel;
 
@@ -74,14 +74,6 @@ public class ProjectFrame extends JFrame {
   }
 
   protected void addCatalogPanel() {
-    /*
-     * final ObjectTreeModel model = new ObjectTreeModel(connectionManagers);
-     * final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel();
-     * listModel.addObjectTreeNodeModels(new DataObjectStoreConnectionsModel(),
-     * new FileSystemConnectionManagerModel()); model.addNodeModel(listModel);
-     * final ObjectTree tree = new ObjectTree(model);
-     * tree.setRootVisible(false); tree.setShowsRootHandles(true);
-     */
 
     final List<Object> connectionManagers = new ArrayList<Object>();
 
@@ -207,7 +199,7 @@ public class ProjectFrame extends JFrame {
 
     addWorkingAreas();
 
-    DefaultSingleCDockable toc = addTableOfContents();
+    final DefaultSingleCDockable toc = addTableOfContents();
     addCatalogPanel();
     toc.toFront();
 
@@ -218,4 +210,14 @@ public class ProjectFrame extends JFrame {
 
     createMenuBar();
   }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    tocPanel = null;
+    project = null;
+    dockControl = null;
+    mapPanel = null;
+  }
+
 }

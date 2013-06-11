@@ -287,16 +287,21 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer();
-    if (sql == null) {
-      string.append(JdbcUtils.getSelectSql(this));
-    } else {
-      string.append(sql);
+    try {
+      final StringBuffer string = new StringBuffer();
+      if (sql == null) {
+        string.append(JdbcUtils.getSelectSql(this));
+      } else {
+        string.append(sql);
+      }
+      if (!parameters.isEmpty()) {
+        string.append(" ");
+        string.append(parameters);
+      }
+      return string.toString();
+    } catch (final Throwable t) {
+      t.printStackTrace();
+      return "";
     }
-    if (!parameters.isEmpty()) {
-      string.append(" ");
-      string.append(parameters);
-    }
-    return string.toString();
   }
 }
