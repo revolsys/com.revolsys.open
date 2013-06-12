@@ -538,7 +538,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
       final Object value = JavaBeanUtil.clone(object.getValue(name));
       setValue(name, value);
     }
-    setGeometryValue((Geometry)JavaBeanUtil.clone(object.getGeometryValue()));
+    setGeometryValue(JavaBeanUtil.clone(object.getGeometryValue()));
   }
 
   @Override
@@ -560,7 +560,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
       for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
-        setValue(name, value);
+        setValueByPath(name, value);
       }
     }
   }

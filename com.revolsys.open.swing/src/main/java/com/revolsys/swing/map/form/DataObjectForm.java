@@ -11,8 +11,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +27,6 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxEditor;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,7 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.TransferHandler;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -45,7 +42,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
-import org.jdesktop.swingx.JXDatePicker;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -62,8 +58,10 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
+import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.util.LayerUtil;
@@ -78,7 +76,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectForm extends JPanel implements FocusListener,
+public class DataObjectForm extends JPanel implements PropertyChangeListener,
   CellEditorListener {
 
   private static final long serialVersionUID = 1L;
@@ -91,11 +89,11 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
 
-  private final Map<String, JComponent> fields = new LinkedHashMap<String, JComponent>();
+  private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
   private boolean fieldsValid;
 
-  private final Map<Component, String> fieldToNameMap = new HashMap<Component, String>();
+  private final Map<Field, String> fieldToNameMap = new HashMap<Field, String>();
 
   private boolean fieldValidationEnabled = true;
 
@@ -109,21 +107,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   private final Map<String, String> originalToolTip = new HashMap<String, String>();
 
-  private Object previousValue;
-
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
   private Set<String> requiredFieldNames = new HashSet<String>();
 
-  private final Color selectedTextColor = new JTextField().getSelectedTextColor();
-
   private final JTabbedPane tabs = new JTabbedPane();
 
   private final Map<String, Boolean> tabValid = new HashMap<String, Boolean>();
-
-  private final Color textBackgroundColor = new JTextField().getBackground();
-
-  private final Color textColor = new JTextField().getForeground();
 
   private ToolBar toolBar;
 
@@ -168,9 +158,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
   protected void addDoubleField(final String fieldName, final int length,
     final int scale, final Double minimumValie, final Double maximumValue) {
     final DataType dataType = DataTypes.DOUBLE;
-    final NumberTextField field = new NumberTextField(dataType, length, scale,
-      minimumValie, maximumValue);
+    final NumberTextField field = new NumberTextField(fieldName, dataType,
+      length, scale, minimumValie, maximumValue);
     addField(fieldName, field);
+  }
+
+  public void addField(final Container container, final Field field) {
+    container.add((Component)field);
   }
 
   public void addField(final Container container, JComponent field) {
@@ -181,15 +175,10 @@ public class DataObjectForm extends JPanel implements FocusListener,
     container.add(field);
   }
 
-  public JComponent addField(final String fieldName, final JComponent field) {
-    if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      final int preferedWidth = textField.getPreferredSize().width;
-      textField.setMinimumSize(new Dimension(preferedWidth, 0));
-      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-    }
-    originalToolTip.put(fieldName, field.getToolTipText());
-    field.addFocusListener(this);
+  public Field addField(final String fieldName, final Field field) {
+    final Field fieldComponent = field;
+    fieldComponent.addPropertyChangeListener(fieldName, this);
+
     fields.put(fieldName, field);
     fieldToNameMap.put(field, fieldName);
     return field;
@@ -205,8 +194,8 @@ public class DataObjectForm extends JPanel implements FocusListener,
   protected void addNumberField(final String fieldName,
     final DataType dataType, final int length, final Number minimumValue,
     final Number maximumValue) {
-    final NumberTextField field = new NumberTextField(dataType, length, 0,
-      minimumValue, maximumValue);
+    final NumberTextField field = new NumberTextField(fieldName, dataType,
+      length, 0, minimumValue, maximumValue);
     addField(fieldName, field);
   }
 
@@ -226,9 +215,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
 
   public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
     this.readOnlyFieldNames.addAll(readOnlyFieldNames);
-    for (final Entry<String, JComponent> entry : fields.entrySet()) {
+    for (final Entry<String, Field> entry : fields.entrySet()) {
       final String name = entry.getKey();
-      final JComponent field = entry.getValue();
+      final Field field = entry.getValue();
       if (this.readOnlyFieldNames.contains(name)) {
         field.setEnabled(false);
       } else {
@@ -454,40 +443,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     setFieldValue(name, value);
   }
 
-  @Override
-  public void focusGained(final FocusEvent e) {
-    final Object source = e.getSource();
-    if (source instanceof Component) {
-      final Component component = (Component)source;
-      final String fieldName = getFieldName(component);
-      if (fieldName != null) {
-        previousValue = getFieldValue(fieldName);
-
-      }
-    }
-  }
-
-  @Override
-  public void focusLost(final FocusEvent e) {
-    final Object source = e.getSource();
-    if (source instanceof Component) {
-      final Component component = (Component)source;
-      final String fieldName = getFieldName(component);
-      if (fieldName != null) {
-        final Object value = getFieldValue(fieldName);
-        if (!EqualsRegistry.equal(value, previousValue)) {
-          object.setValue(fieldName, value);
-          validateFields();
-          if (allAttributes != null) {
-            allAttributes.setValues(getValues());
-          }
-
-        }
-      }
-    }
-    previousValue = null;
-  }
-
   public DataObjectMapTableModel getAllAttributes() {
     return allAttributes;
   }
@@ -526,18 +481,12 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends JComponent> T getField(final String fieldName) {
+  protected <T extends Field> T getField(final String fieldName) {
     synchronized (fields) {
-      JComponent field = fields.get(fieldName);
+      Field field = fields.get(fieldName);
       if (field == null) {
         final boolean enabled = !readOnlyFieldNames.contains(fieldName);
         field = SwingUtil.createField(metaData, fieldName, enabled);
-        if (field instanceof JComboBox) {
-          final JComboBox comboBox = (JComboBox)field;
-          final ComboBoxEditor editor = comboBox.getEditor();
-          final Component editorComponent = editor.getEditorComponent();
-          editorComponent.addFocusListener(this);
-        }
         addField(fieldName, field);
       }
       if (!isEditable()) {
@@ -556,7 +505,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
     return fieldName;
   }
 
-  public Collection<JComponent> getFields() {
+  public Collection<Field> getFields() {
     return fields.values();
   }
 
@@ -564,13 +513,7 @@ public class DataObjectForm extends JPanel implements FocusListener,
   public <T> T getFieldValue(final String name) {
     final JComponent field = getField(name);
     if (field.isEnabled()) {
-      Object value;
-      if (field instanceof JXDatePicker) {
-        final JXDatePicker dateField = (JXDatePicker)field;
-        value = dateField.getDate();
-      } else {
-        value = SwingUtil.getValue(field);
-      }
+      final Object value = SwingUtil.getValue(field);
       final CodeTable codeTable = metaData.getCodeTableByColumn(name);
       if (codeTable == null) {
         if (value != null && name.endsWith("_IND")) {
@@ -705,6 +648,33 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof Field) {
+      final Field field = (Field)source;
+      final String fieldName = field.getFieldName();
+      final Object fieldValue = field.getFieldValue();
+      final Object objectValue = object.getValue(fieldName);
+      if (!EqualsRegistry.equal(objectValue, fieldValue)) {
+        boolean equal = false;
+        if (fieldValue instanceof String) {
+          final String string = (String)fieldValue;
+          if (!StringUtils.hasText(string) && objectValue == null) {
+            equal = true;
+          }
+        }
+        if (!equal) {
+          object.setValue(fieldName, fieldValue);
+          validateFields();
+          if (allAttributes != null) {
+            allAttributes.setValues(getValues());
+          }
+        }
+      }
+    }
+  }
+
   public void reverseAttributes() {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
     property.reverseAttributes(object);
@@ -742,18 +712,13 @@ public class DataObjectForm extends JPanel implements FocusListener,
       fieldsValid = false;
       final JComponent field = getField(fieldName);
       fieldInValidMessage.put(fieldName, message);
-      setFieldInvalidToolTip(fieldName, field);
-      field.setForeground(Color.RED);
-      if (field instanceof JTextComponent) {
-        final JTextComponent textField = (JTextComponent)field;
-        textField.setSelectedTextColor(Color.RED);
-        textField.setBackground(Color.PINK);
-      } else if (field instanceof JComboBox) {
-        final JComboBox comboBox = (JComboBox)field;
-        final ComboBoxEditor editor = comboBox.getEditor();
-        final Component component = editor.getEditorComponent();
-        component.setForeground(Color.RED);
-        component.setBackground(Color.PINK);
+      if (field instanceof Field) {
+        final Field fieldComponent = (Field)field;
+        fieldComponent.setFieldInvalid(message);
+      } else {
+        setFieldInvalidToolTip(fieldName, field);
+        field.setForeground(Color.RED);
+        field.setBackground(Color.PINK);
       }
       fieldValidMap.put(fieldName, false);
     }
@@ -773,19 +738,14 @@ public class DataObjectForm extends JPanel implements FocusListener,
     final JComponent field = getField(fieldName);
     field.setForeground(Color.BLACK);
     final String toolTip = originalToolTip.get(fieldName);
-    field.setToolTipText(toolTip);
-    if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      textField.setSelectedTextColor(selectedTextColor);
-      textField.setBackground(textBackgroundColor);
-    } else if (field instanceof JComboBox) {
-      final JComboBox comboBox = (JComboBox)field;
-      final ComboBoxEditor editor = comboBox.getEditor();
-      final Component component = editor.getEditorComponent();
-      component.setForeground(textColor);
-      component.setBackground(textBackgroundColor);
+    if (field instanceof Field) {
+      final Field fieldComponent = (Field)field;
+      fieldComponent.setFieldValid();
+    } else {
+      field.setToolTipText(toolTip);
+      field.setForeground(TextField.DEFAULT_FOREGROUND);
+      field.setBackground(TextField.DEFAULT_BACKGROUND);
     }
-
     fieldValidMap.put(fieldName, true);
     fieldInValidMessage.remove(field);
   }
@@ -906,9 +866,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
   }
 
   protected void updateReadOnlyFields() {
-    for (final Entry<String, JComponent> entry : fields.entrySet()) {
+    for (final Entry<String, Field> entry : fields.entrySet()) {
       final String name = entry.getKey();
-      final JComponent field = entry.getValue();
+      final Field field = entry.getValue();
       if (readOnlyFieldNames.contains(name)) {
         field.setEnabled(false);
       } else {
@@ -934,7 +894,6 @@ public class DataObjectForm extends JPanel implements FocusListener,
     }
   }
 
-  @SuppressWarnings("rawtypes")
   protected void validateFields() {
     if (isFieldValidationEnabled()) {
       setFieldValidationEnabled(false);
@@ -944,9 +903,9 @@ public class DataObjectForm extends JPanel implements FocusListener,
         for (final String fieldName : fields.keySet()) {
           setFieldValid(fieldName);
         }
-        for (final Entry<String, JComponent> entry : fields.entrySet()) {
+        for (final Entry<String, Field> entry : fields.entrySet()) {
           final String fieldName = entry.getKey();
-          final JComponent field = entry.getValue();
+          final Field field = entry.getValue();
           if (field instanceof ValidatingField) {
             final ValidatingField validatingField = (ValidatingField)field;
             if (!validatingField.isFieldValid()) {

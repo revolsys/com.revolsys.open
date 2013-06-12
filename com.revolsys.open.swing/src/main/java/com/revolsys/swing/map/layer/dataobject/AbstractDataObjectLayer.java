@@ -295,8 +295,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public TabbedValuePanel<Layer> createPropertiesPanel() {
-    final TabbedValuePanel<Layer> propertiesPanel = super.createPropertiesPanel();
+  public TabbedValuePanel createPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
 
     final DataObjectMetaData metaData = getMetaData();
     final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
@@ -307,7 +307,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     propertiesPanel.addTab("Fields", fieldPanel);
 
     final LayerRenderer<? extends Layer> renderer = getRenderer();
-    final ValueField<?> stylePanel = renderer.createStylePanel();
+    final ValueField stylePanel = renderer.createStylePanel();
     if (stylePanel != null) {
       propertiesPanel.addTab(stylePanel);
     }

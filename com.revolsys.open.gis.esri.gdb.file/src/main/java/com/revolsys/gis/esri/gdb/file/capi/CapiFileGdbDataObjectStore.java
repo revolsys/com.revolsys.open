@@ -331,6 +331,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public void appendValue(final StringBuffer buffer, final Object value) {
     if (value instanceof Number) {
       buffer.append(value);
+    } else if (value == null) {
+      buffer.append("''");
     } else {
       buffer.append("'");
       buffer.append(StringConverterRegistry.toString(value).replaceAll("'",

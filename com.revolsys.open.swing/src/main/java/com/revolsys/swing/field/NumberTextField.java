@@ -1,13 +1,12 @@
 package com.revolsys.swing.field;
 
+import java.awt.Color;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.math.BigDecimal;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.jdesktop.swingx.JXTextField;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -15,8 +14,8 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
 
-public class NumberTextField extends JXTextField implements DocumentListener,
-  FocusListener, ValidatingField<Number> {
+public class NumberTextField extends TextField implements DocumentListener,
+  ValidatingField {
 
   private static final long serialVersionUID = 1L;
 
@@ -119,7 +118,7 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     return length;
   }
 
-  private String fieldName;
+  private String errorMessage;
 
   private final DataType dataType;
 
@@ -128,8 +127,6 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   private final int length;
 
   private final int scale;
-
-  private Number fieldValue;
 
   private BigDecimal minimumValue;
 
@@ -149,6 +146,20 @@ public class NumberTextField extends JXTextField implements DocumentListener,
 
   public NumberTextField(final DataType dataType, final int length,
     final int scale, final Number minimumValue, final Number maximumValue) {
+    this(null, dataType, length, scale, minimumValue, maximumValue);
+  }
+
+  public NumberTextField(final String fieldName, final DataType dataType,
+    final int length, final int scale) {
+    this(fieldName, dataType, length, scale, null, createMaximumValue(dataType,
+      length, scale));
+  }
+
+  public NumberTextField(final String fieldName, final DataType dataType,
+    final int length, final int scale, final Number minimumValue,
+    final Number maximumValue) {
+    super(fieldName);
+
     this.dataType = dataType;
     this.length = length;
     this.scale = scale;
@@ -168,16 +179,13 @@ public class NumberTextField extends JXTextField implements DocumentListener,
 
   @Override
   public void focusGained(final FocusEvent e) {
+    super.focusGained(e);
   }
 
   @Override
   public void focusLost(final FocusEvent e) {
+    super.focusLost(e);
     updateText();
-  }
-
-  @Override
-  public String getFieldName() {
-    return fieldName;
   }
 
   @Override
@@ -186,9 +194,14 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
-    return (T)fieldValue;
+
+    final Object fieldValue = super.getFieldValue();
+    try {
+      return (T)StringConverterRegistry.toObject(dataType, fieldValue);
+    } catch (final NumberFormatException e) {
+      return (T)fieldValue;
+    }
   }
 
   public int getLength() {
@@ -208,6 +221,15 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   @Override
+  public String getToolTipText() {
+    if (StringUtils.hasText(errorMessage)) {
+      return errorMessage;
+    } else {
+      return super.getToolTipText();
+    }
+  }
+
+  @Override
   public void insertUpdate(final DocumentEvent e) {
     validateField();
   }
@@ -223,7 +245,23 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   @Override
-  public void setFieldValue(final Number value) {
+  public void setFieldInvalid(final String message) {
+    setForeground(Color.RED);
+    setSelectedTextColor(Color.RED);
+    setBackground(Color.PINK);
+    this.errorMessage = message;
+  }
+
+  @Override
+  public void setFieldValid() {
+    setForeground(TextField.DEFAULT_FOREGROUND);
+    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
+    setBackground(TextField.DEFAULT_BACKGROUND);
+    this.errorMessage = null;
+  }
+
+  @Override
+  public void setFieldValue(final Object value) {
     setText(StringConverterRegistry.toString(value));
     validateField();
     updateText();
@@ -246,7 +284,7 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   private void updateText() {
-    if (isFieldValid() && fieldValue != null) {
+    if (isFieldValid() && getFieldValue() != null) {
       final String text = getText();
       BigDecimal number = new BigDecimal(text);
       number = number.setScale(scale);
@@ -258,7 +296,7 @@ public class NumberTextField extends JXTextField implements DocumentListener,
   }
 
   private void validateField() {
-    final Number oldValue = fieldValue;
+    final Object oldValue = getFieldValue();
     Number value = null;
     final boolean oldValid = fieldValid;
     boolean valid = true;
@@ -295,8 +333,8 @@ public class NumberTextField extends JXTextField implements DocumentListener,
     }
     if (valid) {
       if (!EqualsRegistry.equal(oldValue, value)) {
-        fieldValue = value;
-        firePropertyChange("fieldValid", oldValue, fieldValue);
+        setFieldValue(value);
+        firePropertyChange(getFieldName(), oldValue, getFieldValue());
       }
     }
   }

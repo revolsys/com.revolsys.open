@@ -329,7 +329,7 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public DataObjectStoreSchema getSchema(String schemaName) {
-    if (schemaName == null) {
+    if (schemaName == null || schemaMap == null) {
       return null;
     } else {
       synchronized (schemaMap) {

@@ -16,20 +16,16 @@ import org.springframework.util.StringUtils;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 
-public class DirectoryNameField extends JPanel implements
-  ValidatingField<String> {
+public class DirectoryNameField extends JPanel implements ValidatingField {
   private static final long serialVersionUID = -8433151755294925911L;
 
   private final JTextField directoryName = new JTextField(70);
 
   private final JButton browseButton = new JButton();
 
-  private String fieldName;
+  private final String fieldName = "fieldValue";
 
-  @Override
-  public String getFieldName() {
-    return fieldName;
-  }
+  private String errorMessage;
 
   public DirectoryNameField() {
     super(new SpringLayout());
@@ -84,6 +80,11 @@ public class DirectoryNameField extends JPanel implements
   }
 
   @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
+  @Override
   public String getFieldValidationMessage() {
     final File directory = getDirectoryFile();
     if (directory == null) {
@@ -99,6 +100,15 @@ public class DirectoryNameField extends JPanel implements
   @Override
   public <T> T getFieldValue() {
     return (T)directoryName.getText();
+  }
+
+  @Override
+  public String getToolTipText() {
+    if (StringUtils.hasText(errorMessage)) {
+      return errorMessage;
+    } else {
+      return super.getToolTipText();
+    }
   }
 
   @Override
@@ -123,7 +133,23 @@ public class DirectoryNameField extends JPanel implements
   }
 
   @Override
-  public void setFieldValue(final String fieldValue) {
-    setDirectoryPath(fieldValue);
+  public void setFieldInvalid(final String message) {
+    directoryName.setForeground(Color.RED);
+    directoryName.setSelectedTextColor(Color.RED);
+    directoryName.setBackground(Color.PINK);
+    this.errorMessage = message;
+  }
+
+  @Override
+  public void setFieldValid() {
+    directoryName.setForeground(TextField.DEFAULT_FOREGROUND);
+    directoryName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
+    directoryName.setBackground(TextField.DEFAULT_BACKGROUND);
+    this.errorMessage = null;
+  }
+
+  @Override
+  public void setFieldValue(final Object fieldValue) {
+    setDirectoryPath(fieldValue.toString());
   }
 }

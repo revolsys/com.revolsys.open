@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,12 +18,12 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.JXTextArea;
-import org.jdesktop.swingx.JXTextField;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
@@ -84,7 +83,7 @@ public class LoggingEventPanel extends JPanel {
     if (!StringUtils.hasText(stringValue)) {
       stringValue = "-";
     }
-    final JXTextField field = SwingUtil.createTextField(Math.min(80,
+    final TextField field = SwingUtil.createTextField(Math.min(80,
       stringValue.length()));
     field.setEditable(false);
     field.setText(stringValue);

@@ -13,7 +13,6 @@ import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class BingLayer extends AbstractTiledImageLayer {
@@ -46,12 +45,6 @@ public class BingLayer extends AbstractTiledImageLayer {
     setVisible(true);
   }
 
-  @Override
-  public ValueField<Layer> addPropertiesTabGeneral(
-    TabbedValuePanel<Layer> tabPanel) {
-    return super.addPropertiesTabGeneral(tabPanel);
-  }
-
   public BingLayer(final ImagerySet imagerySet) {
     this(new BingClient(), imagerySet);
   }
@@ -62,6 +55,11 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public BingLayer(final String bingMapKey, final ImagerySet imagerySet) {
     this(new BingClient(bingMapKey), imagerySet);
+  }
+
+  @Override
+  public ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    return super.addPropertiesTabGeneral(tabPanel);
   }
 
   @Override
@@ -81,19 +79,13 @@ public class BingLayer extends AbstractTiledImageLayer {
     return mapLayer;
   }
 
-  public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getMetresPerPixel();
-    final int zoomLevel = client.getZoomLevel(metresPerPixel);
-    return client.getResolution(zoomLevel);
-  }
-
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
-      double resolution = getResolution(viewport);
+      final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
         .convert(GEOMETRY_FACTORY)
         .intersection(MAX_BOUNDING_BOX);
@@ -110,7 +102,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          BingMapTile tile = new BingMapTile(this, zoomLevel, resolution,
+          final BingMapTile tile = new BingMapTile(this, zoomLevel, resolution,
             tileX, tileY);
           tiles.add(tile);
         }
@@ -121,6 +113,13 @@ public class BingLayer extends AbstractTiledImageLayer {
         e);
     }
     return tiles;
+  }
+
+  @Override
+  public double getResolution(final Viewport2D viewport) {
+    final double metresPerPixel = viewport.getMetresPerPixel();
+    final int zoomLevel = client.getZoomLevel(metresPerPixel);
+    return client.getResolution(zoomLevel);
   }
 
   @Override

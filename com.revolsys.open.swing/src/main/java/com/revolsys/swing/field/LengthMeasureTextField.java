@@ -2,28 +2,19 @@ package com.revolsys.swing.field;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DecimalFormat;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
-import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JTextField;
-
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.listener.InvokeMethodListener;
 
-public class LengthMeasureTextField extends ValueField<Measure<Length>>
-  implements ItemListener {
+public class LengthMeasureTextField extends ValueField implements ItemListener {
   /**
    * 
    */
@@ -35,21 +26,22 @@ public class LengthMeasureTextField extends ValueField<Measure<Length>>
 
   private Unit<Length> unit;
 
-  private final JComboBox unitField;
+  private final ComboBox unitField;
 
   public LengthMeasureTextField(final Measure<Length> value,
     final Unit<Length> unit) {
     this(null, value, unit);
   }
 
-  public LengthMeasureTextField(String fieldName, final Measure<Length> value) {
+  public LengthMeasureTextField(final String fieldName,
+    final Measure<Length> value) {
     this(fieldName, value, value.getUnit());
   }
 
-  public LengthMeasureTextField(String fieldName, final Measure<Length> value,
-    final Unit<Length> unit) {
+  public LengthMeasureTextField(final String fieldName,
+    final Measure<Length> value, final Unit<Length> unit) {
     super(fieldName, value);
-    valueField = new NumberTextField(DataTypes.DOUBLE, 6, 2);
+    valueField = new NumberTextField(fieldName, DataTypes.DOUBLE, 6, 2);
     if (value == null) {
       this.number = 0;
       if (unit == null) {
@@ -62,15 +54,14 @@ public class LengthMeasureTextField extends ValueField<Measure<Length>>
       this.unit = value.getUnit();
     }
     valueField.setFieldValue(this.number);
-    InvokeMethodListener updateNumberListener = new InvokeMethodListener(this,
-      "updateNumber");
+    final InvokeMethodListener updateNumberListener = new InvokeMethodListener(
+      this, "updateNumber");
     valueField.addFocusListener(updateNumberListener);
     add(valueField);
     valueField.addActionListener(updateNumberListener);
 
-    unitField = new JComboBox(new Object[] {
-      NonSI.PIXEL, SI.METRE, SI.KILOMETRE, NonSI.FOOT, NonSI.MILE
-    });
+    unitField = new ComboBox(NonSI.PIXEL, SI.METRE, SI.KILOMETRE, NonSI.FOOT,
+      NonSI.MILE);
     unitField.addItemListener(this);
     unitField.setSelectedItem(unit);
     add(unitField);

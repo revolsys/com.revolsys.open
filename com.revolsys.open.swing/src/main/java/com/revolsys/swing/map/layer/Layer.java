@@ -15,7 +15,7 @@ public interface Layer extends PropertyChangeSupportProxy,
   void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener);
 
-  TabbedValuePanel<Layer> createPropertiesPanel();
+  TabbedValuePanel createPropertiesPanel();
 
   void delete();
 

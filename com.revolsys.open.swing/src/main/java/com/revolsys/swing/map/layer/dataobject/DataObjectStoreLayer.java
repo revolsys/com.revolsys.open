@@ -37,9 +37,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private BoundingBox boundingBox = new BoundingBox();
 
-  private final Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
+  private Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
 
-  private final DataObjectStore dataStore;
+  private DataObjectStore dataStore;
 
   private DataObjectQuadTree index = new DataObjectQuadTree();
 
@@ -47,11 +47,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
 
-  private final Method saveChangesMethod;
+  private Method saveChangesMethod;
 
-  private final Method saveObjectChangesMethod;
+  private Method saveObjectChangesMethod;
 
-  private final Object sync = new Object();
+  private Object sync = new Object();
 
   private String typePath;
 
@@ -149,6 +149,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  public void delete() {
+    final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
+    this.sync = null;
+    this.beanPropertyListener = null;
+    this.boundingBox = null;
+    this.cachedObjects = null;
+    this.dataStore = null;
+    this.index = null;
+    this.loadingBoundingBox = null;
+    this.loadingWorker = null;
+    this.saveChangesMethod = null;
+    this.saveObjectChangesMethod = null;
+    this.typePath = null;
+    super.delete();
+    if (loadingWorker != null) {
+      loadingWorker.cancel(true);
+    }
+  }
+
+  @Override
   protected boolean doSaveChanges() {
     return invokeInTransaction(saveChangesMethod);
   }
@@ -206,6 +226,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public List<DataObject> getDataObjects(BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
+      return Collections.emptyList();
+    } else if (sync == null) {
       return Collections.emptyList();
     } else {
       synchronized (sync) {
@@ -380,15 +402,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   protected void setIndex(final BoundingBox loadedBoundingBox,
     final DataObjectQuadTree index) {
-    synchronized (sync) {
-      if (loadedBoundingBox == loadingBoundingBox) {
-        this.index = index;
-        final List<DataObject> newObjects = getNewObjects();
-        index.insert(newObjects);
-        clearLoading(loadedBoundingBox);
+    if (sync != null) {
+      synchronized (sync) {
+        if (loadedBoundingBox == loadingBoundingBox) {
+          this.index = index;
+          final List<DataObject> newObjects = getNewObjects();
+          index.insert(newObjects);
+          clearLoading(loadedBoundingBox);
+        }
       }
+      firePropertyChange("refresh", false, true);
     }
-    firePropertyChange("refresh", false, true);
   }
 
   @Override

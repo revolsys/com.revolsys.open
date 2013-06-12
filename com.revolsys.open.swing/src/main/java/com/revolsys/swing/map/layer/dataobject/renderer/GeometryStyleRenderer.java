@@ -9,7 +9,6 @@ import java.util.Map;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -27,7 +26,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   static {
-    MenuFactory menu = ObjectTreeModel.getMenu(GeometryStyleRenderer.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(GeometryStyleRenderer.class);
     menu.addMenuItem("style", new ChangeStyle());
   }
 
@@ -150,6 +149,12 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     this.style = new GeometryStyle(style);
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public GeometryStylePanel createStylePanel() {
+    return new GeometryStylePanel(this);
+  }
+
   public GeometryStyle getStyle() {
     return style;
   }
@@ -167,11 +172,6 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   public void setStyle(final GeometryStyle style) {
     this.style = style;
     getPropertyChangeSupport().firePropertyChange("style", null, style);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends ValueField<?>> V createStylePanel() {
-    return (V)new GeometryStylePanel(this);
   }
 
 }

@@ -12,13 +12,13 @@ import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
-public class GeometryCoordinatesPanel extends ValueField<Geometry> implements
+public class GeometryCoordinatesPanel extends ValueField implements
   TableModelListener {
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
 
   private final BaseJxTable table;
 
-  public GeometryCoordinatesPanel(String fieldName) {
+  public GeometryCoordinatesPanel(final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
 
@@ -38,13 +38,13 @@ public class GeometryCoordinatesPanel extends ValueField<Geometry> implements
     return table;
   }
 
-  public void setGeometry(final Geometry geometry) {
+  public void setGeometry(final Object geometry) {
     setFieldValue(geometry);
-    model.setGeometry(geometry);
+    model.setGeometry((Geometry)geometry);
   }
 
   @Override
-  public void tableChanged(TableModelEvent e) {
+  public void tableChanged(final TableModelEvent e) {
     for (int i = 0; i < model.getColumnCount(); i++) {
       if (i < model.getNumIndexItems()) {
         table.setColumnWidth(i, (model.getRowCount() / 10 + 1) * 20);

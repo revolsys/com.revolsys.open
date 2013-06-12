@@ -11,7 +11,7 @@ import javax.swing.SpringLayout;
 
 import com.revolsys.swing.layout.SpringLayoutUtil;
 
-public class TogglePanel extends ValueField<String> implements ItemListener {
+public class TogglePanel extends ValueField implements ItemListener {
   /**
    * 
    */
@@ -28,7 +28,7 @@ public class TogglePanel extends ValueField<String> implements ItemListener {
     this(null, value, dimension, actions);
   }
 
-  public TogglePanel(String fieldName, final String value,
+  public TogglePanel(final String fieldName, final String value,
     final Dimension dimension, final Action... actions) {
     super(fieldName, value);
     setLayout(new SpringLayout());

@@ -30,14 +30,19 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 
 public class DataStoreSearchTextField extends JXSearchField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable {
+  ListDataListener, ItemSelectable, Field {
   private static final long serialVersionUID = 1L;
 
   private final String displayAttributeName;
@@ -49,6 +54,20 @@ public class DataStoreSearchTextField extends JXSearchField implements
   private final DataStoreQueryListModel listModel;
 
   public DataObject selectedItem;
+
+  private String errorMessage;
+
+  public DataStoreSearchTextField(final Attribute attribute) {
+    this(attribute.getMetaData(), attribute.getName());
+  }
+
+  public DataStoreSearchTextField(final DataObjectMetaData metaData,
+    final String displayAttributeName) {
+    this(metaData.getDataObjectStore(), displayAttributeName, new Query(
+      metaData, Conditions.equal(Function.upper(displayAttributeName),
+        new Value(null))), new Query(metaData, Conditions.likeUpper(
+      displayAttributeName, "")));
+  }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String displayAttributeName, final List<Query> queries) {
@@ -84,6 +103,14 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String displayAttributeName, final Query... queries) {
     this(dataStore, displayAttributeName, Arrays.asList(queries));
+
+  }
+
+  public DataStoreSearchTextField(final DataObjectStore dataStore,
+    final String typeName, final String displayAttributeName) {
+    this(dataStore, displayAttributeName, new Query(typeName, Conditions.equal(
+      Function.upper(displayAttributeName), new Value(null))), new Query(
+      typeName, Conditions.likeUpper(displayAttributeName, "")));
   }
 
   @Override
@@ -120,6 +147,20 @@ public class DataStoreSearchTextField extends JXSearchField implements
     menu.setVisible(false);
   }
 
+  @Override
+  public String getFieldName() {
+    return displayAttributeName;
+  }
+
+  @Override
+  public <T> T getFieldValue() {
+    if (selectedItem == null) {
+      return null;
+    } else {
+      return selectedItem.getIdValue();
+    }
+  }
+
   public ItemListener[] getItemListeners() {
     return listenerList.getListeners(ItemListener.class);
   }
@@ -137,6 +178,15 @@ public class DataStoreSearchTextField extends JXSearchField implements
       return new Object[] {
         selectedItem
       };
+    }
+  }
+
+  @Override
+  public String getToolTipText() {
+    if (StringUtils.hasText(errorMessage)) {
+      return errorMessage;
+    } else {
+      return super.getToolTipText();
     }
   }
 
@@ -286,6 +336,32 @@ public class DataStoreSearchTextField extends JXSearchField implements
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
         selectedItem, ItemEvent.SELECTED));
     }
+  }
+
+  @Override
+  public void setFieldInvalid(final String message) {
+    setForeground(Color.RED);
+    setSelectedTextColor(Color.RED);
+    setBackground(Color.PINK);
+    this.errorMessage = message;
+  }
+
+  @Override
+  public void setFieldValid() {
+    setForeground(TextField.DEFAULT_FOREGROUND);
+    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
+    setBackground(TextField.DEFAULT_BACKGROUND);
+    this.errorMessage = null;
+  }
+
+  @Override
+  public void setFieldValue(final Object value) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void setMaxResults(final int maxResults) {
+    listModel.setMaxResults(maxResults);
   }
 
   @Override

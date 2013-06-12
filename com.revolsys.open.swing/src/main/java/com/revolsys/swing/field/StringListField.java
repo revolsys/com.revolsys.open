@@ -23,7 +23,7 @@ import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.util.CollectionUtil;
 
-public class StringListField extends ValueField<String> {
+public class StringListField extends ValueField {
   private static final long serialVersionUID = 1L;
 
   private final JTextField valueEntry = new JTextField();
@@ -112,13 +112,15 @@ public class StringListField extends ValueField<String> {
   }
 
   @Override
-  public void setFieldValue(final String value) {
+  public void setFieldValue(final Object value) {
     if (!EqualsRegistry.equal(value, getFieldValue())) {
       super.setFieldValue(value);
       if (values != null) {
         values.clear();
         if (value != null) {
-          values.addAll(Arrays.asList(value.replaceAll("\\s+", "").split(",+")));
+          values.addAll(Arrays.asList(value.toString()
+            .replaceAll("\\s+", "")
+            .split(",+")));
         }
       }
     }

@@ -116,8 +116,18 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.metaData = metaData;
   }
 
+  public Query(final DataObjectMetaData metaData, final Condition whereCondition) {
+    this(metaData);
+    this.whereCondition = whereCondition;
+  }
+
   public Query(final String typePath) {
     this.typeName = typePath;
+  }
+
+  public Query(final String typeName, final Condition whereCondition) {
+    this(typeName);
+    this.whereCondition = whereCondition;
   }
 
   public void addOrderBy(final String column, final boolean ascending) {

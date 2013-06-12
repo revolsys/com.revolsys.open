@@ -9,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -20,6 +19,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.InvokeMethodSelectedItemListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
@@ -163,7 +163,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private void addLayerControls() {
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
       baseMapLayers, true);
-    final JComboBox comboBox = new JComboBox(baseMapLayersModel);
+    final ComboBox comboBox = new ComboBox(baseMapLayersModel);
     comboBox.setEditable(false);
     comboBox.setMaximumSize(new Dimension(200, 20));
     comboBox.addItemListener(new InvokeMethodSelectedItemListener(this,

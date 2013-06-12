@@ -38,6 +38,8 @@ public class DataStoreQueryListModel implements ListModel {
 
   private String searchText = "";
 
+  private int maxResults = 10;
+
   public DataStoreQueryListModel(final DataObjectStore dataStore,
     final String displayAttributeName, final List<Query> queries) {
     this.dataStore = dataStore;
@@ -71,6 +73,10 @@ public class DataStoreQueryListModel implements ListModel {
     }
   }
 
+  public String getDisplayAttributeName() {
+    return displayAttributeName;
+  }
+
   @Override
   public DataObject getElementAt(final int index) {
     return objects.get(index);
@@ -87,7 +93,7 @@ public class DataStoreQueryListModel implements ListModel {
   protected List<DataObject> getObjects(final String searchParam) {
     final Map<String, DataObject> allObjects = new TreeMap<String, DataObject>();
     for (Query query : queries) {
-      if (allObjects.size() < 10) {
+      if (allObjects.size() < maxResults) {
         query = query.clone();
         query.addOrderBy(displayAttributeName, true);
         final Condition whereCondition = query.getWhereCondition();
@@ -102,12 +108,12 @@ public class DataStoreQueryListModel implements ListModel {
             Conditions.setValue(0, binaryCondition, searchParam);
           }
         }
-        query.setLimit(10);
+        query.setLimit(maxResults);
         final Reader<DataObject> reader = dataStore.query(query);
         try {
           final List<DataObject> objects = reader.read();
           for (final DataObject object : objects) {
-            if (allObjects.size() < 10) {
+            if (allObjects.size() < maxResults) {
               final String key = object.getString(displayAttributeName);
               if (!allObjects.containsKey(key)) {
                 if (searchParam.equalsIgnoreCase(key)) {
@@ -141,6 +147,10 @@ public class DataStoreQueryListModel implements ListModel {
   @Override
   public void removeListDataListener(final ListDataListener l) {
     listDataListeners.remove(ListDataListener.class, l);
+  }
+
+  public void setMaxResults(final int maxResults) {
+    this.maxResults = maxResults;
   }
 
   public void setSearchText(final String searchText) {

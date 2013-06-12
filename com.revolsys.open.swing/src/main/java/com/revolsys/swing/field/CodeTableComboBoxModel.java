@@ -6,26 +6,20 @@ import java.util.Set;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
-import javax.swing.JComboBox;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
-@SuppressWarnings("serial")
 public class CodeTableComboBoxModel extends AbstractListModel implements
   ComboBoxModel {
 
   public static final Object NULL = new Object();
 
-  public static JComboBox create(final CodeTable codeTable) {
-    return create(codeTable, true);
-  }
-
-  public static JComboBox create(final CodeTable codeTable,
-    final boolean allowNull) {
+  public static ComboBox create(final String fieldName,
+    final CodeTable codeTable, final boolean allowNull) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
       allowNull);
-    final JComboBox comboBox = new JComboBox(model);
+    final ComboBox comboBox = new ComboBox(fieldName, model);
     final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
       codeTable);
     comboBox.setRenderer(renderer);

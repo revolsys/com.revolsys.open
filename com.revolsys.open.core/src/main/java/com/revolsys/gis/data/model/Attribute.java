@@ -41,6 +41,8 @@ public class Attribute extends AbstractObjectWithProperties implements
   /** The data type of the attribute value. */
   private DataType type;
 
+  private DataObjectMetaData metaData;
+
   public Attribute() {
   }
 
@@ -275,6 +277,10 @@ public class Attribute extends AbstractObjectWithProperties implements
     return length;
   }
 
+  public DataObjectMetaData getMetaData() {
+    return metaData;
+  }
+
   /**
    * Get the name of the attribute.
    * 
@@ -361,6 +367,10 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   void setIndex(final int index) {
     this.index = index;
+  }
+
+  protected void setMetaData(final DataObjectMetaData metaData) {
+    this.metaData = metaData;
   }
 
   public void setRequired(final boolean required) {

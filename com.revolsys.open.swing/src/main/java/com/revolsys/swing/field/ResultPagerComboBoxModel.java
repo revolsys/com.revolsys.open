@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
-import javax.swing.JComboBox;
 
 import com.revolsys.collection.LruMap;
 import com.revolsys.collection.ResultPager;
@@ -17,11 +16,11 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
 
   public static final Object NULL = new Object();
 
-  public static <T> JComboBox create(final ResultPager<T> codeTable,
+  public static <T> ComboBox create(final ResultPager<T> codeTable,
     final boolean allowNull, final String... attributeNames) {
     final ResultPagerComboBoxModel<T> model = new ResultPagerComboBoxModel<T>(
       codeTable, allowNull);
-    final JComboBox comboBox = new JComboBox(model);
+    final ComboBox comboBox = new ComboBox(model);
     final ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
       attributeNames);
     comboBox.setRenderer(renderer);

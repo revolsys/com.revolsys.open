@@ -44,11 +44,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.name = CaseConverter.toCapitalizedWords(type);
   }
 
-  @Override
-  public <V extends ValueField<?>> V createStylePanel() {
-    return null;
-  }
-
   public AbstractLayerRenderer(final String type, final T layer,
     final LayerRenderer<?> parent) {
     this(type, layer, parent, Collections.<String, Object> emptyMap());
@@ -75,6 +70,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
       this.visible = visible;
     }
     setName((String)style.get("name"));
+  }
+
+  @Override
+  public ValueField createStylePanel() {
+    return null;
   }
 
   @Override
@@ -114,6 +114,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     return parent;
   }
 
+  @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
   }

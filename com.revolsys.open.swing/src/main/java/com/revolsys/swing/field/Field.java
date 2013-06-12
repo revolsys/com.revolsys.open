@@ -1,9 +1,20 @@
 package com.revolsys.swing.field;
 
-public interface Field<V> {
-  void setFieldValue(V value);
+import java.beans.PropertyChangeListener;
+
+public interface Field {
+  void addPropertyChangeListener(String propertyName,
+    PropertyChangeListener listener);
+
+  String getFieldName();
 
   <T> T getFieldValue();
-  
-  String getFieldName();
+
+  void setEnabled(boolean enabled);
+
+  void setFieldInvalid(String message);
+
+  void setFieldValid();
+
+  void setFieldValue(Object value);
 }

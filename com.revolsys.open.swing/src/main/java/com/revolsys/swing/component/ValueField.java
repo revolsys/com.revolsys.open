@@ -1,6 +1,7 @@
 package com.revolsys.swing.component;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog.ModalityType;
@@ -20,29 +21,21 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.util.CaseConverter;
 
 @SuppressWarnings("serial")
-public class ValueField<V> extends JPanel implements Field<V> {
-  private String title;
+public class ValueField extends JPanel implements Field {
+  private final Color defaultBackground = getBackground();
 
-  private V fieldValue;
+  private final Color defaultForeground = getBackground();
+
+  private String errorMessage;
 
   private String fieldName;
 
-  @Override
-  public String getFieldName() {
-    return fieldName;
-  }
+  private Object fieldValue;
 
-  public ValueField(String fieldName, V fieldValue) {
-    setFieldName(fieldName);
-    setFieldValue(fieldValue);
-    setTitle(CaseConverter.toCapitalizedWords(fieldName));
-  }
-
-  public ValueField(V fieldValue) {
-    this(null, fieldValue);
-  }
+  private String title;
 
   public ValueField() {
+    this("fieldValue", null);
   }
 
   public ValueField(final boolean isDoubleBuffered) {
@@ -57,15 +50,17 @@ public class ValueField<V> extends JPanel implements Field<V> {
     super(layout, isDoubleBuffered);
   }
 
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
+  public ValueField(final Object fieldValue) {
+    this(null, fieldValue);
+  }
+
+  public ValueField(final String fieldName, final Object fieldValue) {
+    setFieldName(fieldName);
+    setFieldValue(fieldValue);
+    setTitle(CaseConverter.toCapitalizedWords(fieldName));
   }
 
   public void cancel() {
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
   }
 
   public void cancel(final JDialog dialog) {
@@ -73,9 +68,28 @@ public class ValueField<V> extends JPanel implements Field<V> {
     dialog.setVisible(false);
   }
 
+  @Override
+  public String getFieldName() {
+    return fieldName;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
     return (T)fieldValue;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  @Override
+  public String getToolTipText() {
+    if (StringUtils.hasText(errorMessage)) {
+      return errorMessage;
+    } else {
+      return super.getToolTipText();
+    }
   }
 
   public void save() {
@@ -85,8 +99,8 @@ public class ValueField<V> extends JPanel implements Field<V> {
   private void save(final Container container) {
     final Component[] components = container.getComponents();
     for (final Component component : components) {
-      if (component instanceof ValueField<?>) {
-        final ValueField<?> valuePanel = (ValueField<?>)component;
+      if (component instanceof ValueField) {
+        final ValueField valuePanel = (ValueField)component;
         valuePanel.save();
       } else if (component instanceof Container) {
         final Container childContainer = (Container)component;
@@ -101,8 +115,26 @@ public class ValueField<V> extends JPanel implements Field<V> {
     dialog.setVisible(false);
   }
 
-  public void setFieldValue(final V value) {
-    final V oldValue = this.fieldValue;
+  @Override
+  public void setFieldInvalid(final String message) {
+    setForeground(Color.RED);
+    setBackground(Color.PINK);
+    setToolTipText(message);
+  }
+
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
+  }
+
+  @Override
+  public void setFieldValid() {
+    setForeground(defaultForeground);
+    setBackground(defaultBackground);
+  }
+
+  @Override
+  public void setFieldValue(final Object value) {
+    final Object oldValue = this.fieldValue;
     this.fieldValue = value;
     firePropertyChange("fieldValue", oldValue, value);
     if (StringUtils.hasText(fieldName)) {
@@ -110,7 +142,11 @@ public class ValueField<V> extends JPanel implements Field<V> {
     }
   }
 
-  public V showDialog(final Component component) {
+  public void setTitle(final String title) {
+    this.title = title;
+  }
+
+  public Object showDialog(final Component component) {
     Window window;
     if (component == null) {
       window = null;
@@ -137,9 +173,5 @@ public class ValueField<V> extends JPanel implements Field<V> {
     dialog.setVisible(true);
 
     return getFieldValue();
-  }
-
-  public String getTitle() {
-    return title;
   }
 }

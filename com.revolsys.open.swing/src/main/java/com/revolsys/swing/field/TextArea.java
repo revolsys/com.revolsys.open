@@ -4,9 +4,7 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.JTextField;
-
-import org.jdesktop.swingx.JXTextField;
+import org.jdesktop.swingx.JXTextArea;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -14,44 +12,40 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
 
 @SuppressWarnings("serial")
-public class TextField extends JXTextField implements Field, FocusListener {
+public class TextArea extends JXTextArea implements Field, FocusListener {
 
   private final String fieldName;
 
-  private String fieldValue;
-
-  public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
-
-  public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
-
-  public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
+  private final String fieldValue;
 
   private String errorMessage;
 
-  public TextField(final int columns) {
+  public TextArea() {
+    this("fieldValue");
+  }
+
+  public TextArea(final int rows, final int columns) {
     this(null);
+    setRows(rows);
     setColumns(columns);
   }
 
-  public TextField(final String fieldName) {
+  public TextArea(final String fieldName) {
     this(fieldName, "");
   }
 
-  public TextField(final String fieldName, final int columns) {
-    this(fieldName);
+  public TextArea(final String fieldName, final int rows, final int columns) {
+    this(fieldName, "");
+    setRows(rows);
     setColumns(columns);
-    PopupMenu.getPopupMenuFactory(this);
   }
 
-  public TextField(final String fieldName, final Object fieldValue) {
-    if (StringUtils.hasText(fieldName)) {
-      this.fieldName = fieldName;
-    } else {
-      this.fieldName = "fieldValue";
-    }
+  public TextArea(final String fieldName, final Object fieldValue) {
+    this.fieldName = fieldName;
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setText(this.fieldValue);
     addFocusListener(this);
+    PopupMenu.getPopupMenuFactory(this);
   }
 
   @Override
@@ -107,7 +101,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
     if (!EqualsRegistry.equal(getText(), newValue)) {
       setText(newValue);
     }
-    this.fieldValue = newValue;
     firePropertyChange(fieldName, oldValue, newValue);
   }
 }

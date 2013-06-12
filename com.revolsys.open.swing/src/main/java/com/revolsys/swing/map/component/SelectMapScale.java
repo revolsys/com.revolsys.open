@@ -7,15 +7,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import javax.swing.JComboBox;
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 
 @SuppressWarnings("serial")
-public class SelectMapScale extends JComboBox implements ItemListener,
+public class SelectMapScale extends ComboBox implements ItemListener,
   PropertyChangeListener {
   private static final Object[] SCALES = {
     16000000.0, 8000000.0, 4000000.0, 2000000.0, 1000000.0, 500000.0, 250000.0,

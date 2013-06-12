@@ -91,9 +91,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     setProperties(properties);
   }
 
-  public ValueField<Layer> addPropertiesTabGeneral(
-    final TabbedValuePanel<Layer> tabPanel) {
-    final ValueField<Layer> panel = new ValueField<Layer>(this);
+  public ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final ValueField panel = new ValueField(this);
     tabPanel.addTab("General", panel);
 
     final JComponent nameField = SwingUtil.addField(panel, this, "name");
@@ -122,9 +121,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public TabbedValuePanel<Layer> createPropertiesPanel() {
-    final TabbedValuePanel<Layer> tabPanel = new TabbedValuePanel<Layer>(
-      "Layer " + this + " Properties", this);
+  public TabbedValuePanel createPropertiesPanel() {
+    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this
+      + " Properties", this);
     addPropertiesTabGeneral(tabPanel);
     return tabPanel;
   }

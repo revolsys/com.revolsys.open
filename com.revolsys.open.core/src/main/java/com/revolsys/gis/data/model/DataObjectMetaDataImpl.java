@@ -167,6 +167,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       }
     }
     attribute.setIndex(index);
+    attribute.setMetaData(this);
   }
 
   /**

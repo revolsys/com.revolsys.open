@@ -10,9 +10,13 @@ import com.revolsys.swing.map.Viewport2D;
 
 public interface LayerRenderer<T extends Layer> extends PropertyChangeListener {
 
+  ValueField createStylePanel();
+
   Map<String, Object> getAllDefaults();
 
   String getName();
+
+  PropertyChangeSupport getPropertyChangeSupport();
 
   <V> V getValue(String name);
 
@@ -21,8 +25,4 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener {
   void render(Viewport2D viewport, Graphics2D graphics);
 
   void setVisible(boolean visible);
-
-  PropertyChangeSupport getPropertyChangeSupport();
-  
-  <V extends ValueField<?>> V createStylePanel();
 }

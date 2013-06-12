@@ -20,7 +20,6 @@ import java.util.Map.Entry;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -34,9 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXTextArea;
-import org.jdesktop.swingx.JXTextField;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.springframework.util.StringUtils;
 
@@ -50,9 +46,12 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.CodeTableObjectToStringConverter;
 import com.revolsys.swing.field.ColorChooserField;
+import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
+import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.CaseConverter;
@@ -88,10 +87,15 @@ public class SwingUtil {
     return label;
   }
 
-  public static JComboBox createComboBox(final CodeTable codeTable,
+  public static ComboBox createComboBox(final CodeTable codeTable,
     final boolean required) {
-    final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
-      !required);
+    return createComboBox("fieldValue", codeTable, required);
+  }
+
+  public static ComboBox createComboBox(final String fieldName,
+    final CodeTable codeTable, final boolean required) {
+    final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName,
+      codeTable, !required);
     if (comboBox.getModel().getSize() > 0) {
       comboBox.setSelectedIndex(0);
     }
@@ -133,8 +137,8 @@ public class SwingUtil {
     }
   }
 
-  public static JXDatePicker createDateField() {
-    final JXDatePicker dateField = new JXDatePicker();
+  public static DateField createDateField(final String fieldName) {
+    final DateField dateField = new DateField(fieldName);
     dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
       "yyyy/MMM/dd");
     PopupMenu.getPopupMenuFactory(dateField.getEditor());
@@ -146,7 +150,7 @@ public class SwingUtil {
     final String fieldName, final Object fieldValue) {
     JComponent field;
     if (Number.class.isAssignableFrom(fieldClass)) {
-      final NumberTextField numberTextField = new NumberTextField(
+      final NumberTextField numberTextField = new NumberTextField(fieldName,
         DataTypes.DOUBLE, 10, 2);
       if (fieldValue instanceof Number) {
         final Number number = (Number)fieldValue;
@@ -154,7 +158,7 @@ public class SwingUtil {
       }
       field = numberTextField;
     } else if (Date.class.isAssignableFrom(fieldClass)) {
-      final JXDatePicker dateField = createDateField();
+      final DateField dateField = createDateField(fieldName);
       if (fieldValue instanceof Date) {
         final Date date = (Date)fieldValue;
         dateField.setDate(date);
@@ -185,10 +189,10 @@ public class SwingUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends JComponent> T createField(
+  public static <T extends Field> T createField(
     final DataObjectMetaData metaData, final String fieldName,
     final boolean editable) {
-    JComponent field;
+    Field field;
     final Attribute attribute = metaData.getAttribute(fieldName);
     if (attribute == null) {
       throw new IllegalArgumentException("Cannot find field " + fieldName);
@@ -204,22 +208,22 @@ public class SwingUtil {
         columns = 50;
       }
       if (!editable) {
-        final JXTextField textField = createTextField(columns);
+        final TextField textField = createTextField(fieldName, columns);
         textField.setEditable(false);
         field = textField;
       } else if (codeTable != null) {
-        field = createComboBox(codeTable, required);
+        field = createComboBox(fieldName, codeTable, required);
       } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
         final int scale = attribute.getScale();
-        final NumberTextField numberTextField = new NumberTextField(type,
-          length, scale);
+        final NumberTextField numberTextField = new NumberTextField(fieldName,
+          type, length, scale);
         field = numberTextField;
       } else if (type.equals(DataTypes.DATE)) {
-        field = createDateField();
+        field = createDateField(fieldName);
       } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
         field = new ObjectLabelField(fieldName);
       } else {
-        field = createTextField(columns);
+        field = createTextField(fieldName, columns);
       }
       if (field instanceof JTextField) {
         final JTextField textField = (JTextField)field;
@@ -229,7 +233,8 @@ public class SwingUtil {
 
       }
     }
-    field.setFont(FONT);
+
+    ((JComponent)field).setFont(FONT);
     return (T)field;
   }
 
@@ -247,18 +252,25 @@ public class SwingUtil {
     return fileChooser;
   }
 
-  public static JXTextArea createTextArea(final int rows, final int columns) {
-    final JXTextArea textField = new JXTextArea();
-    textField.setRows(rows);
-    textField.setColumns(columns);
-    PopupMenu.getPopupMenuFactory(textField);
+  public static TextArea createTextArea(final int rows, final int columns) {
+    final TextArea textField = new TextArea(rows, columns);
     return textField;
   }
 
-  public static JXTextField createTextField(final int columns) {
-    final JXTextField textField = new JXTextField();
-    textField.setColumns(columns);
-    PopupMenu.getPopupMenuFactory(textField);
+  public static TextArea createTextArea(final String fieldName, final int rows,
+    final int columns) {
+    final TextArea textField = new TextArea(fieldName, rows, columns);
+    return textField;
+  }
+
+  public static TextField createTextField(final int columns) {
+    final TextField textField = new TextField(columns);
+    return textField;
+  }
+
+  public static TextField createTextField(final String fieldName,
+    final int columns) {
+    final TextField textField = new TextField(fieldName, columns);
     return textField;
   }
 
@@ -292,15 +304,12 @@ public class SwingUtil {
   }
 
   @SuppressWarnings({
-    "unchecked", "rawtypes"
+    "unchecked"
   })
   public static <V> V getValue(final JComponent component) {
     if (component instanceof Field) {
       final Field field = (Field)component;
       return (V)field.getFieldValue();
-    } else if (component instanceof JXDatePicker) {
-      final JXDatePicker dateField = (JXDatePicker)component;
-      return (V)dateField.getDate();
     } else if (component instanceof JTextComponent) {
       final JTextComponent textComponent = (JTextComponent)component;
       final String text = textComponent.getText();
@@ -309,9 +318,6 @@ public class SwingUtil {
       } else {
         return null;
       }
-    } else if (component instanceof JComboBox) {
-      final JComboBox comboBox = (JComboBox)component;
-      return (V)comboBox.getSelectedItem();
     } else if (component instanceof JList) {
       final JList list = (JList)component;
       return (V)list.getSelectedValue();
@@ -356,16 +362,10 @@ public class SwingUtil {
     PreferencesUtil.setString(preferencesClass, preferenceName, path);
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   public static void setFieldValue(final JComponent field, final Object value) {
     if (field instanceof Field) {
       final Field fieldObject = (Field)field;
       fieldObject.setFieldValue(value);
-    } else if (field instanceof JXDatePicker) {
-      final JXDatePicker dateField = (JXDatePicker)field;
-      dateField.setDate((Date)value);
     } else if (field instanceof JLabel) {
       final JLabel label = (JLabel)field;
       String string;
@@ -393,9 +393,6 @@ public class SwingUtil {
         string = StringConverterRegistry.toString(value);
       }
       textField.setText(string);
-    } else if (field instanceof JComboBox) {
-      final JComboBox comboField = (JComboBox)field;
-      comboField.setSelectedItem(value);
     }
     final Container parent = field.getParent();
     if (parent != null) {

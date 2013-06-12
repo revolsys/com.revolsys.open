@@ -7,43 +7,43 @@ import javax.swing.JTabbedPane;
 
 import org.springframework.util.StringUtils;
 
-public class TabbedValuePanel<T> extends ValueField<T> {
+public class TabbedValuePanel extends ValueField {
   private static final long serialVersionUID = 1L;
 
-  private JTabbedPane tabs = new JTabbedPane();
+  private final JTabbedPane tabs = new JTabbedPane();
 
   public TabbedValuePanel() {
     super(new BorderLayout());
     add(tabs, BorderLayout.CENTER);
   }
 
-  public TabbedValuePanel(T value) {
+  public TabbedValuePanel(final Object value) {
     this("Edit " + value, value);
   }
 
-  public TabbedValuePanel(String title, T value) {
+  public TabbedValuePanel(final String title, final Object value) {
     this();
     setTitle(title);
     setFieldValue(value);
+  }
+
+  public void addTab(final String title, final Component component) {
+    tabs.addTab(title, component);
+  }
+
+  public void addTab(final ValueField panel) {
+    final String title = panel.getTitle();
+    tabs.addTab(title, panel);
   }
 
   public JTabbedPane getTabs() {
     return tabs;
   }
 
-  public void addTab(String title, Component component) {
-    tabs.addTab(title, component);
-  }
-
-  public void addTab(ValueField<?> panel) {
-    String title = panel.getTitle();
-    tabs.addTab(title, panel);
-  }
-
-  public void setSelectdTab(String tabName) {
+  public void setSelectdTab(final String tabName) {
     if (StringUtils.hasText(tabName)) {
       for (int i = 0; i < tabs.getTabCount(); i++) {
-        String name = tabs.getTitleAt(i);
+        final String name = tabs.getTitleAt(i);
         if (tabName.equals(name)) {
           tabs.setSelectedIndex(i);
         }

@@ -22,7 +22,6 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
@@ -257,31 +256,27 @@ public class LayerUtil {
     }
   }
 
-  public void showForm(final DataObjectLayer layer, final DataObject object) {
-    layer.showForm(object);
-  }
-
   public static void showProperties() {
     final Layer layer = ObjectTree.getMouseClickItem();
     showProperties(layer);
-  }
-
-  public static void showProperties(String tabName) {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    showProperties(layer, tabName);
   }
 
   public static void showProperties(final Layer layer) {
     showProperties(layer, null);
   }
 
-  public static void showProperties(final Layer layer, String tabName) {
+  public static void showProperties(final Layer layer, final String tabName) {
     if (layer != null) {
       final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
-      final TabbedValuePanel<Layer> panel = layer.createPropertiesPanel();
+      final TabbedValuePanel panel = layer.createPropertiesPanel();
       panel.setSelectdTab(tabName);
       panel.showDialog(window);
     }
+  }
+
+  public static void showProperties(final String tabName) {
+    final Layer layer = ObjectTree.getMouseClickItem();
+    showProperties(layer, tabName);
   }
 
   public static void showViewAttributes() {
@@ -364,12 +359,16 @@ public class LayerUtil {
     if (layer != null) {
       final Project project = layer.getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-       BoundingBox boundingBox = BoundingBox.getBoundingBox(
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
         geometryFactory, object)
         .expandPercent(0.1)
         .clipToCoordinateSystem();
-    
+
       project.setViewBoundingBox(boundingBox);
     }
+  }
+
+  public void showForm(final DataObjectLayer layer, final DataObject object) {
+    layer.showForm(object);
   }
 }

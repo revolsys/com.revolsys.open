@@ -331,7 +331,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       final char fieldType = (char)in.read();
       in.skipBytes(4);
       int length = in.read();
-      int decimalCount = in.read();
+      final int decimalCount = in.read();
       in.skipBytes(14);
       b = in.read();
       final DataType dataType = DATA_TYPES.get(fieldType);
@@ -339,7 +339,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
         length = Integer.MAX_VALUE;
       }
       metaData.addAttribute(fieldName.toString(), dataType, length,
-        decimalCount, true);
+        decimalCount, false);
     }
     if (mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;

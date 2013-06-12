@@ -161,16 +161,19 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (source instanceof AttributeFilterPanel) {
       final AttributeFilterPanel filterPanel = (AttributeFilterPanel)source;
       final String searchAttribute = filterPanel.getSearchAttribute();
-      final String searchText = filterPanel.getSearchText();
-      Condition condition;
-      if (StringUtils.hasText(searchAttribute)
-        && StringUtils.hasText(searchText)) {
-        condition = Conditions.likeUpper(searchAttribute, searchText);
-      } else {
-        condition = null;
+      final Object searchValue = filterPanel.getSearchValue();
+      Condition condition = null;
+      if (StringUtils.hasText(searchAttribute) && searchValue != null) {
+        if (searchValue instanceof String) {
+          final String searchText = (String)searchValue;
+          if (StringUtils.hasText(searchText)) {
+            condition = Conditions.likeUpper(searchAttribute, searchText);
+          }
+        } else {
+          condition = Conditions.equal(searchAttribute, searchValue);
+        }
       }
       tableModel.setSearchCondition(condition);
-
     }
   }
 

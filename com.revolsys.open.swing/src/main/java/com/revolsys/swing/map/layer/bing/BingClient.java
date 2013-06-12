@@ -214,7 +214,7 @@ public class BingClient {
   }
 
   public double getResolution(final int zoomLevel) {
-    return METRES_PER_PIXEL[zoomLevel];
+    return METRES_PER_PIXEL[Math.min(zoomLevel, METRES_PER_PIXEL.length - 1)];
   }
 
   public int getTileX(final int zoomLevel, final double longitude) {

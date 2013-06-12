@@ -51,6 +51,7 @@ public class DataObjectLayerForm extends DataObjectForm implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
+    super.propertyChange(event);
     if (event.getSource() == getObject()) {
       final String propertyName = event.getPropertyName();
       final Object value = event.getNewValue();

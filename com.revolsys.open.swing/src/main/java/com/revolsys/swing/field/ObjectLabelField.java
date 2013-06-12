@@ -1,16 +1,19 @@
 package com.revolsys.swing.field;
 
+import java.awt.Color;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
-public class ObjectLabelField extends JLabel implements Field<Object> {
+public class ObjectLabelField extends JLabel implements Field {
   private static final long serialVersionUID = 1L;
 
   private Object fieldValue;
@@ -19,8 +22,14 @@ public class ObjectLabelField extends JLabel implements Field<Object> {
 
   private final String fieldName;
 
+  private String errorMessage;
+
+  private final Color defaultBackground = getBackground();
+
+  private final Color defaultForeground = getForeground();
+
   public ObjectLabelField() {
-    this(null, null);
+    this("fieldValue", null);
   }
 
   public ObjectLabelField(final String fieldName) {
@@ -43,8 +52,31 @@ public class ObjectLabelField extends JLabel implements Field<Object> {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
-    Object value = fieldValue;
+    final Object value = fieldValue;
     return (T)value;
+  }
+
+  @Override
+  public String getToolTipText() {
+    if (StringUtils.hasText(errorMessage)) {
+      return errorMessage;
+    } else {
+      return super.getToolTipText();
+    }
+  }
+
+  @Override
+  public void setFieldInvalid(final String message) {
+    setForeground(Color.RED);
+    setBackground(Color.PINK);
+    this.errorMessage = message;
+  }
+
+  @Override
+  public void setFieldValid() {
+    setForeground(defaultForeground);
+    setBackground(defaultBackground);
+    this.errorMessage = null;
   }
 
   @Override

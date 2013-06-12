@@ -35,8 +35,8 @@ import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.util.JavaBeanUtil;
 
 @SuppressWarnings("serial")
-public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
-  implements PropertyChangeListener {
+public class GeometryStylePanel extends ValueField implements
+  PropertyChangeListener {
 
   private final GeometryStyleRenderer geometryStyleRenderer;
 
@@ -50,9 +50,9 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     setTitle("Style");
     this.geometryStyleRenderer = geometryStyleRenderer;
     this.geometryStyle = geometryStyleRenderer.getStyle().clone();
-    DataObjectLayer layer = geometryStyleRenderer.getLayer();
-    DataObjectMetaData metaData = layer.getMetaData();
-    Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final DataObjectLayer layer = geometryStyleRenderer.getLayer();
+    final DataObjectMetaData metaData = layer.getMetaData();
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
     setFieldValue(geometryStyleRenderer);
     if (geometryAttribute != null) {
       geometryDataType = geometryAttribute.getType();
@@ -66,10 +66,10 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
         geometryDataType = DataTypes.POLYGON;
       }
 
-      boolean hasLineStyle = false;
-      boolean hasPolygonStyle = false;
+      final boolean hasLineStyle = false;
+      final boolean hasPolygonStyle = false;
 
-      JPanel stylePanels = new JPanel();
+      final JPanel stylePanels = new JPanel();
       add(stylePanels);
 
       previews = new JPanel(new GridLayout(1, 1));
@@ -105,53 +105,16 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     }
   }
 
-  protected void addGeometryPreview(DataType geometryDataType) {
-    GeometryStylePreview linePreview = new GeometryStylePreview(geometryStyle,
-      geometryDataType);
-    previews.add(linePreview);
-  }
-
-  protected void addLineStylePanel(JPanel stylePanels) {
-    final JPanel panel = new JPanel();
-    panel.setMinimumSize(new Dimension(300, 0));
-    panel.setBorder(BorderFactory.createTitledBorder("Line Style"));
-    addField(panel, "lineColor");
-    addField(panel, "lineWidthMeasure", "Line Width");
-    addField(panel, "lineJoin");
-    addField(panel, "lineCap");
-    GroupLayoutUtil.makeColumns(panel, 2);
-    stylePanels.add(panel);
-  }
-
-  protected void addMarkerStylePanel(JPanel stylePanels) {
-    final JPanel panel = new JPanel();
-    panel.setMinimumSize(new Dimension(300, 0));
-    panel.setBorder(BorderFactory.createTitledBorder("Marker Style"));
-    addField(panel, "markerLineColor");
-    addField(panel, "markerLineWidthMeasure", "Line Width");
-    addField(panel, "markerFill");
-    GroupLayoutUtil.makeColumns(panel, 2);
-    stylePanels.add(panel);
-  }
-
-  protected LengthMeasureTextField createMeasureField(String fieldName,
-    final Measure<Length> measure) {
-    LengthMeasureTextField widthField = new LengthMeasureTextField(fieldName,
-      measure);
-    widthField.addPropertyChangeListener("number", this);
-    widthField.addPropertyChangeListener("unit", this);
-    return widthField;
-  }
-
-  protected void addField(final JPanel panel, String fieldName) {
-    String label = fieldName;
+  protected void addField(final JPanel panel, final String fieldName) {
+    final String label = fieldName;
     addField(panel, fieldName, label);
   }
 
   @SuppressWarnings("unchecked")
-  protected void addField(final JPanel panel, String fieldName, String label) {
+  protected void addField(final JPanel panel, final String fieldName,
+    final String label) {
     addLabel(panel, label);
-    Object fieldValue = JavaBeanUtil.getValue(geometryStyle, fieldName);
+    final Object fieldValue = JavaBeanUtil.getValue(geometryStyle, fieldName);
     JComponent field;
     if (fieldName.equals("lineCap")) {
       field = createLineCapField((String)fieldValue);
@@ -171,12 +134,41 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     panel.add(field);
   }
 
-  protected void addLabel(final JPanel panel, String text) {
-    JLabel label = SwingUtil.addLabel(panel, text);
+  protected void addGeometryPreview(final DataType geometryDataType) {
+    final GeometryStylePreview linePreview = new GeometryStylePreview(
+      geometryStyle, geometryDataType);
+    previews.add(linePreview);
+  }
+
+  protected void addLabel(final JPanel panel, final String text) {
+    final JLabel label = SwingUtil.addLabel(panel, text);
     label.setMinimumSize(new Dimension(120, 10));
   }
 
-  protected void addPolygonStylePanel(JPanel stylePanels) {
+  protected void addLineStylePanel(final JPanel stylePanels) {
+    final JPanel panel = new JPanel();
+    panel.setMinimumSize(new Dimension(300, 0));
+    panel.setBorder(BorderFactory.createTitledBorder("Line Style"));
+    addField(panel, "lineColor");
+    addField(panel, "lineWidthMeasure", "Line Width");
+    addField(panel, "lineJoin");
+    addField(panel, "lineCap");
+    GroupLayoutUtil.makeColumns(panel, 2);
+    stylePanels.add(panel);
+  }
+
+  protected void addMarkerStylePanel(final JPanel stylePanels) {
+    final JPanel panel = new JPanel();
+    panel.setMinimumSize(new Dimension(300, 0));
+    panel.setBorder(BorderFactory.createTitledBorder("Marker Style"));
+    addField(panel, "markerLineColor");
+    addField(panel, "markerLineWidthMeasure", "Line Width");
+    addField(panel, "markerFill");
+    GroupLayoutUtil.makeColumns(panel, 2);
+    stylePanels.add(panel);
+  }
+
+  protected void addPolygonStylePanel(final JPanel stylePanels) {
     final JPanel panel = new JPanel();
     panel.setMinimumSize(new Dimension(300, 0));
     panel.setBorder(BorderFactory.createTitledBorder("Polygon Style"));
@@ -210,16 +202,25 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
       miterAction, roundAction, bevel);
   }
 
+  protected LengthMeasureTextField createMeasureField(final String fieldName,
+    final Measure<Length> measure) {
+    final LengthMeasureTextField widthField = new LengthMeasureTextField(
+      fieldName, measure);
+    widthField.addPropertyChangeListener("number", this);
+    widthField.addPropertyChangeListener("unit", this);
+    return widthField;
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    Object source = event.getSource();
+    final Object source = event.getSource();
     if (source instanceof Field) {
-      Field<?> field = (Field<?>)source;
-      String fieldName = field.getFieldName();
-      Object fieldValue = field.getFieldValue();
+      final Field field = (Field)source;
+      final String fieldName = field.getFieldName();
+      final Object fieldValue = field.getFieldValue();
       JavaBeanUtil.setProperty(geometryStyle, fieldName, fieldValue);
     }
-    for (Component preview : previews.getComponents()) {
+    for (final Component preview : previews.getComponents()) {
       preview.repaint();
     }
   }
@@ -230,7 +231,7 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     geometryStyleRenderer.setStyle(geometryStyle);
   }
 
-  public void setLineWidthField(final ValueField<Measure<Length>> panel,
+  public void setLineWidthField(final ValueField panel,
     final JFormattedTextField field) {
     final Measure<Length> measure = panel.getFieldValue();
     if (measure == null) {
@@ -242,7 +243,7 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     }
   }
 
-  public void setLineWidthSliderValue(final ValueField<Measure<Length>> panel,
+  public void setLineWidthSliderValue(final ValueField panel,
     final JSlider slider) {
     final Measure<Length> measure = panel.getFieldValue();
     if (measure == null) {
@@ -253,8 +254,8 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
     }
   }
 
-  public void setLineWidthTextFieldValue(
-    final ValueField<Measure<Length>> panel, final JFormattedTextField field) {
+  public void setLineWidthTextFieldValue(final ValueField panel,
+    final JFormattedTextField field) {
     final Measure<Length> measure = panel.getFieldValue();
     final Unit<Length> unit = measure.getUnit();
     final double fieldValue = ((Number)field.getValue()).doubleValue();
@@ -262,8 +263,7 @@ public class GeometryStylePanel extends ValueField<GeometryStyleRenderer>
 
   }
 
-  public void setLineWidthValue(final ValueField<Measure<Length>> panel,
-    final JSlider slider) {
+  public void setLineWidthValue(final ValueField panel, final JSlider slider) {
     final Measure<Length> measure = panel.getFieldValue();
     Unit<Length> unit;
     if (measure == null) {
