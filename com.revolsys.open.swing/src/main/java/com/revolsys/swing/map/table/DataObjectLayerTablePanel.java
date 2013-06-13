@@ -83,7 +83,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       canAddObjectsEnableCheck, layer, "addNewRecord");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
-      metaData);
+      layer);
     attributeFilterPanel.addPropertyChangeListener(this);
     toolBar.addComponent("search", attributeFilterPanel);
 

@@ -524,11 +524,9 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
           codeTableValueName, value));
       }
       if (targetValue == null) {
-        throw new IllegalArgumentException("Cannot get code for "
-          + metaData.getPath() + "." + name + "=" + value);
-      } else {
-        setValue(codeTableAttributeName, targetValue);
+        targetValue = value;
       }
+      setValue(codeTableAttributeName, targetValue);
     }
   }
 

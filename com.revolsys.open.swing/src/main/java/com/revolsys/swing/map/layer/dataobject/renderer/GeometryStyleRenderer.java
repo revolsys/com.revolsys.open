@@ -50,17 +50,19 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   public static final void renderGeometry(final Viewport2D viewport,
     final Graphics2D graphics, final Geometry geometry,
     final GeometryStyle style) {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry part = geometry.getGeometryN(i);
-      if (part instanceof Point) {
-        final Point point = (Point)part;
-        MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
-      } else if (part instanceof LineString) {
-        final LineString lineString = (LineString)part;
-        renderLineString(viewport, graphics, lineString, style);
-      } else if (part instanceof Polygon) {
-        final Polygon polygon = (Polygon)part;
-        renderPolygon(viewport, graphics, polygon, style);
+    if (geometry != null) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (part instanceof Point) {
+          final Point point = (Point)part;
+          MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+        } else if (part instanceof LineString) {
+          final LineString lineString = (LineString)part;
+          renderLineString(viewport, graphics, lineString, style);
+        } else if (part instanceof Polygon) {
+          final Polygon polygon = (Polygon)part;
+          renderPolygon(viewport, graphics, polygon, style);
+        }
       }
     }
   }
@@ -86,20 +88,22 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   public static final void renderOutline(final Viewport2D viewport,
     final Graphics2D graphics, final Geometry geometry,
     final GeometryStyle style) {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry part = geometry.getGeometryN(i);
-      if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
-      } else if (part instanceof LineString) {
-        final LineString lineString = (LineString)part;
-        renderLineString(viewport, graphics, lineString, style);
-      } else if (part instanceof Polygon) {
-        final Polygon polygon = (Polygon)part;
-        renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
-        for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-          final LineString ring = polygon.getInteriorRingN(j);
-          renderLineString(viewport, graphics, ring, style);
+    if (geometry != null) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (geometry instanceof Point) {
+          final Point point = (Point)geometry;
+          MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+        } else if (part instanceof LineString) {
+          final LineString lineString = (LineString)part;
+          renderLineString(viewport, graphics, lineString, style);
+        } else if (part instanceof Polygon) {
+          final Polygon polygon = (Polygon)part;
+          renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
+          for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
+            final LineString ring = polygon.getInteriorRingN(j);
+            renderLineString(viewport, graphics, ring, style);
+          }
         }
       }
     }

@@ -560,25 +560,21 @@ public class DataObjectLayerForm extends JPanel implements
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
     final JComponent field = getField(name);
-    if (field.isEnabled()) {
-      final Object value = SwingUtil.getValue(field);
-      final CodeTable codeTable = metaData.getCodeTableByColumn(name);
-      if (codeTable == null) {
-        if (value != null && name.endsWith("_IND")) {
-          if ("Y".equals(value) || Boolean.TRUE.equals(value)) {
-            return (T)"Y";
-          } else {
-            return (T)"N";
-          }
+    final Object value = SwingUtil.getValue(field);
+    final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+    if (codeTable == null) {
+      if (value != null && name.endsWith("_IND")) {
+        if ("Y".equals(value) || Boolean.TRUE.equals(value)) {
+          return (T)"Y";
         } else {
-          return (T)value;
+          return (T)"N";
         }
       } else {
-        final Object id = codeTable.getId(value);
-        return (T)id;
+        return (T)value;
       }
     } else {
-      return (T)disabledFieldValues.get(name);
+      final Object id = codeTable.getId(value);
+      return (T)id;
     }
   }
 
@@ -715,7 +711,7 @@ public class DataObjectLayerForm extends JPanel implements
           }
         }
         if (!equal) {
-          object.setValue(fieldName, fieldValue);
+          object.setValueByPath(fieldName, fieldValue);
           validateFields();
 
         }

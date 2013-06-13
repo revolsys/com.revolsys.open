@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
   ItemListener {
@@ -47,16 +47,14 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private final DataObjectMetaData metaData;
 
-  public AttributeFilterPanel(final DataObjectMetaData metaData) {
-    this(metaData, metaData.getAttributeNames());
-  }
+  private final DataObjectLayer layer;
 
-  public AttributeFilterPanel(final DataObjectMetaData metaData,
-    final Collection<String> attributeNames) {
-    this.metaData = metaData;
-    this.attributeNames = new ArrayList<String>(attributeNames);
+  public AttributeFilterPanel(final DataObjectLayer layer) {
+    this.layer = layer;
+    this.metaData = layer.getMetaData();
+    this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
     attributeNames.remove(metaData.getGeometryAttributeName());
-    nameField = new ComboBox(attributeNames.toArray());
+    nameField = new ComboBox(false, attributeNames.toArray());
     add(nameField);
 
     nameField.addActionListener(this);
@@ -66,7 +64,13 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
     add(searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 2);
-    nameField.setSelectedIndex(0);
+
+    final String searchField = layer.getProperty("searchField");
+    if (StringUtils.hasText(searchField)) {
+      nameField.setSelectedItem(searchField);
+    } else {
+      nameField.setSelectedIndex(0);
+    }
   }
 
   @Override
@@ -135,6 +139,10 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   public List<String> getAttributeNames() {
     return attributeNames;
+  }
+
+  public DataObjectLayer getLayer() {
+    return layer;
   }
 
   public String getSearchAttribute() {

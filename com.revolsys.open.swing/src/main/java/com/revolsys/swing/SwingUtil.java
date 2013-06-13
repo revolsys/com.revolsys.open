@@ -34,7 +34,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -45,7 +44,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
-import com.revolsys.swing.field.CodeTableObjectToStringConverter;
 import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DateField;
@@ -113,9 +111,6 @@ public class SwingUtil {
     }
     comboBox.setPrototypeDisplayValue(longestValue);
 
-    final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
-      codeTable);
-    AutoCompleteDecorator.decorate(comboBox, stringConverter);
     final ComboBoxEditor editor = comboBox.getEditor();
     final Component editorComponent = editor.getEditorComponent();
     if (editorComponent instanceof JTextComponent) {

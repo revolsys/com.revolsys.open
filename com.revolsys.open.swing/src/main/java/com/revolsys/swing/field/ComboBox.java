@@ -8,7 +8,10 @@ import java.awt.event.ActionListener;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.ListCellRenderer;
 
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -28,16 +31,36 @@ public class ComboBox extends JComboBox implements Field {
     this("fieldValue", null);
   }
 
+  public ComboBox(final boolean editable, final Object... items) {
+    super(items);
+    setEditable(editable);
+    AutoCompleteDecorator.decorate(this);
+  }
+
   public ComboBox(final ComboBoxModel model) {
     this("fieldValue", model);
   }
 
   public ComboBox(final Object... items) {
-    super(items);
+    this(false, items);
   }
 
   public ComboBox(final String fieldName, final ComboBoxModel model) {
+    this(fieldName, model, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+  }
+
+  public ComboBox(final String fieldName, final ComboBoxModel model,
+    final ObjectToStringConverter converter) {
+    this(fieldName, model, converter, null);
+  }
+
+  public ComboBox(final String fieldName, final ComboBoxModel model,
+    final ObjectToStringConverter converter, final ListCellRenderer renderer) {
     super(model);
+    setEditable(false);
+    if (renderer != null) {
+      setRenderer(renderer);
+    }
     this.fieldName = fieldName;
     addActionListener(new ActionListener() {
 
@@ -47,6 +70,7 @@ public class ComboBox extends JComboBox implements Field {
         setFieldValue(selectedItem);
       }
     });
+    AutoCompleteDecorator.decorate(this, converter);
   }
 
   @Override
@@ -100,6 +124,6 @@ public class ComboBox extends JComboBox implements Field {
 
   @Override
   public String toString() {
-    return getFieldName();
+    return getFieldName() + "=" + getFieldValue();
   }
 }

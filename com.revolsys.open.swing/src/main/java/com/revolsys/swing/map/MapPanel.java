@@ -164,7 +164,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
       baseMapLayers, true);
     final ComboBox comboBox = new ComboBox(baseMapLayersModel);
-    comboBox.setEditable(false);
     comboBox.setMaximumSize(new Dimension(200, 20));
     comboBox.addItemListener(new InvokeMethodSelectedItemListener(this,
       "setBaseMapLayer"));

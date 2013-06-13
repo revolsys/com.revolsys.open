@@ -19,11 +19,13 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
     final CodeTable codeTable, final boolean allowNull) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
       allowNull);
-    final ComboBox comboBox = new ComboBox(fieldName, model);
+    final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
+      codeTable);
+
     final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
       codeTable);
-    comboBox.setRenderer(renderer);
-    comboBox.setEditable(false);
+    final ComboBox comboBox = new ComboBox(fieldName, model, stringConverter,
+      renderer);
     return comboBox;
   }
 

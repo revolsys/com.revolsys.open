@@ -39,6 +39,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   public DataObjectListLayer(final DataObjectMetaData metaData) {
     super(metaData);
+    setEditable(true);
   }
 
   public DataObjectListLayer(final DataObjectMetaData metaData,
@@ -62,7 +63,9 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   public void add(final DataObject object) {
     final LayerDataObject layerObject = createObject();
-    layerObject.setValues(layerObject);
+    if (layerObject != null) {
+      layerObject.setValues(object);
+    }
   }
 
   @Override
@@ -137,8 +140,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public LayerDataObject createObject() {
     final LayerDataObject object = super.createObject();
-    this.objects.add(object);
-    fireObjectsChanged();
+    if (object != null) {
+      this.objects.add(object);
+      fireObjectsChanged();
+    }
     return object;
   }
 

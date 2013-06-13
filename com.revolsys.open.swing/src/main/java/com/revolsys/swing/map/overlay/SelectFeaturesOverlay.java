@@ -180,12 +180,14 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
           if (object != null && dataObjectLayer.isVisible(object)
             && !dataObjectLayer.isEditing(object)) {
             final Geometry geometry = object.getGeometryValue();
-            MarkerStyleRenderer.renderMarkerVertices(getViewport(), graphics2d,
-              geometry, vertexStyle);
-            GeometryStyleRenderer.renderGeometry(getViewport(), graphics2d,
-              geometry, highlightStyle);
-            GeometryStyleRenderer.renderOutline(getViewport(), graphics2d,
-              geometry, outlineStyle);
+            if (geometry != null) {
+              MarkerStyleRenderer.renderMarkerVertices(getViewport(),
+                graphics2d, geometry, vertexStyle);
+              GeometryStyleRenderer.renderGeometry(getViewport(), graphics2d,
+                geometry, highlightStyle);
+              GeometryStyleRenderer.renderOutline(getViewport(), graphics2d,
+                geometry, outlineStyle);
+            }
           }
         }
       }
