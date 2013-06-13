@@ -17,6 +17,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -83,11 +84,11 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public DataObject getObject(final int index) {
+  public LayerDataObject getObject(final int index) {
     return layer.getObject(index);
   }
 
-  public List<DataObject> getObjects() {
+  public List<LayerDataObject> getObjects() {
     return layer.getObjects();
   }
 

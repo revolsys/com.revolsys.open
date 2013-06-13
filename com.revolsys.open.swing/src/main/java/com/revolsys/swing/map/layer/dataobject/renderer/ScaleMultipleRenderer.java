@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 /**
  * Use the first renderer which is visible at the current scale, ignore all
@@ -45,7 +45,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public boolean isVisible(final DataObject object) {
+  public boolean isVisible(final LayerDataObject object) {
     if (super.isVisible(object)) {
       if (renderer != null) {
         return renderer.isVisible(object);
@@ -67,7 +67,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   // NOTE: Needed for filter styles
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
@@ -80,11 +80,11 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   // NOTE: Needed for multiple styles
   protected void renderObjects(final Viewport2D viewport,
     final Graphics2D graphics, final DataObjectLayer layer,
-    final List<DataObject> objects) {
+    final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
-      for (final DataObject object : objects) {
+      for (final LayerDataObject object : objects) {
         if (isVisible(object)) {
           renderer.renderObject(viewport, graphics, visibleArea, layer, object);
         }

@@ -28,6 +28,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   private String errorMessage;
 
+  private String originalToolTip;
+
   public TextField(final int columns) {
     this(null);
     setColumns(columns);
@@ -76,20 +78,12 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setSelectedTextColor(Color.RED);
     setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -98,16 +92,37 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
     final String oldValue = fieldValue;
-    if (!EqualsRegistry.equal(getText(), newValue)) {
-      setText(newValue);
+    final String text = getText();
+    if (!EqualsRegistry.equal(text, newValue)) {
+      if (newValue == null) {
+        if (StringUtils.hasText(text)) {
+          setText("");
+        }
+      } else {
+        setText(newValue);
+      }
     }
     this.fieldValue = newValue;
     firePropertyChange(fieldName, oldValue, newValue);
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 }

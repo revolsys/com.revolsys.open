@@ -19,7 +19,6 @@ import javax.swing.table.TableColumnModel;
 
 import com.revolsys.collection.LruMap;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
@@ -28,6 +27,7 @@ import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.table.predicate.NewPredicate;
@@ -95,7 +95,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private SwingWorker<?, ?> loadObjectsWorker;
 
-  private Map<Integer, List<DataObject>> pageCache = new LruMap<Integer, List<DataObject>>(
+  private Map<Integer, List<LayerDataObject>> pageCache = new LruMap<Integer, List<LayerDataObject>>(
     5);
 
   private String attributeFilterMode = MODE_ALL;
@@ -170,7 +170,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return layer;
   }
 
-  protected List<DataObject> getLayerObjects(final Query query) {
+  protected List<LayerDataObject> getLayerObjects(final Query query) {
     return layer.query(query);
   }
 
@@ -186,9 +186,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
-  public DataObject getObject(final int row) {
+  public LayerDataObject getObject(final int row) {
     if (attributeFilterMode.equals(MODE_SELECTED)) {
-      final List<DataObject> selectedObjects = getSelectedObjects();
+      final List<LayerDataObject> selectedObjects = getSelectedObjects();
       if (row < selectedObjects.size()) {
         return selectedObjects.get(row);
       } else {
@@ -197,7 +197,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
     } else if (attributeFilterMode.equals(MODE_EDITS)) {
       final DataObjectLayer layer = getLayer();
-      final List<DataObject> changes = layer.getChanges();
+      final List<LayerDataObject> changes = layer.getChanges();
       if (row < changes.size()) {
         return changes.get(row);
       } else {
@@ -213,10 +213,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return orderBy;
   }
 
-  protected DataObject getPageRecord(final int pageNumber,
+  protected LayerDataObject getPageRecord(final int pageNumber,
     final int recordNumber) {
     synchronized (pageCache) {
-      final List<DataObject> page = pageCache.get(pageNumber);
+      final List<LayerDataObject> page = pageCache.get(pageNumber);
       if (page == null) {
         loadingPageNumbers.add(pageNumber);
         if (loadObjectsWorker == null) {
@@ -226,7 +226,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       } else {
         if (recordNumber < page.size()) {
-          final DataObject object = page.get(recordNumber);
+          final LayerDataObject object = page.get(recordNumber);
           return object;
         } else {
           return null;
@@ -256,9 +256,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return searchCondition;
   }
 
-  protected List<DataObject> getSelectedObjects() {
+  protected List<LayerDataObject> getSelectedObjects() {
     final DataObjectLayer layer = getLayer();
-    final List<DataObject> selectedObjects = layer.getSelectedObjects();
+    final List<LayerDataObject> selectedObjects = layer.getSelectedObjects();
     return selectedObjects;
   }
 
@@ -278,7 +278,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return filterByBoundingBox;
   }
 
-  protected DataObject loadLayerObjects(int row) {
+  protected LayerDataObject loadLayerObjects(int row) {
     final DataObjectLayer layer = getLayer();
     final int newObjectCount = layer.getNewObjectCount();
     if (row < newObjectCount) {
@@ -301,12 +301,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  protected List<DataObject> loadPage(final int pageNumber) {
+  protected List<LayerDataObject> loadPage(final int pageNumber) {
     final Query query = getFilterQuery();
     query.setOrderBy(orderBy);
     query.setOffset(pageSize * pageNumber);
     query.setLimit(pageSize);
-    final List<DataObject> objects = getLayerObjects(query);
+    final List<LayerDataObject> objects = getLayerObjects(query);
     return objects;
   }
 
@@ -317,8 +317,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return;
       } else {
         synchronized (getSync()) {
-          final Map<Integer, List<DataObject>> pageCache = this.pageCache;
-          final List<DataObject> objects;
+          final Map<Integer, List<LayerDataObject>> pageCache = this.pageCache;
+          final List<LayerDataObject> objects;
           if (getFilterQuery() == null) {
             objects = Collections.emptyList();
           } else {
@@ -356,18 +356,18 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
       loadingPageNumbers.clear();
       rowCount = 0;
-      pageCache = new LruMap<Integer, List<DataObject>>(5);
+      pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
       countLoaded = false;
       fireTableDataChanged();
     }
   }
 
-  protected void replaceCachedObject(final DataObject oldObject,
-    final DataObject newObject) {
+  protected void replaceCachedObject(final LayerDataObject oldObject,
+    final LayerDataObject newObject) {
     synchronized (pageCache) {
-      for (final List<DataObject> objects : pageCache.values()) {
-        for (final ListIterator<DataObject> iterator = objects.listIterator(); iterator.hasNext();) {
-          final DataObject object = iterator.next();
+      for (final List<LayerDataObject> objects : pageCache.values()) {
+        for (final ListIterator<LayerDataObject> iterator = objects.listIterator(); iterator.hasNext();) {
+          final LayerDataObject object = iterator.next();
           if (object == oldObject) {
             iterator.set(newObject);
             return;

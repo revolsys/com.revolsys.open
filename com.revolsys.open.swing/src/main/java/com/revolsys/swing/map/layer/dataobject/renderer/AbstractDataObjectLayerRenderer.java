@@ -18,6 +18,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 public abstract class AbstractDataObjectLayerRenderer extends
   AbstractLayerRenderer<DataObjectLayer> {
@@ -95,10 +96,10 @@ public abstract class AbstractDataObjectLayerRenderer extends
     filter = getFilter(style);
   }
 
-  public boolean isVisible(final DataObject object) {
+  public boolean isVisible(final LayerDataObject object) {
     try {
       return filter.accept(object);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       return false;
     }
   }
@@ -108,20 +109,20 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final DataObjectLayer layer) {
     viewport.setUseModelCoordinates(true, graphics);
     final BoundingBox boundingBox = viewport.getBoundingBox();
-    final List<DataObject> dataObjects = layer.getDataObjects(boundingBox);
+    final List<LayerDataObject> dataObjects = layer.getDataObjects(boundingBox);
     renderObjects(viewport, graphics, layer, dataObjects);
   }
 
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
   }
 
   protected void renderObjects(final Viewport2D viewport,
     final Graphics2D graphics, final DataObjectLayer layer,
-    final List<DataObject> objects) {
+    final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
-    for (final DataObject object : objects) {
+    for (final LayerDataObject object : objects) {
       if (isVisible(object) && !layer.isHidden(object)) {
         renderObject(viewport, graphics, visibleArea, layer, object);
       }

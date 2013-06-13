@@ -20,6 +20,8 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
 
   private String errorMessage;
 
+  private String originalToolTip;
+
   public TextArea() {
     this("fieldValue");
   }
@@ -70,20 +72,12 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setSelectedTextColor(Color.RED);
     setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -92,6 +86,7 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
@@ -102,5 +97,18 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
       setText(newValue);
     }
     firePropertyChange(fieldName, oldValue, newValue);
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 }

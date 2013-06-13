@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.LayoutManager;
 import java.awt.MenuContainer;
 import java.awt.MenuItem;
 import java.awt.Toolkit;
@@ -396,7 +397,10 @@ public class SwingUtil {
     }
     final Container parent = field.getParent();
     if (parent != null) {
-      parent.getLayout().layoutContainer(parent);
+      final LayoutManager layout = parent.getLayout();
+      if (layout != null) {
+        layout.layoutContainer(parent);
+      }
       field.revalidate();
     }
   }

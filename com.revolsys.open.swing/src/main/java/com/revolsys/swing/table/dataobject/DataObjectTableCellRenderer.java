@@ -65,7 +65,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     } else if (column == 1) {
       labelComponent.setText(name);
       component = labelComponent;
-    } else if (column == 2) {
+    } else {
       if (uiBuilderRegistry != null) {
         final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
           metaData, attributeIndex);
@@ -108,22 +108,24 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
 
   protected void setRowColor(final JTable table, final Component component,
     final int row) {
-    final int[] selectedRows = table.getSelectedRows();
-    boolean selected = false;
-    for (final int selectedRow : selectedRows) {
-      if (row == selectedRow) {
-        selected = true;
+    if (component != null) {
+      final int[] selectedRows = table.getSelectedRows();
+      boolean selected = false;
+      for (final int selectedRow : selectedRows) {
+        if (row == selectedRow) {
+          selected = true;
+        }
       }
-    }
-    if (selected) {
-      component.setBackground(table.getSelectionBackground());
-      component.setForeground(table.getSelectionForeground());
-    } else if (row % 2 == 0) {
-      component.setBackground(Color.WHITE);
-      component.setForeground(table.getForeground());
-    } else {
-      component.setBackground(Color.LIGHT_GRAY);
-      component.setForeground(table.getForeground());
+      if (selected) {
+        component.setBackground(table.getSelectionBackground());
+        component.setForeground(table.getSelectionForeground());
+      } else if (row % 2 == 0) {
+        component.setBackground(Color.WHITE);
+        component.setForeground(table.getForeground());
+      } else {
+        component.setBackground(Color.LIGHT_GRAY);
+        component.setForeground(table.getForeground());
+      }
     }
   }
 

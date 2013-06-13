@@ -4,10 +4,10 @@ import java.awt.Graphics2D;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -22,7 +22,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       final double scale = viewport.getScale();
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {

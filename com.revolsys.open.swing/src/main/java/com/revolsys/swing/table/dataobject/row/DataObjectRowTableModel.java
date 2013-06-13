@@ -10,9 +10,9 @@ import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.SortableTableModel;
 
 public abstract class DataObjectRowTableModel extends AbstractTableModel
@@ -103,12 +103,12 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
     return metaData;
   }
 
-  public abstract DataObject getObject(final int row);
+  public abstract LayerDataObject getObject(final int row);
 
-  public List<DataObject> getObjects(final int[] rows) {
-    final List<DataObject> objects = new ArrayList<DataObject>();
+  public List<LayerDataObject> getObjects(final int[] rows) {
+    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (final int row : rows) {
-      final DataObject object = getObject(row);
+      final LayerDataObject object = getObject(row);
       if (object != null) {
         objects.add(object);
       }
@@ -129,7 +129,7 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final DataObject object = getObject(rowIndex);
+    final LayerDataObject object = getObject(rowIndex);
     if (object == null) {
       return null;
     } else {

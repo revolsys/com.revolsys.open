@@ -37,7 +37,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private BoundingBox boundingBox = new BoundingBox();
 
-  private Map<Object, DataObject> cachedObjects = new HashMap<Object, DataObject>();
+  private Map<Object, LayerDataObject> cachedObjects = new HashMap<Object, LayerDataObject>();
 
   private DataObjectStore dataStore;
 
@@ -62,7 +62,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     saveChangesMethod.setAccessible(true);
 
     saveObjectChangesMethod = ReflectionUtils.findMethod(getClass(),
-      "transactionSaveObjectChanges", DataObject.class);
+      "transactionSaveObjectChanges", LayerDataObject.class);
     saveObjectChangesMethod.setAccessible(true);
   }
 
@@ -74,23 +74,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void addEditingObject(final DataObject object) {
-    final DataObject cachedObject = getCacheObject(object);
+  public void addEditingObject(final LayerDataObject object) {
+    final LayerDataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {
       super.addEditingObject(cachedObject);
     }
   }
 
   @Override
-  protected void addModifiedObject(final DataObject object) {
-    final DataObject cacheObject = getCacheObject(object);
+  protected void addModifiedObject(final LayerDataObject object) {
+    final LayerDataObject cacheObject = getCacheObject(object);
     if (cacheObject != null) {
       super.addModifiedObject(cacheObject);
     }
   }
 
   @Override
-  protected void addSelectedObject(final DataObject object) {
+  protected void addSelectedObject(final LayerDataObject object) {
     final DataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {
       super.addSelectedObject(object);
@@ -178,7 +178,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return getCoordinateSystem().getAreaBoundingBox();
   }
 
-  protected DataObject getCacheObject(final DataObject object) {
+  protected LayerDataObject getCacheObject(final LayerDataObject object) {
     if (object == null) {
       return null;
     } else {
@@ -187,12 +187,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  protected DataObject getCacheObject(final Object id) {
+  protected LayerDataObject getCacheObject(final Object id) {
     synchronized (cachedObjects) {
       if (id == null) {
         return null;
       } else {
-        DataObject object = cachedObjects.get(id);
+        LayerDataObject object = cachedObjects.get(id);
         if (object == null) {
           object = getObjectById(id);
           if (object != null) {
@@ -204,7 +204,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  private DataObject getCacheObject(final Object id, final DataObject object) {
+  private LayerDataObject getCacheObject(final Object id,
+    final LayerDataObject object) {
     if (object != null && isLayerObject(object)) {
       if (object.getState() == DataObjectState.New) {
         return object;
@@ -223,8 +224,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   @Override
-  public List<DataObject> getDataObjects(BoundingBox boundingBox) {
+  public List<LayerDataObject> getDataObjects(BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else if (sync == null) {
@@ -247,7 +251,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      final List<DataObject> objects = index.queryIntersects(polygon);
+      final List objects = index.queryIntersects(polygon);
       return objects;
     }
   }
@@ -267,7 +271,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public DataObject getObjectById(final Object id) {
+  public LayerDataObject getObjectById(final Object id) {
     final DataObjectMetaData metaData = getMetaData();
     final String idAttributeName = metaData.getIdAttributeName();
     if (idAttributeName == null) {
@@ -278,12 +282,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final Query query = Query.equal(metaData, idAttributeName, id);
       query.setProperty("dataObjectFactory", this);
       final DataObjectStore dataStore = getDataStore();
-      return dataStore.queryFirst(query);
+      return (LayerDataObject)dataStore.queryFirst(query);
     }
 
   }
 
-  protected List<DataObject> getObjects(final BoundingBox boundingBox) {
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  protected List<LayerDataObject> getObjects(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
     BoundingBox loadedBoundingBox;
     DataObjectQuadTree index;
@@ -291,16 +298,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       loadedBoundingBox = this.boundingBox;
       index = this.index;
     }
-    List<DataObject> queryObjects;
+    List<LayerDataObject> queryObjects;
     if (loadedBoundingBox.contains(boundingBox)) {
-      queryObjects = index.query(convertedBoundingBox);
+      queryObjects = (List)index.query(convertedBoundingBox);
     } else {
       queryObjects = getObjectsFromDataStore(convertedBoundingBox);
     }
-    final List<DataObject> allObjects = new ArrayList<DataObject>();
+    final List<LayerDataObject> allObjects = new ArrayList<LayerDataObject>();
     if (!queryObjects.isEmpty()) {
       final Polygon polygon = convertedBoundingBox.toPolygon();
-      for (final DataObject object : queryObjects) {
+      for (final LayerDataObject object : queryObjects) {
         final Geometry geometry = object.getGeometryValue();
         if (geometry.intersects(polygon)) {
           allObjects.add(object);
@@ -310,10 +317,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return allObjects;
   }
 
-  protected List<DataObject> getObjectsFromDataStore(
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  protected List<LayerDataObject> getObjectsFromDataStore(
     final BoundingBox boundingBox) {
-    List<DataObject> queryObjects;
-    final Reader<DataObject> reader = dataStore.query(typePath, boundingBox);
+    List<LayerDataObject> queryObjects;
+    final Reader reader = dataStore.query(typePath, boundingBox);
     try {
       queryObjects = reader.read();
     } finally {
@@ -350,23 +360,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return false;
   }
 
-  public List<DataObject> query(final Map<String, ? extends Object> filter) {
+  public List<LayerDataObject> query(final Map<String, ? extends Object> filter) {
     final DataObjectMetaData metaData = getMetaData();
     final Query query = Query.and(metaData, filter);
     return query(query);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   @Override
-  public List<DataObject> query(final Query query) {
+  public List<LayerDataObject> query(final Query query) {
     query.setProperty("dataObjectFactory", this);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader reader = dataStore.query(query);
     try {
-      final List<DataObject> readObjects = reader.read();
-      final List<DataObject> objects = new ArrayList<DataObject>();
-      for (final DataObject object : readObjects) {
+      final List<LayerDataObject> readObjects = reader.read();
+      final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+      for (final LayerDataObject object : readObjects) {
         final Object id = object.getIdValue();
         synchronized (cachedObjects) {
-          final DataObject cachedObject = cachedObjects.get(id);
+          final LayerDataObject cachedObject = cachedObjects.get(id);
           if (cachedObject == null) {
             objects.add(object);
           } else {
@@ -396,7 +409,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public boolean saveChanges(final DataObject object) {
+  public boolean saveChanges(final LayerDataObject object) {
     return invokeInTransaction(saveObjectChangesMethod, object);
   }
 
@@ -406,7 +419,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       synchronized (sync) {
         if (loadedBoundingBox == loadingBoundingBox) {
           this.index = index;
-          final List<DataObject> newObjects = getNewObjects();
+          final List<LayerDataObject> newObjects = getNewObjects();
           index.insert(newObjects);
           clearLoading(loadedBoundingBox);
         }
@@ -418,13 +431,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public void setSelectedObjects(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<DataObject> objects = getObjects(boundingBox);
+      final List<LayerDataObject> objects = getObjects(boundingBox);
       setSelectedObjects(objects);
     }
   }
 
   @Override
-  public void setSelectedObjects(final Collection<DataObject> objects) {
+  public void setSelectedObjects(final Collection<LayerDataObject> objects) {
     super.setSelectedObjects(objects);
     cleanCachedObjects();
   }
@@ -448,7 +461,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected synchronized boolean transactionSaveChanges() {
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
-      final Set<DataObject> deletedObjects = getDeletedObjects();
+      final Set<LayerDataObject> deletedObjects = getDeletedObjects();
 
       for (final DataObject object : deletedObjects) {
         object.setState(DataObjectState.Deleted);
@@ -460,7 +473,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         writer.write(object);
       }
 
-      final Collection<DataObject> newObjects = getNewObjects();
+      final Collection<LayerDataObject> newObjects = getNewObjects();
       for (final DataObject object : newObjects) {
         writer.write(object);
       }
@@ -471,7 +484,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected synchronized boolean transactionSaveObjectChanges(
-    final DataObject object) {
+    final LayerDataObject object) {
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
       if (super.isDeleted(object)) {
@@ -489,7 +502,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void unselectObjects(final Collection<? extends DataObject> objects) {
+  public void unselectObjects(
+    final Collection<? extends LayerDataObject> objects) {
     super.unselectObjects(objects);
     cleanCachedObjects();
   }

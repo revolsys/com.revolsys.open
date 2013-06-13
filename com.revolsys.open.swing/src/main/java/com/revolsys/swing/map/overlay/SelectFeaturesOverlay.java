@@ -18,13 +18,13 @@ import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -79,7 +79,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     return outlineStyle;
   }
 
-  protected Collection<DataObject> getSelectedObjects(
+  protected Collection<LayerDataObject> getSelectedObjects(
     final DataObjectLayer layer) {
     return layer.getSelectedObjects();
   }
@@ -176,8 +176,9 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         paint(graphics2d, childGroup);
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-        for (final DataObject object : getSelectedObjects(dataObjectLayer)) {
-          if (object != null && dataObjectLayer.isVisible(object) && !dataObjectLayer.isEditing(object)) {
+        for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
+          if (object != null && dataObjectLayer.isVisible(object)
+            && !dataObjectLayer.isEditing(object)) {
             final Geometry geometry = object.getGeometryValue();
             MarkerStyleRenderer.renderMarkerVertices(getViewport(), graphics2d,
               geometry, vertexStyle);

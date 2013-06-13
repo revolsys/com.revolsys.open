@@ -1,7 +1,5 @@
 package com.revolsys.swing.field;
 
-import java.awt.Color;
-import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 
 import javax.swing.event.DocumentEvent;
@@ -11,7 +9,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
 
 public class NumberTextField extends TextField implements DocumentListener,
@@ -118,8 +115,6 @@ public class NumberTextField extends TextField implements DocumentListener,
     return length;
   }
 
-  private String errorMessage;
-
   private final DataType dataType;
 
   private String fieldValidationMessage;
@@ -178,21 +173,11 @@ public class NumberTextField extends TextField implements DocumentListener,
   }
 
   @Override
-  public void focusGained(final FocusEvent e) {
-    super.focusGained(e);
-  }
-
-  @Override
-  public void focusLost(final FocusEvent e) {
-    super.focusLost(e);
-    updateText();
-  }
-
-  @Override
   public String getFieldValidationMessage() {
     return fieldValidationMessage;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
 
@@ -221,15 +206,6 @@ public class NumberTextField extends TextField implements DocumentListener,
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public void insertUpdate(final DocumentEvent e) {
     validateField();
   }
@@ -245,26 +221,30 @@ public class NumberTextField extends TextField implements DocumentListener,
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    setForeground(Color.RED);
-    setSelectedTextColor(Color.RED);
-    setBackground(Color.PINK);
-    this.errorMessage = message;
-  }
-
-  @Override
-  public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-  }
-
-  @Override
   public void setFieldValue(final Object value) {
-    setText(StringConverterRegistry.toString(value));
+    if (value == null) {
+      setText("");
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      final BigDecimal bigNumber = new BigDecimal(number.toString());
+      setText(bigNumber.toPlainString());
+    } else {
+      setText(StringConverterRegistry.toString(value));
+    }
     validateField();
-    updateText();
+    final String text = getText();
+    if (StringUtils.hasText(text)) {
+      try {
+        final BigDecimal bigNumber = new BigDecimal(text);
+        final Number number = (Number)StringConverterRegistry.toObject(
+          dataType, bigNumber);
+        super.setFieldValue(number);
+      } catch (final Throwable t) {
+        super.setFieldValue(text);
+      }
+    } else {
+      super.setFieldValue(null);
+    }
   }
 
   public void setMaximumValue(final Number maximumValue) {
@@ -283,27 +263,13 @@ public class NumberTextField extends TextField implements DocumentListener,
     }
   }
 
-  private void updateText() {
-    if (isFieldValid() && getFieldValue() != null) {
-      final String text = getText();
-      BigDecimal number = new BigDecimal(text);
-      number = number.setScale(scale);
-      final String newText = number.toPlainString();
-      if (!newText.equals(text)) {
-        setText(newText);
-      }
-    }
-  }
-
   private void validateField() {
-    final Object oldValue = getFieldValue();
-    Number value = null;
     final boolean oldValid = fieldValid;
     boolean valid = true;
     final String text = getText();
     if (StringUtils.hasText(text)) {
       try {
-        BigDecimal number = new BigDecimal(text);
+        BigDecimal number = new BigDecimal(text.trim());
         if (number.scale() < 0) {
           number = number.setScale(scale);
         }
@@ -319,7 +285,10 @@ public class NumberTextField extends TextField implements DocumentListener,
           valid = false;
         } else {
           number = number.setScale(scale);
-          value = (Number)StringConverterRegistry.toObject(dataType, number);
+          final String newText = number.toPlainString();
+          if (!newText.equals(text)) {
+            setText(newText);
+          }
         }
       } catch (final Throwable t) {
         fieldValidationMessage = t.getMessage();
@@ -330,12 +299,6 @@ public class NumberTextField extends TextField implements DocumentListener,
     if (valid != oldValid) {
       fieldValid = valid;
       firePropertyChange("fieldValid", oldValid, fieldValid);
-    }
-    if (valid) {
-      if (!EqualsRegistry.equal(oldValue, value)) {
-        setFieldValue(value);
-        firePropertyChange(getFieldName(), oldValue, getFieldValue());
-      }
     }
   }
 

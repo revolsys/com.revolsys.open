@@ -23,7 +23,7 @@ import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
-  List<DataObject> {
+  List<LayerDataObject> {
 
   public static DataObjectMetaDataImpl createMetaData(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
@@ -35,19 +35,19 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   private DataObjectQuadTree index = new DataObjectQuadTree();
 
-  private List<DataObject> objects = new ArrayList<DataObject>();
+  private List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
 
   public DataObjectListLayer(final DataObjectMetaData metaData) {
     super(metaData);
   }
 
   public DataObjectListLayer(final DataObjectMetaData metaData,
-    final DataObject... objects) {
+    final LayerDataObject... objects) {
     this(metaData, Arrays.asList(objects));
   }
 
   public DataObjectListLayer(final DataObjectMetaData metaData,
-    final List<DataObject> objects) {
+    final List<LayerDataObject> objects) {
     this(metaData);
     addAllObjects(objects);
   }
@@ -60,51 +60,59 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     setMetaData(metaData);
   }
 
-  @Override
-  public boolean add(final DataObject object) {
-    addObject(object);
-    return true;
+  public void add(final DataObject object) {
+    final LayerDataObject layerObject = createObject();
+    layerObject.setValues(layerObject);
   }
 
   @Override
-  public void add(final int index, final DataObject element) {
+  public void add(final int index, final LayerDataObject element) {
     // TODO events
     objects.add(index, element);
   }
 
   @Override
-  public boolean addAll(final Collection<? extends DataObject> objects) {
+  public boolean add(final LayerDataObject object) {
+    addObject(object);
+    return true;
+  }
+
+  @Override
+  public boolean addAll(final Collection<? extends LayerDataObject> objects) {
     addAllObjects(objects);
     return true;
   }
 
   @Override
   public boolean addAll(final int index,
-    final Collection<? extends DataObject> c) {
+    final Collection<? extends LayerDataObject> c) {
     // TODO events
     return objects.addAll(index, c);
   }
 
-  private void addAllInternal(final Collection<? extends DataObject> objects) {
+  private void addAllInternal(
+    final Collection<? extends LayerDataObject> objects) {
     this.objects.addAll(objects);
     index.insert(objects);
   }
 
-  public void addAllObjects(final Collection<? extends DataObject> objects) {
-    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+  public void addAllObjects(final Collection<? extends LayerDataObject> objects) {
+    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
+      this.objects);
     addAllInternal(objects);
-    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+    firePropertyChange("objects", oldValue, new ArrayList<LayerDataObject>(
       this.objects));
   }
 
-  public void addObject(final DataObject object) {
-    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+  public void addObject(final LayerDataObject object) {
+    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
+      this.objects);
     addObjectInternal(object);
-    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+    firePropertyChange("objects", oldValue, new ArrayList<LayerDataObject>(
       this.objects));
   }
 
-  private void addObjectInternal(final DataObject object) {
+  private void addObjectInternal(final LayerDataObject object) {
     if (!objects.contains(object)) {
       objects.add(object);
       index.insert(object);
@@ -127,8 +135,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public DataObject createObject() {
-    final DataObject object = super.createObject();
+  public LayerDataObject createObject() {
+    final LayerDataObject object = super.createObject();
     this.objects.add(object);
     fireObjectsChanged();
     return object;
@@ -141,29 +149,31 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   public void deleteAll() {
-    final List<DataObject> oldObjects = new ArrayList<DataObject>(objects);
-    objects = new ArrayList<DataObject>();
+    final List<LayerDataObject> oldObjects = new ArrayList<LayerDataObject>(
+      objects);
+    objects = new ArrayList<LayerDataObject>();
     index = new DataObjectQuadTree();
     firePropertyChange("objects", oldObjects, objects);
   }
 
   @Override
-  public void deleteObjects(final Collection<? extends DataObject> objects) {
+  public void deleteObjects(final Collection<? extends LayerDataObject> objects) {
     super.deleteObjects(objects);
-    final List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
+    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
+      this.objects);
     this.objects.removeAll(objects);
     this.index.remove(objects);
-    firePropertyChange("objects", oldValue, new ArrayList<DataObject>(
+    firePropertyChange("objects", oldValue, new ArrayList<LayerDataObject>(
       this.objects));
   }
 
   @Override
-  public DataObject get(final int index) {
+  public LayerDataObject get(final int index) {
     return objects.get(index);
   }
 
   @Override
-  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
+  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
     final double width = boundingBox.getWidth();
     final double height = boundingBox.getHeight();
     if (boundingBox.isNull() || width == 0 || height == 0) {
@@ -171,27 +181,28 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<DataObject> objects = index.query(convertedBoundingBox);
+      final List<LayerDataObject> objects = (List)index.query(convertedBoundingBox);
       return objects;
     }
   }
 
   @Override
-  public DataObject getObject(final int index) {
+  public LayerDataObject getObject(final int index) {
     return objects.get(index);
   }
 
   @Override
-  public List<DataObject> getObjects() {
-    final ArrayList<DataObject> returnObjects = new ArrayList<DataObject>(
+  public List<LayerDataObject> getObjects() {
+    final ArrayList<LayerDataObject> returnObjects = new ArrayList<LayerDataObject>(
       objects);
     return returnObjects;
   }
 
   @Override
-  public List<DataObject> getObjects(Geometry geometry, final double distance) {
+  public List<LayerDataObject> getObjects(Geometry geometry,
+    final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
-    return index.queryDistance(geometry, distance);
+    return (List)index.queryDistance(geometry, distance);
   }
 
   @Override
@@ -210,7 +221,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public Iterator<DataObject> iterator() {
+  public Iterator<LayerDataObject> iterator() {
     return objects.iterator();
   }
 
@@ -220,25 +231,25 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public ListIterator<DataObject> listIterator() {
+  public ListIterator<LayerDataObject> listIterator() {
     return objects.listIterator();
   }
 
   @Override
-  public ListIterator<DataObject> listIterator(final int index) {
+  public ListIterator<LayerDataObject> listIterator(final int index) {
     return objects.listIterator(index);
   }
 
   @Override
-  public DataObject remove(final int index) {
+  public LayerDataObject remove(final int index) {
     // TODO events
     return objects.remove(index);
   }
 
   @Override
   public boolean remove(final Object o) {
-    if (o instanceof DataObject) {
-      final DataObject object = (DataObject)o;
+    if (o instanceof LayerDataObject) {
+      final LayerDataObject object = (LayerDataObject)o;
       deleteObjects(object);
     }
     return true;
@@ -246,10 +257,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public boolean removeAll(final Collection<?> objects) {
-    final List<DataObject> dataObjects = new ArrayList<DataObject>();
+    final List<LayerDataObject> dataObjects = new ArrayList<LayerDataObject>();
     for (final Object object : objects) {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
+      if (object instanceof LayerDataObject) {
+        final LayerDataObject dataObject = (LayerDataObject)object;
         dataObjects.add(dataObject);
       }
 
@@ -265,24 +276,24 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public DataObject set(final int index, final DataObject element) {
+  public LayerDataObject set(final int index, final LayerDataObject element) {
     // TODO events
     return objects.set(index, element);
   }
 
-  public void setEditingObjects(final DataObject... objects) {
+  public void setEditingObjects(final LayerDataObject... objects) {
     setEditingObjects(Arrays.asList(objects));
   }
 
-  public void setObjects(final Collection<DataObject> newObjects) {
-    final List<DataObject> oldObjects = objects;
-    objects = new ArrayList<DataObject>();
+  public void setObjects(final Collection<LayerDataObject> newObjects) {
+    final List<LayerDataObject> oldObjects = objects;
+    objects = new ArrayList<LayerDataObject>();
     index = new DataObjectQuadTree();
     addAllObjects(newObjects);
     firePropertyChange("objects", oldObjects, objects);
   }
 
-  public void setObjects(final DataObject... objects) {
+  public void setObjects(final LayerDataObject... objects) {
     setObjects(Arrays.asList(objects));
   }
 
@@ -292,7 +303,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public List<DataObject> subList(final int fromIndex, final int toIndex) {
+  public List<LayerDataObject> subList(final int fromIndex, final int toIndex) {
     return objects.subList(fromIndex, toIndex);
   }
 

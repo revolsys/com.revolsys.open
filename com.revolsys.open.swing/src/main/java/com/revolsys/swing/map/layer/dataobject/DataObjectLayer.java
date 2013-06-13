@@ -9,7 +9,6 @@ import javax.swing.JComponent;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.Layer;
@@ -18,45 +17,45 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectLayer extends Layer {
   void addNewRecord();
 
-  void addSelectedObjects(Collection<? extends DataObject> objects);
+  void addSelectedObjects(Collection<? extends LayerDataObject> objects);
 
-  void addSelectedObjects(DataObject... objects);
+  void addSelectedObjects(LayerDataObject... objects);
 
   void clearEditingObjects();
 
   void clearSelectedObjects();
 
-  DataObject createObject();
+  LayerDataObject createObject();
 
   Component createTablePanel();
 
-  void deleteObjects(Collection<? extends DataObject> objects);
+  void deleteObjects(Collection<? extends LayerDataObject> objects);
 
-  void deleteObjects(DataObject... object);
+  void deleteObjects(LayerDataObject... object);
 
   int getChangeCount();
 
-  List<DataObject> getChanges();
+  List<LayerDataObject> getChanges();
 
-  List<DataObject> getDataObjects(BoundingBox boundingBox);
+  List<LayerDataObject> getDataObjects(BoundingBox boundingBox);
 
   DataObjectStore getDataStore();
 
-  Set<DataObject> getEditingObjects();
+  Set<LayerDataObject> getEditingObjects();
 
   DataObjectMetaData getMetaData();
 
   int getNewObjectCount();
 
-  List<DataObject> getNewObjects();
+  List<LayerDataObject> getNewObjects();
 
-  DataObject getObject(int row);
+  LayerDataObject getObject(int row);
 
-  DataObject getObjectById(Object id);
+  LayerDataObject getObjectById(Object id);
 
-  List<DataObject> getObjects();
+  List<LayerDataObject> getObjects();
 
-  List<DataObject> getObjects(Geometry geometry, double distance);
+  List<LayerDataObject> getObjects(Geometry geometry, double distance);
 
   Query getQuery();
 
@@ -64,7 +63,7 @@ public interface DataObjectLayer extends Layer {
 
   int getRowCount(Query query);
 
-  List<DataObject> getSelectedObjects();
+  List<LayerDataObject> getSelectedObjects();
 
   int getSelectionCount();
 
@@ -74,47 +73,47 @@ public interface DataObjectLayer extends Layer {
 
   boolean isCanEditObjects();
 
-  boolean isDeleted(DataObject object);
+  boolean isDeleted(LayerDataObject object);
 
-  boolean isEditing(DataObject object);
+  boolean isEditing(LayerDataObject object);
 
   @Override
   boolean isHasChanges();
 
-  boolean isHidden(DataObject object);
+  boolean isHidden(LayerDataObject object);
 
-  boolean isModified(DataObject object);
+  boolean isModified(LayerDataObject object);
 
-  boolean isNew(DataObject object);
+  boolean isNew(LayerDataObject object);
 
-  boolean isSelected(DataObject object);
+  boolean isSelected(LayerDataObject object);
 
-  boolean isVisible(DataObject object);
+  boolean isVisible(LayerDataObject object);
 
-  List<DataObject> query(Query query);
+  List<LayerDataObject> query(Query query);
 
-  void revertChanges(DataObject object);
+  void revertChanges(LayerDataObject object);
 
-  boolean saveChanges(DataObject object);
+  boolean saveChanges(LayerDataObject object);
 
-  void setEditingObjects(Collection<? extends DataObject> objects);
+  void setEditingObjects(Collection<? extends LayerDataObject> objects);
 
   void setQuery(Query query);
 
   void setSelectedObjects(BoundingBox boundingBox);
 
-  void setSelectedObjects(Collection<DataObject> objects);
+  void setSelectedObjects(Collection<LayerDataObject> objects);
 
-  void setSelectedObjects(DataObject... selectedObjects);
+  void setSelectedObjects(LayerDataObject... selectedObjects);
 
   void setSelectedObjectsById(Object sessionId);
 
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
-  <V extends JComponent> V showForm(final DataObject object);
+  <V extends JComponent> V showForm(final LayerDataObject object);
 
-  void unselectObjects(Collection<? extends DataObject> objects);
+  void unselectObjects(Collection<? extends LayerDataObject> objects);
 
-  void unselectObjects(DataObject... objects);
+  void unselectObjects(LayerDataObject... objects);
 }

@@ -17,8 +17,8 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   protected EventListenerList listenerList = new EventListenerList();
 
   @Override
-  public void add(final int index, final Object element) {
-    add(index, element);
+  public void add(final int index, final T element) {
+    super.add(index, element);
     fireIntervalAdded(this, index, index);
   }
 

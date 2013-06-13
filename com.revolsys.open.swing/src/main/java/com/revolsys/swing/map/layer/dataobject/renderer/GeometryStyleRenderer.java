@@ -8,10 +8,10 @@ import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.menu.ChangeStyle;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
@@ -162,7 +162,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);

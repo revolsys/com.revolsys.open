@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 public abstract class AbstractMultipleRenderer extends
   AbstractDataObjectLayerRenderer {
@@ -59,7 +59,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   @Override
-  public boolean isVisible(final DataObject object) {
+  public boolean isVisible(final LayerDataObject object) {
     if (super.isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         if (renderer.isVisible(object)) {

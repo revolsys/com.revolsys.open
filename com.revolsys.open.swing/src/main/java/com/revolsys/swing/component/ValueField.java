@@ -34,6 +34,8 @@ public class ValueField extends JPanel implements Field {
 
   private String title;
 
+  private String originalToolTip;
+
   public ValueField() {
     this("fieldValue", null);
   }
@@ -83,15 +85,6 @@ public class ValueField extends JPanel implements Field {
     return title;
   }
 
-  @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
   public void save() {
     save(this);
   }
@@ -119,7 +112,8 @@ public class ValueField extends JPanel implements Field {
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setBackground(Color.PINK);
-    setToolTipText(message);
+    this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   public void setFieldName(final String fieldName) {
@@ -130,6 +124,7 @@ public class ValueField extends JPanel implements Field {
   public void setFieldValid() {
     setForeground(defaultForeground);
     setBackground(defaultBackground);
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
@@ -144,6 +139,14 @@ public class ValueField extends JPanel implements Field {
 
   public void setTitle(final String title) {
     this.title = title;
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
   }
 
   public Object showDialog(final Component component) {
@@ -173,5 +176,10 @@ public class ValueField extends JPanel implements Field {
     dialog.setVisible(true);
 
     return getFieldValue();
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 }

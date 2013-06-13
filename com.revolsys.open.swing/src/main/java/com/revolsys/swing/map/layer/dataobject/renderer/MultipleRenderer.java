@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 
 /**
@@ -36,7 +36,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   // Needed for filter styles
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
@@ -50,12 +50,12 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   @Override
   protected void renderObjects(final Viewport2D viewport,
     final Graphics2D graphics, final DataObjectLayer layer,
-    final List<DataObject> objects) {
+    final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
       final long scale = (long)viewport.getScale();
       if (renderer.isVisible(scale)) {
-        for (final DataObject object : objects) {
+        for (final LayerDataObject object : objects) {
           if (renderer.isVisible(object)) {
             renderer.renderObject(viewport, graphics, visibleArea, layer,
               object);

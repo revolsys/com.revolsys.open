@@ -36,6 +36,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -191,10 +192,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           double dy = 0;
 
           final Measure<Length> textDx = style.getTextDeltaX();
-          dx += Viewport2D.toDisplayValue(viewport,textDx);
+          dx += Viewport2D.toDisplayValue(viewport, textDx);
 
           final Measure<Length> textDy = style.getTextDeltaY();
-          dy += Viewport2D.toDisplayValue(viewport,textDy);
+          dy += Viewport2D.toDisplayValue(viewport, textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
           final Rectangle2D bounds = fontMetrics.getStringBounds(label,
@@ -223,7 +224,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
           graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-          final double textHaloRadius = Viewport2D.toDisplayValue(viewport,style.getTextHaloRadiusMeasure());
+          final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
+            style.getTextHaloRadiusMeasure());
           if (textHaloRadius > 0) {
             final Stroke savedStroke = graphics.getStroke();
             final Stroke outlineStroke = new BasicStroke((float)textHaloRadius,
@@ -278,7 +280,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final DataObject object) {
+    final DataObjectLayer layer, final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
     renderText(viewport, graphics, object, geometry, style);
   }

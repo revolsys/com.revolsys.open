@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.swing.component.MapTransferable;
 
 public class DataObjectFormTransferHandler extends TransferHandler {
-  private final DataObjectForm form;
-
   private static final long serialVersionUID = 1L;
 
-  public DataObjectFormTransferHandler(final DataObjectForm form) {
+  private final DataObjectLayerForm form;
+
+  public DataObjectFormTransferHandler(final DataObjectLayerForm form) {
     this.form = form;
   }
 

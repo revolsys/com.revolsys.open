@@ -22,6 +22,8 @@ public class DateField extends JXDatePicker implements Field,
 
   private Date fieldValue;
 
+  private String originalToolTip;
+
   public DateField() {
     this("fieldValue");
   }
@@ -40,15 +42,6 @@ public class DateField extends JXDatePicker implements Field,
   @Override
   public <T> T getFieldValue() {
     return (T)fieldValue;
-  }
-
-  @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
   }
 
   @Override
@@ -76,6 +69,7 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(Color.RED);
     editor.setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   public void setFieldName(final String fieldName) {
@@ -89,16 +83,30 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     editor.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final Date oldValue = fieldValue;
-    Date date = (Date)value;
+    final Date date = (Date)value;
     if (!EqualsRegistry.equal(getDate(), value)) {
       setDate(date);
     }
     this.fieldValue = date;
     firePropertyChange(fieldName, oldValue, value);
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 }

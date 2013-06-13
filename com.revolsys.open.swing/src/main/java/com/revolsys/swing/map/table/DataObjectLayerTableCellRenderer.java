@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -33,7 +32,7 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int column) {
     final DataObjectLayer layer = model.getLayer();
-    final DataObject object = model.getObject(row);
+    final LayerDataObject object = model.getObject(row);
     final boolean selected = layer.isSelected(object);
     final DataObjectMetaData metaData = model.getMetaData();
     final String attributeName = model.getAttributeName(column);
@@ -79,7 +78,7 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
       Color.LIGHT_GRAY, WebColors.DarkSalmon, Color.WHITE, Color.PINK);
     if (layer.isModified(object)) {
       if (object instanceof LayerDataObject) {
-        final LayerDataObject layerDataObject = (LayerDataObject)object;
+        final LayerDataObject layerDataObject = object;
         if (layerDataObject.isModified(attributeName)) {
           if (selected) {
             component.setBackground(WebColors.Green);

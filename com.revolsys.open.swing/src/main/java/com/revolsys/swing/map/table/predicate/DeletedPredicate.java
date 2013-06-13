@@ -11,8 +11,8 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -43,7 +43,7 @@ public class DeletedPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = model.getObject(rowIndex);
+      final LayerDataObject object = model.getObject(rowIndex);
       final DataObjectLayer layer = model.getLayer();
       return layer.isDeleted(object);
     } catch (final IndexOutOfBoundsException e) {

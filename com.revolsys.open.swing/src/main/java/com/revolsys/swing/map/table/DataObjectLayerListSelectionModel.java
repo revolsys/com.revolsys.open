@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.swing.DefaultListSelectionModel;
 
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 @SuppressWarnings("serial")
 public class DataObjectLayerListSelectionModel extends
@@ -21,15 +21,15 @@ public class DataObjectLayerListSelectionModel extends
   @Override
   public void addSelectionInterval(final int index0, final int index1) {
     super.addSelectionInterval(index0, index1);
-    final List<DataObject> objects = getObjects(index0, index1);
+    final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
     layer.addSelectedObjects(objects);
   }
 
-  protected List<DataObject> getObjects(final int index0, final int index1) {
-    final List<DataObject> objects = new ArrayList<DataObject>();
+  protected List<LayerDataObject> getObjects(final int index0, final int index1) {
+    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (int i = index0; i <= index1; i++) {
-      final DataObject object = model.getObject(i);
+      final LayerDataObject object = model.getObject(i);
       objects.add(object);
     }
     return objects;
@@ -37,7 +37,7 @@ public class DataObjectLayerListSelectionModel extends
 
   @Override
   public boolean isSelectedIndex(final int index) {
-    final DataObject object = model.getObject(index);
+    final LayerDataObject object = model.getObject(index);
     if (object != null) {
       final DataObjectLayer layer = model.getLayer();
       return layer.isSelected(object);
@@ -54,7 +54,7 @@ public class DataObjectLayerListSelectionModel extends
   @Override
   public void removeSelectionInterval(final int index0, final int index1) {
     super.removeSelectionInterval(index0, index1);
-    final List<DataObject> objects = getObjects(index0, index1);
+    final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
     layer.unselectObjects(objects);
   }
@@ -62,7 +62,7 @@ public class DataObjectLayerListSelectionModel extends
   @Override
   public void setSelectionInterval(final int index0, final int index1) {
     super.setSelectionInterval(index0, index1);
-    final List<DataObject> objects = getObjects(index0, index1);
+    final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
     layer.setSelectedObjects(objects);
   }

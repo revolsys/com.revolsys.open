@@ -28,6 +28,8 @@ public class ObjectLabelField extends JLabel implements Field {
 
   private final Color defaultForeground = getForeground();
 
+  private String originalToolTip;
+
   public ObjectLabelField() {
     this("fieldValue", null);
   }
@@ -57,19 +59,11 @@ public class ObjectLabelField extends JLabel implements Field {
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -77,10 +71,12 @@ public class ObjectLabelField extends JLabel implements Field {
     setForeground(defaultForeground);
     setBackground(defaultBackground);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object object) {
+    final Object oldValue = this.fieldValue;
     this.fieldValue = object;
     String text;
     if (object == null) {
@@ -96,6 +92,20 @@ public class ObjectLabelField extends JLabel implements Field {
       }
     }
     setText(text);
+    firePropertyChange(fieldName, oldValue, object);
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 
 }

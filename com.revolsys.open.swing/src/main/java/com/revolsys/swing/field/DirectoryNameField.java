@@ -27,6 +27,8 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
 
   private String errorMessage;
 
+  private String originalToolTip;
+
   public DirectoryNameField() {
     super(new SpringLayout());
 
@@ -103,15 +105,6 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public boolean isFieldValid() {
 
     final File directory = getDirectoryFile();
@@ -138,6 +131,7 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     directoryName.setSelectedTextColor(Color.RED);
     directoryName.setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -146,10 +140,24 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     directoryName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     directoryName.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object fieldValue) {
     setDirectoryPath(fieldValue.toString());
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 }

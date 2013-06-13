@@ -30,7 +30,6 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Conditions;
@@ -57,9 +56,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   private String errorMessage;
 
-  public DataStoreSearchTextField(final Attribute attribute) {
-    this(attribute.getMetaData(), attribute.getName());
-  }
+  private String originalToolTip;
 
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
@@ -178,15 +175,6 @@ public class DataStoreSearchTextField extends JXSearchField implements
       return new Object[] {
         selectedItem
       };
-    }
-  }
-
-  @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
     }
   }
 
@@ -344,6 +332,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     setSelectedTextColor(Color.RED);
     setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -352,6 +341,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
@@ -368,6 +358,14 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public void setText(final String text) {
     super.setText(text);
     search();
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
   }
 
   private void showMenu() {
@@ -392,6 +390,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
         }
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return getFieldName() + "=" + getFieldValue();
   }
 
 }

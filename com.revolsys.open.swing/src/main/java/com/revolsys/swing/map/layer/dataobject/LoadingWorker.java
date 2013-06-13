@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.query.Query;
 
 public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
@@ -34,9 +33,9 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     if (query != null) {
       query = query.clone();
       query.setBoundingBox(queryBoundingBox);
-      final List<DataObject> objects = layer.query(query);
+      final List<LayerDataObject> objects = layer.query(query);
       index.insertAll(objects);
-   }
+    }
     return index;
   }
 

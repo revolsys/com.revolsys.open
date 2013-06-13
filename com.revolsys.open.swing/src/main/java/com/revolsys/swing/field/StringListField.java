@@ -1,9 +1,11 @@
 package com.revolsys.swing.field;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -12,12 +14,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.InvokeMethodListener;
@@ -34,14 +38,18 @@ public class StringListField extends ValueField {
 
   private final JButton removeButton;
 
+  private final Comparator<String> comparator;
+
   private final JList valuesField;
 
-  public StringListField(final String fieldName) {
+  public StringListField(final Comparator<String> comparator,
+    final String fieldName) {
     super(fieldName, "");
+    this.comparator = comparator;
 
-    setLayout(new BorderLayout());
+    setLayout(new VerticalLayout(2));
 
-    final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    final JPanel buttonsPanel = new JPanel();
 
     valueEntry.setPreferredSize(new Dimension(600, 25));
     buttonsPanel.add(valueEntry);
@@ -56,13 +64,14 @@ public class StringListField extends ValueField {
     removeButton = new JButton(new InvokeMethodAction(null, "Remove Selected",
       SilkIconLoader.getIcon("delete"), this, "removeSelectedValues"));
     buttonsPanel.add(removeButton);
-    add(buttonsPanel, BorderLayout.NORTH);
+    add(buttonsPanel);
 
+    GroupLayoutUtil.makeColumns(buttonsPanel, 3);
     valuesField = new JList(values);
 
     final JScrollPane namesPane = new JScrollPane(valuesField);
     namesPane.setPreferredSize(new Dimension(100, 3 * 20));
-    add(namesPane, BorderLayout.SOUTH);
+    add(namesPane);
     updateFields();
 
     valueEntry.getDocument().addDocumentListener(
@@ -71,6 +80,10 @@ public class StringListField extends ValueField {
     valuesField.addListSelectionListener(new EnableComponentListener(
       removeButton));
 
+  }
+
+  public StringListField(final String fieldName) {
+    this(null, fieldName);
   }
 
   public void addValue() {
@@ -83,17 +96,31 @@ public class StringListField extends ValueField {
   public boolean addValue(final String value) {
     if (StringUtils.hasText(value)) {
       if (!values.contains(value)) {
-        values.add(value);
+
+        if (comparator == null || values.isEmpty()) {
+          values.add(value);
+          valuesField.setSelectedIndex(values.size() - 1);
+        } else {
+          boolean inserted = false;
+          for (int i = 0; i < values.size() && !inserted; i++) {
+            final String listValue = values.get(i);
+            if (comparator.compare(value, listValue) < 0) {
+              values.add(i, value);
+              inserted = true;
+              valuesField.setSelectedIndex(i);
+            }
+          }
+          if (!inserted) {
+            values.add(value);
+            valuesField.setSelectedIndex(values.size() - 1);
+          }
+        }
         updateFields();
         return true;
       }
     }
+    valueEntry.requestFocusInWindow();
     return false;
-  }
-
-  public void clear() {
-    values.clear();
-    updateFields();
   }
 
   public void removeSelectedValues() {
@@ -109,6 +136,7 @@ public class StringListField extends ValueField {
       }
     }
     updateFields();
+    valueEntry.requestFocusInWindow();
   }
 
   @Override
@@ -118,9 +146,12 @@ public class StringListField extends ValueField {
       if (values != null) {
         values.clear();
         if (value != null) {
-          values.addAll(Arrays.asList(value.toString()
-            .replaceAll("\\s+", "")
-            .split(",+")));
+          final List<String> newValues = new ArrayList<String>(
+            Arrays.asList(value.toString().replaceAll("\\s+", "").split(",+")));
+          if (comparator != null) {
+            Collections.sort(newValues, comparator);
+          }
+          values.addAll(newValues);
         }
       }
     }

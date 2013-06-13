@@ -21,6 +21,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
@@ -120,19 +121,19 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   }
 
   public void deleteRecord() {
-    final DataObject object = getEventRowObject();
+    final LayerDataObject object = getEventRowObject();
     layer.deleteObjects(object);
   }
 
   public void editRecord() {
-    final DataObject object = getEventRowObject();
+    final LayerDataObject object = getEventRowObject();
     layer.showForm(object);
   }
 
-  protected DataObject getEventRowObject() {
+  protected LayerDataObject getEventRowObject() {
     final DataObjectRowTableModel model = getTableModel();
     final int row = getEventRow();
-    final DataObject object = model.getObject(row);
+    final LayerDataObject object = model.getObject(row);
     return object;
   }
 

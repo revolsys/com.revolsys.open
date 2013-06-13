@@ -22,6 +22,8 @@ public class ComboBox extends JComboBox implements Field {
 
   private String errorMessage;
 
+  private String originalToolTip;
+
   public ComboBox() {
     this("fieldValue", null);
   }
@@ -59,21 +61,13 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
-  public String getToolTipText() {
-    if (StringUtils.hasText(errorMessage)) {
-      return errorMessage;
-    } else {
-      return super.getToolTipText();
-    }
-  }
-
-  @Override
   public void setFieldInvalid(final String message) {
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();
     component.setForeground(Color.RED);
     component.setBackground(Color.PINK);
     this.errorMessage = message;
+    super.setToolTipText(errorMessage);
   }
 
   @Override
@@ -83,6 +77,7 @@ public class ComboBox extends JComboBox implements Field {
     component.setForeground(TextField.DEFAULT_FOREGROUND);
     component.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
+    super.setToolTipText(originalToolTip);
   }
 
   @Override
@@ -93,6 +88,14 @@ public class ComboBox extends JComboBox implements Field {
     }
     this.fieldValue = value;
     firePropertyChange(fieldName, oldValue, value);
+  }
+
+  @Override
+  public void setToolTipText(final String text) {
+    this.originalToolTip = text;
+    if (!StringUtils.hasText(errorMessage)) {
+      super.setToolTipText(text);
+    }
   }
 
   @Override

@@ -42,6 +42,11 @@ public class DataObjectMapTableModel extends AbstractDataObjectTableModel {
     return oldValue;
   }
 
+  public void setValue(final String fieldName, final Object fieldValue) {
+    values.put(fieldName, fieldValue);
+    fireTableDataChanged();
+  }
+
   public void setValues(final Map<String, Object> values) {
     if (values != this.values) {
       this.values = values;

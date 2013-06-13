@@ -14,7 +14,6 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
 import com.revolsys.swing.SwingWorkerManager;
 import com.vividsolutions.jts.geom.Polygon;
@@ -24,7 +23,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
 
   private DataObjectQuadTree index;
 
-  private Reader<DataObject> reader;
+  private Reader<LayerDataObject> reader;
 
   private boolean loading = false;
 
@@ -48,7 +47,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
+  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
@@ -92,7 +91,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
             polygon = operation.perform(polygon);
           }
         }
-        return index.queryIntersects(polygon);
+        return (List)index.queryIntersects(polygon);
       } else {
         return Collections.emptyList();
       }
