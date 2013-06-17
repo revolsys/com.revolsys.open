@@ -54,7 +54,17 @@ public class DelegatingVisitor<T> extends AbstractVisitor<T> {
   }
 
   @Override
+  public String toString() {
+    return visitor.toString();
+  }
+
+  @Override
   public boolean visit(final T item) {
-    return visitor.visit(item);
+    final Filter<T> filter = getFilter();
+    if (filter == null || filter.accept(item)) {
+      return visitor.visit(item);
+    } else {
+      return true;
+    }
   }
 }

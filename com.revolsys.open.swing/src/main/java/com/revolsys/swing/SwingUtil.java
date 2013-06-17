@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.MenuContainer;
 import java.awt.MenuItem;
@@ -268,6 +269,20 @@ public class SwingUtil {
     final int columns) {
     final TextField textField = new TextField(fieldName, columns);
     return textField;
+  }
+
+  public static Window getActiveWindow() {
+    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    final Window activeWindow = keyboardFocusManager.getActiveWindow();
+    if (activeWindow == null) {
+      final Window[] windows = Window.getOwnerlessWindows();
+      for (final Window window : windows) {
+        if (window.isVisible()) {
+          return window;
+        }
+      }
+    }
+    return activeWindow;
   }
 
   public static Component getInvoker(final JMenuItem menuItem) {

@@ -158,6 +158,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     double li = Math.asin(q / 2.0);
     if (!Double.isNaN(li)) {
       double delta = 10e010;
+      final double maxIter = 1000;
+      int i = 0;
       do {
         final double sinLi = Math.sin(li);
 
@@ -170,7 +172,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
         final double lip1 = li + j1 * (k1 - k2 + k3);
         delta = Math.abs(lip1 - li);
         li = lip1;
-      } while (!Double.isNaN(li) && delta > 1.0e-011);
+        i++;
+      } while (!Double.isNaN(li) && delta > 1.0e-011 && i < maxIter);
     }
     double phi;
     if (Double.isNaN(li)) {

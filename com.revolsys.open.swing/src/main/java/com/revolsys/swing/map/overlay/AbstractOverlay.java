@@ -120,6 +120,13 @@ public class AbstractOverlay extends JComponent implements
     return map;
   }
 
+  protected Point getPoint(final MouseEvent event) {
+    final java.awt.Point eventPoint = event.getPoint();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point point = viewport.toModelPointRounded(geometryFactory, eventPoint);
+    return point;
+  }
+
   public Project getProject() {
     return project;
   }

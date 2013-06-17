@@ -43,12 +43,12 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -56,6 +56,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
@@ -69,7 +70,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
-  DataObjectLayer, DataObjectFactory {
+  DataObjectLayer, DataObjectFactory, AddGeometryCompleteAction {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
@@ -106,17 +107,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addMenuItem("layer", 0, "Layer Style", "palette", LayerUtil.class,
       "showProperties", "Style");
 
-  }
-
-  public static void actionCompleteAddNewRecord(
-    final EditGeometryOverlay overlay) {
-    synchronized (overlay) {
-      final DataObjectLayer layer = overlay.getLayer();
-      final LayerDataObject object = overlay.getObject();
-      if (object != null) {
-        layer.showForm(object);
-      }
-    }
   }
 
   private DataObjectMetaData metaData;
@@ -170,6 +160,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setGeometryFactory(geometryFactory);
   }
 
+  @Override
+  public LayerDataObject addComplete(final EditGeometryOverlay overlay,
+    final Geometry geometry) {
+    final DataObjectMetaData metaData = getMetaData();
+    final String geometryAttributeName = metaData.getGeometryAttributeName();
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put(geometryAttributeName, geometry);
+    return showAddForm(parameters);
+  }
+
   public void addEditingObject(final LayerDataObject object) {
     editingObjects.add(object);
     refresh();
@@ -186,18 +186,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final DataObjectMetaData metaData = getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
-      final LayerDataObject object = this.createObject();
-      if (object != null) {
-        showForm(object);
-      }
+      showAddForm(null);
     } else {
       final MapPanel map = MapPanel.get(this);
       if (map != null) {
         final EditGeometryOverlay addGeometryOverlay = map.getMapOverlay(EditGeometryOverlay.class);
         synchronized (addGeometryOverlay) {
           // TODO what if there is another feature being edited?
-          addGeometryOverlay.addObject(this, new InvokeMethodListener(this,
-            "actionCompleteAddNewRecord", addGeometryOverlay));
+          addGeometryOverlay.addObject(this, this);
           // TODO cancel action
         }
       }
@@ -264,7 +260,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new DataObjectLayerForm(this, object);
   }
 
-  public JComponent createForm(final LayerDataObject object) {
+  public DataObjectLayerForm createForm(final LayerDataObject object) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (StringUtils.hasText(formFactoryExpression)) {
       try {
@@ -272,7 +268,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         final Expression expression = parser.parseExpression(formFactoryExpression);
         final EvaluationContext context = new StandardEvaluationContext(this);
         context.setVariable("object", object);
-        return expression.getValue(context, JComponent.class);
+        return expression.getValue(context, DataObjectLayerForm.class);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to create form for " + this, e);
@@ -648,13 +644,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     throw new UnsupportedOperationException("Query not currently supported");
   }
 
-  protected void removeDeletedObject(final DataObject object) {
-    deletedObjects.remove(object);
+  protected void removeDeletedObject(final LayerDataObject object) {
+    synchronized (deletedObjects) {
+      deletedObjects.remove(object);
+    }
   }
 
-  protected void removeModifiedObject(final DataObject object) {
+  protected void removeModifiedObject(final LayerDataObject object) {
     synchronized (modifiedObjects) {
       modifiedObjects.remove(object);
+    }
+  }
+
+  protected void removeNewObject(final LayerDataObject object) {
+    synchronized (newObjects) {
+      newObjects.remove(object);
     }
   }
 
@@ -841,6 +845,31 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       selectedObjects.removeAll(objects);
     }
     return objects.size();
+  }
+
+  @Override
+  public LayerDataObject showAddForm(final Map<String, Object> parameters) {
+    if (isCanAddObjects()) {
+      final LayerDataObject newObject = createObject();
+      if (parameters != null) {
+        newObject.setValues(parameters);
+      }
+      final DataObjectLayerForm form = createForm(newObject);
+      if (form == null) {
+        return null;
+      } else {
+        final LayerDataObject object = form.showAddDialog();
+        return object;
+      }
+    } else {
+      final Window window = SwingUtil.getActiveWindow();
+      JOptionPane.showMessageDialog(window,
+        "Adding records is not enabled for the " + getPath()
+          + " layer. If possible make the layer editable", "Cannot Add Record",
+        JOptionPane.ERROR_MESSAGE);
+      return null;
+    }
+
   }
 
   @SuppressWarnings("unchecked")

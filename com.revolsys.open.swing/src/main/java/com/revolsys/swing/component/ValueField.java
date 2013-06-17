@@ -16,6 +16,7 @@ import javax.swing.WindowConstants;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.CaseConverter;
@@ -152,10 +153,9 @@ public class ValueField extends JPanel implements Field {
   public Object showDialog(final Component component) {
     Window window;
     if (component == null) {
-      window = null;
+      window = SwingUtil.getActiveWindow();
     } else if (component instanceof Window) {
       window = (Window)component;
-
     } else {
       window = SwingUtilities.windowForComponent(component);
     }

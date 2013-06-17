@@ -4,12 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -26,13 +29,16 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -47,12 +53,14 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
@@ -123,8 +131,11 @@ public class DataObjectLayerForm extends JPanel implements
 
   private final DataObjectLayer layer;
 
+  private JButton addOkButton;
+
   public DataObjectLayerForm(final DataObjectLayer layer) {
     setLayout(new BorderLayout());
+    setName(layer.getName());
     this.layer = layer;
     final DataObjectMetaData metaData = layer.getMetaData();
     setMetaData(metaData);
@@ -154,6 +165,21 @@ public class DataObjectLayerForm extends JPanel implements
     final LayerDataObject object) {
     this(layer);
     setObject(object);
+  }
+
+  public void actionAddCancel() {
+    final DataObjectLayer layer = getLayer();
+    final LayerDataObject object = getObject();
+    layer.deleteObjects(object);
+    this.object = null;
+    closeWindow();
+  }
+
+  public void actionAddOk() {
+    final DataObjectLayer layer = getLayer();
+    final LayerDataObject object = getObject();
+    layer.saveChanges(object);
+    closeWindow();
   }
 
   public void actionZoomToObject() {
@@ -187,6 +213,11 @@ public class DataObjectLayerForm extends JPanel implements
       field = new JScrollPane(textArea);
     }
     container.add(field);
+  }
+
+  public void addField(final Container container, final String fieldName) {
+    final Field field = getField(fieldName);
+    addField(container, field);
   }
 
   public void addField(final Field field) {
@@ -457,6 +488,13 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     return toolBar;
+  }
+
+  public void closeWindow() {
+    final Window window = SwingUtilities.windowForComponent(this);
+    if (window != null) {
+      window.setVisible(false);
+    }
   }
 
   protected JPanel createPanel(final JPanel container, final String title) {
@@ -750,6 +788,12 @@ public class DataObjectLayerForm extends JPanel implements
     property.reverseGeometry(object);
   }
 
+  public void setAddOkButtonEnabled(final boolean enabled) {
+    if (addOkButton != null) {
+      addOkButton.setEnabled(enabled);
+    }
+  }
+
   protected void setDataStore(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
@@ -807,7 +851,7 @@ public class DataObjectLayerForm extends JPanel implements
       field.setBackground(TextField.DEFAULT_BACKGROUND);
     }
     fieldValidMap.put(fieldName, true);
-    fieldInValidMessage.remove(field);
+    fieldInValidMessage.remove(fieldName);
   }
 
   protected boolean setFieldValidationEnabled(
@@ -840,7 +884,7 @@ public class DataObjectLayerForm extends JPanel implements
     if (field.isEnabled()) {
       final Object objectValue = object.getValue(fieldName);
       if (!EqualsRegistry.equal(value, objectValue)) {
-        object.setValue(fieldName, value);
+        object.setValueByPath(fieldName, value);
         validateFields();
       }
     }
@@ -930,6 +974,34 @@ public class DataObjectLayerForm extends JPanel implements
     validateFields();
   }
 
+  public LayerDataObject showAddDialog() {
+    final String title = "Add New " + getName();
+    final Window window = SwingUtil.getActiveWindow();
+    final JDialog dialog = new JDialog(window, title,
+      ModalityType.APPLICATION_MODAL);
+    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+    dialog.setLayout(new BorderLayout());
+
+    final JScrollPane scrollPane = new JScrollPane(this);
+    dialog.add(scrollPane, BorderLayout.CENTER);
+
+    final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    dialog.add(buttons, BorderLayout.SOUTH);
+    final JButton addCancelButton = InvokeMethodAction.createButton("Cancel",
+      this, "actionAddCancel");
+    buttons.add(addCancelButton);
+    addOkButton = InvokeMethodAction.createButton("OK", this, "actionAddOk");
+    buttons.add(addOkButton);
+
+    dialog.pack();
+    dialog.setLocation(50, 50);
+    validateFields();
+    dialog.setVisible(true);
+    final LayerDataObject object = getObject();
+    dialog.dispose();
+    return object;
+  }
+
   protected void updateReadOnlyFields() {
     for (final Entry<String, Field> entry : fields.entrySet()) {
       final String name = entry.getKey();
@@ -961,8 +1033,8 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected void validateFields() {
     if (isFieldValidationEnabled()) {
-      setFieldValidationEnabled(false);
       try {
+        setFieldValidationEnabled(false);
         setTabsValid();
         fieldsValid = true;
         for (final String fieldName : fields.keySet()) {
@@ -980,13 +1052,22 @@ public class DataObjectLayerForm extends JPanel implements
           }
         }
         for (final String fieldName : getRequiredFieldNames()) {
-          final Object value = getFieldValue(fieldName);
-          if (value == null) {
-            setFieldInvalid(fieldName, "Required");
-          } else if (value instanceof String) {
-            final String string = (String)value;
-            if (!StringUtils.hasText(string)) {
+          boolean run = true;
+          if (object.getState() == DataObjectState.New) {
+            final String idAttributeName = getMetaData().getIdAttributeName();
+            if (fieldName.equals(idAttributeName)) {
+              run = false;
+            }
+          }
+          if (run) {
+            final Object value = getFieldValue(fieldName);
+            if (value == null) {
               setFieldInvalid(fieldName, "Required");
+            } else if (value instanceof String) {
+              final String string = (String)value;
+              if (!StringUtils.hasText(string)) {
+                setFieldInvalid(fieldName, "Required");
+              }
             }
           }
         }
@@ -995,7 +1076,8 @@ public class DataObjectLayerForm extends JPanel implements
       } finally {
         setFieldValidationEnabled(true);
       }
+      final boolean fieldsValid = isFieldsValid();
+      setAddOkButtonEnabled(fieldsValid);
     }
   }
-
 }

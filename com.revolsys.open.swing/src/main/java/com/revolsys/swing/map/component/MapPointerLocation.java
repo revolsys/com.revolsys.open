@@ -43,22 +43,18 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    final int screenX = e.getX();
-    final int screenY = e.getY();
 
-    final Point mapPoint = viewport.toModelPoint(screenX, screenY);
+    final java.awt.Point point = e.getPoint();
+    final Point mapPoint = viewport.toModelPointRounded(geometryFactory, point);
     if (!mapPoint.isEmpty()) {
-      final Point projectedPoint = geometryFactory.copy(mapPoint);
-      if (!projectedPoint.isEmpty()) {
-        final double projectedX = projectedPoint.getX();
-        final double projectedY = projectedPoint.getY();
-        if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          setText(title + ": " + FORMAT.format(projectedY) + ", "
-            + FORMAT.format(projectedX));
-        } else {
-          setText(title + ": " + FORMAT.format(projectedX) + ", "
-            + FORMAT.format(projectedY));
-        }
+      final double projectedX = mapPoint.getX();
+      final double projectedY = mapPoint.getY();
+      if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+        setText(title + ": " + FORMAT.format(projectedY) + ", "
+          + FORMAT.format(projectedX));
+      } else {
+        setText(title + ": " + FORMAT.format(projectedX) + ", "
+          + FORMAT.format(projectedY));
       }
     }
   }

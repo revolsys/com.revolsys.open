@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.awt.Component;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -110,6 +111,8 @@ public interface DataObjectLayer extends Layer {
 
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
+
+  LayerDataObject showAddForm(Map<String, Object> parameters);
 
   <V extends JComponent> V showForm(final LayerDataObject object);
 

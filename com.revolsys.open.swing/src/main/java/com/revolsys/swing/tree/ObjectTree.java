@@ -1,6 +1,7 @@
 package com.revolsys.swing.tree;
 
 import java.awt.BorderLayout;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.IndexedPropertyChangeEvent;
@@ -13,7 +14,7 @@ import java.util.List;
 import javax.swing.DropMode;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.TransferHandler;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
@@ -63,7 +64,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
     addMouseListener(this);
   }
-
 
   @Override
   public String convertValueToText(final Object value, final boolean selected,
@@ -161,6 +161,14 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
   private void popup(final ObjectTreeModel model, final MouseEvent e) {
     if (menuEnabled) {
+      final Window window = SwingUtilities.windowForComponent(this);
+      if (window != null) {
+        if (window.isAlwaysOnTop()) {
+          window.setAlwaysOnTop(true);
+          window.setAlwaysOnTop(false);
+        }
+        window.toFront();
+      }
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = ObjectTree.this.getPathForLocation(x, y);

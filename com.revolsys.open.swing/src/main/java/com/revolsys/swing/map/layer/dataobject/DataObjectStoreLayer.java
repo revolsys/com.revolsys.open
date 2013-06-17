@@ -228,22 +228,21 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     "rawtypes", "unchecked"
   })
   @Override
-  public List<LayerDataObject> getDataObjects(BoundingBox boundingBox) {
+  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else if (sync == null) {
       return Collections.emptyList();
     } else {
       synchronized (sync) {
-        boundingBox = new BoundingBox(boundingBox);
-        boundingBox.expandPercent(0.2);
+        final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
         if (!this.boundingBox.contains(boundingBox)
-          && !loadingBoundingBox.contains(boundingBox)) {
+          && !this.loadingBoundingBox.contains(boundingBox)) {
           if (loadingWorker != null) {
             loadingWorker.cancel(true);
           }
-          loadingBoundingBox = boundingBox;
-          loadingWorker = createLoadingWorker(boundingBox);
+          this.loadingBoundingBox = loadBoundingBox;
+          loadingWorker = createLoadingWorker(loadBoundingBox);
           SwingWorkerManager.execute(loadingWorker);
         }
       }
@@ -493,6 +492,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         writer.write(object);
       } else if (super.isModified(object)) {
         removeModifiedObject(object);
+        writer.write(object);
+      } else if (isNew(object)) {
+        removeNewObject(object);
         writer.write(object);
       }
     } finally {

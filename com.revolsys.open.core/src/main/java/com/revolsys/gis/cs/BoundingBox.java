@@ -341,6 +341,11 @@ public class BoundingBox extends Envelope implements Cloneable {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
+  public BoundingBox(final Point p1, final Point p2) {
+    this(GeometryFactory.getFactory(p1), CoordinatesUtil.get(p1),
+      CoordinatesUtil.get(p2));
+  }
+
   public BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -517,6 +522,14 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public Point getBottomRightPoint() {
     return getGeometryFactory().createPoint(getMaxX(), getMinY());
+  }
+
+  public Coordinates getCentre() {
+    return new DoubleCoordinates(getCentreX(), getCentreY());
+  }
+
+  public Point getCentrePoint() {
+    return geometryFactory.createPoint(getCentre());
   }
 
   public double getCentreX() {

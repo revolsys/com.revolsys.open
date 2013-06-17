@@ -100,9 +100,8 @@ public class DataStoreQueryListModel implements ListModel {
         if (whereCondition instanceof BinaryCondition) {
           final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
           if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
-            final String likeString = searchParam.toUpperCase().replaceAll(
-              "[^A-Z0-9 ]", "%")
-              + "%";
+            final String likeString = "%"
+              + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
             Conditions.setValue(0, binaryCondition, likeString);
           } else {
             Conditions.setValue(0, binaryCondition, searchParam);

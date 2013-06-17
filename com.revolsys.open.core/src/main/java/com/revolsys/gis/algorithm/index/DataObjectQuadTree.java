@@ -16,7 +16,6 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.visitor.CreateListVisitor;
-import com.revolsys.visitor.DelegatingVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -85,17 +84,17 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     return queryEnvelope(geometry);
   }
 
+  public DataObject queryFirst(final DataObject object,
+    final Filter<DataObject> filter) {
+    final Geometry geometry = object.getGeometryValue();
+    return queryFirst(geometry, filter);
+  }
+
   public DataObject queryFirstEquals(final DataObject object,
     final Collection<String> excludedAttributes) {
     final DataObjectEqualsFilter filter = new DataObjectEqualsFilter(object,
       excludedAttributes);
     return queryFirst(object, filter);
-  }
-
-  public DataObject queryFirst(final DataObject object,
-    final Filter<DataObject> filter) {
-    final Geometry geometry = object.getGeometryValue();
-    return queryFirst(geometry, filter);
   }
 
   public List<DataObject> queryIntersects(final Geometry geometry) {
@@ -117,10 +116,9 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
 
   public List<DataObject> queryList(final Envelope envelope,
     final Filter<DataObject> filter, final Comparator<DataObject> comparator) {
-    final CreateListVisitor<DataObject> listVisitor = new CreateListVisitor<DataObject>();
-    final Visitor<DataObject> filterVisitor = new DelegatingVisitor<DataObject>(
-      filter, listVisitor);
-    query(envelope, filterVisitor);
+    final CreateListVisitor<DataObject> listVisitor = new CreateListVisitor<DataObject>(
+      filter);
+    query(envelope, listVisitor);
     final List<DataObject> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

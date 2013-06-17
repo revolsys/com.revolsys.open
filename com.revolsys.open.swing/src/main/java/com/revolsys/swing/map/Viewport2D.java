@@ -2,6 +2,7 @@ package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
@@ -19,8 +20,10 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.swing.map.layer.Project;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class Viewport2D {
@@ -152,6 +155,21 @@ public class Viewport2D {
     return boundingBox;
   }
 
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
+    final int x, final int y, final int pixels) {
+    final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
+    final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
+    final BoundingBox boundingBox = new BoundingBox(p1, p2);
+    return boundingBox;
+  }
+
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
+    final MouseEvent event, final int pixels) {
+    final int x = event.getX();
+    final int y = event.getY();
+    return getBoundingBox(geometryFactory, x, y, pixels);
+  }
+
   /**
    * Get the coordinate system the project is displayed in.
    * 
@@ -203,6 +221,35 @@ public class Viewport2D {
    */
   protected PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
+  }
+
+  public <V extends Geometry> V getRoundedGeometry(final V geometry) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+
+      final GeometryFactory roundedGeometryFactory = getRoundedGeometryFactory(geometryFactory);
+      if (geometryFactory == roundedGeometryFactory) {
+        return geometry;
+      } else {
+        return geometryFactory.copy(geometry);
+      }
+    }
+  }
+
+  public GeometryFactory getRoundedGeometryFactory(
+    GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final double resolution = getMetresPerPixel();
+      if (resolution > 2) {
+        final int srid = geometryFactory.getSRID();
+        final int numAxis = geometryFactory.getNumAxis();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, 1, 1);
+      }
+    }
+    return geometryFactory;
   }
 
   public double getScale() {
@@ -426,13 +473,34 @@ public class Viewport2D {
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     final Point point = this.geometryFactory.createPoint(coordinates);
-    return (Point)geometryFactory.createGeometry(point);
+    return geometryFactory.copy(point);
+  }
+
+  public Point toModelPoint(final GeometryFactory geometryFactory,
+    final java.awt.Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return toModelPoint(geometryFactory, x, y);
+  }
+
+  public Point toModelPoint(final GeometryFactory geometryFactory,
+    final MouseEvent event) {
+    final java.awt.Point eventPoint = event.getPoint();
+    return toModelPoint(geometryFactory, eventPoint);
   }
 
   public Point toModelPoint(final java.awt.Point point) {
     final double x = point.getX();
     final double y = point.getY();
     return toModelPoint(x, y);
+  }
+
+  public Point toModelPointRounded(GeometryFactory geometryFactory,
+    final java.awt.Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    geometryFactory = getRoundedGeometryFactory(geometryFactory);
+    return toModelPoint(geometryFactory, x, y);
   }
 
   public double[] toViewCoordinates(final double... modelCoordinates) {

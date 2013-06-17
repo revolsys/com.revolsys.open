@@ -34,7 +34,12 @@ public class LoggingEventPanel extends JPanel {
 
   public static void showDialog(final Component component,
     final LoggingEvent event) {
-    final Window window = SwingUtilities.getWindowAncestor(component);
+    final Window window;
+    if (component == null) {
+      window = SwingUtil.getActiveWindow();
+    } else {
+      window = SwingUtilities.getWindowAncestor(component);
+    }
     final JDialog dialog = new JDialog(window, "Application Log Details",
       ModalityType.APPLICATION_MODAL);
     dialog.setLayout(new BorderLayout());
