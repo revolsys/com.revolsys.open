@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
@@ -532,9 +533,15 @@ public final class LineStringUtil {
     return z;
   }
 
-  public static Coordinates getFromPoint(final LineString line) {
+  public static Coordinates getFromCoordinates(final LineString line) {
     final int i = 0;
     return getPoint(line, i);
+  }
+
+  public static Point getFromPoint(final LineString line) {
+    final Coordinates coordinates = getFromCoordinates(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    return geometryFactory.createPoint(coordinates);
   }
 
   public static double getLength(final MultiLineString lines) {
@@ -568,9 +575,15 @@ public final class LineStringUtil {
     return points.get(i);
   }
 
-  public static Coordinates getToPoint(final LineString line) {
+  public static Coordinates getToCoordinates(final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return points.get(points.size() - 1);
+  }
+
+  public static Point getToPoint(final LineString line) {
+    final Coordinates coordinates = getToCoordinates(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    return geometryFactory.createPoint(coordinates);
   }
 
   public static boolean hasEqualExact2d(final List<LineString> lines,
@@ -810,11 +823,11 @@ public final class LineStringUtil {
 
   public static boolean isEndsWithinDistance(final LineString line,
     final Coordinates point, final double maxDistance) {
-    final Coordinates fromPoint = getFromPoint(line);
+    final Coordinates fromPoint = getFromCoordinates(line);
     if (fromPoint.distance(point) < maxDistance) {
       return true;
     } else {
-      final Coordinates toPoint = getToPoint(line);
+      final Coordinates toPoint = getToCoordinates(line);
       if (toPoint.distance(point) < maxDistance) {
         return true;
       } else {
@@ -825,11 +838,11 @@ public final class LineStringUtil {
 
   public static boolean isEndsWithinDistance(final LineString line1,
     final LineString line2, final double maxDistance) {
-    final Coordinates fromPoint = getFromPoint(line1);
+    final Coordinates fromPoint = getFromCoordinates(line1);
     if (isEndsWithinDistance(line2, fromPoint, maxDistance)) {
       return true;
     } else {
-      final Coordinates toPoint = getToPoint(line1);
+      final Coordinates toPoint = getToCoordinates(line1);
       if (isEndsWithinDistance(line2, toPoint, maxDistance)) {
         return true;
       } else {
@@ -840,9 +853,9 @@ public final class LineStringUtil {
 
   public static boolean isEndsWithinDistanceOfEnds(final LineString line1,
     final LineString line2, final double maxDistance) {
-    final Coordinates fromPoint = getFromPoint(line1);
+    final Coordinates fromPoint = getFromCoordinates(line1);
     if (isWithinDistanceOfEnds(fromPoint, line2, maxDistance)) {
-      final Coordinates toPoint = getToPoint(line1);
+      final Coordinates toPoint = getToCoordinates(line1);
       return isWithinDistanceOfEnds(toPoint, line2, maxDistance);
     } else {
       return false;
@@ -851,7 +864,7 @@ public final class LineStringUtil {
 
   public static boolean isFirstPoint(final LineString line,
     final Coordinates point) {
-    final Coordinates fromPoint = getFromPoint(line);
+    final Coordinates fromPoint = getFromCoordinates(line);
     return fromPoint.equals(point);
   }
 
@@ -924,7 +937,7 @@ public final class LineStringUtil {
   }
 
   public static boolean isToPoint(final LineString line, final Coordinates point) {
-    final Coordinates toPoint = getToPoint(line);
+    final Coordinates toPoint = getToCoordinates(line);
     return toPoint.equals(point);
   }
 

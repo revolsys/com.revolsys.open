@@ -16,6 +16,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -37,6 +38,7 @@ import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.MethodRunnable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -44,6 +46,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
@@ -56,6 +59,7 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PreferencesUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -360,6 +364,11 @@ public class SwingUtil {
     }
   }
 
+  public static void invokeLater(final Object object, final String methodName,
+    final Object... parameters) {
+    InvokeMethodRunnable.invokeLater(object, methodName, parameters);
+  }
+
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
@@ -374,44 +383,56 @@ public class SwingUtil {
   }
 
   public static void setFieldValue(final JComponent field, final Object value) {
-    if (field instanceof Field) {
-      final Field fieldObject = (Field)field;
-      fieldObject.setFieldValue(value);
-    } else if (field instanceof JLabel) {
-      final JLabel label = (JLabel)field;
-      String string;
-      if (value == null) {
-        string = "";
-      } else {
-        string = StringConverterRegistry.toString(value);
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (field instanceof Field) {
+        final Field fieldObject = (Field)field;
+        fieldObject.setFieldValue(value);
+      } else if (field instanceof JLabel) {
+        final JLabel label = (JLabel)field;
+        String string;
+        if (value == null) {
+          string = "";
+        } else {
+          string = StringConverterRegistry.toString(value);
+        }
+        label.setText(string);
+      } else if (field instanceof JTextField) {
+        final JTextField textField = (JTextField)field;
+        String string;
+        if (value == null) {
+          string = "";
+        } else {
+          string = StringConverterRegistry.toString(value);
+        }
+        textField.setText(string);
+      } else if (field instanceof JTextArea) {
+        final JTextArea textField = (JTextArea)field;
+        String string;
+        if (value == null) {
+          string = "";
+        } else {
+          string = StringConverterRegistry.toString(value);
+        }
+        textField.setText(string);
       }
-      label.setText(string);
-    } else if (field instanceof JTextField) {
-      final JTextField textField = (JTextField)field;
-      String string;
-      if (value == null) {
-        string = "";
-      } else {
-        string = StringConverterRegistry.toString(value);
+      final Container parent = field.getParent();
+      if (parent != null) {
+        final LayoutManager layout = parent.getLayout();
+        if (layout != null) {
+          layout.layoutContainer(parent);
+        }
+        field.revalidate();
       }
-      textField.setText(string);
-    } else if (field instanceof JTextArea) {
-      final JTextArea textField = (JTextArea)field;
-      String string;
-      if (value == null) {
-        string = "";
-      } else {
-        string = StringConverterRegistry.toString(value);
+    } else {
+      try {
+        final Method method = SwingUtil.class.getMethod("setFieldValue",
+          JComponent.class, Object.class);
+        final MethodRunnable runnable = new MethodRunnable(method,
+          SwingUtil.class, field, value);
+        SwingUtilities.invokeLater(runnable);
+      } catch (final Throwable t) {
+        ExceptionUtil.throwUncheckedException(t);
       }
-      textField.setText(string);
-    }
-    final Container parent = field.getParent();
-    if (parent != null) {
-      final LayoutManager layout = parent.getLayout();
-      if (layout != null) {
-        layout.layoutContainer(parent);
-      }
-      field.revalidate();
     }
   }
 

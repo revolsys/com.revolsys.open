@@ -57,7 +57,7 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     }
   }
 
-  public DataObjectStoreLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return layer;
   }
 

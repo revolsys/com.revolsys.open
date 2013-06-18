@@ -16,7 +16,7 @@ import com.kitfox.svg.SVGUniverse;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 
-public class SvgMarker extends  AbstractMarker {
+public class SvgMarker extends AbstractMarker {
 
   private String name;
 
@@ -38,10 +38,10 @@ public class SvgMarker extends  AbstractMarker {
     final double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
-    final Measure<Length> markerWidth = style.getMarkerWidth();
-    final double mapWidth = Viewport2D.toDisplayValue(viewport,markerWidth);
-    final Measure<Length> markerHeight = style.getMarkerHeight();
-    final double mapHeight = Viewport2D.toDisplayValue(viewport,markerHeight);
+    final Measure<Length> markerWidth = style.getMarkerWidthMeasure();
+    final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
+    final Measure<Length> markerHeight = style.getMarkerHeightMeasure();
+    final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
 
     graphics.translate(modelX, modelY);
     if (orientation != 0) {
@@ -50,8 +50,8 @@ public class SvgMarker extends  AbstractMarker {
 
     final Measure<Length> deltaX = style.getMarkerDeltaX();
     final Measure<Length> deltaY = style.getMarkerDeltaY();
-    double dx = Viewport2D.toDisplayValue(viewport,deltaX);
-    double dy = Viewport2D.toDisplayValue(viewport,deltaY);
+    double dx = Viewport2D.toDisplayValue(viewport, deltaX);
+    double dy = Viewport2D.toDisplayValue(viewport, deltaY);
 
     final String verticalAlignment = style.getMarkerVerticalAlignment();
     if ("top".equals(verticalAlignment)) {

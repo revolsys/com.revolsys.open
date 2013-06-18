@@ -56,7 +56,7 @@ public interface DataObjectLayer extends Layer {
 
   List<LayerDataObject> getObjects();
 
-  List<LayerDataObject> getObjects(Geometry geometry, double distance);
+  List<LayerDataObject> query(Geometry geometry, double distance);
 
   Query getQuery();
 

@@ -39,43 +39,29 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.ecsv.EcsvConstants;
 import com.revolsys.io.ecsv.EcsvIoFactory;
 import com.revolsys.spring.InputStreamResource;
-import com.vividsolutions.jts.geom.Geometry;
 
 public class EcsvDataObjectStore extends AbstractDataObjectStore {
   public static final EcsvDataObjectStore create(final URI uri) {
     return new EcsvDataObjectStore(uri, new ArrayDataObjectFactory());
   }
 
-  public Writer<DataObject> createWriter() {
-    return null;
-  }
-
-  public static final EcsvDataObjectStore create(
-    final URI uri,
+  public static final EcsvDataObjectStore create(final URI uri,
     final DataObjectFactory factory) {
     return new EcsvDataObjectStore(uri, factory);
   }
 
-  public static final EcsvDataObjectStore create(
-    final URI uri,
-    final String username,
-    final String password) {
+  public static final EcsvDataObjectStore create(final URI uri,
+    final String username, final String password) {
     final ArrayDataObjectFactory factory = new ArrayDataObjectFactory();
     return new EcsvDataObjectStore(uri, username, password, factory);
   }
 
-  public static final EcsvDataObjectStore create(
-    final URI uri,
-    final String username,
-    final String password,
+  public static final EcsvDataObjectStore create(final URI uri,
+    final String username, final String password,
     final DataObjectFactory factory) {
     return new EcsvDataObjectStore(uri, username, password, factory);
   }
 
-  @Override
-  public int getRowCount(Query query) {
-    throw new UnsupportedOperationException();
-  }
   private final Map<String, String> namespacePaths = new HashMap<String, String>();
 
   private final String password;
@@ -105,8 +91,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
 
   }
 
-  protected DataObjectReader createReader(
-    final String path,
+  protected DataObjectReader createReader(final String path,
     final Map<String, String> parameters) {
 
     final HttpClient client = new HttpClient();
@@ -141,10 +126,10 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     try {
       final int statusCode = client.executeMethod(method);
       if (statusCode == HttpStatus.SC_OK) {
-        String fileName = FileUtil.getFileName(path);
+        final String fileName = FileUtil.getFileName(path);
         final InputStream in = method.getResponseBodyAsStream();
-        return (DataObjectReader)ioFactory.createDataObjectReader(
-          new InputStreamResource(fileName, in), getDataObjectFactory());
+        return ioFactory.createDataObjectReader(new InputStreamResource(
+          fileName, in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "
           + statusCode);
@@ -158,6 +143,11 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
+  @Override
+  public Writer<DataObject> createWriter() {
+    return null;
+  }
+
   private String getPath(final String namespaceUri) {
     String path = namespacePaths.get(namespaceUri);
     if (path == null) {
@@ -168,6 +158,11 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
       }
     }
     return path;
+  }
+
+  @Override
+  public int getRowCount(final Query query) {
+    throw new UnsupportedOperationException();
   }
 
   // TODO move to load loadSchemaDataObjectMetaData
@@ -187,11 +182,11 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    Map<String, DataObjectMetaData> metaDataMap) {
+    final Map<String, DataObjectMetaData> metaDataMap) {
   }
 
   @Override
-  protected void loadSchemas(Map<String, DataObjectStoreSchema> schemaMap) {
+  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
     final Reader<DataObject> reader = createReader("");
     if (reader != null) {
       for (final DataObject object : reader) {
@@ -218,15 +213,9 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return typePaths;
   }
 
-  public Reader<DataObject> query(final String typePath) {
-    final String path = getPath(PathUtil.getPath(typePath)) + "/"
-      + PathUtil.getName(typePath);
-    return createReader(path);
-  }
-
-  public Reader<DataObject> query(
-    final String typePath,
-    final BoundingBox envelope) {
+  @Override
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, final BoundingBox envelope) {
     final String path = getPath(PathUtil.getPath(typePath)) + "/"
       + PathUtil.getName(typePath);
     final Map<String, String> parameters = new HashMap<String, String>();
@@ -238,8 +227,10 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return createReader(path, parameters);
   }
 
-  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
-    final BoundingBox boundingBox = new BoundingBox(geometry);
-    return query(typePath, boundingBox);
+  @Override
+  public Reader<DataObject> query(final String typePath) {
+    final String path = getPath(PathUtil.getPath(typePath)) + "/"
+      + PathUtil.getName(typePath);
+    return createReader(path);
   }
 }

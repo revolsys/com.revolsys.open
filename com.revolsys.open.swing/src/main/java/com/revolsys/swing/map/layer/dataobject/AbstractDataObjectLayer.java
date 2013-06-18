@@ -72,6 +72,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer, DataObjectFactory, AddGeometryCompleteAction {
 
+  public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
     menu.addGroup(0, "table");
@@ -109,33 +111,31 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   }
 
-  private DataObjectMetaData metaData;
-
-  private Set<LayerDataObject> selectedObjects = new LinkedHashSet<LayerDataObject>();
-
-  private Set<LayerDataObject> editingObjects = new LinkedHashSet<LayerDataObject>();
-
-  private Set<LayerDataObject> deletedObjects = new LinkedHashSet<LayerDataObject>();
-
-  private Set<LayerDataObject> newObjects = new LinkedHashSet<LayerDataObject>();
-
-  private Set<LayerDataObject> modifiedObjects = new LinkedHashSet<LayerDataObject>();
+  private BoundingBox boundingBox = new BoundingBox();
 
   private boolean canAddObjects = true;
 
-  private boolean canEditObjects = true;
-
   private boolean canDeleteObjects = true;
 
-  private BoundingBox boundingBox = new BoundingBox();
+  private boolean canEditObjects = true;
 
-  protected Query query;
+  private Set<LayerDataObject> deletedObjects = new LinkedHashSet<LayerDataObject>();
+
+  private Set<LayerDataObject> editingObjects = new LinkedHashSet<LayerDataObject>();
 
   private final Object editSync = new Object();
 
-  public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
-
   private Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
+
+  private DataObjectMetaData metaData;
+
+  private Set<LayerDataObject> modifiedObjects = new LinkedHashSet<LayerDataObject>();
+
+  private Set<LayerDataObject> newObjects = new LinkedHashSet<LayerDataObject>();
+
+  protected Query query;
+
+  private Set<LayerDataObject> selectedObjects = new LinkedHashSet<LayerDataObject>();
 
   public AbstractDataObjectLayer() {
     this("");
@@ -172,7 +172,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void addEditingObject(final LayerDataObject object) {
     editingObjects.add(object);
-    refresh();
+    fireObjectsChanged();
   }
 
   protected void addModifiedObject(final LayerDataObject object) {
@@ -237,7 +237,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearEditingObjects() {
     this.editingObjects.clear();
-    refresh();
+    firePropertyChange("editingObjectsChanged", false, true);
   }
 
   @Override
@@ -358,7 +358,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         deleteObject(object);
       }
     }
-    refresh();
+    fireObjectsChanged();
   }
 
   @Override
@@ -429,6 +429,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new LinkedHashSet<LayerDataObject>(editingObjects);
   }
 
+  public String getGeometryAttributeName() {
+    return getMetaData().getGeometryAttributeName();
+  }
+
   @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
@@ -472,12 +476,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public List<LayerDataObject> getObjects() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public List<LayerDataObject> getObjects(final Geometry geometry,
-    final double distance) {
     throw new UnsupportedOperationException();
   }
 
@@ -640,6 +638,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public List<LayerDataObject> query(final Geometry geometry,
+    final double distance) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public List<LayerDataObject> query(final Query query) {
     throw new UnsupportedOperationException("Query not currently supported");
   }
@@ -755,7 +759,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     for (final LayerDataObject object : editingObjects) {
       addEditingObject(object);
     }
-    refresh();
+    firePropertyChange("editingObjectsChanged", false, true);
   }
 
   @Override
@@ -838,7 +842,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
-    final List<LayerDataObject> objects = getObjects(geometry, distance);
+    final List<LayerDataObject> objects = query(geometry, distance);
     if (selected) {
       selectedObjects.addAll(objects);
     } else {

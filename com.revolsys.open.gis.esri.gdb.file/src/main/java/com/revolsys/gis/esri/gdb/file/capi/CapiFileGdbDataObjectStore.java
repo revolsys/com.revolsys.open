@@ -32,6 +32,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -1037,30 +1038,25 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public synchronized EnumRows query(final String sql, final boolean recycling) {
-    return geodatabase.query(sql, recycling);
-  }
-
   @Override
-  public synchronized Reader<DataObject> query(final String typePath,
+  public synchronized Reader<DataObject> query(
+    final DataObjectFactory dataObjectFactory, final String typePath,
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       throw new IllegalArgumentException("Cannot find table " + typePath);
     } else {
       final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        typePath, boundingBox);
+        dataObjectFactory, typePath, boundingBox);
+
       final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
         iterator);
       return reader;
     }
   }
 
-  @Override
-  public synchronized Reader<DataObject> query(final String typePath,
-    final Geometry geometry) {
-    final BoundingBox boundingBox = new BoundingBox(geometry);
-    return query(typePath, boundingBox);
+  public synchronized EnumRows query(final String sql, final boolean recycling) {
+    return geodatabase.query(sql, recycling);
   }
 
   public synchronized EnumRows search(final Table table, final String fields,

@@ -187,11 +187,12 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox(final Coordinates point) {
-    this(null, point.getX(), point.getY());
+    this(GeometryFactory.getFactory(), point.getX(), point.getY());
   }
 
   public BoundingBox(final Coordinates point1, final Coordinates point2) {
-    this(null, point1.getX(), point1.getY(), point2.getX(), point2.getY());
+    this(GeometryFactory.getFactory(), point1.getX(), point1.getY(),
+      point2.getX(), point2.getY());
   }
 
   public BoundingBox(final double x, final double y) {

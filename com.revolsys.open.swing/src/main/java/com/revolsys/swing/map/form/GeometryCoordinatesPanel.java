@@ -38,9 +38,13 @@ public class GeometryCoordinatesPanel extends ValueField implements
     return table;
   }
 
-  public void setGeometry(final Object geometry) {
-    setFieldValue(geometry);
-    model.setGeometry((Geometry)geometry);
+  @Override
+  public void setFieldValue(final Object value) {
+    if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      model.setGeometry(geometry);
+    }
+    super.setFieldValue(value);
   }
 
   @Override

@@ -111,19 +111,23 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   ResultPager<DataObject> page(Query query);
 
+  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
+    String typePath, Geometry geometry);
+
+  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
+    String typePath, Geometry geometry, double distance);
+
   Reader<DataObject> query(List<Query> queries);
 
   Reader<DataObject> query(Query... queries);
 
   Reader<DataObject> query(String typePath);
 
-  Reader<DataObject> query(String typePath, BoundingBox boundingBox);
-
-  Reader<DataObject> query(String typePath, Geometry geometry);
+  Reader<DataObject> query(DataObjectFactory dataObjectFactory, String typePath, BoundingBox boundingBox);
 
   DataObject queryFirst(Query query);
 
-  void setDataObjectFactory(DataObjectFactory featureDataObjectFactory);
+  void setDataObjectFactory(DataObjectFactory dataObjectFactory);
 
   void setLabel(String label);
 

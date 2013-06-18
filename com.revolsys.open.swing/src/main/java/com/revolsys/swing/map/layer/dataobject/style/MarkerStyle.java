@@ -50,21 +50,6 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
-  @Override
-  public MarkerStyle clone() {
-    try {
-      return (MarkerStyle)super.clone();
-    } catch (CloneNotSupportedException e) {
-      return null;
-    }
-  }
-
-  public static MarkerStyle marker(final Shape shape, final double markerSize,
-    final Color lineColor, final double lineWidth, final Color fillColor) {
-    final AbstractMarker marker = new ShapeMarker(shape);
-    return marker(marker, markerSize, lineColor, fillColor);
-  }
-
   protected static MarkerStyle marker(final AbstractMarker marker,
     final double markerSize, final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
@@ -76,6 +61,12 @@ public class MarkerStyle implements Cloneable {
     style.setMarkerVerticalAlignment("middle");
     style.setMarkerFill(fillColor);
     return style;
+  }
+
+  public static MarkerStyle marker(final Shape shape, final double markerSize,
+    final Color lineColor, final double lineWidth, final Color fillColor) {
+    final AbstractMarker marker = new ShapeMarker(shape);
+    return marker(marker, markerSize, lineColor, fillColor);
   }
 
   public static MarkerStyle marker(final String markerName,
@@ -144,6 +135,15 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
+  @Override
+  public MarkerStyle clone() {
+    try {
+      return (MarkerStyle)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
+
   public Marker getMarker() {
     return marker;
   }
@@ -168,7 +168,11 @@ public class MarkerStyle implements Cloneable {
     return markerFillOpacity;
   }
 
-  public Measure<Length> getMarkerHeight() {
+  public double getMarkerHeight() {
+    return markerHeight.doubleValue(NonSI.PIXEL);
+  }
+
+  public Measure<Length> getMarkerHeightMeasure() {
     return markerHeight;
   }
 
@@ -216,7 +220,11 @@ public class MarkerStyle implements Cloneable {
     return markerVerticalAlignment;
   }
 
-  public Measure<Length> getMarkerWidth() {
+  public double getMarkerWidth() {
+    return markerWidth.doubleValue(NonSI.PIXEL);
+  }
+
+  public Measure<Length> getMarkerWidthMeasure() {
     return markerWidth;
   }
 
@@ -305,10 +313,10 @@ public class MarkerStyle implements Cloneable {
   }
 
   public void setMarkerHeight(final double markerHeight) {
-    setMarkerHeight(Measure.valueOf(markerHeight, NonSI.PIXEL));
+    setMarkerHeightMeasure(Measure.valueOf(markerHeight, NonSI.PIXEL));
   }
 
-  public void setMarkerHeight(final Measure<Length> markerHeight) {
+  public void setMarkerHeightMeasure(final Measure<Length> markerHeight) {
     this.markerHeight = getWithDefault(markerHeight, TEN_PIXELS);
   }
 
@@ -363,8 +371,9 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
-  public void setMarkerLineWidth(double markerLineWidth) {
-    Measure<Length> measure = Measure.valueOf(markerLineWidth, NonSI.PIXEL);
+  public void setMarkerLineWidth(final double markerLineWidth) {
+    final Measure<Length> measure = Measure.valueOf(markerLineWidth,
+      NonSI.PIXEL);
     setMarkerLineWidthMeasure(measure);
   }
 
@@ -416,10 +425,10 @@ public class MarkerStyle implements Cloneable {
   }
 
   public void setMarkerWidth(final double markerWidth) {
-    setMarkerWidth(Measure.valueOf(markerWidth, NonSI.PIXEL));
+    setMarkerWidthMeasure(Measure.valueOf(markerWidth, NonSI.PIXEL));
   }
 
-  public void setMarkerWidth(final Measure<Length> markerWidth) {
+  public void setMarkerWidthMeasure(final Measure<Length> markerWidth) {
     this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
   }
 

@@ -299,6 +299,11 @@ public class LineSegment extends AbstractCoordinatesList {
     return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
   }
 
+  public Point getPoint(final int i) {
+    final Coordinates coordinates = get(i);
+    return geometryFactory.createPoint(coordinates);
+  }
+
   @Override
   public double getValue(final int index, final int axisIndex) {
     switch (index) {
@@ -426,7 +431,7 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates project(final Coordinates p) {
-    double projectionFactor = projectionFactor(p);
+    final double projectionFactor = projectionFactor(p);
     return LineSegmentUtil.project(coordinates1, coordinates2, projectionFactor);
   }
 

@@ -687,8 +687,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public DataObjectStoreQueryReader query(final String typePath,
-    final BoundingBox boundingBox) {
+  public DataObjectStoreQueryReader query(DataObjectFactory dataObjectFactory,
+    final String typePath, final BoundingBox boundingBox) {
 
     final Query query = new Query(typePath);
     query.setBoundingBox(boundingBox);
@@ -698,7 +698,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Reader<DataObject> query(final String typePath, Geometry geometry) {
+  public Reader<DataObject> query(DataObjectFactory dataObjectFactory, final String typePath, Geometry geometry) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);

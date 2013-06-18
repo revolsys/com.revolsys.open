@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
@@ -281,10 +282,12 @@ public final class JdbcUtils {
 
     String sql = query.getSql();
     final Map<String, Boolean> orderBy = query.getOrderBy();
-    final DataObjectMetaData metaData = query.getMetaData();
+    DataObjectMetaData metaData = query.getMetaData();
     if (sql == null) {
       if (metaData == null) {
-        throw new IllegalArgumentException("Unknown table name " + tableName);
+        metaData = new DataObjectMetaDataImpl(tableName);
+        // throw new IllegalArgumentException("Unknown table name " +
+        // tableName);
       }
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());

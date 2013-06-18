@@ -24,6 +24,7 @@ import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -38,6 +39,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
+    menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
+      null, "refresh"));
     menu.addMenuItemTitleIcon("layer", "Delete Layer", "delete",
       LayerUtil.class, "deleteLayer");
     menu.addMenuItemTitleIcon("layer", "Layer Properties", "information",

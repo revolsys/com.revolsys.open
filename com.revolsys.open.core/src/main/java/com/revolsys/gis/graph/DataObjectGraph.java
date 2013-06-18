@@ -32,6 +32,10 @@ public class DataObjectGraph extends Graph<DataObject> {
     super(false);
   }
 
+  public DataObjectGraph(final Collection<DataObject> objects) {
+    addEdges(objects);
+  }
+
   public Edge<DataObject> addEdge(final DataObject object) {
     final LineString line = object.getGeometryValue();
     return addEdge(object, line);
@@ -103,8 +107,8 @@ public class DataObjectGraph extends Graph<DataObject> {
 
   public boolean hasEdge(final DataObject object) {
     final LineString line = object.getGeometryValue();
-    final Coordinates fromPoint = LineStringUtil.getFromPoint(line);
-    final Coordinates toPoint = LineStringUtil.getToPoint(line);
+    final Coordinates fromPoint = LineStringUtil.getFromCoordinates(line);
+    final Coordinates toPoint = LineStringUtil.getToCoordinates(line);
     final Node<DataObject> fromNode = findNode(fromPoint);
     final Node<DataObject> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {

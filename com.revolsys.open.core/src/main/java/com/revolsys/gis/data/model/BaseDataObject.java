@@ -19,6 +19,7 @@ import java.util.Set;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -249,7 +250,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
         throw new RuntimeException("Unable to read clob", e);
       }
     } else {
-      return value.toString();
+      return StringConverterRegistry.toString(value);
     }
   }
 

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -20,7 +19,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
@@ -255,8 +254,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model != null) {
       model.initialize(node);
-      SwingUtilities.invokeLater(new InvokeMethodRunnable(this,
-        "setNodeInitialized", path, node));
+      SwingUtil.invokeLater(this, "setNodeInitialized", path, node);
     }
   }
 

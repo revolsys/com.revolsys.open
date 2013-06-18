@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.dataobject;
 
+import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -37,7 +39,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private BoundingBox boundingBox = new BoundingBox();
 
-  private Map<Object, LayerDataObject> cachedObjects = new HashMap<Object, LayerDataObject>();
+  private final Map<String, LayerDataObject> cachedObjects = new HashMap<String, LayerDataObject>();
 
   private DataObjectStore dataStore;
 
@@ -97,6 +99,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  protected void cacheObjects(final Collection<? extends DataObject> objects) {
+    for (final DataObject object : objects) {
+      if (object instanceof LayerDataObject) {
+        final LayerDataObject layerDataObject = (LayerDataObject)object;
+        getCacheObject(layerDataObject);
+      }
+    }
+  }
+
   /**
    * Remove any cached objects that are currently not used.
    */
@@ -106,6 +117,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       objects.addAll(getSelectedObjects());
       objects.addAll(getEditingObjects());
       objects.addAll(getModifiedObjects());
+      objects.addAll(index.queryAll());
       cachedObjects.values().retainAll(objects);
     }
   }
@@ -154,7 +166,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.sync = null;
     this.beanPropertyListener = null;
     this.boundingBox = null;
-    this.cachedObjects = null;
+    this.cachedObjects.clear();
     this.dataStore = null;
     this.index = null;
     this.loadingBoundingBox = null;
@@ -178,16 +190,33 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return getCoordinateSystem().getAreaBoundingBox();
   }
 
+  protected List<LayerDataObject> getCachedObjects(
+    final List<LayerDataObject> readObjects) {
+    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+    for (final LayerDataObject object : readObjects) {
+      final String id = StringConverterRegistry.toString(object.getIdValue());
+      synchronized (cachedObjects) {
+        final LayerDataObject cachedObject = cachedObjects.get(id);
+        if (cachedObject == null) {
+          objects.add(object);
+        } else {
+          objects.add(cachedObject);
+        }
+      }
+    }
+    return objects;
+  }
+
   protected LayerDataObject getCacheObject(final LayerDataObject object) {
     if (object == null) {
       return null;
     } else {
-      final Object idValue = object.getIdValue();
-      return getCacheObject(idValue, object);
+      final String id = StringConverterRegistry.toString(object.getIdValue());
+      return getCacheObject(id, object);
     }
   }
 
-  protected LayerDataObject getCacheObject(final Object id) {
+  protected LayerDataObject getCacheObject(final String id) {
     synchronized (cachedObjects) {
       if (id == null) {
         return null;
@@ -204,7 +233,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  private LayerDataObject getCacheObject(final Object id,
+  private LayerDataObject getCacheObject(final String id,
     final LayerDataObject object) {
     if (object != null && isLayerObject(object)) {
       if (object.getState() == DataObjectState.New) {
@@ -322,7 +351,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected List<LayerDataObject> getObjectsFromDataStore(
     final BoundingBox boundingBox) {
     List<LayerDataObject> queryObjects;
-    final Reader reader = dataStore.query(typePath, boundingBox);
+    final Reader reader = dataStore.query(this, typePath, boundingBox);
     try {
       queryObjects = reader.read();
     } finally {
@@ -359,6 +388,54 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return false;
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    super.propertyChange(event);
+    final Object source = event.getSource();
+    if (source instanceof LayerDataObject) {
+      final LayerDataObject dataObject = (LayerDataObject)source;
+      if (dataObject.getLayer() == this) {
+        final String geometryAttributeName = getGeometryAttributeName();
+        final String propertyName = event.getPropertyName();
+        if (propertyName.equals(geometryAttributeName)) {
+          final Geometry oldValue = (Geometry)event.getOldValue();
+          if (oldValue != null) {
+            final BoundingBox envelope = BoundingBox.getBoundingBox(dataObject);
+            index.remove(envelope, dataObject);
+          }
+          index.insert(dataObject);
+        }
+      }
+    }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  @Override
+  public List<LayerDataObject> query(final Geometry geometry,
+    final double distance) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Geometry queryGeometry = geometryFactory.copy(geometry);
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
+    boundingBox = boundingBox.expand(distance);
+    if (this.boundingBox.contains(boundingBox)) {
+      return (List)index.queryDistance(queryGeometry, distance);
+    } else {
+      final String typePath = getTypePath();
+      final DataObjectStore dataStore = getDataStore();
+      final Reader reader = dataStore.query(this, typePath, queryGeometry,
+        distance);
+      try {
+        final List<LayerDataObject> readObjects = reader.read();
+        final List<LayerDataObject> objects = getCachedObjects(readObjects);
+        return objects;
+      } finally {
+        reader.close();
+      }
+    }
+  }
+
   public List<LayerDataObject> query(final Map<String, ? extends Object> filter) {
     final DataObjectMetaData metaData = getMetaData();
     final Query query = Query.and(metaData, filter);
@@ -374,18 +451,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Reader reader = dataStore.query(query);
     try {
       final List<LayerDataObject> readObjects = reader.read();
-      final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
-      for (final LayerDataObject object : readObjects) {
-        final Object id = object.getIdValue();
-        synchronized (cachedObjects) {
-          final LayerDataObject cachedObject = cachedObjects.get(id);
-          if (cachedObject == null) {
-            objects.add(object);
-          } else {
-            objects.add(cachedObject);
-          }
-        }
-      }
+      final List<LayerDataObject> objects = getCachedObjects(readObjects);
       return objects;
     } finally {
       reader.close();
@@ -399,10 +465,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (loadingWorker != null) {
         loadingWorker.cancel(true);
       }
-
-      boundingBox = new BoundingBox();
-      loadingBoundingBox = boundingBox;
-      index = new DataObjectQuadTree();
+      this.boundingBox = new BoundingBox();
+      this.loadingBoundingBox = boundingBox;
+      this.index = new DataObjectQuadTree();
     }
     fireObjectsChanged();
   }
@@ -418,6 +483,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       synchronized (sync) {
         if (loadedBoundingBox == loadingBoundingBox) {
           this.index = index;
+          cacheObjects(index.queryAll());
           final List<LayerDataObject> newObjects = getNewObjects();
           index.insert(newObjects);
           clearLoading(loadedBoundingBox);

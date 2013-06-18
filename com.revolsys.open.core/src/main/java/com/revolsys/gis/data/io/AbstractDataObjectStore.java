@@ -21,6 +21,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -31,13 +32,16 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.FilterReader;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
@@ -489,6 +493,34 @@ public abstract class AbstractDataObjectStore extends
     final Reader<DataObject> results = query(query);
     final List<DataObject> list = results.read();
     return new ListResultPager<DataObject>(list);
+  }
+
+  @Override
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, final Geometry geometry) {
+    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    final Reader<DataObject> reader = query(dataObjectFactory, typePath,
+      boundingBox);
+    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
+      geometry);
+    return new FilterReader<DataObject>(filter, reader);
+  }
+
+  @Override
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, final Geometry geometry, final double distance) {
+    final Geometry searchGeometry;
+    if (geometry == null || geometry.isEmpty() || distance <= 0) {
+      searchGeometry = geometry;
+    } else {
+      final Geometry bufferedGeometry = geometry.buffer(distance);
+      if (bufferedGeometry.isEmpty()) {
+        searchGeometry = geometry;
+      } else {
+        searchGeometry = bufferedGeometry;
+      }
+    }
+    return query(dataObjectFactory, typePath, searchGeometry);
   }
 
   @Override

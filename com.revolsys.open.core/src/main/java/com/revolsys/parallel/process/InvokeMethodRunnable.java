@@ -95,9 +95,11 @@ public class InvokeMethodRunnable implements Runnable {
     if (object == null) {
       return methodName + parameters;
     } else if (object instanceof Class<?>) {
-      return object + "." + methodName + parameters;
+      return object + "." + methodName + "(" + Arrays.toString(parameters)
+        + ")";
     } else {
-      return object.getClass() + "." + methodName + Arrays.toString(parameters);
+      return object.getClass() + "." + methodName + "("
+        + Arrays.toString(parameters) + ")";
     }
   }
 }

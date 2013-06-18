@@ -170,12 +170,12 @@ public class ShapeMarker extends AbstractMarker {
     final double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
-    final Measure<Length> markerWidth = style.getMarkerWidth();
+    final Measure<Length> markerWidth = style.getMarkerWidthMeasure();
     final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-    final Measure<Length> markerHeight = style.getMarkerHeight();
+    final Measure<Length> markerHeight = style.getMarkerHeightMeasure();
     final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
 
-    translateMarker(viewport, graphics, style, modelX, modelY,mapWidth,
+    translateMarker(viewport, graphics, style, modelX, modelY, mapWidth,
       mapHeight, orientation);
 
     final AffineTransform shapeTransform = AffineTransform.getScaleInstance(

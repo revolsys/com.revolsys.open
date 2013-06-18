@@ -15,6 +15,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.query.Query;
@@ -185,13 +186,13 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public Reader<DataObject> query(final String typePath,
-    final BoundingBox boundingBox) {
+  public Reader<DataObject> query(DataObjectFactory dataObjectFactory,
+    final String typePath, final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
+  public Reader<DataObject> query(DataObjectFactory dataObjectFactory, final String typePath, final Geometry geometry) {
     throw new UnsupportedOperationException();
   }
 

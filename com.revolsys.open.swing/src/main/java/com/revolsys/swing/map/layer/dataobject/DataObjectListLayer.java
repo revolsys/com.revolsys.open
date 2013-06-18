@@ -204,7 +204,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public List<LayerDataObject> getObjects(Geometry geometry,
+  public List<LayerDataObject> query(Geometry geometry,
     final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
     return (List)index.queryDistance(geometry, distance);
