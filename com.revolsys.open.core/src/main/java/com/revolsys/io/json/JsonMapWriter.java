@@ -77,6 +77,10 @@ public class JsonMapWriter extends AbstractMapWriter {
     this.listRoot = listRoot;
   }
 
+  public void setSingleObject(final boolean singleObject) {
+    setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+  }
+
   @Override
   public void write(final Map<String, ? extends Object> values) {
     if (written) {

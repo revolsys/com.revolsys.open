@@ -22,7 +22,8 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
-import com.revolsys.gis.data.io.DataObjectStoreConnections;
+import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
+import com.revolsys.gis.data.store.JsonDataObjectStoreConnectionRegistry;
 import com.revolsys.io.FileSystemConnectionManager;
 import com.revolsys.io.FileUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
@@ -37,7 +38,7 @@ import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTreePanel;
-import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionsModel;
+import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionManagerModel;
 import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
@@ -77,12 +78,12 @@ public class ProjectFrame extends JFrame {
 
     final List<Object> connectionManagers = new ArrayList<Object>();
 
-    connectionManagers.add(DataObjectStoreConnections.get());
+    connectionManagers.add(DataObjectStoreConnectionManager.get());
     connectionManagers.add(FileSystemConnectionManager.get());
     /* connectionManagers.add(WmsConnectionManager.get()); */
 
     final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
-      new DataObjectStoreConnectionsModel(),
+      new DataObjectStoreConnectionManagerModel(),
       new FileSystemConnectionManagerModel());
     final ObjectTreePanel catalogPanel = new ObjectTreePanel(
       connectionManagers, listModel);
@@ -104,8 +105,7 @@ public class ProjectFrame extends JFrame {
     final File userHomeDirectory = FileUtil.getUserHomeDirectory();
     final File projectFile = new File(userHomeDirectory,
       "Documents/default.rgmap");
-    final File resourcesDir = new File(projectFile, "Contents/Resources");
-    LayerUtil.loadLayerGroup(project, resourcesDir);
+    loadProject(projectFile);
   }
 
   protected void addLogPanel() {
@@ -178,6 +178,13 @@ public class ProjectFrame extends JFrame {
     return menuBar;
   }
 
+  @Override
+  public void dispose() {
+    super.dispose();
+    DataObjectStoreConnectionManager.get().removeConnectionRegistry(
+      project.getDataStores());
+  }
+
   public CControl getDockControl() {
     return dockControl;
   }
@@ -209,6 +216,17 @@ public class ProjectFrame extends JFrame {
     addLayers();
 
     createMenuBar();
+  }
+
+  public void loadProject(final File projectFile) {
+    final File dataStoresDirectory = new File(projectFile, "Data Stores");
+    final JsonDataObjectStoreConnectionRegistry dataStores = new JsonDataObjectStoreConnectionRegistry(
+      "Project", dataStoresDirectory);
+    project.setDataStores(dataStores);
+    DataObjectStoreConnectionManager.get().addConnectionRegistry(dataStores);
+
+    final File layersDir = new File(projectFile, "Layers");
+    LayerUtil.loadLayerGroup(project, layersDir);
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
@@ -22,8 +23,9 @@ public class DelegatingDataObjectStoreHandler implements InvocationHandler {
 
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends DataObjectStore> T create(final String label,
-    final Map<String, Object> config) {
+    final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread()
       .getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
@@ -35,7 +37,7 @@ public class DelegatingDataObjectStoreHandler implements InvocationHandler {
       handler);
     try {
       proxyStore.initialize();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       LoggerFactory.getLogger(DelegatingDataObjectStoreHandler.class).error(
         "Unable to initialize data store " + label, t);
     }
@@ -58,9 +60,9 @@ public class DelegatingDataObjectStoreHandler implements InvocationHandler {
   }
 
   public DelegatingDataObjectStoreHandler(final String label,
-    final Map<String, Object> config) {
+    final Map<String, ? extends Object> config) {
     this.label = label;
-    this.config = config;
+    this.config = new HashMap<String, Object>(config);
   }
 
   protected DataObjectStore createDataStore() {

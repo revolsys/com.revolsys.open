@@ -1,15 +1,16 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreConnections;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.data.io.DelegatingDataObjectStoreHandler;
+import com.revolsys.gis.data.store.ConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.swing.map.layer.AbstractLayerFactory;
+import com.revolsys.swing.tree.datastore.AddDataStoreConnectionPanel;
 
 public class DataObjectStoreLayerFactory extends
   AbstractLayerFactory<DataObjectStoreLayer> {
@@ -21,7 +22,7 @@ public class DataObjectStoreLayerFactory extends
   @Override
   public DataObjectStoreLayer createLayer(final Map<String, Object> properties) {
     @SuppressWarnings("unchecked")
-    final Map<String, String> connectionProperties = (Map<String, String>)properties.get("connectionProperties");
+    final Map<String, String> connectionProperties = (Map<String, String>)properties.get("connection");
     if (connectionProperties == null) {
       throw new IllegalArgumentException(
         "A data store layer requires a connectionProperties entry with a name or url, username, and password.");
@@ -29,24 +30,26 @@ public class DataObjectStoreLayerFactory extends
       final String name = connectionProperties.get("name");
       DataObjectStore dataStore;
       if (StringUtils.hasText(name)) {
-        final DataObjectStoreConnections connections = DataObjectStoreConnections.get();
-        dataStore = connections.getDataObjectStore(name);
+        dataStore = DataObjectStoreConnectionManager.getConnection(name);
         if (dataStore == null) {
-          connections.createConnection(name, connectionProperties);
-          dataStore = connections.getDataObjectStore(name);
+          final DataObjectStoreConnectionManager connectionManager = DataObjectStoreConnectionManager.get();
+          final ConnectionRegistry<DataObjectStore> registry = connectionManager.getConnectionRegistry("User");
+          dataStore = new AddDataStoreConnectionPanel(registry, name).showDialog();
         }
-        if (dataStore instanceof Proxy) {
-          final DelegatingDataObjectStoreHandler handler = (DelegatingDataObjectStoreHandler)Proxy.getInvocationHandler(dataStore);
-          dataStore = handler.getDataStore();
-        }
+        // TODO if null add
       } else {
         dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
       }
-      dataStore.initialize();
-      final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
-      layer.setProperties(properties);
-      return layer;
+      if (dataStore == null) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to create data store for layer: " + properties.get("name"));
+        return null;
+      } else {
+        dataStore.initialize();
+        final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
+        layer.setProperties(properties);
+        return layer;
+      }
     }
   }
-
 }

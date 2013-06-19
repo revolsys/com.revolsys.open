@@ -150,7 +150,13 @@ public class ValueField extends JPanel implements Field {
     }
   }
 
-  public Object showDialog(final Component component) {
+  @SuppressWarnings("unchecked")
+  public <V> V showDialog() {
+    return (V)showDialog(null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V showDialog(final Component component) {
     Window window;
     if (component == null) {
       window = SwingUtil.getActiveWindow();
@@ -175,7 +181,7 @@ public class ValueField extends JPanel implements Field {
     dialog.pack();
     dialog.setVisible(true);
 
-    return getFieldValue();
+    return (V)getFieldValue();
   }
 
   @Override

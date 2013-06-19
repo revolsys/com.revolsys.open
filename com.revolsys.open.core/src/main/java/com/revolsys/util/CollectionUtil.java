@@ -268,7 +268,7 @@ public final class CollectionUtil {
     if (value == null) {
       return null;
     } else {
-      return value.toString();
+      return StringConverterRegistry.toString(value);
     }
   }
 

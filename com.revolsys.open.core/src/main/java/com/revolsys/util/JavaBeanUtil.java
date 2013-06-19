@@ -91,6 +91,18 @@ public final class JavaBeanUtil {
     return value;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> V createInstance(final String className) {
+    try {
+      final Class<?> clazz = Class.forName(className);
+      return (V)clazz.newInstance();
+    } catch (final InstantiationException e) {
+      return (V)ExceptionUtil.throwCauseException(e);
+    } catch (final Throwable e) {
+      return (V)ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   public static boolean getBooleanValue(final Object object,
     final String attributeName) {
     if (object == null) {

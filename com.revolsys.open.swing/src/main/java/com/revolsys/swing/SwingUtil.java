@@ -364,6 +364,11 @@ public class SwingUtil {
     }
   }
 
+  public static void invokeAndWait(final Object object,
+    final String methodName, final Object... parameters) {
+    InvokeMethodRunnable.invokeAndWait(object, methodName, parameters);
+  }
+
   public static void invokeLater(final Object object, final String methodName,
     final Object... parameters) {
     InvokeMethodRunnable.invokeLater(object, methodName, parameters);
@@ -429,7 +434,7 @@ public class SwingUtil {
           JComponent.class, Object.class);
         final MethodRunnable runnable = new MethodRunnable(method,
           SwingUtil.class, field, value);
-        SwingUtilities.invokeLater(runnable);
+        SwingUtilities.invokeAndWait(runnable);
       } catch (final Throwable t) {
         ExceptionUtil.throwUncheckedException(t);
       }

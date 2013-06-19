@@ -8,6 +8,8 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.util.ExceptionUtil;
+
 /**
  * A runnable class which will invoke a method on an object with the specified
  * parameters.
@@ -16,11 +18,32 @@ import org.slf4j.LoggerFactory;
  */
 public class InvokeMethodRunnable implements Runnable {
 
+  public static void invokeAndWait(final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
+      methodName, parameters);
+    if (SwingUtilities.isEventDispatchThread()) {
+      runnable.run();
+    } else {
+      try {
+        SwingUtilities.invokeAndWait(runnable);
+      } catch (final InterruptedException e) {
+        ExceptionUtil.throwUncheckedException(e);
+      } catch (final InvocationTargetException e) {
+        ExceptionUtil.throwCauseException(e);
+      }
+    }
+  }
+
   public static void invokeLater(final Object object, final String methodName,
     final Object... parameters) {
     final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
       methodName, parameters);
-    SwingUtilities.invokeLater(runnable);
+    if (SwingUtilities.isEventDispatchThread()) {
+      runnable.run();
+    } else {
+      SwingUtilities.invokeLater(runnable);
+    }
   }
 
   /** The object to invoke the method on. */

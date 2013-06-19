@@ -26,6 +26,7 @@ import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
 import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.MapScale;
+import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -45,9 +46,9 @@ import com.vividsolutions.jts.geom.Geometry;
 @SuppressWarnings("serial")
 public class MapPanel extends JPanel implements PropertyChangeListener {
 
-  public static final BoundingBox BC_ENVELOPE = //
-  new BoundingBox(GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252,
-    6174862, -12346993, 8584083);
+  public static final BoundingBox BC_ENVELOPE = new BoundingBox(
+    GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252, 6174862,
+    -12346993, 8584083);
 
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
@@ -161,6 +162,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void addLayerControls() {
+    final SelectMapCoordinateSystem selectCoordinateSystem = new SelectMapCoordinateSystem(
+      this);
+    toolBar.addComponent("layers", selectCoordinateSystem);
+
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
       baseMapLayers, true);
     final ComboBox comboBox = new ComboBox(baseMapLayersModel);
@@ -412,6 +417,15 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
 
     repaint();
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    final GeometryFactory oldValue = getGeometryFactory();
+    if (geometryFactory != oldValue) {
+      project.setGeometryFactory(geometryFactory);
+      firePropertyChange("geometryFactory", oldValue, geometryFactory);
+      repaint();
+    }
   }
 
   public void setMapOverlayEnabled(

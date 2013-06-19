@@ -9,47 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.OperatingSystemUtil;
 
 public class ClasspathNativeLibraryUtil {
 
-  private static final String OS_ARCH = System.getProperty("os.arch");
-
   private static final Map<String, Boolean> LIBRARY_LOADED_MAP = new HashMap<String, Boolean>();
-
-  private final static String OS_NAME = System.getProperty("os.name");
-
-  public final static boolean IS_WINDOWS = OS_NAME.startsWith("Windows");
-
-  public final static boolean IS_SOLARIS = OS_NAME.equals("SunOS");
-
-  public final static boolean IS_LINUX = OS_NAME.equals("Linux");
-
-  public final static boolean IS_DARWIN = OS_NAME.equals("Mac OS X")
-    || OS_NAME.equals("Darwin");
 
   public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
 
-  public static String getArch() {
-    final String osArch = OS_ARCH.toLowerCase();
-    if (osArch.equals("i386")) {
-      return "x86";
-    } else if (osArch.startsWith("amd64") || osArch.startsWith("x86_64")) {
-      return "x86_64";
-    } else if (osArch.equals("ppc")) {
-      return "ppc";
-    } else if (osArch.startsWith("ppc")) {
-      return "ppc_64";
-    } else if (osArch.startsWith("sparc")) {
-      return "sparc";
-    } else {
-      return OS_ARCH;
-    }
-  }
-
   public static String getLibraryExtension() {
-    if (IS_WINDOWS) {
+    if (OperatingSystemUtil.IS_WINDOWS) {
       return "dll";
-    } else if (IS_DARWIN) {
+    } else if (OperatingSystemUtil.IS_MAC) {
       return "dylib";
     } else {
       return "so";
@@ -57,7 +28,7 @@ public class ClasspathNativeLibraryUtil {
   }
 
   public static String getLibraryPrefix() {
-    if (IS_WINDOWS) {
+    if (OperatingSystemUtil.IS_WINDOWS) {
       return "";
     } else {
       return "lib";
@@ -65,16 +36,16 @@ public class ClasspathNativeLibraryUtil {
   }
 
   private static String getOperatingSystemName() {
-    if (IS_WINDOWS) {
+    if (OperatingSystemUtil.IS_WINDOWS) {
       return "winnt";
-    } else if (IS_DARWIN) {
+    } else if (OperatingSystemUtil.IS_MAC) {
       return "macosx";
-    } else if (IS_LINUX) {
+    } else if (OperatingSystemUtil.IS_LINUX) {
       return "linux";
-    } else if (IS_SOLARIS) {
+    } else if (OperatingSystemUtil.IS_SOLARIS) {
       return "solaris";
     } else {
-      return OS_NAME;
+      return OperatingSystemUtil.OS_NAME;
     }
   }
 
@@ -84,7 +55,7 @@ public class ClasspathNativeLibraryUtil {
       if (loaded == null) {
         final String prefix = getLibraryPrefix();
         final String ext = getLibraryExtension();
-        final String arch = getArch();
+        final String arch = OperatingSystemUtil.getArch();
         final String operatingSystemName = getOperatingSystemName();
         loadLibrary(prefix, name, arch, operatingSystemName, ext);
       } else if (!loaded) {

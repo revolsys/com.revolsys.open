@@ -124,6 +124,22 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     return writer.toString();
   }
 
+  public static void write(final Map<String, ? extends Object> object,
+    final Resource resource) {
+    final Writer writer = SpringUtil.getWriter(resource);
+    try {
+      final JsonMapWriter out = new JsonMapWriter(writer);
+      try {
+        out.setSingleObject(true);
+        out.write(object);
+      } finally {
+        out.close();
+      }
+    } finally {
+      FileUtil.closeSilent(writer);
+    }
+  }
+
   public JsonMapIoFactory() {
     super("JSON");
     addMediaTypeAndFileExtension("application/json", "json");

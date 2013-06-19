@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -36,7 +38,12 @@ public class StringAttribute extends AbstractFileGdbAttribute {
       }
       return null;
     } else {
-      final String string = value.toString();
+      String string = value.toString();
+      if (string.length() > getLength()) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Value is to long for: " + this + ":" + string);
+        string = string.substring(0, getLength());
+      }
       synchronized (getDataStore()) {
         row.setString(name, string);
       }

@@ -70,5 +70,4 @@ public class PreferencesUtil {
     final Preferences preferences = getPreferences(preferencesClass);
     preferences.put(preferenceName, value);
   }
-
 }

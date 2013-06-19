@@ -705,18 +705,22 @@ public final class FileUtil {
 
   public static List<File> getFiles(final File directory,
     final ExtensionFilenameFilter filter) {
-    final File[] files = directory.listFiles(filter);
-    if (files == null) {
-      return Collections.emptyList();
+    if (directory.isDirectory()) {
+      final File[] files = directory.listFiles(filter);
+      if (files == null) {
+        return Collections.emptyList();
+      } else {
+        return Arrays.asList(files);
+      }
     } else {
-      return Arrays.asList(files);
+      return Collections.emptyList();
     }
   }
 
   public static List<File> getFilesByExtension(final File directory,
-    final String extension) {
+    final String... extensions) {
     final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(
-      extension);
+      extensions);
     return getFiles(directory, filter);
   }
 
@@ -801,5 +805,4 @@ public final class FileUtil {
    */
   private FileUtil() {
   }
-
 }

@@ -27,6 +27,23 @@ public class ArcGisServerRestMapTile extends MapTile {
     this.tileY = tileY;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof ArcGisServerRestMapTile) {
+      final ArcGisServerRestMapTile tile = (ArcGisServerRestMapTile)obj;
+      if (tile.getMapServer() == getMapServer()) {
+        if (tile.getZoomLevel() == getZoomLevel()) {
+          if (tile.getTileX() == getTileX()) {
+            if (tile.getTileY() == getTileY()) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public MapServer getMapServer() {
     return mapServer;
   }
@@ -43,6 +60,12 @@ public class ArcGisServerRestMapTile extends MapTile {
     return zoomLevel;
   }
 
+  @Override
+  public int hashCode() {
+    return zoomLevel << 24 & tileX << 16 & tileY << 8;
+  }
+
+  @Override
   protected BufferedImage loadBuffferedImage() {
     return mapServer.getTileImage(zoomLevel, tileX, tileY);
   }

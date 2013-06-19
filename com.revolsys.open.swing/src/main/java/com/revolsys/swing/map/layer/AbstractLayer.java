@@ -75,6 +75,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean queryable;
 
+  private boolean eventsEnabled = true;
+
   private boolean querySupported;
 
   private final long id = ID_GEN.incrementAndGet();
@@ -157,7 +159,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   protected void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
-    if (propertyChangeSupport != null) {
+    if (propertyChangeSupport != null && isEventsEnabled()) {
       propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
   }
@@ -261,6 +263,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return isVisible(scale) && isEditable();
   }
 
+  public boolean isEventsEnabled() {
+    return eventsEnabled;
+  }
+
   @Override
   public boolean isHasChanges() {
     return false;
@@ -314,7 +320,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    propertyChangeSupport.firePropertyChange(event);
+    if (isEventsEnabled()) {
+      propertyChangeSupport.firePropertyChange(event);
+    }
   }
 
   @Override
@@ -349,6 +357,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final boolean old = isEditable();
     this.editable = editable;
     firePropertyChange("editable", old, isEditable());
+  }
+
+  public boolean setEventsEnabled(final boolean eventsEnabled) {
+    final boolean oldValue = this.eventsEnabled;
+    this.eventsEnabled = eventsEnabled;
+    return oldValue;
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {

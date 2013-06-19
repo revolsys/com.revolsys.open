@@ -36,7 +36,7 @@ public class DataObjectStoreFactoryRegistry {
   }
 
   public static Class<?> getDataObjectStoreInterfaceClass(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final DataObjectStoreFactory factory = getDataStoreFactory(url);
     return factory.getDataObjectStoreInterfaceClass(connectionProperties);

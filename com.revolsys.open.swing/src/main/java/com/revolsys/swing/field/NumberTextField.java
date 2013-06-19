@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
 
 public class NumberTextField extends TextField implements DocumentListener,
@@ -229,7 +230,10 @@ public class NumberTextField extends TextField implements DocumentListener,
       final BigDecimal bigNumber = new BigDecimal(number.toString());
       setText(bigNumber.toPlainString());
     } else {
-      setText(StringConverterRegistry.toString(value));
+      String string = StringConverterRegistry.toString(value);
+      if (!EqualsRegistry.equal(string, getText())) {
+        setText(string);
+      }
     }
     validateField();
     final String text = getText();
@@ -240,7 +244,9 @@ public class NumberTextField extends TextField implements DocumentListener,
           dataType, bigNumber);
         super.setFieldValue(number);
       } catch (final Throwable t) {
-        super.setFieldValue(text);
+        if (!EqualsRegistry.equal(text, value)) {
+          super.setFieldValue(text);
+        }
       }
     } else {
       super.setFieldValue(null);
@@ -289,11 +295,14 @@ public class NumberTextField extends TextField implements DocumentListener,
           if (!newText.equals(text)) {
             setText(newText);
           }
+          fieldValidationMessage = "";
         }
       } catch (final Throwable t) {
         fieldValidationMessage = t.getMessage();
         valid = false;
       }
+    } else {
+      fieldValidationMessage = "";
     }
 
     if (valid != oldValid) {

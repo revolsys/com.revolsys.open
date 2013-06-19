@@ -16,6 +16,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,10 +46,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.MethodRunnable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
@@ -83,6 +84,7 @@ import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener {
@@ -92,8 +94,6 @@ public class DataObjectLayerForm extends JPanel implements
   private DataObjectLayerAttributesTableModel allAttributes;
 
   private DataObjectStore dataStore;
-
-  private final Map<String, Object> disabledFieldValues = new HashMap<String, Object>();
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
 
@@ -121,8 +121,6 @@ public class DataObjectLayerForm extends JPanel implements
 
   private final JTabbedPane tabs = new JTabbedPane();
 
-  private final Map<String, Boolean> tabValid = new HashMap<String, Boolean>();
-
   private ToolBar toolBar;
 
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry = new DataObjectMetaDataUiBuilderRegistry();
@@ -132,6 +130,10 @@ public class DataObjectLayerForm extends JPanel implements
   private final DataObjectLayer layer;
 
   private JButton addOkButton;
+
+  private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
+
+  private final Map<String, Object> fieldValues = new HashMap<String, Object>();
 
   public DataObjectLayerForm(final DataObjectLayer layer) {
     setLayout(new BorderLayout());
@@ -517,48 +519,13 @@ public class DataObjectLayerForm extends JPanel implements
     invokeAction("paste");
   }
 
-  public synchronized void doValidateFields() {
+  public void doValidateFields() {
     if (isFieldValidationEnabled()) {
       try {
         setFieldValidationEnabled(false);
-        setTabsValid();
         fieldsValid = true;
-        for (final String fieldName : fields.keySet()) {
-          setFieldValid(fieldName);
-        }
-        for (final Entry<String, Field> entry : fields.entrySet()) {
-          final String fieldName = entry.getKey();
-          final Field field = entry.getValue();
-          if (field instanceof ValidatingField) {
-            final ValidatingField validatingField = (ValidatingField)field;
-            if (!validatingField.isFieldValid()) {
-              final String message = validatingField.getFieldValidationMessage();
-              setFieldInvalid(fieldName, message);
-            }
-          }
-        }
-        for (final String fieldName : getRequiredFieldNames()) {
-          boolean run = true;
-          if (object.getState() == DataObjectState.New) {
-            final String idAttributeName = getMetaData().getIdAttributeName();
-            if (fieldName.equals(idAttributeName)) {
-              run = false;
-            }
-          }
-          if (run) {
-            final Object value = getFieldValue(fieldName);
-            if (value == null) {
-              setFieldInvalid(fieldName, "Required");
-            } else if (value instanceof String) {
-              final String string = (String)value;
-              if (!StringUtils.hasText(string)) {
-                setFieldInvalid(fieldName, "Required");
-              }
-            }
-          }
-        }
-        SwingUtil.invokeLater(this, "updateTabsValid");
         postValidate();
+
       } finally {
         setFieldValidationEnabled(true);
       }
@@ -574,7 +541,7 @@ public class DataObjectLayerForm extends JPanel implements
     final DataObjectTableCellEditor editor = (DataObjectTableCellEditor)e.getSource();
     final String name = editor.getAttributeName();
     final Object value = editor.getCellEditorValue();
-    setFieldValue(name, value);
+    setFieldValue(name, value, true);
   }
 
   public DataObjectLayerAttributesTableModel getAllAttributes() {
@@ -648,8 +615,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
-    final JComponent field = getField(name);
-    final Object value = SwingUtil.getValue(field);
+    final Object value = fieldValues.get(name);
     final CodeTable codeTable = metaData.getCodeTableByColumn(name);
     if (codeTable == null) {
       if (value != null && name.endsWith("_IND")) {
@@ -707,19 +673,24 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected int getTabIndex(final String fieldName) {
-    final JComponent field = getField(fieldName);
-    if (field == null) {
-      return -1;
-    } else {
-      Component panel = field;
-      Component component = field.getParent();
-      while (component != tabs && component != null) {
-        panel = component;
-        component = component.getParent();
+    Integer index = fieldTabIndex.get(fieldName);
+    if (index == null) {
+      final JComponent field = getField(fieldName);
+      if (field == null) {
+        return -1;
+      } else {
+        Component panel = field;
+        Component component = field.getParent();
+        while (component != tabs && component != null) {
+          panel = component;
+          component = component.getParent();
+        }
+        index = tabs.indexOfComponent(panel);
+        fieldTabIndex.put(fieldName, index);
       }
-      final int index = tabs.indexOfComponent(panel);
-      return index;
     }
+    return index;
+
   }
 
   public JTabbedPane getTabs() {
@@ -770,11 +741,28 @@ public class DataObjectLayerForm extends JPanel implements
 
   public boolean isFieldValid(final String fieldName) {
     final Boolean valid = fieldValidMap.get(fieldName);
-    return valid == Boolean.TRUE;
+    return valid != Boolean.FALSE;
   }
 
   protected boolean isFieldValidationEnabled() {
     return fieldValidationDisabled.get() != Boolean.FALSE;
+  }
+
+  protected boolean isTabValid(final int index) {
+    if (index < 0) {
+      return false;
+    } else {
+      for (final Entry<String, Integer> entry : fieldTabIndex.entrySet()) {
+        final Integer tabIndex = entry.getValue();
+        if (tabIndex == index) {
+          final String name = entry.getKey();
+          if (!isFieldValid(name)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
   }
 
   public void pasteValues(final Map<String, Object> map) {
@@ -813,7 +801,7 @@ public class DataObjectLayerForm extends JPanel implements
       final Object value = event.getNewValue();
       final DataObjectMetaData metaData = getMetaData();
       if (metaData.hasAttribute(propertyName)) {
-        setFieldValue(propertyName, value);
+        setFieldValue(propertyName, value, isFieldValidationEnabled());
       }
     }
   }
@@ -865,7 +853,10 @@ public class DataObjectLayerForm extends JPanel implements
     field.requestFocusInWindow();
   }
 
-  public void setFieldInvalid(final String fieldName, final String message) {
+  public void setFieldInvalid(final String fieldName, String message) {
+    if (message == null) {
+      message = "Invalid value";
+    }
     if (SwingUtilities.isEventDispatchThread()) {
       if (isFieldValid(fieldName)) {
         fieldsValid = false;
@@ -880,9 +871,8 @@ public class DataObjectLayerForm extends JPanel implements
           field.setBackground(Color.PINK);
         }
         fieldValidMap.put(fieldName, false);
+        updateTabsValid(fieldName);
       }
-      final boolean valid = false;
-      setTabValid(fieldName, valid);
     } else {
       SwingUtil.invokeLater(this, "setFieldInvalid", fieldName, message);
     }
@@ -896,20 +886,29 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  protected void setFieldValid(final String fieldName) {
-    final JComponent field = getField(fieldName);
-    field.setForeground(Color.BLACK);
-    final String toolTip = originalToolTip.get(fieldName);
-    if (field instanceof Field) {
-      final Field fieldComponent = (Field)field;
-      fieldComponent.setFieldValid();
+  public boolean setFieldValid(final String fieldName) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (!isFieldValid(fieldName)) {
+        final JComponent field = getField(fieldName);
+        field.setForeground(Color.BLACK);
+        final String toolTip = originalToolTip.get(fieldName);
+        if (field instanceof Field) {
+          final Field fieldComponent = (Field)field;
+          fieldComponent.setFieldValid();
+        } else {
+          field.setToolTipText(toolTip);
+          field.setForeground(TextField.DEFAULT_FOREGROUND);
+          field.setBackground(TextField.DEFAULT_BACKGROUND);
+        }
+        fieldValidMap.put(fieldName, true);
+        fieldInValidMessage.remove(fieldName);
+        updateTabsValid(fieldName);
+      }
+      return true;
     } else {
-      field.setToolTipText(toolTip);
-      field.setForeground(TextField.DEFAULT_FOREGROUND);
-      field.setBackground(TextField.DEFAULT_BACKGROUND);
+      SwingUtil.invokeLater(this, "setFieldValid", fieldName);
+      return false;
     }
-    fieldValidMap.put(fieldName, true);
-    fieldInValidMessage.remove(fieldName);
   }
 
   protected boolean setFieldValidationEnabled(
@@ -919,37 +918,39 @@ public class DataObjectLayerForm extends JPanel implements
     return oldValue;
   }
 
-  public void setFieldValue(final String fieldName, final Object value) {
-    boolean changed = false;
-    final Object oldValue = getFieldValue(fieldName);
-    final JComponent field = getField(fieldName);
-    if (oldValue == null & value != null
-      || !EqualsRegistry.equal(value, oldValue)) {
-      SwingUtil.setFieldValue(field, value);
-      changed = true;
-      if (!field.isEnabled()) {
-        if (field instanceof JTextComponent) {
-          final JTextComponent textField = (JTextComponent)field;
-          String string;
-          disabledFieldValues.put(fieldName, value);
-          if (value == null) {
-            string = "";
-          } else {
-            string = getCodeValue(fieldName, value);
-          }
-          textField.setText(string);
-        }
+  public void setFieldValue(final String fieldName, final Object value,
+    final boolean validate) {
+    if (SwingUtilities.isEventDispatchThread()) {
+
+      try {
+        final Method method = getClass().getMethod("setFieldValue",
+          String.class, Object.class, Boolean.TYPE);
+        final MethodRunnable runnable = new MethodRunnable(method, this,
+          fieldName, value, validate);
+        SwingWorkerManager.execute(runnable);
+      } catch (final Throwable t) {
+        ExceptionUtil.throwUncheckedException(t);
       }
-    }
-    if (field.isEnabled()) {
-      final Object objectValue = object.getValue(fieldName);
-      if (!EqualsRegistry.equal(value, objectValue)) {
-        object.setValueByPath(fieldName, value);
+    } else {
+      boolean changed = false;
+      final Object oldValue = getFieldValue(fieldName);
+      fieldValues.put(fieldName, value);
+      final JComponent field = getField(fieldName);
+      if (oldValue == null & value != null
+        || !EqualsRegistry.equal(value, oldValue)) {
         changed = true;
       }
-    }
-    if (changed) {
-      validateFields();
+      SwingUtil.setFieldValue(field, value);
+      if (field.isEnabled()) {
+        final Object objectValue = object.getValue(fieldName);
+        if (!EqualsRegistry.equal(value, objectValue)) {
+          object.setValueByPath(fieldName, value);
+          changed = true;
+        }
+      }
+      if (changed && validate) {
+        validateField(fieldName);
+      }
     }
   }
 
@@ -988,29 +989,13 @@ public class DataObjectLayerForm extends JPanel implements
     this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
   }
 
-  public void setTabsValid() {
-    for (int i = 0; i < tabs.getTabCount(); i++) {
-      final String tabName = tabs.getTitleAt(i);
-      tabValid.put(tabName, true);
-    }
-  }
-
-  public void setTabValid(final int index, final boolean valid) {
-    if (valid == Boolean.TRUE) {
+  protected void setTabValid(final int index, final boolean valid) {
+    if (valid) {
       tabs.setForegroundAt(index, null);
       tabs.setBackgroundAt(index, null);
     } else {
       tabs.setForegroundAt(index, Color.RED);
       tabs.setBackgroundAt(index, Color.PINK);
-    }
-  }
-
-  protected void setTabValid(final String fieldName, final boolean valid) {
-    final int index = getTabIndex(fieldName);
-    if (index != -1) {
-      final String title = tabs.getTitleAt(index);
-      tabValid.put(title, valid);
-      setTabValid(index, valid);
     }
   }
 
@@ -1020,7 +1005,7 @@ public class DataObjectLayerForm extends JPanel implements
       if (values != null) {
         for (final String fieldName : metaData.getAttributeNames()) {
           final Object value = values.get(fieldName);
-          setFieldValue(fieldName, value);
+          setFieldValue(fieldName, value, false);
         }
       }
     } finally {
@@ -1072,18 +1057,55 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  public void updateTabsValid() {
-    for (int i = 0; i < tabs.getTabCount(); i++) {
-      final String tabName = tabs.getTitleAt(i);
-      final Boolean valid = tabValid.get(tabName);
-      if (valid == Boolean.TRUE) {
-        tabs.setForegroundAt(i, null);
-        tabs.setBackgroundAt(i, null);
-      } else {
-        tabs.setForegroundAt(i, Color.RED);
-        tabs.setBackgroundAt(i, Color.PINK);
+  public void updateTabsValid(final String fieldName) {
+    final int index = getTabIndex(fieldName);
+    if (index >= 0) {
+      final boolean valid = isTabValid(index);
+      setTabValid(index, valid);
+    }
+  }
+
+  public boolean validateField(final String fieldName) {
+    final boolean oldValid = isFieldValid(fieldName);
+    final Field field = getField(fieldName);
+    boolean valid = true;
+    if (field instanceof ValidatingField) {
+      final ValidatingField validatingField = (ValidatingField)field;
+      if (!validatingField.isFieldValid()) {
+        final String message = validatingField.getFieldValidationMessage();
+        setFieldInvalid(fieldName, message);
+        valid = false;
       }
     }
+
+    if (valid) {
+      final Set<String> requiredFieldNames = getRequiredFieldNames();
+      if (requiredFieldNames.contains(fieldName)) {
+        boolean run = true;
+        if (object.getState() == DataObjectState.New) {
+          final String idAttributeName = getMetaData().getIdAttributeName();
+          if (fieldName.equals(idAttributeName)) {
+            run = false;
+          }
+        }
+        if (run) {
+          final Object value = getFieldValue(fieldName);
+          if (value == null) {
+            setFieldInvalid(fieldName, "Required");
+          } else if (value instanceof String) {
+            final String string = (String)value;
+            if (!StringUtils.hasText(string)) {
+              setFieldInvalid(fieldName, "Required");
+            }
+          }
+        }
+      }
+    }
+
+    if (oldValid != valid) {
+      updateTabsValid(fieldName);
+    }
+    return valid;
   }
 
   public void validateFields() {

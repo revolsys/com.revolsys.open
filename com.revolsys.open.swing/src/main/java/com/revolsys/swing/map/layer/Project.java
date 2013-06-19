@@ -11,6 +11,8 @@ import javax.swing.JOptionPane;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.store.ConnectionRegistry;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 
@@ -31,9 +33,11 @@ public class Project extends LayerGroup {
 
   private BoundingBox viewBoundingBox = new BoundingBox();
 
+  private ConnectionRegistry<DataObjectStore> dataStores;
+
   public Project() {
     this("Project");
-    setGeometryFactory(GeometryFactory.getFactory(3005));
+    setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
   }
 
   public Project(final String name) {
@@ -60,6 +64,10 @@ public class Project extends LayerGroup {
     super.delete();
     this.baseMapLayers = null;
     this.viewBoundingBox = null;
+  }
+
+  public ConnectionRegistry<DataObjectStore> getDataStores() {
+    return dataStores;
   }
 
   @Override
@@ -129,6 +137,10 @@ public class Project extends LayerGroup {
         }
       }
     }
+  }
+
+  public void setDataStores(final ConnectionRegistry<DataObjectStore> dataStores) {
+    this.dataStores = dataStores;
   }
 
   @Override

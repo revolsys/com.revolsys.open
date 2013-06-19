@@ -602,7 +602,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isSelected(final LayerDataObject object) {
-    if (object == null) {
+    if (object == null || selectedObjects == null) {
       return false;
     } else {
       return selectedObjects.contains(object);
