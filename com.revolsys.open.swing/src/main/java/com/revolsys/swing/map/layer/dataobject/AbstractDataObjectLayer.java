@@ -624,14 +624,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);
     final Object source = event.getSource();
-    if (source instanceof LayerDataObject) {
-      final LayerDataObject dataObject = (LayerDataObject)source;
-      if (dataObject.getLayer() == this) {
-        final DataObjectState state = dataObject.getState();
-        if (state == DataObjectState.Modified) {
-          addModifiedObject(dataObject);
-        } else if (state == DataObjectState.Persisted) {
-          removeModifiedObject(dataObject);
+    if (!"errorsUpdated".equals(event.getPropertyName())) {
+      if (source instanceof LayerDataObject) {
+        final LayerDataObject dataObject = (LayerDataObject)source;
+        if (dataObject.getLayer() == this) {
+          final DataObjectState state = dataObject.getState();
+          if (state == DataObjectState.Modified) {
+            addModifiedObject(dataObject);
+          } else if (state == DataObjectState.Persisted) {
+            removeModifiedObject(dataObject);
+          }
         }
       }
     }
@@ -760,6 +762,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       addEditingObject(object);
     }
     firePropertyChange("editingObjectsChanged", false, true);
+  }
+
+  public void setEditingObjects(final LayerDataObject... objects) {
+    setEditingObjects(Arrays.asList(objects));
   }
 
   @Override

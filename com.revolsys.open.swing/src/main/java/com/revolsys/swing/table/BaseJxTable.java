@@ -28,7 +28,7 @@ public class BaseJxTable extends JXTable {
     final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();
     tableHeader.setDefaultRenderer(headerRenderer);
-    tableHeader.setReorderingAllowed(false);
+    tableHeader.setReorderingAllowed(true);
     setFont(SwingUtil.FONT);
   }
 

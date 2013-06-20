@@ -248,11 +248,12 @@ public abstract class AbstractDataObjectStore extends
     try {
       for (final DataObject object : reader) {
         delete(object);
+        i++;
       }
     } finally {
       reader.close();
     }
-    return i++;
+    return i;
   }
 
   @Override

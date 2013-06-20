@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -33,9 +32,6 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
 
     final DataObjectTableCellRenderer cellRenderer = new DataObjectTableCellRenderer();
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor();
-
-    final JTableHeader tableHeader = table.getTableHeader();
-    tableHeader.setReorderingAllowed(false);
 
     final DataObjectMetaData metaData = model.getMetaData();
     int maxAttributeWidth = 0;

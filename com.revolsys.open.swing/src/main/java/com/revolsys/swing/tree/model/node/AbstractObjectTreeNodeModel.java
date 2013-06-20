@@ -14,6 +14,7 @@ import javax.swing.tree.TreeCellRenderer;
 import org.springframework.util.CollectionUtils;
 
 import com.revolsys.beans.ClassUtil;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
@@ -37,10 +38,12 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   private ObjectTreeModel objectTreeModel;
 
   public AbstractObjectTreeNodeModel() {
+    this(null);
   }
 
   public AbstractObjectTreeNodeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
+    renderer.setClosedIcon(SilkIconLoader.getIcon("folder"));
   }
 
   @Override

@@ -2,18 +2,23 @@ package com.revolsys.swing.map.tree.renderer;
 
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.map.layer.LayerGroup;
 
 public class LayerGroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 7356001100251805839L;
+
+  public LayerGroupTreeCellRenderer() {
+    final ImageIcon icon = SilkIconLoader.getIcon("folder");
+    setOpenIcon(icon);
+    setClosedIcon(icon);
+  }
 
   @Override
   public Component getTreeCellRendererComponent(final JTree tree,

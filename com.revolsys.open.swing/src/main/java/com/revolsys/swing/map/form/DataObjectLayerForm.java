@@ -16,7 +16,6 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.beans.MethodRunnable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
@@ -84,7 +82,6 @@ import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener {
@@ -127,7 +124,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   private boolean editable = true;
 
-  private final DataObjectLayer layer;
+  private DataObjectLayer layer;
 
   private JButton addOkButton;
 
@@ -519,19 +516,6 @@ public class DataObjectLayerForm extends JPanel implements
     invokeAction("paste");
   }
 
-  public void doValidateFields() {
-    if (isFieldValidationEnabled()) {
-      try {
-        setFieldValidationEnabled(false);
-        fieldsValid = true;
-        postValidate();
-
-      } finally {
-        setFieldValidationEnabled(true);
-      }
-    }
-  }
-
   @Override
   public void editingCanceled(final ChangeEvent e) {
   }
@@ -793,14 +777,15 @@ public class DataObjectLayerForm extends JPanel implements
         }
         if (!equal) {
           object.setValueByPath(fieldName, fieldValue);
-          validateFields();
         }
       }
     } else if (source == getObject()) {
       final String propertyName = event.getPropertyName();
       final Object value = event.getNewValue();
       final DataObjectMetaData metaData = getMetaData();
-      if (metaData.hasAttribute(propertyName)) {
+      if ("errorsUpdated".equals(propertyName)) {
+        updateErrors();
+      } else if (metaData.hasAttribute(propertyName)) {
         setFieldValue(propertyName, value, isFieldValidationEnabled());
       }
     }
@@ -811,7 +796,14 @@ public class DataObjectLayerForm extends JPanel implements
     try {
       super.removeNotify();
     } finally {
-      layer.removePropertyChangeListener(this);
+      if (layer != null) {
+        if (allAttributes != null) {
+          layer.removePropertyChangeListener(allAttributes);
+          allAttributes = null;
+        }
+        layer.removePropertyChangeListener(this);
+        layer = null;
+      }
     }
   }
 
@@ -920,37 +912,23 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void setFieldValue(final String fieldName, final Object value,
     final boolean validate) {
-    if (SwingUtilities.isEventDispatchThread()) {
 
-      try {
-        final Method method = getClass().getMethod("setFieldValue",
-          String.class, Object.class, Boolean.TYPE);
-        final MethodRunnable runnable = new MethodRunnable(method, this,
-          fieldName, value, validate);
-        SwingWorkerManager.execute(runnable);
-      } catch (final Throwable t) {
-        ExceptionUtil.throwUncheckedException(t);
-      }
-    } else {
-      boolean changed = false;
-      final Object oldValue = getFieldValue(fieldName);
-      fieldValues.put(fieldName, value);
-      final JComponent field = getField(fieldName);
-      if (oldValue == null & value != null
-        || !EqualsRegistry.equal(value, oldValue)) {
-        changed = true;
-      }
-      SwingUtil.setFieldValue(field, value);
-      if (field.isEnabled()) {
-        final Object objectValue = object.getValue(fieldName);
-        if (!EqualsRegistry.equal(value, objectValue)) {
-          object.setValueByPath(fieldName, value);
-          changed = true;
-        }
-      }
-      if (changed && validate) {
-        validateField(fieldName);
-      }
+    boolean changed = false;
+    final Object oldValue = getFieldValue(fieldName);
+    fieldValues.put(fieldName, value);
+    final JComponent field = getField(fieldName);
+    if (oldValue == null & value != null
+      || !EqualsRegistry.equal(value, oldValue)) {
+      changed = true;
+    }
+    SwingUtil.setFieldValue(field, value);
+    final Object objectValue = object.getValue(fieldName);
+    if (!EqualsRegistry.equal(value, objectValue)) {
+      object.setValueByPath(fieldName, value);
+      changed = true;
+    }
+    if (changed && validate) {
+      validateField(fieldName);
     }
   }
 
@@ -973,7 +951,7 @@ public class DataObjectLayerForm extends JPanel implements
   public void setObject(final LayerDataObject object) {
     this.object = object;
     allAttributes.setObject(object);
-    SwingUtil.invokeLater(this, "setValues", object);
+    setValues(object);
   }
 
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
@@ -1000,18 +978,26 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void setValues(final Map<String, Object> values) {
-    final boolean validationEnabled = setFieldValidationEnabled(false);
-    try {
-      if (values != null) {
-        for (final String fieldName : metaData.getAttributeNames()) {
-          final Object value = values.get(fieldName);
-          setFieldValue(fieldName, value, false);
+    if (values != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final Set<String> fieldNames = values.keySet();
+        final boolean validationEnabled = setFieldValidationEnabled(false);
+        try {
+          this.fieldValues.putAll(values);
+          for (final String fieldName : fieldNames) {
+            final Object value = values.get(fieldName);
+            final JComponent field = getField(fieldName);
+            SwingUtil.setFieldValue(field, value);
+          }
+        } finally {
+          setFieldValidationEnabled(validationEnabled);
         }
+        validateFields(fieldNames);
+      } else {
+        SwingUtil.invokeLater(this, "setValues", values);
       }
-    } finally {
-      setFieldValidationEnabled(validationEnabled);
     }
-    validateFields();
+
   }
 
   public LayerDataObject showAddDialog() {
@@ -1035,11 +1021,13 @@ public class DataObjectLayerForm extends JPanel implements
 
     dialog.pack();
     dialog.setLocation(50, 50);
-    validateFields();
     dialog.setVisible(true);
     final LayerDataObject object = getObject();
     dialog.dispose();
     return object;
+  }
+
+  protected void updateErrors() {
   }
 
   protected void updateReadOnlyFields() {
@@ -1066,6 +1054,16 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public boolean validateField(final String fieldName) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      SwingWorkerManager.execute("Validate Field " + fieldName, this,
+        "validateField", fieldName);
+      return false;
+    } else {
+      return validateFieldInternal(fieldName);
+    }
+  }
+
+  private boolean validateFieldInternal(final String fieldName) {
     final boolean oldValid = isFieldValid(fieldName);
     final Field field = getField(fieldName);
     boolean valid = true;
@@ -1108,10 +1106,12 @@ public class DataObjectLayerForm extends JPanel implements
     return valid;
   }
 
-  public void validateFields() {
-    if (isFieldValidationEnabled()) {
-      // TODO cancel
-      SwingWorkerManager.execute("Validate Fields", this, "doValidateFields");
+  protected boolean validateFields(final Collection<String> fieldNames) {
+    boolean valid = true;
+    for (final String fieldName : fieldNames) {
+      valid &= validateFieldInternal(fieldName);
     }
+    return valid;
   }
+
 }

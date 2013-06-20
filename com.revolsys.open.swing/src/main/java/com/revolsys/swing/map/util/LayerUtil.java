@@ -329,6 +329,19 @@ public class LayerUtil {
     layer.setEditable(!editable);
   }
 
+  public static void zoomTo(final Geometry geometry) {
+    final Project project = Project.get();
+    if (project != null) {
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
+        geometryFactory, geometry)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
+
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
   public static void zoomToLayer() {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {

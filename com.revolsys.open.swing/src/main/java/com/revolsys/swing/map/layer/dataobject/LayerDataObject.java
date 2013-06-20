@@ -112,7 +112,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   @Override
-  public synchronized void setValue(final int index, final Object value) {
+  public void setValue(final int index, final Object value) {
     final DataObjectMetaData metaData = getMetaData();
     final String attributeName = metaData.getAttributeName(index);
 

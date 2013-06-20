@@ -85,7 +85,10 @@ public class DataObjectLayerAttributesTableModel extends
       final DataObjectMetaData metaData = getMetaData();
       final int index = metaData.getAttributeIndex(propertyName);
       if (index > -1) {
-        fireTableRowsUpdated(index, index);
+        try {
+          fireTableRowsUpdated(index, index);
+        } catch (final Throwable t) {
+        }
       }
     }
   }

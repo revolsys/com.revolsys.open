@@ -10,7 +10,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -33,9 +32,6 @@ public class SwingWorkerTableModel extends AbstractTableModel {
     final BaseJxTable table = new BaseJxTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);
-
-    final JTableHeader tableHeader = table.getTableHeader();
-    tableHeader.setReorderingAllowed(false);
 
     for (int i = 0; i < model.getColumnCount(); i++) {
       final TableColumnExt column = table.getColumnExt(i);

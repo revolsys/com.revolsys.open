@@ -12,6 +12,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.swing.table.TablePanel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -20,6 +21,13 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
+
+  public static int[] getEventRowObject(final TablePanel panel) {
+    final GeometryCoordinatesTableModel model = panel.getTableModel();
+    final int row = panel.getEventRow();
+    final int[] object = model.getVertexIndex(row);
+    return object;
+  }
 
   private List<String> axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
 
@@ -45,10 +53,6 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     setGeometry(geometry);
   }
 
-  public int getNumAxis() {
-    return numAxis;
-  }
-
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     return Double.class;
@@ -57,10 +61,6 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   @Override
   public int getColumnCount() {
     return columnCount;
-  }
-
-  public int getNumIndexItems() {
-    return numIndexItems;
   }
 
   @Override
@@ -81,6 +81,14 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return geometry;
   }
 
+  public int getNumAxis() {
+    return numAxis;
+  }
+
+  public int getNumIndexItems() {
+    return numIndexItems;
+  }
+
   @Override
   public int getRowCount() {
     return vertexIndices.size();
@@ -89,7 +97,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
     if (columnIndex < numIndexItems) {
-      int[] vertexIndex = getVertexIndex(rowIndex);
+      final int[] vertexIndex = getVertexIndex(rowIndex);
       if (vertexIndex.length == numIndexItems) {
         return vertexIndex[columnIndex];
       } else {

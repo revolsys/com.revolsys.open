@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
@@ -21,6 +22,8 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
 
   public ObjectModelTreeCellRenderer(final ObjectTreeModel model) {
     this.model = model;
+    setOpenIcon(SilkIconLoader.getIcon("folder"));
+    setClosedIcon(SilkIconLoader.getIcon("folder"));
   }
 
   @Override

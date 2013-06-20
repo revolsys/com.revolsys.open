@@ -434,7 +434,7 @@ public class SwingUtil {
           JComponent.class, Object.class);
         final MethodRunnable runnable = new MethodRunnable(method,
           SwingUtil.class, field, value);
-        SwingUtilities.invokeAndWait(runnable);
+        SwingUtilities.invokeLater(runnable);
       } catch (final Throwable t) {
         ExceptionUtil.throwUncheckedException(t);
       }
