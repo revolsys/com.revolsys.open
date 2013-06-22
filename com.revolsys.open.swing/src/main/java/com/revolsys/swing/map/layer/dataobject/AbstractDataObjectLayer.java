@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -815,6 +816,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void setSelectedObjects(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerDataObject> objects = getDataObjects(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject)) {
+          iterator.remove();
+        }
+      }
       setSelectedObjects(objects);
     }
   }
@@ -849,6 +856,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
     final List<LayerDataObject> objects = query(geometry, distance);
+    for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+      final LayerDataObject layerDataObject = iterator.next();
+      if (!isVisible(layerDataObject)) {
+        iterator.remove();
+      }
+    }
     if (selected) {
       selectedObjects.addAll(objects);
     } else {

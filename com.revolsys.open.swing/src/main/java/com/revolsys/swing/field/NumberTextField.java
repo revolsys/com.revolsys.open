@@ -224,13 +224,13 @@ public class NumberTextField extends TextField implements DocumentListener,
   @Override
   public void setFieldValue(final Object value) {
     if (value == null) {
-      setText("");
+      super.setFieldValue(null);
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final BigDecimal bigNumber = new BigDecimal(number.toString());
       setText(bigNumber.toPlainString());
     } else {
-      String string = StringConverterRegistry.toString(value);
+      final String string = StringConverterRegistry.toString(value);
       if (!EqualsRegistry.equal(string, getText())) {
         setText(string);
       }

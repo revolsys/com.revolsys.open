@@ -2,6 +2,7 @@ package com.revolsys.swing.map.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -57,7 +58,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer,
     final List<String> attributeNames) {
-    return createTable(layer, attributeNames, attributeNames);
+    return createTable(layer, attributeNames, Collections.<String> emptyList());
   }
 
   public static DataObjectRowTable createTable(final DataObjectLayer layer,
@@ -122,7 +123,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public DataObjectLayerTableModel(final DataObjectLayer layer,
     final List<String> attributeNames) {
-    this(layer, attributeNames, attributeNames);
+    this(layer, attributeNames, new ArrayList<String>());
   }
 
   public DataObjectLayerTableModel(final DataObjectLayer layer,

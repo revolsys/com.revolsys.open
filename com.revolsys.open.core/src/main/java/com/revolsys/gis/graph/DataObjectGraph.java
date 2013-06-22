@@ -13,9 +13,11 @@ import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class DataObjectGraph extends Graph<DataObject> {
 
@@ -32,7 +34,7 @@ public class DataObjectGraph extends Graph<DataObject> {
     super(false);
   }
 
-  public DataObjectGraph(final Collection<DataObject> objects) {
+  public DataObjectGraph(final Collection<? extends DataObject> objects) {
     addEdges(objects);
   }
 
@@ -41,7 +43,8 @@ public class DataObjectGraph extends Graph<DataObject> {
     return addEdge(object, line);
   }
 
-  public List<Edge<DataObject>> addEdges(final Collection<DataObject> objects) {
+  public List<Edge<DataObject>> addEdges(
+    final Collection<? extends DataObject> objects) {
     final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (final DataObject object : objects) {
       final Edge<DataObject> edge = addEdge(object);
@@ -75,6 +78,10 @@ public class DataObjectGraph extends Graph<DataObject> {
       final LineString line = object.getGeometryValue();
       return line;
     }
+  }
+
+  public Node<DataObject> getNode(final Point point) {
+    return getNode(CoordinatesUtil.get(point));
   }
 
   public List<DataObject> getObjects(final Collection<Integer> edgeIds) {

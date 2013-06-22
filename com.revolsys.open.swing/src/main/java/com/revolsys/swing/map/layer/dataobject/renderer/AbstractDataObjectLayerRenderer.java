@@ -97,9 +97,13 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public boolean isVisible(final LayerDataObject object) {
-    try {
-      return filter.accept(object);
-    } catch (final Throwable e) {
+    if (isVisible()) {
+      try {
+        return filter.accept(object);
+      } catch (final Throwable e) {
+        return false;
+      }
+    } else {
       return false;
     }
   }

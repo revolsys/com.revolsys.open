@@ -1101,7 +1101,7 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
     if (oldValid != valid) {
-      updateTabsValid(fieldName);
+      SwingUtil.invokeLater(this, "updateTabsValid", fieldName);
     }
     return valid;
   }

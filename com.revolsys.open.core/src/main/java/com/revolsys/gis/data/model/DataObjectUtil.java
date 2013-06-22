@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -58,6 +60,7 @@ public final class DataObjectUtil {
    * @param geometry The new geometry.
    * @return The copied object.
    */
+  @SuppressWarnings("unchecked")
   public static <T extends DataObject> T copy(final T object,
     final Geometry geometry) {
     final Geometry oldGeometry = object.getGeometryValue();
@@ -241,6 +244,22 @@ public final class DataObjectUtil {
       objects.add(object);
     }
     return objects;
+  }
+
+  public static void mergeValue(final Map<String, Object> object,
+    final DataObject object1, final DataObject object2, final String fieldName,
+    final String separator) {
+    final String value1 = object1.getString(fieldName);
+    final String value2 = object2.getString(fieldName);
+    Object value;
+    if (!StringUtils.hasText(value1)) {
+      value = value2;
+    } else if (!StringUtils.hasText(value2)) {
+      value = value1;
+    } else {
+      value = value1 + separator + value2;
+    }
+    object.put(fieldName, value);
   }
 
   public static void setValues(final DataObject target,

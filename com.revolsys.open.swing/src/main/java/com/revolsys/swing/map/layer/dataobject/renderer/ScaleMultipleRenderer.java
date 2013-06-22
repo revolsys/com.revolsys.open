@@ -46,7 +46,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public boolean isVisible(final LayerDataObject object) {
-    if (super.isVisible(object)) {
+    if (super.isVisible() && super.isVisible(object)) {
       if (renderer != null) {
         return renderer.isVisible(object);
       }

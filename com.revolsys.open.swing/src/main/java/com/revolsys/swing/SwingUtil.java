@@ -216,8 +216,10 @@ public class SwingUtil {
         field = createComboBox(fieldName, codeTable, required);
       } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
         final int scale = attribute.getScale();
+        final Number minValue = attribute.getMinValue();
+        final Number maxValue = attribute.getMaxValue();
         final NumberTextField numberTextField = new NumberTextField(fieldName,
-          type, length, scale);
+          type, length, scale, minValue, maxValue);
         field = numberTextField;
       } else if (type.equals(DataTypes.DATE)) {
         field = createDateField(fieldName);

@@ -1,6 +1,7 @@
 package com.revolsys.swing.table.dataobject.row;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   private List<String> attributeNames = new ArrayList<String>();
 
-  private List<String> attributeTitles = new ArrayList<String>();
+  private final List<String> attributeTitles = new ArrayList<String>();
 
   private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<Integer, SortOrder>();
 
@@ -35,7 +36,8 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
     final List<String> attributeNames) {
-    this(metaData, attributeNames, attributeNames);
+    this(metaData, attributeNames, Collections.<String> emptyList());
+
   }
 
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
@@ -151,8 +153,20 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
     this.attributeNames = new ArrayList<String>(attributeNames);
   }
 
-  public void setAttributeTitles(final List<String> columnIndexTitles) {
-    this.attributeTitles = new ArrayList<String>(columnIndexTitles);
+  public void setAttributeTitles(final List<String> attributeTitles) {
+    this.attributeTitles.clear();
+    for (int i = 0; i < this.attributeNames.size(); i++) {
+      String title;
+      if (i < attributeTitles.size()) {
+        title = attributeTitles.get(i);
+      } else {
+        final String attributeName = getAttributeName(i);
+        DataObjectMetaData metaData = getMetaData();
+        Attribute attribute = metaData.getAttribute(attributeName);
+        title = attribute.getTitle();
+      }
+      this.attributeTitles.add(title);
+    }
   }
 
   public void setEditable(final boolean editable) {

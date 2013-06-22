@@ -60,7 +60,7 @@ public abstract class AbstractMultipleRenderer extends
 
   @Override
   public boolean isVisible(final LayerDataObject object) {
-    if (super.isVisible(object)) {
+    if (super.isVisible() && super.isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         if (renderer.isVisible(object)) {
           return true;

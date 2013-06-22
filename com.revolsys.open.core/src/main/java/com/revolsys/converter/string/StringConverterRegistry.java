@@ -47,10 +47,12 @@ public class StringConverterRegistry {
     }
   }
 
-  public static Object toObject(final DataType dataType, final Object value) {
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings({
+    "unchecked"
+  })
+  public static <V> V toObject(final DataType dataType, final Object value) {
     final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    return toObject(dataTypeClass, value);
+    return (V)toObject(dataTypeClass, value);
   }
 
   public static Object toObject(final Object value) {

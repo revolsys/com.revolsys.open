@@ -43,11 +43,18 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   private DataObjectMetaData metaData;
 
+  private String title;
+
+  private Object minValue;
+
+  private Object maxValue;
+
   public Attribute() {
   }
 
   public Attribute(final Attribute attribute) {
     this.name = attribute.getName();
+    this.title = attribute.getTitle();
     this.description = attribute.getDescription();
     this.type = attribute.getType();
     this.required = attribute.isRequired();
@@ -176,6 +183,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description) {
     this.name = name;
+    this.title = name;
     this.description = description;
     this.type = type;
     if (required != null) {
@@ -205,6 +213,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description, final Map<String, Object> properties) {
     this.name = name;
+    this.title = name;
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -277,8 +286,18 @@ public class Attribute extends AbstractObjectWithProperties implements
     return length;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V> V getMaxValue() {
+    return (V)maxValue;
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V getMinValue() {
+    return (V)minValue;
   }
 
   /**
@@ -297,6 +316,10 @@ public class Attribute extends AbstractObjectWithProperties implements
    */
   public int getScale() {
     return scale;
+  }
+
+  public String getTitle() {
+    return title;
   }
 
   /**
@@ -369,12 +392,32 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.index = index;
   }
 
+  public void setLength(final int length) {
+    this.length = length;
+  }
+
+  public void setMaxValue(final Object maxValue) {
+    this.maxValue = maxValue;
+  }
+
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
   }
 
+  public void setMinValue(final Object minValue) {
+    this.minValue = minValue;
+  }
+
   public void setRequired(final boolean required) {
     this.required = required;
+  }
+
+  public void setScale(final int scale) {
+    this.scale = scale;
+  }
+
+  public void setTitle(final String title) {
+    this.title = title;
   }
 
   public void setType(final DataType type) {

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -497,6 +498,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public void setSelectedObjects(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerDataObject> objects = getObjects(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject)) {
+          iterator.remove();
+        }
+      }
       setSelectedObjects(objects);
     }
   }
