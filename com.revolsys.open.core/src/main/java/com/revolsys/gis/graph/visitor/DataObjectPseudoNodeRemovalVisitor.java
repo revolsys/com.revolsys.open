@@ -87,7 +87,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     final DataObject object2 = edge2.getObject();
 
     final DataObject newObject = mergeObjects(node, object1, object2);
-    newObject.setIdValue(null);
+    // newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
     final Edge<DataObject> newEdge = graph.addEdge(newObject);

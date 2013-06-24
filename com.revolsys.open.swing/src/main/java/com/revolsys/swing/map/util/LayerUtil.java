@@ -282,6 +282,10 @@ public class LayerUtil {
 
   public static void showViewAttributes() {
     final DataObjectLayer layer = ObjectTree.getMouseClickItem();
+    showViewAttributes(layer);
+  }
+
+  public static void showViewAttributes(final DataObjectLayer layer) {
     if (layer != null) {
       DefaultSingleCDockable dockable;
       synchronized (layer) {

@@ -543,7 +543,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isDeleted(final LayerDataObject object) {
-    return deletedObjects.contains(object);
+    return deletedObjects != null && deletedObjects.contains(object);
   }
 
   @Override

@@ -291,6 +291,9 @@ public final class JdbcUtils {
       }
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());
+      if (attributeNames.isEmpty()) {
+        attributeNames.add("T.*");
+      }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
       sql = createSelectSql(metaData, "T", fromClause, lockResults,

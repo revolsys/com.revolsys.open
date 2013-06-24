@@ -593,6 +593,10 @@ public class DataObjectLayerForm extends JPanel implements
     return fieldName;
   }
 
+  public Set<String> getFieldNames() {
+    return fields.keySet();
+  }
+
   public Collection<Field> getFields() {
     return fields.values();
   }
@@ -615,6 +619,10 @@ public class DataObjectLayerForm extends JPanel implements
       final Object id = codeTable.getId(value);
       return (T)id;
     }
+  }
+
+  public String getGeometryAttributeName() {
+    return getMetaData().getGeometryAttributeName();
   }
 
   public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
@@ -729,7 +737,8 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected boolean isFieldValidationEnabled() {
-    return fieldValidationDisabled.get() != Boolean.FALSE;
+    final boolean enabled = fieldValidationDisabled.get() != Boolean.FALSE;
+    return enabled;
   }
 
   protected boolean isTabValid(final int index) {
@@ -808,18 +817,37 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void reverseAttributes() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    property.reverseAttributes(object);
+    final boolean enbled = setFieldValidationEnabled(false);
+    try {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+      property.reverseAttributes(object);
+    } finally {
+      setFieldValidationEnabled(enbled);
+      validateFields();
+    }
   }
 
   public void reverseAttributesAndGeometry() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    property.reverseAttributesAndGeometry(object);
+    final boolean enbled = setFieldValidationEnabled(false);
+    try {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+      property.reverseAttributesAndGeometry(object);
+    } finally {
+      setFieldValidationEnabled(enbled);
+      validateFields();
+    }
   }
 
   public void reverseGeometry() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-    property.reverseGeometry(object);
+    final boolean enbled = setFieldValidationEnabled(false);
+    try {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
+      property.reverseGeometry(object);
+    } finally {
+      setFieldValidationEnabled(enbled);
+      final String geometryAttributeName = getGeometryAttributeName();
+      validateField(geometryAttributeName);
+    }
   }
 
   public void setAddOkButtonEnabled(final boolean enabled) {
@@ -905,7 +933,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected boolean setFieldValidationEnabled(
     final boolean fieldValidationEnabled) {
-    final boolean oldValue = this.fieldValidationDisabled.get() != Boolean.FALSE;
+    final boolean oldValue = isFieldValidationEnabled();
     this.fieldValidationDisabled.set(fieldValidationEnabled);
     return oldValue;
   }
@@ -921,12 +949,12 @@ public class DataObjectLayerForm extends JPanel implements
       || !EqualsRegistry.equal(value, oldValue)) {
       changed = true;
     }
-    SwingUtil.setFieldValue(field, value);
     final Object objectValue = object.getValue(fieldName);
     if (!EqualsRegistry.equal(value, objectValue)) {
       object.setValueByPath(fieldName, value);
       changed = true;
     }
+    SwingUtil.setFieldValue(field, value);
     if (changed && validate) {
       validateField(fieldName);
     }
@@ -1104,6 +1132,11 @@ public class DataObjectLayerForm extends JPanel implements
       SwingUtil.invokeLater(this, "updateTabsValid", fieldName);
     }
     return valid;
+  }
+
+  public void validateFields() {
+    final Set<String> fieldNames = getFieldNames();
+    validateFields(fieldNames);
   }
 
   protected boolean validateFields(final Collection<String> fieldNames) {
