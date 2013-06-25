@@ -23,6 +23,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.util.AssertionFailedException;
@@ -303,8 +304,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public Attribute getAttribute(final CharSequence name) {
-    final String lowerName = name.toString().toLowerCase();
-    return attributeMap.get(lowerName);
+    if (name == null) {
+      return null;
+    } else {
+      final String lowerName = name.toString().toLowerCase();
+      return attributeMap.get(lowerName);
+    }
   }
 
   @Override
@@ -382,6 +387,16 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public int getAttributeScale(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getScale();
+  }
+
+  @Override
+  public String getAttributeTitle(final String fieldName) {
+    final Attribute attribute = getAttribute(fieldName);
+    if (attribute == null) {
+      return CaseConverter.toCapitalizedWords(fieldName);
+    } else {
+      return attribute.getTitle();
+    }
   }
 
   @Override

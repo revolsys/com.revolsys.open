@@ -106,7 +106,6 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
 
   @Override
   public boolean isFieldValid() {
-
     final File directory = getDirectoryFile();
     if (directory == null || !directory.exists()) {
       directoryName.setForeground(Color.RED);
@@ -123,6 +122,22 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
 
   public void setDirectoryPath(final String directoryPath) {
     directoryName.setText(directoryPath);
+  }
+
+  @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_FOREGROUND;
+    }
+    setForeground(color);
   }
 
   @Override

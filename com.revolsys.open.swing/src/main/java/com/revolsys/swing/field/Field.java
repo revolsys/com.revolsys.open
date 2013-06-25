@@ -1,5 +1,6 @@
 package com.revolsys.swing.field;
 
+import java.awt.Color;
 import java.beans.PropertyChangeListener;
 
 public interface Field {
@@ -11,6 +12,10 @@ public interface Field {
   <T> T getFieldValue();
 
   void setEnabled(boolean enabled);
+
+  void setFieldBackgroundColor(Color color);
+
+  void setFieldForegroundColor(Color color);
 
   void setFieldInvalid(String message);
 

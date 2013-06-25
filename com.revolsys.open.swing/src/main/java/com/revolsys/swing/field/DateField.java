@@ -63,6 +63,24 @@ public class DateField extends JXDatePicker implements Field,
   }
 
   @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    final JFormattedTextField editor = getEditor();
+    editor.setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    final JFormattedTextField editor = getEditor();
+    editor.setForeground(color);
+  }
+
+  @Override
   public void setFieldInvalid(final String message) {
     final JFormattedTextField editor = getEditor();
     editor.setForeground(Color.RED);

@@ -110,6 +110,22 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = defaultBackground;
+    }
+    setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = defaultForeground;
+    }
+    setForeground(color);
+  }
+
+  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setBackground(Color.PINK);

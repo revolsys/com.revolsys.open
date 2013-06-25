@@ -152,6 +152,11 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public MavenPom getPom(final String id) {
     final String[] parts = id.split(":");
+    if (parts.length < 3) {
+      throw new IllegalArgumentException(
+        id
+          + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
+    }
     final String groupId = parts[0];
     final String artifactId = parts[1];
     String version;

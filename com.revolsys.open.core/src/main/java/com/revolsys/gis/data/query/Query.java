@@ -283,6 +283,10 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.sql = sql;
   }
 
+  public void setSqlWhereCondition(final String whereCondition) {
+    setWhereCondition(Conditions.sql(whereCondition));
+  }
+
   public void setTypeName(final String typeName) {
     this.typeName = typeName;
   }

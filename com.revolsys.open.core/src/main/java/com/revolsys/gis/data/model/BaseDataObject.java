@@ -118,6 +118,11 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     return this == o;
   }
 
+  public String getAttributeTitle(final String name) {
+    final DataObjectMetaData metaData = getMetaData();
+    return metaData.getAttributeTitle(name);
+  }
+
   @Override
   public Byte getByte(final CharSequence name) {
     final Number value = getValue(name);

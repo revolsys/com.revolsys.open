@@ -78,6 +78,22 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = DEFAULT_BACKGROUND;
+    }
+    setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = DEFAULT_FOREGROUND;
+    }
+    setForeground(color);
+  }
+
+  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setSelectedTextColor(Color.RED);

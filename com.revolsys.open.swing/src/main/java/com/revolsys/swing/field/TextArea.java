@@ -72,6 +72,22 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    setForeground(color);
+  }
+
+  @Override
   public void setFieldInvalid(final String message) {
     setForeground(Color.RED);
     setSelectedTextColor(Color.RED);

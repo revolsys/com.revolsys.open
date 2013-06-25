@@ -85,6 +85,26 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
+  public void setFieldBackgroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_BACKGROUND;
+    }
+    final ComboBoxEditor editor = getEditor();
+    final Component component = editor.getEditorComponent();
+    component.setBackground(color);
+  }
+
+  @Override
+  public void setFieldForegroundColor(Color color) {
+    if (color == null) {
+      color = TextField.DEFAULT_FOREGROUND;
+    }
+    final ComboBoxEditor editor = getEditor();
+    final Component component = editor.getEditorComponent();
+    component.setForeground(color);
+  }
+
+  @Override
   public void setFieldInvalid(final String message) {
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();

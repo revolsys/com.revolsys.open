@@ -75,8 +75,6 @@ public final class MathUtil {
   public static final double PI_TIMES_2 = 2.0 * Math.PI;
 
   /**
-   * Divide two currency amounts, setting the scale to {@link #CURRENCY_SCALE}
-   * and rounding 1/2 u
    * 
    * @param left The left operand.
    * @param right The right operand.
@@ -335,6 +333,19 @@ public final class MathUtil {
     return angleNorthDegrees(x1, y1, x2, y2);
   }
 
+  public static BigDecimal getBigDecimal(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      try {
+        final String stringValue = StringConverterRegistry.toString(value);
+        return new BigDecimal(stringValue);
+      } catch (final NumberFormatException e) {
+        return null;
+      }
+    }
+  }
+
   /**
    * Convert a BigDecimal amount into a currency BigDecimal.
    * 
@@ -532,6 +543,15 @@ public final class MathUtil {
 
     return Math.abs(s)
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V extends Number> V subtract(final Number left,
+    final Number right, final Class<V> resultClass) {
+    final BigDecimal a = getBigDecimal(left);
+    final BigDecimal b = getBigDecimal(right);
+    final BigDecimal result = a.subtract(b);
+    return (V)StringConverterRegistry.toObject(resultClass, result);
   }
 
   public static double[] toDoubleArray(final List<? extends Number> numbers) {

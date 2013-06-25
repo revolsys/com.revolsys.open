@@ -67,7 +67,6 @@ import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
-import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -109,8 +108,6 @@ public class DataObjectLayerForm extends JPanel implements
   private DataObjectMetaData metaData;
 
   private LayerDataObject object;
-
-  private final Map<String, String> originalToolTip = new HashMap<String, String>();
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
@@ -157,7 +154,6 @@ public class DataObjectLayerForm extends JPanel implements
       addTabGeometry();
     }
     layer.addPropertyChangeListener(this);
-    // TODO mark the object as attribute editing
   }
 
   public DataObjectLayerForm(final DataObjectLayer layer,
@@ -601,6 +597,11 @@ public class DataObjectLayerForm extends JPanel implements
     return fields.values();
   }
 
+  public String getFieldTitle(final String fieldName) {
+    final DataObjectMetaData metaData = getMetaData();
+    return metaData.getAttributeTitle(fieldName);
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
     final Object value = fieldValues.get(name);
@@ -877,22 +878,14 @@ public class DataObjectLayerForm extends JPanel implements
     if (message == null) {
       message = "Invalid value";
     }
+    fieldInValidMessage.put(fieldName, message);
     if (SwingUtilities.isEventDispatchThread()) {
-      if (isFieldValid(fieldName)) {
-        fieldsValid = false;
-        final JComponent field = getField(fieldName);
-        fieldInValidMessage.put(fieldName, message);
-        if (field instanceof Field) {
-          final Field fieldComponent = (Field)field;
-          fieldComponent.setFieldInvalid(message);
-        } else {
-          setFieldInvalidToolTip(fieldName, field);
-          field.setForeground(Color.RED);
-          field.setBackground(Color.PINK);
-        }
-        fieldValidMap.put(fieldName, false);
-        updateTabsValid(fieldName);
-      }
+      fieldsValid = false;
+      final Field field = getField(fieldName);
+      field.setFieldInvalid(message);
+
+      fieldValidMap.put(fieldName, false);
+      updateTabsValid(fieldName);
     } else {
       SwingUtil.invokeLater(this, "setFieldInvalid", fieldName, message);
     }
@@ -908,22 +901,14 @@ public class DataObjectLayerForm extends JPanel implements
 
   public boolean setFieldValid(final String fieldName) {
     if (SwingUtilities.isEventDispatchThread()) {
-      if (!isFieldValid(fieldName)) {
-        final JComponent field = getField(fieldName);
-        field.setForeground(Color.BLACK);
-        final String toolTip = originalToolTip.get(fieldName);
-        if (field instanceof Field) {
-          final Field fieldComponent = (Field)field;
-          fieldComponent.setFieldValid();
-        } else {
-          field.setToolTipText(toolTip);
-          field.setForeground(TextField.DEFAULT_FOREGROUND);
-          field.setBackground(TextField.DEFAULT_BACKGROUND);
-        }
-        fieldValidMap.put(fieldName, true);
-        fieldInValidMessage.remove(fieldName);
-        updateTabsValid(fieldName);
+      final Field field = getField(fieldName);
+      field.setFieldValid();
+      if (object.isModified(fieldName)) {
+        field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
       }
+      fieldValidMap.put(fieldName, true);
+      fieldInValidMessage.remove(fieldName);
+      updateTabsValid(fieldName);
       return true;
     } else {
       SwingUtil.invokeLater(this, "setFieldValid", fieldName);

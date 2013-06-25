@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.i18n.I18nCharSequence;
@@ -33,6 +34,14 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
       methodName, parameters);
     final JButton button = new JButton(action);
     return button;
+  }
+
+  public static JMenuItem createMenuItem(final String name,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, object,
+      methodName, parameters);
+    final JMenuItem menuItem = new JMenuItem(action);
+    return menuItem;
   }
 
   private boolean invokeLater;

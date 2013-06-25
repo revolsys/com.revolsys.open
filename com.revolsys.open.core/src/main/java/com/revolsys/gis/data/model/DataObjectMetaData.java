@@ -98,6 +98,8 @@ public interface DataObjectMetaData extends ObjectWithProperties,
    */
   int getAttributeScale(int index);
 
+  String getAttributeTitle(String fieldName);
+
   DataType getAttributeType(CharSequence name);
 
   /**
