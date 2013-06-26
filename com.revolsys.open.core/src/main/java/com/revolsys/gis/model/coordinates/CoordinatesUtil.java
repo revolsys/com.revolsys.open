@@ -130,9 +130,9 @@ public class CoordinatesUtil {
 
   public static Coordinates get(final Coordinate coordinate) {
     if (Double.isNaN(coordinate.z)) {
-      return new DoubleCoordinates(coordinate.z, coordinate.y);
+      return new DoubleCoordinates(coordinate.x, coordinate.y);
     } else {
-      return new DoubleCoordinates(coordinate.z, coordinate.y, coordinate.z);
+      return new DoubleCoordinates(coordinate.x, coordinate.y, coordinate.z);
     }
   }
 

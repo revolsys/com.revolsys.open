@@ -246,15 +246,32 @@ public final class JdbcUtils {
   }
 
   public static String getProductName(final DataSource dataSource) {
-    final Connection connection = getConnection(dataSource);
-    try {
-      final DatabaseMetaData metaData = connection.getMetaData();
-      return metaData.getDatabaseProductName();
-    } catch (final SQLException e) {
-      throw new IllegalArgumentException("Unable to get database product name",
-        e);
-    } finally {
-      release(connection, dataSource);
+    if (dataSource == null) {
+      return null;
+    } else {
+      final Connection connection = getConnection(dataSource);
+      try {
+        if (connection == null) {
+          if (dataSource.getClass().getName().toLowerCase().contains("oracle")) {
+            return "Oracle";
+          } else if (dataSource.getClass()
+            .getName()
+            .toLowerCase()
+            .contains("postgres")) {
+            return "PostgreSQL";
+          } else {
+            return null;
+          }
+        } else {
+          final DatabaseMetaData metaData = connection.getMetaData();
+          return metaData.getDatabaseProductName();
+        }
+      } catch (final SQLException e) {
+        throw new IllegalArgumentException(
+          "Unable to get database product name", e);
+      } finally {
+        release(connection, dataSource);
+      }
     }
   }
 

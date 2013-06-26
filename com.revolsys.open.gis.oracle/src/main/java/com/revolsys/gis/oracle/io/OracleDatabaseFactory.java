@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
@@ -31,21 +32,30 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
 
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
 
+  protected void addCacheProperty(final Map<String, Object> config,
+    final String key, final Properties cacheProperties,
+    final String propertyName, final Object defaultValue,
+    final DataType dataType) {
+    Object value = config.remove(key);
+    if (value == null) {
+      value = config.get(propertyName);
+    }
+    cacheProperties.put(propertyName, String.valueOf(defaultValue));
+    if (value != null) {
+      try {
+        final Object propertyValue = StringConverterRegistry.toObject(dataType,
+          value);
+        final String stringValue = String.valueOf(propertyValue);
+        cacheProperties.put(propertyName, stringValue);
+      } catch (final Throwable e) {
+      }
+    }
+  }
+
+  @Override
   public boolean canHandleUrl(final String url) {
     final Matcher urlMatcher = URL_PATTERN.matcher(url);
     return urlMatcher.matches();
-  }
-
-  public void closeDataSource(final DataSource dataSource) {
-    if (dataSource instanceof OracleDataSource) {
-      final OracleDataSource oracleDataSource = (OracleDataSource)dataSource;
-      try {
-        oracleDataSource.close();
-      } catch (final SQLException e) {
-        LoggerFactory.getLogger(OracleDatabaseFactory.class).warn(
-          "Unable to close data source", e);
-      }
-    }
   }
 
   // public void closeDataSource(final DataSource dataSource) {
@@ -65,39 +75,54 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   // }
   // }
 
+  @Override
+  public void closeDataSource(final DataSource dataSource) {
+    if (dataSource instanceof OracleDataSource) {
+      final OracleDataSource oracleDataSource = (OracleDataSource)dataSource;
+      try {
+        oracleDataSource.close();
+      } catch (final SQLException e) {
+        LoggerFactory.getLogger(OracleDatabaseFactory.class).warn(
+          "Unable to close data source", e);
+      }
+    }
+  }
+
+  @Override
+  public JdbcDataObjectStore createDataObjectStore(final DataSource dataSource) {
+    return new OracleDataObjectStore(dataSource);
+  }
+
+  @Override
   public JdbcDataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     return new OracleDataObjectStore(this, connectionProperties);
   }
 
-  public JdbcDataObjectStore createDataObjectStore(final DataSource dataSource) {
-    return new OracleDataObjectStore(dataSource);
-  }
-
+  @Override
   public DataSource createDataSource(final Map<String, ? extends Object> config) {
     try {
       final Map<String, Object> newConfig = new HashMap<String, Object>(config);
-      Properties cacheProperties = new Properties();
+      final Properties cacheProperties = new Properties();
       final String url = (String)newConfig.remove("url");
       final String username = (String)newConfig.remove("username");
       final String password = (String)newConfig.remove("password");
-      Object minimumPoolSize = newConfig.remove("minPoolSize");
-      if (minimumPoolSize != null) {
-        final int minPoolSize = (Integer)StringConverterRegistry.toObject(
-          DataTypes.INT, minimumPoolSize);
-        cacheProperties.put("MinLimit", minPoolSize);
-      }
-      Object maximumPoolSize = newConfig.remove("maxPoolSize");
-      if (maximumPoolSize != null) {
-        final int maxPoolSize = (Integer)StringConverterRegistry.toObject(
-          DataTypes.INT, maximumPoolSize);
-        cacheProperties.put("MaxLimit", maxPoolSize);
-      }
-      cacheProperties.put("InactivityTimeout", 300);
+      addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit",
+        0, DataTypes.INT);
+      addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit",
+        10, DataTypes.INT);
+      addCacheProperty(newConfig, "inactivityTimeout", cacheProperties,
+        "InactivityTimeout", 300, DataTypes.INT);
+      addCacheProperty(newConfig, "waitTimeout", cacheProperties,
+        "ConnectionWaitTimeout", 1, DataTypes.INT);
+      addCacheProperty(newConfig, "validateConnection", cacheProperties,
+        "ValidateConnection", Boolean.TRUE, DataTypes.BOOLEAN);
+
       final OracleDataSource dataSource = new OracleDataSource();
 
       dataSource.setConnectionCachingEnabled(true);
       dataSource.setConnectionCacheProperties(cacheProperties);
+
       for (final Entry<String, Object> property : newConfig.entrySet()) {
         final String name = property.getKey();
         final Object value = property.getValue();
@@ -160,15 +185,18 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   // }
   // }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 
+  @Override
   public List<String> getProductNames() {
     return Collections.singletonList("Oracle");
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
   }
