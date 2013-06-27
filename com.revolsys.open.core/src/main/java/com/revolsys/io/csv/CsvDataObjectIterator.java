@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -20,9 +23,23 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.CollectionUtil;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
+
+  private String pointXAttributeName;
+
+  private String pointYAttributeName;
+
+  private String geometryColumnName;
+
+  private DataType geometryType;
+
+  private Integer geometrySrid;
+
+  private GeometryFactory geometryFactory;
 
   private final DataObjectFactory dataObjectFactory;
 
@@ -33,6 +50,8 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   private DataObjectMetaData metaData;
 
   private final Resource resource;
+
+  private boolean hasPointFields;
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
@@ -52,6 +71,27 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       final DataType type = DataTypes.STRING;
       attributes.add(new Attribute(name, type, false));
     }
+    hasPointFields = StringUtils.hasText(pointXAttributeName)
+      && StringUtils.hasText(pointYAttributeName);
+    if (geometryColumnName != null || hasPointFields) {
+      if (hasPointFields) {
+        geometryType = DataTypes.POINT;
+      } else {
+        pointXAttributeName = null;
+        pointYAttributeName = null;
+      }
+      if (!StringUtils.hasText(geometryColumnName)) {
+        geometryColumnName = "GEOMETRY";
+      }
+      final Attribute geometryAttribute = new Attribute(geometryColumnName,
+        geometryType, true);
+      attributes.add(geometryAttribute);
+      if (geometryFactory == null) {
+        geometryFactory = GeometryFactory.WGS84;
+      }
+      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryFactory);
+    }
     final String filename = FileUtil.getBaseName(resource.getFilename());
     metaData = new DataObjectMetaDataImpl(filename, getProperties(), attributes);
   }
@@ -67,6 +107,22 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   @Override
   protected void doInit() {
     try {
+      pointXAttributeName = getProperty("pointXAttributeName");
+      pointYAttributeName = getProperty("pointYAttributeName");
+      geometryColumnName = getProperty("geometryColumnName");
+      geometrySrid = StringConverterRegistry.toObject(DataTypes.INT,
+        getProperty("geometryColumnName"));
+      if (geometrySrid != null) {
+        geometryFactory = GeometryFactory.getFactory(geometrySrid);
+      }
+      final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
+      if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
+        this.geometryType = geometryType;
+      } else {
+        this.geometryType = DataTypes.GEOMETRY;
+      }
+      geometryFactory = getProperty("geometryFactory");
+
       this.in = new BufferedReader(new InputStreamReader(
         this.resource.getInputStream(), CsvConstants.CHARACTER_SET));
       final String[] line = readNextRecord();
@@ -128,6 +184,14 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
             dataType, value);
           object.setValue(i, convertedValue);
         }
+      }
+    }
+    if (hasPointFields) {
+      final Double x = CollectionUtil.getDouble(object, pointXAttributeName);
+      final Double y = CollectionUtil.getDouble(object, pointYAttributeName);
+      if (x != null && y != null) {
+        final Geometry geometry = geometryFactory.createPoint(x, y);
+        object.setGeometryValue(geometry);
       }
     }
     return object;

@@ -12,6 +12,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactory;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.esri.gdb.file.capi.CapiFileGdbDataObjectStore;
+import com.revolsys.io.FileUtil;
 
 public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
@@ -31,7 +32,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
     final String url = (String)properties.remove("url");
     try {
       final URI uri = new URI(url);
-      final File file = new File(uri);
+      final File file = FileUtil.getFile(new File(uri));
 
       final FileGdbDataObjectStore dataObjectStore = create(file);
       DataObjectStoreFactoryRegistry.setConnectionProperties(dataObjectStore,
@@ -39,7 +40,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
       return dataObjectStore;
     } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Url is not valid " + url, e);
-    } 
+    }
   }
 
   @Override

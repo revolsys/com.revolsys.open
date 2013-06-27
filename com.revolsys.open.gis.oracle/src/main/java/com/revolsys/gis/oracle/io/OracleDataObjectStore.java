@@ -221,12 +221,12 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
       final OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
       addAttributeAdder("CLOB", clobAdder);
+      setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
       setPermissionsSql("select distinct owner \"SCHEMA\", table_name, privilege "
         + "from ALL_TAB_PRIVS_RECD P "
         + "where privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') AND ( "
         + "EXISTS (SELECT * FROM ALL_VIEWS V WHERE V.OWNER = P.OWNER AND V.VIEW_NAME = P.TABLE_NAME) OR "
-        + "EXISTS (SELECT * FROM ALL_TABLES T WHERE T.OWNER = P.OWNER AND T.TABLE_NAME = P.TABLE_NAME)   ) "
-        + " order by owner, table_name, privilege");
+        + "EXISTS (SELECT * FROM ALL_TABLES T WHERE T.OWNER = P.OWNER AND T.TABLE_NAME = P.TABLE_NAME)   ) ");
     }
   }
 

@@ -79,8 +79,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String permissionsSql;
 
-  private List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
-
   private Map<String, String> schemaNameMap = new HashMap<String, String>();
 
   private Map<String, String> tableNameMap = new HashMap<String, String>();
@@ -90,6 +88,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   private final Object writerKey = new Object();
 
   private Map<String, Map<String, List<String>>> schemaTablePermissions;
+
+  private String primaryKeySql;
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -164,7 +164,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       sqlPrefix = null;
       sqlSuffix = null;
       tableNameMap = null;
-      tableTypes = null;
     }
   }
 
@@ -323,10 +322,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  public String getDatabaseSchemaName(final String schemaPath) {
-    return schemaNameMap.get(schemaPath);
-  }
-
   // protected Set<String> getDatabaseSchemaNames() {
   // final Set<String> databaseSchemaNames = new TreeSet<String>();
   // try {
@@ -352,9 +347,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   // return databaseSchemaNames;
   // }
 
-  protected Set<String> getDatabaseSchemaNames() {
-    final Map<String, Map<String, List<String>>> tablePermissions = getSchemaTablePermissions();
-    return tablePermissions.keySet();
+  public String getDatabaseSchemaName(final String schemaPath) {
+    return schemaNameMap.get(schemaPath);
   }
 
   // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
@@ -384,6 +378,11 @@ public abstract class AbstractJdbcDataObjectStore extends
   // releaseConnection(connection);
   // }
   // }
+
+  protected Set<String> getDatabaseSchemaNames() {
+    final Map<String, Map<String, List<String>>> tablePermissions = getSchemaTablePermissions();
+    return tablePermissions.keySet();
+  }
 
   public String getDatabaseTableName(final String typePath) {
     return tableNameMap.get(typePath);
@@ -419,21 +418,28 @@ public abstract class AbstractJdbcDataObjectStore extends
     return hints;
   }
 
+  public String getIdAttributeName(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.getIdAttributeName();
+    }
+  }
+
   @Override
   public DataObjectMetaData getMetaData(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
       final String schemaName = PathUtil.getPath(typePath);
       final DataObjectStoreSchema schema = getSchema(schemaName);
-      final String dbSchema = getDatabaseSchemaName(schema);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
         schema, typePath);
 
-      final String tableName = getDatabaseTableName(typePath);
-      final String idColumnName = loadIdColumnName(dbSchema, tableName);
+      final String idAttributeName = getIdAttributeName(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
         final String name = resultSetMetaData.getColumnName(i).toUpperCase();
-        if (name.equals(idColumnName)) {
+        if (name.equals(idAttributeName)) {
           metaData.setIdAttributeIndex(i - 1);
         }
         addAttribute(resultSetMetaData, metaData, name, i);
@@ -685,29 +691,31 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public abstract boolean isSchemaExcluded(String schemaName);
 
-  private synchronized String loadIdColumnName(final String schemaName,
-    final String tableName) {
+  protected synchronized Map<String, String> loadIdColumnNames(
+    final String dbSchemaName) {
+    final String schemaName = "/" + dbSchemaName.toUpperCase();
+    final Map<String, String> idColumnNames = new HashMap<String, String>();
     final Connection connection = getDbConnection();
     try {
-      final DatabaseMetaData databaseMetaData = connection.getMetaData();
-      final ResultSet rs = databaseMetaData.getPrimaryKeys(null, schemaName,
-        tableName);
+      final PreparedStatement statement = connection.prepareStatement(primaryKeySql);
+      statement.setString(1, dbSchemaName);
+      final ResultSet rs = statement.executeQuery();
       try {
-        if (rs.next()) {
-          final String idColumnName = rs.getString("COLUMN_NAME");
-          return idColumnName;
-        } else {
-          return null;
+        while (rs.next()) {
+          final String tableName = rs.getString("TABLE_NAME").toUpperCase();
+          final String idAttributeName = rs.getString("COLUMN_NAME");
+          idColumnNames.put(schemaName + "/" + tableName, idAttributeName);
         }
       } finally {
         JdbcUtils.close(rs);
       }
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to primary keys for schema "
-        + schemaName, e);
+        + dbSchemaName, e);
     } finally {
       releaseConnection(connection);
     }
+    return idColumnNames;
   }
 
   @Override
@@ -723,7 +731,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-      final Map<String, String> idColumnNames = new HashMap<String, String>();
+      final Map<String, String> idAttributeNames = loadIdColumnNames(dbSchemaName);
       final Set<String> tableNames = getDatabaseTableNames(dbSchemaName);
       for (final String dbTableName : tableNames) {
         final String tableName = dbTableName.toUpperCase();
@@ -735,8 +743,6 @@ public abstract class AbstractJdbcDataObjectStore extends
           dbTableName);
         metaData.setProperty("permissions", permissions);
         metaDataMap.put(typePath, metaData);
-        final String idColumnName = loadIdColumnName(dbSchemaName, dbTableName);
-        idColumnNames.put(typePath, idColumnName);
       }
 
       final ResultSet columnsRs = databaseMetaData.getColumns(null,
@@ -759,12 +765,15 @@ public abstract class AbstractJdbcDataObjectStore extends
             }
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
-            if (name.equalsIgnoreCase(idColumnNames.get(typePath))) {
-              metaData.setIdAttributeIndex(metaData.getAttributeCount());
-            }
             addAttribute(metaData, name, dataType, sqlType, length, scale,
               required);
           }
+        }
+
+        for (final DataObjectMetaData metaData : schema.getTypes()) {
+          final String typePath = metaData.getPath();
+          final String idAttributeName = idAttributeNames.get(typePath);
+          ((DataObjectMetaDataImpl)metaData).setIdAttributeName(idAttributeName);
         }
 
       } finally {
@@ -888,6 +897,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   protected void setPermissionsSql(final String permissionsSql) {
     this.permissionsSql = permissionsSql;
+  }
+
+  public void setPrimaryKeySql(final String primaryKeySql) {
+    this.primaryKeySql = primaryKeySql;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {
