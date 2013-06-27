@@ -30,21 +30,11 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   private boolean editable;
 
-  public DataObjectRowTableModel(final DataObjectMetaData metaData) {
-    this(metaData, metaData.getAttributeNames());
-  }
-
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
     final List<String> attributeNames) {
-    this(metaData, attributeNames, Collections.<String> emptyList());
-
-  }
-
-  public DataObjectRowTableModel(final DataObjectMetaData metaData,
-    final List<String> attributeNames, final List<String> attributeTitles) {
     this.metaData = metaData;
     setAttributeNames(attributeNames);
-    setAttributeTitles(attributeTitles);
+    setAttributeTitles(Collections.<String> emptyList());
   }
 
   public void clearSortedColumns() {
@@ -161,8 +151,8 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
         title = attributeTitles.get(i);
       } else {
         final String attributeName = getAttributeName(i);
-        DataObjectMetaData metaData = getMetaData();
-        Attribute attribute = metaData.getAttribute(attributeName);
+        final DataObjectMetaData metaData = getMetaData();
+        final Attribute attribute = metaData.getAttribute(attributeName);
         title = attribute.getTitle();
       }
       this.attributeTitles.add(title);

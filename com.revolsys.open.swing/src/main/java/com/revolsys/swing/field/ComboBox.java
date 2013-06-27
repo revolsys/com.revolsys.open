@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
@@ -111,17 +112,24 @@ public class ComboBox extends JComboBox implements Field {
     component.setForeground(Color.RED);
     component.setBackground(Color.PINK);
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    setFieldToolTip(errorMessage);
+  }
+
+  @Override
+  public void setFieldToolTip(final String toolTip) {
+    final ComboBoxEditor editor = getEditor();
+    final JComponent component = (JComponent)editor.getEditorComponent();
+    component.setToolTipText(toolTip);
   }
 
   @Override
   public void setFieldValid() {
     final ComboBoxEditor editor = getEditor();
-    final Component component = editor.getEditorComponent();
+    final JComponent component = (JComponent)editor.getEditorComponent();
     component.setForeground(TextField.DEFAULT_FOREGROUND);
     component.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    setFieldToolTip(originalToolTip);
   }
 
   @Override

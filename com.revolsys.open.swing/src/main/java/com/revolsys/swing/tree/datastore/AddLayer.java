@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.layer.Layer;
@@ -27,12 +26,9 @@ public class AddLayer extends I18nAction {
       DataObjectMetaData.class);
     for (final DataObjectMetaData metaData : types) {
       final String typePath = metaData.getPath();
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute != null) {
-        final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
-        final Layer layer = new DataObjectStoreLayer(dataObjectStore, typePath);
-        LayerUtil.addLayer(layer);
-      }
+      final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+      final Layer layer = new DataObjectStoreLayer(dataObjectStore, typePath);
+      LayerUtil.addLayer(layer);
     }
   }
 

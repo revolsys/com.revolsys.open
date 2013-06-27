@@ -904,7 +904,17 @@ public class DataObjectLayerForm extends JPanel implements
       final Field field = getField(fieldName);
       field.setFieldValid();
       if (object.isModified(fieldName)) {
+        final Object originalValue = object.getOriginalValue(fieldName);
+        String originalString;
+        if (originalValue == null) {
+          originalString = "-";
+        } else {
+          originalString = StringConverterRegistry.toString(originalValue);
+        }
+        field.setFieldToolTip(originalString);
         field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
+      } else {
+        field.setFieldToolTip("");
       }
       fieldValidMap.put(fieldName, true);
       fieldInValidMessage.remove(fieldName);

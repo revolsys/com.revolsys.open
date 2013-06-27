@@ -2,7 +2,6 @@ package com.revolsys.swing.map.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,37 +51,28 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     if (metaData == null) {
       return null;
     } else {
-      return createTable(layer, metaData.getAttributeNames());
+      final List<String> columnNames = layer.getColumnNames();
+      final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
+        layer, columnNames);
+      final DataObjectRowTable table = new DataObjectRowTable(model);
+
+      ModifiedPredicate.add(table);
+      NewPredicate.add(table);
+      DeletedPredicate.add(table);
+
+      final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
+        model);
+      final TableColumnModel columnModel = table.getColumnModel();
+      for (int i = 0; i < columnModel.getColumnCount(); i++) {
+        final TableColumn column = columnModel.getColumn(i);
+
+        column.setCellRenderer(cellRenderer);
+      }
+      table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
+      layer.addPropertyChangeListener("selected",
+        new InvokeMethodPropertyChangeListener(table, "repaint"));
+      return table;
     }
-  }
-
-  public static DataObjectRowTable createTable(final DataObjectLayer layer,
-    final List<String> attributeNames) {
-    return createTable(layer, attributeNames, Collections.<String> emptyList());
-  }
-
-  public static DataObjectRowTable createTable(final DataObjectLayer layer,
-    final List<String> attributeNames, final List<String> attributeTitles) {
-    final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
-      layer, attributeNames, attributeTitles);
-    final DataObjectRowTable table = new DataObjectRowTable(model);
-
-    ModifiedPredicate.add(table);
-    NewPredicate.add(table);
-    DeletedPredicate.add(table);
-
-    final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
-      model);
-    final TableColumnModel columnModel = table.getColumnModel();
-    for (int i = 0; i < columnModel.getColumnCount(); i++) {
-      final TableColumn column = columnModel.getColumn(i);
-
-      column.setCellRenderer(cellRenderer);
-    }
-    table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
-    layer.addPropertyChangeListener("selected",
-      new InvokeMethodPropertyChangeListener(table, "repaint"));
-    return table;
   }
 
   private Condition searchCondition;
@@ -117,18 +107,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
-  public DataObjectLayerTableModel(final DataObjectLayer layer) {
-    this(layer, layer.getMetaData().getAttributeNames());
-  }
-
   public DataObjectLayerTableModel(final DataObjectLayer layer,
     final List<String> attributeNames) {
-    this(layer, attributeNames, new ArrayList<String>());
-  }
-
-  public DataObjectLayerTableModel(final DataObjectLayer layer,
-    final List<String> attributeNames, final List<String> attributeTitles) {
-    super(layer.getMetaData(), attributeNames, attributeTitles);
+    super(layer.getMetaData(), attributeNames);
     this.layer = layer;
     layer.addPropertyChangeListener(this);
     setEditable(false);

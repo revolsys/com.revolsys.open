@@ -2,6 +2,8 @@ package com.revolsys.gis.oracle.io;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +37,13 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
+
+  public static final List<String> ORACLE_INTERNAL_SCHEMAS = Arrays.asList(
+    "ANONYMOUS", "APEX_030200", "AURORA$JIS$UTILITY$",
+    "AURORA$ORB$UNAUTHENTICATED", "AWR_STAGE", "CSMIG", "CTXSYS", "DBSNMP",
+    "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "LBACSYS", "MDSYS", "OLAPSYS",
+    "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN",
+    "PERFSTAT", "SDE", "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -212,7 +221,18 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
       final OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
       addAttributeAdder("CLOB", clobAdder);
+      setPermissionsSql("select distinct owner \"SCHEMA\", table_name, privilege "
+        + "from ALL_TAB_PRIVS_RECD P "
+        + "where privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') AND ( "
+        + "EXISTS (SELECT * FROM ALL_VIEWS V WHERE V.OWNER = P.OWNER AND V.VIEW_NAME = P.TABLE_NAME) OR "
+        + "EXISTS (SELECT * FROM ALL_TABLES T WHERE T.OWNER = P.OWNER AND T.TABLE_NAME = P.TABLE_NAME)   ) "
+        + " order by owner, table_name, privilege");
     }
+  }
+
+  @Override
+  public boolean isSchemaExcluded(final String schemaName) {
+    return ORACLE_INTERNAL_SCHEMAS.contains(schemaName);
   }
 
   public boolean isUseSchemaSequencePrefix() {

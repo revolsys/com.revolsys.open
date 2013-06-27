@@ -13,11 +13,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +77,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String sqlSuffix;
 
+  private String permissionsSql;
+
   private List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
 
   private Map<String, String> schemaNameMap = new HashMap<String, String>();
@@ -83,6 +88,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   private JdbcDatabaseFactory databaseFactory;
 
   private final Object writerKey = new Object();
+
+  private Map<String, Map<String, List<String>>> schemaTablePermissions;
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -320,8 +327,73 @@ public abstract class AbstractJdbcDataObjectStore extends
     return schemaNameMap.get(schemaPath);
   }
 
+  // protected Set<String> getDatabaseSchemaNames() {
+  // final Set<String> databaseSchemaNames = new TreeSet<String>();
+  // try {
+  // final Connection connection = getDbConnection();
+  // try {
+  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
+  // final ResultSet schemaRs = databaseMetaData.getSchemas();
+  //
+  // try {
+  // while (schemaRs.next()) {
+  // final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
+  // databaseSchemaNames.add(dbSchemaName);
+  // }
+  // } finally {
+  // JdbcUtils.close(schemaRs);
+  // }
+  // } finally {
+  // releaseConnection(connection);
+  // }
+  // } catch (final SQLException e) {
+  // throw new RuntimeException("Unable to get list of namespaces", e);
+  // }
+  // return databaseSchemaNames;
+  // }
+
+  protected Set<String> getDatabaseSchemaNames() {
+    final Map<String, Map<String, List<String>>> tablePermissions = getSchemaTablePermissions();
+    return tablePermissions.keySet();
+  }
+
+  // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
+  // throws SQLException {
+  // final Connection connection = getDbConnection();
+  // try {
+  // final Set<String> tableNames = new LinkedHashSet<String>();
+  //
+  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
+  // final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
+  // "%", null);
+  // try {
+  // while (tablesRs.next()) {
+  // final String dbTableName = tablesRs.getString("TABLE_NAME");
+  // final String tableName = dbTableName.toUpperCase();
+  // final String tableType = tablesRs.getString("TABLE_TYPE");
+  // final boolean excluded = !tableTypes.contains(tableType);
+  // if (!excluded && !isExcluded(dbSchemaName, dbTableName)) {
+  // tableNames.add(tableName);
+  // }
+  // }
+  // } finally {
+  // JdbcUtils.close(tablesRs);
+  // }
+  // return tableNames;
+  // } finally {
+  // releaseConnection(connection);
+  // }
+  // }
+
   public String getDatabaseTableName(final String typePath) {
     return tableNameMap.get(typePath);
+  }
+
+  protected Set<String> getDatabaseTableNames(final String dbSchemaName)
+    throws SQLException {
+    final Map<String, Map<String, List<String>>> schemaTablePermissions = getSchemaTablePermissions();
+    final Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(dbSchemaName);
+    return schemaPermissions.keySet();
   }
 
   @Override
@@ -415,6 +487,59 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  protected Map<String, Map<String, List<String>>> getSchemaTablePermissions() {
+    if (schemaTablePermissions == null) {
+      synchronized (this) {
+        if (schemaTablePermissions == null) {
+
+          final Map<String, Map<String, List<String>>> schemaTablePermissions1 = new HashMap<String, Map<String, List<String>>>();
+          try {
+            final Connection connection = getDbConnection();
+            try {
+              final PreparedStatement statement = connection.prepareStatement(permissionsSql);
+              final ResultSet resultSet = statement.executeQuery();
+
+              try {
+                while (resultSet.next()) {
+                  final String owner = resultSet.getString("SCHEMA");
+                  if (!isSchemaExcluded(owner)) {
+                    final String dbTableName = resultSet.getString("TABLE_NAME");
+                    if (!isExcluded(owner, dbTableName)) {
+
+                      final String privilege = resultSet.getString("PRIVILEGE");
+                      Map<String, List<String>> schemaPermissions = schemaTablePermissions1.get(owner);
+                      if (schemaPermissions == null) {
+                        schemaPermissions = new TreeMap<String, List<String>>();
+                        schemaTablePermissions1.put(owner, schemaPermissions);
+                      }
+                      List<String> tablePermissions = schemaPermissions.get(dbTableName);
+                      if (tablePermissions == null) {
+                        tablePermissions = new ArrayList<String>();
+                        schemaPermissions.put(dbTableName, tablePermissions);
+                      }
+                      tablePermissions.add(privilege);
+                    }
+                  }
+                }
+              } finally {
+                JdbcUtils.close(resultSet);
+              }
+            } finally {
+              releaseConnection(connection);
+            }
+          } catch (final Throwable e) {
+            LoggerFactory.getLogger(getClass()).error(
+              "Unable to get schema and table permissions", e);
+          }
+          final Map<String, Map<String, List<String>>> schemaTablePermissions = schemaTablePermissions1;
+          this.schemaTablePermissions = schemaTablePermissions;
+
+        }
+      }
+    }
+    return schemaTablePermissions;
+  }
+
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
@@ -461,6 +586,19 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public String getSqlSuffix() {
     return sqlSuffix;
+  }
+
+  public List<String> getTablePermissions(final String schema,
+    final String table) {
+    final Map<String, Map<String, List<String>>> schemaTablePermissions = getSchemaTablePermissions();
+    final Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(schema);
+    if (schemaPermissions != null) {
+      final List<String> tablePermissions = schemaPermissions.get(table);
+      if (tablePermissions != null) {
+        return tablePermissions;
+      }
+    }
+    return Arrays.asList("SELECT");
   }
 
   @Override
@@ -531,9 +669,21 @@ public abstract class AbstractJdbcDataObjectStore extends
     return metaData.getIdAttributeIndex() != -1;
   }
 
+  protected boolean isExcluded(final String dbSchemaName, final String tableName) {
+    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase();
+    for (final String pattern : excludeTablePatterns) {
+      if (path.matches(pattern) || tableName.matches(pattern)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isFlushBetweenTypes() {
     return flushBetweenTypes;
   }
+
+  public abstract boolean isSchemaExcluded(String schemaName);
 
   private synchronized String loadIdColumnName(final String schemaName,
     final String tableName) {
@@ -573,34 +723,20 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-      final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
-        "%", null);
       final Map<String, String> idColumnNames = new HashMap<String, String>();
-      try {
-        while (tablesRs.next()) {
-          final String dbTableName = tablesRs.getString("TABLE_NAME");
-          final String tableName = dbTableName.toUpperCase();
-          final String tableType = tablesRs.getString("TABLE_TYPE");
-          boolean excluded = !tableTypes.contains(tableType);
-          for (final String pattern : excludeTablePatterns) {
-            if (dbTableName.matches(pattern) || tableName.matches(pattern)) {
-              excluded = true;
-            }
-          }
-          if (!excluded) {
-            final String typePath = PathUtil.toPath(schemaName, tableName);
-            tableNameMap.put(typePath, dbTableName);
-            final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
-              this, schema, typePath);
-            metaDataMap.put(typePath, metaData);
-            final String idColumnName = loadIdColumnName(dbSchemaName,
-              dbTableName);
-            idColumnNames.put(typePath, idColumnName);
-
-          }
-        }
-      } finally {
-        JdbcUtils.close(tablesRs);
+      final Set<String> tableNames = getDatabaseTableNames(dbSchemaName);
+      for (final String dbTableName : tableNames) {
+        final String tableName = dbTableName.toUpperCase();
+        final String typePath = PathUtil.toPath(schemaName, tableName);
+        tableNameMap.put(typePath, dbTableName);
+        final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+          this, schema, typePath);
+        final List<String> permissions = getTablePermissions(dbSchemaName,
+          dbTableName);
+        metaData.setProperty("permissions", permissions);
+        metaDataMap.put(typePath, metaData);
+        final String idColumnName = loadIdColumnName(dbSchemaName, dbTableName);
+        idColumnNames.put(typePath, idColumnName);
       }
 
       final ResultSet columnsRs = databaseMetaData.getColumns(null,
@@ -651,29 +787,13 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
-    try {
-      final Connection connection = getDbConnection();
-      try {
-        final DatabaseMetaData databaseMetaData = connection.getMetaData();
-        final ResultSet schemaRs = databaseMetaData.getSchemas();
-
-        try {
-          while (schemaRs.next()) {
-            final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
-            final String schemaName = "/" + dbSchemaName.toUpperCase();
-            schemaNameMap.put(schemaName, dbSchemaName);
-            final DataObjectStoreSchema schema = new DataObjectStoreSchema(
-              this, schemaName);
-            schemaMap.put(schemaName, schema);
-          }
-        } finally {
-          JdbcUtils.close(schemaRs);
-        }
-      } finally {
-        releaseConnection(connection);
-      }
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to get list of namespaces", e);
+    final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
+    for (final String dbSchemaName : databaseSchemaNames) {
+      final String schemaName = "/" + dbSchemaName.toUpperCase();
+      schemaNameMap.put(schemaName, dbSchemaName);
+      final DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
+        schemaName);
+      schemaMap.put(schemaName, schema);
     }
   }
 
@@ -687,8 +807,9 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public DataObjectStoreQueryReader query(DataObjectFactory dataObjectFactory,
-    final String typePath, final BoundingBox boundingBox) {
+  public DataObjectStoreQueryReader query(
+    final DataObjectFactory dataObjectFactory, final String typePath,
+    final BoundingBox boundingBox) {
 
     final Query query = new Query(typePath);
     query.setBoundingBox(boundingBox);
@@ -698,7 +819,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Reader<DataObject> query(DataObjectFactory dataObjectFactory, final String typePath, Geometry geometry) {
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, Geometry geometry) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
@@ -762,6 +884,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public void setHints(final String hints) {
     this.hints = hints;
+  }
+
+  protected void setPermissionsSql(final String permissionsSql) {
+    this.permissionsSql = permissionsSql;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {

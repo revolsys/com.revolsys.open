@@ -18,10 +18,10 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcConstants;
 import com.revolsys.jdbc.io.SqlFunction;
 
@@ -36,9 +36,9 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private boolean available = true;
 
-  private OracleDataObjectStore dataStore;
+  private AbstractJdbcDataObjectStore dataStore;
 
-  public StGeometryAttributeAdder(OracleDataObjectStore dataStore,
+  public StGeometryAttributeAdder(AbstractJdbcDataObjectStore dataStore,
     final DataSource dataSource, final Connection connection) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;

@@ -3,11 +3,12 @@ package com.revolsys.gis.oracle.io;
 import java.util.Map;
 
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
 
 public class OracleJdbcQueryIterator extends JdbcQueryIterator {
 
-  public OracleJdbcQueryIterator(OracleDataObjectStore dataStore, Query query,
+  public OracleJdbcQueryIterator(AbstractJdbcDataObjectStore dataStore, Query query,
     Map<String, Object> properties) {
     super(dataStore, query, properties);
   }

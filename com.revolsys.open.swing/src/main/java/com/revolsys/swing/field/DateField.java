@@ -87,11 +87,17 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(Color.RED);
     editor.setBackground(Color.PINK);
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    setFieldToolTip(errorMessage);
   }
 
   public void setFieldName(final String fieldName) {
     this.fieldName = fieldName;
+  }
+
+  @Override
+  public void setFieldToolTip(final String toolTip) {
+    final JFormattedTextField editor = getEditor();
+    editor.setToolTipText(toolTip);
   }
 
   @Override
@@ -101,7 +107,7 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     editor.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    setFieldToolTip(originalToolTip);
   }
 
   @Override

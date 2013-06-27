@@ -138,6 +138,11 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
+  public void setFieldToolTip(final String toolTip) {
+    setToolTipText(toolTip);
+  }
+
+  @Override
   public void setFieldValid() {
     setForeground(defaultForeground);
     setBackground(defaultBackground);

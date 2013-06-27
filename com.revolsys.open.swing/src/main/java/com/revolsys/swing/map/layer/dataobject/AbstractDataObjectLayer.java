@@ -138,6 +138,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<LayerDataObject> selectedObjects = new LinkedHashSet<LayerDataObject>();
 
+  private List<String> columnNames;
+
+  private List<String> columnNameOrder = Collections.emptyList();
+
   public AbstractDataObjectLayer() {
     this("");
   }
@@ -407,6 +411,22 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
+  public List<String> getColumnNames() {
+    synchronized (this) {
+      if (columnNames == null) {
+        final Set<String> columnNames = new LinkedHashSet<String>(
+          columnNameOrder);
+        final DataObjectMetaData metaData = getMetaData();
+        final List<String> attributeNames = metaData.getAttributeNames();
+        columnNames.addAll(attributeNames);
+        this.columnNames = new ArrayList<String>(columnNames);
+        updateColumnNames();
+      }
+    }
+    return columnNames;
+  }
+
   public CoordinateSystem getCoordinateSystem() {
     return getGeometryFactory().getCoordinateSystem();
   }
@@ -522,23 +542,40 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return selectedObjects.size();
   }
 
+  protected boolean hasPermission(final String permission) {
+    if (metaData == null) {
+      return true;
+    } else {
+      final Collection<String> permissions = metaData.getProperty("permissions");
+      if (permissions == null) {
+        return true;
+      } else {
+        final boolean hasPermission = permissions.contains(permission);
+        return hasPermission;
+      }
+    }
+  }
+
   protected void internalCancelChanges() {
     clearChanges();
   }
 
   @Override
   public boolean isCanAddObjects() {
-    return !isReadOnly() && isEditable() && canAddObjects;
+    return !super.isReadOnly() && isEditable() && canAddObjects
+      && hasPermission("INSERT");
   }
 
   @Override
   public boolean isCanDeleteObjects() {
-    return !isReadOnly() && isEditable() && canDeleteObjects;
+    return !super.isReadOnly() && isEditable() && canDeleteObjects
+      && hasPermission("DELETE");
   }
 
   @Override
   public boolean isCanEditObjects() {
-    return !isReadOnly() && isEditable() && canEditObjects;
+    return !super.isReadOnly() && isEditable() && canEditObjects
+      && hasPermission("UPDATE");
   }
 
   @Override
@@ -599,6 +636,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public boolean isNew(final LayerDataObject object) {
     return newObjects.contains(object);
+  }
+
+  @Override
+  public boolean isReadOnly() {
+    if (super.isReadOnly()) {
+      return true;
+    } else {
+      if (canAddObjects && hasPermission("INSERT")) {
+        return false;
+      } else if (canDeleteObjects && hasPermission("DELETE")) {
+        return false;
+      } else if (canEditObjects && hasPermission("UPDATE")) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
 
   @Override
@@ -718,6 +772,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       isCanEditObjects());
   }
 
+  public void setColumnNameOrder(final Collection<String> columnNameOrder) {
+    this.columnNameOrder = new ArrayList<String>(columnNameOrder);
+  }
+
+  public void setColumnNames(final Collection<String> columnNames) {
+    this.columnNames = new ArrayList<String>(columnNames);
+    updateColumnNames();
+  }
+
   @Override
   public void setEditable(final boolean editable) {
     if (SwingUtilities.isEventDispatchThread()) {
@@ -780,11 +843,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     if (metaData != null) {
+
       setGeometryFactory(metaData.getGeometryFactory());
       if (metaData.getGeometryAttributeIndex() == -1) {
         setSelectSupported(false);
         setRenderer(null);
       }
+      updateColumnNames();
     }
   }
 
@@ -962,5 +1027,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void unselectObjects(final LayerDataObject... objects) {
     unselectObjects(Arrays.asList(objects));
+  }
+
+  protected void updateColumnNames() {
+    if (columnNames != null && this.metaData != null) {
+      final List<String> attributeNames = this.metaData.getAttributeNames();
+      columnNames.retainAll(attributeNames);
+    }
   }
 }

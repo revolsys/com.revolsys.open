@@ -26,6 +26,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcConstants;
 import com.revolsys.jdbc.io.SqlFunction;
 
@@ -89,9 +90,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
 
-  private OracleDataObjectStore dataStore;
+  private AbstractJdbcDataObjectStore dataStore;
 
-  public OracleSdoGeometryAttributeAdder(OracleDataObjectStore dataStore,
+  public OracleSdoGeometryAttributeAdder(AbstractJdbcDataObjectStore dataStore,
     final DataSource dataSource) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;

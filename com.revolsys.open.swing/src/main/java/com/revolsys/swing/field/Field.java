@@ -19,6 +19,8 @@ public interface Field {
 
   void setFieldInvalid(String message);
 
+  void setFieldToolTip(String toolTip);
+
   void setFieldValid();
 
   void setFieldValue(Object value);

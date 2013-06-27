@@ -150,6 +150,11 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
   }
 
   @Override
+  public void setFieldToolTip(final String toolTip) {
+    setToolTipText(toolTip);
+  }
+
+  @Override
   public void setFieldValid() {
     directoryName.setForeground(TextField.DEFAULT_FOREGROUND);
     directoryName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);

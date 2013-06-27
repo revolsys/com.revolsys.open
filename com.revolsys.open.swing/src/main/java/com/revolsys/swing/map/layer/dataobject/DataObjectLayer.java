@@ -38,6 +38,8 @@ public interface DataObjectLayer extends Layer {
 
   List<LayerDataObject> getChanges();
 
+  List<String> getColumnNames();
+
   List<LayerDataObject> getDataObjects(BoundingBox boundingBox);
 
   DataObjectStore getDataStore();
@@ -55,8 +57,6 @@ public interface DataObjectLayer extends Layer {
   LayerDataObject getObjectById(Object id);
 
   List<LayerDataObject> getObjects();
-
-  List<LayerDataObject> query(Geometry geometry, double distance);
 
   Query getQuery();
 
@@ -90,6 +90,8 @@ public interface DataObjectLayer extends Layer {
   boolean isSelected(LayerDataObject object);
 
   boolean isVisible(LayerDataObject object);
+
+  List<LayerDataObject> query(Geometry geometry, double distance);
 
   List<LayerDataObject> query(Query query);
 

@@ -1,7 +1,10 @@
 package com.revolsys.gis.postgresql;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -27,6 +30,9 @@ import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
+
+  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
+    "information_schema", "pg_catalog", "pg_toast_temp_1");
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -61,6 +67,13 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   public AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(this, query, properties);
+  }
+
+  @Override
+  protected Set<String> getDatabaseSchemaNames() {
+    final Set<String> databaseSchemaNames = super.getDatabaseSchemaNames();
+    databaseSchemaNames.removeAll(POSTGRESQL_INTERNAL_SCHEMAS);
+    return databaseSchemaNames;
   }
 
   @Override
@@ -189,6 +202,15 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
+    setPermissionsSql("select table_schema \"SCHEMA\", table_name, privilege_type \"PRIVILEGE\" from information_schema.role_table_grants "
+      + "where grantee  in (current_user, 'PUBLIC') or grantee in (select role_name from information_schema.applicable_roles where grantee = current_user) AND "
+      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
+      + "order by table_schema, table_name, privilege_type");
+  }
+
+  @Override
+  public boolean isSchemaExcluded(final String schemaName) {
+    return POSTGRESQL_INTERNAL_SCHEMAS.contains(schemaName);
   }
 
   public boolean isUseSchemaSequencePrefix() {

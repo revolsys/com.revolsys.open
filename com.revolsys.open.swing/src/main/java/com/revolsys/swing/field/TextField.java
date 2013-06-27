@@ -103,6 +103,11 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public void setFieldToolTip(final String toolTip) {
+    setToolTipText(toolTip);
+  }
+
+  @Override
   public void setFieldValid() {
     setForeground(TextField.DEFAULT_FOREGROUND);
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
