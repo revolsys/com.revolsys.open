@@ -29,7 +29,6 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -293,7 +292,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
           dataObjectLayer.setSelectedObjects(boundingBox);
-          LayerUtil.showViewAttributes();
+          dataObjectLayer.showViewAttributes();
         }
       }
     }

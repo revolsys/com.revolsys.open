@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 
@@ -20,6 +19,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.Reorderable;
@@ -29,39 +29,37 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {
   private static final long serialVersionUID = 1L;
 
-  public static JPanel createPanel(final DataObjectMetaData metaData,
+  public static TablePanel createPanel(final DataObjectLayer layer) {
+    return createPanel(layer.getMetaData(), new ArrayList<LayerDataObject>(),
+      layer.getColumnNames());
+  }
+
+  public static TablePanel createPanel(final DataObjectLayer layer,
     final List<LayerDataObject> objects) {
-    final JTable table = createTable(metaData, objects);
+    return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
+  }
+
+  public static TablePanel createPanel(final DataObjectMetaData metaData,
+    final Collection<LayerDataObject> objects,
+    final Collection<String> attributeNames) {
+    final DataObjectListTableModel model = new DataObjectListTableModel(
+      metaData, objects, attributeNames);
+    final JTable table = new DataObjectRowTable(model);
     return new TablePanel(table);
   }
 
-  public static DataObjectRowTable createTable(
-    final DataObjectListTableModel model) {
-    return new DataObjectRowTable(model);
-  }
-
-  public static DataObjectRowTable createTable(
-    final DataObjectMetaData metaData, final List<LayerDataObject> objects) {
-    final DataObjectListTableModel model = new DataObjectListTableModel(
-      metaData, objects);
-    return createTable(model);
+  public static TablePanel createPanel(final DataObjectMetaData metaData,
+    final List<LayerDataObject> objects, final String... attributeNames) {
+    return createPanel(metaData, objects, Arrays.asList(attributeNames));
   }
 
   private final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
-  public DataObjectListTableModel(final DataObjectMetaData metaData) {
-    this(metaData, null);
-  }
-
   public DataObjectListTableModel(final DataObjectMetaData metaData,
-    final List<LayerDataObject> objects) {
-    this(metaData, objects, metaData.getAttributeNames());
-  }
-
-  public DataObjectListTableModel(final DataObjectMetaData metaData,
-    final List<LayerDataObject> objects, final List<String> columnNames) {
+    final Collection<LayerDataObject> objects,
+    final Collection<String> columnNames) {
     super(metaData, columnNames);
     if (objects != null) {
       this.objects.addAll(objects);
@@ -139,7 +137,9 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       final String columnName = getColumnName(columnIndex);
       final DataObjectMetaData metaData = getMetaData();
       final DataType dataType = metaData.getAttributeType(columnName);
-      if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+      if (dataType == null) {
+        return false;
+      } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
         return false;
       } else {
         return true;

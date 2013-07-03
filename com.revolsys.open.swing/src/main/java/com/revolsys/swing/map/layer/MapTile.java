@@ -68,8 +68,12 @@ public abstract class MapTile {
 
   protected GeoReferencedImage loadImage() {
     final BufferedImage bufferedImage = loadBuffferedImage();
-    final BoundingBox boundingBox = getBoundingBox();
-    return new GeoReferencedImage(boundingBox, bufferedImage);
+    if (bufferedImage == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = getBoundingBox();
+      return new GeoReferencedImage(boundingBox, bufferedImage);
+    }
   }
 
   public GeoReferencedImage loadImage(final CoordinateSystem coordinateSystem) {
@@ -82,8 +86,10 @@ public abstract class MapTile {
           image = loadImage();
           projectedImages.put(geometryFactory.getCoordinateSystem(), image);
         }
-        projectedImage = image.getImage(coordinateSystem, resolution);
-        projectedImages.put(coordinateSystem, projectedImage);
+        if (image != null) {
+          projectedImage = image.getImage(coordinateSystem, resolution);
+          projectedImages.put(coordinateSystem, projectedImage);
+        }
       }
       return projectedImage;
     }

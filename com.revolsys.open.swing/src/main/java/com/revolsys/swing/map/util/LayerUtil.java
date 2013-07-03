@@ -16,10 +16,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -30,7 +26,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
@@ -87,11 +82,11 @@ public class LayerUtil {
     LAYER_FACTORIES.put(typeName, factory);
   }
 
-  public static void addNewRecord() {
+  public static void addNewObject() {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer instanceof DataObjectLayer) {
       final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-      dataObjectLayer.addNewRecord();
+      dataObjectLayer.addNewObject();
     }
   }
 
@@ -282,48 +277,8 @@ public class LayerUtil {
 
   public static void showViewAttributes() {
     final DataObjectLayer layer = ObjectTree.getMouseClickItem();
-    showViewAttributes(layer);
-  }
-
-  public static void showViewAttributes(final DataObjectLayer layer) {
     if (layer != null) {
-      DefaultSingleCDockable dockable;
-      synchronized (layer) {
-        dockable = layer.getProperty("TableView");
-      }
-      if (dockable == null) {
-        final Project project = layer.getProject();
-
-        final Component component = layer.createTablePanel();
-        if (component != null) {
-          final String id = layer.getClass().getName() + "." + layer.getId();
-          dockable = DockingFramesUtil.addDockable(project,
-            MapPanel.MAP_TABLE_WORKING_AREA, id, layer.getName(), component);
-
-          dockable.setCloseable(true);
-          layer.setProperty("TableView", dockable);
-          dockable.addCDockableStateListener(new CDockableStateListener() {
-            @Override
-            public void extendedModeChanged(final CDockable dockable,
-              final ExtendedMode mode) {
-            }
-
-            @Override
-            public void visibilityChanged(final CDockable dockable) {
-              final boolean visible = dockable.isVisible();
-              if (!visible) {
-                dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
-                synchronized (layer) {
-                  layer.setProperty("TableView", null);
-                }
-              }
-            }
-          });
-          dockable.toFront();
-        }
-      }
+      layer.showViewAttributes();
     }
   }
 

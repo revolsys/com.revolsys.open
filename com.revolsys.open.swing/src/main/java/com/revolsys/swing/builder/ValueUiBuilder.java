@@ -1,8 +1,7 @@
 package com.revolsys.swing.builder;
 
-import java.awt.Component;
-
 import javax.swing.CellEditor;
+import javax.swing.JComponent;
 
 public interface ValueUiBuilder {
 
@@ -15,7 +14,7 @@ public interface ValueUiBuilder {
    * @return
    * @see CellEditor
    */
-  Component getEditorComponent(Object value);
+  JComponent getEditorComponent(Object value);
 
-  Component getRendererComponent(Object value);
+  JComponent getRendererComponent(Object value);
 }

@@ -1,6 +1,7 @@
 package com.revolsys.swing.table.dataobject.row;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   private boolean editable;
 
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
-    final List<String> attributeNames) {
+    final Collection<String> attributeNames) {
     this.metaData = metaData;
     setAttributeNames(attributeNames);
     setAttributeTitles(Collections.<String> emptyList());
@@ -139,8 +140,12 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
     return editable;
   }
 
-  public void setAttributeNames(final List<String> attributeNames) {
-    this.attributeNames = new ArrayList<String>(attributeNames);
+  public void setAttributeNames(final Collection<String> attributeNames) {
+    if (attributeNames == null || attributeNames.isEmpty()) {
+      this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
+    } else {
+      this.attributeNames = new ArrayList<String>(attributeNames);
+    }
   }
 
   public void setAttributeTitles(final List<String> attributeTitles) {

@@ -283,8 +283,10 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
     final DataObjectLayer layer, final LayerDataObject object) {
-    final Geometry geometry = object.getGeometryValue();
-    renderMarker(viewport, graphics, geometry, style);
+    if (isVisible(object)) {
+      final Geometry geometry = object.getGeometryValue();
+      renderMarker(viewport, graphics, geometry, style);
+    }
   }
 
   public void setStyle(final GeometryStyle style) {

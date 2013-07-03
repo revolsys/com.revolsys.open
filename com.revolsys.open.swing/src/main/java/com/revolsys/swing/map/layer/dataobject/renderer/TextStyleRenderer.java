@@ -83,7 +83,13 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         placementType);
       final CoordinatesList points = CoordinatesListUtil.get(geometry);
       final int numPoints = points.size();
-      if (numPoints > 1) {
+      if (numPoints == 1) {
+        point = points.get(0);
+        point = ProjectionFactory.convert(point, geometryFactory,
+          viewportGeometryFactory);
+
+        return new CoordinatesWithOrientation(point, 0);
+      } else if (numPoints > 1) {
         final boolean matches = matcher.matches();
         if (matches) {
           final String argument = matcher.group(1);
@@ -151,6 +157,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         }
 
         if (point != null && viewport.getBoundingBox().contains(point)) {
+          final String orientationType = style.getTextOrientationType();
+          if ("none".equals(orientationType)) {
+            orientation = 0;
+          }
           return new CoordinatesWithOrientation(point, orientation);
         }
       }
@@ -167,6 +177,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         geometry, style);
       if (point != null) {
         final double orientation = point.getOrientation();
+
         final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
         final Paint paint = graphics.getPaint();
         viewport.setUseModelCoordinates(true, graphics);
@@ -208,7 +219,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           if ("top".equals(verticalAlignment)) {
             dy -= height;
           } else if ("middle".equals(verticalAlignment)) {
-            dy -= height;
+            dy -= height / 2;
           }
           final String horizontalAlignment = style.getTextAlign();
           if ("right".equals(horizontalAlignment)) {
@@ -241,10 +252,13 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             graphics.setStroke(savedStroke);
           }
 
-          final double pixel = viewport.getModelUnitsPerViewUnit();
-          graphics.setColor(new Color(223, 223, 233, 127));
-          graphics.fill(new Rectangle2D.Double(bounds.getX() - pixel,
-            bounds.getY(), width + 2 * pixel, height));
+          final Color textBoxColor = style.getTextBoxColor();
+          if (textBoxColor != null) {
+            final double pixel = viewport.getModelUnitsPerViewUnit();
+            graphics.setColor(textBoxColor);
+            graphics.fill(new Rectangle2D.Double(bounds.getX() - pixel,
+              bounds.getY(), width + 2 * pixel, height));
+          }
 
           graphics.setColor(style.getTextFill());
           graphics.drawString(label, (float)0, (float)0);

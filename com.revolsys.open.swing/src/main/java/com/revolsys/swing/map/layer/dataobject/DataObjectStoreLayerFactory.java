@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.data.store.ConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.swing.map.layer.AbstractLayerFactory;
 import com.revolsys.swing.tree.datastore.AddDataStoreConnectionPanel;
@@ -33,7 +34,7 @@ public class DataObjectStoreLayerFactory extends
         dataStore = DataObjectStoreConnectionManager.getConnection(name);
         if (dataStore == null) {
           final DataObjectStoreConnectionManager connectionManager = DataObjectStoreConnectionManager.get();
-          final ConnectionRegistry<DataObjectStore> registry = connectionManager.getConnectionRegistry("User");
+          final ConnectionRegistry<DataObjectStoreConnection> registry = connectionManager.getConnectionRegistry("User");
           dataStore = new AddDataStoreConnectionPanel(registry, name).showDialog();
         }
         // TODO if null add

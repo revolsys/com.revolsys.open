@@ -80,7 +80,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final EnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
       layer, "canAddObjects");
     toolBar.addButton("record", "Add New Record", "table_row_insert",
-      canAddObjectsEnableCheck, layer, "addNewRecord");
+      canAddObjectsEnableCheck, layer, "addNewObject");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       layer);

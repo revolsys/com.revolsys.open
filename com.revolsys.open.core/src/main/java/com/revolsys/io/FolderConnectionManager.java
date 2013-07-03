@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class FileSystemConnectionManager {
-  private static FileSystemConnectionManager INSTANCE = new FileSystemConnectionManager();
+public class FolderConnectionManager {
+  private static FolderConnectionManager INSTANCE = new FolderConnectionManager();
 
-  public static FileSystemConnectionManager get() {
+  public static FolderConnectionManager get() {
     return INSTANCE;
   }
 

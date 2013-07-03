@@ -6,15 +6,14 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DelegatingDataObjectStoreHandler;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class JsonDataObjectStoreConnectionRegistry extends
-  AbstractConnectionRegistry<DataObjectStore> {
+  AbstractConnectionRegistry<DataObjectStoreConnection> {
 
   private final File directory;
 
@@ -49,7 +48,10 @@ public class JsonDataObjectStoreConnectionRegistry extends
 
   protected void loadDataStore(final File dataStoreFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(dataStoreFile);
-    final String name = CollectionUtil.getString(config, "name");
+    String name = CollectionUtil.getString(config, "name");
+    if (!StringUtils.hasText(name)) {
+      name = FileUtil.getBaseName(dataStoreFile);
+    }
     try {
       final Map<String, Object> connectionProperties = CollectionUtil.get(
         config, "connection", Collections.<String, Object> emptyMap());
@@ -58,9 +60,9 @@ public class JsonDataObjectStoreConnectionRegistry extends
           "Data store must include a 'connection' map property: "
             + dataStoreFile);
       } else {
-        final DataObjectStore dataStore = DelegatingDataObjectStoreHandler.create(
-          name, connectionProperties);
-        addConnection(name, dataStore);
+        final DataObjectStoreConnection dataStoreConnection = new DataObjectStoreConnection(
+          dataStoreFile.toString(), config);
+        addConnection(name, dataStoreConnection);
       }
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(

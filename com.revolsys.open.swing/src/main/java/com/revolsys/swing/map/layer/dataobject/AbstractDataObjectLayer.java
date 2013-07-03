@@ -32,6 +32,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.StringUtils;
 
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
+
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
@@ -43,10 +49,14 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
@@ -55,6 +65,8 @@ import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.dataobject.component.MergeObjectsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
@@ -92,6 +104,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
       false);
     final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
+    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
+    final EnableCheck canEdit = new TreeItemPropertyEnableCheck(
+      "canEditObjects");
+    final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
+      "canDeleteObjects");
+    final EnableCheck hasSelectedObjects = new TreeItemPropertyEnableCheck(
+      "hasSelectedObjects");
+    final EnableCheck canMergeObjects = new TreeItemPropertyEnableCheck(
+      "canMergeObjects");
 
     menu.addCheckboxMenuItem("edit", new InvokeMethodAction("Editable",
       "Editable", SilkIconLoader.getIcon("pencil"), readonly, LayerUtil.class,
@@ -103,9 +124,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
       "table_cancel", hasChanges, "cancelChanges"));
 
-    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
-      "table_row_insert", canAdd, "addNewRecord"));
+      "table_row_insert", canAdd, "addNewObject"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+      "Delete Selected Records", "table_row_delete", new AndEnableCheck(
+        hasSelectedObjects, canDelete), "deleteSelectedObjects"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+      "Merged Selected Records", "shape_group", canMergeObjects,
+      "mergeSelectedObjects"));
 
     menu.addMenuItem("layer", 0, "Layer Style", "palette", LayerUtil.class,
       "showProperties", "Style");
@@ -187,7 +215,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void addNewRecord() {
+  public void addNewObject() {
     final DataObjectMetaData metaData = getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
@@ -371,6 +399,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     deleteObjects(Arrays.asList(objects));
   }
 
+  public void deleteSelectedObjects() {
+    final List<LayerDataObject> selectedObjects = getSelectedObjects();
+    deleteObjects(selectedObjects);
+  }
+
   @Override
   protected boolean doSaveChanges() {
     return true;
@@ -452,6 +485,33 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public String getGeometryAttributeName() {
     return getMetaData().getGeometryAttributeName();
+  }
+
+  @Override
+  public DataType getGeometryType() {
+    final DataObjectMetaData metaData = getMetaData();
+    if (metaData == null) {
+      return null;
+    } else {
+      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      if (geometryAttribute == null) {
+        return null;
+      } else {
+        return geometryAttribute.getType();
+      }
+    }
+  }
+
+  @Override
+  public List<LayerDataObject> getMergeableSelectedObjects() {
+    final List<LayerDataObject> selectedObjects = getSelectedObjects();
+    for (final Iterator<LayerDataObject> iterator = selectedObjects.iterator(); iterator.hasNext();) {
+      final LayerDataObject mergedDataObject = iterator.next();
+      if (mergedDataObject.isDeleted()) {
+        iterator.remove();
+      }
+    }
+    return selectedObjects;
   }
 
   @Override
@@ -578,6 +638,22 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       && hasPermission("UPDATE");
   }
 
+  public boolean isCanMergeObjects() {
+    if (isCanAddObjects()) {
+      if (isCanDeleteObjects()) {
+        if (isCanDeleteObjects()) {
+          final DataType geometryType = getGeometryType();
+          if (DataTypes.LINE_STRING.equals(geometryType)) {
+            if (getMergeableSelectedObjects().size() > 1) {
+              return true;
+            }
+          } // TODO allow merging other type
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean isDeleted(final LayerDataObject object) {
     return deletedObjects != null && deletedObjects.contains(object);
@@ -605,6 +681,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       return false;
     }
+  }
+
+  public boolean isHasSelectedObjects() {
+    return getSelectionCount() > 0;
   }
 
   @Override
@@ -673,6 +753,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     return false;
+  }
+
+  public void mergeSelectedObjects() {
+    if (isCanMergeObjects()) {
+      SwingUtil.invokeLater(MergeObjectsDialog.class, "showDialog", this);
+    }
   }
 
   @Override
@@ -887,6 +973,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           iterator.remove();
         }
       }
+      if (!objects.isEmpty()) {
+        showViewAttributes();
+      }
       setSelectedObjects(objects);
     }
   }
@@ -896,7 +985,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Collection<LayerDataObject> selectedObjects) {
     this.selectedObjects = new LinkedHashSet<LayerDataObject>(selectedObjects);
     fireSelected();
-
   }
 
   @Override
@@ -1015,6 +1103,42 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
 
+  }
+
+  @Override
+  public void showViewAttributes() {
+    DefaultSingleCDockable dockable = getProperty("TableView");
+    if (dockable == null) {
+      final Project project = getProject();
+
+      final Component component = createTablePanel();
+      if (component != null) {
+        final String id = getClass().getName() + "." + getId();
+        dockable = DockingFramesUtil.addDockable(project,
+          MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), component);
+
+        dockable.setCloseable(true);
+        setProperty("TableView", dockable);
+        dockable.addCDockableStateListener(new CDockableStateListener() {
+          @Override
+          public void extendedModeChanged(final CDockable dockable,
+            final ExtendedMode mode) {
+          }
+
+          @Override
+          public void visibilityChanged(final CDockable dockable) {
+            final boolean visible = dockable.isVisible();
+            if (!visible) {
+              dockable.getControl()
+                .getOwner()
+                .remove((SingleCDockable)dockable);
+              setProperty("TableView", null);
+            }
+          }
+        });
+        dockable.toFront();
+      }
+    }
   }
 
   @Override

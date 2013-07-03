@@ -326,7 +326,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public Class<?> getAttributeClass(final int i) {
     final DataType dataType = getAttributeType(i);
-    return dataType.getJavaClass();
+    if (dataType == null) {
+      return Object.class;
+    } else {
+      return dataType.getJavaClass();
+    }
   }
 
   @Override

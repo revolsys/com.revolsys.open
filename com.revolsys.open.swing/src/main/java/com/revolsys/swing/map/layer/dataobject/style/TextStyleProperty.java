@@ -74,9 +74,12 @@ public enum TextStyleProperty {
   /** */
   text_clip("text-clip"),
   /** */
-  text_comp_op("text-comp-op")
+  text_comp_op("text-comp-op"),
   // Custom Extensions
-  ;
+  /** */
+  text_box_color("text-box-color", DataTypes.COLOR),
+  /** */
+  text_orientation_type("text-orientation-type");
 
   private static final Map<String, TextStyleProperty> propertiesByLabel = new LinkedHashMap<String, TextStyleProperty>();
 

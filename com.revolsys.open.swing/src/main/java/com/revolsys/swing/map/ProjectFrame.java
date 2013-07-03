@@ -24,7 +24,7 @@ import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.gis.data.store.JsonDataObjectStoreConnectionRegistry;
-import com.revolsys.io.FileSystemConnectionManager;
+import com.revolsys.io.FolderConnectionManager;
 import com.revolsys.io.FileUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
@@ -79,7 +79,7 @@ public class ProjectFrame extends JFrame {
     final List<Object> connectionManagers = new ArrayList<Object>();
 
     connectionManagers.add(DataObjectStoreConnectionManager.get());
-    connectionManagers.add(FileSystemConnectionManager.get());
+    connectionManagers.add(FolderConnectionManager.get());
     /* connectionManagers.add(WmsConnectionManager.get()); */
 
     final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(

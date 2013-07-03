@@ -6,14 +6,14 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.store.ConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class DataObjectStoreConnectionManagerModel
   extends
-  AbstractObjectTreeNodeModel<DataObjectStoreConnectionManager, ConnectionRegistry<DataObjectStore>> {
+  AbstractObjectTreeNodeModel<DataObjectStoreConnectionManager, ConnectionRegistry<DataObjectStoreConnection>> {
 
   public DataObjectStoreConnectionManagerModel() {
     setSupportedClasses(DataObjectStoreConnectionManager.class);
@@ -29,9 +29,9 @@ public class DataObjectStoreConnectionManagerModel
   }
 
   @Override
-  protected List<ConnectionRegistry<DataObjectStore>> getChildren(
+  protected List<ConnectionRegistry<DataObjectStoreConnection>> getChildren(
     final DataObjectStoreConnectionManager connectionRegistry) {
-    final List<ConnectionRegistry<DataObjectStore>> registries = connectionRegistry.getConnectionRegistries();
+    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = connectionRegistry.getConnectionRegistries();
     return registries;
   }
 

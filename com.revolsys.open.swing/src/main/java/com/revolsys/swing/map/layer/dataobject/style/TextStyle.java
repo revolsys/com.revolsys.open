@@ -44,6 +44,8 @@ public class TextStyle {
 
   private String textVerticalAlignment = "auto";
 
+  private String textOrientationType = "auto";
+
   private String textPlacementType = "dummy";
 
   private Measure<Length> textDx = GeometryStyle.ZERO_PIXEL;
@@ -53,6 +55,8 @@ public class TextStyle {
   private long lastScale = 0;
 
   private Font font;
+
+  private Color textBoxColor = new Color(223, 223, 233, 127);
 
   public TextStyle() {
   }
@@ -73,6 +77,10 @@ public class TextStyle {
 
   public String getTextAlign() {
     return textAlign;
+  }
+
+  public Color getTextBoxColor() {
+    return textBoxColor;
   }
 
   public Measure<Length> getTextDeltaX() {
@@ -111,6 +119,10 @@ public class TextStyle {
     return textOrientation;
   }
 
+  public String getTextOrientationType() {
+    return textOrientationType;
+  }
+
   public String getTextPlacementType() {
     return textPlacementType;
   }
@@ -129,6 +141,10 @@ public class TextStyle {
     } else {
       this.textAlign = "auto";
     }
+  }
+
+  public void setTextBoxColor(final Color textBoxColor) {
+    this.textBoxColor = textBoxColor;
   }
 
   public void setTextDeltaX(final Measure<Length> textDx) {
@@ -176,6 +192,10 @@ public class TextStyle {
     this.textHaloRadiusMeasure = textHaloRadius;
   }
 
+  public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
+    setTextAlign(textHorizontalAlignment);
+  }
+
   public void setTextName(final String textName) {
     if (textName == null) {
       this.textName = "";
@@ -198,6 +218,10 @@ public class TextStyle {
 
   public void setTextOrientation(final double textOrientation) {
     this.textOrientation = textOrientation;
+  }
+
+  public void setTextOrientationType(final String textOrientationType) {
+    this.textOrientationType = textOrientationType;
   }
 
   public void setTextPlacementType(final String textPlacementType) {
@@ -229,7 +253,8 @@ public class TextStyle {
       // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
       // style += Font.ITALIC;
       // }
-      final double fontSize = Viewport2D.toDisplayValue(viewport,textSizeMeasure);
+      final double fontSize = Viewport2D.toDisplayValue(viewport,
+        textSizeMeasure);
       font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
     }
     graphics.setFont(font);
@@ -242,5 +267,4 @@ public class TextStyle {
       this.textVerticalAlignment = "auto";
     }
   }
-
 }

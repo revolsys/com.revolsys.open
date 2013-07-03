@@ -35,13 +35,17 @@ public class SvgMarker extends AbstractMarker {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY,
-    final double orientation) {
+    double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
     final Measure<Length> markerWidth = style.getMarkerWidthMeasure();
     final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
     final Measure<Length> markerHeight = style.getMarkerHeightMeasure();
     final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+    final String orientationType = style.getMarkerOrientationType();
+    if ("none".equals(orientationType)) {
+      orientation = 0;
+    }
 
     graphics.translate(modelX, modelY);
     if (orientation != 0) {

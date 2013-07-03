@@ -1,7 +1,5 @@
 package com.revolsys.swing.builder;
 
-import java.awt.Component;
-
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
@@ -26,12 +24,12 @@ public class DefaultValueUiBuilder implements ValueUiBuilder {
   }
 
   @Override
-  public Component getEditorComponent(final Object value) {
+  public JComponent getEditorComponent(final Object value) {
     return SwingUtil.getValue(component);
   }
 
   @Override
-  public Component getRendererComponent(final Object value) {
+  public JComponent getRendererComponent(final Object value) {
     final String text = getText(value);
     defaultRenderer.setText(text);
     return defaultRenderer;

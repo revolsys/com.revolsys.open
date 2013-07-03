@@ -79,7 +79,6 @@ import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellRenderer;
 import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
@@ -326,7 +325,7 @@ public class DataObjectLayerForm extends JPanel implements
         final int row, final int column) {
         final boolean even = row % 2 == 0;
 
-        final String fieldName = (String)table.getValueAt(row, 1);
+        final String fieldName = allAttributes.getAttributeName(row);
         final boolean isIdField = fieldName.equals(metaData.getIdAttributeName());
         if (isIdField) {
           if (value == null) {
@@ -631,7 +630,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected JLabel getLabel(final String fieldName) {
-    String title = CaseConverter.toCapitalizedWords(fieldName);
+    String title = metaData.getAttributeTitle(fieldName);
     title = title.replaceAll(" Code$", "");
     title = title.replaceAll(" Ind$", "");
     final JLabel label = new JLabel(title);

@@ -42,12 +42,17 @@ public class BingMapTile extends MapTile {
 
   @Override
   public BufferedImage loadBuffferedImage() {
-    final BingClient client = layer.getClient();
-    final ImagerySet imagerySet = layer.getImagerySet();
-    final MapLayer mapLayer = layer.getMapLayer();
-    final BufferedImage image = client.getMapImage(imagerySet, mapLayer,
-      quadKey);
-    return image;
+    try {
+      final BingClient client = layer.getClient();
+      final ImagerySet imagerySet = layer.getImagerySet();
+      final MapLayer mapLayer = layer.getMapLayer();
+      final BufferedImage image = client.getMapImage(imagerySet, mapLayer,
+        quadKey);
+      return image;
+    } catch (final Throwable t) {
+      layer.setError(t);
+      return null;
+    }
   }
 
   @Override

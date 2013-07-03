@@ -60,9 +60,13 @@ public class OpenStreetMapTile extends MapTile {
 
   @Override
   public BufferedImage loadBuffferedImage() {
-    final OpenStreetMapClient client = layer.getClient();
-    final BufferedImage image = client.getMapImage(zoomLevel, tileX, tileY);
-    return image;
+    try {
+      final OpenStreetMapClient client = layer.getClient();
+      final BufferedImage image = client.getMapImage(zoomLevel, tileX, tileY);
+      return image;
+    } catch (final Throwable e) {
+      return null;
+    }
   }
 
   @Override

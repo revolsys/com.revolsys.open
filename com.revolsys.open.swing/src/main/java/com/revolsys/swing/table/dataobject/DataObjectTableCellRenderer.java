@@ -16,7 +16,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
-import com.revolsys.swing.builder.ValueUiBuilder;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectTableCellRenderer implements TableCellRenderer {
@@ -59,20 +58,14 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
 
     Component component = null;
     final String name = metaData.getAttributeName(attributeIndex);
+    final String title = metaData.getAttributeTitle(name);
     if (column == 0) {
       valueComponent.setText(String.valueOf(attributeIndex));
       component = valueComponent;
     } else if (column == 1) {
-      labelComponent.setText(name);
+      labelComponent.setText(title);
       component = labelComponent;
     } else {
-      if (uiBuilderRegistry != null) {
-        final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
-          metaData, attributeIndex);
-        if (uiBuilder != null) {
-          component = uiBuilder.getRendererComponent(value);
-        }
-      }
       if (component == null) {
         String text;
         if (value == null) {

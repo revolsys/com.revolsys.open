@@ -272,6 +272,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       sqlBuffer.append(tableName);
       sqlBuffer.append(" where ");
       final JdbcAttribute idAttribute = (JdbcAttribute)type.getIdAttribute();
+      if (idAttribute == null) {
+        throw new RuntimeException("No primary key found for " + type);
+      }
       addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
 
       sqlBuffer.append(" ");

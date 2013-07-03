@@ -11,12 +11,13 @@ import javax.swing.JComponent;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.Layer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
-  void addNewRecord();
+  void addNewObject();
 
   void addSelectedObjects(Collection<? extends LayerDataObject> objects);
 
@@ -45,6 +46,10 @@ public interface DataObjectLayer extends Layer {
   DataObjectStore getDataStore();
 
   Set<LayerDataObject> getEditingObjects();
+
+  DataType getGeometryType();
+
+  List<LayerDataObject> getMergeableSelectedObjects();
 
   DataObjectMetaData getMetaData();
 
@@ -117,6 +122,8 @@ public interface DataObjectLayer extends Layer {
   LayerDataObject showAddForm(Map<String, Object> parameters);
 
   <V extends JComponent> V showForm(final LayerDataObject object);
+
+  void showViewAttributes();
 
   void unselectObjects(Collection<? extends LayerDataObject> objects);
 

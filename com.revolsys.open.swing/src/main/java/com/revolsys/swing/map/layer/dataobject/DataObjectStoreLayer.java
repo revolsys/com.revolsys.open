@@ -504,6 +504,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           iterator.remove();
         }
       }
+      if (!objects.isEmpty()) {
+        showViewAttributes();
+      }
       setSelectedObjects(objects);
     }
   }

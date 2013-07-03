@@ -8,8 +8,8 @@ import javax.swing.JTextField;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.store.ConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 
@@ -24,18 +24,19 @@ public class AddDataStoreConnectionPanel extends ValueField {
 
   private final JTextField nameField;
 
-  private final ConnectionRegistry<DataObjectStore> registry;
+  private final ConnectionRegistry<DataObjectStoreConnection> registry;
 
   private final String name;
 
   public AddDataStoreConnectionPanel(
-    final ConnectionRegistry<DataObjectStore> registry) {
+    final ConnectionRegistry<DataObjectStoreConnection> registry) {
     this(registry, null);
 
   }
 
   public AddDataStoreConnectionPanel(
-    final ConnectionRegistry<DataObjectStore> registry, final String name) {
+    final ConnectionRegistry<DataObjectStoreConnection> registry,
+    final String name) {
     this.registry = registry;
     this.name = name;
     add(new JLabel("Name:"));

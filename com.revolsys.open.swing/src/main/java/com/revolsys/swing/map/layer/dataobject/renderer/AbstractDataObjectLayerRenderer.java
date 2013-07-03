@@ -98,12 +98,16 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   public boolean isVisible(final LayerDataObject object) {
     if (isVisible()) {
-      try {
-        return filter.accept(object);
-      } catch (final Throwable e) {
-        return false;
-      }
+      return isFilterAccept(object);
     } else {
+      return false;
+    }
+  }
+
+  protected boolean isFilterAccept(final LayerDataObject object) {
+    try {
+      return filter.accept(object);
+    } catch (final Throwable e) {
       return false;
     }
   }

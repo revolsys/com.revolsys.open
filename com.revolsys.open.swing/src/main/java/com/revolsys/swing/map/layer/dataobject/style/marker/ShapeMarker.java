@@ -22,6 +22,7 @@ public class ShapeMarker extends AbstractMarker {
 
   static {
     SHAPES.put("square", square(1));
+    SHAPES.put("rectangle", square(1));
     SHAPES.put("circle", circle(1));
     SHAPES.put("ellipse", circle(1));
     SHAPES.put("triangle", triangle(1));
@@ -30,6 +31,7 @@ public class ShapeMarker extends AbstractMarker {
     SHAPES.put("x", x(1));
     SHAPES.put("arrow", arrow(1));
     SHAPES.put("solidArrow", solidArrow(1));
+    SHAPES.put("diamond", diamond(1));
   }
 
   /**
@@ -63,6 +65,16 @@ public class ShapeMarker extends AbstractMarker {
     path.lineTo(0, size / 3);
     path.lineTo(0, size * 2 / 3);
     path.lineTo(size / 3, size * 2 / 3);
+    path.closePath();
+    return path;
+  }
+
+  public static Shape diamond(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(size / 2, 0);
+    path.lineTo(size, size / 2);
+    path.lineTo(size / 2, size);
+    path.lineTo(0, size / 2);
     path.closePath();
     return path;
   }
@@ -167,13 +179,17 @@ public class ShapeMarker extends AbstractMarker {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY,
-    final double orientation) {
+    double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
     final Measure<Length> markerWidth = style.getMarkerWidthMeasure();
     final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
     final Measure<Length> markerHeight = style.getMarkerHeightMeasure();
     final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+    final String orientationType = style.getMarkerOrientationType();
+    if ("none".equals(orientationType)) {
+      orientation = 0;
+    }
 
     translateMarker(viewport, graphics, style, modelX, modelY, mapWidth,
       mapHeight, orientation);

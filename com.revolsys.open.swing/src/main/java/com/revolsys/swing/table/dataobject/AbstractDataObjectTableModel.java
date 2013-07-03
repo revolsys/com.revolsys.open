@@ -125,7 +125,9 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
       case 0:
         return rowIndex;
       case 1:
-        return getAttributeName(rowIndex);
+        final String attributeName = getAttributeName(rowIndex);
+        final String title = metaData.getAttributeTitle(attributeName);
+        return title;
       case 2:
         return getValue(rowIndex);
       default:

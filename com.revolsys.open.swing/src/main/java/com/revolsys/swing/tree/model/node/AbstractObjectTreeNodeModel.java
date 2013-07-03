@@ -44,6 +44,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   public AbstractObjectTreeNodeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
     renderer.setClosedIcon(SilkIconLoader.getIcon("folder"));
+    renderer.setOpenIcon(SilkIconLoader.getIcon("folder"));
   }
 
   @Override

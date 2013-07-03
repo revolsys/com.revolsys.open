@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -45,15 +44,24 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   @Override
   public BoundingBox getBoundingBox() {
     final MapServer mapServer = getMapServer();
-    return mapServer.getFullExtent();
+    if (mapServer == null) {
+      return new BoundingBox();
+    } else {
+      return mapServer.getFullExtent();
+    }
   }
 
   public synchronized MapServer getMapServer() {
     if (mapServer == null) {
-      // TODO initialize in background?
-      this.mapServer = ArcGisServerRestClient.getMapServer(url);
-      final TileInfo tileInfo = mapServer.getTileInfo();
-      this.geometryFactory = tileInfo.getSpatialReference();
+      try {
+        // TODO initialize in background?
+        this.mapServer = ArcGisServerRestClient.getMapServer(url);
+        final TileInfo tileInfo = mapServer.getTileInfo();
+        this.geometryFactory = tileInfo.getSpatialReference();
+      } catch (final Throwable e) {
+        setError(e);
+        return null;
+      }
     }
     return mapServer;
   }
@@ -62,36 +70,38 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final MapServer mapServer = getMapServer();
     final List<MapTile> tiles = new ArrayList<MapTile>();
-    try {
-      final double metresPerPixel = viewport.getMetresPerPixel();
-      final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
-      final double resolution = getResolution(viewport);
-      final BoundingBox viewBoundingBox = viewport.getBoundingBox();
-      final BoundingBox maxBoundingBox = getBoundingBox();
-      final BoundingBox boundingBox = viewBoundingBox.convert(geometryFactory)
-        .intersection(maxBoundingBox);
-      final double minX = boundingBox.getMinX();
-      final double minY = boundingBox.getMinY();
-      final double maxX = boundingBox.getMaxX();
-      final double maxY = boundingBox.getMaxY();
+    if (!isHasError()) {
+      try {
+        final double metresPerPixel = viewport.getMetresPerPixel();
+        final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
+        final double resolution = getResolution(viewport);
+        if (resolution > 0) {
+          final BoundingBox viewBoundingBox = viewport.getBoundingBox();
+          final BoundingBox maxBoundingBox = getBoundingBox();
+          final BoundingBox boundingBox = viewBoundingBox.convert(
+            geometryFactory).intersection(maxBoundingBox);
+          final double minX = boundingBox.getMinX();
+          final double minY = boundingBox.getMinY();
+          final double maxX = boundingBox.getMaxX();
+          final double maxY = boundingBox.getMaxY();
 
-      // Tiles start at the North-West corner of the map
-      final int minTileX = mapServer.getTileX(zoomLevel, minX);
-      final int minTileY = mapServer.getTileY(zoomLevel, maxY);
-      final int maxTileX = mapServer.getTileX(zoomLevel, maxX);
-      final int maxTileY = mapServer.getTileY(zoomLevel, minY);
+          // Tiles start at the North-West corner of the map
+          final int minTileX = mapServer.getTileX(zoomLevel, minX);
+          final int minTileY = mapServer.getTileY(zoomLevel, maxY);
+          final int maxTileX = mapServer.getTileX(zoomLevel, maxX);
+          final int maxTileY = mapServer.getTileY(zoomLevel, minY);
 
-      for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
-        for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          final ArcGisServerRestMapTile tile = new ArcGisServerRestMapTile(
-            mapServer, zoomLevel, resolution, tileX, tileY);
-          tiles.add(tile);
+          for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
+            for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
+              final ArcGisServerRestMapTile tile = new ArcGisServerRestMapTile(
+                this, zoomLevel, resolution, tileX, tileY);
+              tiles.add(tile);
+            }
+          }
         }
+      } catch (final Throwable e) {
+        setError(e);
       }
-
-    } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Error getting tile envelopes",
-        e);
     }
     return tiles;
   }
@@ -99,9 +109,13 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   @Override
   public double getResolution(final Viewport2D viewport) {
     final MapServer mapServer = getMapServer();
-    final double metresPerPixel = viewport.getMetresPerPixel();
-    final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
-    return mapServer.getResolution(zoomLevel);
+    if (mapServer == null) {
+      return 0;
+    } else {
+      final double metresPerPixel = viewport.getMetresPerPixel();
+      final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
+      return mapServer.getResolution(zoomLevel);
+    }
   }
 
   @Override

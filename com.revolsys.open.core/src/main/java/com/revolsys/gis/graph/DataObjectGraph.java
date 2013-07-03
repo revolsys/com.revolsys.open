@@ -131,6 +131,19 @@ public class DataObjectGraph extends Graph<DataObject> {
     return false;
   }
 
+  @Override
+  public Edge<DataObject> merge(final Node<DataObject> node,
+    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
+    final DataObject object1 = edge1.getObject();
+    final DataObject object2 = edge2.getObject();
+    final DataObject mergedObject = DirectionalAttributes.merge(node, object1,
+      object2);
+    final Edge<DataObject> mergedEdge = addEdge(mergedObject);
+    remove(edge1);
+    remove(edge2);
+    return mergedEdge;
+  }
+
   public List<Edge<DataObject>> splitEdges(final Coordinates point,
     final double distance) {
     final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();

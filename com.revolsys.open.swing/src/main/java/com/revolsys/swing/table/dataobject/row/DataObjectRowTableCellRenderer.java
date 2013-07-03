@@ -2,61 +2,38 @@ package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
+
+import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
-import com.revolsys.swing.builder.ValueUiBuilder;
+import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.util.CollectionUtil;
 
-public class DataObjectRowTableCellRenderer implements TableCellRenderer {
-  private final JLabel valueComponent;
-
-  private DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
+@SuppressWarnings("serial")
+public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
 
   public DataObjectRowTableCellRenderer() {
-    this(DataObjectMetaDataUiBuilderRegistry.getInstance());
-  }
-
-  public DataObjectRowTableCellRenderer(
-    final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
-    this.uiBuilderRegistry = uiBuilderRegistry;
-    valueComponent = new JLabel();
-    valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
-    valueComponent.setOpaque(true);
+    setBorder(new EmptyBorder(1, 2, 1, 2));
+    setOpaque(true);
   }
 
   @Override
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int column) {
-    Component component = null;
 
     final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
 
     final DataObjectMetaData metaData = model.getMetaData();
+    final String attributeName = model.getAttributeName(column);
     final boolean required = metaData.isAttributeRequired(column);
-    if (uiBuilderRegistry != null) {
-      final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
-        metaData, column);
-      if (uiBuilder != null) {
-        component = uiBuilder.getRendererComponent(value);
-      }
-    }
-    if (component == null) {
-      String text;
-      if (value == null) {
-        text = "-";
-      } else {
-        text = StringConverterRegistry.toString(value);
-      }
-      valueComponent.setText(text);
-      component = valueComponent;
-    }
+
     final int[] selectedRows = table.getSelectedRows();
     boolean selected = false;
     for (final int selectedRow : selectedRows) {
@@ -64,24 +41,41 @@ public class DataObjectRowTableCellRenderer implements TableCellRenderer {
         selected = true;
       }
     }
-    if (required && value == null) {
-      component.setBackground(new Color(255, 0, 0, 100));
-      component.setForeground(table.getForeground());
-    } else if (selected) {
-      component.setBackground(table.getSelectionBackground());
-      component.setForeground(table.getSelectionForeground());
-    } else if (row % 2 == 0) {
-      component.setBackground(Color.WHITE);
-      component.setForeground(table.getForeground());
-    } else {
-      component.setBackground(Color.LIGHT_GRAY);
-      component.setForeground(table.getForeground());
-    }
-    return component;
-  }
 
-  public void setUiBuilderRegistry(
-    final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
-    this.uiBuilderRegistry = uiBuilderRegistry;
+    boolean hasValue;
+    String text = "-";
+    if (value == null) {
+      hasValue = false;
+    } else {
+      hasValue = true;
+      final CodeTable codeTable = metaData.getCodeTableByColumn(attributeName);
+      if (attributeName.equals(metaData.getIdAttributeName())
+        || codeTable == null) {
+        text = StringConverterRegistry.toString(value);
+      } else {
+        final List<Object> values = codeTable.getValues(value);
+        text = CollectionUtil.toString(values);
+      }
+    }
+
+    if (!StringUtils.hasText(text)) {
+      text = "-";
+      hasValue = false;
+    }
+    if (!hasValue) {
+      if (metaData.getIdAttributeIndex() == column) {
+        text = "NEW";
+        hasValue = true;
+      }
+    }
+
+    super.getTableCellRendererComponent(table, text, selected, hasFocus, row,
+      column);
+
+    if (required && !hasValue) {
+      setBackground(new Color(255, 0, 0, 100));
+      setForeground(table.getForeground());
+    }
+    return this;
   }
 }
