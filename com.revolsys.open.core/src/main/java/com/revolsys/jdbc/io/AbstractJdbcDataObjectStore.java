@@ -507,7 +507,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
               try {
                 while (resultSet.next()) {
-                  final String owner = resultSet.getString("SCHEMA");
+                  final String owner = resultSet.getString("SCHEMA_NAME");
                   if (!isSchemaExcluded(owner)) {
                     final String dbTableName = resultSet.getString("TABLE_NAME");
                     if (!isExcluded(owner, dbTableName)) {

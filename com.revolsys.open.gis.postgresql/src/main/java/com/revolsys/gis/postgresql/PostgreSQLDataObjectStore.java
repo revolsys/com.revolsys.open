@@ -203,7 +203,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
     setPrimaryKeySql("select p.table_name,c.column_name from information_schema.table_constraints p join information_schema.key_column_usage c using (constraint_catalog, constraint_schema, constraint_name) where p.constraint_type = 'PRIMARY KEY' and p.table_schema = ?");
-    setPermissionsSql("select distinct table_schema \"SCHEMA\", table_name, privilege_type \"PRIVILEGE\" from information_schema.role_table_grants "
+    setPermissionsSql("select distinct table_schema as \"SCHEMA_NAME\", table_name, privilege_type as \"PRIVILEGE\" from information_schema.role_table_grants "
       + "where (grantee  in (current_user, 'PUBLIC') or grantee in (select role_name from information_schema.applicable_roles where grantee = current_user)) AND "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
       + "order by table_schema, table_name, privilege_type");
