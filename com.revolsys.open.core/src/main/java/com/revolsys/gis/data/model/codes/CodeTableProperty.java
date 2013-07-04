@@ -219,7 +219,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
+	  DataObjectMetaData metaData = dataStore.getMetaData(typePath);
     final Query query = new Query(typePath);
+    query.setAttributeNames(metaData.getAttributeNames());
     for (final String order : orderBy) {
       query.addOrderBy(order, true);
     }

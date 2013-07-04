@@ -78,7 +78,6 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
-
     final int entity = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
