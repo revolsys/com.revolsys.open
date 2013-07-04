@@ -203,6 +203,10 @@ public class LineSegment extends AbstractCoordinatesList {
 
   }
 
+  public BoundingBox getBoundingBox() {
+    return BoundingBox.getBoundingBox(getLine());
+  }
+
   private Coordinates getCrossing(final Coordinates coordinates1,
     final Coordinates coordinates2, final BoundingBox boundingBox) {
     Coordinates intersection = null;

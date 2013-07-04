@@ -11,6 +11,7 @@ import javax.swing.SwingWorker;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.InvokeMethodCallable;
 
@@ -37,13 +38,15 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     final String doneMethodName,
     final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
-    if (backgroundMethodName != null) {
+    this.object = object;
+    if (StringUtils.hasText(backgroundMethodName)) {
       this.backgroundTask = new InvokeMethodCallable<T>(object,
         backgroundMethodName, backgroundMethodParameters.toArray());
     }
-    this.object = object;
-    this.doneMethodName = doneMethodName;
-    this.doneMethodParameters = new ArrayList<Object>(doneMethodParameters);
+    if (StringUtils.hasText(doneMethodName)) {
+      this.doneMethodName = doneMethodName;
+      this.doneMethodParameters = new ArrayList<Object>(doneMethodParameters);
+    }
   }
 
   public InvokeMethodSwingWorker(final String description, final Object object,

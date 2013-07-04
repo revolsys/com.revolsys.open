@@ -21,12 +21,15 @@
 package com.revolsys.gis.data.model.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
+
+  private final GeometryFactory geometryFactory;
 
   /**
    * Construct a new DataObjectGeometryIntersectsFilter.
@@ -35,12 +38,13 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
    */
   public DataObjectGeometryIntersectsFilter(final Geometry geometry) {
     this.geometry = geometry;
+    this.geometryFactory = GeometryFactory.getFactory(geometry);
   }
 
   @Override
   public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
-    if (matchGeometry.intersects(geometry)) {
+    if (geometryFactory.copy(matchGeometry).intersects(geometry)) {
       return true;
     } else {
       return false;

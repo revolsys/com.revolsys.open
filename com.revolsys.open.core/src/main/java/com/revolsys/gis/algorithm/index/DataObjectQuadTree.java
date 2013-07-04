@@ -10,6 +10,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
@@ -27,6 +28,12 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     insert(objects);
   }
 
+  public DataObjectQuadTree(final GeometryFactory geometryFactory,
+    final Collection<? extends DataObject> objects) {
+    super(geometryFactory);
+    insert(objects);
+  }
+
   public void insert(final Collection<? extends DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
@@ -36,8 +43,8 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   public void insert(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
-      final Envelope envelope = geometry.getEnvelopeInternal();
-      insert(envelope, object);
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+      insert(boundingBox, object);
     }
   }
 
@@ -97,7 +104,19 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     return queryFirst(object, filter);
   }
 
-  public List<DataObject> queryIntersects(final Geometry geometry) {
+  public List<DataObject> queryIntersects(final BoundingBox boundingBox) {
+    final Geometry geometry = boundingBox.convert(getGeometryFactory())
+      .toPolygon(1, 1);
+    final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
+      geometry);
+    return queryList(geometry, filter);
+  }
+
+  public List<DataObject> queryIntersects(Geometry geometry) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      geometry = geometryFactory.copy(geometry);
+    }
     final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
       geometry);
     return queryList(geometry, filter);

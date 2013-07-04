@@ -28,6 +28,9 @@ import com.vividsolutions.jts.geom.Point;
 
 public class Viewport2D {
 
+  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
+    .createEmptyGeometry();
+
   public static AffineTransform createModelToScreenTransform(
     final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
@@ -168,6 +171,20 @@ public class Viewport2D {
     final int x = event.getX();
     final int y = event.getY();
     return getBoundingBox(geometryFactory, x, y, pixels);
+  }
+
+  public Geometry getGeometry(final Geometry geometry) {
+    final BoundingBox viewExtent = getBoundingBox();
+    if (geometry != null && !geometry.isEmpty()) {
+      if (!viewExtent.isNull()) {
+        final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        if (geometryExtent.intersects(viewExtent)) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+          return geometryFactory.createGeometry(geometry);
+        }
+      }
+    }
+    return EMPTY_GEOMETRY;
   }
 
   /**

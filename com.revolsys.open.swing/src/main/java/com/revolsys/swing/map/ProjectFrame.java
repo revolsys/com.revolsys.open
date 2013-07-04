@@ -22,10 +22,12 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
+import com.revolsys.gis.data.store.ConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.gis.data.store.JsonDataObjectStoreConnectionRegistry;
-import com.revolsys.io.FolderConnectionManager;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.FolderConnectionManager;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -181,8 +183,15 @@ public class ProjectFrame extends JFrame {
   @Override
   public void dispose() {
     super.dispose();
-    DataObjectStoreConnectionManager.get().removeConnectionRegistry(
-      project.getDataStores());
+    if (project != null) {
+      final ConnectionRegistry<DataObjectStoreConnection> dataStores = project.getDataStores();
+      DataObjectStoreConnectionManager.get().removeConnectionRegistry(
+        dataStores);
+      tocPanel = null;
+      project = null;
+      dockControl = null;
+      mapPanel = null;
+    }
   }
 
   public CControl getDockControl() {
@@ -227,15 +236,6 @@ public class ProjectFrame extends JFrame {
 
     final File layersDir = new File(projectFile, "Layers");
     LayerUtil.loadLayerGroup(project, layersDir);
-  }
-
-  @Override
-  public void removeNotify() {
-    super.removeNotify();
-    tocPanel = null;
-    project = null;
-    dockControl = null;
-    mapPanel = null;
   }
 
 }

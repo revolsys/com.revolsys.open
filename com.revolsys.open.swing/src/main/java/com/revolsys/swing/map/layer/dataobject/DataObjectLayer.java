@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComponent;
 
@@ -22,8 +21,6 @@ public interface DataObjectLayer extends Layer {
   void addSelectedObjects(Collection<? extends LayerDataObject> objects);
 
   void addSelectedObjects(LayerDataObject... objects);
-
-  void clearEditingObjects();
 
   void clearSelectedObjects();
 
@@ -44,8 +41,6 @@ public interface DataObjectLayer extends Layer {
   List<LayerDataObject> getDataObjects(BoundingBox boundingBox);
 
   DataObjectStore getDataStore();
-
-  Set<LayerDataObject> getEditingObjects();
 
   DataType getGeometryType();
 
@@ -71,6 +66,8 @@ public interface DataObjectLayer extends Layer {
 
   List<LayerDataObject> getSelectedObjects();
 
+  List<LayerDataObject> getSelectedObjects(BoundingBox boundingBox);
+
   int getSelectionCount();
 
   boolean isCanAddObjects();
@@ -80,8 +77,6 @@ public interface DataObjectLayer extends Layer {
   boolean isCanEditObjects();
 
   boolean isDeleted(LayerDataObject object);
-
-  boolean isEditing(LayerDataObject object);
 
   @Override
   boolean isHasChanges();
@@ -103,8 +98,6 @@ public interface DataObjectLayer extends Layer {
   void revertChanges(LayerDataObject object);
 
   boolean saveChanges(LayerDataObject object);
-
-  void setEditingObjects(Collection<? extends LayerDataObject> objects);
 
   void setQuery(Query query);
 

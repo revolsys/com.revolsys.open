@@ -154,7 +154,6 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public GeometryStylePanel createStylePanel() {
     return new GeometryStylePanel(this);
   }

@@ -6,7 +6,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -38,7 +40,6 @@ import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
-import com.revolsys.swing.map.overlay.SelectFeaturesOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.vividsolutions.jts.geom.Geometry;
@@ -75,7 +76,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private final JLayeredPane layeredPane;
 
-  private final LayerRendererOverlay map;
+  private final LayerRendererOverlay layerOverlay;
 
   private MouseOverlay mouseOverlay;
 
@@ -126,8 +127,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     layeredPane.add(baseMapOverlay, new Integer(0));
     baseMapOverlay.addPropertyChangeListener("layer", this);
 
-    map = new LayerRendererOverlay(this, project);
-    layeredPane.add(map, new Integer(1));
+    layerOverlay = new LayerRendererOverlay(this, project);
+    layeredPane.add(layerOverlay, new Integer(1));
 
     project.addPropertyChangeListener("viewBoundingBox",
       new PropertyChangeListener() {
@@ -175,7 +176,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (baseMapLayers.size() > 0) {
       comboBox.setSelectedIndex(1);
     }
-    comboBox.setToolTipText("Select the base map layer");
+    comboBox.setToolTipText("Select the base layerOverlay layer");
     toolBar.addComponent("layers", comboBox);
     baseMapOverlay.addPropertyChangeListener("layer",
       new PropertyChangeListener() {
@@ -208,7 +209,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addMapOverlays() {
     new ZoomOverlay(this);
-    new SelectFeaturesOverlay(this);
     new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(layeredPane);
     new EditGeoReferencedImageOverlay(this);
@@ -275,12 +275,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void dispose() {
-    map.dispose();
+    layerOverlay.dispose();
   }
 
   @Override
   protected void finalize() throws Throwable {
-    map.dispose();
+    layerOverlay.dispose();
     super.finalize();
   }
 
@@ -290,6 +290,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public LayerGroup getBaseMapLayers() {
     return baseMapLayers;
+  }
+
+  public LayerRendererOverlay getBaseMapOverlay() {
+    return baseMapOverlay;
   }
 
   public BoundingBox getBoundingBox() {
@@ -304,6 +308,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return project.getGeometryFactory();
   }
 
+  public LayerRendererOverlay getLayerOverlay() {
+    return layerOverlay;
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends JComponent> T getMapOverlay(final Class<T> overlayClass) {
     for (final Component component : layeredPane.getComponents()) {
@@ -312,6 +320,18 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends JComponent> List<T> getMapOverlays(
+    final Class<T> overlayClass) {
+    final List<T> overlays = new ArrayList<T>();
+    for (final Component component : layeredPane.getComponents()) {
+      if (overlayClass.isAssignableFrom(component.getClass())) {
+        overlays.add((T)component);
+      }
+    }
+    return overlays;
   }
 
   public Project getProject() {

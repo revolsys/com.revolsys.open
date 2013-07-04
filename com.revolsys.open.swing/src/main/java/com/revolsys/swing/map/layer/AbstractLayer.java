@@ -289,7 +289,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isSelectable() {
-    return isSelectSupported() && isVisible() && selectable;
+    return isVisible() && (isSelectSupported() && selectable || isEditable());
   }
 
   @Override

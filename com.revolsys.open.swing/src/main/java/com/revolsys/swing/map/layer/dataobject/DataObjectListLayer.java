@@ -204,13 +204,6 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public List<LayerDataObject> query(Geometry geometry,
-    final double distance) {
-    geometry = getGeometryFactory().createGeometry(geometry);
-    return (List)index.queryDistance(geometry, distance);
-  }
-
-  @Override
   public int getRowCount() {
     return objects.size();
   }
@@ -243,6 +236,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public ListIterator<LayerDataObject> listIterator(final int index) {
     return objects.listIterator(index);
+  }
+
+  @Override
+  public List<LayerDataObject> query(Geometry geometry, final double distance) {
+    geometry = getGeometryFactory().createGeometry(geometry);
+    return (List)index.queryDistance(geometry, distance);
   }
 
   @Override
@@ -284,10 +283,6 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public LayerDataObject set(final int index, final LayerDataObject element) {
     // TODO events
     return objects.set(index, element);
-  }
-
-  public void setEditingObjects(final LayerDataObject... objects) {
-    setEditingObjects(Arrays.asList(objects));
   }
 
   public void setObjects(final Collection<LayerDataObject> newObjects) {

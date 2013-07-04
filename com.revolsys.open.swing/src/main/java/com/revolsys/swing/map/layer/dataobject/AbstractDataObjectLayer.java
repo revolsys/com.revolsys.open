@@ -40,6 +40,7 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -52,6 +53,7 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.SwingWorkerManager;
@@ -150,8 +152,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<LayerDataObject> deletedObjects = new LinkedHashSet<LayerDataObject>();
 
-  private Set<LayerDataObject> editingObjects = new LinkedHashSet<LayerDataObject>();
-
   private final Object editSync = new Object();
 
   private Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
@@ -165,6 +165,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected Query query;
 
   private Set<LayerDataObject> selectedObjects = new LinkedHashSet<LayerDataObject>();
+
+  private DataObjectQuadTree selectedObjectsIndex;
 
   private List<String> columnNames;
 
@@ -203,11 +205,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return showAddForm(parameters);
   }
 
-  public void addEditingObject(final LayerDataObject object) {
-    editingObjects.add(object);
-    fireObjectsChanged();
-  }
-
   protected void addModifiedObject(final LayerDataObject object) {
     synchronized (modifiedObjects) {
       modifiedObjects.add(object);
@@ -235,6 +232,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void addSelectedObject(final LayerDataObject object) {
     if (isLayerObject(object)) {
+      clearSelectedObjectsIndex();
       selectedObjects.add(object);
     }
   }
@@ -264,19 +262,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     newObjects = new LinkedHashSet<LayerDataObject>();
     modifiedObjects = new LinkedHashSet<LayerDataObject>();
     deletedObjects = new LinkedHashSet<LayerDataObject>();
-    editingObjects.clear();
-  }
-
-  @Override
-  public void clearEditingObjects() {
-    this.editingObjects.clear();
-    firePropertyChange("editingObjectsChanged", false, true);
   }
 
   @Override
   public void clearSelectedObjects() {
     selectedObjects = new LinkedHashSet<LayerDataObject>();
     firePropertyChange("selected", true, false);
+  }
+
+  protected void clearSelectedObjectsIndex() {
+    selectedObjectsIndex = null;
   }
 
   @Override
@@ -362,7 +357,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     this.deletedObjects = null;
-    this.editingObjects = null;
     this.forms = null;
     this.metaData = null;
     this.modifiedObjects = null;
@@ -374,6 +368,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void deleteObject(final LayerDataObject object) {
     if (isLayerObject(object)) {
+      clearSelectedObjectsIndex();
       if (!newObjects.remove(object)) {
         modifiedObjects.remove(object);
         deletedObjects.add(object);
@@ -476,11 +471,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public Set<LayerDataObject> getDeletedObjects() {
     return new LinkedHashSet<LayerDataObject>(deletedObjects);
-  }
-
-  @Override
-  public Set<LayerDataObject> getEditingObjects() {
-    return new LinkedHashSet<LayerDataObject>(editingObjects);
   }
 
   public String getGeometryAttributeName() {
@@ -598,6 +588,25 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public List<LayerDataObject> getSelectedObjects(final BoundingBox boundingBox) {
+    final DataObjectQuadTree index = getSelectedObjectsIndex();
+    return (List)index.queryIntersects(boundingBox);
+  }
+
+  protected DataObjectQuadTree getSelectedObjectsIndex() {
+    if (selectedObjectsIndex == null) {
+      final List<LayerDataObject> selectedObjects = getSelectedObjects();
+      final DataObjectQuadTree index = new DataObjectQuadTree(
+        getProject().getGeometryFactory(), selectedObjects);
+      this.selectedObjectsIndex = index;
+    }
+    return selectedObjectsIndex;
+  }
+
+  @Override
   public int getSelectionCount() {
     return selectedObjects.size();
   }
@@ -660,11 +669,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public boolean isEditing(final LayerDataObject object) {
-    return editingObjects.contains(object);
-  }
-
-  @Override
   public boolean isHasChanges() {
     if (isEditable()) {
       synchronized (editSync) {
@@ -692,8 +696,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (isCanDeleteObjects() && isDeleted(object)) {
       return true;
     } else if (isSelected(object)) {
-      return true;
-    } else if ((isCanAddObjects() || isCanEditObjects()) && isEditing(object)) {
       return true;
     } else {
       return false;
@@ -765,10 +767,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);
     final Object source = event.getSource();
-    if (!"errorsUpdated".equals(event.getPropertyName())) {
+    final String propertyName = event.getPropertyName();
+    if (!"errorsUpdated".equals(propertyName)) {
       if (source instanceof LayerDataObject) {
         final LayerDataObject dataObject = (LayerDataObject)source;
         if (dataObject.getLayer() == this) {
+          if (EqualsRegistry.equal(propertyName, getGeometryAttributeName())) {
+            final Geometry oldGeometry = (Geometry)event.getOldValue();
+            updateSpatialIndex(dataObject, oldGeometry);
+          }
+          clearSelectedObjectsIndex();
           final DataObjectState state = dataObject.getState();
           if (state == DataObjectState.Modified) {
             addModifiedObject(dataObject);
@@ -905,20 +913,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void setEditingObjects(
-    final Collection<? extends LayerDataObject> editingObjects) {
-    this.editingObjects = new LinkedHashSet<LayerDataObject>();
-    for (final LayerDataObject object : editingObjects) {
-      addEditingObject(object);
-    }
-    firePropertyChange("editingObjectsChanged", false, true);
-  }
-
-  public void setEditingObjects(final LayerDataObject... objects) {
-    setEditingObjects(Arrays.asList(objects));
-  }
-
-  @Override
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     super.setGeometryFactory(geometryFactory);
     if (geometryFactory != null && boundingBox.isNull()) {
@@ -969,7 +963,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final List<LayerDataObject> objects = getDataObjects(boundingBox);
       for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
         final LayerDataObject layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject)) {
+        if (!isVisible(layerDataObject)
+          || deletedObjects.contains(layerDataObject)) {
           iterator.remove();
         }
       }
@@ -983,6 +978,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void setSelectedObjects(
     final Collection<LayerDataObject> selectedObjects) {
+    clearSelectedObjectsIndex();
     this.selectedObjects = new LinkedHashSet<LayerDataObject>(selectedObjects);
     fireSelected();
   }
@@ -1008,6 +1004,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
+    clearSelectedObjectsIndex();
     final List<LayerDataObject> objects = query(geometry, distance);
     for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
       final LayerDataObject layerDataObject = iterator.next();
@@ -1144,6 +1141,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void unselectObjects(
     final Collection<? extends LayerDataObject> objects) {
+    clearSelectedObjectsIndex();
     selectedObjects.removeAll(objects);
     fireSelected();
   }
@@ -1158,5 +1156,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final List<String> attributeNames = this.metaData.getAttributeNames();
       columnNames.retainAll(attributeNames);
     }
+  }
+
+  protected void updateSpatialIndex(final LayerDataObject object,
+    final Geometry oldGeometry) {
   }
 }

@@ -3,7 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -16,10 +15,15 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.color.ColorUtil;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.jts.IsSimpleOp;
+import com.revolsys.gis.jts.IsValidOp;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -31,6 +35,7 @@ import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 @SuppressWarnings("serial")
 public class SelectFeaturesOverlay extends AbstractOverlay {
@@ -144,18 +149,6 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void mouseEntered(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseMoved(final MouseEvent e) {
-  }
-
-  @Override
   public void mousePressed(final MouseEvent event) {
     if (isSelectEvent(event)) {
       selectBoxStart(event);
@@ -170,6 +163,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   }
 
   protected void paint(final Graphics2D graphics2d, final LayerGroup layerGroup) {
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -177,16 +172,35 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
-          if (object != null && dataObjectLayer.isVisible(object)
-            && !dataObjectLayer.isEditing(object)) {
-            final Geometry geometry = object.getGeometryValue();
-            if (geometry != null) {
-              MarkerStyleRenderer.renderMarkerVertices(getViewport(),
-                graphics2d, geometry, vertexStyle);
-              GeometryStyleRenderer.renderGeometry(getViewport(), graphics2d,
+          if (object != null && dataObjectLayer.isVisible(object)) {
+            Geometry geometry = object.getGeometryValue();
+            if (geometry != null && !geometry.isEmpty()) {
+              geometry = viewport.getGeometry(geometry);
+              MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
+                geometry, vertexStyle);
+              GeometryStyleRenderer.renderGeometry(viewport, graphics2d,
                 geometry, highlightStyle);
-              GeometryStyleRenderer.renderOutline(getViewport(), graphics2d,
+              GeometryStyleRenderer.renderOutline(viewport, graphics2d,
                 geometry, outlineStyle);
+              final IsValidOp validOp = new IsValidOp(geometry);
+              final MarkerStyle errorStyle = MarkerStyle.marker("ellipse", 7,
+                WebColors.Yellow, 1, WebColors.Red);
+              if (validOp.isValid()) {
+                final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
+                if (!simpleOp.isSimple()) {
+                  for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
+                    final Point point = viewportGeometryFactory.createPoint(coordinates);
+                    MarkerStyleRenderer.renderMarker(viewport, graphics2d,
+                      point, errorStyle);
+                  }
+                }
+              } else {
+                for (final TopologyValidationError error : validOp.getErrors()) {
+                  final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
+                  MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
+                    errorStyle);
+                }
+              }
             }
           }
         }
@@ -195,11 +209,10 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void paintComponent(final Graphics graphics) {
-    final Graphics2D graphics2d = (Graphics2D)graphics;
+  public void paintComponent(final Graphics2D graphics) {
     final Project layerGroup = getProject();
-    paint(graphics2d, layerGroup);
-    paintSelectBox(graphics2d);
+    paint(graphics, layerGroup);
+    paintSelectBox(graphics);
   }
 
   protected void paintSelectBox(final Graphics2D graphics2d) {
@@ -220,6 +233,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     } else if ("selectable".equals(propertyName)) {
       repaint();
     } else if ("visible".equals(propertyName)) {
+      repaint();
+    } else if ("editable".equals(propertyName)) {
       repaint();
     }
   }
@@ -278,6 +293,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   public void selectObjects(final BoundingBox boundingBox) {
     final Project project = getProject();
     selectObjects(project, boundingBox);
+    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    overlay.redraw();
   }
 
   private void selectObjects(final LayerGroup group,
@@ -293,6 +310,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         if (dataObjectLayer.isSelectable(scale)) {
           dataObjectLayer.setSelectedObjects(boundingBox);
           dataObjectLayer.showViewAttributes();
+        } else {
+          dataObjectLayer.clearSelectedObjects();
         }
       }
     }

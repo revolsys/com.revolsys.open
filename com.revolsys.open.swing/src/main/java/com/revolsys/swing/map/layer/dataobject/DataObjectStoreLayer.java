@@ -77,14 +77,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void addEditingObject(final LayerDataObject object) {
-    final LayerDataObject cachedObject = getCacheObject(object);
-    if (cachedObject != null) {
-      super.addEditingObject(cachedObject);
-    }
-  }
-
-  @Override
   protected void addModifiedObject(final LayerDataObject object) {
     final LayerDataObject cacheObject = getCacheObject(object);
     if (cacheObject != null) {
@@ -116,7 +108,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     synchronized (cachedObjects) {
       final Set<DataObject> objects = new HashSet<DataObject>();
       objects.addAll(getSelectedObjects());
-      objects.addAll(getEditingObjects());
       objects.addAll(getModifiedObjects());
       objects.addAll(index.queryAll());
       cachedObjects.values().retainAll(objects);
@@ -127,14 +118,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected void clearChanges() {
     super.clearChanges();
     cachedObjects.clear();
-  }
-
-  @Override
-  public void clearEditingObjects() {
-    synchronized (cachedObjects) {
-      super.clearEditingObjects();
-      cleanCachedObjects();
-    }
   }
 
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
@@ -500,7 +483,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final List<LayerDataObject> objects = getObjects(boundingBox);
       for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
         final LayerDataObject layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject)) {
+        if (!isVisible(layerDataObject) || super.isDeleted(layerDataObject)) {
           iterator.remove();
         }
       }
@@ -584,6 +567,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Collection<? extends LayerDataObject> objects) {
     super.unselectObjects(objects);
     cleanCachedObjects();
+  }
+
+  @Override
+  protected void updateSpatialIndex(final LayerDataObject object,
+    final Geometry oldGeometry) {
+    index.remove(BoundingBox.getBoundingBox(oldGeometry), object);
+    index.insert(object);
   }
 
 }

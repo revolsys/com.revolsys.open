@@ -65,9 +65,9 @@ public class AbstractOverlay extends JComponent implements
     drawXorGeometry(graphics, geometry);
   }
 
-  protected void drawXorGeometry(final Graphics2D graphics,
-    final Geometry geometry) {
+  protected void drawXorGeometry(final Graphics2D graphics, Geometry geometry) {
     if (geometry != null) {
+      geometry = getViewport().getGeometryFactory().copy(geometry);
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);
@@ -104,6 +104,9 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected GeometryFactory getGeometryFactory() {
+    if (geometryFactory == null) {
+      return project.getGeometryFactory();
+    }
     return geometryFactory;
   }
 
@@ -123,7 +126,8 @@ public class AbstractOverlay extends JComponent implements
   protected Point getPoint(final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point point = viewport.toModelPointRounded(geometryFactory, eventPoint);
+    final Point point = viewport.toModelPointRounded(geometryFactory,
+      eventPoint);
     return point;
   }
 

@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.geometry.util;
 
 import java.awt.Toolkit;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,66 +40,156 @@ public class GeometryEditUtil {
     }
   }
 
+  protected static ListCoordinatesList appendVertex(
+    final CoordinatesList coordinatesList, final Coordinates newVertex) {
+    final ListCoordinatesList points = new ListCoordinatesList(coordinatesList);
+    points.add(newVertex);
+    return points;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Geometry> T appendVertex(final Geometry geometry,
+    final Coordinates newVertex, final int[] geometryId) {
+    if (geometry != null && newVertex != null) {
+      if (geometry instanceof Point) {
+        return (T)geometry;
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        return (T)appendVertex(line, newVertex);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        final int ringIndex = geometryId[0];
+        return (T)appendVertex(polygon, ringIndex, newVertex);
+      } else if (geometry instanceof MultiPoint) {
+        final MultiPoint multiPoint = (MultiPoint)geometry;
+        return (T)appendVertex(multiPoint, newVertex);
+      } else {
+        final int partIndex = geometryId[0];
+        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
+          final Geometry part = parts.get(partIndex);
+          Geometry newPart = part;
+          if (part instanceof Point) {
+            return (T)geometry;
+          } else if (part instanceof LineString) {
+            final LineString line = (LineString)part;
+            newPart = appendVertex(line, newVertex);
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            final int ringIndex = geometryId[1];
+            newPart = appendVertex(polygon, ringIndex, newVertex);
+          }
+          parts.set(partIndex, newPart);
+        }
+      }
+    }
+    return (T)geometry;
+  }
+
+  public static <T extends Geometry> T appendVertex(final Geometry geometry,
+    final Point newVertex, final int[] partId) {
+    return appendVertex(geometry, CoordinatesUtil.get(newVertex), partId);
+  }
+
+  public static LineString appendVertex(final LineString line,
+    final Coordinates newVertex) {
+    final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
+    final ListCoordinatesList points = appendVertex(coordinatesList, newVertex);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    return geometryFactory.createLineString(points);
+  }
+
+  public static MultiPoint appendVertex(final MultiPoint multiPoint,
+    final Coordinates newVertex) {
+    final CoordinatesList coordinatesList = CoordinatesListUtil.get(multiPoint);
+    final ListCoordinatesList points = appendVertex(coordinatesList, newVertex);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    return geometryFactory.createMultiPoint(points);
+  }
+
+  public static Polygon appendVertex(final Polygon polygon,
+    final int ringIndex, final Coordinates newVertex) {
+    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+    final CoordinatesList coordinatesList = rings.get(ringIndex);
+    final ListCoordinatesList points = insertVertex(coordinatesList,
+      coordinatesList.size() - 1, newVertex);
+
+    rings.set(ringIndex, points);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
+    return geometryFactory.createPolygon(rings);
+  }
+
   public static QuadTree<IndexedLineSegment> createLineSegmentQuadTree(
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      final QuadTree<IndexedLineSegment> index = new QuadTree<IndexedLineSegment>(
-        geometryFactory);
-      if (geometry instanceof LineString) {
-        final LineString line = (LineString)geometry;
-        int segmentIndex = 0;
-        for (final LineSegment lineSegment : new CoordinatesListIndexLineSegmentIterator(
-          line)) {
-          final IndexedLineSegment indexedSegment = new IndexedLineSegment(
-            geometryFactory, lineSegment, segmentIndex);
-          index.insert(indexedSegment.getEnvelope(), indexedSegment);
-          segmentIndex++;
-        }
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-        for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-          final CoordinatesList ring = rings.get(ringIndex);
+      final Reference<QuadTree<IndexedLineSegment>> reference = JtsGeometryUtil.getGeometryProperty(
+        geometry, "LineSegmentQuadTree");
+      QuadTree<IndexedLineSegment> index;
+      if (reference == null) {
+        index = null;
+      } else {
+        index = reference.get();
+      }
+      if (index == null) {
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+        index = new QuadTree<IndexedLineSegment>(geometryFactory);
+        if (geometry instanceof LineString) {
+          final LineString line = (LineString)geometry;
           int segmentIndex = 0;
           for (final LineSegment lineSegment : new CoordinatesListIndexLineSegmentIterator(
-            ring)) {
+            line)) {
             final IndexedLineSegment indexedSegment = new IndexedLineSegment(
-              geometryFactory, lineSegment, ringIndex, segmentIndex);
-            index.insert(indexedSegment.getEnvelope(), indexedSegment);
+              geometryFactory, lineSegment, segmentIndex);
+            index.insert(indexedSegment.getBoundingBox(), indexedSegment);
             segmentIndex++;
           }
-        }
-      } else {
-        for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-          final Geometry part = geometry.getGeometryN(partIndex);
-          if (part instanceof LineString) {
-            final LineString line = (LineString)part;
+        } else if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+          for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+            final CoordinatesList ring = rings.get(ringIndex);
             int segmentIndex = 0;
             for (final LineSegment lineSegment : new CoordinatesListIndexLineSegmentIterator(
-              line)) {
+              ring)) {
               final IndexedLineSegment indexedSegment = new IndexedLineSegment(
-                geometryFactory, lineSegment, partIndex, segmentIndex);
-              index.insert(indexedSegment.getEnvelope(), indexedSegment);
+                geometryFactory, lineSegment, ringIndex, segmentIndex);
+              index.insert(indexedSegment.getBoundingBox(), indexedSegment);
               segmentIndex++;
             }
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-            for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-              final CoordinatesList ring = rings.get(ringIndex);
+          }
+        } else {
+          for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+            final Geometry part = geometry.getGeometryN(partIndex);
+            if (part instanceof LineString) {
+              final LineString line = (LineString)part;
               int segmentIndex = 0;
               for (final LineSegment lineSegment : new CoordinatesListIndexLineSegmentIterator(
-                ring)) {
+                line)) {
                 final IndexedLineSegment indexedSegment = new IndexedLineSegment(
-                  geometryFactory, lineSegment, partIndex, ringIndex,
-                  segmentIndex);
-                index.insert(indexedSegment.getEnvelope(), indexedSegment);
+                  geometryFactory, lineSegment, partIndex, segmentIndex);
+                index.insert(indexedSegment.getBoundingBox(), indexedSegment);
                 segmentIndex++;
+              }
+            } else if (part instanceof Polygon) {
+              final Polygon polygon = (Polygon)part;
+              final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+              for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+                final CoordinatesList ring = rings.get(ringIndex);
+                int segmentIndex = 0;
+                for (final LineSegment lineSegment : new CoordinatesListIndexLineSegmentIterator(
+                  ring)) {
+                  final IndexedLineSegment indexedSegment = new IndexedLineSegment(
+                    geometryFactory, lineSegment, partIndex, ringIndex,
+                    segmentIndex);
+                  index.insert(indexedSegment.getBoundingBox(), indexedSegment);
+                  segmentIndex++;
+                }
               }
             }
           }
         }
+        JtsGeometryUtil.setGeometryProperty(geometry, "LineSegmentQuadTree",
+          new SoftReference<QuadTree<IndexedLineSegment>>(index));
       }
       return index;
     }
@@ -108,76 +200,97 @@ public class GeometryEditUtil {
     if (geometry == null || geometry.isEmpty()) {
       return new PointQuadTree<int[]>();
     } else {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      final PointQuadTree<int[]> index = new PointQuadTree<int[]>(
-        geometryFactory);
+      final Reference<PointQuadTree<int[]>> reference = JtsGeometryUtil.getGeometryProperty(
+        geometry, "PointQuadTree");
+      PointQuadTree<int[]> index;
+      if (reference == null) {
+        index = null;
+      } else {
+        index = reference.get();
+      }
+      if (index == null) {
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+        index = new PointQuadTree<int[]>(geometryFactory);
 
-      if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        final Coordinates coordinates = CoordinatesUtil.get(point);
-        index.put(coordinates, new int[] {
-          0
-        });
-      } else if (geometry instanceof LineString) {
-        final LineString line = (LineString)geometry;
-        final CoordinatesList points = CoordinatesListUtil.get(line);
-        for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
-          final double x = points.getX(pointIndex);
-          final double y = points.getY(pointIndex);
-          index.put(x, y, new int[] {
-            pointIndex
+        if (geometry instanceof Point) {
+          final Point point = (Point)geometry;
+          final Coordinates coordinates = CoordinatesUtil.get(point);
+          index.put(coordinates, new int[] {
+            0
           });
-        }
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-        for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-          final CoordinatesList points = rings.get(ringIndex);
+        } else if (geometry instanceof LineString) {
+          final LineString line = (LineString)geometry;
+          final CoordinatesList points = CoordinatesListUtil.get(line);
           for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
             final double x = points.getX(pointIndex);
             final double y = points.getY(pointIndex);
             index.put(x, y, new int[] {
-              ringIndex, pointIndex
+              pointIndex
             });
           }
-        }
-      } else {
-        for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-          final Geometry part = geometry.getGeometryN(partIndex);
-          if (part instanceof Point) {
-            final Point point = (Point)part;
-            final Coordinates coordinates = CoordinatesUtil.get(point);
-            index.put(coordinates, new int[] {
-              partIndex, 0
-            });
-          } else if (part instanceof LineString) {
-            final LineString line = (LineString)part;
-            final CoordinatesList points = CoordinatesListUtil.get(line);
+        } else if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+          for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+            final CoordinatesList points = rings.get(ringIndex);
             for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
               final double x = points.getX(pointIndex);
               final double y = points.getY(pointIndex);
               index.put(x, y, new int[] {
-                partIndex, pointIndex
+                ringIndex, pointIndex
               });
             }
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-            for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-              final CoordinatesList points = rings.get(ringIndex);
+          }
+        } else {
+          for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+            final Geometry part = geometry.getGeometryN(partIndex);
+            if (part instanceof Point) {
+              final Point point = (Point)part;
+              final Coordinates coordinates = CoordinatesUtil.get(point);
+              index.put(coordinates, new int[] {
+                partIndex, 0
+              });
+            } else if (part instanceof LineString) {
+              final LineString line = (LineString)part;
+              final CoordinatesList points = CoordinatesListUtil.get(line);
               for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
                 final double x = points.getX(pointIndex);
                 final double y = points.getY(pointIndex);
                 index.put(x, y, new int[] {
-                  partIndex, ringIndex, pointIndex
+                  partIndex, pointIndex
                 });
+              }
+            } else if (part instanceof Polygon) {
+              final Polygon polygon = (Polygon)part;
+              final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+              for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
+                final CoordinatesList points = rings.get(ringIndex);
+                for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+                  final double x = points.getX(pointIndex);
+                  final double y = points.getY(pointIndex);
+                  index.put(x, y, new int[] {
+                    partIndex, ringIndex, pointIndex
+                  });
+                }
               }
             }
           }
         }
+        JtsGeometryUtil.setGeometryProperty(geometry, "PointQuadTree",
+          new SoftReference<PointQuadTree<int[]>>(index));
       }
       return index;
     }
+  }
+
+  public static CoordinatesList deleteVertex(final CoordinatesList points,
+    final int pointIndex) {
+    if (pointIndex >= 0 && pointIndex < points.size()) {
+      final ListCoordinatesList newPoints = new ListCoordinatesList(points);
+      newPoints.remove(pointIndex);
+      return newPoints;
+    }
+    return points;
   }
 
   public static Geometry deleteVertex(final Geometry geometry,
@@ -230,16 +343,6 @@ public class GeometryEditUtil {
     return geometry;
   }
 
-  public static CoordinatesList deleteVertex(final CoordinatesList points,
-    final int pointIndex) {
-    if (pointIndex >= 0 && pointIndex < points.size()) {
-      final ListCoordinatesList newPoints = new ListCoordinatesList(points);
-      newPoints.remove(pointIndex);
-      return newPoints;
-    }
-    return points;
-  }
-
   public static LineString deleteVertex(final LineString line,
     final int pointIndex) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
@@ -278,114 +381,6 @@ public class GeometryEditUtil {
     } else {
       rings.set(ringIndex, newPoints);
       return geometryFactory.createPolygon(rings);
-    }
-  }
-
-  public static Coordinates getVertex(final Geometry geometry,
-    final int[] partId, int pointIndex) {
-    int[] vertexId = new int[partId.length + 1];
-    System.arraycopy(partId, 0, vertexId, 0, partId.length);
-    vertexId[partId.length] = pointIndex;
-    return getVertex(geometry, vertexId);
-  }
-
-  public static Coordinates getVertex(final Geometry geometry,
-    final int[] vertexId) {
-    if (geometry == null || vertexId.length == 0) {
-      return null;
-    } else {
-      int pointIndex = vertexId[vertexId.length - 1];
-      if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        final Coordinates coordinates = CoordinatesUtil.get(point);
-        return coordinates;
-      } else if (geometry instanceof LineString) {
-        final LineString line = (LineString)geometry;
-        final CoordinatesList points = CoordinatesListUtil.get(line);
-        final int numPoints = points.size();
-        while (numPoints > 0 && pointIndex < 0) {
-          pointIndex += numPoints;
-        }
-        pointIndex = pointIndex % numPoints;
-        return getVertex(points, pointIndex);
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-        final int ringIndex = vertexId[0];
-
-        final CoordinatesList points = rings.get(ringIndex);
-        final int numPoints = points.size();
-        while (numPoints > 0 && pointIndex < 0) {
-          pointIndex += numPoints - 1;
-        }
-        return getVertex(points, pointIndex);
-      } else {
-        final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final Geometry part = geometry.getGeometryN(partIndex);
-          if (part instanceof Point) {
-            final Point point = (Point)part;
-            final Coordinates coordinates = CoordinatesUtil.get(point);
-            return coordinates;
-          } else if (part instanceof LineString) {
-            final LineString line = (LineString)part;
-            final CoordinatesList points = CoordinatesListUtil.get(line);
-            final int numPoints = points.size();
-            while (numPoints > 0 && pointIndex < 0) {
-              pointIndex += numPoints;
-            }
-            return getVertex(points, pointIndex);
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-            final int vertexIndex = vertexId[1];
-            final CoordinatesList points = rings.get(vertexIndex);
-            return getVertex(points, pointIndex);
-          }
-        }
-      }
-      return null;
-    }
-  }
-
-  public static CoordinatesList getPoints(final Geometry geometry,
-    final int[] vertexId) {
-    if (geometry == null) {
-      return null;
-    } else {
-      if (geometry instanceof Point) {
-        final CoordinatesList points = CoordinatesListUtil.get(geometry);
-        return points;
-      } else if (geometry instanceof LineString) {
-        final CoordinatesList points = CoordinatesListUtil.get(geometry);
-        return points;
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-        final int ringIndex = vertexId[0];
-
-        final CoordinatesList points = rings.get(ringIndex);
-        return points;
-      } else {
-        final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final Geometry part = geometry.getGeometryN(partIndex);
-          if (part instanceof Point) {
-            final CoordinatesList points = CoordinatesListUtil.get(part);
-            return points;
-          } else if (part instanceof LineString) {
-            final CoordinatesList points = CoordinatesListUtil.get(part);
-            return points;
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-            final int vertexIndex = vertexId[1];
-            final CoordinatesList points = rings.get(vertexIndex);
-            return points;
-          }
-        }
-      }
-      return null;
     }
   }
 
@@ -455,10 +450,51 @@ public class GeometryEditUtil {
     return pointIndexes;
   }
 
+  public static CoordinatesList getPoints(final Geometry geometry,
+    final int[] vertexId) {
+    if (geometry == null) {
+      return null;
+    } else {
+      if (geometry instanceof Point) {
+        final CoordinatesList points = CoordinatesListUtil.get(geometry);
+        return points;
+      } else if (geometry instanceof LineString) {
+        final CoordinatesList points = CoordinatesListUtil.get(geometry);
+        return points;
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+        final int ringIndex = vertexId[0];
+
+        final CoordinatesList points = rings.get(ringIndex);
+        return points;
+      } else {
+        final int partIndex = vertexId[0];
+        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+          final Geometry part = geometry.getGeometryN(partIndex);
+          if (part instanceof Point) {
+            final CoordinatesList points = CoordinatesListUtil.get(part);
+            return points;
+          } else if (part instanceof LineString) {
+            final CoordinatesList points = CoordinatesListUtil.get(part);
+            return points;
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+            final int vertexIndex = vertexId[1];
+            final CoordinatesList points = rings.get(vertexIndex);
+            return points;
+          }
+        }
+      }
+      return null;
+    }
+  }
+
   public static Coordinates getVertex(final CoordinatesList points,
     final int pointIndex) {
     if (pointIndex >= 0 && pointIndex < points.size()) {
-      Coordinates point = points.get(pointIndex);
+      final Coordinates point = points.get(pointIndex);
       if (point != null) {
         return point.cloneCoordinates();
       }
@@ -466,18 +502,78 @@ public class GeometryEditUtil {
     return null;
   }
 
+  public static Coordinates getVertex(final Geometry geometry,
+    final int[] vertexId) {
+    if (geometry == null || vertexId.length == 0) {
+      return null;
+    } else {
+      int pointIndex = vertexId[vertexId.length - 1];
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        final Coordinates coordinates = CoordinatesUtil.get(point);
+        return coordinates;
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        final CoordinatesList points = CoordinatesListUtil.get(line);
+        final int numPoints = points.size();
+        while (numPoints > 0 && pointIndex < 0) {
+          pointIndex += numPoints;
+        }
+        pointIndex = pointIndex % numPoints;
+        return getVertex(points, pointIndex);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+        final int ringIndex = vertexId[0];
+
+        final CoordinatesList points = rings.get(ringIndex);
+        final int numPoints = points.size();
+        while (numPoints > 0 && pointIndex < 0) {
+          pointIndex += numPoints - 1;
+        }
+        return getVertex(points, pointIndex);
+      } else {
+        final int partIndex = vertexId[0];
+        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+          final Geometry part = geometry.getGeometryN(partIndex);
+          if (part instanceof Point) {
+            final Point point = (Point)part;
+            final Coordinates coordinates = CoordinatesUtil.get(point);
+            return coordinates;
+          } else if (part instanceof LineString) {
+            final LineString line = (LineString)part;
+            final CoordinatesList points = CoordinatesListUtil.get(line);
+            final int numPoints = points.size();
+            while (numPoints > 0 && pointIndex < 0) {
+              pointIndex += numPoints;
+            }
+            return getVertex(points, pointIndex);
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+            final int vertexIndex = vertexId[1];
+            final CoordinatesList points = rings.get(vertexIndex);
+            return getVertex(points, pointIndex);
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  public static Coordinates getVertex(final Geometry geometry,
+    final int[] partId, final int pointIndex) {
+    final int[] vertexId = new int[partId.length + 1];
+    System.arraycopy(partId, 0, vertexId, 0, partId.length);
+    vertexId[partId.length] = pointIndex;
+    return getVertex(geometry, vertexId);
+  }
+
   protected static ListCoordinatesList insertVertex(
     final CoordinatesList coordinatesList, final int pointIndex,
     final Coordinates newVertex) {
     final ListCoordinatesList points = new ListCoordinatesList(coordinatesList);
     points.add(pointIndex, newVertex);
-    return points;
-  }
-
-  protected static ListCoordinatesList appendVertex(
-    final CoordinatesList coordinatesList, final Coordinates newVertex) {
-    final ListCoordinatesList points = new ListCoordinatesList(coordinatesList);
-    points.add(newVertex);
     return points;
   }
 
@@ -555,78 +651,6 @@ public class GeometryEditUtil {
       rings.get(ringIndex));
 
     points.add(pointIndex, newVertex);
-
-    rings.set(ringIndex, points);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
-    return geometryFactory.createPolygon(rings);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends Geometry> T appendVertex(final Geometry geometry,
-    final Coordinates newVertex, final int[] geometryId) {
-    if (geometry != null && newVertex != null) {
-      if (geometry instanceof Point) {
-        return (T)geometry;
-      } else if (geometry instanceof LineString) {
-        final LineString line = (LineString)geometry;
-        return (T)appendVertex(line, newVertex);
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final int ringIndex = geometryId[0];
-        return (T)appendVertex(polygon, ringIndex, newVertex);
-      } else if (geometry instanceof MultiPoint) {
-        final MultiPoint multiPoint = (MultiPoint)geometry;
-        return (T)appendVertex(multiPoint, newVertex);
-      } else {
-        final int partIndex = geometryId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
-          final Geometry part = parts.get(partIndex);
-          Geometry newPart = part;
-          if (part instanceof Point) {
-            return (T)geometry;
-          } else if (part instanceof LineString) {
-            final LineString line = (LineString)part;
-            newPart = appendVertex(line, newVertex);
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final int ringIndex = geometryId[1];
-            newPart = appendVertex(polygon, ringIndex, newVertex);
-          }
-          parts.set(partIndex, newPart);
-        }
-      }
-    }
-    return (T)geometry;
-  }
-
-  public static <T extends Geometry> T appendVertex(final Geometry geometry,
-    final Point newVertex, final int[] partId) {
-    return appendVertex(geometry, CoordinatesUtil.get(newVertex), partId);
-  }
-
-  public static LineString appendVertex(final LineString line,
-    final Coordinates newVertex) {
-    final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
-    final ListCoordinatesList points = appendVertex(coordinatesList, newVertex);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    return geometryFactory.createLineString(points);
-  }
-
-  public static MultiPoint appendVertex(final MultiPoint multiPoint,
-    final Coordinates newVertex) {
-    final CoordinatesList coordinatesList = CoordinatesListUtil.get(multiPoint);
-    final ListCoordinatesList points = appendVertex(coordinatesList, newVertex);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    return geometryFactory.createMultiPoint(points);
-  }
-
-  public static Polygon appendVertex(final Polygon polygon,
-    final int ringIndex, final Coordinates newVertex) {
-    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-    CoordinatesList coordinatesList = rings.get(ringIndex);
-    final ListCoordinatesList points = insertVertex(coordinatesList,
-      coordinatesList.size() - 1, newVertex);
 
     rings.set(ringIndex, points);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
