@@ -99,6 +99,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   public void revertChanges() {
     if (isModified() || isDeleted()) {
+      setState(DataObjectState.Persisted);
       if (originalValues != null) {
         super.setValues(originalValues);
       }

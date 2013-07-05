@@ -156,16 +156,16 @@ public class Project extends LayerGroup {
       final BoundingBox oldValue = this.viewBoundingBox;
       if (viewBoundingBox.getWidth() == 0) {
         if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          viewBoundingBox = viewBoundingBox.expand(0.000009 * 100, 0);
+          viewBoundingBox = viewBoundingBox.expand(0.000009 * 20, 0);
         } else {
-          viewBoundingBox = viewBoundingBox.expand(100, 0);
+          viewBoundingBox = viewBoundingBox.expand(20, 0);
         }
       }
       if (viewBoundingBox.getHeight() == 0) {
         if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          viewBoundingBox = viewBoundingBox.expand(0, 0.000009 * 100);
+          viewBoundingBox = viewBoundingBox.expand(0, 0.000009 * 20);
         } else {
-          viewBoundingBox = viewBoundingBox.expand(0, 100);
+          viewBoundingBox = viewBoundingBox.expand(0, 20);
         }
       }
       this.viewBoundingBox = viewBoundingBox;

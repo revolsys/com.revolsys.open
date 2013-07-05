@@ -570,7 +570,7 @@ public final class LineStringUtil {
     return null;
   }
 
-  private static Coordinates getPoint(final LineString line, final int i) {
+  public static Coordinates getPoint(final LineString line, final int i) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return points.get(i);
   }

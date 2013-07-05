@@ -259,6 +259,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void clearChanges() {
+    clearSelectedObjects();
     newObjects = new LinkedHashSet<LayerDataObject>();
     modifiedObjects = new LinkedHashSet<LayerDataObject>();
     deletedObjects = new LinkedHashSet<LayerDataObject>();
@@ -272,6 +273,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void clearSelectedObjectsIndex() {
     selectedObjectsIndex = null;
+  }
+
+  public <V extends LayerDataObject> V copyObject(final V object) {
+    final LayerDataObject copy = createObject();
+    copy.setValues(object);
+    copy.setIdValue(null);
+    return (V)copy;
   }
 
   @Override
@@ -367,11 +375,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void deleteObject(final LayerDataObject object) {
+    final boolean trackDeletions = true;
+    deleteObject(object, trackDeletions);
+  }
+
+  protected void deleteObject(final LayerDataObject object,
+    final boolean trackDeletions) {
     if (isLayerObject(object)) {
       clearSelectedObjectsIndex();
       if (!newObjects.remove(object)) {
         modifiedObjects.remove(object);
-        deletedObjects.add(object);
+        if (trackDeletions) {
+          deletedObjects.add(object);
+        }
         selectedObjects.remove(object);
       }
       object.setState(DataObjectState.Deleted);
@@ -1082,7 +1098,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               @Override
               public void windowClosing(final WindowEvent e) {
                 form.removeNotify();
-                forms.remove(object);
+                removeForm(object);
               }
             });
             window.requestFocus();
@@ -1160,5 +1176,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void updateSpatialIndex(final LayerDataObject object,
     final Geometry oldGeometry) {
+  }
+
+  protected void removeForm(final LayerDataObject object) {
+    forms.remove(object);
   }
 }

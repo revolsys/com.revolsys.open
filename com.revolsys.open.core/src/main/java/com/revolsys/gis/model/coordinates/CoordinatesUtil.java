@@ -76,7 +76,14 @@ public class CoordinatesUtil {
     for (int i = 0; i < numAxis; i++) {
       final double value1 = c1.getValue(i);
       final double value2 = c2.getValue(i);
-      final double value = MathUtil.avg(value1, value2);
+      double value;
+      if (Double.isNaN(value1) || Double.isNaN(value1)) {
+        value = value2;
+      } else if (Double.isNaN(value2) || Double.isNaN(value2)) {
+        value = value1;
+      } else {
+        value = MathUtil.avg(value1, value2);
+      }
       newPoint.setValue(i, value);
     }
     return newPoint;

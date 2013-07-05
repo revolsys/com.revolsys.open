@@ -49,6 +49,7 @@
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgresql</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
+    <module>com.revolsys.open.gis.spatialite</module>
     <module>com.revolsys.open.doclet</module>
     <module>war-overlay</module>
     <module>com.revolsys.open.swing</module>

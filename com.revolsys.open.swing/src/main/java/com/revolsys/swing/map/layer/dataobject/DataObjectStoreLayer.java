@@ -8,10 +8,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   private Object sync = new Object();
 
   private String typePath;
+
+  private final Set<String> deletedObjectIds = new LinkedHashSet<String>();
+
+  private final Set<String> formObjectIds = new LinkedHashSet<String>();
 
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
@@ -106,11 +112,28 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
    */
   private void cleanCachedObjects() {
     synchronized (cachedObjects) {
-      final Set<DataObject> objects = new HashSet<DataObject>();
-      objects.addAll(getSelectedObjects());
-      objects.addAll(getModifiedObjects());
-      objects.addAll(index.queryAll());
-      cachedObjects.values().retainAll(objects);
+      final Set<String> ids = new HashSet<String>();
+      ids.addAll(deletedObjectIds);
+      ids.addAll(formObjectIds);
+      for (final LayerDataObject object : getSelectedObjects()) {
+        final String id = getId(object);
+        if (id != null) {
+          ids.add(id);
+        }
+      }
+      for (final LayerDataObject object : getModifiedObjects()) {
+        final String id = getId(object);
+        if (id != null) {
+          ids.add(id);
+        }
+      }
+      for (final DataObject object : index.queryAll()) {
+        final String id = getId((LayerDataObject)object);
+        if (id != null) {
+          ids.add(id);
+        }
+      }
+      cachedObjects.keySet().retainAll(ids);
     }
   }
 
@@ -118,6 +141,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected void clearChanges() {
     super.clearChanges();
     cachedObjects.clear();
+    deletedObjectIds.clear();
   }
 
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
@@ -165,6 +189,22 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  protected void deleteObject(final LayerDataObject object) {
+    if (isLayerObject(object)) {
+      final LayerDataObject cacheObject = getCacheObject(object);
+      final String id = getId(cacheObject);
+      if (StringUtils.hasText(id)) {
+        deletedObjectIds.add(id);
+        deleteObject(cacheObject, true);
+        index.remove(object);
+        index.remove(cacheObject);
+      } else {
+        super.deleteObject(cacheObject);
+      }
+    }
+  }
+
+  @Override
   protected boolean doSaveChanges() {
     return invokeInTransaction(saveChangesMethod);
   }
@@ -178,7 +218,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final List<LayerDataObject> readObjects) {
     final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (final LayerDataObject object : readObjects) {
-      final String id = StringConverterRegistry.toString(object.getIdValue());
+      final String id = getId(object);
       synchronized (cachedObjects) {
         final LayerDataObject cachedObject = cachedObjects.get(id);
         if (cachedObject == null) {
@@ -195,7 +235,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (object == null) {
       return null;
     } else {
-      final String id = StringConverterRegistry.toString(object.getIdValue());
+      final String id = getId(object);
       return getCacheObject(id, object);
     }
   }
@@ -273,6 +313,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return dataStore;
   }
 
+  protected String getId(final LayerDataObject object) {
+    if (isLayerObject(object)) {
+      return StringConverterRegistry.toString(object.getIdValue());
+    } else {
+      return null;
+    }
+  }
+
   public BoundingBox getLoadingBoundingBox() {
     return loadingBoundingBox;
   }
@@ -291,10 +339,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         typePath + " does not have a primary key");
       return null;
     } else {
-      final Query query = Query.equal(metaData, idAttributeName, id);
-      query.setProperty("dataObjectFactory", this);
-      final DataObjectStore dataStore = getDataStore();
-      return (LayerDataObject)dataStore.queryFirst(query);
+      final String idString = StringConverterRegistry.toString(id);
+      final LayerDataObject object = cachedObjects.get(idString);
+      if (object == null) {
+        final Query query = Query.equal(metaData, idAttributeName, id);
+        query.setProperty("dataObjectFactory", this);
+        final DataObjectStore dataStore = getDataStore();
+        return (LayerDataObject)dataStore.queryFirst(query);
+      } else {
+        return object;
+      }
     }
 
   }
@@ -384,7 +438,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         if (propertyName.equals(geometryAttributeName)) {
           final Geometry oldValue = (Geometry)event.getOldValue();
           if (oldValue != null) {
-            final BoundingBox envelope = BoundingBox.getBoundingBox(dataObject);
+            final BoundingBox envelope = BoundingBox.getBoundingBox(oldValue);
             index.remove(envelope, dataObject);
           }
           index.insert(dataObject);
@@ -457,6 +511,25 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  protected void removeForm(final LayerDataObject object) {
+    synchronized (formObjectIds) {
+      final String id = getId(object);
+      if (id != null) {
+        formObjectIds.remove(id);
+        cleanCachedObjects();
+      }
+      super.removeForm(object);
+    }
+  }
+
+  @Override
+  public void revertChanges(final LayerDataObject object) {
+    final String id = getId(object);
+    deletedObjectIds.remove(id);
+    super.revertChanges(object);
+  }
+
+  @Override
   public boolean saveChanges(final LayerDataObject object) {
     return invokeInTransaction(saveObjectChangesMethod, object);
   }
@@ -516,6 +589,20 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     query = null;
   }
 
+  @Override
+  public <V extends JComponent> V showForm(final LayerDataObject object) {
+    synchronized (formObjectIds) {
+      final String id = getId(object);
+      if (id == null) {
+        return null;
+      } else {
+        formObjectIds.add(id);
+        final LayerDataObject cachedObject = getCacheObject(id, object);
+        return super.showForm(cachedObject);
+      }
+    }
+  }
+
   protected synchronized boolean transactionSaveChanges() {
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
@@ -545,7 +632,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final LayerDataObject object) {
     final Writer<DataObject> writer = dataStore.createWriter();
     try {
-      if (super.isDeleted(object)) {
+      final String id = object.getString(getMetaData().getIdAttributeName());
+      if (deletedObjectIds.contains(id) || super.isDeleted(object)) {
         removeDeletedObject(object);
         object.setState(DataObjectState.Deleted);
         writer.write(object);

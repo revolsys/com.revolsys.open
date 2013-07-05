@@ -568,7 +568,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   private boolean hasSnapPoint(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getCurrentGeometryFactory();
     final Point point = boundingBox.getCentrePoint();
     final DataObjectLayer layer;
     if (isModeAddGeometry()) {
@@ -659,8 +659,12 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_BACK_SPACE) {
       if (mouseOverVertexId != null) {
-        setGeometry(GeometryEditUtil.deleteVertex(addGeometry,
-          mouseOverVertexId));
+        final Geometry geometry = getGeometry();
+        final Geometry newGeometry = GeometryEditUtil.deleteVertex(geometry,
+          mouseOverVertexId);
+        if (newGeometry != null && !geometry.isEmpty()) {
+          setGeometry(newGeometry);
+        }
         clearMouseOverVertex();
         repaint();
       }
