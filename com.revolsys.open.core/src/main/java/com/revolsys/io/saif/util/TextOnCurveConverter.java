@@ -48,6 +48,11 @@ public class TextOnCurveConverter implements OsnConverter {
       attributeName = iterator.nextAttributeName();
     }
     geometry = geometryFactory.createMultiPoint(points);
+    for (int i = 0; i < points.size(); i++) {
+      final Point originalPoint = points.get(0);
+      final Point geometryPoint = (Point)geometry.getGeometryN(i);
+      geometryPoint.setUserData(originalPoint.getUserData());
+    }
     geometry.setUserData(values);
     return geometry;
   }

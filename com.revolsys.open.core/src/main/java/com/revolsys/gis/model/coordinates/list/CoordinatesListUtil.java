@@ -1138,7 +1138,8 @@ public class CoordinatesListUtil {
     boolean startEqual = false;
     boolean endEqual = false;
     if (startPoint != null) {
-      startEqual = startPoint.equals2d(points.get(start));
+      Coordinates p1 = points.get(start);
+      startEqual = startPoint.equals2d(p1);
       if (!startEqual) {
         size++;
         lastIndex++;
@@ -1146,7 +1147,8 @@ public class CoordinatesListUtil {
       }
     }
     if (endPoint != null) {
-      endEqual = endPoint.equals2d(points.get(start + length - 1));
+      Coordinates pointsEnd = points.get(start + length - 1);
+      endEqual = endPoint.equals2d(pointsEnd);
       if (!endEqual) {
         size++;
       }

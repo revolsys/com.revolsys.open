@@ -578,6 +578,9 @@ public class SaifReader extends AbstractReader<DataObject> implements
         }
         if (file.isDirectory()) {
           saifArchiveDirectory = file;
+        } else if (!file.exists()) {
+          throw new IllegalArgumentException("SAIF file " + file
+            + " does not exist");
         } else {
           zipFile = new ZipFile(file);
         }

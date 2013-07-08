@@ -55,6 +55,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   public BaseDataObject clone() {
     try {
       final BaseDataObject newObject = (BaseDataObject)super.clone();
+      newObject.setState(DataObjectState.New);
       return newObject;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException("Unable to clone", e);
@@ -510,8 +511,9 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     final CodeTable codeTable = metaData.getCodeTableByColumn(codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
-        throw new IllegalArgumentException("Cannot get code table for "
-          + metaData.getPath() + "." + name);
+        LoggerFactory.getLogger(getClass()).debug(
+          "Cannot get code table for " + metaData.getPath() + "." + name);
+        return;
       }
       setValue(name, value);
     } else if (value == null || !StringUtils.hasText(value.toString())) {

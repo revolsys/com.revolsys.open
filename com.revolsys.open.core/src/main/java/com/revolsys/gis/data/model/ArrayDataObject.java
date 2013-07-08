@@ -104,8 +104,8 @@ public class ArrayDataObject extends BaseDataObject {
       final Object oldValue = attributes[index];
       if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
         updateState();
-        attributes[index] = value;
       }
+      attributes[index] = value;
     }
   }
 }

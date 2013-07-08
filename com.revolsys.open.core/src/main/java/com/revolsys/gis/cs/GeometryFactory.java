@@ -66,19 +66,19 @@ public class GeometryFactory extends
    */
   public static GeometryFactory getFactory(
     final CoordinateSystem coordinateSystem) {
-    final int crsId = getId(coordinateSystem);
-    return getFactory(crsId, 3, 0, 0);
+    final int srid = getId(coordinateSystem);
+    return getFactory(srid, 3, 0, 0);
   }
 
   /**
    * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y & floating z precision models.</p>
    * 
-   * @param scaleXy The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory getFactory(final double scaleXy) {
-    return getFactory(0, 3, scaleXy, 0);
+  public static GeometryFactory getFactory(final double scaleXY) {
+    return getFactory(0, 3, scaleXY, 0);
   }
 
   // Get the geometry factory from an existing geometry
@@ -90,13 +90,13 @@ public class GeometryFactory extends
       if (factory instanceof GeometryFactory) {
         return (GeometryFactory)factory;
       } else {
-        final int crsId = geometry.getSRID();
+        final int srid = geometry.getSRID();
         final PrecisionModel precisionModel = factory.getPrecisionModel();
         if (precisionModel.isFloating()) {
-          return getFactory(crsId, 3, 0, 0);
+          return getFactory(srid, 3, 0, 0);
         } else {
-          final double scaleXy = precisionModel.getScale();
-          return getFactory(crsId, 3, scaleXy, 0);
+          final double scaleXY = precisionModel.getScale();
+          return getFactory(srid, 3, scaleXY, 0);
         }
       }
     }
@@ -116,27 +116,27 @@ public class GeometryFactory extends
    * <p>Get a GeometryFactory with the coordinate system, 2D axis (x &amp; y) and a fixed x, y precision model.</p>
    * 
    * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param scaleXy The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory getFactory(final int srid, final double scaleXy) {
-    return getFactory(srid, 2, scaleXy, 0);
+  public static GeometryFactory getFactory(final int srid, final double scaleXY) {
+    return getFactory(srid, 2, scaleXY, 0);
   }
 
   /**
    * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y &amp; floating z precision models.</p>
    * 
    * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param scaleXy The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @param scaleZ The scale factor used to round the z coordinates. The precision is 1 / scaleZ.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid,
-    final double scaleXy, final double scaleZ) {
-    return getFactory(srid, 3, scaleXy, scaleZ);
+    final double scaleXY, final double scaleZ) {
+    return getFactory(srid, 3, scaleXY, scaleZ);
   }
 
   /**
@@ -155,19 +155,19 @@ public class GeometryFactory extends
    * 
    * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
    * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y coordinates. 3 for 3D x, y &amp; z coordinates.
-   * @param scaleXy The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @param scaleZ The scale factor used to round the z coordinates. The precision is 1 / scaleZ.
    * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory getFactory(final int crsId, final int numAxis,
+  public static GeometryFactory getFactory(final int srid, final int numAxis,
     final double scaleXY, final double scaleZ) {
     synchronized (factories) {
-      final String key = crsId + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
+      final String key = srid + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
       GeometryFactory factory = factories.get(key);
       if (factory == null) {
-        factory = new GeometryFactory(crsId, numAxis, scaleXY, scaleZ);
+        factory = new GeometryFactory(srid, numAxis, scaleXY, scaleZ);
         factories.put(key, factory);
       }
       return factory;
@@ -201,11 +201,11 @@ public class GeometryFactory extends
 
   public static final GeometryFactory WGS84 = getFactory(4326);
 
-  protected GeometryFactory(final int crsId, final int numAxis,
+  protected GeometryFactory(final int srid, final int numAxis,
     final double scaleXY, final double scaleZ) {
-    super(PrecisionModelUtil.getPrecisionModel(scaleXY), crsId,
+    super(PrecisionModelUtil.getPrecisionModel(scaleXY), srid,
       new DoubleCoordinatesListFactory());
-    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
+    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
       scaleXY, scaleZ);
     this.numAxis = numAxis;
@@ -524,10 +524,10 @@ public class GeometryFactory extends
     if (coordinatesList != null) {
       coordinatesList.makePrecise(coordinatesPrecisionModel);
     }
-    Point[] points = new Point[coordinatesList.size()];
+    final Point[] points = new Point[coordinatesList.size()];
     for (int i = 0; i < points.length; i++) {
-      Coordinates coordinates = coordinatesList.get(i);
-      Point point = createPoint(coordinates);
+      final Coordinates coordinates = coordinatesList.get(i);
+      final Point point = createPoint(coordinates);
       points[i] = point;
     }
     return super.createMultiPoint(points);
@@ -655,8 +655,47 @@ public class GeometryFactory extends
     }
   }
 
+  public LineString[] getLineStringArray(final Collection<?> lines) {
+    final LineString[] lineStrings = new LineString[lines.size()];
+    final Iterator<?> iterator = lines.iterator();
+    for (int i = 0; i < lines.size(); i++) {
+      final Object value = iterator.next();
+      if (value instanceof LineString) {
+        final LineString lineString = (LineString)value;
+        lineStrings[i] = lineString;
+      } else if (value instanceof CoordinatesList) {
+        final CoordinatesList coordinates = (CoordinatesList)value;
+        lineStrings[i] = createLineString(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        final CoordinateSequence coordinates = (CoordinateSequence)value;
+        lineStrings[i] = createLineString(coordinates);
+      } else if (value instanceof double[]) {
+        final double[] points = (double[])value;
+        lineStrings[i] = createLineString(points);
+      }
+    }
+    return lineStrings;
+  }
+
   public int getNumAxis() {
     return numAxis;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Polygon[] getPolygonArray(final Collection<?> polygonList) {
+    final Polygon[] polygons = new Polygon[polygonList.size()];
+    int i = 0;
+    for (final Object value : polygonList) {
+      if (value instanceof Polygon) {
+        final Polygon polygon = (Polygon)value;
+        polygons[i] = polygon;
+      } else if (value instanceof List) {
+        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
+        polygons[i] = createPolygon(coordinateList);
+      }
+      i++;
+    }
+    return polygons;
   }
 
   @Override
@@ -715,45 +754,6 @@ public class GeometryFactory extends
    */
   public <G extends Geometry> G project(final G geometry) {
     return GeometryProjectionUtil.perform(geometry, this);
-  }
-
-  public LineString[] getLineStringArray(final Collection<?> lines) {
-    final LineString[] lineStrings = new LineString[lines.size()];
-    final Iterator<?> iterator = lines.iterator();
-    for (int i = 0; i < lines.size(); i++) {
-      final Object value = iterator.next();
-      if (value instanceof LineString) {
-        final LineString lineString = (LineString)value;
-        lineStrings[i] = lineString;
-      } else if (value instanceof CoordinatesList) {
-        final CoordinatesList coordinates = (CoordinatesList)value;
-        lineStrings[i] = createLineString(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        final CoordinateSequence coordinates = (CoordinateSequence)value;
-        lineStrings[i] = createLineString(coordinates);
-      } else if (value instanceof double[]) {
-        final double[] points = (double[])value;
-        lineStrings[i] = createLineString(points);
-      }
-    }
-    return lineStrings;
-  }
-
-  @SuppressWarnings("unchecked")
-  public Polygon[] getPolygonArray(final Collection<?> polygonList) {
-    final Polygon[] polygons = new Polygon[polygonList.size()];
-    int i = 0;
-    for (final Object value : polygonList) {
-      if (value instanceof Polygon) {
-        final Polygon polygon = (Polygon)value;
-        polygons[i] = polygon;
-      } else if (value instanceof List) {
-        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
-        polygons[i] = createPolygon(coordinateList);
-      }
-      i++;
-    }
-    return polygons;
   }
 
   @Override

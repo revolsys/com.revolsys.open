@@ -53,7 +53,7 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
     } catch (final ClosedException c) {
       throw c;
     } catch (final Throwable t) {
-      log.error(t);
+      log.error("Error reading", t);
     } finally {
       reader.close();
     }
