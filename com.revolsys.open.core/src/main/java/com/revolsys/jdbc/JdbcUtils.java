@@ -309,7 +309,12 @@ public final class JdbcUtils {
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());
       if (attributeNames.isEmpty()) {
-        attributeNames.add("T.*");
+        final List<String> metaDataAttributeNames = metaData.getAttributeNames();
+        if (metaDataAttributeNames.isEmpty()) {
+          attributeNames.add("T.*");
+        } else {
+          attributeNames.addAll(metaDataAttributeNames);
+        }
       }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
