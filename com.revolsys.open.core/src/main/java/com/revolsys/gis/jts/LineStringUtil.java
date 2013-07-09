@@ -538,12 +538,6 @@ public final class LineStringUtil {
     return getPoint(line, i);
   }
 
-  public static Point getFromPoint(final LineString line) {
-    final Coordinates coordinates = getFromCoordinates(line);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    return geometryFactory.createPoint(coordinates);
-  }
-
   public static double getLength(final MultiLineString lines) {
     double length = 0;
     for (int i = 0; i < lines.getNumGeometries(); i++) {

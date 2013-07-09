@@ -63,6 +63,9 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
     6, new Color(0, 0, 0, 127), 1, TRANSPARENT_COLOR);;
 
+  private static final MarkerStyle ERROR_STYLE = MarkerStyle.marker("ellipse",
+    7, WebColors.Yellow, 1, WebColors.Red);
+
   private Double selectBox;
 
   private java.awt.Point selectBoxFirstPoint;
@@ -146,8 +149,6 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
   }
 
   protected void paint(final Graphics2D graphics2d, final LayerGroup layerGroup) {
-    final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -156,35 +157,9 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
           if (object != null && dataObjectLayer.isVisible(object)) {
-            Geometry geometry = object.getGeometryValue();
-            if (geometry != null && !geometry.isEmpty()) {
-              geometry = viewport.getGeometry(geometry);
-              MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
-                geometry, VERTEX_STYLE);
-              GeometryStyleRenderer.renderGeometry(viewport, graphics2d,
-                geometry, HIGHLIGHT_STYLE);
-              GeometryStyleRenderer.renderOutline(viewport, graphics2d,
-                geometry, OUTLINE_STYLE);
-              final IsValidOp validOp = new IsValidOp(geometry);
-              final MarkerStyle errorStyle = MarkerStyle.marker("ellipse", 7,
-                WebColors.Yellow, 1, WebColors.Red);
-              if (validOp.isValid()) {
-                final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
-                if (!simpleOp.isSimple()) {
-                  for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
-                    final Point point = viewportGeometryFactory.createPoint(coordinates);
-                    MarkerStyleRenderer.renderMarker(viewport, graphics2d,
-                      point, errorStyle);
-                  }
-                }
-              } else {
-                for (final TopologyValidationError error : validOp.getErrors()) {
-                  final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
-                  MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
-                    errorStyle);
-                }
-              }
-            }
+            final Geometry geometry = object.getGeometryValue();
+            paintSelected(graphics2d, geometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
+              VERTEX_STYLE);
           }
         }
       }
@@ -205,6 +180,39 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       graphics2d.draw(selectBox);
       graphics2d.setPaint(BOX_FILL_COLOR);
       graphics2d.fill(selectBox);
+    }
+  }
+
+  protected void paintSelected(final Graphics2D graphics2d, Geometry geometry,
+    final GeometryStyle highlightStyle, final GeometryStyle outlineStyle,
+    final MarkerStyle vertexStyle) {
+    if (geometry != null && !geometry.isEmpty()) {
+      final Viewport2D viewport = getViewport();
+      final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+      geometry = viewport.getGeometry(geometry);
+      MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d, geometry,
+        vertexStyle);
+      GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
+        highlightStyle);
+      GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
+        outlineStyle);
+      final IsValidOp validOp = new IsValidOp(geometry);
+      if (validOp.isValid()) {
+        final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
+        if (!simpleOp.isSimple()) {
+          for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
+            final Point point = viewportGeometryFactory.createPoint(coordinates);
+            MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
+              ERROR_STYLE);
+          }
+        }
+      } else {
+        for (final TopologyValidationError error : validOp.getErrors()) {
+          final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
+          MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
+            ERROR_STYLE);
+        }
+      }
     }
   }
 

@@ -368,9 +368,13 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public boolean contains(final Coordinates coordinate) {
-    final double x = coordinate.getX();
-    final double y = coordinate.getY();
-    return contains(x, y);
+    if (coordinate == null) {
+      return false;
+    } else {
+      final double x = coordinate.getX();
+      final double y = coordinate.getY();
+      return contains(x, y);
+    }
   }
 
   public boolean contains(final Point point) {

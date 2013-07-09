@@ -23,6 +23,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
@@ -1530,5 +1531,61 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
+  }
+
+  public static Point getFromPoint(final LineString line) {
+    final Coordinates coordinates = LineStringUtil.getFromCoordinates(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    return geometryFactory.createPoint(coordinates);
+  }
+
+  public static Point getToPoint(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      return (Point)geometry;
+    } else if (geometry instanceof LineString) {
+      return LineStringUtil.getToPoint((LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      final LineString ring = polygon.getExteriorRing();
+      return LineStringUtil.getToPoint(ring);
+    } else {
+      for (int i = geometry.getNumGeometries() - 1; i < -1; i--) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (part != null && !part.isEmpty()) {
+          return getToPoint(geometry);
+        }
+      }
+    }
+    return null;
+  }
+
+  public static boolean isFromPoint(final Geometry geometry, final Point point) {
+    final Point fromPoint = JtsGeometryUtil.getFromPoint(geometry);
+    return EqualsRegistry.equal(point, fromPoint);
+  }
+
+  public static boolean isToPoint(final Geometry geometry, final Point point) {
+    final Point toPoint = getToPoint(geometry);
+    return EqualsRegistry.equal(point, toPoint);
+  }
+
+  public static Point getFromPoint(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      return (Point)geometry;
+    } else if (geometry instanceof LineString) {
+      return getFromPoint((LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      final LineString ring = polygon.getExteriorRing();
+      return getFromPoint(ring);
+    } else {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (part != null && !part.isEmpty()) {
+          return getFromPoint(geometry);
+        }
+      }
+    }
+    return null;
   }
 }

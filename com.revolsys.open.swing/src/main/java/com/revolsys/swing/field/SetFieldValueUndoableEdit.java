@@ -32,6 +32,7 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
     this.field = field;
     this.oldValue = oldValue;
     this.newValue = newValue;
+    setHasBeenDone(true);
   }
 
   @Override
