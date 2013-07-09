@@ -40,57 +40,40 @@ import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 @SuppressWarnings("serial")
 public class SelectFeaturesOverlay extends AbstractOverlay {
 
+  private static final Color COLOR = WebColors.Lime;
+
+  private static final Color TRANSPARENT_COLOR = ColorUtil.setAlpha(COLOR, 127);
+
+  private static final Color BOX_OUTLINE_COLOR = new Color(COLOR.getRed() / 2,
+    COLOR.getGreen() / 2, COLOR.getBlue() / 2);
+
+  private static final Color BOX_FILL_COLOR = ColorUtil.setAlpha(
+    BOX_OUTLINE_COLOR, 127);
+
   private static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
     }, 0f);
 
+  private static final GeometryStyle HIGHLIGHT_STYLE = GeometryStyle.polygon(
+    COLOR, 3, TRANSPARENT_COLOR);
+
+  private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(WebColors.Black);
+
+  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
+    6, new Color(0, 0, 0, 127), 1, TRANSPARENT_COLOR);;
+
   private Double selectBox;
 
   private java.awt.Point selectBoxFirstPoint;
 
-  private final GeometryStyle highlightStyle;
-
-  private final GeometryStyle outlineStyle;
-
-  private final MarkerStyle vertexStyle;
-
-  private final Color boxFillColor;
-
-  private final Color boxOutlineColor;
-
   public SelectFeaturesOverlay(final MapPanel map) {
-    this(map, new Color(0, 255, 0));
-  }
-
-  protected SelectFeaturesOverlay(final MapPanel map, final Color color) {
     super(map);
-    final Color transparentColor = ColorUtil.setAlpha(color, 127);
-    highlightStyle = GeometryStyle.polygon(color, 3, transparentColor);
-    outlineStyle = GeometryStyle.line(new Color(0, 0, 0, 255));
-    vertexStyle = MarkerStyle.marker("ellipse", 6, new Color(0, 0, 0, 127), 1,
-      transparentColor);
-
-    boxOutlineColor = new Color(color.getRed() / 2, color.getGreen() / 2,
-      color.getBlue() / 2);
-    boxFillColor = ColorUtil.setAlpha(boxOutlineColor, 127);
-  }
-
-  public GeometryStyle getHighlightStyle() {
-    return highlightStyle;
-  }
-
-  public GeometryStyle getOutlineStyle() {
-    return outlineStyle;
   }
 
   protected Collection<LayerDataObject> getSelectedObjects(
     final DataObjectLayer layer) {
     return layer.getSelectedObjects();
-  }
-
-  public MarkerStyle getVertexStyle() {
-    return vertexStyle;
   }
 
   protected boolean isSelectable(final DataObjectLayer dataObjectLayer) {
@@ -129,7 +112,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       final int x = event.getX();
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
-      final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
+      final GeometryFactory geometryFactory = getViewportGeometryFactory();
       BoundingBox boundingBox = new BoundingBox(geometryFactory, location[0],
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
@@ -164,7 +147,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
 
   protected void paint(final Graphics2D graphics2d, final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -177,11 +160,11 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
             if (geometry != null && !geometry.isEmpty()) {
               geometry = viewport.getGeometry(geometry);
               MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d,
-                geometry, vertexStyle);
+                geometry, VERTEX_STYLE);
               GeometryStyleRenderer.renderGeometry(viewport, graphics2d,
-                geometry, highlightStyle);
+                geometry, HIGHLIGHT_STYLE);
               GeometryStyleRenderer.renderOutline(viewport, graphics2d,
-                geometry, outlineStyle);
+                geometry, OUTLINE_STYLE);
               final IsValidOp validOp = new IsValidOp(geometry);
               final MarkerStyle errorStyle = MarkerStyle.marker("ellipse", 7,
                 WebColors.Yellow, 1, WebColors.Red);
@@ -217,10 +200,10 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
 
   protected void paintSelectBox(final Graphics2D graphics2d) {
     if (selectBox != null) {
-      graphics2d.setColor(boxOutlineColor);
+      graphics2d.setColor(BOX_OUTLINE_COLOR);
       graphics2d.setStroke(BOX_STROKE);
       graphics2d.draw(selectBox);
-      graphics2d.setPaint(boxFillColor);
+      graphics2d.setPaint(BOX_FILL_COLOR);
       graphics2d.fill(selectBox);
     }
   }

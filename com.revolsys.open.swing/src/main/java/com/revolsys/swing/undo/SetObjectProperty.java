@@ -1,8 +1,5 @@
 package com.revolsys.swing.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -48,19 +45,17 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   }
 
   @Override
-  public void redo() throws CannotRedoException {
-    super.redo();
+  protected void doRedo() {
     JavaBeanUtil.setValue(object, propertyName, newValue);
+  }
+
+  @Override
+  protected void doUndo() {
+    JavaBeanUtil.setValue(object, propertyName, oldValue);
   }
 
   @Override
   public String toString() {
     return propertyName + " old=" + oldValue + ", new=" + newValue;
-  }
-
-  @Override
-  public void undo() throws CannotUndoException {
-    super.undo();
-    JavaBeanUtil.setValue(object, propertyName, oldValue);
   }
 }

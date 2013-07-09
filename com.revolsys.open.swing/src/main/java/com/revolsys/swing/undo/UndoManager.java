@@ -9,7 +9,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
-import javax.swing.event.UndoableEditEvent;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -27,6 +26,23 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
     this);
 
   private boolean eventsEnabled = true;
+
+  @Override
+  public synchronized boolean addEdit(final UndoableEdit edit) {
+    if (edit instanceof AbstractUndoableEdit) {
+      final AbstractUndoableEdit abstractEdit = (AbstractUndoableEdit)edit;
+      if (!abstractEdit.isHasBeenDone()) {
+        abstractEdit.redo();
+      }
+    }
+    if (eventsEnabled) {
+      final boolean added = super.addEdit(edit);
+      fireEvents();
+      return added;
+    } else {
+      return false;
+    }
+  }
 
   public void addKeyMap(final Component component) {
     if (component instanceof JComponent) {
@@ -113,22 +129,4 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
     }
   }
 
-  @Override
-  public synchronized boolean addEdit(UndoableEdit edit) {
-    if (eventsEnabled) {
-      boolean added = super.addEdit(edit);
-      fireEvents();
-      return added;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public synchronized void undoableEditHappened(final UndoableEditEvent e) {
-    if (eventsEnabled) {
-      super.undoableEditHappened(e);
-      fireEvents();
-    }
-  }
 }

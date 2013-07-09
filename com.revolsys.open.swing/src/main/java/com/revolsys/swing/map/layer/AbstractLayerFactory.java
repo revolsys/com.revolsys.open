@@ -1,14 +1,12 @@
 package com.revolsys.swing.map.layer;
 
-import javax.swing.JTabbedPane;
-
 public abstract class AbstractLayerFactory<T extends Layer> implements
   LayerFactory<T> {
   private String description;
 
   private String typeName;
 
-  public AbstractLayerFactory(String typeName, String description) {
+  public AbstractLayerFactory(final String typeName, final String description) {
     this.typeName = typeName;
     this.description = description;
   }
@@ -27,13 +25,12 @@ public abstract class AbstractLayerFactory<T extends Layer> implements
     this.description = description;
   }
 
+  protected void setTypeName(final String typeName) {
+    this.typeName = typeName;
+  }
+
   @Override
   public String toString() {
     return description;
-  }
-  
-
-  protected void setTypeName(final String typeName) {
-    this.typeName = typeName;
   }
 }

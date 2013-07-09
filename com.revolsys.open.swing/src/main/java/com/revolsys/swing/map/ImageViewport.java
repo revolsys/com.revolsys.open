@@ -1,7 +1,6 @@
 package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.gis.cs.BoundingBox;

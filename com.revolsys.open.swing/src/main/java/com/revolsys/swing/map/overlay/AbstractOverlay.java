@@ -156,6 +156,14 @@ public class AbstractOverlay extends JComponent implements
     return viewport;
   }
 
+  protected GeometryFactory getViewportGeometryFactory() {
+    if (viewport == null) {
+      return GeometryFactory.getFactory();
+    } else {
+      return viewport.getGeometryFactory();
+    }
+  }
+
   protected Point getViewportPoint(final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     final Point point = viewport.toModelPoint(eventPoint);

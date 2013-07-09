@@ -1,8 +1,6 @@
 package com.revolsys.swing.field;
 
 import javax.swing.JComponent;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
@@ -59,21 +57,19 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   }
 
   @Override
-  public void redo() throws CannotRedoException {
-    super.redo();
+  public void doRedo() {
     field.setFieldValue(newValue);
+    ((JComponent)field).requestFocusInWindow();
+  }
+
+  @Override
+  public void doUndo() {
+    field.setFieldValue(oldValue);
     ((JComponent)field).requestFocusInWindow();
   }
 
   @Override
   public String toString() {
     return field.getFieldName() + " old=" + oldValue + ", new=" + newValue;
-  }
-
-  @Override
-  public void undo() throws CannotUndoException {
-    super.undo();
-    field.setFieldValue(oldValue);
-    ((JComponent)field).requestFocusInWindow();
   }
 }

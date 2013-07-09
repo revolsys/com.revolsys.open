@@ -11,14 +11,14 @@ public abstract class NodeBase<T> {
   public static int getSubnodeIndex(final Envelope envelope,
     final Coordinates centre) {
     int subnodeIndex = -1;
-    double minX = envelope.getMinX();
-    double minY = envelope.getMinY();
-    double maxX = envelope.getMaxX();
-    double maxY = envelope.getMaxY();
-    
-    double centreX = centre.getX();
-    double centreY = centre.getY();
-    
+    final double minX = envelope.getMinX();
+    final double minY = envelope.getMinY();
+    final double maxX = envelope.getMaxX();
+    final double maxY = envelope.getMaxY();
+
+    final double centreX = centre.getX();
+    final double centreY = centre.getY();
+
     if (minX >= centreX) {
       if (minY >= centreY) {
         subnodeIndex = 3;
@@ -51,6 +51,13 @@ public abstract class NodeBase<T> {
   }
 
   public void add(final Envelope envelope, final T item) {
+    for (int i = 0; i < items.size(); i++) {
+      final T oldItem = items.get(i);
+      if (oldItem == item) {
+        envelopes.set(i, envelope);
+        return;
+      }
+    }
     envelopes.add(envelope);
     items.add(item);
   }
@@ -58,7 +65,7 @@ public abstract class NodeBase<T> {
   public int depth() {
     int depth = 0;
     for (int i = 0; i < 4; i++) {
-      Node<T> node = getNode(i);
+      final Node<T> node = getNode(i);
       if (node != null) {
         final int nodeDepth = node.depth();
         if (nodeDepth > depth) {
@@ -80,7 +87,7 @@ public abstract class NodeBase<T> {
   protected int getNodeCount() {
     int nodeCount = 0;
     for (int i = 0; i < 4; i++) {
-      Node<T> node = getNode(i);
+      final Node<T> node = getNode(i);
       if (node != null) {
         nodeCount += node.size();
       }
@@ -107,7 +114,7 @@ public abstract class NodeBase<T> {
       isEmpty = false;
     }
     for (int i = 0; i < 4; i++) {
-      Node<T> node = getNode(i);
+      final Node<T> node = getNode(i);
       if (node != null) {
         if (!node.isEmpty()) {
           isEmpty = false;
@@ -126,7 +133,7 @@ public abstract class NodeBase<T> {
   public boolean remove(final Envelope envelope, final T item) {
     if (isSearchMatch(envelope)) {
       for (int i = 0; i < 4; i++) {
-        Node<T> node = getNode(i);
+        final Node<T> node = getNode(i);
         if (node != null) {
           if (node.remove(envelope, item)) {
             if (node.isPrunable()) {
@@ -136,7 +143,7 @@ public abstract class NodeBase<T> {
           }
         }
       }
-      int index = items.indexOf(item);
+      final int index = items.indexOf(item);
       if (index == -1) {
         return false;
       } else {
@@ -156,7 +163,7 @@ public abstract class NodeBase<T> {
   protected int size() {
     int subSize = 0;
     for (int i = 0; i < 4; i++) {
-      Node<T> node = getNode(i);
+      final Node<T> node = getNode(i);
       if (node != null) {
         subSize += node.size();
       }
@@ -167,9 +174,9 @@ public abstract class NodeBase<T> {
   public boolean visit(final Envelope envelope, final Visitor<T> visitor) {
     if (isSearchMatch(envelope)) {
       for (int i = 0; i < items.size(); i++) {
-        Envelope itemEnvelope = envelopes.get(i);
+        final Envelope itemEnvelope = envelopes.get(i);
         if (isSearchMatch(itemEnvelope)) {
-          T item = items.get(i);
+          final T item = items.get(i);
           if (!visitor.visit(item)) {
             return false;
           }

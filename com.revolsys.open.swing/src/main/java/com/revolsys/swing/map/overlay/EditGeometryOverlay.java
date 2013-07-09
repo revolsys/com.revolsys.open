@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -16,9 +17,10 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
+import org.jdesktop.swingx.color.ColorUtil;
+
+import com.revolsys.awt.WebColors;
 import com.revolsys.comparator.IntArrayComparator;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
@@ -47,6 +49,8 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -73,7 +77,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
     private AddGeometryUndoEdit(final Geometry geometry) {
       this.newGeometry = geometry;
-      System.out.println("UC\t" + oldGeometry);
     }
 
     @Override
@@ -97,18 +100,14 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     }
 
     @Override
-    public void redo() throws CannotRedoException {
-      super.redo();
-      System.out.println("UR\t" + newGeometry);
+    protected void doRedo() {
       addGeometry = newGeometry;
       setXorGeometry(null);
       repaint();
     }
 
     @Override
-    public void undo() throws CannotUndoException {
-      super.undo();
-      System.out.println("UU\t" + oldGeometry);
+    protected void doUndo() {
       addGeometry = oldGeometry;
       addGeometryPartDataType = geometryPartDataType;
       addGeometryPartIndex = geometryPartIndex;
@@ -116,6 +115,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       repaint();
     }
   }
+
+  private static final Color COLOR = WebColors.Aqua;
+
+  private static final Color TRANSPARENT_COLOR = ColorUtil.setAlpha(COLOR, 127);
 
   private static final Cursor ADD_NODE_CURSOR = SilkIconLoader.getCursor(
     "cursor_new_node", 8, 7);
@@ -127,6 +130,14 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private static final Cursor SNAP_CURSOR = SilkIconLoader.getCursor(
     "cursor_snap", 8, 7);
+
+  private static final GeometryStyle HIGHLIGHT_STYLE = GeometryStyle.polygon(
+    COLOR, 3, TRANSPARENT_COLOR);
+
+  private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(WebColors.Black);
+
+  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
+    6, new Color(0, 0, 0, 127), 1, TRANSPARENT_COLOR);;
 
   private int actionId = 0;
 
@@ -155,18 +166,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private int[] mouseOverVertexIndex;
 
-  private final Project project;
-
   private Point snapPoint;
-
-  private final Viewport2D viewport;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
-
-    this.viewport = map.getViewport();
-    this.project = map.getProject();
-    setGeometryFactory(viewport.getGeometryFactory());
   }
 
   protected void actionGeometryCompleted() {
@@ -175,11 +178,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         setXorGeometry(null);
         if (isModeAddGeometry()) {
           if (addCompleteAction != null) {
-            final Geometry geometry = getGeometryFactory().copy(
+            final Geometry geometry = getCurrentGeometryFactory().copy(
               this.addGeometry);
-            final LayerDataObject newObject = addCompleteAction.addComplete(
-              this, geometry);
-            addLayer.addSelectedObjects(newObject);
+            addCompleteAction.addComplete(this, geometry);
             this.addCompleteAction = null;
             this.addLayer = null;
             this.addGeometry = null;
@@ -251,7 +252,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected Geometry appendVertex(final Point newPoint) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getCurrentGeometryFactory();
     Geometry geometry = getGeometry();
     if (geometry.isEmpty()) {
       geometry = geometryFactory.createPoint(newPoint);
@@ -314,6 +315,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected LineString createXorLine(final Coordinates c0, final Point p1) {
+    final Viewport2D viewport = getViewport();
     final GeometryFactory geometryFactory = getCurrentGeometryFactory();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     final Coordinates c1 = CoordinatesUtil.get(p1);
@@ -535,13 +537,11 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected GeometryFactory getCurrentGeometryFactory() {
-    if (isModeAddGeometry()) {
-      return getGeometryFactory();
-    } else if (mouseOverObject != null) {
-      final DataObjectMetaData metaData = mouseOverObject.getMetaData();
-      return metaData.getGeometryFactory();
+    final DataObjectMetaData metaData = getMetaData();
+    if (metaData == null) {
+      return getProject().getGeometryFactory();
     } else {
-      return project.getGeometryFactory();
+      return metaData.getGeometryFactory();
     }
   }
 
@@ -609,6 +609,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
+    final Viewport2D viewport = getViewport();
     final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
     final BoundingBox boundingBox;
     if (geometryFactory != null) {
@@ -637,16 +638,17 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   protected Point getPoint(final GeometryFactory geometryFactory,
     final MouseEvent event) {
-    final Point point;
+    final Viewport2D viewport = getViewport();
     final java.awt.Point eventPoint = event.getPoint();
-    point = viewport.toModelPointRounded(geometryFactory, eventPoint);
+    final Point point = viewport.toModelPointRounded(geometryFactory,
+      eventPoint);
     return point;
   }
 
   protected List<LayerDataObject> getSelectedObjects(
     final BoundingBox boundingBox) {
     final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
-    addSelectedObjects(objects, project, boundingBox);
+    addSelectedObjects(objects, getProject(), boundingBox);
     return objects;
   }
 
@@ -771,6 +773,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         if (snapPoint == null) {
           point = getPoint(event);
         } else {
+          final Viewport2D viewport = getViewport();
           point = viewport.getRoundedGeometry(snapPoint);
         }
         if (addGeometry.isEmpty()) {
@@ -862,7 +865,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
                 if (previousPoint.equals(firstPoint)) {
                   xorGeometry = createXorLine(previousPoint, point);
                 } else {
-                  final GeometryFactory geometryFactory = getGeometryFactory();
+                  final GeometryFactory geometryFactory = getViewportGeometryFactory();
                   xorGeometry = geometryFactory.createLineString(previousPoint,
                     point, firstPoint);
                 }
@@ -894,57 +897,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     super.mousePressed(event);
   }
 
-  /*
-   * @Override public void selectObjects(final BoundingBox boundingBox) { final
-   * Project project = getProject(); if (!selectObjects(project, boundingBox)) {
-   * setEditingObject(null, null); } } protected boolean selectObjects(final
-   * LayerGroup group, final BoundingBox boundingBox) { boolean found = false;
-   * for (final Layer addLayer : group.getLayers()) { final double scale =
-   * getViewport().getScale(); if (addLayer instanceof LayerGroup) { final
-   * LayerGroup childGroup = (LayerGroup)addLayer; found |=
-   * selectObjects(childGroup, boundingBox); } else if (addLayer instanceof
-   * DataObjectLayer) { final DataObjectLayer dataObjectLayer =
-   * (DataObjectLayer)addLayer; if (dataObjectLayer.isEditable(scale)) { final
-   * DataObjectMetaData metaData = dataObjectLayer.getMetaData(); if (metaData
-   * != null) { if (metaData.getGeometryAttributeIndex() != -1) { final
-   * List<LayerDataObject> objects =
-   * dataObjectLayer.getDataObjects(boundingBox); for (final LayerDataObject
-   * object : objects) { final Geometry oldGeometry = object.getGeometryValue();
-   * if (oldGeometry != null) { final Polygon selectPolygon =
-   * boundingBox.toPolygon(1); if (getViewport().getGeometryFactory()
-   * .project(oldGeometry) .intersects(selectPolygon)) {
-   * dataObjectLayer.setEditingObjects(Collections.singleton(object));
-   * setEditingObject(dataObjectLayer, object); return true; } } } } } } } }
-   * return found; }
-   */
-  // public void setEditingObject(final DataObjectLayer layer,
-  // final LayerDataObject object) {
-  // clearEditingObjects(project);
-  // this.addLayer = layer;
-  // final LayerDataObject oldValue = this.object;
-  // if (oldValue != null) {
-  // actionGeometryCompleted();
-  // }
-  // this.object = object;
-  // Geometry oldGeometry = null;
-  //
-  // if (object != null) {
-  // final DataObjectMetaData metaData = layer.getMetaData();
-  // final Attribute geometryAttribute = metaData.getGeometryAttribute();
-  // if (geometryAttribute != null) {
-  // setAddGeometryDataType(geometryAttribute.getType());
-  // oldGeometry = object.getGeometryValue();
-  // } else {
-  // setAddGeometryDataType(DataTypes.GEOMETRY);
-  // }
-  // layer.setEditingObjects(Collections.singletonList(object));
-  // }
-  // setGeometry(oldGeometry);
-  //
-  // mode = "edit";
-  // firePropertyChange("object", oldValue, object);
-  // }
-
   @Override
   public void mouseReleased(final MouseEvent event) {
     if (mouseOverVertexIndex != null) {
@@ -962,19 +914,20 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     paint(graphics, layerGroup);
 
     if (addGeometry != null) {
-      final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+      final Viewport2D viewport = getViewport();
+      final GeometryFactory viewGeometryFactory = getViewportGeometryFactory();
       final Geometry mapGeometry = viewGeometryFactory.copy(addGeometry);
       for (int i = 0; i < mapGeometry.getNumGeometries(); i++) {
         final Geometry part = mapGeometry.getGeometryN(i);
         if (!(part instanceof Point)) {
           GeometryStyleRenderer.renderGeometry(viewport, graphics, part,
-            getHighlightStyle());
+            HIGHLIGHT_STYLE);
           GeometryStyleRenderer.renderOutline(viewport, graphics, part,
-            getOutlineStyle());
+            OUTLINE_STYLE);
         }
       }
       MarkerStyleRenderer.renderMarkerVertices(viewport, graphics, mapGeometry,
-        getVertexStyle());
+        VERTEX_STYLE);
     }
     paintSelectBox(graphics);
   }
@@ -1007,17 +960,14 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   private void setGeometry(final Geometry geometry) {
-    System.out.println("GS\t" + geometry);
     if (isModeAddGeometry()) {
       if (!JtsGeometryUtil.equalsExact3D(geometry, addGeometry)) {
         addUndo(new AddGeometryUndoEdit(geometry));
-        this.addGeometry = geometry;
       }
     } else if (mouseOverObject != null) {
       final String geometryAttributeName = getGeometryAttributeName();
       final Geometry oldValue = mouseOverObject.getValue(geometryAttributeName);
       if (!JtsGeometryUtil.equalsExact3D(geometry, oldValue)) {
-        mouseOverObject.setGeometryValue(geometry);
         this.mouseOverGeometry = geometry;
         createPropertyUndo(mouseOverObject, geometryAttributeName, oldValue,
           geometry);

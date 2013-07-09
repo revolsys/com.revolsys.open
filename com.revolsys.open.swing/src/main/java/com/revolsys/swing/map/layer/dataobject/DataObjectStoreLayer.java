@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -199,7 +198,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         index.remove(object);
         index.remove(cacheObject);
       } else {
-        super.deleteObject(cacheObject);
+        index.remove(object);
+        super.deleteObject(object);
       }
     }
   }
@@ -426,27 +426,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return false;
   }
 
-  @Override
-  public void propertyChange(final PropertyChangeEvent event) {
-    super.propertyChange(event);
-    final Object source = event.getSource();
-    if (source instanceof LayerDataObject) {
-      final LayerDataObject dataObject = (LayerDataObject)source;
-      if (dataObject.getLayer() == this) {
-        final String geometryAttributeName = getGeometryAttributeName();
-        final String propertyName = event.getPropertyName();
-        if (propertyName.equals(geometryAttributeName)) {
-          final Geometry oldValue = (Geometry)event.getOldValue();
-          if (oldValue != null) {
-            final BoundingBox envelope = BoundingBox.getBoundingBox(oldValue);
-            index.remove(envelope, dataObject);
-          }
-          index.insert(dataObject);
-        }
-      }
-    }
-  }
-
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
@@ -660,7 +639,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   protected void updateSpatialIndex(final LayerDataObject object,
     final Geometry oldGeometry) {
-    index.remove(BoundingBox.getBoundingBox(oldGeometry), object);
+    if (oldGeometry != null) {
+      final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
+      index.remove(oldBoundingBox, object);
+    }
     index.insert(object);
   }
 

@@ -177,6 +177,7 @@ public class DataObjectLayerForm extends JPanel implements
     final DataObjectLayer layer = getLayer();
     final LayerDataObject object = getObject();
     layer.saveChanges(object);
+    layer.addSelectedObjects(object);
     closeWindow();
   }
 

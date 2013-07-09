@@ -2,7 +2,6 @@ package com.revolsys.swing.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.swing.Icon;
@@ -21,10 +20,6 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 
 public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   ChangeListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 3533569797414988165L;
 
   private final JSlider alphaSlider;
@@ -38,7 +33,7 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
     alphaSlider.setToolTipText("Alpha");
     alphaSlider.addChangeListener(this);
     alphaSlider.setPaintLabels(true);
-    Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+    final Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
     labels.put(0, new JLabel("0"));
     labels.put(64, new JLabel("64"));
     labels.put(128, new JLabel("128"));
@@ -53,20 +48,6 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   }
 
   @Override
-  public void stateChanged(ChangeEvent e) {
-    Color color = getColorFromModel();
-    Color newColor = ColorUtil.setAlpha(color, alphaSlider.getValue());
-    ColorSelectionModel colorSelectionModel = getColorSelectionModel();
-    colorSelectionModel.setSelectedColor(newColor);
-  }
-
-  @Override
-  public void updateChooser() {
-    Color color = getColorFromModel();
-    alphaSlider.setValue(color.getAlpha());
-  }
-
-  @Override
   protected void buildChooser() {
   }
 
@@ -76,12 +57,26 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   }
 
   @Override
+  public Icon getLargeDisplayIcon() {
+    return new ImageIcon();
+  }
+
+  @Override
   public Icon getSmallDisplayIcon() {
     return new ImageIcon();
   }
 
   @Override
-  public Icon getLargeDisplayIcon() {
-    return new ImageIcon();
+  public void stateChanged(final ChangeEvent e) {
+    final Color color = getColorFromModel();
+    final Color newColor = ColorUtil.setAlpha(color, alphaSlider.getValue());
+    final ColorSelectionModel colorSelectionModel = getColorSelectionModel();
+    colorSelectionModel.setSelectedColor(newColor);
+  }
+
+  @Override
+  public void updateChooser() {
+    final Color color = getColorFromModel();
+    alphaSlider.setValue(color.getAlpha());
   }
 }
