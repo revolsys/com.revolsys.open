@@ -16,6 +16,8 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 @SuppressWarnings("serial")
 public class ComboBox extends JComboBox implements Field {
@@ -27,6 +29,8 @@ public class ComboBox extends JComboBox implements Field {
   private String errorMessage;
 
   private String originalToolTip;
+
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
   public ComboBox() {
     this("fieldValue", null);
@@ -72,6 +76,7 @@ public class ComboBox extends JComboBox implements Field {
       }
     });
     AutoCompleteDecorator.decorate(this, converter);
+    undoManager.addKeyMap(getEditor().getEditorComponent());
   }
 
   @Override
@@ -138,8 +143,12 @@ public class ComboBox extends JComboBox implements Field {
     if (!EqualsRegistry.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
-    this.fieldValue = value;
-    firePropertyChange(fieldName, oldValue, value);
+    if (!EqualsRegistry.equal(oldValue, value)) {
+      this.fieldValue = value;
+      firePropertyChange(fieldName, oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+        oldValue, value);
+    }
   }
 
   @Override
@@ -148,6 +157,11 @@ public class ComboBox extends JComboBox implements Field {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   @Override

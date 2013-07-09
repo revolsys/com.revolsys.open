@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
 public class ObjectLabelField extends JLabel implements Field {
@@ -122,6 +123,10 @@ public class ObjectLabelField extends JLabel implements Field {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
   }
 
   @Override

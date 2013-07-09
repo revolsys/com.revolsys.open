@@ -7,7 +7,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
@@ -15,11 +14,12 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
+import com.revolsys.swing.undo.UndoManager;
 
 public class DirectoryNameField extends JPanel implements ValidatingField {
   private static final long serialVersionUID = -8433151755294925911L;
 
-  private final JTextField directoryName = new JTextField(70);
+  private final TextField directoryName = new TextField(70);
 
   private final JButton browseButton = new JButton();
 
@@ -174,6 +174,11 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    directoryName.setUndoManager(undoManager);
   }
 
   @Override

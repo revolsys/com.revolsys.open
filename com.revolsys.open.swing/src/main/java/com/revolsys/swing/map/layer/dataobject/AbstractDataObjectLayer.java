@@ -71,6 +71,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.component.MergeObjectsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
@@ -196,7 +197,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public LayerDataObject addComplete(final EditGeometryOverlay overlay,
+  public LayerDataObject addComplete(final AbstractOverlay overlay,
     final Geometry geometry) {
     final DataObjectMetaData metaData = getMetaData();
     final String geometryAttributeName = metaData.getGeometryAttributeName();

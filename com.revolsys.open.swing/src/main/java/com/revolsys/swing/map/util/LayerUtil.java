@@ -37,7 +37,6 @@ import com.revolsys.swing.map.layer.bing.BingLayerFactory;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayerFactory;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
@@ -341,7 +340,4 @@ public class LayerUtil {
     }
   }
 
-  public void showForm(final DataObjectLayer layer, final LayerDataObject object) {
-    layer.showForm(object);
-  }
 }

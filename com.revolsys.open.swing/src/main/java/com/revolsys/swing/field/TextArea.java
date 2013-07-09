@@ -10,17 +10,21 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 @SuppressWarnings("serial")
 public class TextArea extends JXTextArea implements Field, FocusListener {
 
   private final String fieldName;
 
-  private final String fieldValue;
+  private String fieldValue;
 
   private String errorMessage;
 
   private String originalToolTip;
+
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
   public TextArea() {
     this("fieldValue");
@@ -48,6 +52,7 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     setText(this.fieldValue);
     addFocusListener(this);
     PopupMenu.getPopupMenuFactory(this);
+    undoManager.addKeyMap(this);
   }
 
   @Override
@@ -117,7 +122,12 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     if (!EqualsRegistry.equal(getText(), newValue)) {
       setText(newValue);
     }
-    firePropertyChange(fieldName, oldValue, newValue);
+    if (!EqualsRegistry.equal(oldValue, value)) {
+      this.fieldValue = (String)value;
+      firePropertyChange(fieldName, oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+        oldValue, value);
+    }
   }
 
   @Override
@@ -126,6 +136,11 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   @Override

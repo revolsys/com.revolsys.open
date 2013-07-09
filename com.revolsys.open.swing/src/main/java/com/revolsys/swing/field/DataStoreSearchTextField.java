@@ -38,6 +38,8 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 public class DataStoreSearchTextField extends JXSearchField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
@@ -57,6 +59,8 @@ public class DataStoreSearchTextField extends JXSearchField implements
   private String errorMessage;
 
   private String originalToolTip;
+
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
@@ -95,6 +99,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     setEditable(true);
     setSearchMode(SearchMode.REGULAR);
     PopupMenu.getPopupMenuFactory(this);
+    undoManager.addKeyMap(this);
   }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
@@ -387,6 +392,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   private void showMenu() {

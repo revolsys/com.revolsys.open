@@ -9,6 +9,8 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {
   private static final long serialVersionUID = 1L;
@@ -21,12 +23,15 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   private String originalToolTip;
 
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+
   public SearchField() {
     this("fieldValue");
   }
 
   public SearchField(final String fieldName) {
     this.fieldName = fieldName;
+    undoManager.addKeyMap(this);
   }
 
   @Override
@@ -96,7 +101,12 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     if (!EqualsRegistry.equal(getText(), newValue)) {
       setText(newValue);
     }
-    firePropertyChange(fieldName, oldValue, newValue);
+    if (!EqualsRegistry.equal(oldValue, value)) {
+      this.fieldValue = (String)value;
+      firePropertyChange(fieldName, oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+        oldValue, value);
+    }
   }
 
   @Override
@@ -105,6 +115,11 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   @Override

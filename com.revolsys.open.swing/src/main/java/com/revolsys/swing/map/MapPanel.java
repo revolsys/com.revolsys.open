@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.JXStatusBar;
 
@@ -21,6 +22,8 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.InvokeMethodSelectedItemListener;
@@ -42,6 +45,7 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.undo.UndoManager;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
@@ -88,9 +92,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private SelectMapScale selectMapScale;
 
+  private final UndoManager undoManager = new UndoManager();
+
   private final JXStatusBar statusBar = new JXStatusBar();
 
-  private final ToolBar toolBar;
+  private final ToolBar toolBar = new ToolBar();
 
   private final Viewport2D viewport;
 
@@ -106,10 +112,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     super(new BorderLayout());
     this.baseMapLayers = project.addLayerGroup("Base Maps");
     project.setProperty(MAP_PANEL, this);
-
-    toolBar = new ToolBar();
-    add(toolBar, BorderLayout.NORTH);
-
     layeredPane = new JLayeredPane();
     layeredPane.setOpaque(true);
     layeredPane.setBackground(Color.WHITE);
@@ -142,15 +144,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     baseMapLayers.addPropertyChangeListener(this);
     project.addPropertyChangeListener(this);
 
-    addStandardButtons();
-
     addMapOverlays();
+
+    addToolBar();
 
     addStatusBar();
 
     zoomToWorld();
 
     fileDropListener = new FileDropTargetListener(this);
+    undoManager.addKeyMap(this);
   }
 
   public void addBaseMap(final Layer layer) {
@@ -222,18 +225,39 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     statusBar.add(location);
   }
 
-  private void addStandardButtons() {
-    addZoomButtons();
-
-    addLayerControls();
-  }
-
   protected void addStatusBar() {
     add(statusBar, BorderLayout.SOUTH);
 
     addPointerLocation("Albers", 3005, 1000.0);
     addPointerLocation("Lat/Lon", 4269, 10000000.0);
     statusBar.add(new MapScale(viewport));
+  }
+
+  protected void addToolBar() {
+    add(toolBar, BorderLayout.NORTH);
+
+    addZoomButtons();
+
+    addUndoButtons();
+
+    addLayerControls();
+
+  }
+
+  public void addUndo(final UndoableEdit edit) {
+    undoManager.addEdit(edit);
+  }
+
+  protected void addUndoButtons() {
+    final EnableCheck canUndo = new ObjectPropertyEnableCheck(undoManager,
+      "canUndo");
+    final EnableCheck canRedo = new ObjectPropertyEnableCheck(undoManager,
+      "canRedo");
+
+    toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, undoManager,
+      "undo");
+    toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, undoManager,
+      "redo");
   }
 
   private void addZoomButtons() {
@@ -348,6 +372,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public ToolBar getToolBar() {
     return toolBar;
+  }
+
+  public UndoManager getUndoManager() {
+    return undoManager;
   }
 
   public Viewport2D getViewport() {

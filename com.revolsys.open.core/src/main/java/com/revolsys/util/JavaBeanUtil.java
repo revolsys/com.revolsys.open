@@ -483,6 +483,22 @@ public final class JavaBeanUtil {
     }
   }
 
+  public static void setValue(final Object object, final String propertyName,
+    final Object value) {
+    if (object != null) {
+      if (object instanceof DataObject) {
+        final DataObject dataObject = (DataObject)object;
+        dataObject.setValueByPath(propertyName, value);
+      } else if (object instanceof Map) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>)object;
+        map.put(propertyName, value);
+      } else {
+        setProperty(object, propertyName, value);
+      }
+    }
+  }
+
   /**
    * Construct a new JavaBeanUtil.
    */

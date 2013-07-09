@@ -311,7 +311,12 @@ public final class JtsGeometryUtil {
 
   public static boolean equalsExact3D(final Geometry geometry1,
     final Geometry geometry2) {
-    if ((geometry1 instanceof LineString) && (geometry2 instanceof LineString)) {
+    if (geometry1 == null) {
+      return geometry2 == null;
+    } else if (geometry2 == null) {
+      return false;
+    } else if ((geometry1 instanceof LineString)
+      && (geometry2 instanceof LineString)) {
       final LineString line1 = (LineString)geometry1;
       final LineString line2 = (LineString)geometry2;
       return equalsExact3D(line1, line2);
@@ -368,9 +373,15 @@ public final class JtsGeometryUtil {
   public static boolean equalsExact3D(final Point point1, final Point point2) {
     final Coordinate coordinate1 = point1.getCoordinate();
     final Coordinate coordinate2 = point2.getCoordinate();
-
-    return (coordinate1.x == coordinate2.x) && (coordinate1.y == coordinate2.y)
-      && equalsZ(coordinate1.z, coordinate2.z);
+    if (coordinate1 == null) {
+      return coordinate2 == null;
+    } else if (coordinate2 == null) {
+      return false;
+    } else {
+      return (coordinate1.x == coordinate2.x)
+        && (coordinate1.y == coordinate2.y)
+        && equalsZ(coordinate1.z, coordinate2.z);
+    }
   }
 
   public static boolean equalsExact3D(final Polygon polygon1,

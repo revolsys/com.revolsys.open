@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 @SuppressWarnings("serial")
 public class TextField extends JXTextField implements Field, FocusListener {
@@ -30,6 +32,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   private String originalToolTip;
 
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+
   public TextField(final int columns) {
     this(null);
     setColumns(columns);
@@ -42,7 +46,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
   public TextField(final String fieldName, final int columns) {
     this(fieldName);
     setColumns(columns);
-    PopupMenu.getPopupMenuFactory(this);
   }
 
   public TextField(final String fieldName, final Object fieldValue) {
@@ -54,6 +57,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setText(this.fieldValue);
     addFocusListener(this);
+    undoManager.addKeyMap(this);
+    PopupMenu.getPopupMenuFactory(this);
   }
 
   @Override
@@ -130,8 +135,12 @@ public class TextField extends JXTextField implements Field, FocusListener {
         setText(newValue);
       }
     }
-    this.fieldValue = newValue;
-    firePropertyChange(fieldName, oldValue, newValue);
+    if (!EqualsRegistry.equal(oldValue, newValue)) {
+      this.fieldValue = newValue;
+      firePropertyChange(fieldName, oldValue, newValue);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+        oldValue, newValue);
+    }
   }
 
   @Override
@@ -140,6 +149,11 @@ public class TextField extends JXTextField implements Field, FocusListener {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   @Override

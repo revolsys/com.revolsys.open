@@ -271,42 +271,53 @@ public class GeometryFactory extends
         coordinatesList.setPoint(i, point);
         i++;
       }
+      makePrecise(coordinatesList);
       return coordinatesList;
     }
   }
 
   public CoordinatesList createCoordinatesList(final Coordinates... points) {
-    return new DoubleCoordinatesList(numAxis, points);
+    final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
+      getNumAxis(), points);
+    coordinatesList.makePrecise(coordinatesPrecisionModel);
+    return coordinatesList;
   }
 
   public CoordinatesList createCoordinatesList(final CoordinateSequence points) {
-    final int size = points.size();
-    final CoordinatesList newPoints = new DoubleCoordinatesList(size,
-      this.numAxis);
-    final int numAxis2 = points.getDimension();
-    final int numAxis = Math.min(this.numAxis, numAxis2);
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < numAxis; j++) {
-        final double coordinate = points.getOrdinate(i, j);
-        newPoints.setValue(i, j, coordinate);
+    if (points == null) {
+      return null;
+    } else {
+      final int size = points.size();
+      final CoordinatesList newPoints = new DoubleCoordinatesList(size,
+        this.numAxis);
+      final int numAxis2 = points.getDimension();
+      final int numAxis = Math.min(this.numAxis, numAxis2);
+      for (int i = 0; i < size; i++) {
+        for (int j = 0; j < numAxis; j++) {
+          final double coordinate = points.getOrdinate(i, j);
+          newPoints.setValue(i, j, coordinate);
+        }
       }
+      makePrecise(newPoints);
+      return newPoints;
     }
-    return newPoints;
   }
 
   public CoordinatesList createCoordinatesList(final CoordinatesList points) {
-    final int size = points.size();
-    final CoordinatesList newPoints = new DoubleCoordinatesList(size,
-      this.numAxis);
-    final byte numAxis2 = points.getNumAxis();
-    final int numAxis = Math.min(this.numAxis, numAxis2);
-    points.copy(0, newPoints, 0, numAxis, size);
-    return newPoints;
+    if (points == null) {
+      return null;
+    } else {
+      final CoordinatesList newPoints = new DoubleCoordinatesList(getNumAxis(),
+        points);
+      makePrecise(newPoints);
+      return newPoints;
+    }
   }
 
   public CoordinatesList createCoordinatesList(final double... coordinates) {
     final CoordinatesList newPoints = new DoubleCoordinatesList(this.numAxis,
       coordinates);
+    makePrecise(newPoints);
     return newPoints;
   }
 
@@ -447,8 +458,8 @@ public class GeometryFactory extends
   }
 
   public LinearRing createLinearRing(final CoordinatesList points) {
-    points.makePrecise(coordinatesPrecisionModel);
-    return super.createLinearRing(points);
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return super.createLinearRing(coordinatesList);
   }
 
   public LinearRing createLinearRing(final double... coordinates) {
@@ -483,10 +494,8 @@ public class GeometryFactory extends
   }
 
   public LineString createLineString(final CoordinatesList points) {
-    if (points != null) {
-      points.makePrecise(coordinatesPrecisionModel);
-    }
-    final LineString line = super.createLineString(points);
+    final CoordinatesList newPoints = createCoordinatesList(points);
+    final LineString line = super.createLineString(newPoints);
     return line;
   }
 
@@ -522,7 +531,7 @@ public class GeometryFactory extends
 
   public MultiPoint createMultiPoint(final CoordinatesList coordinatesList) {
     if (coordinatesList != null) {
-      coordinatesList.makePrecise(coordinatesPrecisionModel);
+      makePrecise(coordinatesList);
     }
     final Point[] points = new Point[coordinatesList.size()];
     for (int i = 0; i < points.length; i++) {
@@ -552,24 +561,19 @@ public class GeometryFactory extends
     if (point == null) {
       return createPoint((Coordinate)null);
     } else {
-      final byte numAxis = point.getNumAxis();
-      final double[] coordinates = point.getCoordinates();
-      final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
-        numAxis, coordinates);
-      coordinatesList.makePrecise(coordinatesPrecisionModel);
+      final CoordinatesList coordinatesList = createCoordinatesList(point);
       return super.createPoint(coordinatesList);
     }
   }
 
   public Point createPoint(final CoordinatesList points) {
-    if (points != null) {
-      points.makePrecise(coordinatesPrecisionModel);
-    }
-    return super.createPoint(points);
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return super.createPoint(coordinatesList);
   }
 
   public Point createPoint(final double... coordinates) {
     final DoubleCoordinates coords = new DoubleCoordinates(numAxis, coordinates);
+    makePrecise(coords);
     return createPoint(coords);
   }
 
@@ -731,6 +735,10 @@ public class GeometryFactory extends
   @Override
   public void makePrecise(final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
+  }
+
+  public void makePrecise(final CoordinatesList points) {
+    points.makePrecise(coordinatesPrecisionModel);
   }
 
   public double makePrecise(final double value) {

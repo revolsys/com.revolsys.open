@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 
 @SuppressWarnings("serial")
@@ -169,6 +170,10 @@ public class ValueField extends JPanel implements Field {
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
   }
 
   @SuppressWarnings("unchecked")

@@ -236,6 +236,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       repaint();
     } else if ("editable".equals(propertyName)) {
       repaint();
+    } else if ("selected".equals(propertyName)) {
+      clearUndoHistory();
     }
   }
 

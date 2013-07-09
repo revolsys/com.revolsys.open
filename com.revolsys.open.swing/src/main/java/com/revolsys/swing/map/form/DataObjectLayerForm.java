@@ -79,12 +79,15 @@ import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellRenderer;
 import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener {
 
   private static final long serialVersionUID = 1L;
+
+  private final UndoManager undoManager = new UndoManager();
 
   private DataObjectLayerAttributesTableModel allAttributes;
 
@@ -153,6 +156,7 @@ public class DataObjectLayerForm extends JPanel implements
       addTabGeometry();
     }
     layer.addPropertyChangeListener(this);
+    undoManager.setLimit(100);
   }
 
   public DataObjectLayerForm(final DataObjectLayer layer,
@@ -221,7 +225,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   public Field addField(final String fieldName, final Field field) {
     field.addPropertyChangeListener(fieldName, this);
-
+    field.setUndoManager(undoManager);
     fields.put(fieldName, field);
     fieldToNameMap.put(field, fieldName);
     return field;
@@ -455,6 +459,16 @@ public class DataObjectLayerForm extends JPanel implements
       "dataTransferCopy");
     toolBar.addButton("dnd", "Paste", "paste_plain", editable, this,
       "dataTransferPaste");
+
+    final EnableCheck canUndo = new ObjectPropertyEnableCheck(undoManager,
+      "canUndo");
+    final EnableCheck canRedo = new ObjectPropertyEnableCheck(undoManager,
+      "canRedo");
+
+    toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, undoManager,
+      "undo");
+    toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, undoManager,
+      "redo");
 
     // Zoom
 
@@ -974,6 +988,7 @@ public class DataObjectLayerForm extends JPanel implements
     this.object = object;
     allAttributes.setObject(object);
     setValues(object);
+    undoManager.discardAllEdits();
   }
 
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {

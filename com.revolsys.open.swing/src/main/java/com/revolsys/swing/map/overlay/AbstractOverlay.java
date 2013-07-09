@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
+import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.MapPanel;
@@ -26,6 +27,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.undo.SetObjectProperty;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -56,8 +58,23 @@ public class AbstractOverlay extends JComponent implements
     map.addMapOverlay(this);
   }
 
+  protected void addUndo(final UndoableEdit edit) {
+    map.addUndo(edit);
+  }
+
   protected void clearMapCursor() {
     setMapCursor(Cursor.getDefaultCursor());
+  }
+
+  protected void clearUndoHistory() {
+    getMap().getUndoManager().discardAllEdits();
+  }
+
+  protected void createPropertyUndo(final Object object,
+    final String propertyName, final Object oldValue, final Object newValue) {
+    final SetObjectProperty edit = new SetObjectProperty(object, propertyName,
+      oldValue, newValue);
+    addUndo(edit);
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {

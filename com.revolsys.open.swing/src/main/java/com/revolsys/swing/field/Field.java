@@ -3,6 +3,8 @@ package com.revolsys.swing.field;
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
 
+import com.revolsys.swing.undo.UndoManager;
+
 public interface Field {
   void addPropertyChangeListener(String propertyName,
     PropertyChangeListener listener);
@@ -24,4 +26,6 @@ public interface Field {
   void setFieldValid();
 
   void setFieldValue(Object value);
+
+  void setUndoManager(UndoManager undoManager);
 }

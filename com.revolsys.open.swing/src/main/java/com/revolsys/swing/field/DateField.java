@@ -11,6 +11,8 @@ import org.jdesktop.swingx.JXDatePicker;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.undo.CascadingUndoManager;
+import com.revolsys.swing.undo.UndoManager;
 
 public class DateField extends JXDatePicker implements Field,
   PropertyChangeListener {
@@ -24,6 +26,8 @@ public class DateField extends JXDatePicker implements Field,
 
   private String originalToolTip;
 
+  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+
   public DateField() {
     this("fieldValue");
   }
@@ -31,6 +35,7 @@ public class DateField extends JXDatePicker implements Field,
   public DateField(final String fieldName) {
     this.fieldName = fieldName;
     addPropertyChangeListener("date", this);
+    undoManager.addKeyMap(getEditor());
   }
 
   @Override
@@ -117,8 +122,12 @@ public class DateField extends JXDatePicker implements Field,
     if (!EqualsRegistry.equal(getDate(), value)) {
       setDate(date);
     }
-    this.fieldValue = date;
-    firePropertyChange(fieldName, oldValue, value);
+    if (!EqualsRegistry.equal(oldValue, value)) {
+      this.fieldValue = (Date)value;
+      firePropertyChange(fieldName, oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+        oldValue, value);
+    }
   }
 
   @Override
@@ -127,6 +136,11 @@ public class DateField extends JXDatePicker implements Field,
     if (!StringUtils.hasText(errorMessage)) {
       super.setToolTipText(text);
     }
+  }
+
+  @Override
+  public void setUndoManager(final UndoManager undoManager) {
+    this.undoManager.setParent(undoManager);
   }
 
   @Override
