@@ -101,6 +101,10 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
     return canUndo();
   }
 
+  public boolean isEventsEnabled() {
+    return eventsEnabled;
+  }
+
   @Override
   public synchronized void redo() throws CannotRedoException {
     final boolean enabled = eventsEnabled;
@@ -113,6 +117,12 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
       eventsEnabled = enabled;
       fireEvents();
     }
+  }
+
+  public boolean setEventsEnabled(final boolean eventsEnabled) {
+    final boolean oldValue = this.eventsEnabled;
+    this.eventsEnabled = eventsEnabled;
+    return oldValue;
   }
 
   @Override

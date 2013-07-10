@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.util.CaseConverter;
 
 /**
  * The Attribute class defines the name, type and other properties about each
@@ -213,7 +214,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description, final Map<String, Object> properties) {
     this.name = name;
-    this.title = name;
+    this.title = CaseConverter.toCapitalizedWords(title);
     this.type = type;
     if (required != null) {
       this.required = required;

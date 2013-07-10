@@ -9,9 +9,15 @@ public interface Field {
   void addPropertyChangeListener(String propertyName,
     PropertyChangeListener listener);
 
+  void firePropertyChange(String propertyName, Object oldValue, Object newValue);
+
   String getFieldName();
 
+  String getFieldValidationMessage();
+
   <T> T getFieldValue();
+
+  boolean isFieldValid();
 
   void setEnabled(boolean enabled);
 
@@ -28,4 +34,5 @@ public interface Field {
   void setFieldValue(Object value);
 
   void setUndoManager(UndoManager undoManager);
+
 }

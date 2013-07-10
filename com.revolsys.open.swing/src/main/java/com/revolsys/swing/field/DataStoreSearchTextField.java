@@ -140,6 +140,12 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  @Override
   public void focusGained(final FocusEvent e) {
     showMenu();
   }
@@ -152,6 +158,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public String getFieldName() {
     return displayAttributeName;
+  }
+
+  @Override
+  public String getFieldValidationMessage() {
+    return errorMessage;
   }
 
   @Override
@@ -196,6 +207,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public void intervalRemoved(final ListDataEvent e) {
     intervalAdded(e);
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return !StringUtils.hasText(errorMessage);
   }
 
   public boolean isTextSameAsSelected() {

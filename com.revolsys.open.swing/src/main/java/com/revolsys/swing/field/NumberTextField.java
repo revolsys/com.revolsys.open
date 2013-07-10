@@ -20,7 +20,7 @@ import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
 public class NumberTextField extends JXTextField implements Field,
-  DocumentListener, ValidatingField, FocusListener {
+  DocumentListener, FocusListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -201,6 +201,12 @@ public class NumberTextField extends JXTextField implements Field,
   @Override
   public void changedUpdate(final DocumentEvent e) {
     validateField();
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   @Override

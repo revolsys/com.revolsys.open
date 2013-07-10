@@ -16,7 +16,7 @@ import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.undo.UndoManager;
 
-public class DirectoryNameField extends JPanel implements ValidatingField {
+public class DirectoryNameField extends JPanel implements Field {
   private static final long serialVersionUID = -8433151755294925911L;
 
   private final TextField directoryName = new TextField(70);
@@ -66,6 +66,12 @@ public class DirectoryNameField extends JPanel implements ValidatingField {
       JOptionPane.showMessageDialog(this, t.getMessage(), "Error",
         JOptionPane.ERROR_MESSAGE);
     }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   public File getDirectoryFile() {

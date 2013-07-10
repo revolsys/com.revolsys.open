@@ -67,7 +67,6 @@ import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
-import com.revolsys.swing.field.ValidatingField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -214,9 +213,11 @@ public class DataObjectLayerForm extends JPanel implements
     container.add(field);
   }
 
-  public void addField(final Container container, final String fieldName) {
+  @SuppressWarnings("unchecked")
+  public <T> T addField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
     addField(container, field);
+    return (T)field;
   }
 
   public void addField(final Field field) {
@@ -238,8 +239,8 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  protected void addLabel(final Container container, final String title) {
-    final JLabel label = getLabel(title);
+  protected void addLabel(final Container container, final String fieldName) {
+    final JLabel label = getLabel(fieldName);
     container.add(label);
   }
 
@@ -249,9 +250,12 @@ public class DataObjectLayerForm extends JPanel implements
     addField(container, field);
   }
 
-  public void addLabelledField(final Container container, final String fieldName) {
+  @SuppressWarnings("unchecked")
+  public <T> T addLabelledField(final Container container,
+    final String fieldName) {
     final Field field = getField(fieldName);
     addLabelledField(container, field);
+    return (T)field;
   }
 
   protected void addNumberField(final String fieldName,
@@ -712,6 +716,10 @@ public class DataObjectLayerForm extends JPanel implements
     return uiBuilderRegistry;
   }
 
+  public UndoManager getUndoManager() {
+    return undoManager;
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T getValue(final String name) {
     return (T)object.getValue(name);
@@ -1105,13 +1113,10 @@ public class DataObjectLayerForm extends JPanel implements
     final boolean oldValid = isFieldValid(fieldName);
     final Field field = getField(fieldName);
     boolean valid = true;
-    if (field instanceof ValidatingField) {
-      final ValidatingField validatingField = (ValidatingField)field;
-      if (!validatingField.isFieldValid()) {
-        final String message = validatingField.getFieldValidationMessage();
-        setFieldInvalid(fieldName, message);
-        valid = false;
-      }
+    if (!field.isFieldValid()) {
+      final String message = field.getFieldValidationMessage();
+      setFieldInvalid(fieldName, message);
+      valid = false;
     }
 
     if (valid) {

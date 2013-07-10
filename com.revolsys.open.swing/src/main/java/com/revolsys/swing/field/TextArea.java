@@ -49,10 +49,17 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   public TextArea(final String fieldName, final Object fieldValue) {
     this.fieldName = fieldName;
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
+    setDocument(new PropertyChangeDocument(this));
     setText(this.fieldValue);
     addFocusListener(this);
     PopupMenu.getPopupMenuFactory(this);
     undoManager.addKeyMap(this);
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   @Override
@@ -70,10 +77,20 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     return fieldName;
   }
 
+  @Override
+  public String getFieldValidationMessage() {
+    return errorMessage;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)getText();
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return !StringUtils.hasText(errorMessage);
   }
 
   @Override

@@ -177,20 +177,6 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     writer.endTag();
   }
 
-  private void writeLookAt(Geometry geometry) {
-    if (geometry != null) {
-      GeometryFactory geometryFactory = GeometryFactory.WGS84;
-      Geometry projectedGeometry = geometryFactory.copy(geometry);
-      BoundingBox boundingBox = BoundingBox.getBoundingBox(projectedGeometry);
-      Point centre = geometryFactory.createPoint(boundingBox.getCentreX(),
-        boundingBox.getCentreY());
-
-      long range = KmlXmlWriter.getLookAtRange(boundingBox);
-   
-      writeLookAt(centre, range);
-    }
-  }
-
   private void writeHeader() {
     opened = true;
     writer.startDocument();
@@ -212,7 +198,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
         writer.element(DESCRIPTION, description);
       }
       writer.element(OPEN, 1);
-      Point point = getProperty(LOOK_AT_POINT_PROPERTY);
+      final Point point = getProperty(LOOK_AT_POINT_PROPERTY);
       if (point != null) {
         Number range = getProperty(LOOK_AT_RANGE_PROPERTY);
         if (range == null) {
@@ -228,20 +214,34 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
   }
 
+  private void writeLookAt(final Geometry geometry) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = GeometryFactory.WGS84;
+      final Geometry projectedGeometry = geometryFactory.copy(geometry);
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(projectedGeometry);
+      final Point centre = geometryFactory.createPoint(
+        boundingBox.getCentreX(), boundingBox.getCentreY());
+
+      final long range = KmlXmlWriter.getLookAtRange(boundingBox);
+
+      writeLookAt(centre, range);
+    }
+  }
+
   public void writeLookAt(Point point, long range) {
-    Number minRange = getProperty(Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY);
+    final Number minRange = getProperty(Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY);
     if (minRange != null) {
       if (range < minRange.doubleValue()) {
         range = minRange.longValue();
       }
     }
-    Number maxRange = getProperty(Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY);
+    final Number maxRange = getProperty(Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY);
     if (maxRange != null) {
       if (range > maxRange.doubleValue()) {
         range = maxRange.longValue();
       }
     }
-    
+
     writer.startTag(LOOK_AT);
     point = GeometryFactory.WGS84.copy(point);
     writer.element(LONGITUDE, point.getX());
@@ -250,7 +250,6 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     writer.element(HEADING, 0);
     writer.element(TILT, 0);
     writer.element(RANGE, range);
-    writer.element(ALTITUDE_MODE, "absolute");
     writer.endTag(LOOK_AT);
   }
 }

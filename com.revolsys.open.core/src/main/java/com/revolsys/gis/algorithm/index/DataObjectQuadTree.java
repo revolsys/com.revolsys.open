@@ -165,7 +165,11 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
 
   public boolean remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Envelope envelope = geometry.getEnvelopeInternal();
-    return super.remove(envelope, object);
+    if (geometry == null) {
+      return false;
+    } else {
+      final Envelope envelope = geometry.getEnvelopeInternal();
+      return super.remove(envelope, object);
+    }
   }
 }

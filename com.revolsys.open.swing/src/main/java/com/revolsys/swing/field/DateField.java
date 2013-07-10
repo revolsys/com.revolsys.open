@@ -39,14 +39,30 @@ public class DateField extends JXDatePicker implements Field,
   }
 
   @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  @Override
   public String getFieldName() {
     return fieldName;
+  }
+
+  @Override
+  public String getFieldValidationMessage() {
+    return errorMessage;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)fieldValue;
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return !StringUtils.hasText(errorMessage);
   }
 
   @Override

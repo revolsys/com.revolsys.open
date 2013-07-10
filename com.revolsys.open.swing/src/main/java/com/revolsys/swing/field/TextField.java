@@ -49,6 +49,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   public TextField(final String fieldName, final Object fieldValue) {
+    setDocument(new PropertyChangeDocument(this));
     if (StringUtils.hasText(fieldName)) {
       this.fieldName = fieldName;
     } else {
@@ -59,6 +60,12 @@ public class TextField extends JXTextField implements Field, FocusListener {
     addFocusListener(this);
     undoManager.addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   @Override
@@ -76,10 +83,20 @@ public class TextField extends JXTextField implements Field, FocusListener {
     return fieldName;
   }
 
+  @Override
+  public String getFieldValidationMessage() {
+    return errorMessage;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)getText();
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return !StringUtils.hasText(errorMessage);
   }
 
   @Override
@@ -134,6 +151,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
       } else {
         setText(newValue);
       }
+      undoManager.discardAllEdits();
     }
     if (!EqualsRegistry.equal(oldValue, newValue)) {
       this.fieldValue = newValue;

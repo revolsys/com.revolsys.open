@@ -35,6 +35,12 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
+  public void firePropertyChange(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  @Override
   public void focusGained(final FocusEvent e) {
   }
 
@@ -49,10 +55,20 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     return fieldName;
   }
 
+  @Override
+  public String getFieldValidationMessage() {
+    return errorMessage;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     return (T)getText();
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return !StringUtils.hasText(errorMessage);
   }
 
   @Override

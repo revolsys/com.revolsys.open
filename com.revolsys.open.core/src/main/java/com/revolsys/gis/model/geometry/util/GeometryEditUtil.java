@@ -671,7 +671,6 @@ public class GeometryEditUtil {
 
     if (geometry != null && !geometry.isEmpty()) {
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      final double precision = 0;
       if (deltaX != 0 && deltaY != 0) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
