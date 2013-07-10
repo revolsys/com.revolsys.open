@@ -930,8 +930,6 @@ public class Base64 {
     return bytes;
   } // end decode
 
-  /* E N C O D I N G M E T H O D S */
-
   /**
    * Decodes four bytes from array <var>source</var> and writes the resulting
    * bytes (up to three of them) to <var>destination</var>. The source and
@@ -1018,6 +1016,8 @@ public class Base64 {
       } // end catch
     }
   } // end decodeToBytes
+
+  /* E N C O D I N G M E T H O D S */
 
   /**
    * Reads <tt>infile</tt> and decodes it to <tt>outfile</tt>.
@@ -1185,6 +1185,11 @@ public class Base64 {
 
     return obj;
   } // end decodeObject
+
+  public static String decodeToString(final String string) {
+    final byte[] data = decode(string);
+    return new String(data);
+  }
 
   public static String encode(final String string) {
     return encodeBytes(string.getBytes());

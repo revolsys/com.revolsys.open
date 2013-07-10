@@ -12,6 +12,7 @@ import com.revolsys.gis.data.store.ConnectionRegistry;
 import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.util.PasswordUtil;
 
 public class AddDataStoreConnectionPanel extends ValueField {
   private static final long serialVersionUID = 2750736040832727823L;
@@ -74,9 +75,15 @@ public class AddDataStoreConnectionPanel extends ValueField {
     }
     final Map<String, String> connectionParameters = new LinkedHashMap<String, String>();
     properties.put("connection", connectionParameters);
-    connectionParameters.put("url", urlField.getText());
-    connectionParameters.put("password", passwordField.getText());
-    connectionParameters.put("username", usernameField.getText());
+
+    final String url = urlField.getText();
+    connectionParameters.put("url", url);
+
+    final String username = usernameField.getText();
+    connectionParameters.put("username", username);
+
+    final String password = passwordField.getText();
+    connectionParameters.put("password", PasswordUtil.encrypt(password));
     registry.createConnection(properties);
   }
 }

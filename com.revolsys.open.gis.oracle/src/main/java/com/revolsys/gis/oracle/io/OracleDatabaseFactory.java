@@ -24,6 +24,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.PasswordUtil;
 
 public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
@@ -58,23 +59,6 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
     return urlMatcher.matches();
   }
 
-  // public void closeDataSource(final DataSource dataSource) {
-  // if (dataSource instanceof PoolDataSource) {
-  // try {
-  // UniversalConnectionPoolManager poolManager =
-  // UniversalConnectionPoolManagerImpl.getUniversalConnectionPoolManager();
-  //
-  // final PoolDataSource oracleDataSource = (PoolDataSource)dataSource;
-  // String connectionPoolName = oracleDataSource.getConnectionPoolName();
-  // poolManager.stopConnectionPool(connectionPoolName);
-  // poolManager.destroyConnectionPool(connectionPoolName);
-  // } catch (final UniversalConnectionPoolException e) {
-  // LoggerFactory.getLogger(OracleDatabaseFactory.class).warn(
-  // "Unable to close data source", e);
-  // }
-  // }
-  // }
-
   @Override
   public void closeDataSource(final DataSource dataSource) {
     if (dataSource instanceof OracleDataSource) {
@@ -106,7 +90,8 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       final Properties cacheProperties = new Properties();
       final String url = (String)newConfig.remove("url");
       final String username = (String)newConfig.remove("username");
-      final String password = (String)newConfig.remove("password");
+      String password = (String)newConfig.remove("password");
+      password = PasswordUtil.decrypt(password);
       addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit",
         0, DataTypes.INT);
       addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit",
@@ -143,47 +128,6 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
         + config, e);
     }
   }
-
-  // public DataSource createDataSource(final Map<String, ? extends Object>
-  // config) {
-  // try {
-  // UniversalConnectionPoolManager poolManager =
-  // UniversalConnectionPoolManagerImpl.getUniversalConnectionPoolManager();
-  // poolManager.setJmxEnabled(false);
-  //
-  // final Map<String, Object> newConfig = new HashMap<String, Object>(config);
-  // final String url = (String)newConfig.remove("url");
-  // final String username = (String)newConfig.remove("username");
-  // final String password = (String)newConfig.remove("password");
-  // PoolDataSource dataSource = PoolDataSourceFactory.getPoolDataSource();
-  // dataSource.setMaxConnectionReuseTime(300);
-  // dataSource.setInactiveConnectionTimeout(300);
-  //
-  // dataSource.setConnectionFactoryClassName("oracle.jdbc.pool.OracleConnectionPoolDataSource");
-  //
-  // for (final MapKeyEntry<String, Object> property : newConfig.entrySet()) {
-  // final String name = property.getKey();
-  // final Object value = property.getValue();
-  // try {
-  // JavaBeanUtil.setProperty(dataSource, name, value);
-  // } catch (final Throwable e) {
-  // LoggerFactory.getLogger(OracleDatabaseFactory.class).debug(
-  // "Unable to set Oracle data source property " + name, e);
-  // }
-  // }
-  // dataSource.setURL(url);
-  // dataSource.setUser(username);
-  // dataSource.setPassword(password);
-  //
-  // poolManager.createConnectionPool((UniversalConnectionPoolAdapter)dataSource);
-  // String connectionPoolName = dataSource.getConnectionPoolName();
-  // poolManager.startConnectionPool(connectionPoolName);
-  // return dataSource;
-  // } catch (final Throwable e) {
-  // throw new IllegalArgumentException("Unable to create data source for "
-  // + config, e);
-  // }
-  // }
 
   @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(

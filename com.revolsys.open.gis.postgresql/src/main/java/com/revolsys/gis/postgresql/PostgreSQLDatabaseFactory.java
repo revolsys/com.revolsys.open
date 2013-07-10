@@ -19,6 +19,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.PasswordUtil;
 
 public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLDatabaseFactory.class);
@@ -29,11 +30,13 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
 
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
 
+  @Override
   public boolean canHandleUrl(final String url) {
     final Matcher urlMatcher = URL_PATTERN.matcher(url);
     return urlMatcher.matches();
   }
 
+  @Override
   public void closeDataSource(final DataSource dataSource) {
     if (dataSource instanceof PGPoolingDataSource) {
       final PGPoolingDataSource postgreSqlDataSource = (PGPoolingDataSource)dataSource;
@@ -41,20 +44,24 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
     }
   }
 
+  @Override
   public JdbcDataObjectStore createDataObjectStore(final DataSource dataSource) {
     return new PostgreSQLDataObjectStore(dataSource);
   }
 
+  @Override
   public JdbcDataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     return new PostgreSQLDataObjectStore(this, connectionProperties);
   }
 
+  @Override
   public DataSource createDataSource(final Map<String, ? extends Object> config) {
     final Map<String, Object> newConfig = new HashMap<String, Object>(config);
     final String url = (String)newConfig.remove("url");
     final String username = (String)newConfig.remove("username");
-    final String password = (String)newConfig.remove("password");
+    String password = (String)newConfig.remove("password");
+    password = PasswordUtil.decrypt(password);
     final Matcher urlMatcher = URL_PATTERN.matcher(url);
 
     final boolean matches = urlMatcher.matches();
@@ -90,15 +97,18 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
     }
   }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 
+  @Override
   public List<String> getProductNames() {
     return Collections.singletonList("PostgreSQL");
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
   }

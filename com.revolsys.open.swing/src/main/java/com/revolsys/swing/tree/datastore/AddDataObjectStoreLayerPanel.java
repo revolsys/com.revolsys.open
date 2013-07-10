@@ -21,6 +21,7 @@ import com.revolsys.i18n.I18n;
 import com.revolsys.swing.i18n.NamedJPanel;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.util.PasswordUtil;
 
 public class AddDataObjectStoreLayerPanel extends NamedJPanel {
   /**
@@ -67,7 +68,8 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
             final Map<String, Object> connectionProperties = new LinkedHashMap<String, Object>();
             connectionProperties.put("url", urlField.getText());
             connectionProperties.put("username", usernameField.getText());
-            connectionProperties.put("password", passwordField.getText());
+            final String password = PasswordUtil.encrypt(passwordField.getText());
+            connectionProperties.put("password", password);
 
             final DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
             storePanel.add(new DataObjectStoreTreePanel(dataStore),
