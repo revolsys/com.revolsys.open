@@ -184,7 +184,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description) {
     this.name = name;
-    this.title = name;
+    this.title = CaseConverter.toCapitalizedWords(name);
     this.description = description;
     this.type = type;
     if (required != null) {
@@ -214,7 +214,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description, final Map<String, Object> properties) {
     this.name = name;
-    this.title = CaseConverter.toCapitalizedWords(title);
+    this.title = CaseConverter.toCapitalizedWords(name);
     this.type = type;
     if (required != null) {
       this.required = required;

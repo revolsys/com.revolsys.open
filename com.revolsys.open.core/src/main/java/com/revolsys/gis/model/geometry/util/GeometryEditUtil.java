@@ -121,7 +121,8 @@ public class GeometryEditUtil {
     final int ringIndex, final Coordinates newPoint) {
     final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
     final CoordinatesList points = rings.get(ringIndex);
-    final CoordinatesList newPoints = appendVertex(points, newPoint);
+    final CoordinatesList newPoints = insertVertex(points,
+      points.size() - 1, newPoint);
 
     rings.set(ringIndex, newPoints);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
