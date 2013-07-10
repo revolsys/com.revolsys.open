@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -10,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -122,6 +124,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   private static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
     "cursor_node_add", 8, 7);
 
+  private static final Cursor CURSOR_MOVE = SilkIconLoader.getCursor(
+    "cursor_move", 8, 7);
+
   private static final Cursor CURSOR_NODE_EDIT = SilkIconLoader.getCursor(
     "cursor_node_edit", 8, 7);
 
@@ -159,8 +164,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private DataObjectLayer addLayer;
 
-  private String mode = "edit";
-
   private Geometry mouseOverGeometry;
 
   private LayerDataObject mouseOverObject;
@@ -174,6 +177,10 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   private Point snapPoint;
 
   private boolean dragged = false;
+
+  private Geometry moveGeometry;
+
+  private java.awt.Point moveGeometryStart;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -193,7 +200,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
             this.addGeometry = null;
             this.addGeometryDataType = null;
             this.addGeometryPartDataType = null;
-            mode = "edit";
           }
         }
       } finally {
@@ -213,7 +219,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       final DataObjectMetaData metaData = layer.getMetaData();
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       if (geometryAttribute != null) {
-        mode = "add";
         this.addLayer = layer;
         this.addCompleteAction = addCompleteAction;
         final GeometryFactory geometryFactory = metaData.getGeometryFactory();
@@ -328,6 +333,12 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   protected void clearMouseOverVertex() {
     setXorGeometry(null);
     clearMouseOverGeometry();
+    repaint();
+  }
+
+  protected void clearMoveGeometry() {
+    moveGeometry = null;
+    moveGeometryStart = null;
     repaint();
   }
 
@@ -760,7 +771,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected boolean isModeAddGeometry() {
-    return "add".equals(mode);
+    return addLayer != null;
+  }
+
+  @Override
+  public void keyPressed(final KeyEvent e) {
+    super.keyPressed(e);
+    final int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_ALT) {
+      mouseMoved(e);
+    }
   }
 
   @Override
@@ -782,10 +802,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         vertexMoveFinish(null);
       } else if (mouseOverSegment != null) {
         vertexAddFinish(null);
+      } else {
+        clearMoveGeometry();
       }
     } else if (keyCode == KeyEvent.VK_CONTROL) {
       if (!isModeAddGeometry()) {
         clearMouseOverVertex();
+      }
+    } else if (keyCode == KeyEvent.VK_ALT) {
+      if (moveGeometryStart != null) {
+        mouseMoved(e);
       }
     }
   }
@@ -889,9 +915,18 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
+    if (moveGeometryStart != null) {
+      repaint();
+      return;
+    } else if (SwingUtilities.isLeftMouseButton(event)) {
       dragged = true;
+      if (event.isAltDown() && mouseOverGeometry != null) {
+        moveGeometryStart = event.getPoint();
+        moveGeometry = getGeometry();
+        return;
+      }
     }
+
     final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
     if (mouseOverVertexIndex != null) {
@@ -910,6 +945,21 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     }
   }
 
+  protected void mouseMoved(final KeyEvent e) {
+    int modifiers;
+    if (e.getID() == KeyEvent.KEY_PRESSED) {
+      modifiers = MouseEvent.ALT_MASK;
+    } else {
+      modifiers = 0;
+    }
+
+    final java.awt.Point mousePosition = getMap().getMapMousePosition();
+    final MouseEvent event = new MouseEvent((Component)e.getSource(),
+      MouseEvent.MOUSE_MOVED, e.getWhen(), modifiers, mousePosition.x,
+      mousePosition.y, 0, false);
+    mouseMoved(event);
+  }
+
   @Override
   public void mouseMoved(final MouseEvent event) {
     if (modeAddMouseMoved(event)) {
@@ -922,6 +972,11 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         clearMapCursor();
       }
     }
+    if (event.isAltDown()) {
+      if (mouseOverGeometry != null) {
+        setMapCursor(CURSOR_MOVE);
+      }
+    }
   }
 
   @Override
@@ -929,14 +984,12 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     if (SwingUtilities.isLeftMouseButton(event)) {
       dragged = false;
     }
-    if (mode != null) {
-      if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
-        if (isModeAddGeometry() || mouseOverVertexIndex != null
-          || mouseOverSegment != null) {
-          repaint();
-          event.consume();
-          return;
-        }
+    if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
+      if (isModeAddGeometry() || mouseOverVertexIndex != null
+        || mouseOverSegment != null) {
+        repaint();
+        event.consume();
+        return;
       }
     }
     super.mousePressed(event);
@@ -944,7 +997,9 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (dragged && mouseOverVertexIndex != null) {
+    if (moveGeometry != null) {
+      moveGeometryFinish(event);
+    } else if (dragged && mouseOverVertexIndex != null) {
       vertexMoveFinish(event);
     } else if (dragged && mouseOverSegment != null) {
       vertexAddFinish(event);
@@ -956,14 +1011,41 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     }
   }
 
+  protected void moveGeometryFinish(final MouseEvent event) {
+    final GeometryFactory geometryFactory = getCurrentGeometryFactory();
+    final Point startPoint = geometryFactory.copy(getViewportPoint(moveGeometryStart));
+    final Point endPoint = geometryFactory.copy(getViewportPoint(event));
+
+    final double deltaX = endPoint.getX() - startPoint.getX();
+    final double deltaY = endPoint.getY() - startPoint.getY();
+    final Geometry geometry = GeometryEditUtil.moveGeometry(getGeometry(),
+      deltaX, deltaY);
+    setGeometry(geometry);
+    clearMoveGeometry();
+  }
+
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final Project layerGroup = getProject();
     paint(graphics, layerGroup);
-
-    paintSelected(graphics, addGeometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
-      VERTEX_STYLE);
-
+    if (moveGeometryStart != null) {
+      final AffineTransform transform = graphics.getTransform();
+      try {
+        final java.awt.Point mousePoint = getMap().getMapMousePosition();
+        if (mousePoint != null) {
+          final int deltaX = mousePoint.x - moveGeometryStart.x;
+          final int deltaY = mousePoint.y - moveGeometryStart.y;
+          graphics.translate(deltaX, deltaY);
+          paintSelected(graphics, moveGeometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
+            VERTEX_STYLE);
+        }
+      } finally {
+        graphics.setTransform(transform);
+      }
+    } else {
+      paintSelected(graphics, addGeometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
+        VERTEX_STYLE);
+    }
     paintSelectBox(graphics);
   }
 

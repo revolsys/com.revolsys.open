@@ -432,24 +432,29 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public List<LayerDataObject> query(final Geometry geometry,
     final double distance) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final Geometry queryGeometry = geometryFactory.copy(geometry);
-    BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
-    boundingBox = boundingBox.expand(distance);
-    if (this.boundingBox.contains(boundingBox)) {
-      return (List)index.queryDistance(queryGeometry, distance);
-    } else {
-      final String typePath = getTypePath();
-      final DataObjectStore dataStore = getDataStore();
-      final Reader reader = dataStore.query(this, typePath, queryGeometry,
-        distance);
-      try {
-        final List<LayerDataObject> readObjects = reader.read();
-        final List<LayerDataObject> objects = getCachedObjects(readObjects);
-        return objects;
-      } finally {
-        reader.close();
+    final boolean enabled = setEventsEnabled(false);
+    try {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry queryGeometry = geometryFactory.copy(geometry);
+      BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
+      boundingBox = boundingBox.expand(distance);
+      if (this.boundingBox.contains(boundingBox)) {
+        return (List)index.queryDistance(queryGeometry, distance);
+      } else {
+        final String typePath = getTypePath();
+        final DataObjectStore dataStore = getDataStore();
+        final Reader reader = dataStore.query(this, typePath, queryGeometry,
+          distance);
+        try {
+          final List<LayerDataObject> readObjects = reader.read();
+          final List<LayerDataObject> objects = getCachedObjects(readObjects);
+          return objects;
+        } finally {
+          reader.close();
+        }
       }
+    } finally {
+      setEventsEnabled(enabled);
     }
   }
 
@@ -464,14 +469,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   })
   @Override
   public List<LayerDataObject> query(final Query query) {
-    query.setProperty("dataObjectFactory", this);
-    final Reader reader = dataStore.query(query);
+    final boolean enabled = setEventsEnabled(false);
     try {
-      final List<LayerDataObject> readObjects = reader.read();
-      final List<LayerDataObject> objects = getCachedObjects(readObjects);
-      return objects;
+      query.setProperty("dataObjectFactory", this);
+      final Reader reader = dataStore.query(query);
+      try {
+        final List<LayerDataObject> readObjects = reader.read();
+        final List<LayerDataObject> objects = getCachedObjects(readObjects);
+        return objects;
+      } finally {
+        reader.close();
+      }
     } finally {
-      reader.close();
+      setEventsEnabled(enabled);
     }
   }
 

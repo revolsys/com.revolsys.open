@@ -78,6 +78,8 @@ public interface DataObjectLayer extends Layer {
 
   boolean isDeleted(LayerDataObject object);
 
+  boolean isEventsEnabled();
+
   @Override
   boolean isHasChanges();
 

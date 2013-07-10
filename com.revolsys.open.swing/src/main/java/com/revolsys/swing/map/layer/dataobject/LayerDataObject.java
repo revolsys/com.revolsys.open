@@ -27,9 +27,11 @@ public class LayerDataObject extends ArrayDataObject {
   protected void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
     final DataObjectLayer layer = getLayer();
-    final PropertyChangeEvent event = new PropertyChangeEvent(this,
-      attributeName, oldValue, newValue);
-    layer.propertyChange(event);
+    if (layer.isEventsEnabled()) {
+      final PropertyChangeEvent event = new PropertyChangeEvent(this,
+        attributeName, oldValue, newValue);
+      layer.propertyChange(event);
+    }
   }
 
   public DataObjectLayer getLayer() {

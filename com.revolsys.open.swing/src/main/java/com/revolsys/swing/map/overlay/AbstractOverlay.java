@@ -166,6 +166,10 @@ public class AbstractOverlay extends JComponent implements
 
   protected Point getViewportPoint(final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
+    return getViewportPoint(eventPoint);
+  }
+
+  protected Point getViewportPoint(final java.awt.Point eventPoint) {
     final Point point = viewport.toModelPoint(eventPoint);
     return point;
   }

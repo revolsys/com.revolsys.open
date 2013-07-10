@@ -3,6 +3,7 @@ package com.revolsys.gis.model.geometry.util;
 import java.awt.Toolkit;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -662,6 +663,86 @@ public class GeometryEditUtil {
     rings.set(ringIndex, points);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
     return geometryFactory.createPolygon(rings);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Geometry> T moveGeometry(final Geometry geometry,
+    final double deltaX, final double deltaY) {
+
+    if (geometry != null && !geometry.isEmpty()) {
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final double precision = 0;
+      if (deltaX != 0 && deltaY != 0) {
+        if (geometry instanceof Point) {
+          final Point point = (Point)geometry;
+          return (T)moveGeometry(geometryFactory, point, deltaX, deltaY);
+        } else if (geometry instanceof LineString) {
+          final LineString line = (LineString)geometry;
+          return (T)moveGeometry(geometryFactory, line, deltaX, deltaY);
+        } else if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          return (T)moveGeometry(geometryFactory, polygon, deltaX, deltaY);
+        } else {
+          final List<Geometry> parts = new ArrayList<Geometry>();
+          for (int i = 0; i < geometry.getNumGeometries(); i++) {
+            final Geometry part = geometry.getGeometryN(i);
+            if (part != null && !part.isEmpty()) {
+              final Geometry newPart = moveGeometry(part, deltaX, deltaY);
+              parts.add(newPart);
+            }
+          }
+          return (T)geometryFactory.createGeometry(parts);
+        }
+      }
+    }
+    return (T)geometry;
+  }
+
+  protected static CoordinatesList moveGeometry(
+    final GeometryFactory geometryFactory, final CoordinatesList points,
+    final double deltaX, final double deltaY) {
+    final CoordinatesList newPoints = geometryFactory.createCoordinatesList(points);
+    for (int i = 0; i < newPoints.size(); i++) {
+      final double x = points.getX(i);
+      newPoints.setX(i, x + deltaX);
+
+      final double y = points.getY(i);
+      newPoints.setY(i, y + deltaY);
+    }
+    return newPoints;
+  }
+
+  protected static LineString moveGeometry(
+    final GeometryFactory geometryFactory, final LineString line,
+    final double deltaX, final double deltaY) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList newPoints = moveGeometry(geometryFactory, points,
+      deltaX, deltaY);
+    final LineString newLine = geometryFactory.createLineString(newPoints);
+    return newLine;
+  }
+
+  protected static Point moveGeometry(final GeometryFactory geometryFactory,
+    final Point point, final double deltaX, final double deltaY) {
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    coordinates.setX(coordinates.getX() + deltaX);
+    coordinates.setY(coordinates.getY() + deltaY);
+    final Point newPoint = geometryFactory.createPoint(coordinates);
+    return newPoint;
+  }
+
+  protected static Polygon moveGeometry(final GeometryFactory geometryFactory,
+    final Polygon polygon, final double deltaX, final double deltaY) {
+    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+    for (int i = 0; i < rings.size(); i++) {
+      final CoordinatesList ring = rings.get(i);
+      final CoordinatesList newRing = moveGeometry(geometryFactory, ring,
+        deltaX, deltaY);
+      rings.set(i, newRing);
+    }
+
+    final Polygon newPolygon = geometryFactory.createPolygon(rings);
+    return newPolygon;
   }
 
   protected static CoordinatesList moveVertex(

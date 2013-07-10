@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -334,6 +335,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public LayerRendererOverlay getLayerOverlay() {
     return layerOverlay;
+  }
+
+  public Point getMapMousePosition() {
+    final Point mousePosition = layeredPane.getMousePosition();
+    mousePosition.x -= layeredPane.getInsets().left;
+    mousePosition.y -= layeredPane.getInsets().top;
+    return mousePosition;
   }
 
   @SuppressWarnings("unchecked")

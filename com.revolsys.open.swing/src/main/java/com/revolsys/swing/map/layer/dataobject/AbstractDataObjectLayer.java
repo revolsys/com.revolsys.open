@@ -173,6 +173,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private List<String> columnNameOrder = Collections.emptyList();
 
+  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<Boolean>();
+
   public AbstractDataObjectLayer() {
     this("");
   }
@@ -686,6 +688,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public boolean isEventsEnabled() {
+    return eventsEnabled.get() != Boolean.FALSE;
+  }
+
+  @Override
   public boolean isHasChanges() {
     if (isEditable()) {
       synchronized (editSync) {
@@ -822,6 +829,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  protected void removeForm(final LayerDataObject object) {
+    forms.remove(object);
+  }
+
   protected void removeModifiedObject(final LayerDataObject object) {
     synchronized (modifiedObjects) {
       modifiedObjects.remove(object);
@@ -927,6 +938,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         setCanEditObjects(canEditObjects);
       }
     }
+  }
+
+  @Override
+  public boolean setEventsEnabled(final boolean enabled) {
+    final boolean oldValue = isEventsEnabled();
+    eventsEnabled.set(enabled);
+    return oldValue;
   }
 
   @Override
@@ -1177,9 +1195,5 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void updateSpatialIndex(final LayerDataObject object,
     final Geometry oldGeometry) {
-  }
-
-  protected void removeForm(final LayerDataObject object) {
-    forms.remove(object);
   }
 }
