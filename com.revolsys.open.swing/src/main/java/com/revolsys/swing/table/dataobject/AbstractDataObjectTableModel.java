@@ -1,19 +1,18 @@
 package com.revolsys.swing.table.dataobject;
 
-import java.awt.Font;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.StringNumericComparator;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.table.BaseJxTable;
 
@@ -21,31 +20,38 @@ import com.revolsys.swing.table.BaseJxTable;
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
 
   private static final String[] COLUMN_NAMES = {
-    "#", "Attribute", "Value"
+    "#", "Name", "Value"
   };
 
   public static BaseJxTable create(final AbstractDataObjectTableModel model) {
     final BaseJxTable table = new BaseJxTable(model);
     table.setModel(model);
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.setAutoCreateColumnsFromModel(false);
 
     final DataObjectTableCellRenderer cellRenderer = new DataObjectTableCellRenderer();
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor();
 
     final DataObjectMetaData metaData = model.getMetaData();
-    int maxAttributeWidth = 0;
-    final JLabel label = new JLabel();
-    label.setFont(label.getFont().deriveFont(Font.BOLD));
-    for (final String attributeName : metaData.getAttributeNames()) {
-      label.setText(attributeName);
-      final int width = label.getMaximumSize().width;
-      if (width > maxAttributeWidth) {
-        maxAttributeWidth = width;
+
+    int maxTitleWidth = 100;
+    for (final Attribute attribute : metaData.getAttributes()) {
+      final String title = attribute.getTitle();
+      final int titleWidth = title.length() * 7;
+      if (titleWidth > maxTitleWidth) {
+        maxTitleWidth = titleWidth;
       }
+
     }
-    maxAttributeWidth += 7;
-    for (int i = 0; i < model.getColumnCount(); i++) {
+
+    final int columnCount = model.getColumnCount();
+    int columnWidth;
+    if (columnCount > 3) {
+      columnWidth = (740 - maxTitleWidth) / 2;
+    } else {
+      columnWidth = (740 - maxTitleWidth) / 2;
+    }
+    for (int i = 0; i < columnCount; i++) {
       final TableColumnExt column = table.getColumnExt(i);
       column.setCellRenderer(cellRenderer);
       if (i == 0) {
@@ -54,14 +60,16 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
         column.setMaxWidth(40);
         column.setComparator(new StringNumericComparator());
       } else if (i == 1) {
-        column.setMinWidth(maxAttributeWidth);
-        column.setPreferredWidth(maxAttributeWidth);
-        column.setMaxWidth(maxAttributeWidth);
-      } else if (i == 2) {
-        column.setCellEditor(cellEditor);
+        column.setMinWidth(maxTitleWidth);
+        column.setPreferredWidth(maxTitleWidth);
+        column.setMaxWidth(maxTitleWidth);
+      } else {
+        column.setPreferredWidth(columnWidth);
+        if (i == 2) {
+          column.setCellEditor(cellEditor);
+        }
       }
     }
-    table.packAll();
     return table;
   }
 

@@ -95,8 +95,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
 
-    menu.addMenuItem("table", new InvokeMethodAction("View Attributes",
-      "View Attributes", SilkIconLoader.getIcon("table_go"), LayerUtil.class,
+    menu.addMenuItem("table", new InvokeMethodAction("View Records",
+      "View Records", SilkIconLoader.getIcon("table_go"), LayerUtil.class,
       "showViewAttributes"));
 
     final EnableCheck hasSelectedObjects = new TreeItemPropertyEnableCheck(
@@ -1113,7 +1113,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               }
             }
             window = new JFrame(title);
-            window.add(new JScrollPane(form));
+            window.add(form);
             window.pack();
             window.setLocation(50, 50);
             // TODO smart location

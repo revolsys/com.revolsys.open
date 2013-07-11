@@ -147,7 +147,7 @@ public class DataObjectLayerForm extends JPanel implements
     setTransferHandler(transferHandler);
     setFont(SwingUtil.FONT);
 
-    addTabAllAttributes();
+    addTabAllFields();
     final boolean editable = layer.isEditable();
     setEditable(editable);
     getAllAttributes().setEditable(editable);
@@ -302,7 +302,7 @@ public class DataObjectLayerForm extends JPanel implements
     addRequiredFieldNames(Arrays.asList(requiredFieldNames));
   }
 
-  public void addTab(final int index, final String name,
+  public JScrollPane addTab(final int index, final String name,
     final Component component) {
     boolean init = false;
     final Container parent = tabs.getParent();
@@ -310,17 +310,19 @@ public class DataObjectLayerForm extends JPanel implements
       add(tabs, BorderLayout.CENTER);
       init = true;
     }
-    tabs.insertTab(name, null, component, null, index);
+    final JScrollPane scrollPane = new JScrollPane(component);
+    tabs.insertTab(name, null, scrollPane, null, index);
     if (init) {
       tabs.setSelectedIndex(0);
     }
+    return scrollPane;
   }
 
-  public void addTab(final String name, final Component component) {
-    addTab(tabs.getComponentCount(), name, component);
+  public JScrollPane addTab(final String name, final Component component) {
+    return addTab(tabs.getComponentCount(), name, component);
   }
 
-  protected void addTabAllAttributes() {
+  protected void addTabAllFields() {
     allAttributes = new DataObjectLayerAttributesTableModel(getLayer(), true);
     allAttributes.setReadOnlyFieldNames(getReadOnlyFieldNames());
     final BaseJxTable table = AbstractDataObjectTableModel.create(allAttributes);
@@ -417,7 +419,8 @@ public class DataObjectLayerForm extends JPanel implements
         cellEditor.addCellEditorListener(this);
       }
     }
-    final JScrollPane scrollPane = new JScrollPane(table);
+
+    final JScrollPane scrollPane = addTab("All Fields", table);
     int maxHeight = Integer.MAX_VALUE;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
       .getScreenDevices()) {
@@ -426,12 +429,10 @@ public class DataObjectLayerForm extends JPanel implements
       maxHeight = Math.min(bounds.height, maxHeight);
     }
     maxHeight -= 300;
-    final int preferredHeight = allAttributes.getRowCount() * 25;
-    scrollPane.setMinimumSize(new Dimension(0, preferredHeight));
-    scrollPane.setPreferredSize(new Dimension(800, Math.min(maxHeight,
-      allAttributes.getRowCount() * 25)));
+    final int preferredHeight = (allAttributes.getRowCount() + 1) * 20;
+    scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
-    addTab("All Attributes", scrollPane);
+    scrollPane.setPreferredSize(new Dimension(800, preferredHeight));
   }
 
   protected void addTabGeometry() {
@@ -460,7 +461,7 @@ public class DataObjectLayerForm extends JPanel implements
     // Cut, Copy Paste
     // TODO enable checks
 
-    toolBar.addButton("dnd", "Copy", "page_copy", editable, this,
+    toolBar.addButton("dnd", "Copy", "page_copy", (EnableCheck)null, this,
       "dataTransferCopy");
     toolBar.addButton("dnd", "Paste", "paste_plain", editable, this,
       "dataTransferPaste");
@@ -483,7 +484,6 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
     // Geometry manipulation
-
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
@@ -492,9 +492,9 @@ public class DataObjectLayerForm extends JPanel implements
           editable, this, "reverseGeometry");
         if (DirectionalAttributes.getProperty(metaData)
           .hasDirectionalAttributes()) {
-          toolBar.addButton("geometry", "Reverse Attributes",
-            "attributes_reverse", editable, this, "reverseAttributes");
-          toolBar.addButton("geometry", "Reverse Geometry & Attributes",
+          toolBar.addButton("geometry", "Reverse Fields", "attributes_reverse",
+            editable, this, "reverseAttributes");
+          toolBar.addButton("geometry", "Reverse Geometry & Fields",
             "attributes_line_reverse", editable, this,
             "reverseAttributesAndGeometry");
         }
@@ -1054,8 +1054,7 @@ public class DataObjectLayerForm extends JPanel implements
     dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
-    final JScrollPane scrollPane = new JScrollPane(this);
-    dialog.add(scrollPane, BorderLayout.CENTER);
+    dialog.add(this, BorderLayout.CENTER);
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     dialog.add(buttons, BorderLayout.SOUTH);
