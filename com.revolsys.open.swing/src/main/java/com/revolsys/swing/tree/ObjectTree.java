@@ -1,6 +1,7 @@
 package com.revolsys.swing.tree;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -19,6 +20,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
@@ -37,6 +39,37 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   private boolean menuEnabled = true;
 
   private static Object mouseClickItem = null;
+
+  public static void showMenu(final MenuFactory menuFactory,
+    final Object object, final Component component, final int x, final int y) {
+    if (menuFactory != null) {
+      mouseClickItem = object;
+      final JPopupMenu menu = menuFactory.createJPopupMenu();
+      if (menu != null) {
+        final int numItems = menu.getSubElements().length;
+        if (menu != null && numItems > 0) {
+          final Window window = SwingUtilities.windowForComponent(component);
+          if (window != null) {
+            if (window.isAlwaysOnTop()) {
+              window.setAlwaysOnTop(true);
+              window.setAlwaysOnTop(false);
+            }
+            window.toFront();
+          }
+          menu.show(component, x, y);
+          // TODO add listener to set item=null
+        }
+      }
+    }
+  }
+
+  public static void showMenu(final Object object, final Component component,
+    final int x, final int y) {
+    if (object != null) {
+      final MenuFactory menu = ObjectTreeModel.findMenu(object);
+      showMenu(menu, object, component, x, y);
+    }
+  }
 
   public ObjectTree(final ObjectTreeModel model) {
     super(model);
@@ -136,19 +169,9 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    final int x = e.getX();
-    final int y = e.getY();
-    final TreePath path = ObjectTree.this.getPathForLocation(x, y);
-    if (path != null) {
-      final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
-      if (nodeModel != null) {
-        final Object node = path.getLastPathComponent();
-        if (e.isPopupTrigger()) {
-          mouseClickItem = node;
-          popup(model, e);
-          repaint();
-        }
-      }
+    if (e.isPopupTrigger()) {
+      popup(model, e);
+      repaint();
     }
   }
 
@@ -156,19 +179,12 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   public void mouseReleased(final MouseEvent e) {
     if (e.isPopupTrigger()) {
       popup(model, e);
+      repaint();
     }
   }
 
   private void popup(final ObjectTreeModel model, final MouseEvent e) {
     if (menuEnabled) {
-      final Window window = SwingUtilities.windowForComponent(this);
-      if (window != null) {
-        if (window.isAlwaysOnTop()) {
-          window.setAlwaysOnTop(true);
-          window.setAlwaysOnTop(false);
-        }
-        window.toFront();
-      }
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = ObjectTree.this.getPathForLocation(x, y);
@@ -186,13 +202,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
         final Object node = path.getLastPathComponent();
         final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
         if (nodeModel != null) {
-          final JPopupMenu menu = nodeModel.getMenu(node).createJPopupMenu();
-          final int numItems = menu.getSubElements().length;
-          if (menu != null && numItems > 0) {
-            mouseClickItem = node;
-            menu.show(ObjectTree.this, x, y);
-            // TODO add listener to set item=null
-          }
+          final MenuFactory menu = nodeModel.getMenu(node);
+          showMenu(menu, node, this, x, y);
         }
       }
     }

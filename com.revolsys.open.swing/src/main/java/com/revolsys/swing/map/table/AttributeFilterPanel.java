@@ -29,6 +29,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
   ItemListener {
+
   private static final long serialVersionUID = 1L;
 
   private String previousAttributeName;
@@ -54,7 +55,10 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.metaData = layer.getMetaData();
     this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
     attributeNames.remove(metaData.getGeometryAttributeName());
-    nameField = new ComboBox(false, attributeNames.toArray());
+    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
+      metaData);
+    nameField = new ComboBox(converter, false, attributeNames.toArray());
+    nameField.setRenderer(converter);
     add(nameField);
 
     nameField.addActionListener(this);

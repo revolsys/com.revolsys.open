@@ -31,7 +31,6 @@ import com.revolsys.swing.listener.InvokeMethodSelectedItemListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
 import com.revolsys.swing.map.component.MapPointerLocation;
-import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
 import com.revolsys.swing.map.layer.Layer;
@@ -231,7 +230,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     addPointerLocation("Albers", 3005, 1000.0);
     addPointerLocation("Lat/Lon", 4269, 10000000.0);
-    statusBar.add(new MapScale(viewport));
   }
 
   protected void addToolBar() {

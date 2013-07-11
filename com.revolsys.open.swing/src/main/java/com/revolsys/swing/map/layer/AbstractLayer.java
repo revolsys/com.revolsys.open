@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -7,8 +8,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
+
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.gis.cs.BoundingBox;
@@ -16,14 +21,16 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
@@ -34,17 +41,23 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
-    menu.addMenuItemTitleIcon("zoom", "Zoom to Layer", "magnifier",
-      LayerUtil.class, "zoomToLayer");
+
+    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
+      "hasGeometry");
+    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
+      "magnifier", hasGeometry, "zoomToLayer"));
+
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
     menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
       null, "refresh"));
-    menu.addMenuItemTitleIcon("layer", "Delete Layer", "delete",
-      LayerUtil.class, "deleteLayer");
-    menu.addMenuItemTitleIcon("layer", "Layer Properties", "information",
-      LayerUtil.class, "showProperties");
+
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete Layer",
+      "delete", null, "deleteWithConfirm"));
+
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("Layer Properties",
+      "information", null, "showProperties"));
   }
 
   protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
@@ -135,6 +148,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
+    final DefaultSingleCDockable dockable = getProperty("TableView");
+    if (dockable != null) {
+      // TODO all this should be done by listeners
+      dockable.setVisible(false);
+    }
     firePropertyChange("deleted", false, true);
     if (layerGroup != null) {
       layerGroup.remove(this);
@@ -143,6 +161,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.layerGroup = null;
     this.propertyChangeSupport = null;
     this.renderer = null;
+  }
+
+  public void deleteWithConfirm() {
+    final int confirm = JOptionPane.showConfirmDialog(MapPanel.get(this),
+      "Delete the layer and any child layers? This action cannot be undone.",
+      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+    if (confirm == JOptionPane.OK_OPTION) {
+      delete();
+    }
   }
 
   protected boolean doSaveChanges() {
@@ -270,6 +297,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isHasChanges() {
     return false;
+  }
+
+  @Override
+  public boolean isHasGeometry() {
+    return true;
   }
 
   @Override
@@ -484,7 +516,30 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public void showProperties() {
+    showProperties(null);
+  }
+
+  @Override
+  public void showProperties(final String tabName) {
+    final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(this));
+    final TabbedValuePanel panel = createPropertiesPanel();
+    panel.setSelectdTab(tabName);
+    panel.showDialog(window);
+  }
+
+  @Override
   public String toString() {
     return getName();
+  }
+
+  public void zoomToLayer() {
+    final Project project = getProject();
+    final GeometryFactory geometryFactory = project.getGeometryFactory();
+    final BoundingBox boundingBox = getBoundingBox().convert(geometryFactory)
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
+
+    project.setViewBoundingBox(boundingBox);
   }
 }

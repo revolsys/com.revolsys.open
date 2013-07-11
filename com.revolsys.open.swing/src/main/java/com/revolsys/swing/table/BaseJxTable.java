@@ -126,6 +126,7 @@ public class BaseJxTable extends JXTable {
         setRowSorter(createDefaultRowSorter());
       }
     }
+    initializeColumnWidths();
   }
 
   @Override

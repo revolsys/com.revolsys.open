@@ -47,34 +47,37 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
     } else {
       name = "Hide zoomed in beyond (maximum) scale";
     }
-    final JMenu menu = new JMenu(name);
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
-      double layerScale;
-      if (min) {
-        layerScale = layer.getMinimumScale();
-      } else {
-        layerScale = layer.getMaximumScale();
-        if (layerScale == Long.MAX_VALUE) {
-          layerScale = 0;
-        }
-      }
-      for (final double scale : SCALES) {
-        String label;
-        if (scale == 0) {
-          label = "Unlimited";
+      if (layer.isHasGeometry()) {
+        final JMenu menu = new JMenu(name);
+        double layerScale;
+        if (min) {
+          layerScale = layer.getMinimumScale();
         } else {
-          label = MapScale.formatScale(scale);
+          layerScale = layer.getMaximumScale();
+          if (layerScale == Long.MAX_VALUE) {
+            layerScale = 0;
+          }
         }
-        final InvokeMethodAction action = new InvokeMethodAction(label, this,
-          "setScale", scale);
-        final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
-        final boolean selected = scale == layerScale;
-        menuItem.setSelected(selected);
-        menu.add(menuItem);
+        for (final double scale : SCALES) {
+          String label;
+          if (scale == 0) {
+            label = "Unlimited";
+          } else {
+            label = MapScale.formatScale(scale);
+          }
+          final InvokeMethodAction action = new InvokeMethodAction(label, this,
+            "setScale", scale);
+          final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
+          final boolean selected = scale == layerScale;
+          menuItem.setSelected(selected);
+          menu.add(menuItem);
+        }
+        return menu;
       }
     }
-    return menu;
+    return null;
   }
 
   @Override

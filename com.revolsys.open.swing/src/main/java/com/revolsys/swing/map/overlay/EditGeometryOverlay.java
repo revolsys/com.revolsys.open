@@ -178,8 +178,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private boolean dragged = false;
 
-  private Geometry moveGeometry;
-
   private java.awt.Point moveGeometryStart;
 
   public EditGeometryOverlay(final MapPanel map) {
@@ -195,11 +193,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
             final Geometry geometry = getCurrentGeometryFactory().copy(
               this.addGeometry);
             addCompleteAction.addComplete(this, geometry);
-            this.addCompleteAction = null;
-            this.addLayer = null;
-            this.addGeometry = null;
-            this.addGeometryDataType = null;
-            this.addGeometryPartDataType = null;
+            clearAddGeometry();
           }
         }
       } finally {
@@ -315,6 +309,16 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     return geometry;
   }
 
+  protected void clearAddGeometry() {
+    this.addCompleteAction = null;
+    this.addLayer = null;
+    this.addGeometry = null;
+    this.addGeometryDataType = null;
+    this.addGeometryPartDataType = null;
+    setXorGeometry(null);
+    repaint();
+  }
+
   public Point clearMouseOverGeometry() {
     clearMapCursor();
     if (mouseOverGeometry == null) {
@@ -336,10 +340,14 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
     repaint();
   }
 
-  protected void clearMoveGeometry() {
-    moveGeometry = null;
-    moveGeometryStart = null;
-    repaint();
+  protected boolean clearMoveGeometry() {
+    if (moveGeometryStart == null) {
+      return false;
+    } else {
+      moveGeometryStart = null;
+      repaint();
+      return true;
+    }
   }
 
   protected LineString createXorLine(final Coordinates c0, final Point p1) {
@@ -802,8 +810,12 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
         vertexMoveFinish(null);
       } else if (mouseOverSegment != null) {
         vertexAddFinish(null);
-      } else {
-        clearMoveGeometry();
+      } else if (clearMoveGeometry()) {
+      } else if (isModeAddGeometry()) {
+        if (addCompleteAction != null) {
+          addCompleteAction.addComplete(this, null);
+        }
+        clearAddGeometry();
       }
     } else if (keyCode == KeyEvent.VK_CONTROL) {
       if (!isModeAddGeometry()) {
@@ -922,7 +934,6 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       dragged = true;
       if (event.isAltDown() && mouseOverGeometry != null) {
         moveGeometryStart = event.getPoint();
-        moveGeometry = getGeometry();
         return;
       }
     }
@@ -997,7 +1008,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (moveGeometry != null) {
+    if (moveGeometryStart != null) {
       moveGeometryFinish(event);
     } else if (dragged && mouseOverVertexIndex != null) {
       vertexMoveFinish(event);
@@ -1036,8 +1047,8 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
           final int deltaX = mousePoint.x - moveGeometryStart.x;
           final int deltaY = mousePoint.y - moveGeometryStart.y;
           graphics.translate(deltaX, deltaY);
-          paintSelected(graphics, moveGeometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
-            VERTEX_STYLE);
+          paintSelected(graphics, getGeometry(), HIGHLIGHT_STYLE,
+            OUTLINE_STYLE, VERTEX_STYLE);
         }
       } finally {
         graphics.setTransform(transform);

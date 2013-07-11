@@ -2,23 +2,33 @@ package com.revolsys.swing.map.layer.grid;
 
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
+import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.CaseConverter;
+import com.revolsys.util.PreferencesUtil;
 
 public class GridLayer extends AbstractLayer {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
-    menu.addMenuItem("zoom", new ZoomToMapSheet());
+    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Mapsheet",
+      "magnifier_zoom_grid", null, "zoomTosheet"));
   }
 
   public static final LayerFactory<GridLayer> FACTORY = new InvokeMethodLayerFactory<GridLayer>(
@@ -70,14 +80,43 @@ public class GridLayer extends AbstractLayer {
     return grid;
   }
 
-  public void zoomToSheet(final String sheet) {
-    // final MapPanel layerViewPanel = context.getMapPanel();
-    // final Viewport2D viewport = layerViewPanel.getViewport();
-    // final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    // final RectangularMapTile tile = grid.getTileByName(sheet);
-    // final Polygon polygon = tile.getPolygon(geometryFactory, 50);
-    //
-    // viewport.setBoundingBox(BoundingBox.getBoundingBox(polygon));
-    // layerViewPanel.fireSelectionChanged();
+  public void zoomTosheet() {
+    final Project project = getProject();
+    if (project != null) {
+      final MapPanel map = MapPanel.get(this);
+      final RectangularMapGrid grid = getGrid();
+      final String gridName = grid.getName();
+      final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
+        + "Mapsheet";
+      String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
+      mapsheet = JOptionPane.showInputDialog(map, "Enter name of the"
+        + gridName + " mapsheet to zoom to", mapsheet);
+      zoomTosheet(mapsheet);
+    }
+  }
+
+  public void zoomTosheet(final String mapsheet) {
+    final Project project = getProject();
+    if (project != null) {
+      if (StringUtils.hasText(mapsheet)) {
+        final MapPanel map = MapPanel.get(this);
+        final RectangularMapGrid grid = getGrid();
+        final String gridName = grid.getName();
+        try {
+          final RectangularMapTile mapTile = grid.getTileByName(mapsheet);
+          final BoundingBox boundingBox = mapTile.getBoundingBox();
+          project.setViewBoundingBox(boundingBox);
+        } catch (final Throwable e) {
+          final String message = "Invalid mapsheet " + mapsheet + " for "
+            + gridName;
+          LoggerFactory.getLogger(getClass()).error(message, e);
+          JOptionPane.showMessageDialog(map, message);
+        } finally {
+          final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
+            + "Mapsheet";
+          PreferencesUtil.setString(getClass(), preferenceName, mapsheet);
+        }
+      }
+    }
   }
 }

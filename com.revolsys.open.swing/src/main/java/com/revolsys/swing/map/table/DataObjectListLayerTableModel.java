@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -28,16 +26,9 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
     final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
-    final DataObjectRowTable table = new DataObjectRowTable(model);
-
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);
-    final TableColumnModel columnModel = table.getColumnModel();
-    for (int i = 0; i < columnModel.getColumnCount(); i++) {
-      final TableColumn column = columnModel.getColumn(i);
-
-      column.setCellRenderer(cellRenderer);
-    }
+    final DataObjectRowTable table = new DataObjectRowTable(model, cellRenderer);
 
     table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
     layer.addPropertyChangeListener("selected",

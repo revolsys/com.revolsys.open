@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.dataobject.row;
 
-import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -9,6 +8,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -23,12 +23,16 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
   public DataObjectRowTable(final DataObjectRowTableModel model) {
+    this(model, new DataObjectRowTableCellRenderer());
+  }
+
+  public DataObjectRowTable(final DataObjectRowTableModel model,
+    final TableCellRenderer cellRenderer) {
     super(model);
     setSortable(false);
 
     final DataObjectMetaData metaData = model.getMetaData();
 
-    final DataObjectRowTableCellRenderer cellRenderer = new DataObjectRowTableCellRenderer();
     final JTableHeader tableHeader = getTableHeader();
 
     final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
@@ -39,24 +43,6 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       if (Geometry.class.isAssignableFrom(attributeClass)) {
         removeColumns.add(column);
       } else {
-        final String columnName = model.getColumnName(i) + "XX";
-
-        final Attribute attribute = model.getColumnAttribute(i);
-        final int attributeLength = Math.min(
-          Math.max(columnName.length(), attribute.getMaxStringLength()), 40) + 2;
-        final StringBuffer text = new StringBuffer(attributeLength);
-        for (int j = 0; j < attributeLength + 2; j++) {
-          text.append('X');
-        }
-
-        final Component c = tableHeader.getDefaultRenderer()
-          .getTableCellRendererComponent(null, text.toString(), false, false,
-            0, 0);
-        column.setMinWidth(c.getMinimumSize().width);
-        column.setMaxWidth(c.getMaximumSize().width);
-        column.setPreferredWidth(c.getPreferredSize().width);
-        column.setWidth(column.getPreferredWidth());
-
         column.setCellRenderer(cellRenderer);
       }
     }
@@ -70,6 +56,25 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   public DataObjectMetaData getMetaData() {
     final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
     return model.getMetaData();
+  }
+
+  @Override
+  protected void initializeColumnPreferredWidth(final TableColumn column) {
+    super.initializeColumnPreferredWidth(column);
+    final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
+    final DataObjectMetaData metaData = model.getMetaData();
+    final int viewIndex = column.getModelIndex();
+    final String attributeName = model.getAttributeName(viewIndex);
+    final Attribute attribute = metaData.getAttribute(attributeName);
+    Integer columnWidth = attribute.getProperty("tableColumnWidth");
+    final String columnName = attribute.getTitle();
+    if (columnWidth == null) {
+      columnWidth = attribute.getMaxStringLength() * 7;
+      columnWidth = Math.min(columnWidth, 200);
+      attribute.setProperty("tableColumnWidth", columnWidth);
+    }
+    column.setMinWidth(columnName.length() * 7 + 15);
+    column.setPreferredWidth(columnWidth);
   }
 
   @Override
@@ -109,8 +114,8 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     final TableModel model = getModel();
     if (model instanceof DataObjectLayerTableModel) {
       final DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
-      String mode = layerModel.getAttributeFilterMode();
-      List<String> sortableModes = layerModel.getSortableModes();
+      final String mode = layerModel.getAttributeFilterMode();
+      final List<String> sortableModes = layerModel.getSortableModes();
       if (sortableModes.contains(mode)) {
         setSortable(true);
       } else {

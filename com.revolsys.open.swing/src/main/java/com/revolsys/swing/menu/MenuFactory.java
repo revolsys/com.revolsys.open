@@ -93,6 +93,16 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   public void addMenuItem(final String groupName, final int index,
+    final Action action) {
+    if (action == this) {
+      throw new RuntimeException("Cannot recursively add");
+    }
+    final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
+      action);
+    addComponentFactory(groupName, index, factory);
+  }
+
+  public void addMenuItem(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
@@ -160,6 +170,12 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public void close(final Component component) {
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   @Override
   public JMenu createComponent() {
     final JMenu menu = new JMenu(name);
@@ -183,26 +199,26 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
     return menu;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(name);
     boolean first = true;
     for (final String groupName : groupNames) {
+      boolean groupHasItem = false;
       final List<ComponentFactory<?>> factories = groups.get(groupName);
       if (!factories.isEmpty()) {
-        if (first) {
-          first = false;
-        } else {
-          menu.addSeparator();
-        }
+
         for (final ComponentFactory<?> factory : factories) {
+
           final Component component = factory.createComponent();
           if (component != null) {
+            if (!groupHasItem) {
+              groupHasItem = true;
+              if (first) {
+                first = false;
+              } else {
+                menu.addSeparator();
+              }
+            }
             menu.add(component);
           }
         }

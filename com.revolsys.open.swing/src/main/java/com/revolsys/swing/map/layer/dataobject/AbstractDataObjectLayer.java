@@ -99,27 +99,26 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       "View Attributes", SilkIconLoader.getIcon("table_go"), LayerUtil.class,
       "showViewAttributes"));
 
-    menu.addMenuItem("zoom", new InvokeMethodAction("Zoom to Selected",
-      "Zoom to Selected", SilkIconLoader.getIcon("magnifier_zoom_selected"),
-      LayerUtil.class, "zoomToLayerSelected"));
+    final EnableCheck hasSelectedObjects = new TreeItemPropertyEnableCheck(
+      "hasSelectedObjects");
+    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
+      "hasGeometry");
+    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
+      "magnifier_zoom_selected", new AndEnableCheck(hasGeometry,
+        hasSelectedObjects), "zoomToSelected"));
 
     final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
     final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
       false);
     final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
     final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddObjects");
-    final EnableCheck canEdit = new TreeItemPropertyEnableCheck(
-      "canEditObjects");
     final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
       "canDeleteObjects");
-    final EnableCheck hasSelectedObjects = new TreeItemPropertyEnableCheck(
-      "hasSelectedObjects");
     final EnableCheck canMergeObjects = new TreeItemPropertyEnableCheck(
       "canMergeObjects");
 
-    menu.addCheckboxMenuItem("edit", new InvokeMethodAction("Editable",
-      "Editable", SilkIconLoader.getIcon("pencil"), readonly, LayerUtil.class,
-      "toggleEditable"), editable);
+    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
+      "pencil", readonly, "toggleEditable"), editable);
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
       "table_save", hasChanges, "saveChanges"));
@@ -138,9 +137,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       "Merged Selected Records", "shape_group", canMergeObjects,
       "mergeSelectedObjects"));
 
-    menu.addMenuItem("layer", 0, "Layer Style", "palette", LayerUtil.class,
-      "showProperties", "Style");
-
+    menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
+      "palette", hasGeometry, "showProperties", "Style"));
   }
 
   private BoundingBox boundingBox = new BoundingBox();
@@ -278,6 +276,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     selectedObjectsIndex = null;
   }
 
+  @SuppressWarnings("unchecked")
   public <V extends LayerDataObject> V copyObject(final V object) {
     final LayerDataObject copy = createObject();
     copy.setValues(object);
@@ -342,9 +341,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     propertiesPanel.addTab("Fields", fieldPanel);
 
     final LayerRenderer<? extends Layer> renderer = getRenderer();
-    final ValueField stylePanel = renderer.createStylePanel();
-    if (stylePanel != null) {
-      propertiesPanel.addTab(stylePanel);
+    if (renderer != null) {
+      final ValueField stylePanel = renderer.createStylePanel();
+      if (stylePanel != null) {
+        propertiesPanel.addTab(stylePanel);
+      }
     }
     return propertiesPanel;
   }
@@ -709,6 +710,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       return false;
     }
+  }
+
+  @Override
+  public boolean isHasGeometry() {
+    return getGeometryAttributeName() != null;
   }
 
   public boolean isHasSelectedObjects() {
@@ -1173,6 +1179,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  public void toggleEditable() {
+    final boolean editable = isEditable();
+    setEditable(!editable);
+  }
+
   @Override
   public void unselectObjects(
     final Collection<? extends LayerDataObject> objects) {
@@ -1195,5 +1206,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void updateSpatialIndex(final LayerDataObject object,
     final Geometry oldGeometry) {
+  }
+
+  public void zoomToSelected() {
+    final Project project = getProject();
+    final GeometryFactory geometryFactory = project.getGeometryFactory();
+    final BoundingBox boundingBox = getSelectedBoundingBox().convert(
+      geometryFactory).expandPercent(0.1);
+    project.setViewBoundingBox(boundingBox);
   }
 }

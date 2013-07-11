@@ -37,9 +37,7 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   public ComboBox(final boolean editable, final Object... items) {
-    super(items);
-    setEditable(editable);
-    AutoCompleteDecorator.decorate(this);
+    this(null, editable, items);
   }
 
   public ComboBox(final ComboBoxModel model) {
@@ -48,6 +46,13 @@ public class ComboBox extends JComboBox implements Field {
 
   public ComboBox(final Object... items) {
     this(false, items);
+  }
+
+  public ComboBox(final ObjectToStringConverter converter,
+    final boolean editable, final Object... items) {
+    super(items);
+    setEditable(editable);
+    AutoCompleteDecorator.decorate(this, converter);
   }
 
   public ComboBox(final String fieldName, final ComboBoxModel model) {

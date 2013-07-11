@@ -1,21 +1,14 @@
 package com.revolsys.swing.map.util;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -26,8 +19,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.component.TabbedValuePanel;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerFactory;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -87,34 +78,6 @@ public class LayerUtil {
       final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
       dataObjectLayer.addNewObject();
     }
-  }
-
-  public static void deleteLayer() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      final int confirm = JOptionPane.showConfirmDialog(MapPanel.get(layer),
-        "Delete the layer and any child layers? This action cannot be undone.",
-        "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-      if (confirm == JOptionPane.OK_OPTION) {
-        deleteLayer(layer);
-      }
-    }
-  }
-
-  public static void deleteLayer(final Layer layer) {
-    if (layer instanceof LayerGroup) {
-      final LayerGroup layerGroup = (LayerGroup)layer;
-      for (final Layer childLayer : new ArrayList<Layer>(layerGroup)) {
-        deleteLayer(childLayer);
-      }
-    }
-    // TODO all this should be done by listeners
-
-    final DefaultSingleCDockable dockable = layer.getProperty("TableView");
-    if (dockable != null) {
-      dockable.setVisible(false);
-    }
-    layer.delete();
   }
 
   public static LayerGroup getCurrentLayerGroup() {
@@ -252,26 +215,14 @@ public class LayerUtil {
   }
 
   public static void showProperties() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    showProperties(layer);
-  }
-
-  public static void showProperties(final Layer layer) {
-    showProperties(layer, null);
-  }
-
-  public static void showProperties(final Layer layer, final String tabName) {
-    if (layer != null) {
-      final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(layer));
-      final TabbedValuePanel panel = layer.createPropertiesPanel();
-      panel.setSelectdTab(tabName);
-      panel.showDialog(window);
-    }
+    showProperties(null);
   }
 
   public static void showProperties(final String tabName) {
     final Layer layer = ObjectTree.getMouseClickItem();
-    showProperties(layer, tabName);
+    if (layer != null) {
+      layer.showProperties(tabName);
+    }
   }
 
   public static void showViewAttributes() {
@@ -279,12 +230,6 @@ public class LayerUtil {
     if (layer != null) {
       layer.showViewAttributes();
     }
-  }
-
-  public static void toggleEditable() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    final boolean editable = layer.isEditable();
-    layer.setEditable(!editable);
   }
 
   public static void zoomTo(final Geometry geometry) {
@@ -296,32 +241,6 @@ public class LayerUtil {
         .expandPercent(0.1)
         .clipToCoordinateSystem();
 
-      project.setViewBoundingBox(boundingBox);
-    }
-  }
-
-  public static void zoomToLayer() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      final Project project = layer.getProject();
-      final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = layer.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
-
-      project.setViewBoundingBox(boundingBox);
-    }
-  }
-
-  public static void zoomToLayerSelected() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      final Project project = layer.getProject();
-      final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = layer.getSelectedBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }

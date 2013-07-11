@@ -12,6 +12,8 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import com.revolsys.util.OperatingSystemUtil;
+
 public class SilkIconLoader {
   private static final String RESOURCE_FOLDER = "/"
     + SilkIconLoader.class.getPackage().getName().replace(".", "/") + "/icons/";
@@ -27,11 +29,18 @@ public class SilkIconLoader {
 
   public static Cursor getCursor(final String imageName, final int dx,
     final int dy) {
-    final Image image = getImage(imageName);
+    Image image = getImage(imageName);
     if (image == null) {
       return null;
     } else {
       final Toolkit toolkit = Toolkit.getDefaultToolkit();
+      if (OperatingSystemUtil.isWindows()) {
+        final BufferedImage newImage = new BufferedImage(32, 32,
+          BufferedImage.TYPE_INT_ARGB);
+        final Graphics graphics = newImage.getGraphics();
+        graphics.drawImage(image, 0, 0, null);
+        image = newImage;
+      }
       return toolkit.createCustomCursor(image, new Point(dx, dy), imageName);
     }
   }

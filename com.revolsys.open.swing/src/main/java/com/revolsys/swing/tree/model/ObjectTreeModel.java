@@ -30,6 +30,17 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<MenuFactory>();
 
+  public static MenuFactory findMenu(final Class<?> clazz) {
+    synchronized (CLASS_MENUS) {
+      return CLASS_MENUS.find(clazz);
+    }
+  }
+
+  public static MenuFactory findMenu(final Object object) {
+    final Class<?> clazz = object.getClass();
+    return findMenu(clazz);
+  }
+
   public static MenuFactory getMenu(final Class<?> layerClass) {
     if (layerClass == null) {
       return new MenuFactory();
@@ -179,10 +190,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         return popupMenu;
       }
     }
-    final Class<?> clazz = object.getClass();
-    synchronized (CLASS_MENUS) {
-      return CLASS_MENUS.find(clazz);
-    }
+    return findMenu(object);
   }
 
   public ObjectTreeNodeModel<Object, Object> getNodeModel(final Class<?> clazz) {

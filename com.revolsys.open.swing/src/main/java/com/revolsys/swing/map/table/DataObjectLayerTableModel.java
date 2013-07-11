@@ -14,8 +14,6 @@ import java.util.Set;
 import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import com.revolsys.collection.LruMap;
 import com.revolsys.gis.cs.BoundingBox;
@@ -54,20 +52,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       final List<String> columnNames = layer.getColumnNames();
       final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
         layer, columnNames);
-      final DataObjectRowTable table = new DataObjectRowTable(model);
+      final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
+        model);
+      final DataObjectRowTable table = new DataObjectRowTable(model,
+        cellRenderer);
 
       ModifiedPredicate.add(table);
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
-        model);
-      final TableColumnModel columnModel = table.getColumnModel();
-      for (int i = 0; i < columnModel.getColumnCount(); i++) {
-        final TableColumn column = columnModel.getColumn(i);
-
-        column.setCellRenderer(cellRenderer);
-      }
       table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
       layer.addPropertyChangeListener("selected",
         new InvokeMethodPropertyChangeListener(table, "repaint"));

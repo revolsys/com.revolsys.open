@@ -29,6 +29,8 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowPropertyEnableCheck;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowRunnable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.tree.ObjectTree;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("serial")
@@ -61,7 +63,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
     final EnableCheck deletableEnableCheck = new DataObjectRowPropertyEnableCheck(
       "deletable");
-    menu.addMenuItemTitleIcon("record", "Delete Record", "table_delete",
+    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
       deletableEnableCheck, this, "deleteRecord");
 
     final EnableCheck modifiedEnableCheck = new DataObjectRowPropertyEnableCheck(
@@ -75,12 +77,12 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
     final ToolBar toolBar = getToolBar();
 
+    final MenuFactory menuFactory = ObjectTreeModel.findMenu(layer);
+    if (menuFactory != null) {
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+        ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
+    }
     toolBar.addComponent("count", new TableRowCount(tableModel));
-
-    final EnableCheck canAddObjectsEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "canAddObjects");
-    toolBar.addButton("record", "Add New Record", "table_row_insert",
-      canAddObjectsEnableCheck, layer, "addNewObject");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       layer);

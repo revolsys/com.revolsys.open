@@ -10,10 +10,10 @@ import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer> {
-  void addPropertyChangeListener(final PropertyChangeListener listener);
+  void addPropertyChangeListener(PropertyChangeListener listener);
 
-  void addPropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener);
+  void addPropertyChangeListener(String propertyName,
+    PropertyChangeListener listener);
 
   TabbedValuePanel createPropertiesPanel();
 
@@ -47,6 +47,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   boolean isHasChanges();
 
+  boolean isHasGeometry();
+
   boolean isQueryable();
 
   boolean isQuerySupported();
@@ -65,10 +67,10 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   void refresh();
 
-  void removePropertyChangeListener(final PropertyChangeListener listener);
+  void removePropertyChangeListener(PropertyChangeListener listener);
 
-  void removePropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener);
+  void removePropertyChangeListener(String propertyName,
+    PropertyChangeListener listener);
 
   boolean saveChanges();
 
@@ -101,4 +103,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);
+
+  void showProperties();
+
+  void showProperties(String tabName);
 }

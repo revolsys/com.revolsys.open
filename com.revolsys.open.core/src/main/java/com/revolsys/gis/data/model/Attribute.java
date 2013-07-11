@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.util.CaseConverter;
 
@@ -283,6 +284,8 @@ public class Attribute extends AbstractObjectWithProperties implements
     }
     if (Number.class.isAssignableFrom(type.getJavaClass())) {
       length += 1;
+    } else if (DataTypes.DATE.equals(type)) {
+      return 10;
     }
     return length;
   }
