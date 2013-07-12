@@ -72,12 +72,15 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerAttributesTableModel;
 import com.revolsys.swing.map.util.LayerUtil;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellRenderer;
 import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.tree.ObjectTree;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
@@ -458,6 +461,11 @@ public class DataObjectLayerForm extends JPanel implements
     final boolean hasGeometry = geometryAttribute != null;
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
 
+    final MenuFactory menuFactory = ObjectTreeModel.findMenu(layer);
+    if (menuFactory != null) {
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+        ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
+    }
     // Cut, Copy Paste
     // TODO enable checks
 
