@@ -1,7 +1,8 @@
-package com.revolsys.swing.map.form;
+package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.swing.JComponent;
@@ -9,14 +10,16 @@ import javax.swing.TransferHandler;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.swing.component.MapTransferable;
+import com.revolsys.swing.dnd.transferable.DataObjectTransferable;
+import com.revolsys.swing.dnd.transferable.MapTransferable;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
 
-public class DataObjectFormTransferHandler extends TransferHandler {
+public class DataObjectLayerFormTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
   private final DataObjectLayerForm form;
 
-  public DataObjectFormTransferHandler(final DataObjectLayerForm form) {
+  public DataObjectLayerFormTransferHandler(final DataObjectLayerForm form) {
     this.form = form;
   }
 
@@ -25,6 +28,8 @@ public class DataObjectFormTransferHandler extends TransferHandler {
     final DataFlavor[] transferFlavors) {
     for (final DataFlavor dataFlavor : transferFlavors) {
       if (MapTransferable.MAP_FLAVOR.equals(dataFlavor)) {
+        return true;
+      } else if (DataObjectTransferable.DATA_OBJECT_FLAVOR.equals(dataFlavor)) {
         return true;
       }
     }
@@ -43,13 +48,24 @@ public class DataObjectFormTransferHandler extends TransferHandler {
     return COPY;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
+   @Override
   public boolean importData(final JComponent comp,
     final Transferable transferable) {
-    if (transferable.isDataFlavorSupported(MapTransferable.MAP_FLAVOR)) {
+    for (final DataFlavor dataFlavor : Arrays.asList(
+      DataObjectTransferable.DATA_OBJECT_FLAVOR, MapTransferable.MAP_FLAVOR)) {
+      if (pasteValues(transferable, dataFlavor)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+   @SuppressWarnings("unchecked")
+    public boolean pasteValues(final Transferable transferable,
+    final DataFlavor dataFlavor) {
+    if (transferable.isDataFlavorSupported(dataFlavor)) {
       try {
-        final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(MapTransferable.MAP_FLAVOR);
+        final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(dataFlavor);
         form.pasteValues(map);
         return true;
       } catch (final Throwable e) {

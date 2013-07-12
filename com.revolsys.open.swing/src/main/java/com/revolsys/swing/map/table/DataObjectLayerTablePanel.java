@@ -124,7 +124,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public void deleteRecord() {
     final LayerDataObject object = getEventRowObject();
-    layer.deleteObjects(object);
+    layer.deleteRecords(object);
   }
 
   public void editRecord() {

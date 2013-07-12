@@ -16,21 +16,21 @@ import com.revolsys.swing.map.layer.Layer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
-  void addNewObject();
+  void addNewRecord();
 
-  void addSelectedObjects(Collection<? extends LayerDataObject> objects);
+  void addSelectedRecords(Collection<? extends LayerDataObject> records);
 
-  void addSelectedObjects(LayerDataObject... objects);
+  void addSelectedRecords(LayerDataObject... records);
 
-  void clearSelectedObjects();
+  void clearSelectedRecords();
 
-  LayerDataObject createObject();
+  LayerDataObject createRecord();
 
   Component createTablePanel();
 
-  void deleteObjects(Collection<? extends LayerDataObject> objects);
+  void deleteRecords(Collection<? extends LayerDataObject> records);
 
-  void deleteObjects(LayerDataObject... object);
+  void deleteRecords(LayerDataObject... record);
 
   int getChangeCount();
 
@@ -44,83 +44,83 @@ public interface DataObjectLayer extends Layer {
 
   DataType getGeometryType();
 
-  List<LayerDataObject> getMergeableSelectedObjects();
+  List<LayerDataObject> getMergeableSelectedRecords();
 
   DataObjectMetaData getMetaData();
 
   int getNewObjectCount();
 
-  List<LayerDataObject> getNewObjects();
-
-  LayerDataObject getObject(int row);
-
-  LayerDataObject getObjectById(Object id);
-
-  List<LayerDataObject> getObjects();
+  List<LayerDataObject> getNewRecords();
 
   Query getQuery();
+
+  LayerDataObject getRecord(int row);
+
+  LayerDataObject getRecordById(Object id);
+
+  List<LayerDataObject> getRecords();
 
   int getRowCount();
 
   int getRowCount(Query query);
 
-  List<LayerDataObject> getSelectedObjects();
+  List<LayerDataObject> getSelectedRecords();
 
-  List<LayerDataObject> getSelectedObjects(BoundingBox boundingBox);
+  List<LayerDataObject> getSelectedRecords(BoundingBox boundingBox);
 
   int getSelectionCount();
 
-  boolean isCanAddObjects();
+  boolean isCanAddRecords();
 
-  boolean isCanDeleteObjects();
+  boolean isCanDeleteRecords();
 
-  boolean isCanEditObjects();
+  boolean isCanEditRecords();
 
-  boolean isDeleted(LayerDataObject object);
+  boolean isDeleted(LayerDataObject record);
 
   boolean isEventsEnabled();
 
   @Override
   boolean isHasChanges();
 
-  boolean isHidden(LayerDataObject object);
+  boolean isHidden(LayerDataObject record);
 
-  boolean isModified(LayerDataObject object);
+  boolean isModified(LayerDataObject record);
 
-  boolean isNew(LayerDataObject object);
+  boolean isNew(LayerDataObject record);
 
-  boolean isSelected(LayerDataObject object);
+  boolean isSelected(LayerDataObject record);
 
-  boolean isVisible(LayerDataObject object);
+  boolean isVisible(LayerDataObject record);
 
   List<LayerDataObject> query(Geometry geometry, double distance);
 
   List<LayerDataObject> query(Query query);
 
-  void revertChanges(LayerDataObject object);
+  void revertChanges(LayerDataObject record);
 
-  boolean saveChanges(LayerDataObject object);
+  boolean saveChanges(LayerDataObject record);
 
   void setQuery(Query query);
 
-  void setSelectedObjects(BoundingBox boundingBox);
+  void setSelectedRecords(BoundingBox boundingBox);
 
-  void setSelectedObjects(Collection<LayerDataObject> objects);
+  void setSelectedRecords(Collection<LayerDataObject> records);
 
-  void setSelectedObjects(LayerDataObject... selectedObjects);
+  void setSelectedRecords(LayerDataObject... records);
 
-  void setSelectedObjectsById(Object sessionId);
+  void setSelectedRecordsById(Object id);
 
   int setSelectedWithinDistance(boolean selected, Geometry geometry,
     int distance);
 
   LayerDataObject showAddForm(Map<String, Object> parameters);
 
-  <V extends JComponent> V showForm(final LayerDataObject object);
+  <V extends JComponent> V showForm(final LayerDataObject record);
 
-  void showViewAttributes();
+  void showRecordsTable();
 
-  void unselectObjects(Collection<? extends LayerDataObject> objects);
+  void unselectRecords(Collection<? extends LayerDataObject> records);
 
-  void unselectObjects(LayerDataObject... objects);
+  void unselectRecords(LayerDataObject... records);
 }

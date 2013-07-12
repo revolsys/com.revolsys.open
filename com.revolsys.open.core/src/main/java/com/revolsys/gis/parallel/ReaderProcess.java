@@ -3,29 +3,29 @@ package com.revolsys.gis.parallel;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.io.DataObjectReader;
+import com.revolsys.gis.io.DataObjectIterator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.AbstractOutProcess;
 
 public class ReaderProcess extends AbstractOutProcess<DataObject> {
-  private DataObjectReader reader;
+  private DataObjectIterator reader;
 
   public ReaderProcess() {
 
   }
 
   public ReaderProcess(final Channel<DataObject> out,
-    final DataObjectReader reader) {
+    final DataObjectIterator reader) {
     super(out);
     this.reader = reader;
   }
 
-  public ReaderProcess(final DataObjectReader reader) {
+  public ReaderProcess(final DataObjectIterator reader) {
     this.reader = reader;
   }
 
-  public ReaderProcess(final DataObjectReader reader, final int bufferSize) {
+  public ReaderProcess(final DataObjectIterator reader, final int bufferSize) {
     super(bufferSize);
     this.reader = reader;
   }
@@ -33,7 +33,7 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
   /**
    * @return the reader
    */
-  public DataObjectReader getReader() {
+  public DataObjectIterator getReader() {
     return reader;
   }
 
@@ -62,7 +62,7 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
   /**
    * @param reader the reader to set
    */
-  public void setReader(final DataObjectReader reader) {
+  public void setReader(final DataObjectIterator reader) {
     this.reader = reader;
   }
 

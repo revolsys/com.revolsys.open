@@ -49,7 +49,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     final List<String> columnNames) {
     super(layer, columnNames);
     this.layer = layer;
-    layer.addPropertyChangeListener("objects", this);
+    layer.addPropertyChangeListener("records", this);
     setEditable(false);
   }
 
@@ -76,11 +76,11 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
   @Override
   public LayerDataObject getObject(final int index) {
-    return layer.getObject(index);
+    return layer.getRecord(index);
   }
 
   public List<LayerDataObject> getObjects() {
-    return layer.getObjects();
+    return layer.getRecords();
   }
 
   public Set<PropertyChangeListener> getPropertyChangeListeners() {

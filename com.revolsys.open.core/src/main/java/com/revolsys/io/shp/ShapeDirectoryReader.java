@@ -28,7 +28,7 @@ import com.revolsys.gis.data.io.DataObjectReader;
 
 /**
  * <p>
- * The ShapeDirectoryReader is a {@link DataObjectReader} that can read .shp
+ * The ShapeDirectoryReader is a {@link DataObjectIterator} that can read .shp
  * data files contained in a single directory. The reader will iterate through
  * the .shp files in alpabetical order returning all features.
  * </p>

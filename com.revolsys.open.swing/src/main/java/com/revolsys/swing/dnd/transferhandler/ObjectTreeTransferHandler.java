@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -12,6 +12,7 @@ import javax.swing.tree.TreePath;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 

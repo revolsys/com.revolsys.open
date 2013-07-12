@@ -64,6 +64,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
+import com.revolsys.swing.dnd.transferhandler.DataObjectLayerFormTransferHandler;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
@@ -145,7 +146,7 @@ public class DataObjectLayerForm extends JPanel implements
     map.put("copy", TransferHandler.getCopyAction());
     map.put("paste", TransferHandler.getPasteAction());
 
-    final DataObjectFormTransferHandler transferHandler = new DataObjectFormTransferHandler(
+    final DataObjectLayerFormTransferHandler transferHandler = new DataObjectLayerFormTransferHandler(
       this);
     setTransferHandler(transferHandler);
     setFont(SwingUtil.FONT);
@@ -170,7 +171,7 @@ public class DataObjectLayerForm extends JPanel implements
   public void actionAddCancel() {
     final DataObjectLayer layer = getLayer();
     final LayerDataObject object = getObject();
-    layer.deleteObjects(object);
+    layer.deleteRecords(object);
     this.object = null;
     closeWindow();
   }
@@ -179,7 +180,7 @@ public class DataObjectLayerForm extends JPanel implements
     final DataObjectLayer layer = getLayer();
     final LayerDataObject object = getObject();
     layer.saveChanges(object);
-    layer.addSelectedObjects(object);
+    layer.addSelectedRecords(object);
     closeWindow();
   }
 

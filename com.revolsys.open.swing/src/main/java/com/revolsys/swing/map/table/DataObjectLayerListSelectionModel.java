@@ -23,7 +23,7 @@ public class DataObjectLayerListSelectionModel extends
     super.addSelectionInterval(index0, index1);
     final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
-    layer.addSelectedObjects(objects);
+    layer.addSelectedRecords(objects);
   }
 
   protected List<LayerDataObject> getObjects(final int index0, final int index1) {
@@ -56,7 +56,7 @@ public class DataObjectLayerListSelectionModel extends
     super.removeSelectionInterval(index0, index1);
     final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
-    layer.unselectObjects(objects);
+    layer.unselectRecords(objects);
   }
 
   @Override
@@ -64,6 +64,6 @@ public class DataObjectLayerListSelectionModel extends
     super.setSelectionInterval(index0, index1);
     final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = model.getLayer();
-    layer.setSelectedObjects(objects);
+    layer.setSelectedRecords(objects);
   }
 }

@@ -2,15 +2,15 @@ package com.revolsys.gis.io;
 
 import com.revolsys.gis.data.model.DataObject;
 
-public class StatisticsReader implements DataObjectReader {
-  private DataObjectReader reader;
+public class StatisticsReader implements DataObjectIterator {
+  private DataObjectIterator reader;
 
   private Statistics statistics;
 
   public StatisticsReader() {
   }
 
-  public StatisticsReader(final DataObjectReader reader) {
+  public StatisticsReader(final DataObjectIterator reader) {
     setReader(reader);
   }
 
@@ -23,7 +23,7 @@ public class StatisticsReader implements DataObjectReader {
   /**
    * @return the reader
    */
-  public DataObjectReader getReader() {
+  public DataObjectIterator getReader() {
     return reader;
   }
 
@@ -62,7 +62,7 @@ public class StatisticsReader implements DataObjectReader {
   /**
    * @param reader the reader to set
    */
-  public void setReader(final DataObjectReader reader) {
+  public void setReader(final DataObjectIterator reader) {
     this.reader = reader;
     if (statistics == null) {
       setStatistics(new Statistics("Read " + reader.toString()));

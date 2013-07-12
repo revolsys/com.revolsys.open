@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.dnd.transferable;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -18,8 +18,8 @@ public class TreePathListTransferable implements Transferable {
   public static final DataFlavor[] FLAVORS;
   static {
     try {
-      String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=\""
-        + TreePathListTransferable.class.getName() + "\"";
+      final String mimeType = DataFlavor.javaJVMLocalObjectMimeType
+        + ";class=\"" + TreePathListTransferable.class.getName() + "\"";
       FLAVOR = new DataFlavor(mimeType);
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException("Flavour not supported");
@@ -41,7 +41,7 @@ public class TreePathListTransferable implements Transferable {
     this(Arrays.asList(paths));
   }
 
-  protected List<TreePath> getPaths() {
+  public List<TreePath> getPaths() {
     return paths;
   }
 
@@ -62,16 +62,15 @@ public class TreePathListTransferable implements Transferable {
 
   @Override
   public boolean isDataFlavorSupported(final DataFlavor flavor) {
-    boolean supported = FLAVOR.equals(flavor);
+    final boolean supported = FLAVOR.equals(flavor);
     return supported;
   }
 
-  protected boolean isSameParent(final TreePath path) {
+  public boolean isSameParent(final TreePath path) {
     return sameParent.containsKey(path);
   }
 
-  protected void setSameParent(final TreePath path) {
+  public void setSameParent(final TreePath path) {
     sameParent.put(path, Boolean.TRUE);
   }
-
 }

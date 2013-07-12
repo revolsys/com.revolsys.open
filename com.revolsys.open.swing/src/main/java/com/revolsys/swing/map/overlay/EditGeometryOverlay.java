@@ -250,7 +250,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         if (dataObjectLayer.isEditable(scale)) {
-          final List<LayerDataObject> selectedObjects = dataObjectLayer.getSelectedObjects(boundingBox);
+          final List<LayerDataObject> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
           objects.addAll(selectedObjects);
         }
       }
@@ -731,7 +731,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
   }
 
   protected boolean isEditable(final DataObjectLayer dataObjectLayer) {
-    return dataObjectLayer.isVisible() && dataObjectLayer.isCanEditObjects();
+    return dataObjectLayer.isVisible() && dataObjectLayer.isCanEditRecords();
   }
 
   protected boolean isGeometryValid() {

@@ -49,7 +49,11 @@ public class DataObjectStoreLayerFactory extends
         dataStore.initialize();
         final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
         layer.setProperties(properties);
-        return layer;
+        if (layer.getMetaData() == null) {
+          return null;
+        } else {
+          return layer;
+        }
       }
     }
   }

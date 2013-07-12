@@ -1,4 +1,4 @@
-package com.revolsys.swing.table;
+package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;

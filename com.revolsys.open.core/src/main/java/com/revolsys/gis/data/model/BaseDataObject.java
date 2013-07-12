@@ -415,9 +415,8 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   @Override
   public void setIdValue(final Object id) {
     final int index = metaData.getIdAttributeIndex();
-    if (state == DataObjectState.New) {
+    if (state == DataObjectState.New || state == DataObjectState.Initalizing) {
       setValue(index, id);
-
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {

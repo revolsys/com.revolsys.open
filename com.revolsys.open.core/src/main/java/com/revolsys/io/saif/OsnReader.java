@@ -15,12 +15,12 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.io.DataObjectReader;
+import com.revolsys.gis.io.DataObjectIterator;
 import com.revolsys.io.saif.util.OsnConverter;
 import com.revolsys.io.saif.util.OsnConverterRegistry;
 import com.revolsys.io.saif.util.OsnIterator;
 
-public class OsnReader implements DataObjectReader {
+public class OsnReader implements DataObjectIterator {
   private final OsnConverterRegistry converters;
 
   private File directory;

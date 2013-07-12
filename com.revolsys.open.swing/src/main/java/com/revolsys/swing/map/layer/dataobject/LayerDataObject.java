@@ -48,7 +48,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public boolean isDeletable() {
-    if (layer.isCanDeleteObjects()) {
+    if (layer.isCanDeleteRecords()) {
       return isDeleted();
     }
     return false;
@@ -126,7 +126,7 @@ public class LayerDataObject extends ArrayDataObject {
       if (DataObjectState.Initalizing.equals(state)) {
         // Allow modification on initialization
       } else if (DataObjectState.New.equals(state)) {
-        if (!layer.isCanAddObjects()) {
+        if (!layer.isCanAddRecords()) {
           throw new IllegalStateException(
             "Adding new objects is not supported for layer " + layer);
         }
@@ -134,7 +134,7 @@ public class LayerDataObject extends ArrayDataObject {
         throw new IllegalStateException(
           "Cannot edit a deleted object for layer " + layer);
       } else {
-        if (layer.isCanEditObjects()) {
+        if (layer.isCanEditRecords()) {
           final Object originalValue = getOriginalValue(attributeName);
           if (EqualsRegistry.equal(value, originalValue)) {
             if (originalValues != null) {

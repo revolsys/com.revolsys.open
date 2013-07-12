@@ -76,7 +76,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
 
   protected Collection<LayerDataObject> getSelectedObjects(
     final DataObjectLayer layer) {
-    return layer.getSelectedObjects();
+    return layer.getSelectedRecords();
   }
 
   protected boolean isSelectable(final DataObjectLayer dataObjectLayer) {
@@ -120,7 +120,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-      SwingWorkerManager.execute("Select objects", this, "selectObjects",
+      SwingWorkerManager.execute("Select records", this, "selectRecords",
         boundingBox);
       event.consume();
     }
@@ -271,7 +271,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     selectBox = null;
     clearMapCursor();
     repaint();
-    SwingWorkerManager.execute("Select objects", this, "selectObjects",
+    SwingWorkerManager.execute("Select records", this, "selectRecords",
       boundingBox);
     event.consume();
   }
@@ -283,28 +283,28 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     event.consume();
   }
 
-  public void selectObjects(final BoundingBox boundingBox) {
+  public void selectRecords(final BoundingBox boundingBox) {
     final Project project = getProject();
-    selectObjects(project, boundingBox);
+    selectRecords(project, boundingBox);
     final LayerRendererOverlay overlay = getMap().getLayerOverlay();
     overlay.redraw();
   }
 
-  private void selectObjects(final LayerGroup group,
+  private void selectRecords(final LayerGroup group,
     final BoundingBox boundingBox) {
 
     final double scale = getViewport().getScale();
     for (final Layer layer : group.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        selectObjects(childGroup, boundingBox);
+        selectRecords(childGroup, boundingBox);
       } else if (layer instanceof DataObjectLayer) {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.setSelectedObjects(boundingBox);
-          dataObjectLayer.showViewAttributes();
+          dataObjectLayer.setSelectedRecords(boundingBox);
+          dataObjectLayer.showRecordsTable();
         } else {
-          dataObjectLayer.clearSelectedObjects();
+          dataObjectLayer.clearSelectedRecords();
         }
       }
     }

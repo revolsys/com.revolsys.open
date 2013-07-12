@@ -233,7 +233,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected List<LayerDataObject> getSelectedObjects() {
     final DataObjectLayer layer = getLayer();
-    final List<LayerDataObject> selectedObjects = layer.getSelectedObjects();
+    final List<LayerDataObject> selectedObjects = layer.getSelectedRecords();
     return selectedObjects;
   }
 
@@ -257,7 +257,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     final DataObjectLayer layer = getLayer();
     final int newObjectCount = layer.getNewObjectCount();
     if (row < newObjectCount) {
-      return layer.getNewObjects().get(row);
+      return layer.getNewRecords().get(row);
     } else {
       row -= newObjectCount;
     }

@@ -106,7 +106,7 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
 
   public void run() {
     try {
-      originalObjects = layer.getMergeableSelectedObjects();
+      originalObjects = layer.getMergeableSelectedRecords();
       final DataType geometryType = layer.getGeometryType();
       if (originalObjects.size() < 2) {
         setStatus("<p style=\"color:red;font-weight: bold\">At least 2 active records must be selected to merge.</p></body></html>");

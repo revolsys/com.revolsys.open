@@ -72,14 +72,6 @@ public class LayerUtil {
     LAYER_FACTORIES.put(typeName, factory);
   }
 
-  public static void addNewObject() {
-    final Layer layer = ObjectTree.getMouseClickItem();
-    if (layer instanceof DataObjectLayer) {
-      final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-      dataObjectLayer.addNewObject();
-    }
-  }
-
   public static LayerGroup getCurrentLayerGroup() {
     final Project project = Project.get();
     if (project != null) {
@@ -222,13 +214,6 @@ public class LayerUtil {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
       layer.showProperties(tabName);
-    }
-  }
-
-  public static void showViewAttributes() {
-    final DataObjectLayer layer = ObjectTree.getMouseClickItem();
-    if (layer != null) {
-      layer.showViewAttributes();
     }
   }
 

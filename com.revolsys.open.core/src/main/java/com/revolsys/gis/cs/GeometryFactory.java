@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
@@ -47,6 +47,10 @@ public class GeometryFactory extends
   private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
 
   private static final long serialVersionUID = 4328651897279304108L;
+
+  public static final GeometryFactory WORLD_MERCATOR = getFactory(3857);
+
+  public static final GeometryFactory WGS84 = getFactory(4326);
 
   public static void clear() {
     factories.clear();
@@ -197,10 +201,6 @@ public class GeometryFactory extends
 
   private int numAxis = 2;
 
-  public static final GeometryFactory WORLD_MERCATOR = getFactory(3857);
-
-  public static final GeometryFactory WGS84 = getFactory(4326);
-
   protected GeometryFactory(final int srid, final int numAxis,
     final double scaleXY, final double scaleZ) {
     super(PrecisionModelUtil.getPrecisionModel(scaleXY), srid,
@@ -211,19 +211,27 @@ public class GeometryFactory extends
     this.numAxis = numAxis;
   }
 
+  public void addGeometries(final List<Geometry> geometryList,
+    final Geometry geometry) {
+    if (geometry != null && !geometry.isEmpty()) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (part != null && !part.isEmpty()) {
+          geometryList.add(copy(part));
+        }
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G copy(final G geometry) {
     return (G)createGeometry(geometry);
   }
 
-  public GeometryCollection createCollection(final Geometry... geometries) {
-    final List<Geometry> list = new ArrayList<Geometry>();
-    for (final Geometry geometry : geometries) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        list.add(geometry.getGeometryN(i));
-      }
-    }
-    return createGeometryCollection(geometries);
+  @SuppressWarnings("unchecked")
+  public <V extends GeometryCollection> V createCollection(
+    final Geometry... geometries) {
+    return (V)createGeometryCollection(Arrays.asList(geometries));
   }
 
   public Coordinates createCoordinates(final Coordinates point) {
@@ -245,12 +253,14 @@ public class GeometryFactory extends
     } else {
       final int numPoints = points.size();
       final int numAxis = getNumAxis();
-      final CoordinatesList coordinatesList = new DoubleCoordinatesList(
-        numPoints, numAxis);
+      CoordinatesList coordinatesList = new DoubleCoordinatesList(numPoints,
+        numAxis);
       int i = 0;
       for (final Object object : points) {
         Coordinates point;
-        if (object instanceof Coordinates) {
+        if (object == null) {
+          point = null;
+        } else if (object instanceof Coordinates) {
           point = (Coordinates)object;
         } else if (object instanceof Point) {
           point = CoordinatesUtil.get((Point)object);
@@ -268,8 +278,13 @@ public class GeometryFactory extends
           throw new IllegalArgumentException("Unexepected data type: " + object);
         }
 
-        coordinatesList.setPoint(i, point);
-        i++;
+        if (point != null) {
+          coordinatesList.setPoint(i, point);
+          i++;
+        }
+      }
+      if (i < coordinatesList.size() - 1) {
+        coordinatesList = coordinatesList.subList(0, i);
       }
       makePrecise(coordinatesList);
       return coordinatesList;
@@ -334,24 +349,96 @@ public class GeometryFactory extends
     return new GeometryCollection(null, this);
   }
 
-  public Geometry createGeometry(final Collection<? extends Geometry> geometries) {
-    if (geometries == null || geometries.size() == 0) {
-      return createEmptyGeometryCollection();
+  /**
+   * <p>Create a new geometry of the requested target geometry class.<p>
+   * @param targetClass
+   * @param geometry
+   * @return
+   */
+  @SuppressWarnings({
+    "unchecked"
+  })
+  public <V extends Geometry> V createGeometry(final Class<?> targetClass,
+    Geometry geometry) {
+    if (geometry != null && !geometry.isEmpty()) {
+      geometry = copy(geometry);
+      if (geometry instanceof GeometryCollection) {
+        geometry = geometry.union();
+        // Union doesn't use this geometry factory
+        geometry = copy(geometry);
+      }
+      final Class<?> geometryClass = geometry.getClass();
+      if (targetClass.isAssignableFrom(geometryClass)) {
+        // TODO if geometry collection then clean up
+        return (V)geometry;
+      } else if (Point.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiPoint) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometryN(0);
+          }
+        }
+      } else if (LineString.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiLineString) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometryN(0);
+          } else {
+            final LineMerger merger = new LineMerger();
+            merger.add(geometry);
+            final List<LineString> mergedLineStrings = (List<LineString>)merger.getMergedLineStrings();
+            if (mergedLineStrings.size() == 1) {
+              return (V)mergedLineStrings.get(0);
+            }
+          }
+        }
+      } else if (Polygon.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiPolygon) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometryN(0);
+          }
+        }
+      } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Point) {
+          return (V)createMultiPoint(geometry);
+        }
+      } else if (MultiLineString.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof LineString) {
+          return (V)createMultiLineString(geometry);
+        }
+      } else if (MultiPolygon.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Polygon) {
+          return (V)createMultiPolygon(geometry);
+        }
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V createGeometry(
+    final Collection<? extends Geometry> geometries) {
+    final Collection<? extends Geometry> geometryList = getGeometries(geometries);
+    if (geometryList == null || geometries.size() == 0) {
+      return (V)createEmptyGeometryCollection();
     } else if (geometries.size() == 1) {
-      return CollectionUtil.get(geometries, 0);
+      return (V)CollectionUtil.get(geometries, 0);
     } else {
       final Set<Class<?>> classes = getGeometryClassSet(geometries);
       if (classes.equals(Collections.singleton(Point.class))) {
-        return createMultiPoint(geometries);
+        return (V)createMultiPoint(geometries);
       } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return createMultiLineString(geometries);
+        return (V)createMultiLineString(geometries);
       } else if (classes.equals(Collections.singleton(Polygon.class))) {
-        return createMultiPolygon(geometries);
+        return (V)createMultiPolygon(geometries);
       } else {
         final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
-        return createGeometryCollection(geometryArray);
+        return (V)createGeometryCollection(geometryArray);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V createGeometry(final Geometry... geometries) {
+    return (V)createGeometry(Arrays.asList(geometries));
   }
 
   @Override
@@ -366,42 +453,17 @@ public class GeometryFactory extends
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
         return geometryFactory.createGeometry(geometry);
       } else if (srid != 0 && geometrySrid != srid) {
-        return GeometryProjectionUtil.performCopy(geometry, this);
-      } else if (geometry instanceof MultiPoint) {
-        final List<Point> geometries = new ArrayList<Point>();
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final Point subGeometry = (Point)geometry.getGeometryN(i);
-          final Point newSubGeometry = createPoint(subGeometry);
-          geometries.add(newSubGeometry);
+        if (geometry instanceof GeometryCollection) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createGeometryCollection(geometries);
+        } else {
+          return GeometryProjectionUtil.performCopy(geometry, this);
         }
-        return createMultiPoint(geometries);
-      } else if (geometry instanceof MultiLineString) {
-        final List<LineString> geometries = new ArrayList<LineString>();
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final LineString subGeometry = (LineString)geometry.getGeometryN(i);
-          final LineString newSubGeometry = createLineString(subGeometry);
-          geometries.add(newSubGeometry);
-        }
-        return createMultiLineString(geometries);
-      } else if (geometry instanceof MultiPolygon) {
-        final List<Polygon> geometries = new ArrayList<Polygon>();
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final Polygon subGeometry = (Polygon)geometry.getGeometryN(i);
-          final Polygon newSubGeometry = createPolygon(subGeometry);
-          geometries.add(newSubGeometry);
-        }
-        return createMultiPolygon(geometries);
       } else if (geometry instanceof GeometryCollection) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final Geometry subGeometry = geometry.getGeometryN(i);
-          final Geometry newSubGeometry = createGeometry(subGeometry);
-          geometries.add(newSubGeometry);
-        }
+        addGeometries(geometries, geometry);
         return createGeometryCollection(geometries);
-      } else if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        return createPoint(point);
       } else if (geometry instanceof Point) {
         final Point point = (Point)geometry;
         return createPoint(point);
@@ -415,7 +477,7 @@ public class GeometryFactory extends
         final Polygon polygon = (Polygon)geometry;
         return createPolygon(polygon);
       } else {
-        throw new RuntimeException("Unknown geometry type " + geometry);
+        return null;
       }
     }
   }
@@ -433,23 +495,31 @@ public class GeometryFactory extends
     return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
   }
 
-  public GeometryCollection createGeometryCollection(
-    final List<? extends Geometry> geometries) {
-    if (geometries == null || geometries.size() == 0) {
-      return createEmptyGeometryCollection();
+  @SuppressWarnings("unchecked")
+  public <V extends GeometryCollection> V createGeometryCollection(
+    final Collection<? extends Geometry> geometries) {
+    final List<Geometry> geometryList = getGeometries(geometries);
+    if (geometryList == null || geometryList.size() == 0) {
+      return (V)createEmptyGeometryCollection();
     } else {
-      final Set<Class<?>> classes = getGeometryClassSet(geometries);
+      final Set<Class<?>> classes = getGeometryClassSet(geometryList);
       if (classes.equals(Collections.singleton(Point.class))) {
-        return createMultiPoint(geometries);
+        return (V)createMultiPoint(geometryList);
       } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return createMultiLineString(geometries);
+        return (V)createMultiLineString(geometryList);
       } else if (classes.equals(Collections.singleton(Polygon.class))) {
-        return createMultiPolygon(geometries);
+        return (V)createMultiPolygon(geometryList);
       } else {
-        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
-        return createGeometryCollection(geometryArray);
+        final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
+        return (V)super.createGeometryCollection(geometryArray);
       }
     }
+  }
+
+  @Deprecated
+  @Override
+  public GeometryCollection createGeometryCollection(final Geometry[] geometries) {
+    return super.createGeometryCollection(geometries);
   }
 
   public LinearRing createLinearRing(final Collection<?> points) {
@@ -460,11 +530,6 @@ public class GeometryFactory extends
   public LinearRing createLinearRing(final CoordinatesList points) {
     final CoordinatesList coordinatesList = createCoordinatesList(points);
     return super.createLinearRing(coordinatesList);
-  }
-
-  public LinearRing createLinearRing(final double... coordinates) {
-    final CoordinatesList points = createCoordinatesList(coordinates);
-    return createLinearRing(points);
   }
 
   public LinearRing createLinearRing(final LinearRing linearRing) {
@@ -499,11 +564,6 @@ public class GeometryFactory extends
     return line;
   }
 
-  public LineString createLineString(final double... coordinates) {
-    final CoordinatesList points = createCoordinatesList(coordinates);
-    return createLineString(points);
-  }
-
   public LineString createLineString(final LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final CoordinatesList newPoints = createCoordinatesList(points);
@@ -519,14 +579,13 @@ public class GeometryFactory extends
     return createMultiLineString(lineArray);
   }
 
-  @Override
-  public MultiLineString createMultiLineString(final LineString... lines) {
-    return super.createMultiLineString(lines);
+  public MultiLineString createMultiLineString(final Object... lines) {
+    return createMultiLineString(Arrays.asList(lines));
   }
 
   public MultiPoint createMultiPoint(final Collection<?> points) {
-    final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return createMultiPoint(coordinatesList);
+    final Point[] pointArray = getPointArray(points);
+    return createMultiPoint(pointArray);
   }
 
   public MultiPoint createMultiPoint(final CoordinatesList coordinatesList) {
@@ -549,6 +608,10 @@ public class GeometryFactory extends
   public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
     final Polygon[] polygonArray = getPolygonArray(polygons);
     return createMultiPolygon(polygonArray);
+  }
+
+  public MultiPolygon createMultiPolygon(final Object... polygons) {
+    return createMultiPolygon(Arrays.asList(polygons));
   }
 
   public Point createPoint() {
@@ -575,6 +638,28 @@ public class GeometryFactory extends
     final DoubleCoordinates coords = new DoubleCoordinates(numAxis, coordinates);
     makePrecise(coords);
     return createPoint(coords);
+  }
+
+  public Point createPoint(final Object object) {
+    Coordinates coordinates;
+    if (object instanceof Coordinates) {
+      coordinates = (Coordinates)object;
+    } else if (object instanceof Point) {
+      return copy((Point)object);
+    } else if (object instanceof double[]) {
+      coordinates = new DoubleCoordinates((double[])object);
+    } else if (object instanceof Coordinate) {
+      coordinates = new CoordinateCoordinates((Coordinate)object);
+    } else if (object instanceof CoordinatesList) {
+      final CoordinatesList coordinatesList = (CoordinatesList)object;
+      coordinates = coordinatesList.get(0);
+    } else if (object instanceof CoordinateSequence) {
+      final CoordinateSequence coordinatesList = (CoordinateSequence)object;
+      coordinates = new CoordinateCoordinates(coordinatesList.getCoordinate(0));
+    } else {
+      coordinates = null;
+    }
+    return createPoint(coordinates);
   }
 
   public Point createPoint(final Point point) {
@@ -637,6 +722,15 @@ public class GeometryFactory extends
     return coordinateSystem;
   }
 
+  public List<Geometry> getGeometries(
+    final Collection<? extends Geometry> geometries) {
+    final List<Geometry> geometryList = new ArrayList<Geometry>();
+    for (final Geometry geometry : geometries) {
+      addGeometries(geometryList, geometry);
+    }
+    return geometryList;
+  }
+
   private LinearRing getLinearRing(final List<?> rings, final int index) {
     final Object ring = rings.get(index);
     if (ring instanceof LinearRing) {
@@ -653,53 +747,75 @@ public class GeometryFactory extends
       return createLinearRing(points);
     } else if (ring instanceof double[]) {
       final double[] coordinates = (double[])ring;
-      return createLinearRing(coordinates);
+      final DoubleCoordinatesList points = new DoubleCoordinatesList(
+        getNumAxis(), coordinates);
+      return createLinearRing(points);
     } else {
       return null;
     }
   }
 
   public LineString[] getLineStringArray(final Collection<?> lines) {
-    final LineString[] lineStrings = new LineString[lines.size()];
-    final Iterator<?> iterator = lines.iterator();
-    for (int i = 0; i < lines.size(); i++) {
-      final Object value = iterator.next();
+    final List<LineString> lineStrings = new ArrayList<LineString>();
+    for (final Object value : lines) {
+      LineString lineString;
       if (value instanceof LineString) {
-        final LineString lineString = (LineString)value;
-        lineStrings[i] = lineString;
+        lineString = (LineString)value;
       } else if (value instanceof CoordinatesList) {
         final CoordinatesList coordinates = (CoordinatesList)value;
-        lineStrings[i] = createLineString(coordinates);
+        lineString = createLineString(coordinates);
       } else if (value instanceof CoordinateSequence) {
         final CoordinateSequence coordinates = (CoordinateSequence)value;
-        lineStrings[i] = createLineString(coordinates);
+        lineString = createLineString(coordinates);
       } else if (value instanceof double[]) {
         final double[] points = (double[])value;
-        lineStrings[i] = createLineString(points);
+        lineString = createLineString(points);
+      } else {
+        lineString = null;
+      }
+      if (lineString != null) {
+        lineStrings.add(lineString);
       }
     }
-    return lineStrings;
+    return lineStrings.toArray(new LineString[lineStrings.size()]);
   }
 
   public int getNumAxis() {
     return numAxis;
   }
 
+  public Point[] getPointArray(final Collection<?> pointsList) {
+    final List<Point> points = new ArrayList<Point>();
+    for (final Object object : pointsList) {
+      final Point point = createPoint(object);
+      if (point != null && !point.isEmpty()) {
+        points.add(point);
+      }
+    }
+    return points.toArray(new Point[points.size()]);
+  }
+
   @SuppressWarnings("unchecked")
   public Polygon[] getPolygonArray(final Collection<?> polygonList) {
-    final Polygon[] polygons = new Polygon[polygonList.size()];
-    int i = 0;
+    final List<Polygon> polygons = new ArrayList<Polygon>();
     for (final Object value : polygonList) {
+      Polygon polygon;
       if (value instanceof Polygon) {
-        final Polygon polygon = (Polygon)value;
-        polygons[i] = polygon;
+        polygon = (Polygon)value;
       } else if (value instanceof List) {
         final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
-        polygons[i] = createPolygon(coordinateList);
+        polygon = createPolygon(coordinateList);
+      } else if (value instanceof CoordinatesList) {
+        final CoordinatesList coordinateList = (CoordinatesList)value;
+        polygon = createPolygon(coordinateList);
+      } else {
+        polygon = null;
       }
-      i++;
+      if (polygon != null) {
+        polygons.add(polygon);
+      }
     }
-    return polygons;
+    return polygons.toArray(new Polygon[polygons.size()]);
   }
 
   @Override

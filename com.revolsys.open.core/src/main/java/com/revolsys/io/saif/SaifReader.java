@@ -51,7 +51,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactoryImpl;
-import com.revolsys.gis.io.DataObjectReader;
+import com.revolsys.gis.io.DataObjectIterator;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
@@ -67,7 +67,7 @@ import com.revolsys.spring.SpringUtil;
  * @see SaifWriter
  */
 public class SaifReader extends AbstractReader<DataObject> implements
-  DataObjectReader, DataObjectMetaDataFactory,
+  DataObjectIterator, DataObjectMetaDataFactory,
   com.revolsys.gis.data.io.DataObjectReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);

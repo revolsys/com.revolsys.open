@@ -28,7 +28,7 @@ import com.revolsys.gis.data.io.DataObjectReader;
 
 /**
  * <p>
- * The XbaseDatasetReader is a {@link DataObjectReader} that can read .dbf data
+ * The XbaseDatasetReader is a {@link DataObjectIterator} that can read .dbf data
  * files contained in a single directory. The reader will iterate through the
  * .dbf files in alphabetical order returning all features.
  * </p>

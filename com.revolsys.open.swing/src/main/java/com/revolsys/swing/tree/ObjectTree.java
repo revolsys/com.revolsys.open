@@ -20,6 +20,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;

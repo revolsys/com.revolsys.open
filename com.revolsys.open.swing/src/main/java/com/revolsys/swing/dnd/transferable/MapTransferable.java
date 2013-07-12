@@ -1,4 +1,4 @@
-package com.revolsys.swing.component;
+package com.revolsys.swing.dnd.transferable;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
