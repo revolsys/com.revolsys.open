@@ -23,4 +23,6 @@ public interface CoordinateSystem extends Serializable {
   String getName();
 
   <Q extends Quantity> Unit<Q> getUnit();
+
+  boolean isDeprecated();
 }

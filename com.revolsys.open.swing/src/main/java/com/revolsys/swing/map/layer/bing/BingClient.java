@@ -27,6 +27,8 @@ import com.revolsys.util.UrlUtil;
 
 public class BingClient {
 
+  public static final int TILE_SIZE = 256;
+
   private static final double[] METRES_PER_PIXEL = {
     78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849,
     1222.9925, 611.4962, 305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546,
@@ -87,14 +89,14 @@ public class BingClient {
 
   public double getLatitude(final int zoomLevel, final int tileY) {
     final double mapSize = getMapSizePixels(zoomLevel);
-    final double y = 0.5 - tileY * 256 / mapSize;
+    final double y = 0.5 - tileY * TILE_SIZE / mapSize;
 
     return 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
   }
 
   public double getLongitude(final int zoomLevel, final int tileX) {
     final double mapSize = getMapSizePixels(zoomLevel);
-    final double x = tileX * 256 / mapSize - 0.5;
+    final double x = tileX * TILE_SIZE / mapSize - 0.5;
     return 360 * x;
   }
 
@@ -126,7 +128,7 @@ public class BingClient {
   }
 
   public int getMapSizePixels(final int zoomLevel) {
-    return 256 << zoomLevel;
+    return TILE_SIZE << zoomLevel;
   }
 
   @SuppressWarnings("unchecked")

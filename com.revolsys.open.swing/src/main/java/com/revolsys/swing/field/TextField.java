@@ -96,7 +96,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   @Override
@@ -143,6 +143,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     final String newValue = StringConverterRegistry.toString(value);
     final String oldValue = fieldValue;
     final String text = getText();
+    undoManager.discardAllEdits();
     if (!EqualsRegistry.equal(text, newValue)) {
       if (newValue == null) {
         if (StringUtils.hasText(text)) {

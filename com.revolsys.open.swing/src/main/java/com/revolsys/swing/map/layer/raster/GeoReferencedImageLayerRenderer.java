@@ -55,8 +55,8 @@ public class GeoReferencedImageLayerRenderer extends
 
               graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-              graphics.drawImage(image, 0, 0, (int)imageScreenWidth,
-                (int)imageScreenHeight, null);
+              graphics.drawImage(image, 0, 0, (int)Math.ceil(imageScreenWidth),
+                (int)Math.ceil(imageScreenHeight), null);
             } finally {
               graphics.setTransform(transform);
             }

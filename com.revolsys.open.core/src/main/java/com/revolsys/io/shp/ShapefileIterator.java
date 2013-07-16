@@ -12,7 +12,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
@@ -123,9 +122,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           + ".prj");
         if (projResource.exists()) {
           try {
-            CoordinateSystem coordinateSystem = new WktCsParser(
-              projResource.getInputStream()).parse();
-            coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+            final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projResource);
             srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
             setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
           } catch (final Exception e) {

@@ -100,7 +100,7 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   public void save() {

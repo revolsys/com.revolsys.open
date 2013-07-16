@@ -211,7 +211,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   public boolean isTextSameAsSelected() {

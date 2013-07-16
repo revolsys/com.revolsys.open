@@ -119,7 +119,7 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private static final Color COLOR = WebColors.Aqua;
 
-  private static final Color TRANSPARENT_COLOR = ColorUtil.setAlpha(COLOR, 127);
+  private static final Color COLOR_TRANSPARENT = ColorUtil.setAlpha(COLOR, 127);
 
   private static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
     "cursor_node_add", 8, 7);
@@ -141,13 +141,20 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
 
   private static final IntArrayComparator INT_ARRAY_COMPARATOR = new IntArrayComparator();
 
-  private static final GeometryStyle HIGHLIGHT_STYLE = GeometryStyle.polygon(
-    COLOR, 3, TRANSPARENT_COLOR);
+  private static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
+    COLOR, 3, COLOR_TRANSPARENT);
 
-  private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(WebColors.Black);
+  private static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
 
-  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
-    6, new Color(0, 0, 0, 127), 1, TRANSPARENT_COLOR);;
+  private static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker("ellipse",
+    6, COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);;
+
+  static {
+    MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
+      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);
+    MarkerStyle.setMarker(STYLE_OUTLINE, "ellipse", 6,
+      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);
+  }
 
   private int actionId = 0;
 
@@ -1047,15 +1054,15 @@ public class EditGeometryOverlay extends SelectFeaturesOverlay implements
           final int deltaX = mousePoint.x - moveGeometryStart.x;
           final int deltaY = mousePoint.y - moveGeometryStart.y;
           graphics.translate(deltaX, deltaY);
-          paintSelected(graphics, getGeometry(), HIGHLIGHT_STYLE,
-            OUTLINE_STYLE, VERTEX_STYLE);
+          paintSelected(graphics, getGeometry(), STYLE_HIGHLIGHT,
+            STYLE_OUTLINE, STYLE_VERTEX);
         }
       } finally {
         graphics.setTransform(transform);
       }
     } else {
-      paintSelected(graphics, addGeometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
-        VERTEX_STYLE);
+      paintSelected(graphics, addGeometry, STYLE_HIGHLIGHT, STYLE_OUTLINE,
+        STYLE_VERTEX);
     }
     paintSelectBox(graphics);
   }

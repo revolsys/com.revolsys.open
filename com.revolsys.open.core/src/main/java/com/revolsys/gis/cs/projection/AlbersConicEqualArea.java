@@ -102,22 +102,39 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
   private final Spheroid spheroid;
 
   /** The false Easting. */
-  private final double x0;
+  private double x0;
 
   /** The false Northing. */
-  private final double y0;
+  private double y0;
 
   public AlbersConicEqualArea(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final Double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
-    final double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
-    final double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
-    final Double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
-
+    double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
+    if (Double.isNaN(centralMeridian)) {
+      centralMeridian = cs.getDoubleParameter("central_meridian");
+    }
+    double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
+    if (Double.isNaN(firstStandardParallel)) {
+      firstStandardParallel = cs.getDoubleParameter("standard_parallel_1");
+    }
+    double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
+    if (Double.isNaN(secondStandardParallel)) {
+      secondStandardParallel = cs.getDoubleParameter("standard_parallel_2");
+    }
+    double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
+    if (Double.isNaN(latitudeOfProjection)) {
+      latitudeOfProjection = cs.getDoubleParameter("latitude_of_origin");
+    }
     this.spheroid = datum.getSpheroid();
     this.x0 = cs.getDoubleParameter("easting_at_false_origin");
+    if (Double.isNaN(this.x0)) {
+      this.x0 = cs.getDoubleParameter("false_easting");
+    }
     this.y0 = cs.getDoubleParameter("northing_at_false_origin");
+    if (Double.isNaN(this.y0)) {
+      this.y0 = cs.getDoubleParameter("false_northing");
+    }
     this.lambda0 = Math.toRadians(centralMeridian);
     this.phi0 = Math.toRadians(latitudeOfProjection);
     this.phi1 = Math.toRadians(firstStandardParallel);

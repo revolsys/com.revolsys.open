@@ -195,13 +195,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (StringUtils.hasText(id)) {
         deletedObjectIds.add(id);
         deleteObject(cacheObject, true);
-        index.remove(object);
-        index.remove(cacheObject);
+        removeFromIndex(object);
+        removeFromIndex(cacheObject);
       } else {
-        index.remove(object);
+        removeFromIndex(object);
         super.deleteObject(object);
       }
     }
+  }
+
+  protected void removeFromIndex(final LayerDataObject object) {
+    index.remove(object);
   }
 
   @Override
@@ -357,6 +361,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         }
       }
     }
+
     return allObjects;
   }
 
@@ -653,6 +658,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
       index.remove(oldBoundingBox, object);
     }
+    addToIndex(object);
+  }
+
+  protected void addToIndex(final LayerDataObject object) {
     index.insert(object);
   }
 

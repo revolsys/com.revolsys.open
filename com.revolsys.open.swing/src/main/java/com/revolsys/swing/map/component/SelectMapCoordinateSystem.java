@@ -23,7 +23,8 @@ public class SelectMapCoordinateSystem extends ComboBox implements
   private final MapPanel map;
 
   public SelectMapCoordinateSystem(final MapPanel map) {
-    super(3857, 3005);
+    super(3857, 3005// , 26907, 26908, 26909, 26910, 26911
+    );
 
     this.map = map;
     setEditable(true);

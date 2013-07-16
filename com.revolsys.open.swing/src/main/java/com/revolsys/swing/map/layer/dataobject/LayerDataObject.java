@@ -40,11 +40,12 @@ public class LayerDataObject extends ArrayDataObject {
 
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String name) {
-    if (originalValues == null) {
-      return (T)getValue(name);
-    } else {
-      return (T)originalValues.get(name);
+    if (originalValues != null) {
+      if (originalValues.containsKey(name)) {
+        return (T)originalValues.get(name);
+      }
     }
+    return (T)getValue(name);
   }
 
   public boolean isDeletable() {
@@ -100,18 +101,22 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public void revertChanges() {
-    if (isModified() || isDeleted()) {
+    if (originalValues != null || getState() == DataObjectState.Deleted) {
       setState(DataObjectState.Persisted);
-      if (originalValues != null) {
-        super.setValues(originalValues);
-      }
-      originalValues = null;
+      clearOriginalValues();
       setState(DataObjectState.Persisted);
       final DataObjectLayer layer = getLayer();
       layer.revertChanges(this);
       firePropertyChange("state", DataObjectState.Modified,
         DataObjectState.Persisted);
     }
+  }
+
+  protected void clearOriginalValues() {
+    if (originalValues != null) {
+      super.setValues(originalValues);
+    }
+    originalValues = null;
   }
 
   @Override

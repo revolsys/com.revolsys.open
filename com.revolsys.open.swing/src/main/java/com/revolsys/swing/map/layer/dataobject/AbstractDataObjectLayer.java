@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -27,6 +28,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -40,10 +42,12 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.beans.InvokeMethodCallable;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.ListDataObjectReader;
@@ -56,6 +60,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.SwingWorkerManager;
@@ -722,7 +727,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public boolean isCanPaste() {
-    return ClipboardUtil.isDataFlavorAvailable(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+    return ClipboardUtil.isDataFlavorAvailable(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR)
+      || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
   @Override
@@ -836,7 +842,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void pasteRecords() {
-    final DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+    DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+    if (reader == null) {
+      final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+      final Resource resource = new ByteArrayResource("t.csv", string);
+      reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+    }
     final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();
     final List<DataObject> regectedRecords = new ArrayList<DataObject>();
     if (reader != null) {
@@ -850,12 +861,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         layerGeometryClass = geometryDataType.getJavaClass();
       }
       final List<String> attributeNames = metaData.getAttributeNames();
+      final Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
+      if (ignorePasteFields != null) {
+        attributeNames.removeAll(ignorePasteFields);
+      }
       for (final DataObject sourceRecord : reader) {
         final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
           sourceRecord);
         newValues.keySet().retainAll(attributeNames);
         if (geometryDataType != null) {
-          final Geometry sourceGeometry = sourceRecord.getGeometryValue();
+          Geometry sourceGeometry = sourceRecord.getGeometryValue();
+          if (sourceGeometry == null) {
+            final Object value = sourceRecord.get(geometryAttribute.getName());
+            sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
+              value);
+          }
           final Geometry geometry = geometryFactory.createGeometry(
             layerGeometryClass, sourceGeometry);
           if (geometry == null) {

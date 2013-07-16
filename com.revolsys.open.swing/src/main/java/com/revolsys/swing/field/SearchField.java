@@ -68,7 +68,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   @Override

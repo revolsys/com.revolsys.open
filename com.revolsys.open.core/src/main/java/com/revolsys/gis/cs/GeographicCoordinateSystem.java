@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,31 +12,31 @@ import javax.measure.unit.Unit;
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
 
-  public static double distanceMetres(double lon1, double lat1, double lon2,
-    double lat2) {
-    double lon1Radians = Math.toRadians(lon1);
-    double lon2Radians = Math.toRadians(lon2);
-    double width = lon2Radians - lon1Radians;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 8655274386401351222L;
 
-    double lat1Radians = Math.toRadians(lat1);
-    double lat2Radians = Math.toRadians(lat2);
+  public static double distanceMetres(final double lon1, final double lat1,
+    final double lon2, final double lat2) {
+    final double lon1Radians = Math.toRadians(lon1);
+    final double lon2Radians = Math.toRadians(lon2);
+    final double width = lon2Radians - lon1Radians;
 
-    double height = lat2Radians - lat1Radians;
+    final double lat1Radians = Math.toRadians(lat1);
+    final double lat2Radians = Math.toRadians(lat2);
 
-    double sinHeightOver2 = Math.sin(height / 2);
-    double sinWidthOver2 = Math.sin(width / 2);
-    double distance = 2
+    final double height = lat2Radians - lat1Radians;
+
+    final double sinHeightOver2 = Math.sin(height / 2);
+    final double sinWidthOver2 = Math.sin(width / 2);
+    final double distance = 2
       * EARTH_RADIUS
       * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
         + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2
         * sinWidthOver2));
     return distance;
   }
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 8655274386401351222L;
 
   private final AngularUnit angularUnit;
 
@@ -236,15 +235,15 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  // public Unit<Angle> getUnit() {
-  // return angularUnit.getUnit();
-  // }
-
   @Override
   @SuppressWarnings("unchecked")
   public Unit<Angle> getUnit() {
     return angularUnit.getUnit();
   }
+
+  // public Unit<Angle> getUnit() {
+  // return angularUnit.getUnit();
+  // }
 
   @Override
   public int hashCode() {
@@ -259,6 +258,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return result;
   }
 
+  @Override
   public boolean isDeprecated() {
     return deprecated;
   }

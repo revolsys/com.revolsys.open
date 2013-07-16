@@ -273,13 +273,18 @@ public class Viewport2D {
     return scale;
   }
 
+  public int getScreenResolution() {
+    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+    final int screenResolution = defaultToolkit.getScreenResolution();
+    return 96;
+  }
+
   public AffineTransform getScreenToModelTransform() {
     return screenToModelTransform;
   }
 
   public Unit<Length> getScreenUnit() {
-    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-    final int screenResolution = defaultToolkit.getScreenResolution();
+    final int screenResolution = getScreenResolution();
     return NonSI.INCH.divide(screenResolution);
   }
 
@@ -379,8 +384,7 @@ public class Viewport2D {
             }
           }
 
-          final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-          final int screenResolution = defaultToolkit.getScreenResolution();
+          final int screenResolution = getScreenResolution();
           standardPixelScaleFactor = screenResolution / 72.0;
 
           modelToScreenTransform = createModelToScreenTransform(

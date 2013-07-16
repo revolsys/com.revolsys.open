@@ -29,11 +29,20 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
 
   @Override
   public synchronized boolean addEdit(final UndoableEdit edit) {
-    if (edit instanceof AbstractUndoableEdit) {
-      final AbstractUndoableEdit abstractEdit = (AbstractUndoableEdit)edit;
-      if (!abstractEdit.isHasBeenDone()) {
-        abstractEdit.redo();
+    final boolean enabled = setEventsEnabled(false);
+    try {
+      if (edit instanceof AbstractUndoableEdit) {
+        final AbstractUndoableEdit abstractEdit = (AbstractUndoableEdit)edit;
+        if (!abstractEdit.isHasBeenDone()) {
+          if (abstractEdit.canRedo()) {
+            abstractEdit.redo();
+          } else {
+            return false;
+          }
+        }
       }
+    } finally {
+      setEventsEnabled(enabled);
     }
     if (eventsEnabled) {
       final boolean added = super.addEdit(edit);

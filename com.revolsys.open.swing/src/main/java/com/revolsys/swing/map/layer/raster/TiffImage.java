@@ -155,8 +155,9 @@ public class TiffImage extends GeoReferencedImage {
   }
 
   @Override
-  protected void loadImageMetaData(final Resource resource,
-    final PlanarImage image) {
+  protected void loadImageMetaData() {
+    final Resource resource = getImageResource();
+    final PlanarImage image = getJaiImage();
     final Object tiffDirectory = image.getProperty("tiff.directory");
     if (tiffDirectory == null) {
       throw new IllegalArgumentException(

@@ -15,7 +15,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
@@ -51,11 +50,15 @@ public class GeoReferencedImage {
   }
 
   public GeoReferencedImage(final Resource imageResource) {
+    this.imageResource = imageResource;
+    setImage(createBufferedImage());
+    loadImageMetaData();
+  }
+
+  protected BufferedImage createBufferedImage() {
     final File file = SpringUtil.getOrDownloadFile(imageResource);
     jaiImage = JAI.create("fileload", file.getAbsolutePath());
-    setImage(jaiImage.getAsBufferedImage());
-    loadImageMetaData(imageResource, jaiImage);
-    this.imageResource = imageResource;
+    return jaiImage.getAsBufferedImage();
   }
 
   @Override
@@ -116,6 +119,10 @@ public class GeoReferencedImage {
     return imageHeight;
   }
 
+  public Resource getImageResource() {
+    return imageResource;
+  }
+
   public int getImageWidth() {
     if (imageWidth == -1) {
       imageWidth = image.getWidth();
@@ -139,16 +146,14 @@ public class GeoReferencedImage {
     return image;
   }
 
-  protected void loadImageMetaData(final Resource imageResource,
-    final PlanarImage jaiImage) {
+  protected void loadImageMetaData() {
   }
 
   protected void loadProjectionFile(final Resource resource) {
     final Resource projectionFile = SpringUtil.getResourceWithExtension(
       resource, "prj");
     if (projectionFile.exists()) {
-      CoordinateSystem coordinateSystem = new WktCsParser(projectionFile).parse();
-      coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projectionFile);
       setCoordinateSystem(coordinateSystem);
     }
   }
@@ -184,11 +189,12 @@ public class GeoReferencedImage {
 
   public void revert() {
     if (imageResource != null) {
-      loadImageMetaData(imageResource, jaiImage);
+      loadImageMetaData();
     }
   }
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
+    this.geometryFactory = boundingBox.getGeometryFactory();
     this.boundingBox = boundingBox;
   }
 

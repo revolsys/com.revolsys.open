@@ -62,7 +62,7 @@ public class DateField extends JXDatePicker implements Field,
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   @Override

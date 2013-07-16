@@ -3,9 +3,8 @@ package com.revolsys.swing.map.table;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.JComponent;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
@@ -14,28 +13,18 @@ import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 public class DataObjectLayerAttributesTableModel extends
   AbstractDataObjectTableModel implements PropertyChangeListener {
 
-  public static JComponent create(final LayerDataObject object,
-    final boolean editable) {
-    final DataObjectLayerAttributesTableModel model = new DataObjectLayerAttributesTableModel(
-      object, editable);
-    return create(model);
-  }
-
   private LayerDataObject object;
 
   private final DataObjectLayer layer;
 
-  public DataObjectLayerAttributesTableModel(final DataObjectLayer layer,
-    final boolean editable) {
-    super(layer.getMetaData(), editable);
-    this.layer = layer;
-    layer.addPropertyChangeListener(this);
-  }
+  private final DataObjectLayerForm form;
 
-  public DataObjectLayerAttributesTableModel(final LayerDataObject object,
-    final boolean editable) {
-    this(object.getLayer(), editable);
-    this.object = object;
+  public DataObjectLayerAttributesTableModel(final DataObjectLayerForm form) {
+    super(form.getMetaData(), true);
+    this.form = form;
+    this.layer = form.getLayer();
+    this.object = form.getObject();
+    layer.addPropertyChangeListener(this);
   }
 
   @Override
@@ -74,6 +63,25 @@ public class DataObjectLayerAttributesTableModel extends
       return object.getOriginalValue(attributeName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
+    }
+  }
+
+  @Override
+  public boolean isCellEditable(final int rowIndex, final int columnIndex) {
+    if (columnIndex == 2) {
+      if (form.isEditable()) {
+        final String idAttributeName = getMetaData().getIdAttributeName();
+        final String attributeName = getAttributeName(rowIndex);
+        if (attributeName.equals(idAttributeName)) {
+          return false;
+        } else {
+          return form.isEditable(attributeName);
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
   }
 

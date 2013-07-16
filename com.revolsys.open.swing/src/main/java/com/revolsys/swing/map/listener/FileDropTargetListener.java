@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.util.LayerUtil;
 
@@ -111,8 +112,9 @@ public class FileDropTargetListener implements DropTargetListener,
           return;
         }
       }
-      if (files != null) {
-        LayerUtil.openFiles(files);
+      if (files != null && !files.isEmpty()) {
+        SwingWorkerManager.execute("Open Files", LayerUtil.class, "openFiles",
+          files);
       }
       event.getDropTargetContext().dropComplete(true);
     } catch (final Throwable e) {

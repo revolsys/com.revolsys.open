@@ -462,10 +462,10 @@ public class BoundingBox extends Envelope implements Cloneable {
       } else if (contains(convertedOther)) {
         return this;
       } else {
-        final double minX = Math.min(getMinX(), other.getMinX());
-        final double maxX = Math.min(getMaxX(), other.getMaxX());
-        final double minY = Math.min(getMinY(), other.getMinY());
-        final double maxY = Math.min(getMaxY(), other.getMaxY());
+        final double minX = Math.min(getMinX(), convertedOther.getMinX());
+        final double maxX = Math.max(getMaxX(), convertedOther.getMaxX());
+        final double minY = Math.min(getMinY(), convertedOther.getMinY());
+        final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
         return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
       }
     }
@@ -501,11 +501,24 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox expandToInclude(final Geometry geometry) {
-    if (geometry == null) {
+    if (geometry == null || geometry.isEmpty()) {
       return this;
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return expandToInclude(point);
     } else {
       final BoundingBox box = getBoundingBox(geometry);
       return expandToInclude(box);
+    }
+  }
+
+  public BoundingBox expandToInclude(final Point point) {
+    if (point == null || point.isEmpty()) {
+      return this;
+    } else {
+      final Point copy = geometryFactory.copy(point);
+      final Coordinates coordinates = CoordinatesUtil.get(copy);
+      return expandToInclude(coordinates);
     }
   }
 

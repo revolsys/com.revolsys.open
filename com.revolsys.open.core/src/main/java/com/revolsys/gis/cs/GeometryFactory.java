@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -175,6 +176,23 @@ public class GeometryFactory extends
         factories.put(key, factory);
       }
       return factory;
+    }
+  }
+
+  /**
+   * <p>Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z) and a floating precision models.</p>
+   * 
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
+   * @return The geometry factory.
+   */
+  public static GeometryFactory getFactory(final String wkt) {
+    final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+    if (esriCoordinateSystem == null) {
+      return getFactory();
+    } else {
+      final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(esriCoordinateSystem);
+      final int srid = epsgCoordinateSystem.getId();
+      return getFactory(srid, 3, 0, 0);
     }
   }
 
@@ -720,6 +738,19 @@ public class GeometryFactory extends
 
   public CoordinateSystem getCoordinateSystem() {
     return coordinateSystem;
+  }
+
+  public GeometryFactory getGeographicGeometryFactory() {
+    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      return this;
+    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
+      final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
+      final int srid = geographicCs.getId();
+      return getFactory(srid, getNumAxis(), 0, 0);
+    } else {
+      return getFactory(4326, getNumAxis(), 0, 0);
+    }
   }
 
   public List<Geometry> getGeometries(

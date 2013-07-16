@@ -31,7 +31,9 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     this.geometryFactory = geometryFactory;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   private void addUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     final Object userData = oldGeometry.getUserData();
@@ -46,7 +48,6 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   }
 
   public CoordinatesList perform(final CoordinatesList coordinates) {
-    final int numAxis = coordinates.getDimension();
     final int size = coordinates.size();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
       geometryFactory.getNumAxis());

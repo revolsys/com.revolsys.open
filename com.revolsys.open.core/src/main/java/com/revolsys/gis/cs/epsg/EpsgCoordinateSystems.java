@@ -54,6 +54,8 @@ public final class EpsgCoordinateSystems {
 
   private static HashMap<Integer, LinearUnit> linearUnits;
 
+  private static int nextSrid = 2000000;
+
   private static void addCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getId();
@@ -70,13 +72,54 @@ public final class EpsgCoordinateSystems {
     coordinateSystemsByName.clear();
   }
 
-  public static CoordinateSystem getCoordinateSystem(
+  public synchronized static CoordinateSystem getCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
     initialize();
-    final CoordinateSystem coordinateSystem2 = coordinateSystemsByCoordinateSystem.get(coordinateSystem);
-    if (coordinateSystem2 == null) {
-      return coordinateSystem;
+    if (coordinateSystem == null) {
+      return null;
     } else {
+      int srid = coordinateSystem.getId();
+      CoordinateSystem coordinateSystem2 = coordinateSystemsById.get(srid);
+      if (coordinateSystem2 == null) {
+        coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
+        if (coordinateSystem2 == null) {
+          coordinateSystem2 = coordinateSystemsByCoordinateSystem.get(coordinateSystem);
+          if (coordinateSystem2 == null) {
+            if (srid <= 0) {
+              srid = nextSrid++;
+            }
+            final String name = coordinateSystem.getName();
+            final List<Axis> axis = coordinateSystem.getAxis();
+            final Area area = coordinateSystem.getArea();
+            final Authority authority = coordinateSystem.getAuthority();
+            final boolean deprecated = coordinateSystem.isDeprecated();
+            if (coordinateSystem instanceof GeographicCoordinateSystem) {
+              final GeographicCoordinateSystem geographicCs = (GeographicCoordinateSystem)coordinateSystem;
+              final Datum datum = geographicCs.getDatum();
+              final PrimeMeridian primeMeridian = geographicCs.getPrimeMeridian();
+              final AngularUnit angularUnit = geographicCs.getAngularUnit();
+              final GeographicCoordinateSystem newCs = new GeographicCoordinateSystem(
+                srid, name, datum, primeMeridian, angularUnit, axis, area,
+                authority, deprecated);
+              addCoordinateSystem(newCs);
+              return newCs;
+            } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+              final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
+              GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
+              geographicCs = (GeographicCoordinateSystem)getCoordinateSystem(geographicCs);
+              final Projection projection = projectedCs.getProjection();
+              final Map<String, Object> parameters = projectedCs.getParameters();
+              final LinearUnit linearUnit = projectedCs.getLinearUnit();
+              final ProjectedCoordinateSystem newCs = new ProjectedCoordinateSystem(
+                srid, name, geographicCs, area, projection, parameters,
+                linearUnit, axis, authority, deprecated);
+              addCoordinateSystem(newCs);
+              return newCs;
+            }
+            return coordinateSystem;
+          }
+        }
+      }
       return coordinateSystem2;
     }
   }

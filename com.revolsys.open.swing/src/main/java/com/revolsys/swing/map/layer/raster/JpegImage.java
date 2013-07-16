@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.raster;
 
-import javax.media.jai.PlanarImage;
-
 import org.springframework.core.io.Resource;
 
 public class JpegImage extends GeoReferencedImage {
@@ -11,8 +9,8 @@ public class JpegImage extends GeoReferencedImage {
   }
 
   @Override
-  protected void loadImageMetaData(final Resource resource,
-    final PlanarImage image) {
+  protected void loadImageMetaData() {
+    final Resource resource = getImageResource();
     loadProjectionFile(resource);
     loadWorldFile(resource, "jgw");
   }

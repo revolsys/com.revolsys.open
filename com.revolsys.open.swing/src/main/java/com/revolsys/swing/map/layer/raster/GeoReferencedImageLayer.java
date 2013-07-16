@@ -40,16 +40,22 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       final Resource imageResource = SpringUtil.getResource(url);
       if (imageResource.exists()) {
-        final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
-        if (image == null) {
+        try {
+          final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+          if (image == null) {
+            LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+              "Cannot load image:" + imageResource);
+            return null;
+          } else {
+            final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+              image);
+            layer.setProperties(properties);
+            return layer;
+          }
+        } catch (final RuntimeException e) {
           LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-            "Cannot load image:" + imageResource);
+            "Unable to load image" + imageResource, e);
           return null;
-        } else {
-          final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-            image);
-          layer.setProperties(properties);
-          return layer;
         }
       } else {
         LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(

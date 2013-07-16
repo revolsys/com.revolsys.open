@@ -72,7 +72,7 @@ public class ObjectLabelField extends JLabel implements Field {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   @Override

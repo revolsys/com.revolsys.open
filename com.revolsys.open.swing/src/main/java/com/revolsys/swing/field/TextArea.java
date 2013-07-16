@@ -90,7 +90,7 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(errorMessage);
+    return true;
   }
 
   @Override

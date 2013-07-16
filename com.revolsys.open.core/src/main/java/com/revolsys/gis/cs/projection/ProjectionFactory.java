@@ -29,6 +29,7 @@ public final class ProjectionFactory {
   static {
     registerCoordinatesProjection("Albers_Equal_Area",
       AlbersConicEqualArea.class);
+    registerCoordinatesProjection("Albers", AlbersConicEqualArea.class);
     registerCoordinatesProjection("Transverse_Mercator",
       TransverseMercator.class);
     registerCoordinatesProjection("Mercator", Mercator1SP.class);

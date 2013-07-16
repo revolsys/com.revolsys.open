@@ -309,6 +309,7 @@ public class NumberTextField extends JXTextField implements Field,
 
   @Override
   public void setFieldValue(final Object value) {
+    undoManager.discardAllEdits();
     Object newValue;
     if (value == null) {
       newValue = null;
@@ -325,6 +326,8 @@ public class NumberTextField extends JXTextField implements Field,
         setText(string);
       }
     }
+    undoManager.discardAllEdits();
+
     validateField();
     final String text = getText();
     if (StringUtils.hasText(text)) {

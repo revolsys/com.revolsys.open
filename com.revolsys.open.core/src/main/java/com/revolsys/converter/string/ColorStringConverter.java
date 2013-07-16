@@ -14,7 +14,7 @@ public class ColorStringConverter implements StringConverter<Color> {
 
   private static int fromHex(final String string, final int start,
     final int end, final int defaultValue) {
-    if (string.length() < end) {
+    if (end <= string.length()) {
       try {
         String text = string.substring(start, end);
         if (text.length() == 1) {
@@ -40,7 +40,12 @@ public class ColorStringConverter implements StringConverter<Color> {
       green = fromHex(colorString, 2, 3, red);
       blue = fromHex(colorString, 3, 4, green);
       opacity = fromHex(colorString, 4, 5, 255);
-    } else if (length < 10) {
+    } else if (length == 7) {
+      red = fromHex(colorString, 1, 3, 0);
+      green = fromHex(colorString, 4, 5, red);
+      blue = fromHex(colorString, 5, 7, green);
+      opacity = 255;
+    } else if (length == 9) {
       red = fromHex(colorString, 1, 3, 0);
       green = fromHex(colorString, 4, 5, red);
       blue = fromHex(colorString, 5, 7, green);

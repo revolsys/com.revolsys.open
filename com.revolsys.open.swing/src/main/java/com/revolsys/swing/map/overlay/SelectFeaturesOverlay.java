@@ -40,31 +40,43 @@ import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 @SuppressWarnings("serial")
 public class SelectFeaturesOverlay extends AbstractOverlay {
 
-  private static final Color COLOR = WebColors.Lime;
-
-  private static final Color TRANSPARENT_COLOR = ColorUtil.setAlpha(COLOR, 127);
-
-  private static final Color BOX_OUTLINE_COLOR = new Color(COLOR.getRed() / 2,
-    COLOR.getGreen() / 2, COLOR.getBlue() / 2);
-
-  private static final Color BOX_FILL_COLOR = ColorUtil.setAlpha(
-    BOX_OUTLINE_COLOR, 127);
-
-  private static final BasicStroke BOX_STROKE = new BasicStroke(2,
+  protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
     }, 0f);
 
-  private static final GeometryStyle HIGHLIGHT_STYLE = GeometryStyle.polygon(
-    COLOR, 3, TRANSPARENT_COLOR);
+  protected static final Color COLOR_BOX = WebColors.Green;
 
-  private static final GeometryStyle OUTLINE_STYLE = GeometryStyle.line(WebColors.Black);
+  protected static final Color COLOR_BOX_TRANSPARENT = ColorUtil.setAlpha(
+    COLOR_BOX, 127);
 
-  private static final MarkerStyle VERTEX_STYLE = MarkerStyle.marker("ellipse",
-    6, new Color(0, 0, 0, 127), 1, TRANSPARENT_COLOR);;
+  protected static final Color COLOR_OUTLINE = WebColors.Black;
 
-  private static final MarkerStyle ERROR_STYLE = MarkerStyle.marker("ellipse",
-    7, WebColors.Yellow, 1, WebColors.Red);
+  protected static final Color COLOR_OUTLINE_TRANSPARENT = new Color(0, 0, 0,
+    127);
+
+  protected static final Color COLOR_SELECT = WebColors.Lime;
+
+  protected static final Color COLOR_SELECT_TRANSPARENT = ColorUtil.setAlpha(
+    COLOR_SELECT, 127);
+
+  protected static final MarkerStyle STYLE_ERROR = MarkerStyle.marker(
+    "ellipse", 7, WebColors.Yellow, 1, WebColors.Red);
+
+  protected static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
+    COLOR_SELECT, 3, COLOR_SELECT_TRANSPARENT);
+
+  protected static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
+
+  protected static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker(
+    "ellipse", 6, COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
+
+  static {
+    MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
+      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
+    MarkerStyle.setMarker(STYLE_OUTLINE, "ellipse", 6,
+      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
+  }
 
   private Double selectBox;
 
@@ -158,8 +170,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
           if (object != null && dataObjectLayer.isVisible(object)) {
             final Geometry geometry = object.getGeometryValue();
-            paintSelected(graphics2d, geometry, HIGHLIGHT_STYLE, OUTLINE_STYLE,
-              VERTEX_STYLE);
+            paintSelected(graphics2d, geometry, STYLE_HIGHLIGHT, STYLE_OUTLINE,
+              STYLE_VERTEX);
           }
         }
       }
@@ -175,10 +187,10 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
 
   protected void paintSelectBox(final Graphics2D graphics2d) {
     if (selectBox != null) {
-      graphics2d.setColor(BOX_OUTLINE_COLOR);
+      graphics2d.setColor(COLOR_BOX);
       graphics2d.setStroke(BOX_STROKE);
       graphics2d.draw(selectBox);
-      graphics2d.setPaint(BOX_FILL_COLOR);
+      graphics2d.setPaint(COLOR_BOX_TRANSPARENT);
       graphics2d.fill(selectBox);
     }
   }
@@ -192,6 +204,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       geometry = viewport.getGeometry(geometry);
       MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d, geometry,
         vertexStyle);
+
       GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
         highlightStyle);
       GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
@@ -203,14 +216,14 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
           for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
             final Point point = viewportGeometryFactory.createPoint(coordinates);
             MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
-              ERROR_STYLE);
+              STYLE_ERROR);
           }
         }
       } else {
         for (final TopologyValidationError error : validOp.getErrors()) {
           final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
           MarkerStyleRenderer.renderMarker(viewport, graphics2d, point,
-            ERROR_STYLE);
+            STYLE_ERROR);
         }
       }
     }
@@ -226,6 +239,8 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     } else if ("visible".equals(propertyName)) {
       repaint();
     } else if ("editable".equals(propertyName)) {
+      repaint();
+    } else if ("updatedObject".equals(propertyName)) {
       repaint();
     } else if ("selected".equals(propertyName)) {
       clearUndoHistory();

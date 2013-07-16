@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystemParser;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.cs.WktCsParser;
 
 public class EsriCoordinateSystems {
 
@@ -45,9 +48,9 @@ public class EsriCoordinateSystems {
     if (coordinateSystem == null) {
       return null;
     } else {
-      CoordinateSystem coordinateSystem2 = coordinateSystems.get(coordinateSystem);
+      CoordinateSystem coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
       if (coordinateSystem2 == null) {
-        coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
+        coordinateSystem2 = coordinateSystems.get(coordinateSystem);
         if (coordinateSystem2 == null) {
           return coordinateSystem;
         }
@@ -59,6 +62,21 @@ public class EsriCoordinateSystems {
   public static CoordinateSystem getCoordinateSystem(final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final Resource resource) {
+    final WktCsParser parser = new WktCsParser(resource);
+    return getCoordinateSystem(parser);
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final String wkt) {
+    final WktCsParser parser = new WktCsParser(wkt);
+    return getCoordinateSystem(parser);
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final WktCsParser parser) {
+    final CoordinateSystem coordinateSystem = parser.parse();
+    return getCoordinateSystem(coordinateSystem);
   }
 
   public static int getCrsId(final CoordinateSystem coordinateSystem) {

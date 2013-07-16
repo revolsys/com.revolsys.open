@@ -246,6 +246,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return result;
   }
 
+  @Override
   public boolean isDeprecated() {
     return deprecated;
   }

@@ -50,16 +50,10 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
-  protected static MarkerStyle marker(final AbstractMarker marker,
+  public static MarkerStyle marker(final AbstractMarker marker,
     final double markerSize, final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
-    style.setMarker(marker);
-    style.setMarkerWidth(markerSize);
-    style.setMarkerHeight(markerSize);
-    style.setMarkerLineColor(lineColor);
-    style.setMarkerHorizontalAlignment("center");
-    style.setMarkerVerticalAlignment("middle");
-    style.setMarkerFill(fillColor);
+    setMarker(style, marker, markerSize, lineColor, fillColor);
     return style;
   }
 
@@ -74,6 +68,25 @@ public class MarkerStyle implements Cloneable {
     final Color fillColor) {
     final AbstractMarker marker = new ShapeMarker(markerName);
     return marker(marker, markerSize, lineColor, fillColor);
+  }
+
+  public static void setMarker(final MarkerStyle style,
+    final AbstractMarker marker, final double markerSize,
+    final Color lineColor, final Color fillColor) {
+    style.setMarker(marker);
+    style.setMarkerWidth(markerSize);
+    style.setMarkerHeight(markerSize);
+    style.setMarkerLineColor(lineColor);
+    style.setMarkerHorizontalAlignment("center");
+    style.setMarkerVerticalAlignment("middle");
+    style.setMarkerFill(fillColor);
+  }
+
+  public static void setMarker(final MarkerStyle style,
+    final String markerName, final double markerSize, final Color lineColor,
+    final double lineWidth, final Color fillColor) {
+    final AbstractMarker marker = new ShapeMarker(markerName);
+    setMarker(style, marker, markerSize, lineColor, fillColor);
   }
 
   private String markerHorizontalAlignment = "auto";

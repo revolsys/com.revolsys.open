@@ -65,8 +65,10 @@ public class StringConverterRegistry {
     }
   }
 
-  public static String toString(final Class<Object> valueClass,
-    final Object value) {
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static String toString(final Class valueClass, final Object value) {
     if (value == null) {
       return null;
     } else {
