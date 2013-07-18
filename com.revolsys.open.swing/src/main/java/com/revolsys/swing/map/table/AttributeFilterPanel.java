@@ -79,6 +79,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
     add(searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 3);
+
+    final String searchField = layer.getProperty("searchField");
+    setSearchField(searchField);
   }
 
   @Override
@@ -100,18 +103,12 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           if (searchField instanceof DataStoreSearchTextField) {
             final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)searchField;
             dataStoreSearchTextField.removeItemListener(this);
-            operatorField.setSelectedItem("=");
-            operatorField.setEnabled(false);
           } else if (searchField instanceof JXSearchField) {
             final JXSearchField searchTextField = (JXSearchField)searchField;
             searchTextField.removeActionListener(this);
-            operatorField.setSelectedItem("=");
-            operatorField.setEnabled(true);
           } else if (searchField instanceof JComboBox) {
             final JComboBox comboField = (JComboBox)searchField;
             comboField.removeActionListener(this);
-            operatorField.setSelectedItem("=");
-            operatorField.setEnabled(false);
           }
           final Attribute attribute = metaData.getAttribute(searchAttribute);
           final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
@@ -124,16 +121,20 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           } else {
             searchField = SwingUtil.createComboBox(codeTable, false);
           }
+          operatorField.setSelectedItem("=");
           if (searchField instanceof DataStoreSearchTextField) {
             final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)searchField;
             dataStoreSearchTextField.addItemListener(this);
             dataStoreSearchTextField.setMaxResults(5);
+            operatorField.setEnabled(false);
           } else if (searchField instanceof JXSearchField) {
             final JXSearchField searchTextField = (JXSearchField)searchField;
             searchTextField.addActionListener(this);
+            operatorField.setEnabled(true);
           } else if (searchField instanceof JComboBox) {
             final JComboBox comboField = (JComboBox)searchField;
             comboField.addActionListener(this);
+            operatorField.setEnabled(false);
           }
           searchFieldPanel.add(searchField);
           GroupLayoutUtil.makeColumns(searchFieldPanel, 1);
@@ -185,6 +186,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       final String oldValue = previousSearchOperator;
       previousSearchOperator = searchOperator;
       firePropertyChange("searchOperator", oldValue, searchOperator);
+    } else if (source == nameField) {
+      final String searchAttribute = getSearchAttribute();
+      final String oldValue = previousAttributeName;
+      previousAttributeName = searchAttribute;
+      firePropertyChange("searchAttribute", oldValue, searchAttribute);
     }
   }
 

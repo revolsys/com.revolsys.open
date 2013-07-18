@@ -90,9 +90,6 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     attributeFilterPanel.addPropertyChangeListener(this);
     toolBar.addComponent("search", attributeFilterPanel);
 
-    final String searchField = layer.getProperty("searchField");
-    attributeFilterPanel.setSearchField(searchField);
-
     toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
       attributeFilterPanel, "clear");
 
