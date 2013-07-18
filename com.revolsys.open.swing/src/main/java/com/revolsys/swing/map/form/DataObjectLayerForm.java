@@ -1108,10 +1108,17 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void setObject(final LayerDataObject object) {
-    this.object = object;
-    allAttributes.setObject(object);
-    setValues(object);
-    undoManager.discardAllEdits();
+    final boolean undo = undoManager.setEventsEnabled(false);
+    final boolean validate = setFieldValidationEnabled(false);
+    try {
+      this.object = object;
+      allAttributes.setObject(object);
+      setValues(object);
+      undoManager.discardAllEdits();
+    } finally {
+      setFieldValidationEnabled(validate);
+      undoManager.setEventsEnabled(undo);
+    }
   }
 
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
