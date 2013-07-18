@@ -14,6 +14,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
 import com.revolsys.gis.data.model.filter.SpringExpresssionLanguageFilter;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -96,18 +97,18 @@ public abstract class AbstractDataObjectLayerRenderer extends
     filter = getFilter(style);
   }
 
-  public boolean isVisible(final LayerDataObject object) {
-    if (isVisible()) {
-      return isFilterAccept(object);
-    } else {
-      return false;
-    }
-  }
-
   protected boolean isFilterAccept(final LayerDataObject object) {
     try {
       return filter.accept(object);
     } catch (final Throwable e) {
+      return false;
+    }
+  }
+
+  public boolean isVisible(final LayerDataObject object) {
+    if (isVisible()) {
+      return isFilterAccept(object);
+    } else {
       return false;
     }
   }
@@ -137,4 +138,12 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
+  @Override
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    if (!(filter instanceof AcceptAllFilter)) {
+      MapSerializerUtil.add(map, "filter", filter);
+    }
+    return map;
+  }
 }

@@ -38,6 +38,7 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
     this.equalsRegistry = equalsRegistry;
   }
 
+  @SuppressWarnings("rawtypes")
   public boolean userDataEquals(final Geometry geometry1,
     final Geometry geometry2, final Collection<String> exclude) {
     final Object userData1 = geometry1.getUserData();

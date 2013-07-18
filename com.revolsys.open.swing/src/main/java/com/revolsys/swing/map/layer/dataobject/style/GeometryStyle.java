@@ -7,20 +7,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import org.jdesktop.swingx.color.ColorUtil;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryStyle extends MarkerStyle {
+
+  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
+
+  private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
 
   private static int colorIndex = -1;
 
@@ -29,8 +36,111 @@ public class GeometryStyle extends MarkerStyle {
     WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
     WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
 
+  static {
+    // addProperty("backgroundColor", Color.class);
+    // addProperty("backgroundImage", String.class);
+    // addProperty("base", String.class);
+    // addProperty("bufferSize", Double.class);
+    // addProperty("buildingFill", Color.class);
+    // addProperty("buildingFillOpacity", String.class);
+    // addProperty("buildingHeight", Double.class);
+    // addProperty("compOp", String.class);
+    // addProperty("fontDirectory", String.class);
+    // addProperty("imageFilters", String.class);
+    addProperty("lineCap", String.class, LineCap.ROUND);
+    addProperty("lineClip", Boolean.class, true);
+    addProperty("lineColor", Color.class, new Color(128, 128, 128, 255));
+    addProperty("lineCompOp", String.class, CompositionOperation.src_over);
+    // addProperty("lineDashOffset", String.class);
+    // addProperty("lineDasharray", String.class);
+    addProperty("lineGamma", Double.class, 1.0);
+    addProperty("lineGammaMethod", String.class, GammaMethod.power);
+    addProperty("lineJoin", String.class, LineJoin.ROUND);
+    addProperty("lineMiterlimit", Float.class, 4f);
+    // addProperty("lineOffset", String.class);
+    addProperty("lineOpacity", Integer.class, 255);
+    // addProperty("linePattern", String.class);
+    // addProperty("linePatternClip", String.class);
+    // addProperty("linePatternCompOp", String.class);
+    // addProperty("linePatternFile", String.class);
+    // addProperty("linePatternSmooth", String.class);
+    // addProperty("lineRasterizer", String.class);
+    addProperty("lineSmooth", Double.class, 0.0);
+    addProperty("lineWidth", Measure.class, ONE_PIXEL);
+    // addProperty("opacity", String.class);
+    // addProperty("point", String.class);
+    // addProperty("pointAllowOverlap", String.class);
+    // addProperty("pointCompOp", String.class);
+    // addProperty("pointFile", String.class);
+    // addProperty("pointIgnorePlacement", String.class);
+    // addProperty("pointOpacity", String.class);
+    // addProperty("pointPlacement", String.class);
+    // addProperty("pointTransform", String.class);
+    // addProperty("polygon", String.class);
+    addProperty("polygonClip", Boolean.class, true);
+    addProperty("polygonCompOp", String.class, CompositionOperation.src_over);
+    addProperty("polygonFill", Color.class, new Color(128, 128, 128, 255));
+    addProperty("polygonFillOpacity", Integer.class, 255);
+    addProperty("polygonGamma", Double.class, 1.0);
+    addProperty("polygonGammaMethod", String.class, GammaMethod.power);
+    // addProperty("polygonPattern", String.class);
+    // addProperty("polygonPatternAlignment", String.class);
+    // addProperty("polygonPatternClip", String.class);
+    // addProperty("polygonPatternCompOp", String.class);
+    // addProperty("polygonPatternFile", String.class);
+    // addProperty("polygonPatternGamma", String.class);
+    // addProperty("polygonPatternOpacity", String.class);
+    // addProperty("polygonPatternSmooth", String.class);
+    addProperty("polygonSmooth", Double.class, 0.0);
+    // addProperty("raster", String.class);
+    // addProperty("rasterCompOp", String.class);
+    // addProperty("rasterFilterFactor", String.class);
+    // addProperty("rasterMeshSize", Double.class);
+    // addProperty("rasterOpacity", String.class);
+    // addProperty("rasterScaling", String.class);
+    // addProperty("shield", String.class);
+    // addProperty("shieldAllowOverlap", String.class);
+    // addProperty("shieldAvoidEdges", String.class);
+    // addProperty("shieldCharacterSpacing", String.class);
+    // addProperty("shieldClip", String.class);
+    // addProperty("shieldCompOp", String.class);
+    // addProperty("shieldDx", Double.class);
+    // addProperty("shieldDy", Double.class);
+    // addProperty("shieldFaceName", String.class);
+    // addProperty("shieldFile", String.class);
+    // addProperty("shieldFill", Color.class);
+    // addProperty("shieldHaloFill", Color.class);
+    // addProperty("shieldHaloRadius", String.class);
+    // addProperty("shieldHorizontalAlignment", String.class);
+    // addProperty("shieldJustifyAlignment", String.class);
+    // addProperty("shieldLineSpacing", String.class);
+    // addProperty("shieldMinDistance", String.class);
+    // addProperty("shieldMinPadding", String.class);
+    // addProperty("shieldName", String.class);
+    // addProperty("shieldOpacity", String.class);
+    // addProperty("shieldPlacement", String.class);
+    // addProperty("shieldSize", Double.class);
+    // addProperty("shieldSpacing", String.class);
+    // addProperty("shieldTextDx", Double.class);
+    // addProperty("shieldTextDy", Double.class);
+    // addProperty("shieldTextOpacity", String.class);
+    // addProperty("shieldTextTransform", String.class);
+    // addProperty("shieldverticalAlignment", String.class);
+    // addProperty("shieldWrapBefore", String.class);
+    // addProperty("shieldWrapCharacter", String.class);
+    // addProperty("shieldWrapWidth", Double.class);
+    // addProperty("srs", String.class);
+
+  }
+
+  private static final void addProperty(final String name,
+    final Class<?> dataClass, final Object defaultValue) {
+    PROPERTIES.put(name, dataClass);
+    DEFAULT_VALUES.put(name, defaultValue);
+  }
+
   public static GeometryStyle createStyle() {
-    GeometryStyle style = new GeometryStyle();
+    final GeometryStyle style = new GeometryStyle();
     Color color;
     synchronized (COLORS) {
       colorIndex = (colorIndex + 1) % COLORS.size();
@@ -41,9 +151,13 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
-  @Override
-  public GeometryStyle clone() {
-    return (GeometryStyle)super.clone();
+  private static Object getValue(final String propertyName, final Object value) {
+    final Class<?> dataClass = PROPERTIES.get(propertyName);
+    if (dataClass == null) {
+      return null;
+    } else {
+      return StringConverterRegistry.toObject(dataClass, value);
+    }
   }
 
   public static GeometryStyle line(final Color color) {
@@ -52,10 +166,10 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
-  public static GeometryStyle line(final Color color, final double width) {
+  public static GeometryStyle line(final Color color, final double lineWidth) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
-    style.setLineWidth(width);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
     return style;
   }
 
@@ -71,7 +185,7 @@ public class GeometryStyle extends MarkerStyle {
     final int lineWidth, final Color fillColor) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(lineColor);
-    style.setLineWidth(lineWidth);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
     style.setPolygonFill(fillColor);
     return style;
   }
@@ -82,7 +196,7 @@ public class GeometryStyle extends MarkerStyle {
 
   private Color lineColor = new Color(128, 128, 128, 255);
 
-  private CompositionOperation lineCompositionOperation = CompositionOperation.src_over;
+  private CompositionOperation lineCompOp = CompositionOperation.src_over;
 
   private double lineGamma = 1.0;
 
@@ -100,7 +214,7 @@ public class GeometryStyle extends MarkerStyle {
 
   private boolean polygonClip = true;
 
-  private CompositionOperation polygonCompositionOperation = CompositionOperation.src_over;
+  private CompositionOperation polygonCompOp = CompositionOperation.src_over;
 
   private Color polygonFill = new Color(128, 128, 128, 255);
 
@@ -118,32 +232,34 @@ public class GeometryStyle extends MarkerStyle {
   public GeometryStyle(final Map<String, Object> style) {
     super(style);
     for (final Entry<String, Object> entry : style.entrySet()) {
-      final String label = entry.getKey();
-      Object value = entry.getValue();
-      final GeometryStyleProperty geometryStyleProperty = GeometryStyleProperty.getProperty(label);
-      if (geometryStyleProperty != null) {
-        final DataType dataType = geometryStyleProperty.getDataType();
-        final String propertyName = geometryStyleProperty.getPropertyName();
-        value = StringConverterRegistry.toObject(dataType, value);
-        JavaBeanUtil.setProperty(this, propertyName, value);
+      final String propertyName = entry.getKey();
+      final Object value = entry.getValue();
+      final Object propertyValue = getValue(propertyName, value);
+      if (propertyValue != null) {
+        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
       }
     }
+  }
+
+  @Override
+  public GeometryStyle clone() {
+    return (GeometryStyle)super.clone();
+  }
+
+  public LineCap getLineCap() {
+    return lineCap;
   }
 
   public LineCap getLineCapEnum() {
     return lineCap;
   }
 
-  public String getLineCap() {
-    return lineCap.toString();
-  }
-
   public Color getLineColor() {
     return lineColor;
   }
 
-  public CompositionOperation getLineCompositionOperation() {
-    return lineCompositionOperation;
+  public CompositionOperation getLineCompOp() {
+    return lineCompOp;
   }
 
   public double getLineGamma() {
@@ -154,8 +270,8 @@ public class GeometryStyle extends MarkerStyle {
     return lineGammaMethod;
   }
 
-  public String getLineJoin() {
-    return lineJoin.toString();
+  public LineJoin getLineJoin() {
+    return lineJoin;
   }
 
   public LineJoin getLineJoinEnum() {
@@ -174,16 +290,12 @@ public class GeometryStyle extends MarkerStyle {
     return lineSmooth;
   }
 
-  public double getLineWidth() {
-    return lineWidth.doubleValue(NonSI.PIXEL);
-  }
-
-  public Measure<Length> getLineWidthMeasure() {
+  public Measure<Length> getLineWidth() {
     return lineWidth;
   }
 
-  public CompositionOperation getPolygonCompositionOperation() {
-    return polygonCompositionOperation;
+  public CompositionOperation getPolygonCompOp() {
+    return polygonCompOp;
   }
 
   public Color getPolygonFill() {
@@ -235,12 +347,12 @@ public class GeometryStyle extends MarkerStyle {
     // }
   }
 
-  public void setLineCapEnum(final LineCap lineCap) {
-    this.lineCap = lineCap;
-  }
-
   public void setLineCap(final String lineCap) {
     setLineCapEnum(LineCap.valueOf(lineCap.toUpperCase()));
+  }
+
+  public void setLineCapEnum(final LineCap lineCap) {
+    this.lineCap = lineCap;
   }
 
   public void setLineClip(final boolean lineClip) {
@@ -256,9 +368,12 @@ public class GeometryStyle extends MarkerStyle {
     }
   }
 
-  public void setLineCompositionOperation(
-    final CompositionOperation compositionOperation) {
-    this.lineCompositionOperation = compositionOperation;
+  public void setLineCompOp(final String lineCompOp) {
+    if (StringUtils.hasText(lineCompOp)) {
+      this.lineCompOp = CompositionOperation.valueOf(lineCompOp);
+    } else {
+      this.lineCompOp = CompositionOperation.src_over;
+    }
   }
 
   public void setLineGamma(final double gamma) {
@@ -336,12 +451,7 @@ public class GeometryStyle extends MarkerStyle {
     graphics.setStroke(basicStroke);
   }
 
-  public void setLineWidth(final double lineWidth) {
-    Measure<Length> measure = Measure.valueOf(lineWidth, NonSI.PIXEL);
-    setLineWidthMeasure(measure);
-  }
-
-  public void setLineWidthMeasure(final Measure<Length> lineWidth) {
+  public void setLineWidth(final Measure<Length> lineWidth) {
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
   }
 
@@ -349,9 +459,12 @@ public class GeometryStyle extends MarkerStyle {
     this.polygonClip = polygonClip;
   }
 
-  public void setPolygonCompositionOperation(
-    final CompositionOperation polygonCompositionOperation) {
-    this.polygonCompositionOperation = polygonCompositionOperation;
+  public void setPolygonCompOp(final String polygonCompOp) {
+    if (StringUtils.hasText(polygonCompOp)) {
+      this.polygonCompOp = CompositionOperation.valueOf(polygonCompOp);
+    } else {
+      this.polygonCompOp = CompositionOperation.src_over;
+    }
   }
 
   public void setPolygonFill(final Color fill) {
@@ -396,4 +509,23 @@ public class GeometryStyle extends MarkerStyle {
     this.polygonSmooth = polygonSmooth;
   }
 
+  @Override
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    for (final String name : PROPERTIES.keySet()) {
+      final Object value = JavaBeanUtil.getValue(this, name);
+
+      Object defaultValue = defaults.get(name);
+      if (defaultValue != null) {
+        defaultValue = getValue(name, defaultValue);
+      }
+      if (defaultValue == null) {
+        defaultValue = DEFAULT_VALUES.get(name);
+      }
+      if (!EqualsRegistry.equal(defaultValue, value)) {
+        MapSerializerUtil.add(map, name, value);
+      }
+    }
+    return map;
+  }
 }

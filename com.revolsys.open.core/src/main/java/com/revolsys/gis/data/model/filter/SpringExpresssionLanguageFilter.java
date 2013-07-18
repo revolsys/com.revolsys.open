@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.model.filter;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.expression.Expression;
@@ -10,8 +11,10 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.io.map.MapSerializer;
 
-public class SpringExpresssionLanguageFilter implements Filter<DataObject> {
+public class SpringExpresssionLanguageFilter implements Filter<DataObject>,
+  MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
     true, true);
 
@@ -22,14 +25,17 @@ public class SpringExpresssionLanguageFilter implements Filter<DataObject> {
 
   private final StandardEvaluationContext context = new StandardEvaluationContext();
 
-  public SpringExpresssionLanguageFilter(final String expression) {
-    this(expression, Collections.<String, Object> emptyMap());
+  private final String query;
+
+  public SpringExpresssionLanguageFilter(final String query) {
+    this(query, Collections.<String, Object> emptyMap());
   }
 
   @SuppressWarnings("unchecked")
-  public SpringExpresssionLanguageFilter(final String expression,
+  public SpringExpresssionLanguageFilter(final String query,
     final Map<String, ? extends Object> variables) {
-    this.expression = EXPRESSION_PARSER.parseExpression(expression);
+    this.query = query;
+    this.expression = EXPRESSION_PARSER.parseExpression(query);
     context.addPropertyAccessor(new DataObjectAccessor());
     context.setVariables((Map<String, Object>)variables);
   }
@@ -42,6 +48,14 @@ public class SpringExpresssionLanguageFilter implements Filter<DataObject> {
     } catch (final Throwable e) {
       return false;
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "queryFilter");
+    map.put("query", query);
+    return map;
   }
 
   @Override

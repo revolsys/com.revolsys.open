@@ -4,6 +4,7 @@ import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -20,6 +21,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -74,9 +76,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private GeometryFactory geometryFactory;
 
-  private boolean readOnly;
+  private boolean readOnly = false;
 
-  private boolean selectable = false;
+  private boolean selectable = true;
 
   private boolean selectSupported = true;
 
@@ -86,15 +88,17 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean visible = true;
 
-  private boolean queryable;
+  private boolean queryable = true;
 
   private boolean eventsEnabled = true;
 
-  private boolean querySupported;
+  private boolean querySupported = true;
 
   private final long id = ID_GEN.incrementAndGet();
 
   private LayerRenderer<?> renderer;
+
+  private String type;
 
   public AbstractLayer() {
   }
@@ -281,6 +285,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public String getType() {
+    return type;
+  }
+
+  @Override
   public boolean isEditable() {
     return editable;
   }
@@ -461,9 +470,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
           this, "property", oldValue, value, name);
         propertyChangeSupport.firePropertyChange(event);
 
-        super.setProperty(name, value);
         try {
-          JavaBeanUtil.setProperty(this, name, value);
+          if (JavaBeanUtil.setProperty(this, name, value)) {
+          } else {
+            super.setProperty(name, value);
+          }
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
             "Unable to set property:" + name, e);
@@ -508,6 +519,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.selectSupported = selectSupported;
   }
 
+  protected void setType(final String type) {
+    this.type = type;
+  }
+
   @Override
   public void setVisible(final boolean visible) {
     final boolean oldVisible = this.visible;
@@ -526,6 +541,35 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final TabbedValuePanel panel = createPropertiesPanel();
     panel.setSelectdTab(tabName);
     panel.showDialog(window);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    MapSerializerUtil.add(map, "type", type);
+    MapSerializerUtil.add(map, "name", name);
+    MapSerializerUtil.add(map, "visible", visible, true);
+    MapSerializerUtil.add(map, "querySupported", querySupported, true);
+    if (querySupported) {
+      MapSerializerUtil.add(map, "queryable", queryable, true);
+    }
+    MapSerializerUtil.add(map, "readOnly", readOnly, false);
+    if (!readOnly) {
+      MapSerializerUtil.add(map, "editable", editable, false);
+    }
+    if (selectSupported) {
+      MapSerializerUtil.add(map, "selectable", selectable, true);
+    }
+    MapSerializerUtil.add(map, "selectSupported", selectSupported, true);
+    MapSerializerUtil.add(map, "maximumScale", maximumScale, 0L);
+    MapSerializerUtil.add(map, "minimumScale", minimumScale, Long.MAX_VALUE);
+    MapSerializerUtil.add(map, "style", renderer);
+    final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil.getValue(getProperties());
+    if (properties != null) {
+      map.putAll(properties);
+    }
+    return map;
   }
 
   @Override

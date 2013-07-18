@@ -15,4 +15,6 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
   List<String> getConnectionNames();
 
   String getName();
+
+  boolean isVisible();
 }

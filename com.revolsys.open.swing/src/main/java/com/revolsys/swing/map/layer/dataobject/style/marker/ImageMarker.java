@@ -42,9 +42,9 @@ public class ImageMarker extends AbstractMarker {
     double orientation) {
     if (image != null) {
       final AffineTransform savedTransform = graphics.getTransform();
-      final Measure<Length> markerWidth = style.getMarkerWidthMeasure();
+      final Measure<Length> markerWidth = style.getMarkerWidth();
       final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-      final Measure<Length> markerHeight = style.getMarkerHeightMeasure();
+      final Measure<Length> markerHeight = style.getMarkerHeight();
       final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
 
       final String orientationType = style.getMarkerOrientationType();

@@ -32,6 +32,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -65,6 +66,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
+    setType("dataStore");
     saveChangesMethod = ReflectionUtils.findMethod(getClass(),
       "transactionSaveChanges");
     saveChangesMethod.setAccessible(true);
@@ -95,6 +97,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (cachedObject != null) {
       super.addSelectedObject(object);
     }
+  }
+
+  protected void addToIndex(final LayerDataObject object) {
+    index.insert(object);
   }
 
   protected void cacheObjects(final Collection<? extends DataObject> objects) {
@@ -202,10 +208,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         super.deleteObject(object);
       }
     }
-  }
-
-  protected void removeFromIndex(final LayerDataObject object) {
-    index.remove(object);
   }
 
   @Override
@@ -516,6 +518,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  protected void removeFromIndex(final LayerDataObject object) {
+    index.remove(object);
+  }
+
   @Override
   public void revertChanges(final LayerDataObject object) {
     final String id = getId(object);
@@ -569,7 +575,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   public void setTypePath(final String typePath) {
     this.typePath = typePath;
-    setName(PathUtil.getName(typePath));
+    if (!StringUtils.hasText(getName())) {
+      setName(PathUtil.getName(typePath));
+    }
     if (StringUtils.hasText(typePath)) {
       final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
       if (metaData != null) {
@@ -595,6 +603,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         return super.showForm(cachedObject);
       }
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    MapSerializerUtil.add(map, "typePath", typePath);
+    return map;
   }
 
   protected synchronized boolean transactionSaveChanges() {
@@ -660,9 +675,4 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
     addToIndex(object);
   }
-
-  protected void addToIndex(final LayerDataObject object) {
-    index.insert(object);
-  }
-
 }

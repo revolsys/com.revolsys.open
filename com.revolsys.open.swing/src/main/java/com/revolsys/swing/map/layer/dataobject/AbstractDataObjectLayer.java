@@ -60,6 +60,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -1286,6 +1287,18 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void toggleEditable() {
     final boolean editable = isEditable();
     setEditable(!editable);
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    if (!super.isReadOnly()) {
+      MapSerializerUtil.add(map, "canAddRecords", canAddRecords, true);
+      MapSerializerUtil.add(map, "canDeleteRecords", canDeleteRecords, true);
+      MapSerializerUtil.add(map, "canEditRecords", canEditRecords, true);
+    }
+    MapSerializerUtil.add(map, "columnNameOrder", columnNameOrder);
+    return map;
   }
 
   @Override

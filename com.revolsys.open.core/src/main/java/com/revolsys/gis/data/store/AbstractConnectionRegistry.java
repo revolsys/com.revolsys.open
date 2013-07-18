@@ -15,6 +15,8 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   private Map<String, T> connections;
 
+  private boolean visible;
+
   private final Set<String> connectionNames = new TreeSet<String>();
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
@@ -57,6 +59,7 @@ public abstract class AbstractConnectionRegistry<T> implements
     return new ArrayList<String>(connectionNames);
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -75,8 +78,17 @@ public abstract class AbstractConnectionRegistry<T> implements
     return readOnly;
   }
 
+  @Override
+  public boolean isVisible() {
+    return visible;
+  }
+
   protected void setReadOnly(final boolean readOnly) {
     this.readOnly = readOnly;
+  }
+
+  protected void setVisible(final boolean visible) {
+    this.visible = visible;
   }
 
   @Override

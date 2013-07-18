@@ -10,7 +10,9 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
@@ -89,4 +91,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
     }
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    return Collections.emptyMap();
+  }
 }

@@ -15,7 +15,18 @@ import com.revolsys.util.CollectionUtil;
 public class JsonDataObjectStoreConnectionRegistry extends
   AbstractConnectionRegistry<DataObjectStoreConnection> {
 
-  private final File directory;
+  private File directory;
+
+  public JsonDataObjectStoreConnectionRegistry(final String name,
+    final boolean visible, final DataObjectStoreConnection... connections) {
+    super(name);
+    setReadOnly(!visible);
+    setVisible(visible);
+    init();
+    for (final DataObjectStoreConnection connection : connections) {
+      addConnection(connection);
+    }
+  }
 
   public JsonDataObjectStoreConnectionRegistry(final String name,
     final File directory) {
@@ -24,6 +35,10 @@ public class JsonDataObjectStoreConnectionRegistry extends
     final boolean readOnly = !directory.canWrite();
     setReadOnly(readOnly);
     init();
+  }
+
+  public void addConnection(final DataObjectStoreConnection connection) {
+    addConnection(connection.getName(), connection);
   }
 
   @Override
@@ -38,7 +53,7 @@ public class JsonDataObjectStoreConnectionRegistry extends
 
   @Override
   protected void doInit() {
-    if (directory.isDirectory()) {
+    if (directory != null && directory.isDirectory()) {
       for (final File dataStoreFile : FileUtil.getFilesByExtension(directory,
         "rgdatastore")) {
         loadDataStore(dataStoreFile);

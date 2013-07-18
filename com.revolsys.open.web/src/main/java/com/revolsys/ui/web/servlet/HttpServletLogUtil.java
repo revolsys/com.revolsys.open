@@ -7,19 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 
 public final class HttpServletLogUtil {
-  public static void logRequestException(
-    final Logger log,
-    final HttpServletRequest request,
-    final Throwable exception) {
+  public static void logRequestException(final Logger log,
+    final HttpServletRequest request, final Throwable exception) {
     logRequestException(log, request, exception, null);
   }
 
-  public static void logRequestException(
-    final Logger log,
-    final HttpServletRequest request,
-    final Throwable exception,
+  public static void logRequestException(final Logger log,
+    final HttpServletRequest request, final Throwable exception,
     final String[] headerNames) {
-    if (!(exception instanceof IOException)) {
+    if (!(exception instanceof IOException)
+      && !exception.getMessage().contains("Broken pipe")) {
       if (request.getAttribute("LogException") != exception) {
         final StringBuffer text = new StringBuffer();
         final String message = exception.getMessage();

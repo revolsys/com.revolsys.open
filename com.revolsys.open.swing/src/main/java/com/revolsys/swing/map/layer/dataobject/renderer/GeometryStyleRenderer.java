@@ -177,4 +177,14 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     getPropertyChangeSupport().firePropertyChange("style", null, style);
   }
 
+  @Override
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    if (style != null) {
+      final Map<String, Object> allDefaults = getAllDefaults();
+      final Map<String, Object> styleMap = style.toMap(allDefaults);
+      map.putAll(styleMap);
+    }
+    return map;
+  }
 }

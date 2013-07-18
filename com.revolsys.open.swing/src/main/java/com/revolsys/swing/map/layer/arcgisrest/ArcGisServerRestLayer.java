@@ -11,6 +11,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -36,6 +37,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
   public ArcGisServerRestLayer(final String name, final String url) {
     this.url = url;
+    setType("arcgisServerRest");
     if (StringUtils.hasText(name)) {
       setName(name);
     }
@@ -125,6 +127,13 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     } else {
       return true;
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    MapSerializerUtil.add(map, "url", url);
+    return map;
   }
 
 }

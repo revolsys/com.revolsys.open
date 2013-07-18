@@ -6,10 +6,12 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
-  ObjectWithProperties, PropertyChangeListener, Comparable<Layer> {
+  ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
+  MapSerializer {
   void addPropertyChangeListener(PropertyChangeListener listener);
 
   void addPropertyChangeListener(String propertyName,
@@ -40,6 +42,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   <L extends LayerRenderer<? extends Layer>> L getRenderer();
 
   BoundingBox getSelectedBoundingBox();
+
+  String getType();
 
   boolean isEditable();
 

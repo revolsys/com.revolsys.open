@@ -258,7 +258,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   public MarkerStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
-    super("geometryStyle", layer, parent, geometryStyle);
+    super("markerStyle", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(geometryStyle);
     this.style = new GeometryStyle(style);
@@ -266,7 +266,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   public MarkerStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final MarkerStyle style) {
-    super("geometryStyle", layer, parent);
+    super("markerStyle", layer, parent);
     this.style = style;
   }
 
@@ -293,4 +293,14 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     this.style = style;
   }
 
+  @Override
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    if (style != null) {
+      final Map<String, Object> allDefaults = getAllDefaults();
+      final Map<String, Object> styleMap = style.toMap(allDefaults);
+      map.putAll(styleMap);
+    }
+    return map;
+  }
 }

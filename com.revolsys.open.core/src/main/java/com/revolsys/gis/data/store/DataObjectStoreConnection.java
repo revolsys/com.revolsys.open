@@ -15,13 +15,19 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectStoreConnection {
-  private final Map<String, ? extends Object> config;
+  private Map<String, ? extends Object> config;
 
   private String name;
 
-  private final String resourceName;
+  private String resourceName;
 
   private DataObjectStore dataStore;
+
+  public DataObjectStoreConnection(final String name,
+    final DataObjectStore dataStore) {
+    this.name = name;
+    this.dataStore = dataStore;
+  }
 
   public DataObjectStoreConnection(final String resourceName,
     final Map<String, ? extends Object> config) {
@@ -55,6 +61,10 @@ public class DataObjectStoreConnection {
       }
     }
     return dataStore;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public List<DataObjectStoreSchema> getSchemas() {

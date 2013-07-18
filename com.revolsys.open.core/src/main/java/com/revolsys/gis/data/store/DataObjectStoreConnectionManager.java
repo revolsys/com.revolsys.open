@@ -26,7 +26,8 @@ public class DataObjectStoreConnectionManager {
 
   public static DataObjectStore getConnection(final String name) {
     final DataObjectStoreConnectionManager connectionManager = get();
-    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = connectionManager.getConnectionRegistries();
+    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>(
+      connectionManager.registries);
     Collections.reverse(registries);
     for (final ConnectionRegistry<DataObjectStoreConnection> registry : registries) {
       final DataObjectStoreConnection dataStoreConnection = registry.getConnection(name);
@@ -50,8 +51,13 @@ public class DataObjectStoreConnectionManager {
   }
 
   public List<ConnectionRegistry<DataObjectStoreConnection>> getConnectionRegistries() {
-    return new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>(
-      registries);
+    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>();
+    for (final ConnectionRegistry<DataObjectStoreConnection> registry : this.registries) {
+      if (registry.isVisible()) {
+        registries.add(registry);
+      }
+    }
+    return registries;
   }
 
   public ConnectionRegistry<DataObjectStoreConnection> getConnectionRegistry(

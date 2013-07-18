@@ -1,10 +1,10 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -80,15 +80,15 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("type", "multipleStyle");
-    final Map<String, Object> defaults = getDefaults();
-    if (!defaults.isEmpty()) {
-      map.put("defaults", defaults);
-    }
-    if (!renderers.isEmpty()) {
-      map.put("styles", renderers);
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    final Map<String, Object> allDefaults = getAllDefaults();
+    if (!this.renderers.isEmpty()) {
+      final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
+      for (final AbstractDataObjectLayerRenderer renderer : renderers) {
+        rendererMaps.add(renderer.toMap(allDefaults));
+      }
+      MapSerializerUtil.add(map, "styles", rendererMaps);
     }
     return map;
   }

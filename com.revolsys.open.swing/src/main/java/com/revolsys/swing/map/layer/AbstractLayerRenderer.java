@@ -8,9 +8,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.CaseConverter;
@@ -23,9 +26,9 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   private final T layer;
 
-  private double minimumScale = 0;
+  private long maximumScale = 0;
 
-  private double maximumScale = Double.MAX_VALUE;
+  private long minimumScale = Long.MAX_VALUE;
 
   private boolean visible = true;
 
@@ -59,11 +62,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     setDefaults(styleDefaults);
     final Number minimumScale = getValue(style, "minimumScale");
     if (minimumScale != null) {
-      this.minimumScale = minimumScale.doubleValue();
+      this.minimumScale = minimumScale.longValue();
     }
     final Number maximumScale = getValue(style, "maximumScale");
     if (maximumScale != null) {
-      this.maximumScale = maximumScale.doubleValue();
+      this.maximumScale = maximumScale.longValue();
     }
     final Boolean visible = getValue(style, "visible");
     if (visible != null) {
@@ -149,10 +152,9 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   public boolean isVisible(final double scale) {
     if (isVisible()) {
-      if (scale >= minimumScale) {
-        if (scale <= maximumScale) {
-          return true;
-        }
+      final long longScale = (long)scale;
+      if (getMinimumScale() >= longScale && longScale >= getMaximumScale()) {
+        return true;
       }
     }
     return false;
@@ -182,11 +184,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     }
   }
 
-  public void setMaximumScale(final double maximumScale) {
+  public void setMaximumScale(final long maximumScale) {
     this.maximumScale = maximumScale;
   }
 
-  public void setMinimumScale(final double minimumScale) {
+  public void setMinimumScale(final long minimumScale) {
     this.minimumScale = minimumScale;
   }
 
@@ -207,18 +209,30 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     propertyChangeSupport.firePropertyChange("visible", oldVisible, visible);
   }
 
+  @Override
   public Map<String, Object> toMap() {
+    return toMap(Collections.<String, Object> emptyMap());
+  }
+
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("type", type);
-    if (StringUtils.hasText(name)) {
-      map.put("name", name);
+    MapSerializerUtil.add(map, "type", type);
+    MapSerializerUtil.add(map, "name", name);
+    MapSerializerUtil.add(map, "visible", visible, true);
+    final Map<String, Object> newDefaults = new LinkedHashMap<String, Object>(
+      this.defaults);
+    for (final Entry<String, Object> entry : defaults.entrySet()) {
+      final String name = entry.getKey();
+      final Object defaultValue = entry.getValue();
+      final Object newDefaultValue = newDefaults.get(name);
+      if (EqualsRegistry.equal(defaultValue, newDefaultValue)) {
+        newDefaults.remove(name);
+      }
     }
-    if (!defaults.isEmpty()) {
-      map.put("defaults", defaults);
-    }
-    map.put("minimumScale", minimumScale);
-    map.put("maximumScale", maximumScale);
-    return Collections.emptyMap();
+    MapSerializerUtil.add(map, "defaults", newDefaults);
+    MapSerializerUtil.add(map, "maximumScale", maximumScale, 0);
+    MapSerializerUtil.add(map, "minimumScale", minimumScale, Long.MAX_VALUE);
+    return map;
   }
 
   @Override

@@ -123,6 +123,7 @@ public class StringConverterRegistry {
     addConverter(MultiPolygon.class, geometryConverter);
     addConverter(new ListStringConverter());
     addConverter(new ColorStringConverter());
+    addConverter(new MeasureStringConverter());
   }
 
   public void addConverter(final Class<?> clazz,

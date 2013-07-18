@@ -66,6 +66,7 @@ public class GridLayer extends AbstractLayer {
       setName(grid.getName());
     }
     this.grid = grid;
+    setType("grid");
     setReadOnly(true);
     setSelectSupported(false);
     setRenderer(new GridLayerRenderer(this));
@@ -78,6 +79,14 @@ public class GridLayer extends AbstractLayer {
 
   public RectangularMapGrid getGrid() {
     return grid;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    map.remove("readOnly");
+    map.remove("selectSupported");
+    return map;
   }
 
   public void zoomTosheet() {

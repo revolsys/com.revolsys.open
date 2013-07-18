@@ -84,6 +84,10 @@ public class OpenStreetMapClient {
     return METRES_PER_PIXEL[zoomLevel];
   }
 
+  public String getServerUrl() {
+    return serverUrl;
+  }
+
   public int getTileX(final int zoomLevel, final double longitude) {
     final double ratio = (longitude + 180) / 360;
     int tileX = (int)Math.floor(ratio * (1 << zoomLevel));

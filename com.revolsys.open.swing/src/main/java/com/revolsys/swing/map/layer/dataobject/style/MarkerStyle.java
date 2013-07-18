@@ -4,8 +4,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +19,9 @@ import javax.measure.unit.NonSI;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.marker.AbstractMarker;
@@ -25,9 +30,16 @@ import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
 import com.revolsys.util.JavaBeanUtil;
 
-public class MarkerStyle implements Cloneable {
+public class MarkerStyle implements Cloneable, MapSerializer {
+
+  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
 
   public static final AbstractMarker ELLIPSE = new ShapeMarker("ellipse");
+
+  public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1,
+    NonSI.PIXEL);
+
+  private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
 
   public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10,
     NonSI.PIXEL);
@@ -35,11 +47,52 @@ public class MarkerStyle implements Cloneable {
   public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0,
     NonSI.PIXEL);
 
-  public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1,
-    NonSI.PIXEL);
+  static {
+    addProperty("markerFile", String.class, null);
+    addProperty("markerOpacity", Integer.class, 255);
+    addProperty("markerFillOpacity", Integer.class, 255);
+    addProperty("markerLineColor", Color.class, new Color(255, 255, 255, 255));
+    addProperty("markerLineWidth", Measure.class, ONE_PIXEL);
+    addProperty("markerLineOpacity", Double.class, 255);
+    addProperty("markerPlacement", String.class, "point");
+    addProperty("markerType", String.class, "ellipse");
+    addProperty("markerWidth", Measure.class, TEN_PIXELS);
+    addProperty("markerHeight", Measure.class, TEN_PIXELS);
+    addProperty("markerFill", Color.class, new Color(0, 0, 255, 255));
+    addProperty("markerAllowOverlap", Boolean.class, false);
+    addProperty("markerIgnorePlacement", String.class, null);
+    /*
+     * addProperty("markerSpacing",DataTypes.String);
+     * addProperty("markerMaxError",DataTypes.String);
+     */
+    addProperty("markerTransform", String.class, null);
+    addProperty("markerClip", Boolean.class, true);
+    addProperty("markerSmooth", Double.class, 0.0);
+    addProperty("markerCompOp", String.class, null);
+    addProperty("markerOrientationType", String.class, "none");
+    addProperty("markerHorizontalAlignment", String.class, "auto");
+    addProperty("markerVerticalAlignment", String.class, "auto");
+    addProperty("markerDx", Measure.class, ZERO_PIXEL);
+    addProperty("markerDy", Measure.class, ZERO_PIXEL);
+  }
+
+  private static final void addProperty(final String name,
+    final Class<?> dataClass, final Object defaultValue) {
+    PROPERTIES.put(name, dataClass);
+    DEFAULT_VALUES.put(name, defaultValue);
+  }
 
   public static Color getColorWithOpacity(final Color color, final int opacity) {
     return new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
+  }
+
+  private static Object getValue(final String propertyName, final Object value) {
+    final Class<?> dataClass = PROPERTIES.get(propertyName);
+    if (dataClass == null) {
+      return null;
+    } else {
+      return StringConverterRegistry.toObject(dataClass, value);
+    }
   }
 
   public static <T> T getWithDefault(final T value, final T defaultValue) {
@@ -74,8 +127,8 @@ public class MarkerStyle implements Cloneable {
     final AbstractMarker marker, final double markerSize,
     final Color lineColor, final Color fillColor) {
     style.setMarker(marker);
-    style.setMarkerWidth(markerSize);
-    style.setMarkerHeight(markerSize);
+    style.setMarkerWidth(Measure.valueOf(markerSize, NonSI.PIXEL));
+    style.setMarkerHeight(Measure.valueOf(markerSize, NonSI.PIXEL));
     style.setMarkerLineColor(lineColor);
     style.setMarkerHorizontalAlignment("center");
     style.setMarkerVerticalAlignment("middle");
@@ -89,61 +142,65 @@ public class MarkerStyle implements Cloneable {
     setMarker(style, marker, markerSize, lineColor, fillColor);
   }
 
-  private String markerHorizontalAlignment = "auto";
+  private Marker marker = ELLIPSE;
 
-  private String markerVerticalAlignment = "auto";
-
-  private String markerOrientationType = "none";
-
-  private Measure<Length> markerWidth = TEN_PIXELS;
-
-  private Measure<Length> markerHeight = TEN_PIXELS;
-
-  private int markerLineOpacity = 255;
-
-  private int markerOpacity = 255;
-
-  private int markerFillOpacity = 255;
-
-  private double markerSmooth = 0;
+  private boolean markerAllowOverlap;
 
   private boolean markerClip = true;
+
+  private String markerCompOp;
 
   private Measure<Length> markerDeltaX = ZERO_PIXEL;
 
   private Measure<Length> markerDeltaY = ZERO_PIXEL;
 
-  private Marker marker = ELLIPSE;
-
-  private String markerPlacement = "point";
-
-  private String markerType = "ellipse";
-
-  private Color markerLineColor = new Color(255, 255, 255, 255);
-
-  private Color markerFill = new Color(0, 0, 255, 255);
-
-  private Measure<Length> markerLineWidth = ONE_PIXEL;
-
   private String markerFile;
 
   private Resource markerFileResource;
+
+  private Color markerFill = new Color(0, 0, 255, 255);
+
+  private int markerFillOpacity = 255;
+
+  private Measure<Length> markerHeight = TEN_PIXELS;
+
+  private String markerHorizontalAlignment = "auto";
+
+  private String markerIgnorePlacement;
+
+  private Color markerLineColor = new Color(255, 255, 255, 255);
+
+  private int markerLineOpacity = 255;
+
+  private Measure<Length> markerLineWidth = ONE_PIXEL;
+
+  private int markerOpacity = 255;
+
+  private String markerOrientationType = "none";
+
+  private String markerPlacement = "point";
+
+  private double markerSmooth = 0;
+
+  private String markerTransform;
+
+  private String markerType = "ellipse";
+
+  private String markerVerticalAlignment = "auto";
+
+  private Measure<Length> markerWidth = TEN_PIXELS;
 
   public MarkerStyle() {
   }
 
   public MarkerStyle(final Map<String, Object> style) {
     for (final Entry<String, Object> entry : style.entrySet()) {
-      final String label = entry.getKey();
-      Object value = entry.getValue();
-      final MarkerStyleProperty markerStyleProperty = MarkerStyleProperty.getProperty(label);
-      if (markerStyleProperty != null) {
-        final DataType dataType = markerStyleProperty.getDataType();
-        final String propertyName = markerStyleProperty.getPropertyName();
-        value = StringConverterRegistry.toObject(dataType, value);
-        JavaBeanUtil.setProperty(this, propertyName, value);
-      } else if (label.startsWith("marker")) {
-        System.out.println(label);
+      final String propertyName = entry.getKey();
+      final Object value = entry.getValue();
+
+      final Object propertyValue = getValue(propertyName, value);
+      if (propertyValue != null) {
+        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
       }
     }
   }
@@ -161,11 +218,23 @@ public class MarkerStyle implements Cloneable {
     return marker;
   }
 
+  public String getMarkerCompOp() {
+    return markerCompOp;
+  }
+
   public Measure<Length> getMarkerDeltaX() {
     return markerDeltaX;
   }
 
   public Measure<Length> getMarkerDeltaY() {
+    return markerDeltaY;
+  }
+
+  public Measure<Length> getMarkerDx() {
+    return markerDeltaX;
+  }
+
+  public Measure<Length> getMarkerDy() {
     return markerDeltaY;
   }
 
@@ -181,16 +250,16 @@ public class MarkerStyle implements Cloneable {
     return markerFillOpacity;
   }
 
-  public double getMarkerHeight() {
-    return markerHeight.doubleValue(NonSI.PIXEL);
-  }
-
-  public Measure<Length> getMarkerHeightMeasure() {
+  public Measure<Length> getMarkerHeight() {
     return markerHeight;
   }
 
   public String getMarkerHorizontalAlignment() {
     return markerHorizontalAlignment;
+  }
+
+  public String getMarkerIgnorePlacement() {
+    return markerIgnorePlacement;
   }
 
   public Color getMarkerLineColor() {
@@ -201,11 +270,7 @@ public class MarkerStyle implements Cloneable {
     return markerLineOpacity;
   }
 
-  public double getMarkerLineWidth() {
-    return markerLineWidth.doubleValue(NonSI.PIXEL);
-  }
-
-  public Measure<Length> getMarkerLineWidthMeasure() {
+  public Measure<Length> getMarkerLineWidth() {
     return markerLineWidth;
   }
 
@@ -225,6 +290,10 @@ public class MarkerStyle implements Cloneable {
     return markerSmooth;
   }
 
+  public String getMarkerTransform() {
+    return markerTransform;
+  }
+
   public String getMarkerType() {
     return markerType;
   }
@@ -233,12 +302,12 @@ public class MarkerStyle implements Cloneable {
     return markerVerticalAlignment;
   }
 
-  public double getMarkerWidth() {
-    return markerWidth.doubleValue(NonSI.PIXEL);
+  public Measure<Length> getMarkerWidth() {
+    return markerWidth;
   }
 
-  public Measure<Length> getMarkerWidthMeasure() {
-    return markerWidth;
+  public boolean isMarkerAllowOverlap() {
+    return markerAllowOverlap;
   }
 
   public boolean isMarkerClip() {
@@ -249,8 +318,16 @@ public class MarkerStyle implements Cloneable {
     this.marker = getWithDefault(marker, ELLIPSE);
   }
 
+  public void setMarkerAllowOverlap(final boolean markerAllowOverlap) {
+    this.markerAllowOverlap = markerAllowOverlap;
+  }
+
   public void setMarkerClip(final boolean markerClip) {
     this.markerClip = markerClip;
+  }
+
+  public void setMarkerCompOp(final String markerCompOp) {
+    this.markerCompOp = markerCompOp;
   }
 
   public void setMarkerDeltaX(final Measure<Length> markerDx) {
@@ -325,11 +402,7 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
-  public void setMarkerHeight(final double markerHeight) {
-    setMarkerHeightMeasure(Measure.valueOf(markerHeight, NonSI.PIXEL));
-  }
-
-  public void setMarkerHeightMeasure(final Measure<Length> markerHeight) {
+  public void setMarkerHeight(final Measure<Length> markerHeight) {
     this.markerHeight = getWithDefault(markerHeight, TEN_PIXELS);
   }
 
@@ -337,6 +410,10 @@ public class MarkerStyle implements Cloneable {
     final String markerHorizontalAlignment) {
     this.markerHorizontalAlignment = getWithDefault(markerHorizontalAlignment,
       "auto");
+  }
+
+  public void setMarkerIgnorePlacement(final String markerIgnorePlacement) {
+    this.markerIgnorePlacement = markerIgnorePlacement;
   }
 
   public void setMarkerLineColor(final Color markerLineColor) {
@@ -384,13 +461,7 @@ public class MarkerStyle implements Cloneable {
     }
   }
 
-  public void setMarkerLineWidth(final double markerLineWidth) {
-    final Measure<Length> measure = Measure.valueOf(markerLineWidth,
-      NonSI.PIXEL);
-    setMarkerLineWidthMeasure(measure);
-  }
-
-  public void setMarkerLineWidthMeasure(final Measure<Length> markerLineWidth) {
+  public void setMarkerLineWidth(final Measure<Length> markerLineWidth) {
     this.markerLineWidth = getWithDefault(markerLineWidth, ONE_PIXEL);
   }
 
@@ -427,6 +498,10 @@ public class MarkerStyle implements Cloneable {
     this.markerSmooth = markerSmooth;
   }
 
+  public void setMarkerTransform(final String markerTransform) {
+    this.markerTransform = markerTransform;
+  }
+
   public void setMarkerType(final String markerType) {
     this.markerType = getWithDefault(markerType, "ellipse");
     setMarker(new ShapeMarker(this.markerType));
@@ -437,12 +512,31 @@ public class MarkerStyle implements Cloneable {
       "auto");
   }
 
-  public void setMarkerWidth(final double markerWidth) {
-    setMarkerWidthMeasure(Measure.valueOf(markerWidth, NonSI.PIXEL));
-  }
-
-  public void setMarkerWidthMeasure(final Measure<Length> markerWidth) {
+  public void setMarkerWidth(final Measure<Length> markerWidth) {
     this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    return toMap(Collections.<String, Object> emptyMap());
+  }
+
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    for (final String name : PROPERTIES.keySet()) {
+      final Object value = JavaBeanUtil.getValue(this, name);
+
+      Object defaultValue = defaults.get(name);
+      if (defaultValue != null) {
+        defaultValue = getValue(name, defaultValue);
+      }
+      if (defaultValue == null) {
+        defaultValue = DEFAULT_VALUES.get(name);
+      }
+      if (!EqualsRegistry.equal(defaultValue, value)) {
+        MapSerializerUtil.add(map, name, value);
+      }
+    }
+    return map;
+  }
 }

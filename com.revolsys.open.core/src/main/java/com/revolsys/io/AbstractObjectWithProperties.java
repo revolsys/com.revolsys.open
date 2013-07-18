@@ -3,14 +3,14 @@ package com.revolsys.io;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
 
 public class AbstractObjectWithProperties implements ObjectWithProperties {
-  private Map<String, Object> properties = new HashMap<String, Object>();
+  private Map<String, Object> properties = new TreeMap<String, Object>();
 
   @Override
   public void clearProperties() {

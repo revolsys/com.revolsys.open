@@ -16,10 +16,12 @@
 package com.revolsys.util;
 
 import java.beans.BeanInfo;
+import java.beans.IndexedPropertyDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,9 +35,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.apache.commons.beanutils.Converter;
+import org.apache.commons.beanutils.DynaBean;
+import org.apache.commons.beanutils.DynaClass;
+import org.apache.commons.beanutils.DynaProperty;
+import org.apache.commons.beanutils.MappedPropertyDescriptor;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.beanutils.expression.Resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -50,6 +59,10 @@ import com.revolsys.gis.data.model.DataObject;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
+  public static final PropertyUtilsBean PROPERTY_UTILS_BEAN = new PropertyUtilsBean();
+
+  public static final ConvertUtilsBean CONVERT_UTILS_BEAN = new ConvertUtilsBean();
+
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
   /**
@@ -89,6 +102,16 @@ public final class JavaBeanUtil {
 
     }
     return value;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public static Object convert(final Object value, final Class type) {
+    final Converter converter = CONVERT_UTILS_BEAN.lookup(type);
+    if (converter == null) {
+      return value;
+    } else {
+      return converter.convert(type, value);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -462,13 +485,133 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static void setProperty(final Object object,
-    final String propertyName, final Object value) {
-    if (object != null && StringUtils.hasText(propertyName)) {
+  public static boolean setProperty(final Object object, String propertyName,
+    final Object value) {
+    if (object == null || !StringUtils.hasText(propertyName)) {
+      return false;
+    } else {
       try {
-        BeanUtils.setProperty(object, propertyName, value);
+        Object target = object;
+        final Resolver resolver = PROPERTY_UTILS_BEAN.getResolver();
+        while (resolver.hasNested(propertyName)) {
+          try {
+            target = PROPERTY_UTILS_BEAN.getProperty(target,
+              resolver.next(propertyName));
+            propertyName = resolver.remove(propertyName);
+          } catch (final NoSuchMethodException e) {
+            return false;
+          }
+        }
+
+        final String propName = resolver.getProperty(propertyName);
+        @SuppressWarnings("rawtypes")
+        Class type = null;
+        final int index = resolver.getIndex(propertyName);
+        final String key = resolver.getKey(propertyName);
+
+        if (target instanceof DynaBean) {
+          final DynaClass dynaClass = ((DynaBean)target).getDynaClass();
+          final DynaProperty dynaProperty = dynaClass.getDynaProperty(propName);
+          if (dynaProperty == null) {
+            return false;
+          }
+          type = dynaProperty.getType();
+        } else if (target instanceof Map) {
+          type = Object.class;
+        } else if ((target != null) && (target.getClass().isArray())
+          && (index >= 0)) {
+          type = Array.get(target, index).getClass();
+        } else {
+          PropertyDescriptor descriptor = null;
+          try {
+            descriptor = PROPERTY_UTILS_BEAN.getPropertyDescriptor(target,
+              propertyName);
+
+            if (descriptor == null) {
+              return false;
+            }
+          } catch (final NoSuchMethodException e) {
+            return false;
+          }
+          if (descriptor instanceof MappedPropertyDescriptor) {
+            if (((MappedPropertyDescriptor)descriptor).getMappedWriteMethod() == null) {
+              return false;
+            }
+            type = ((MappedPropertyDescriptor)descriptor).getMappedPropertyType();
+          } else if ((index >= 0)
+            && (descriptor instanceof IndexedPropertyDescriptor)) {
+            if (((IndexedPropertyDescriptor)descriptor).getIndexedWriteMethod() == null) {
+              return false;
+            }
+            type = ((IndexedPropertyDescriptor)descriptor).getIndexedPropertyType();
+          } else if (key != null) {
+            if (descriptor.getReadMethod() == null) {
+              return false;
+            }
+            type = (value == null) ? Object.class : value.getClass();
+          } else {
+            if (descriptor.getWriteMethod() == null) {
+              final String setMethodName = "set"
+                + CaseConverter.toUpperFirstChar(propertyName);
+              Method setMethod = MethodUtils.getAccessibleMethod(
+                target.getClass(), setMethodName, value.getClass());
+              if (setMethod == null) {
+                setMethod = MethodUtils.getAccessibleMethod(target.getClass(),
+                  setMethodName, Double.TYPE);
+              }
+              if (setMethod != null) {
+                invokeMethod(setMethod, target, value);
+                return true;
+              }
+
+              return false;
+            }
+            type = descriptor.getPropertyType();
+          }
+
+        }
+
+        Object newValue = null;
+        if ((type.isArray()) && (index < 0)) {
+          if (value == null) {
+            final String[] values = new String[1];
+            values[0] = null;
+            newValue = CONVERT_UTILS_BEAN.convert(values, type);
+          } else if (value instanceof String) {
+            newValue = CONVERT_UTILS_BEAN.convert(value, type);
+          } else if (value instanceof String[]) {
+            newValue = CONVERT_UTILS_BEAN.convert((String[])value, type);
+          } else {
+            newValue = convert(value, type);
+          }
+        } else if (type.isArray()) {
+          if ((value instanceof String) || (value == null)) {
+            newValue = CONVERT_UTILS_BEAN.convert((String)value,
+              type.getComponentType());
+          } else if (value instanceof String[]) {
+            newValue = CONVERT_UTILS_BEAN.convert(((String[])value)[0],
+              type.getComponentType());
+          } else {
+            newValue = convert(value, type.getComponentType());
+          }
+        } else if (value instanceof String) {
+          newValue = CONVERT_UTILS_BEAN.convert((String)value, type);
+        } else if (value instanceof String[]) {
+          newValue = CONVERT_UTILS_BEAN.convert(((String[])value)[0], type);
+        } else {
+          newValue = convert(value, type);
+
+        }
+
+        try {
+          PROPERTY_UTILS_BEAN.setProperty(target, propertyName, newValue);
+          return true;
+        } catch (final NoSuchMethodException e) {
+          return false;
+        }
       } catch (final IllegalAccessException e) {
-        throw new RuntimeException("Unable to set property " + propertyName, e);
+        throw new RuntimeException(
+          "Unable to access property: " + propertyName, e);
       } catch (final InvocationTargetException e) {
         final Throwable t = e.getCause();
         if (t instanceof RuntimeException) {
@@ -476,7 +619,7 @@ public final class JavaBeanUtil {
         } else if (t instanceof Error) {
           throw (Error)t;
         } else {
-          throw new RuntimeException("Unable to set property " + propertyName,
+          throw new RuntimeException("Unable to set property: " + propertyName,
             e);
         }
       }

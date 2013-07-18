@@ -2,11 +2,13 @@ package com.revolsys.swing.map.layer.bing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -41,6 +43,7 @@ public class BingLayer extends AbstractTiledImageLayer {
     this.client = client;
     this.imagerySet = imagerySet;
     this.mapLayer = mapLayer;
+    setType("bing");
     setName("Bing " + imagerySet);
     setVisible(true);
   }
@@ -153,4 +156,11 @@ public class BingLayer extends AbstractTiledImageLayer {
     this.mapLayer = MapLayer.valueOf(mapLayer);
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    MapSerializerUtil.add(map, "imagerySet", imagerySet);
+    MapSerializerUtil.add(map, "mapLayer", mapLayer);
+    return map;
+  }
 }

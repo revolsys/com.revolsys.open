@@ -4,6 +4,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
@@ -85,5 +87,10 @@ public class GeoReferencedImageLayerRenderer extends
         render(viewport, graphics, image);
       }
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    return Collections.emptyMap();
   }
 }

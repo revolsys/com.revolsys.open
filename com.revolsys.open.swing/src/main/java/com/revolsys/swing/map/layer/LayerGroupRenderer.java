@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,11 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
         }
       }
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    return Collections.emptyMap();
   }
 
 }

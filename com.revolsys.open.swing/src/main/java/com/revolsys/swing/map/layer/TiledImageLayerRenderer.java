@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,5 +110,10 @@ public class TiledImageLayerRenderer extends
 
   public void setLoaded() {
     getLayer().firePropertyChange("loading", false, true);
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    return Collections.emptyMap();
   }
 }

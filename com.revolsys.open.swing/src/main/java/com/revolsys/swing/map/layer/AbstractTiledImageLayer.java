@@ -1,6 +1,8 @@
 package com.revolsys.swing.map.layer;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -47,5 +49,13 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
       hasError = true;
       LoggerFactory.getLogger(getClass()).error("Unable to get map tiles", e);
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    map.keySet().removeAll(
+      Arrays.asList("readOnly", "querySupported", "selectSupported"));
+    return map;
   }
 }

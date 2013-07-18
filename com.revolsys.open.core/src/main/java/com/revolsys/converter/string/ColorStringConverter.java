@@ -153,9 +153,19 @@ public class ColorStringConverter implements StringConverter<Color> {
   public String toString(final Object value) {
     if (value instanceof Color) {
       final Color color = (Color)value;
-      // TODO Auto-generated method stub
-      return "rgba(" + color.getRed() + "," + color.getGreen() + ","
-        + color.getBlue() + "," + color.getAlpha() / 255.0 + ")";
+      final String colorName = WebColors.getName(color);
+      if (StringUtils.hasText(colorName)) {
+        return colorName;
+      } else {
+        final int alpha = color.getAlpha();
+        if (alpha == 255) {
+          return "rgb(" + color.getRed() + "," + color.getGreen() + ","
+            + color.getBlue() + ")";
+        } else {
+          return "rgba(" + color.getRed() + "," + color.getGreen() + ","
+            + color.getBlue() + "," + alpha / 255.0 + ")";
+        }
+      }
     } else {
       return null;
     }

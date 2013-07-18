@@ -2,11 +2,13 @@ package com.revolsys.swing.map.layer.openstreetmap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -26,6 +28,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   public OpenStreetMapLayer(final OpenStreetMapClient client) {
     this.client = client;
+    setType("openStreetMap");
   }
 
   public OpenStreetMapLayer(final String serverUrl) {
@@ -47,7 +50,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
-      double resolution = getResolution(viewport);
+      final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
         .convert(GEOMETRY_FACTORY)
         .intersection(MAX_BOUNDING_BOX);
@@ -64,7 +67,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          OpenStreetMapTile tile = new OpenStreetMapTile(this, zoomLevel,
+          final OpenStreetMapTile tile = new OpenStreetMapTile(this, zoomLevel,
             resolution, tileX, tileY);
           tiles.add(tile);
         }
@@ -85,12 +88,9 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public boolean isVisible() {
-    if (!super.isVisible()) {
-      return false;
-    } else {
-      return true;
-    }
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    MapSerializerUtil.add(map, "url", client.getServerUrl());
+    return map;
   }
-
 }

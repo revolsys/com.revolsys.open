@@ -202,10 +202,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           double dx = 0;
           double dy = 0;
 
-          final Measure<Length> textDx = style.getTextDeltaX();
+          final Measure<Length> textDx = style.getTextDx();
           dx += Viewport2D.toDisplayValue(viewport, textDx);
 
-          final Measure<Length> textDy = style.getTextDeltaY();
+          final Measure<Length> textDy = style.getTextDy();
           dy += Viewport2D.toDisplayValue(viewport, textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
@@ -221,7 +221,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           } else if ("middle".equals(verticalAlignment)) {
             dy -= height / 2;
           }
-          final String horizontalAlignment = style.getTextAlign();
+          final String horizontalAlignment = style.getTextHorizontalAlignment();
           if ("right".equals(horizontalAlignment)) {
             dx -= width;
           } else if ("center".equals(horizontalAlignment)) {
@@ -236,7 +236,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
           final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
-            style.getTextHaloRadiusMeasure());
+            style.getTextHaloRadius());
           if (textHaloRadius > 0) {
             final Stroke savedStroke = graphics.getStroke();
             final Stroke outlineStroke = new BasicStroke((float)textHaloRadius,
@@ -303,4 +303,14 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     this.style = style;
   }
 
+  @Override
+  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final Map<String, Object> map = super.toMap(defaults);
+    if (style != null) {
+      final Map<String, Object> allDefaults = getAllDefaults();
+      final Map<String, Object> styleMap = style.toMap(allDefaults);
+      map.putAll(styleMap);
+    }
+    return map;
+  }
 }
