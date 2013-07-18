@@ -9,6 +9,7 @@ import javax.swing.JToggleButton;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
@@ -89,6 +90,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     attributeFilterPanel.addPropertyChangeListener(this);
     toolBar.addComponent("search", attributeFilterPanel);
 
+    final String searchField = layer.getProperty("searchField");
+    attributeFilterPanel.setSearchField(searchField);
+
     toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
       attributeFilterPanel, "clear");
 
@@ -167,13 +171,18 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       final Object searchValue = filterPanel.getSearchValue();
       Condition condition = null;
       if (StringUtils.hasText(searchAttribute) && searchValue != null) {
-        if (searchValue instanceof String) {
+        final String searchOperator = filterPanel.getSearchOperator();
+        if ("Like".equalsIgnoreCase(searchOperator)) {
           final String searchText = (String)searchValue;
           if (StringUtils.hasText(searchText)) {
             condition = Conditions.likeUpper(searchAttribute, searchText);
           }
         } else {
-          condition = Conditions.equal(searchAttribute, searchValue);
+          final DataObjectMetaData metaData = tableModel.getMetaData();
+          final Class<?> attributeClass = metaData.getAttributeClass(searchAttribute);
+          final Object value = StringConverterRegistry.toObject(attributeClass,
+            searchValue);
+          condition = Conditions.equal(searchAttribute, value);
         }
       }
       tableModel.setSearchCondition(condition);

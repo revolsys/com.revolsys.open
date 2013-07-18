@@ -1,7 +1,7 @@
 package com.revolsys.gis.data.store;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +12,11 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.CollectionUtil;
 
-public class DataObjectStoreConnection {
-  private Map<String, ? extends Object> config;
+public class DataObjectStoreConnection implements MapSerializer {
+  private Map<String, Object> config;
 
   private String name;
 
@@ -33,7 +34,7 @@ public class DataObjectStoreConnection {
     final Map<String, ? extends Object> config) {
     super();
     this.resourceName = resourceName;
-    this.config = new HashMap<String, Object>(config);
+    this.config = new LinkedHashMap<String, Object>(config);
     name = CollectionUtil.getString(config, "name");
     if (!StringUtils.hasText(name)) {
       name = FileUtil.getBaseName(resourceName);
@@ -74,6 +75,11 @@ public class DataObjectStoreConnection {
     } else {
       return dataStore.getSchemas();
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    return config;
   }
 
   @Override

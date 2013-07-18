@@ -158,6 +158,7 @@ public class GeoReferencedImage {
     }
   }
 
+  @SuppressWarnings("unused")
   protected void loadWorldFile(final Resource resource,
     final String worldFileExtension) {
 

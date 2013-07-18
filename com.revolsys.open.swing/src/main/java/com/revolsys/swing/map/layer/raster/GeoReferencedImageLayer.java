@@ -4,9 +4,13 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
 import com.revolsys.swing.map.layer.LayerFactory;
@@ -34,51 +38,34 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public static GeoReferencedImageLayer create(
     final Map<String, Object> properties) {
     final String url = (String)properties.get("url");
-    if (url == null) {
-      throw new IllegalArgumentException(
-        "A geo referenced image layer requires a url.");
+    if (StringUtils.hasText(url)) {
+      final Resource resource = SpringUtil.getResource(url);
+      final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+        resource);
+      layer.setProperties(properties);
+      return layer;
     } else {
-      final Resource imageResource = SpringUtil.getResource(url);
-      if (imageResource.exists()) {
-        try {
-          final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
-          if (image == null) {
-            LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-              "Cannot load image:" + imageResource);
-            return null;
-          } else {
-            final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-              image);
-            layer.setProperties(properties);
-            return layer;
-          }
-        } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-            "Unable to load image" + imageResource, e);
-          return null;
-        }
-      } else {
-        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-          "Image does not exist:" + imageResource);
-        return null;
-      }
+      throw new IllegalArgumentException(
+        "Layer definition does not contain a 'url' property");
     }
   }
 
   private GeoReferencedImage image;
 
-  public GeoReferencedImageLayer(final GeoReferencedImage image) {
+  private final Resource resource;
+
+  private final String url;
+
+  public GeoReferencedImageLayer(final Resource resource) {
+    setType(getType());
     setRenderer(new GeoReferencedImageLayerRenderer(this));
     setSelectSupported(false);
     setQuerySupported(false);
-    setImage(image);
-    setGeometryFactory(image.getGeometryFactory());
-  }
-
-  public GeoReferencedImageLayer(final String name,
-    final GeoReferencedImage image) {
-    this(image);
-    setName(name);
+    this.resource = resource;
+    this.url = SpringUtil.getUrl(resource).toString();
+    setType("geoReferencedImage");
+    setName(FileUtil.getBaseName(url));
+    SwingWorkerManager.execute("Loading file: " + url, this, "revert");
   }
 
   public BoundingBox fitToViewport() {
@@ -133,11 +120,29 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   public void revert() {
-    final GeoReferencedImage image = getImage();
-    if (image != null) {
+    if (image == null && resource != null) {
+      final Resource imageResource = SpringUtil.getResource(url);
+      if (imageResource.exists()) {
+        try {
+          image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+          if (image == null) {
+            LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+              "Cannot load image:" + url);
+          } else {
+            setGeometryFactory(image.getGeometryFactory());
+          }
+        } catch (final RuntimeException e) {
+          LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+            "Unable to load image" + url, e);
+        }
+      } else {
+        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+          "Image does not exist:" + url);
+      }
+    } else {
       image.revert();
-      firePropertyChange("revert", false, true);
     }
+    firePropertyChange("revert", false, true);
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -146,5 +151,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public void setImage(final GeoReferencedImage image) {
     this.image = image;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    map.remove("querySupported");
+    map.remove("selectSupported");
+    MapSerializerUtil.add(map, "url", url);
+    // TODO add geo-referencing information
+    return map;
   }
 }

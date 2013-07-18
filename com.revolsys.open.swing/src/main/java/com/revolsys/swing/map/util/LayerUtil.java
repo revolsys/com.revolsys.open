@@ -13,9 +13,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
@@ -25,8 +23,8 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayerFactory;
 import com.revolsys.swing.map.layer.bing.BingLayerFactory;
+import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayerFactory;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -34,7 +32,6 @@ import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayerFactory;
 import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.tree.ObjectTree;
@@ -49,6 +46,7 @@ public class LayerUtil {
     addLayerFactory(new ArcGisServerRestLayerFactory());
     addLayerFactory(new BingLayerFactory());
     addLayerFactory(new OpenStreetMapLayerFactory());
+    addLayerFactory(DataObjectFileLayer.FACTORY);
     addLayerFactory(GridLayer.FACTORY);
     addLayerFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     addLayerFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
@@ -166,35 +164,16 @@ public class LayerUtil {
         loadLayer(layerGroup, file);
       } else {
         final FileSystemResource resource = new FileSystemResource(file);
-
-        final GeoReferencedImage image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(resource);
-        if (image != null) {
+        if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(resource)) {
           final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-            FileUtil.getBaseName(file), image);
+            resource);
           layerGroup.add(layer);
           layer.setEditable(true);
-        } else {
-          final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
-          if (reader != null) {
-            try {
-              final DataObjectMetaData metaData = reader.getMetaData();
-              final GeometryFactory geometryFactory = metaData.getGeometryFactory();
-              BoundingBox boundingBox = new BoundingBox(geometryFactory);
-              final DataObjectListLayer layer = new DataObjectListLayer(
-                metaData);
-              final GeometryStyleRenderer renderer = layer.getRenderer();
-              renderer.setStyle(GeometryStyle.createStyle());
-              for (final DataObject object : reader) {
-                final Geometry geometry = object.getGeometryValue();
-                boundingBox = boundingBox.expandToInclude(geometry);
-                layer.add(object);
-              }
-              layer.setBoundingBox(boundingBox);
-              layerGroup.add(layer);
-            } finally {
-              reader.close();
-            }
-          }
+        } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(resource)) {
+          final DataObjectFileLayer layer = new DataObjectFileLayer(resource);
+          final GeometryStyleRenderer renderer = layer.getRenderer();
+          renderer.setStyle(GeometryStyle.createStyle());
+          layerGroup.add(layer);
         }
       }
     }

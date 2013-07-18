@@ -45,6 +45,18 @@ public class TablePanel extends JPanel implements MouseListener {
     add(scrollPane, BorderLayout.CENTER);
   }
 
+  private void doMenu(final MouseEvent e) {
+    setEventRow(e);
+    if (e.isPopupTrigger()) {
+      popupMouseEvent = new WeakReference<MouseEvent>(e);
+      final int x = e.getX();
+      final int y = e.getY();
+      final JPopupMenu popupMenu = menu.createJPopupMenu();
+      final Component component = e.getComponent();
+      popupMenu.show(component, x, y);
+    }
+  }
+
   public int getEventRow() {
     return eventRow;
   }
@@ -69,7 +81,6 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    setEventRow(e);
   }
 
   @Override
@@ -82,19 +93,12 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    setEventRow(e);
-    if (e.isPopupTrigger()) {
-      popupMouseEvent = new WeakReference<MouseEvent>(e);
-      final int x = e.getX();
-      final int y = e.getY();
-      final JPopupMenu popupMenu = menu.createJPopupMenu();
-      final Component component = e.getComponent();
-      popupMenu.show(component, x, y);
-    }
+    doMenu(e);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    doMenu(e);
   }
 
   protected void setEventRow(final MouseEvent e) {

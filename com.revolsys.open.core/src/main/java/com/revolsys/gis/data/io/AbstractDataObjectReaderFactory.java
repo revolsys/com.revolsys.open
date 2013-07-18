@@ -37,7 +37,7 @@ public abstract class AbstractDataObjectReaderFactory extends
     }
   }
 
-  protected static DataObjectReaderFactory getDataObjectReaderFactory(
+  public static DataObjectReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
@@ -45,7 +45,9 @@ public abstract class AbstractDataObjectReaderFactory extends
     return readerFactory;
   }
 
-  private boolean geometrySupported;
+  public static boolean hasDataObjectReaderFactory(final Resource resource) {
+    return getDataObjectReaderFactory(resource) != null;
+  }
 
   private final boolean binary;
 
@@ -111,6 +113,9 @@ public abstract class AbstractDataObjectReaderFactory extends
     return directoryReader;
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final Reader reader = createDataObjectReader(resource);

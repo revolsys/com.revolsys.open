@@ -37,6 +37,9 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   private List<LayerDataObject> records = new ArrayList<LayerDataObject>();
 
+  public DataObjectListLayer() {
+  }
+
   public DataObjectListLayer(final DataObjectMetaData metaData) {
     super(metaData);
     setEditable(true);

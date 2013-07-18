@@ -61,7 +61,7 @@ public class JsonDataObjectStoreConnectionRegistry extends
     }
   }
 
-  protected void loadDataStore(final File dataStoreFile) {
+  protected DataObjectStoreConnection loadDataStore(final File dataStoreFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(dataStoreFile);
     String name = CollectionUtil.getString(config, "name");
     if (!StringUtils.hasText(name)) {
@@ -74,14 +74,17 @@ public class JsonDataObjectStoreConnectionRegistry extends
         LoggerFactory.getLogger(getClass()).error(
           "Data store must include a 'connection' map property: "
             + dataStoreFile);
+        return null;
       } else {
         final DataObjectStoreConnection dataStoreConnection = new DataObjectStoreConnection(
           dataStoreFile.toString(), config);
         addConnection(name, dataStoreConnection);
+        return dataStoreConnection;
       }
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(
         "Error creating data store from: " + dataStoreFile, e);
+      return null;
     }
   }
 }

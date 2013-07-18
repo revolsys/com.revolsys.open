@@ -35,21 +35,20 @@ public class GridLayer extends AbstractLayer {
     "grid", "Grid", GridLayer.class, "create");
 
   public static GridLayer create(final Map<String, Object> properties) {
-    final String layerName = (String)properties.get("name");
     final String gridName = (String)properties.get("gridName");
     if (StringUtils.hasText(gridName)) {
       final RectangularMapGrid grid = RectangularMapGridFactory.getGrid(gridName);
       if (grid == null) {
         LoggerFactory.getLogger(GridLayer.class).error(
-          properties + " cannot find gridName=" + gridName);
+          "Cannot find gridName=" + gridName);
       } else {
-        final GridLayer layer = new GridLayer(layerName, grid);
+        final GridLayer layer = new GridLayer(grid);
         layer.setProperties(properties);
         return layer;
       }
     } else {
       LoggerFactory.getLogger(GridLayer.class).error(
-        properties + " does not contain a gridName property");
+        "Layer definition does not contain a 'gridName' property");
     }
     return null;
   }
@@ -57,14 +56,7 @@ public class GridLayer extends AbstractLayer {
   private final RectangularMapGrid grid;
 
   public GridLayer(final RectangularMapGrid grid) {
-    this(grid.getName(), grid);
-  }
-
-  public GridLayer(final String name, final RectangularMapGrid grid) {
-    super(name);
-    if (!StringUtils.hasText(name)) {
-      setName(grid.getName());
-    }
+    super(grid.getName());
     this.grid = grid;
     setType("grid");
     setReadOnly(true);
