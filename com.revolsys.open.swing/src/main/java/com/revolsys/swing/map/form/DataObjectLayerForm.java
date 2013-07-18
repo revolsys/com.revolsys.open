@@ -477,7 +477,8 @@ public class DataObjectLayerForm extends JPanel implements
       maxHeight = Math.min(bounds.height, maxHeight);
     }
     maxHeight -= 300;
-    final int preferredHeight = (allAttributes.getRowCount() + 1) * 20;
+    final int preferredHeight = Math.min(maxHeight,
+      (allAttributes.getRowCount() + 1) * 20);
     scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
     scrollPane.setPreferredSize(new Dimension(800, preferredHeight));
