@@ -14,6 +14,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.BaseJxTable;
@@ -58,6 +59,20 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     return model.getMetaData();
   }
 
+  public DataObject getSelectedRecord() {
+    final int row = getSelectedRow();
+    if (row == -1) {
+      return null;
+    } else {
+      final DataObjectRowTableModel tableModel = getTableModel();
+      return tableModel.getObject(row);
+    }
+  }
+
+  public DataObjectRowTableModel getTableModel() {
+    return (DataObjectRowTableModel)getModel();
+  }
+
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
@@ -87,7 +102,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
         final int index = convertColumnIndexToModel(column);
         final Class<?> attributeClass = metaData.getAttributeClass(index);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
-          model.setSortOrder(column);
+          model.setSortOrder(index);
         }
       }
     }

@@ -32,7 +32,9 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
       final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
       // TODO how to make this a weak reference
-      propertyChangeSupport.addPropertyChangeListener(propertyName, this);
+      if (propertyChangeSupport != null) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, this);
+      }
     }
     this.propertyName = propertyName;
     this.value = value;

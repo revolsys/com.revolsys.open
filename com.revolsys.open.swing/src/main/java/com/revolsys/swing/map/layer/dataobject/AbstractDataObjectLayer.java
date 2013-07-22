@@ -285,7 +285,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearSelectedRecords() {
     selectedRecords = new LinkedHashSet<LayerDataObject>();
-    firePropertyChange("selected", true, false);
+    fireSelected();
   }
 
   protected void clearSelectedRecordsIndex() {
@@ -476,6 +476,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final boolean selected = !selectedRecords.isEmpty();
     firePropertyChange("selected", !selected, selected);
     firePropertyChange("selectionCount", -1, selectedRecords.size());
+    final boolean hasSelectedRecords = isHasSelectedRecords();
+    firePropertyChange("hasSelectedRecords", !hasSelectedRecords,
+      hasSelectedRecords);
   }
 
   @Override
@@ -829,7 +832,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public boolean isVisible(final LayerDataObject object) {
     if (isVisible()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer();
-      if (renderer != null && renderer.isVisible(object)) {
+      if (renderer == null || renderer.isVisible(object)) {
         return true;
       }
     }

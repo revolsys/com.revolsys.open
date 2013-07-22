@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Vector;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
@@ -49,10 +52,19 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   public ComboBox(final ObjectToStringConverter converter,
-    final boolean editable, final Object... items) {
-    super(items);
+    final boolean editable, final Collection<?> items) {
+    super(new Vector<Object>(items));
     setEditable(editable);
     AutoCompleteDecorator.decorate(this, converter);
+    if (converter instanceof ListCellRenderer) {
+      final ListCellRenderer renderer = (ListCellRenderer)converter;
+      setRenderer(renderer);
+    }
+  }
+
+  public ComboBox(final ObjectToStringConverter converter,
+    final boolean editable, final Object... items) {
+    this(converter, editable, Arrays.asList(items));
   }
 
   public ComboBox(final String fieldName, final ComboBoxModel model) {
