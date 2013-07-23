@@ -11,8 +11,7 @@ import javax.swing.JOptionPane;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
+import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 
@@ -33,7 +32,7 @@ public class Project extends LayerGroup {
 
   private BoundingBox viewBoundingBox = new BoundingBox();
 
-  private ConnectionRegistry<DataObjectStoreConnection> dataStores;
+  private DataObjectStoreConnectionRegistry dataStores;
 
   public Project() {
     this("Project");
@@ -66,7 +65,7 @@ public class Project extends LayerGroup {
     this.viewBoundingBox = null;
   }
 
-  public ConnectionRegistry<DataObjectStoreConnection> getDataStores() {
+  public DataObjectStoreConnectionRegistry getDataStores() {
     return dataStores;
   }
 
@@ -139,8 +138,7 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void setDataStores(
-    final ConnectionRegistry<DataObjectStoreConnection> dataStores) {
+  public void setDataStores(final DataObjectStoreConnectionRegistry dataStores) {
     this.dataStores = dataStores;
   }
 

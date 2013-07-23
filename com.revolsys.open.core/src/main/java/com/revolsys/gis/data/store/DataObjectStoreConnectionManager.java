@@ -31,10 +31,10 @@ public class DataObjectStoreConnectionManager implements
 
   public static DataObjectStore getConnection(final String name) {
     final DataObjectStoreConnectionManager connectionManager = get();
-    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>(
+    final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>(
       connectionManager.registries);
     Collections.reverse(registries);
-    for (final ConnectionRegistry<DataObjectStoreConnection> registry : registries) {
+    for (final DataObjectStoreConnectionRegistry registry : registries) {
       final DataObjectStoreConnection dataStoreConnection = registry.getConnection(name);
       if (dataStoreConnection != null) {
         return dataStoreConnection.getDataStore();
@@ -46,22 +46,22 @@ public class DataObjectStoreConnectionManager implements
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  private final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>();
+  private final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>();
 
   public DataObjectStoreConnectionManager() {
   }
 
   public void addConnectionRegistry(
-    final ConnectionRegistry<DataObjectStoreConnection> registry) {
+    final DataObjectStoreConnectionRegistry registry) {
     if (!registries.contains(registry)) {
       registries.add(registry);
       registry.getPropertyChangeSupport().addPropertyChangeListener(this);
     }
   }
 
-  public List<ConnectionRegistry<DataObjectStoreConnection>> getConnectionRegistries() {
-    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>();
-    for (final ConnectionRegistry<DataObjectStoreConnection> registry : this.registries) {
+  public List<DataObjectStoreConnectionRegistry> getConnectionRegistries() {
+    final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>();
+    for (final DataObjectStoreConnectionRegistry registry : this.registries) {
       if (registry.isVisible()) {
         registries.add(registry);
       }
@@ -69,9 +69,9 @@ public class DataObjectStoreConnectionManager implements
     return registries;
   }
 
-  public ConnectionRegistry<DataObjectStoreConnection> getConnectionRegistry(
+  public DataObjectStoreConnectionRegistry getConnectionRegistry(
     final String name) {
-    for (final ConnectionRegistry<DataObjectStoreConnection> registry : registries) {
+    for (final DataObjectStoreConnectionRegistry registry : registries) {
       if (registry.getName().equals(name)) {
         return registry;
       }
@@ -90,7 +90,7 @@ public class DataObjectStoreConnectionManager implements
   }
 
   public void removeConnectionRegistry(
-    final ConnectionRegistry<DataObjectStoreConnection> registry) {
+    final DataObjectStoreConnectionRegistry registry) {
     registries.remove(registry);
     registry.getPropertyChangeSupport().removePropertyChangeListener(this);
   }

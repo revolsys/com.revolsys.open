@@ -22,8 +22,6 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.collection.PropertyChangeArrayList;
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.FileSystemConnectionManager;
@@ -188,7 +186,7 @@ public class ProjectFrame extends JFrame {
   public void dispose() {
     super.dispose();
     if (project != null) {
-      final ConnectionRegistry<DataObjectStoreConnection> dataStores = project.getDataStores();
+      final DataObjectStoreConnectionRegistry dataStores = project.getDataStores();
       DataObjectStoreConnectionManager.get().removeConnectionRegistry(
         dataStores);
       tocPanel = null;

@@ -209,7 +209,11 @@ public abstract class AbstractConnectionRegistry<T> implements
     this.directory = directory;
   }
 
-  protected void setReadOnly(final boolean readOnly) {
+  public void setReadOnly(final boolean readOnly) {
+    if (this.isReadOnly() && !readOnly) {
+      throw new IllegalArgumentException(
+        "Cannot make a read only registry not read only");
+    }
     this.readOnly = readOnly;
   }
 

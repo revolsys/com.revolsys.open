@@ -6,22 +6,20 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
+import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class DataObjectStoreConnectionManagerModel
   extends
-  AbstractObjectTreeNodeModel<DataObjectStoreConnectionManager, ConnectionRegistry<DataObjectStoreConnection>> {
+  AbstractObjectTreeNodeModel<DataObjectStoreConnectionManager, DataObjectStoreConnectionRegistry> {
 
   public DataObjectStoreConnectionManagerModel() {
     setSupportedClasses(DataObjectStoreConnectionManager.class);
-    setSupportedChildClasses(ConnectionRegistry.class);
+    setSupportedChildClasses(DataObjectStoreConnectionRegistry.class);
     setObjectTreeNodeModels(new DataObjectStoreConnectionRegistryModel());
     setLazyLoad(true);
-    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder",
-      "database");
+    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
     final DefaultTreeCellRenderer renderer = getRenderer();
     renderer.setLeafIcon(icon);
     renderer.setOpenIcon(icon);
@@ -29,9 +27,9 @@ public class DataObjectStoreConnectionManagerModel
   }
 
   @Override
-  protected List<ConnectionRegistry<DataObjectStoreConnection>> getChildren(
+  protected List<DataObjectStoreConnectionRegistry> getChildren(
     final DataObjectStoreConnectionManager connectionRegistry) {
-    final List<ConnectionRegistry<DataObjectStoreConnection>> registries = connectionRegistry.getConnectionRegistries();
+    final List<DataObjectStoreConnectionRegistry> registries = connectionRegistry.getConnectionRegistries();
     return registries;
   }
 
