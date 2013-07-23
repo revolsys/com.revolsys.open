@@ -6,7 +6,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>2013.07.23.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <licenses>
     <license>
