@@ -947,7 +947,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void removeForm(final LayerDataObject object) {
-    forms.remove(object);
+    final Window form = forms.remove(object);
+    if (form != null) {
+      form.dispose();
+      form.removeNotify();
+
+    }
   }
 
   protected void removeModifiedObject(final LayerDataObject object) {
@@ -1230,7 +1235,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.addWindowListener(new WindowAdapter() {
               @Override
               public void windowClosing(final WindowEvent e) {
-                form.removeNotify();
                 removeForm(object);
               }
             });

@@ -133,7 +133,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     if (tempDirectory != null) {
       try {
         if (log.isInfoEnabled()) {
@@ -178,6 +178,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
             log.debug("  Finished closing file");
           }
         }
+        tempDirectory = null;
       }
     }
   }
