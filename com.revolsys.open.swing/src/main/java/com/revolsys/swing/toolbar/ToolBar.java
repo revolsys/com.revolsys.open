@@ -32,10 +32,6 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
-  public void removeComponent(String groupName, int index) {
-    groups.removeComponent(this, groupName, index);
-  }
-
   public JButton addButton(final String groupName, final Action action) {
     final JButton button = createButton(action);
     button.setAction(action);
@@ -82,7 +78,7 @@ public class ToolBar extends JToolBar {
     groups.addGroup(groupName);
   }
 
-  public JToggleButton addToggleButton(final String groupName, int index,
+  public JToggleButton addToggleButton(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
@@ -90,7 +86,7 @@ public class ToolBar extends JToolBar {
       enableCheck, object, methodName, parameters);
   }
 
-  public JToggleButton addToggleButton(final String groupName, int index,
+  public JToggleButton addToggleButton(final String groupName, final int index,
     final String name, final String title, final Icon icon,
     final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
@@ -106,8 +102,8 @@ public class ToolBar extends JToolBar {
   }
 
   public JToggleButton addToggleButtonTitleIcon(final String groupName,
-    int index, final String title, final String iconName, final Object object,
-    final String methodName, final Object... parameters) {
+    final int index, final String title, final String iconName,
+    final Object object, final String methodName, final Object... parameters) {
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, null,
       object, methodName, parameters);
@@ -147,13 +143,17 @@ public class ToolBar extends JToolBar {
     return groups.getGroup(groupName);
   }
 
-  public void setGroupEnabled(final String groupName, final boolean enabled) {
-    groups.setGroupEnabled(groupName, enabled);
+  public void removeComponent(final String groupName, final int index) {
+    groups.removeComponent(this, groupName, index);
   }
 
-  public void removeGroup(String groupName) {
+  public void removeGroup(final String groupName) {
     groups.removeGroup(this, groupName);
 
+  }
+
+  public void setGroupEnabled(final String groupName, final boolean enabled) {
+    groups.setGroupEnabled(groupName, enabled);
   }
 
 }

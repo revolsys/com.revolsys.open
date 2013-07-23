@@ -36,21 +36,12 @@ public class ComponentGroup {
   }
 
   public void addComponent(final JComponent container, final String groupName,
-    int index, final Component component) {
+    final int index, final Component component) {
     final List<Component> components = getGroup(groupName);
     if (index < 0) {
       components.add(component);
     } else {
       components.add(index, component);
-    }
-    updateComponents(container);
-  }
-
-  public void removeComponent(final JComponent container,
-    final String groupName, int index) {
-    final List<Component> components = getGroup(groupName);
-    if (index < components.size()) {
-      components.remove(index);
     }
     updateComponents(container);
   }
@@ -76,6 +67,23 @@ public class ComponentGroup {
       groupNames.add(groupName);
     }
     return components;
+  }
+
+  public void removeComponent(final JComponent container,
+    final String groupName, final int index) {
+    final List<Component> components = getGroup(groupName);
+    if (index < components.size()) {
+      components.remove(index);
+    }
+    updateComponents(container);
+  }
+
+  public void removeGroup(final Container container, final String groupName) {
+    buttonGroups.remove(groupName);
+    groupNames.remove(groupName);
+    for (final Component component : groups.remove(groupName)) {
+      container.remove(component);
+    }
   }
 
   public void setGroupEnabled(final String groupName, final boolean enabled) {
@@ -110,13 +118,6 @@ public class ComponentGroup {
         }
       }
     }
-  }
-
-  public void removeGroup(Container container, String groupName) {
-    buttonGroups.remove(groupName);
-    groupNames.remove(groupName);
-    for (Component component : groups.remove(groupName)) {
-      container.remove(component);
-    }
+    container.revalidate();
   }
 }

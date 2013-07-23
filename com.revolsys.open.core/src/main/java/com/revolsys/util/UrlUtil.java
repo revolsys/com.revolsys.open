@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
@@ -142,6 +144,14 @@ public final class UrlUtil {
   public static String getParentString(final URL url) {
     final String urlString = url.toString();
     return getParent(urlString);
+  }
+
+  public static URI getUri(final String uri) {
+    try {
+      return new URI(uri);
+    } catch (final URISyntaxException e) {
+      throw new IllegalArgumentException("Unknown URI: " + uri, e);
+    }
   }
 
   /**
