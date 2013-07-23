@@ -1,44 +1,89 @@
 package com.revolsys.gis.data.store;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.util.CollectionUtil;
+
 public abstract class AbstractConnectionRegistry<T> implements
-  ConnectionRegistry<T> {
+  ConnectionRegistry<T>, PropertyChangeListener {
 
   private Map<String, T> connections;
 
-  private boolean visible;
+  private boolean visible = true;
 
-  private final Set<String> connectionNames = new TreeSet<String>();
+  private final Map<String, String> connectionNames = new TreeMap<String, String>();
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
+
+  private File directory;
 
   private final String name;
 
   private boolean readOnly;
 
-  public AbstractConnectionRegistry(final String name) {
+  private final String fileExtension;
+
+  public AbstractConnectionRegistry(final String fileExtension,
+    final String name) {
+    this.fileExtension = fileExtension;
     this.name = name;
   }
 
-  protected void addConnection(final String name, final T connection) {
-    if (connection != null) {
-      this.connectionNames.add(name);
+  protected synchronized void addConnection(final String name,
+    final T connection) {
+    if (connection != null && name != null) {
       final String lowerName = name.toLowerCase();
+      final T existingConnection = this.connections.get(lowerName);
+      removeConnection(existingConnection);
+      this.connectionNames.put(lowerName, name);
       this.connections.put(lowerName, connection);
+      if (connection instanceof PropertyChangeSupportProxy) {
+        final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)connection;
+        final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+        if (propertyChangeSupport != null) {
+          propertyChangeSupport.addPropertyChangeListener(this);
+        }
+      }
+      final int index = getConnectionIndex(name);
+      propertyChangeSupport.fireIndexedPropertyChange("connections", index,
+        null, connection);
     }
   }
 
-  protected abstract void doInit();
+  @Override
+  public void createConnection(
+    final Map<String, ? extends Object> connectionParameters) {
+    final String name = CollectionUtil.getString(connectionParameters, "name");
+    final File file = getConnectionFile(name);
+    if (file != null && (!file.exists() || file.canRead())) {
+      final FileSystemResource resource = new FileSystemResource(file);
+      JsonMapIoFactory.write(connectionParameters, resource);
+      loadConnection(file);
+    }
+  }
+
+  protected void doInit() {
+    if (directory != null && directory.isDirectory()) {
+      for (final File connectionFile : FileUtil.getFilesByExtension(directory,
+        fileExtension)) {
+        loadConnection(connectionFile);
+      }
+    }
+  }
 
   @Override
   public List<T> getConections() {
@@ -54,9 +99,38 @@ public abstract class AbstractConnectionRegistry<T> implements
     }
   }
 
+  protected File getConnectionFile(final String name) {
+    if (!directory.exists()) {
+      if (isReadOnly()) {
+        return null;
+      } else if (!directory.mkdirs()) {
+        return null;
+      }
+    }
+    final String fileName = name.replaceAll("[^a-zA-Z0-9\\-_ ]", "_") + "."
+      + fileExtension;
+    final File file = new File(directory, fileName);
+    return file;
+  }
+
+  protected int getConnectionIndex(final String name) {
+    final String lowerName = name.toLowerCase();
+    final int index = new ArrayList<String>(connectionNames.keySet()).indexOf(lowerName);
+    return index;
+  }
+
   @Override
   public List<String> getConnectionNames() {
-    return new ArrayList<String>(connectionNames);
+    final List<String> names = new ArrayList<String>(connectionNames.values());
+    return names;
+  }
+
+  public File getDirectory() {
+    return directory;
+  }
+
+  public String getFileExtension() {
+    return fileExtension;
   }
 
   @Override
@@ -81,6 +155,58 @@ public abstract class AbstractConnectionRegistry<T> implements
   @Override
   public boolean isVisible() {
     return visible;
+  }
+
+  protected abstract T loadConnection(final File connectionFile);
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    propertyChangeSupport.firePropertyChange(event);
+  }
+
+  protected synchronized boolean removeConnection(final String name,
+    final T connection) {
+    if (connection != null && name != null) {
+      final String lowerName = name.toLowerCase();
+      final T existingConnection = this.connections.get(lowerName);
+      if (existingConnection == connection) {
+        final int index = getConnectionIndex(name);
+        this.connectionNames.remove(lowerName);
+        this.connections.remove(lowerName);
+        if (connection instanceof PropertyChangeSupportProxy) {
+          final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)connection;
+          final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+          if (propertyChangeSupport != null) {
+            propertyChangeSupport.removePropertyChangeListener(this);
+          }
+        }
+        propertyChangeSupport.fireIndexedPropertyChange("connections", index,
+          connection, null);
+        if (directory != null && !readOnly) {
+          final File file = getConnectionFile(name);
+          file.delete();
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected abstract boolean removeConnection(T connection);
+
+  protected void setDirectory(final File directory) {
+    if (directory != null) {
+      boolean readOnly;
+      if (directory.exists()) {
+        readOnly = !directory.canWrite();
+      } else if (directory.mkdirs()) {
+        readOnly = false;
+      } else {
+        readOnly = true;
+      }
+      setReadOnly(readOnly);
+    }
+    this.directory = directory;
   }
 
   protected void setReadOnly(final boolean readOnly) {

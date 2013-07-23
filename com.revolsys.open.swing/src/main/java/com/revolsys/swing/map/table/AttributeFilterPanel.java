@@ -25,6 +25,7 @@ import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreSearchTextField;
+import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 
@@ -72,11 +73,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     operatorField.addItemListener(this);
     add(operatorField);
 
-    this.searchTextField = new JXSearchField();
+    this.searchTextField = new SearchField();
     this.searchField = searchTextField;
     searchTextField.addActionListener(this);
-    searchTextField.setMinimumSize(new Dimension(200, 10));
-
+    searchTextField.setPreferredSize(new Dimension(200,
+      searchTextField.getHeight()));
     add(searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 3);
 
@@ -127,10 +128,14 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
             dataStoreSearchTextField.addItemListener(this);
             dataStoreSearchTextField.setMaxResults(5);
             operatorField.setEnabled(false);
+            dataStoreSearchTextField.setPreferredSize(new Dimension(200,
+              searchTextField.getHeight()));
           } else if (searchField instanceof JXSearchField) {
             final JXSearchField searchTextField = (JXSearchField)searchField;
             searchTextField.addActionListener(this);
             operatorField.setEnabled(true);
+            searchTextField.setPreferredSize(new Dimension(200,
+              searchTextField.getHeight()));
           } else if (searchField instanceof JComboBox) {
             final JComboBox comboField = (JComboBox)searchField;
             comboField.addActionListener(this);

@@ -23,6 +23,8 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   int getIndexOfChild(final NODE node, final CHILD child);
 
+  Object getLabel(final NODE node);
+
   MenuFactory getMenu(final NODE node);
 
   MouseListener getMouseListener(final NODE node);

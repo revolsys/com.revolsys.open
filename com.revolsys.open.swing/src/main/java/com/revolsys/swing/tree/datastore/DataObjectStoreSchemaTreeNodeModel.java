@@ -26,7 +26,7 @@ public class DataObjectStoreSchemaTreeNodeModel extends
     setSupportedChildClasses(DataObjectMetaData.class);
     setObjectTreeNodeModels(new DataObjectMetaDataTreeNodeModel());
     setLazyLoad(true);
-    final ImageIcon icon = SilkIconLoader.getIconWidthBadge("folder",
+    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder",
         "database");
     renderer.setLeafIcon(icon);
     renderer.setOpenIcon(icon);

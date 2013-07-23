@@ -55,8 +55,8 @@ public class SilkIconLoader {
     }
   }
 
-  public static ImageIcon getIconWidthBadge(final String imageName,
-    final String smallImageName) {
+  public static ImageIcon getIconWithBadge(final String imageName,
+    final String... smallImageName) {
     final Image image = getImageWidthBadge(imageName, smallImageName);
     if (image == null) {
       return null;
@@ -82,24 +82,22 @@ public class SilkIconLoader {
   }
 
   public static Image getImageWidthBadge(final String imageName,
-    final String smallImageName) {
+    final String... smallImageNames) {
     final BufferedImage image = getImage(imageName);
-    final BufferedImage smallImage = getSmallImage(smallImageName);
-    if (image == null) {
-      return smallImage;
-    } else if (smallImage == null) {
-      return image;
-    } else {
-      final int w = Math.max(image.getWidth(), smallImage.getWidth());
-      final int h = Math.max(image.getHeight(), smallImage.getHeight());
-      final BufferedImage combined = new BufferedImage(w, h,
-        BufferedImage.TYPE_INT_ARGB);
+    final int w = image.getWidth();
+    final int h = image.getHeight();
+    final BufferedImage combined = new BufferedImage(w, h,
+      BufferedImage.TYPE_INT_ARGB);
+    final Graphics g = combined.getGraphics();
+    g.drawImage(image, 0, 0, null);
 
-      final Graphics g = combined.getGraphics();
-      g.drawImage(image, 0, 0, null);
-      g.drawImage(smallImage, 0, 0, null);
-      return combined;
+    for (final String smallImageName : smallImageNames) {
+      final BufferedImage smallImage = getSmallImage(smallImageName);
+      if (image != null) {
+        g.drawImage(smallImage, 0, 0, null);
+      }
     }
+    return combined;
   }
 
   private static BufferedImage getImageWithPrefix(final String prefix,
@@ -126,6 +124,6 @@ public class SilkIconLoader {
   }
 
   public static BufferedImage getSmallImage(final String imageName) {
-    return getImageWithPrefix("small/", imageName);
+    return getImageWithPrefix("../badges/", imageName);
   }
 }

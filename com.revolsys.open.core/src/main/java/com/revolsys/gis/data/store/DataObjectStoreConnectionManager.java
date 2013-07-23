@@ -1,21 +1,26 @@
 package com.revolsys.gis.data.store;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.util.OperatingSystemUtil;
 
-public class DataObjectStoreConnectionManager {
+public class DataObjectStoreConnectionManager implements
+  PropertyChangeSupportProxy, PropertyChangeListener {
 
   private static final DataObjectStoreConnectionManager INSTANCE;
 
   static {
     INSTANCE = new DataObjectStoreConnectionManager();
     final File dataStoresDirectory = OperatingSystemUtil.getUserApplicationDataDirectory("com.revolsys.gis/Data Stores");
-    final JsonDataObjectStoreConnectionRegistry registry = new JsonDataObjectStoreConnectionRegistry(
+    final DataObjectStoreConnectionRegistry registry = new DataObjectStoreConnectionRegistry(
       "User", dataStoresDirectory);
     INSTANCE.addConnectionRegistry(registry);
   }
@@ -38,6 +43,9 @@ public class DataObjectStoreConnectionManager {
     return null;
   }
 
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
+
   private final List<ConnectionRegistry<DataObjectStoreConnection>> registries = new ArrayList<ConnectionRegistry<DataObjectStoreConnection>>();
 
   public DataObjectStoreConnectionManager() {
@@ -47,6 +55,7 @@ public class DataObjectStoreConnectionManager {
     final ConnectionRegistry<DataObjectStoreConnection> registry) {
     if (!registries.contains(registry)) {
       registries.add(registry);
+      registry.getPropertyChangeSupport().addPropertyChangeListener(this);
     }
   }
 
@@ -70,9 +79,20 @@ public class DataObjectStoreConnectionManager {
     return registries.get(0);
   }
 
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    propertyChangeSupport.firePropertyChange(event);
+  }
+
   public void removeConnectionRegistry(
     final ConnectionRegistry<DataObjectStoreConnection> registry) {
     registries.remove(registry);
+    registry.getPropertyChangeSupport().removePropertyChangeListener(this);
   }
 
   @Override

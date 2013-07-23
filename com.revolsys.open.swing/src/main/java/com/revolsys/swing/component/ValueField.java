@@ -38,6 +38,8 @@ public class ValueField extends JPanel implements Field {
 
   private String originalToolTip;
 
+  private boolean saved = false;
+
   public ValueField() {
     this("fieldValue", null);
   }
@@ -65,6 +67,7 @@ public class ValueField extends JPanel implements Field {
   }
 
   public void cancel() {
+    saved = false;
   }
 
   public void cancel(final JDialog dialog) {
@@ -103,6 +106,10 @@ public class ValueField extends JPanel implements Field {
     return true;
   }
 
+  public boolean isSaved() {
+    return saved;
+  }
+
   public void save() {
     save(this);
   }
@@ -119,6 +126,7 @@ public class ValueField extends JPanel implements Field {
       }
 
     }
+    saved = true;
   }
 
   public void save(final JDialog dialog) {
@@ -221,6 +229,7 @@ public class ValueField extends JPanel implements Field {
     dialog.add(buttons, BorderLayout.SOUTH);
 
     dialog.pack();
+    saved = false;
     dialog.setVisible(true);
 
     return (V)getFieldValue();

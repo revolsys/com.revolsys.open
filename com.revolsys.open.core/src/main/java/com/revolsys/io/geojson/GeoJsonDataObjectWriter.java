@@ -276,9 +276,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
           } else {
             out.value(value);
           }
-        }
-        if (i < lastIndex) {
-          out.endAttribute();
+          if (i < lastIndex) {
+            out.endAttribute();
+          }
         }
       }
     }

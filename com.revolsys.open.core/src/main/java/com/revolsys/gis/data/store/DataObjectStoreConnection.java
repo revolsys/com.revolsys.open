@@ -20,25 +20,38 @@ public class DataObjectStoreConnection implements MapSerializer {
 
   private String name;
 
-  private String resourceName;
-
   private DataObjectStore dataStore;
 
-  public DataObjectStoreConnection(final String name,
+  private DataObjectStoreConnectionRegistry registry;
+
+  public DataObjectStoreConnection(
+    final DataObjectStoreConnectionRegistry registry, final String name,
     final DataObjectStore dataStore) {
+    this.registry = registry;
     this.name = name;
     this.dataStore = dataStore;
   }
 
-  public DataObjectStoreConnection(final String resourceName,
-    final Map<String, ? extends Object> config) {
-    super();
-    this.resourceName = resourceName;
+  public DataObjectStoreConnection(
+    final DataObjectStoreConnectionRegistry registry,
+    final String resourceName, final Map<String, ? extends Object> config) {
+    this.registry = registry;
     this.config = new LinkedHashMap<String, Object>(config);
     name = CollectionUtil.getString(config, "name");
     if (!StringUtils.hasText(name)) {
       name = FileUtil.getBaseName(resourceName);
     }
+  }
+
+  public void delete() {
+    if (registry != null) {
+      registry.removeConnection(this);
+    }
+    this.config = null;
+    this.dataStore = null;
+    this.name = null;
+    this.registry = null;
+
   }
 
   public DataObjectStore getDataStore() {
@@ -49,15 +62,14 @@ public class DataObjectStoreConnection implements MapSerializer {
             config, "connection", Collections.<String, Object> emptyMap());
           if (connectionProperties.isEmpty()) {
             LoggerFactory.getLogger(getClass()).error(
-              "Data store must include a 'connection' map property: "
-                + resourceName);
+              "Data store must include a 'connection' map property: " + name);
           } else {
             dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
             dataStore.initialize();
           }
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
-            "Error creating data store from: " + resourceName, e);
+            "Error creating data store for: " + name, e);
         }
       }
     }
@@ -74,6 +86,14 @@ public class DataObjectStoreConnection implements MapSerializer {
       return Collections.emptyList();
     } else {
       return dataStore.getSchemas();
+    }
+  }
+
+  public boolean isReadOnly() {
+    if (registry == null) {
+      return true;
+    } else {
+      return registry.isReadOnly();
     }
   }
 

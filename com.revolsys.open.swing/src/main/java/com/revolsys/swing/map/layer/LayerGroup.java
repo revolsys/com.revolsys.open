@@ -92,7 +92,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   @Override
-  public boolean addAll(int index, final Collection<? extends Layer> c) {
+  public boolean addAll(int index, final Collection<? extends Layer> layers) {
     boolean added = false;
     for (final Layer layer : layers) {
       if (!layers.contains(layer)) {

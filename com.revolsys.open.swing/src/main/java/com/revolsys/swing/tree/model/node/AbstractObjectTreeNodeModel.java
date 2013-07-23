@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -20,6 +21,8 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD extends Object>
   implements ObjectTreeNodeModel<NODE, CHILD> {
+
+  public static final ImageIcon ICON_FOLDER = SilkIconLoader.getIcon("folder");
 
   private boolean lazyLoad = false;
 
@@ -43,8 +46,8 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   public AbstractObjectTreeNodeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
-    renderer.setClosedIcon(SilkIconLoader.getIcon("folder"));
-    renderer.setOpenIcon(SilkIconLoader.getIcon("folder"));
+    renderer.setClosedIcon(ICON_FOLDER);
+    renderer.setOpenIcon(ICON_FOLDER);
   }
 
   @Override
@@ -106,6 +109,11 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   public int getIndexOfChild(final NODE node, final CHILD child) {
     final List<CHILD> children = getChildren(node);
     return children.indexOf(child);
+  }
+
+  @Override
+  public Object getLabel(final NODE node) {
+    return node;
   }
 
   @Override

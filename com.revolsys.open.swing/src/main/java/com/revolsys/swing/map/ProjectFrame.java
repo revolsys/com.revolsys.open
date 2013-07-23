@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
 import java.net.ResponseCache;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -22,10 +21,12 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
+import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.data.store.ConnectionRegistry;
 import com.revolsys.gis.data.store.DataObjectStoreConnection;
 import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
-import com.revolsys.gis.data.store.JsonDataObjectStoreConnectionRegistry;
+import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.FileSystemConnectionManager;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.FolderConnectionManager;
 import com.revolsys.net.urlcache.FileResponseCache;
@@ -42,6 +43,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionManagerModel;
 import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
+import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
@@ -78,15 +80,17 @@ public class ProjectFrame extends JFrame {
 
   protected void addCatalogPanel() {
 
-    final List<Object> connectionManagers = new ArrayList<Object>();
+    final List<Object> connectionManagers = new PropertyChangeArrayList<Object>();
 
     connectionManagers.add(DataObjectStoreConnectionManager.get());
+    connectionManagers.add(FileSystemConnectionManager.get());
     connectionManagers.add(FolderConnectionManager.get());
     /* connectionManagers.add(WmsConnectionManager.get()); */
 
     final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
       new DataObjectStoreConnectionManagerModel(),
-      new FileSystemConnectionManagerModel());
+      new FileSystemConnectionManagerModel(),
+      new FolderConnectionManagerModel());
     final ObjectTreePanel catalogPanel = new ObjectTreePanel(
       connectionManagers, listModel);
     final Project project = getProject();
@@ -229,10 +233,15 @@ public class ProjectFrame extends JFrame {
 
   public void loadProject(final File projectFile) {
     final File dataStoresDirectory = new File(projectFile, "Data Stores");
-    final JsonDataObjectStoreConnectionRegistry dataStores = new JsonDataObjectStoreConnectionRegistry(
+    final DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
       "Project", dataStoresDirectory);
     project.setDataStores(dataStores);
     DataObjectStoreConnectionManager.get().addConnectionRegistry(dataStores);
+
+    final File folderConnectionsDirectory = new File(projectFile,
+      "Folder Connections");
+    FolderConnectionManager.get().addConnectionRegistry("Project",
+      folderConnectionsDirectory);
 
     final File layersDir = new File(projectFile, "Layers");
     LayerUtil.loadLayerGroup(project, layersDir);

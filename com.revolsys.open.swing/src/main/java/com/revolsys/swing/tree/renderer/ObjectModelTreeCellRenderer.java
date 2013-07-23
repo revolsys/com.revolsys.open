@@ -37,14 +37,16 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
     } else {
       nodeModel = model.getNodeModel(path);
     }
+    Object label = value;
     if (nodeModel != null) {
       final TreeCellRenderer renderer = nodeModel.getRenderer(value);
+      label = nodeModel.getLabel(value);
       if (renderer != null) {
-        return renderer.getTreeCellRendererComponent(tree, value, selected,
+        return renderer.getTreeCellRendererComponent(tree, label, selected,
           expanded, leaf, row, hasFocus);
       }
     }
-    return super.getTreeCellRendererComponent(tree, value, selected, expanded,
+    return super.getTreeCellRendererComponent(tree, label, selected, expanded,
       leaf, row, hasFocus);
   }
 

@@ -1,0 +1,107 @@
+package com.revolsys.io;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.springframework.util.StringUtils;
+
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.map.MapSerializer;
+
+public class FolderConnection implements MapSerializer {
+  private final Map<String, Object> config = new LinkedHashMap<String, Object>();
+
+  private String name;
+
+  private File file;
+
+  private FolderConnectionRegistry registry;
+
+  public FolderConnection(final FolderConnectionRegistry registry,
+    final String name, final File file) {
+    this.registry = registry;
+    setNameAndFile(name, file);
+  }
+
+  public void delete() {
+    if (registry != null) {
+      registry.removeConnection(this);
+    }
+    name = null;
+    file = null;
+    registry = null;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof FolderConnection) {
+      final FolderConnection folderConnection = (FolderConnection)obj;
+      if (registry == folderConnection.registry) {
+        if (EqualsRegistry.equal(name, folderConnection.name)) {
+          if (EqualsRegistry.equal(file, folderConnection.file)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public File getFile() {
+    return file;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public FolderConnectionRegistry getRegistry() {
+    return registry;
+  }
+
+  @Override
+  public int hashCode() {
+    if (name == null) {
+      return 0;
+    } else {
+      return name.hashCode();
+    }
+  }
+
+  public boolean isReadOnly() {
+    if (registry == null) {
+      return true;
+    } else {
+      return registry.isReadOnly();
+    }
+  }
+
+  public void setNameAndFile(final String name, final File file) {
+    if (file == null) {
+      throw new IllegalArgumentException("File must not be null");
+    }
+    if (StringUtils.hasText(name)) {
+      this.name = name;
+    } else {
+      this.name = file.getName();
+      if (!StringUtils.hasText(this.name)) {
+        this.name = "/";
+      }
+    }
+    this.file = file;
+    this.config.put("type", "folderConnection");
+    this.config.put("name", this.name);
+    this.config.put("file", FileUtil.getCanonicalPath(file));
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    return config;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
+}

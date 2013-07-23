@@ -32,4 +32,5 @@ public class ListObjectTreeNodeModel extends
   protected List<Object> getChildren(final List list) {
     return list;
   }
+
 }

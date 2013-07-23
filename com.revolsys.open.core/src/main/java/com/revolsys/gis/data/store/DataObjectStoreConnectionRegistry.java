@@ -5,35 +5,27 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
 
-public class JsonDataObjectStoreConnectionRegistry extends
+public class DataObjectStoreConnectionRegistry extends
   AbstractConnectionRegistry<DataObjectStoreConnection> {
 
-  private File directory;
-
-  public JsonDataObjectStoreConnectionRegistry(final String name,
-    final boolean visible, final DataObjectStoreConnection... connections) {
-    super(name);
-    setReadOnly(!visible);
+  public DataObjectStoreConnectionRegistry(final String name,
+    final boolean visible) {
+    super("rgdatastore", name);
     setVisible(visible);
     init();
-    for (final DataObjectStoreConnection connection : connections) {
-      addConnection(connection);
-    }
   }
 
-  public JsonDataObjectStoreConnectionRegistry(final String name,
+  public DataObjectStoreConnectionRegistry(final String name,
     final File directory) {
-    super(name);
-    this.directory = directory;
-    final boolean readOnly = !directory.canWrite();
-    setReadOnly(readOnly);
+    super("rgdatastore", name);
+    setDirectory(directory);
     init();
   }
 
@@ -41,27 +33,12 @@ public class JsonDataObjectStoreConnectionRegistry extends
     addConnection(connection.getName(), connection);
   }
 
-  @Override
-  public void createConnection(
-    final Map<String, ? extends Object> connectionParameters) {
-    final String name = CollectionUtil.getString(connectionParameters, "name");
-    final File file = new File(directory, name + ".rgdatastore");
-    final FileSystemResource resource = new FileSystemResource(file);
-    JsonMapIoFactory.write(connectionParameters, resource);
-    loadDataStore(file);
+  public void addConnection(final String name, final DataObjectStore dataStore) {
+    addConnection(new DataObjectStoreConnection(this, name, dataStore));
   }
 
   @Override
-  protected void doInit() {
-    if (directory != null && directory.isDirectory()) {
-      for (final File dataStoreFile : FileUtil.getFilesByExtension(directory,
-        "rgdatastore")) {
-        loadDataStore(dataStoreFile);
-      }
-    }
-  }
-
-  protected DataObjectStoreConnection loadDataStore(final File dataStoreFile) {
+  protected DataObjectStoreConnection loadConnection(final File dataStoreFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(dataStoreFile);
     String name = CollectionUtil.getString(config, "name");
     if (!StringUtils.hasText(name)) {
@@ -77,7 +54,7 @@ public class JsonDataObjectStoreConnectionRegistry extends
         return null;
       } else {
         final DataObjectStoreConnection dataStoreConnection = new DataObjectStoreConnection(
-          dataStoreFile.toString(), config);
+          this, dataStoreFile.toString(), config);
         addConnection(name, dataStoreConnection);
         return dataStoreConnection;
       }
@@ -85,6 +62,15 @@ public class JsonDataObjectStoreConnectionRegistry extends
       LoggerFactory.getLogger(getClass()).error(
         "Error creating data store from: " + dataStoreFile, e);
       return null;
+    }
+  }
+
+  @Override
+  public boolean removeConnection(final DataObjectStoreConnection connection) {
+    if (connection == null) {
+      return false;
+    } else {
+      return removeConnection(connection.getName(), connection);
     }
   }
 }
