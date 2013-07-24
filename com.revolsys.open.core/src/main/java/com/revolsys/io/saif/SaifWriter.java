@@ -197,7 +197,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = PathUtil.getName(compositeType);
-      final String compositeNamespace = PathUtil.getPath(compositeType);
+      final String compositeNamespace = PathUtil.getPath(compositeType)
+        .replaceAll("/", "");
       if (compositeNamespace != "") {
         compositeTypeName += "::" + compositeNamespace;
       }

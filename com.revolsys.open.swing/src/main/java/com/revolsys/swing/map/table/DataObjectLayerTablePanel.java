@@ -121,6 +121,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         "Show Records on Map", "map_filter", tableModel,
         "setFilterByBoundingBox", true);
     }
+    layer.addPropertyChangeListener(this);
   }
 
   public void deleteRecord() {
@@ -183,7 +184,15 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         }
       }
       tableModel.setSearchCondition(condition);
+    } else if (source instanceof LayerDataObject) {
+      repaint();
     }
+  }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    layer.removePropertyChangeListener(this);
   }
 
   public void zoomToRecord() {
