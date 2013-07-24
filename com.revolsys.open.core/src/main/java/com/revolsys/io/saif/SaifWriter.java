@@ -189,7 +189,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       exportsFile, Long.MAX_VALUE);
     exportsSerializer.startObject("/ExportedObjects");
     exportsSerializer.attributeName("handles");
-    exportsSerializer.startCollection("/Set");
+    exportsSerializer.startCollection("Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
       "globmeta.osn");
     for (final Map<String, Object> export : exports.values()) {
@@ -384,7 +384,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
             serializer.endLine();
             serializer.serializeIndent();
             serializer.attributeName("annotationComponents");
-            serializer.startCollection("/Set");
+            serializer.startCollection("Set");
           } else if (compositeType.isInstanceOf(spatialDataSetType)) {
             serializer.startObject(compositeType.getPath());
             serializer.attributeName("objectIdentifier");
@@ -393,7 +393,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
             serializer.endLine();
             serializer.serializeIndent();
             serializer.attributeName("geoComponents");
-            serializer.startCollection("/Set");
+            serializer.startCollection("Set");
           }
           addExport(typePath, compositeType.getPath(), objectSubsetName);
           serializers.put(typePath, serializer);

@@ -70,7 +70,7 @@ public class TextOnCurveConverter implements OsnConverter {
       final MultiPoint multiPoint = (MultiPoint)object;
       serializer.startObject("/TextOnCurve");
       serializer.attributeName("characters");
-      serializer.startCollection("/List");
+      serializer.startCollection("List");
       final OsnConverter osnConverter = converters.getConverter("/TextLine");
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
         final Point point = (Point)multiPoint.getGeometryN(i);

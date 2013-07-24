@@ -518,6 +518,12 @@ public class DataObjectLayerForm extends JPanel implements
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
         ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
     }
+
+    final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(
+      this, "deletable");
+    toolBar.addButton("record", "Delete Record", "table_row_delete",
+      deletableEnableCheck, this, "deleteRecord");
+
     // Cut, Copy Paste
     // TODO copy enable checks
 
@@ -606,6 +612,13 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void dataTransferPaste() {
     invokeAction("paste");
+  }
+
+  public void deleteRecord() {
+    final LayerDataObject object = getObject();
+    if (object != null) {
+      getLayer().deleteRecords(object);
+    }
   }
 
   @Override
@@ -850,6 +863,15 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
+  public boolean isDeletable() {
+    final LayerDataObject object = getObject();
+    if (object == null) {
+      return false;
+    } else {
+      return object.isDeletable();
+    }
+  }
+
   public boolean isEditable() {
     return editable;
   }
@@ -952,6 +974,9 @@ public class DataObjectLayerForm extends JPanel implements
       final boolean modifiedOrDeleted = isModifiedOrDeleted();
       propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
         !modifiedOrDeleted, modifiedOrDeleted);
+      final boolean deletable = isDeletable();
+      propertyChangeSupport.firePropertyChange("deletable", !deletable,
+        deletable);
     }
   }
 
@@ -1006,7 +1031,10 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void revertChanges() {
-    getObject().revertChanges();
+    final LayerDataObject object = getObject();
+    if (object != null) {
+      object.revertChanges();
+    }
   }
 
   public void setAddOkButtonEnabled(final boolean enabled) {
