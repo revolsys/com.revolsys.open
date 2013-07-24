@@ -429,11 +429,16 @@ public class OsnSerializer {
 
   public void startObject(final String path) throws IOException {
     endElement = false;
-
-    String name = path.replaceAll("^/+", "");
-    name = name.replaceAll("/+$", "");
-    name = name.replaceAll("/", "::");
-    write(name);
+    final String[] elements = path.replaceAll("^/+", "").split("/");
+    if (elements.length == 1) {
+      write(elements[0]);
+    } else {
+      final String typeName = elements[1];
+      final String schema = elements[0];
+      write(typeName);
+      write("::");
+      write(schema);
+    }
     write('(');
     if (indentEnabled) {
       endLine();

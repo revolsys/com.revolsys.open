@@ -1050,7 +1050,7 @@ public class DataObjectLayerForm extends JPanel implements
   public void setEditable(final boolean editable) {
     this.editable = editable;
     for (final String fieldName : getFieldNames()) {
-      if (getReadOnlyFieldNames().contains(fieldName)) {
+      if (!getReadOnlyFieldNames().contains(fieldName)) {
         final Field field = getField(fieldName);
         field.setEnabled(editable);
       }
