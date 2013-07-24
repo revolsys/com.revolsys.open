@@ -2,12 +2,20 @@ package com.revolsys.gis.model.data.equals;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
 public class Geometry3DExactEquals implements Equals<Geometry> {
+  public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();
+
+  public static void addExclude(final String name) {
+    USER_DATA_EXCLUDE.add(name);
+  }
+
   private EqualsRegistry equalsRegistry;
 
   @Override
@@ -16,18 +24,25 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
     if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
       return false;
     }
+    final boolean userDataEquals = !exclude.contains("userData");
     for (int j = 0; j < geometry1.getNumGeometries(); j++) {
       final Geometry geometryPart1 = geometry1.getGeometryN(j);
       final Geometry geometryPart2 = geometry2.getGeometryN(j);
       if (!JtsGeometryUtil.equalsExact3D(geometryPart1, geometryPart2)) {
         return false;
       }
-      if (!userDataEquals(geometryPart1, geometryPart2, exclude)) {
-        return false;
+      if (userDataEquals) {
+        if (!userDataEquals(geometryPart1, geometryPart2, exclude)) {
+          return false;
+        }
       }
     }
     if (geometry1 instanceof GeometryCollection) {
-      return userDataEquals(geometry1, geometry2, exclude);
+      if (userDataEquals) {
+        return userDataEquals(geometry1, geometry2, exclude);
+      } else {
+        return true;
+      }
     } else {
       return true;
     }
@@ -40,7 +55,7 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
 
   @SuppressWarnings("rawtypes")
   public boolean userDataEquals(final Geometry geometry1,
-    final Geometry geometry2, final Collection<String> exclude) {
+    final Geometry geometry2, Collection<String> exclude) {
     final Object userData1 = geometry1.getUserData();
     final Object userData2 = geometry2.getUserData();
     if (userData1 == null) {
@@ -57,6 +72,12 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
       } else {
         return false;
       }
+    }
+    if (exclude.isEmpty()) {
+      exclude = USER_DATA_EXCLUDE;
+    } else {
+      exclude = new TreeSet<String>(exclude);
+      exclude.addAll(USER_DATA_EXCLUDE);
     }
     return equalsRegistry.equals(userData1, userData2, exclude);
   }

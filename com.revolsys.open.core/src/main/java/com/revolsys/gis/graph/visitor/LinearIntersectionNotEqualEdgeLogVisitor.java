@@ -16,6 +16,7 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
+import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 import com.vividsolutions.jts.geom.LineString;
@@ -24,6 +25,9 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {
   private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
     + ".PROCESSED";
+  static {
+    Geometry3DExactEquals.addExclude(PROCESSED);
+  }
 
   @Override
   public void process(final DataObjectGraph graph) {

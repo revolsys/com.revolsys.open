@@ -24,6 +24,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
@@ -50,6 +51,10 @@ public final class JtsGeometryUtil {
     1);
 
   public static final String FEATURE_PROPERTY = "feature";
+
+  static {
+    Geometry3DExactEquals.addExclude(FEATURE_PROPERTY);
+  }
 
   /**
    * Add a evelation (z) value for a coordinate that is on a line segment.

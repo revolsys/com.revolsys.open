@@ -19,6 +19,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIt
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
+import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -27,6 +28,15 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryEditUtil {
+
+  private static final String LINE_SEGMENT_QUAD_TREE = "LineSegmentQuadTree";
+
+  private static final String POINT_QUAD_TREE = "PointQuadTree";
+
+  static {
+    Geometry3DExactEquals.addExclude(LINE_SEGMENT_QUAD_TREE);
+    Geometry3DExactEquals.addExclude(POINT_QUAD_TREE);
+  }
 
   protected static void add(final Map<int[], Coordinates> pointIndexes,
     final Coordinates point, final int... index) {
@@ -121,8 +131,8 @@ public class GeometryEditUtil {
     final int ringIndex, final Coordinates newPoint) {
     final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
     final CoordinatesList points = rings.get(ringIndex);
-    final CoordinatesList newPoints = insertVertex(points,
-      points.size() - 1, newPoint);
+    final CoordinatesList newPoints = insertVertex(points, points.size() - 1,
+      newPoint);
 
     rings.set(ringIndex, newPoints);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
@@ -133,7 +143,7 @@ public class GeometryEditUtil {
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       final Reference<QuadTree<IndexedLineSegment>> reference = JtsGeometryUtil.getGeometryProperty(
-        geometry, "LineSegmentQuadTree");
+        geometry, LINE_SEGMENT_QUAD_TREE);
       QuadTree<IndexedLineSegment> index;
       if (reference == null) {
         index = null;
@@ -198,7 +208,7 @@ public class GeometryEditUtil {
             }
           }
         }
-        JtsGeometryUtil.setGeometryProperty(geometry, "LineSegmentQuadTree",
+        JtsGeometryUtil.setGeometryProperty(geometry, LINE_SEGMENT_QUAD_TREE,
           new SoftReference<QuadTree<IndexedLineSegment>>(index));
       }
       return index;
@@ -211,7 +221,7 @@ public class GeometryEditUtil {
       return new PointQuadTree<int[]>();
     } else {
       final Reference<PointQuadTree<int[]>> reference = JtsGeometryUtil.getGeometryProperty(
-        geometry, "PointQuadTree");
+        geometry, POINT_QUAD_TREE);
       PointQuadTree<int[]> index;
       if (reference == null) {
         index = null;
@@ -286,7 +296,7 @@ public class GeometryEditUtil {
             }
           }
         }
-        JtsGeometryUtil.setGeometryProperty(geometry, "PointQuadTree",
+        JtsGeometryUtil.setGeometryProperty(geometry, POINT_QUAD_TREE,
           new SoftReference<PointQuadTree<int[]>>(index));
       }
       return index;

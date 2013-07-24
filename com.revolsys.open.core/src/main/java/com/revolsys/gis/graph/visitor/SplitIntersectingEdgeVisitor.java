@@ -19,10 +19,16 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 
 public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
+
+  public static final String MTACHED = "mtached";
+  static {
+    Geometry3DExactEquals.addExclude(MTACHED);
+  }
 
   /**
    * Split the line into segments which are either within or not within 1m of
@@ -79,7 +85,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
           if (hasMatches != matched) {
             final LineString newLine = factory.createLineString(coordinates);
             newLine.setUserData(line.getUserData());
-            JtsGeometryUtil.setGeometryProperty(newLine, "mtached", matched);
+            JtsGeometryUtil.setGeometryProperty(newLine, MTACHED, matched);
             lines.add(newLine);
             matched = hasMatches;
             coordinates.clear();
