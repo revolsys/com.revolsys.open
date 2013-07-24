@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.data.equals;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -56,19 +57,29 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
   @SuppressWarnings("rawtypes")
   public boolean userDataEquals(final Geometry geometry1,
     final Geometry geometry2, Collection<String> exclude) {
-    final Object userData1 = geometry1.getUserData();
-    final Object userData2 = geometry2.getUserData();
+    Object userData1 = geometry1.getUserData();
+    Object userData2 = geometry2.getUserData();
     if (userData1 == null) {
       if (userData2 == null) {
         return true;
       } else if (userData2 instanceof Map) {
         final Map map = (Map)userData2;
-        return map.isEmpty();
+        if (map.isEmpty()) {
+          return true;
+        } else {
+          userData1 = Collections.emptyMap();
+        }
+      } else {
+        return false;
       }
     } else if (userData2 == null) {
       if (userData1 instanceof Map) {
         final Map map = (Map)userData1;
-        return map.isEmpty();
+        if (map.isEmpty()) {
+          return true;
+        } else {
+          userData2 = Collections.emptyMap();
+        }
       } else {
         return false;
       }

@@ -31,7 +31,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
       "arrow_out", null, "fitToViewport"));
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Revert to Saved",
-      "arrow_undo", null, "revert"));
+      "arrow_revert", null, "revert"));
 
   }
 

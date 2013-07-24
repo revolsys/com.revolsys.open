@@ -18,6 +18,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import javax.swing.undo.UndoableEdit;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
@@ -91,7 +93,8 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
-  PropertyChangeListener, CellEditorListener, FocusListener {
+  PropertyChangeListener, CellEditorListener, FocusListener,
+  PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -125,6 +128,9 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
   };
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
 
   private DataObjectLayerAttributesTableModel allAttributes;
 
@@ -525,9 +531,15 @@ public class DataObjectLayerForm extends JPanel implements
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(undoManager,
       "canRedo");
 
-    toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, undoManager,
+    final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
+      "modifiedOrDeleted");
+
+    toolBar.addButton("changes", "Revert Record", "arrow_revert",
+      modifiedOrDeleted, this, "revertChanges");
+
+    toolBar.addButton("changes", "Undo", "arrow_undo", canUndo, undoManager,
       "undo");
-    toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, undoManager,
+    toolBar.addButton("changes", "Redo", "arrow_redo", canRedo, undoManager,
       "redo");
 
     // Zoom
@@ -762,6 +774,11 @@ public class DataObjectLayerForm extends JPanel implements
     return object.getOriginalValue(fieldName);
   }
 
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
   public Set<String> getReadOnlyFieldNames() {
     return readOnlyFieldNames;
   }
@@ -860,6 +877,15 @@ public class DataObjectLayerForm extends JPanel implements
     return enabled;
   }
 
+  public boolean isModifiedOrDeleted() {
+    final LayerDataObject object = getObject();
+    if (object == null) {
+      return false;
+    } else {
+      return object.isDeleted() || object.isModified();
+    }
+  }
+
   protected boolean isTabValid(final int index) {
     if (index < 0) {
       return false;
@@ -923,6 +949,9 @@ public class DataObjectLayerForm extends JPanel implements
       } else if (metaData.hasAttribute(propertyName)) {
         setFieldValue(propertyName, value, isFieldValidationEnabled());
       }
+      final boolean modifiedOrDeleted = isModifiedOrDeleted();
+      propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+        !modifiedOrDeleted, modifiedOrDeleted);
     }
   }
 
@@ -974,6 +1003,10 @@ public class DataObjectLayerForm extends JPanel implements
       final String geometryAttributeName = getGeometryAttributeName();
       validateField(geometryAttributeName);
     }
+  }
+
+  public void revertChanges() {
+    getObject().revertChanges();
   }
 
   public void setAddOkButtonEnabled(final boolean enabled) {

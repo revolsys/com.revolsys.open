@@ -140,8 +140,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           log.info("Closing SAIF archive '" + file.getCanonicalPath() + "'");
         }
         createExports();
-        createMissingDirObject("/InternallyReferencedObjects", "internal.dir");
-        createMissingDirObject("/ImportedObjects", "imports.dir");
+        createMissingDirObject("InternallyReferencedObjects", "internal.dir");
+        createMissingDirObject("ImportedObjects", "imports.dir");
         createMissingGlobalMetadata();
         if (log.isInfoEnabled()) {
           log.info("  Closing serializers");

@@ -74,7 +74,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
       modifiedEnableCheck, deletedEnableCheck);
     menu.addMenuItem("record", DataObjectRowRunnable.createAction(
-      "Revert Record", "arrow_undo", modifiedOrDeleted, "revertChanges"));
+      "Revert Record", "arrow_revert", modifiedOrDeleted, "revertChanges"));
 
     final ToolBar toolBar = getToolBar();
 
