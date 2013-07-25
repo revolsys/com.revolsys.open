@@ -38,6 +38,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -199,7 +200,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       String compositeTypeName = PathUtil.getName(compositeType);
       final String compositeNamespace = PathUtil.getPath(compositeType)
         .replaceAll("/", "");
-      if (compositeNamespace != "") {
+      if (StringUtils.hasText(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }
       writeExport(exportsSerializer, referenceId, compositeTypeName,
