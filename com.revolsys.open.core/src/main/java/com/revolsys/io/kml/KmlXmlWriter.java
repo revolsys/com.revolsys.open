@@ -3,7 +3,6 @@ package com.revolsys.io.kml;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;

@@ -6,17 +6,18 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class OrientedArcConverter extends ArcConverter {
-  private static final String GEOMETRY_CLASS = "/OrientedArc";
+  private static final String GEOMETRY_CLASS = SaifConstants.ORIENTED_ARC;
 
   private final OsnConverterRegistry converters;
 
   public OrientedArcConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
-    super(geometryFactory, "/Arc");
+    super(geometryFactory, SaifConstants.ARC);
     this.converters = converters;
   }
 

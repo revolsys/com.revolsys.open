@@ -2,7 +2,6 @@ package com.revolsys.io;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;

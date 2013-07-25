@@ -24,7 +24,6 @@ import java.io.File;
 
 import com.revolsys.gis.data.io.AbstractDirectoryReader;
 import com.revolsys.gis.data.io.DataObjectDirectoryReader;
-import com.revolsys.gis.data.io.DataObjectReader;
 
 /**
  * <p>

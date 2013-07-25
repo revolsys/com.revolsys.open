@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -23,7 +24,7 @@ public class TextLineConverter implements OsnConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put(TYPE, "/TextLine");
+    values.put(TYPE, SaifConstants.TEXT_LINE);
     Geometry geometry = null;
 
     String attributeName = iterator.nextAttributeName();
@@ -57,9 +58,9 @@ public class TextLineConverter implements OsnConverter {
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
-      serializer.startObject("/TextLine");
+      serializer.startObject(SaifConstants.TEXT_LINE);
       serializer.attributeName("position");
-      final OsnConverter osnConverter = converters.getConverter("/Point");
+      final OsnConverter osnConverter = converters.getConverter(SaifConstants.POINT);
       osnConverter.write(serializer, point);
       serializer.endAttribute();
 

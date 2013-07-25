@@ -6,24 +6,25 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class ContourConverter extends ArcConverter {
-  private static final String GEOMETRY_CLASS = "/Contour";
+  private static final String GEOMETRY_CLASS = SaifConstants.CONTOUR;
 
   private final OsnConverterRegistry converters;
 
   public ContourConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
-    super(geometryFactory, "/Arc");
+    super(geometryFactory, SaifConstants.ARC);
     this.converters = converters;
   }
 
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put("type", GEOMETRY_CLASS);
+    values.put(SaifConstants.TYPE, GEOMETRY_CLASS);
     Geometry geometry = null;
 
     String attributeName = iterator.nextAttributeName();

@@ -12,12 +12,13 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.LineString;
 
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;
 
-  private String geometryType = "/Arc";
+  private String geometryType = SaifConstants.ARC;
 
   public ArcConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
@@ -32,7 +33,7 @@ public class ArcConverter implements OsnConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put("type", geometryType);
+    values.put(SaifConstants.TYPE, geometryType);
 
     String attributeName = iterator.nextAttributeName();
     LineString geometry = null;
@@ -101,7 +102,7 @@ public class ArcConverter implements OsnConverter {
       final CoordinatesList points = CoordinatesListUtil.get(line);
       final int numAxis = points.getNumAxis();
       for (int i = 0; i < points.size(); i++) {
-        serializer.startObject("/Point");
+        serializer.startObject(SaifConstants.POINT);
         serializer.attributeName("coords");
         final double x = points.getX(i);
         final double y = points.getY(i);

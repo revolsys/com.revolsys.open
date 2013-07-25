@@ -43,6 +43,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.EnumerationDataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -266,16 +267,16 @@ public class OsnSerializer {
   private void serialize(final Geometry geometry) throws IOException {
     final String type = (String)JtsGeometryUtil.getGeometryProperty(geometry,
       "type");
-    OsnConverter converter = converters.getConverter("/" + type);
+    OsnConverter converter = converters.getConverter(type);
     if (converter == null) {
       if (geometry instanceof Point) {
         if (converter == null) {
-          converter = converters.getConverter("/Point");
+          converter = converters.getConverter(SaifConstants.POINT);
         }
 
       } else if (geometry instanceof LineString) {
         if (converter == null) {
-          converter = converters.getConverter("/Arc");
+          converter = converters.getConverter(SaifConstants.ARC);
         }
       }
     }
@@ -283,11 +284,11 @@ public class OsnSerializer {
   }
 
   public void serialize(final List<Object> list) throws IOException {
-    serializeCollection("/List", list);
+    serializeCollection("List", list);
   }
 
   public void serialize(final Set<Object> set) throws IOException {
-    serializeCollection("/Set", set);
+    serializeCollection("Set", set);
   }
 
   public void serialize(final String string) throws IOException {
@@ -340,7 +341,7 @@ public class OsnSerializer {
                 final DataObject parentObject = (DataObject)parent;
                 if (parentObject.getMetaData()
                   .getTypeName()
-                  .equals("TextOnCurve")) {
+                  .equals(SaifConstants.TEXT_ON_CURVE)) {
                   endLine();
                 }
               }

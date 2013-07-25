@@ -3,7 +3,6 @@ package com.revolsys.transaction;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionTemplate;
 
 

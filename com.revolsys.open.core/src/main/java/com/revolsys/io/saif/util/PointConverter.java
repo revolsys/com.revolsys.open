@@ -7,29 +7,25 @@ import java.util.TreeMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class PointConverter implements OsnConverter {
-  private String geometryClass = "/Point";
+  private String geometryClass = SaifConstants.POINT;
 
   private final GeometryFactory geometryFactory;
 
-  private final CoordinatesPrecisionModel precisionModel;
-
   public PointConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    precisionModel = geometryFactory.getCoordinatesPrecisionModel();
   }
 
   public PointConverter(final GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
-    precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     this.geometryClass = geometryClass;
   }
 

@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
@@ -29,7 +30,7 @@ public class TextOnCurveConverter implements OsnConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put(TYPE, "/TextOnCurve");
+    values.put(TYPE, SaifConstants.TEXT_ON_CURVE);
     Geometry geometry = null;
     final List<Point> points = new ArrayList<Point>();
 
@@ -68,10 +69,10 @@ public class TextOnCurveConverter implements OsnConverter {
     throws IOException {
     if (object instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)object;
-      serializer.startObject("/TextOnCurve");
+      serializer.startObject(SaifConstants.TEXT_ON_CURVE);
       serializer.attributeName("characters");
       serializer.startCollection("List");
-      final OsnConverter osnConverter = converters.getConverter("/TextLine");
+      final OsnConverter osnConverter = converters.getConverter(SaifConstants.TEXT_LINE);
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
         final Point point = (Point)multiPoint.getGeometryN(i);
         osnConverter.write(serializer, point);

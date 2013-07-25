@@ -125,7 +125,11 @@ public class SaifSchemaReader {
       currentClass.setIdAttributeName(idAttributeName);
 
     }
-    final String geometryAttributeName = superClass.getGeometryAttributeName();
+    String geometryAttributeName = superClass.getGeometryAttributeName();
+    final String path = currentClass.getPath();
+    if (path.equals("/TRIM/TrimText")) {
+      geometryAttributeName = "textOrSymbol";
+    }
     if (geometryAttributeName != null) {
       currentClass.setGeometryAttributeName(geometryAttributeName);
     }

@@ -25,6 +25,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -65,7 +66,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "textType",
-      "/TextLine");
+      SaifConstants.TEXT_LINE);
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "fontName",
       object.getValue(MoepConstants.FONT_NAME));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
