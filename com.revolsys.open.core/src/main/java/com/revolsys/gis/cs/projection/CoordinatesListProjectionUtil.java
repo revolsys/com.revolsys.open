@@ -9,10 +9,10 @@ public class CoordinatesListProjectionUtil {
 
   public static CoordinatesList perform(final CoordinatesList coordinates,
     final CoordinatesOperation operation) {
-    final int dimension = coordinates.getDimension();
+    final int numAxis = coordinates.getNumAxis();
     final int size = coordinates.size();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
-      dimension);
+      numAxis);
     final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
       coordinates);
     final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(

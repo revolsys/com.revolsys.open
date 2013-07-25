@@ -70,8 +70,8 @@ public class GeometryTest {
   public static void main(final String[] args) {
 
     for (final GeometryFactory geometryFactory : new GeometryFactory[] {
-      GeometryFactory.getFactory(3005, 1000.0),
-      GeometryFactory.getFactory(3005, 1000.0, 1.0)
+      GeometryFactory.getFactory(3005, 2, 1000.0, 1),
+      GeometryFactory.getFactory(3005, 3, 1000.0, 1.0)
     }) {
       createTestFile(geometryFactory, "POINT(1185093.8356 385662.9221)");
       createTestFile(

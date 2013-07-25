@@ -39,7 +39,7 @@ public class Triangle extends AbstractCoordinatesList {
   private final double[] coordinates = new double[9];
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
-    0, 1.0);
+    0, 2, 1.0, 1);
 
   public Triangle() {
   }
