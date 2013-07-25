@@ -266,7 +266,7 @@ public class OsnSerializer {
   private void serialize(final Geometry geometry) throws IOException {
     final String type = (String)JtsGeometryUtil.getGeometryProperty(geometry,
       "type");
-    OsnConverter converter = converters.getConverter(type);
+    OsnConverter converter = converters.getConverter("/" + type);
     if (converter == null) {
       if (geometry instanceof Point) {
         if (converter == null) {

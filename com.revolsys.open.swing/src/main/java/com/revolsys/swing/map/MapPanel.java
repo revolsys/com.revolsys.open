@@ -86,7 +86,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private int overlayIndex = 1;
 
-  private Project project = new Project();
+  private Project project;
 
   private double scale = 0;
 
@@ -109,7 +109,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private boolean updateZoomHistory = true;
 
   public MapPanel() {
+    this(new Project());
+  }
+
+  public MapPanel(final Project project) {
     super(new BorderLayout());
+    this.project = project;
     this.baseMapLayers = project.addLayerGroup("Base Maps");
     project.setProperty(MAP_PANEL, this);
     layeredPane = new JLayeredPane();

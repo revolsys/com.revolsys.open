@@ -240,7 +240,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
       repaint();
     } else if ("editable".equals(propertyName)) {
       repaint();
-    } else if ("updatedObject".equals(propertyName)) {
+    } else if ("updateObject".equals(propertyName)) {
       repaint();
     } else if ("selected".equals(propertyName)) {
       clearUndoHistory();
@@ -317,7 +317,6 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
         final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
           dataObjectLayer.setSelectedRecords(boundingBox);
-          dataObjectLayer.showRecordsTable();
         } else {
           dataObjectLayer.clearSelectedRecords();
         }

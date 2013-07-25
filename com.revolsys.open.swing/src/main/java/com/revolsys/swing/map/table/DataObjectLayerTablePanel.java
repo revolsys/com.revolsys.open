@@ -168,7 +168,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       final String searchAttribute = filterPanel.getSearchAttribute();
       final Object searchValue = filterPanel.getSearchValue();
       Condition condition = null;
-      if (StringUtils.hasText(searchAttribute) && searchValue != null) {
+      if (StringUtils.hasText(searchAttribute)
+        && StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
         final String searchOperator = filterPanel.getSearchOperator();
         if ("Like".equalsIgnoreCase(searchOperator)) {
           final String searchText = (String)searchValue;

@@ -7,6 +7,8 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.tree.TreeUtil;
@@ -28,7 +30,10 @@ public class AddLayer extends I18nAction {
       final String typePath = metaData.getPath();
       final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
       final Layer layer = new DataObjectStoreLayer(dataObjectStore, typePath);
-      LayerUtil.addLayer(layer);
+      final LayerGroup layerGroup = Project.get();
+      if (layerGroup != null) {
+        layerGroup.add(layer);
+      }
     }
   }
 

@@ -99,11 +99,16 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public BoundingBox getBoundingBox() {
-    final BoundingBox boundingBox = getImage().getBoundingBox();
-    if (boundingBox == null || boundingBox.isNull()) {
-      return fitToViewport();
+    final GeoReferencedImage image = getImage();
+    if (image == null) {
+      return new BoundingBox();
+    } else {
+      final BoundingBox boundingBox = image.getBoundingBox();
+      if (boundingBox == null || boundingBox.isNull()) {
+        return fitToViewport();
+      }
+      return boundingBox;
     }
-    return boundingBox;
   }
 
   @Override

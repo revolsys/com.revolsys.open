@@ -450,6 +450,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     } else {
       insertSequence(object, typePath, metaData);
     }
+    object.setState(DataObjectState.Persisted);
     dataStore.addStatistic("Insert", object);
   }
 

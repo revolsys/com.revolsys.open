@@ -1061,9 +1061,15 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public synchronized EnumRows search(final Table table, final String fields,
     final String whereClause, final boolean recycling) {
-    final EnumRows rows = table.search(fields, whereClause, recycling);
-    enumRowsToClose.add(rows);
-    return rows;
+    try {
+      final EnumRows rows = table.search(fields, whereClause, recycling);
+      enumRowsToClose.add(rows);
+      return rows;
+    } catch (final Throwable t) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to execute query " + fields + " WHERE " + whereClause, t);
+      return null;
+    }
   }
 
   public synchronized EnumRows search(final Table table, final String fields,

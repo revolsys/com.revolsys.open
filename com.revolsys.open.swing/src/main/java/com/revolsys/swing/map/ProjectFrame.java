@@ -35,7 +35,6 @@ import com.revolsys.swing.action.file.Exit;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTreePanel;
@@ -59,7 +58,12 @@ public class ProjectFrame extends JFrame {
   private MapPanel mapPanel;
 
   public ProjectFrame(final String title) {
+    this(title, new Project());
+  }
+
+  public ProjectFrame(final String title, final Project project) {
     super(title);
+    this.project = project;
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
@@ -119,8 +123,7 @@ public class ProjectFrame extends JFrame {
   }
 
   protected MapPanel addMapPanel() {
-    mapPanel = new MapPanel();
-    project = mapPanel.getProject();
+    mapPanel = new MapPanel(this.project);
 
     final DefaultSingleCDockable dockable = new DefaultSingleCDockable("map",
       "Map", mapPanel);
@@ -142,6 +145,7 @@ public class ProjectFrame extends JFrame {
 
     final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
     tocPanel = new ObjectTreePanel(project, model);
+    tocPanel.getTree().setRootVisible(true);
     panel.add(tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
@@ -242,7 +246,7 @@ public class ProjectFrame extends JFrame {
       folderConnectionsDirectory);
 
     final File layersDir = new File(projectFile, "Layers");
-    LayerUtil.loadLayerGroup(project, layersDir);
+    project.loadLayerGroup(layersDir);
   }
 
 }

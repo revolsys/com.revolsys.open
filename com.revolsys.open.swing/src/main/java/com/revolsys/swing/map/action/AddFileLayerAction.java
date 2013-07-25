@@ -102,8 +102,8 @@ public class AddFileLayerAction extends AbstractAction {
       final LayerGroup layerGroup = ObjectTree.getMouseClickItem();
       final File file = fileChooser.getSelectedFile();
       SwingWorkerManager.execute(
-        "Open File: " + FileUtil.getCanonicalPath(file), LayerUtil.class,
-        "openFile", layerGroup, file);
+        "Open File: " + FileUtil.getCanonicalPath(file), layerGroup,
+        "openFile", file);
     }
     SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory",
       fileChooser);

@@ -66,8 +66,7 @@ public class DockingFramesUtil {
     final CWorkingArea workingArea = getCWorkingArea(workingAreaObject,
       workingAreaName);
     if (workingArea == null) {
-      throw new IllegalArgumentException("Cannot find working area "
-        + workingAreaName + " for " + workingAreaObject);
+      return null;
     } else {
       return addDockable(workingArea, id, title, component);
     }

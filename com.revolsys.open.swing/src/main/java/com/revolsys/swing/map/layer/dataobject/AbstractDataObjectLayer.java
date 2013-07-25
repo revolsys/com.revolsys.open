@@ -407,9 +407,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void delete() {
     super.delete();
-    for (final Window window : forms.values()) {
-      if (window != null) {
-        window.dispose();
+    if (forms != null) {
+      for (final Window window : forms.values()) {
+        if (window != null) {
+          window.dispose();
+        }
       }
     }
     this.deletedRecords = null;
@@ -541,7 +543,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public String getGeometryAttributeName() {
-    return getMetaData().getGeometryAttributeName();
+    if (metaData == null) {
+      return "";
+    } else {
+      return getMetaData().getGeometryAttributeName();
+    }
   }
 
   @Override
@@ -651,7 +657,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public List<LayerDataObject> getSelectedRecords() {
-    return new ArrayList<LayerDataObject>(selectedRecords);
+    if (selectedRecords == null) {
+      return Collections.emptyList();
+    } else {
+      return new ArrayList<LayerDataObject>(selectedRecords);
+    }
   }
 
   @Override
@@ -1137,6 +1147,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Collection<LayerDataObject> selectedRecords) {
     clearSelectedRecordsIndex();
     this.selectedRecords = new LinkedHashSet<LayerDataObject>(selectedRecords);
+    if (!selectedRecords.isEmpty()) {
+      showRecordsTable();
+    }
     fireSelected();
   }
 
@@ -1267,26 +1280,28 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         dockable = DockingFramesUtil.addDockable(project,
           MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), component);
 
-        dockable.setCloseable(true);
-        setProperty("TableView", dockable);
-        dockable.addCDockableStateListener(new CDockableStateListener() {
-          @Override
-          public void extendedModeChanged(final CDockable dockable,
-            final ExtendedMode mode) {
-          }
-
-          @Override
-          public void visibilityChanged(final CDockable dockable) {
-            final boolean visible = dockable.isVisible();
-            if (!visible) {
-              dockable.getControl()
-                .getOwner()
-                .remove((SingleCDockable)dockable);
-              setProperty("TableView", null);
+        if (dockable != null) {
+          dockable.setCloseable(true);
+          setProperty("TableView", dockable);
+          dockable.addCDockableStateListener(new CDockableStateListener() {
+            @Override
+            public void extendedModeChanged(final CDockable dockable,
+              final ExtendedMode mode) {
             }
-          }
-        });
-        dockable.toFront();
+
+            @Override
+            public void visibilityChanged(final CDockable dockable) {
+              final boolean visible = dockable.isVisible();
+              if (!visible) {
+                dockable.getControl()
+                  .getOwner()
+                  .remove((SingleCDockable)dockable);
+                setProperty("TableView", null);
+              }
+            }
+          });
+          dockable.toFront();
+        }
       }
     }
   }

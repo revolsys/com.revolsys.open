@@ -440,7 +440,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       } finally {
         graphics.setComposite(oldComposite);
       }
-      if (boundingBox != null) {
+      if (boundingBox != null && !boundingBox.isNull()) {
         final Polygon imageBoundary = getImageBoundingBox().toPolygon(1);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -452,20 +452,21 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         MarkerStyleRenderer.renderMarkerVertices(viewport, graphics,
           imageBoundary,
           MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));
+        if (image != null) {
+          final int imageWidth = image.getImageWidth();
+          final int imageHeight = image.getImageHeight();
+          for (int i = 1; i < tiePointsModel.size(); i++) {
+            final Coordinates modelPoint = tiePointsModel.get(i);
+            final Coordinates imagePoint = tiePointsImage.get(i);
+            final Coordinates imageModelPoint = warpFilter.toModelPoint(
+              boundingBox, imagePoint, imageWidth, imageHeight);
+            final GeometryFactory geometryFactory = getGeometryFactory();
+            final LineString line = geometryFactory.createLineString(
+              imageModelPoint, modelPoint);
+            GeometryStyleRenderer.renderLineString(viewport, graphics, line,
+              GeometryStyle.line(Color.CYAN, 3));
 
-        final int imageWidth = image.getImageWidth();
-        final int imageHeight = image.getImageHeight();
-        for (int i = 1; i < tiePointsModel.size(); i++) {
-          final Coordinates modelPoint = tiePointsModel.get(i);
-          final Coordinates imagePoint = tiePointsImage.get(i);
-          final Coordinates imageModelPoint = warpFilter.toModelPoint(
-            boundingBox, imagePoint, imageWidth, imageHeight);
-          final GeometryFactory geometryFactory = getGeometryFactory();
-          final LineString line = geometryFactory.createLineString(
-            imageModelPoint, modelPoint);
-          GeometryStyleRenderer.renderLineString(viewport, graphics, line,
-            GeometryStyle.line(Color.CYAN, 3));
-
+          }
         }
         drawXorGeometry(graphics);
       }
@@ -539,14 +540,16 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   }
 
   protected void updateWarpedImage() {
-    final int numPoints = tiePointsModel.size();
-    final BufferedImage image = this.image.getImage();
-    final int imageWidth = image.getWidth();
-    final int imageHeight = image.getHeight();
-    final BoundingBox boundingBox = imageBoundingBox;
-    warpFilter = WarpFilter.createWarpFilter(boundingBox, tiePointsImage,
-      tiePointsModel, numPoints, degree, imageWidth, imageHeight);
-    final BufferedImage warpedImage = warpFilter.filter(image);
-    this.warpedImage = new GeoReferencedImage(boundingBox, warpedImage);
+    if (this.image != null) {
+      final int numPoints = tiePointsModel.size();
+      final BufferedImage image = this.image.getImage();
+      final int imageWidth = image.getWidth();
+      final int imageHeight = image.getHeight();
+      final BoundingBox boundingBox = imageBoundingBox;
+      warpFilter = WarpFilter.createWarpFilter(boundingBox, tiePointsImage,
+        tiePointsModel, numPoints, degree, imageWidth, imageHeight);
+      final BufferedImage warpedImage = warpFilter.filter(image);
+      this.warpedImage = new GeoReferencedImage(boundingBox, warpedImage);
+    }
   }
 }

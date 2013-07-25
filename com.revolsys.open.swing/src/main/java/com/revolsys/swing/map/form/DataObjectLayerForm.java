@@ -89,6 +89,9 @@ import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.undo.ReverseDataObjectAttributesUndo;
+import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
+import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
@@ -997,37 +1000,15 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void reverseAttributes() {
-    final boolean enbled = setFieldValidationEnabled(false);
-    try {
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-      property.reverseAttributes(object);
-    } finally {
-      setFieldValidationEnabled(enbled);
-      validateFields();
-    }
+    addUndo(new ReverseDataObjectAttributesUndo(object));
   }
 
   public void reverseAttributesAndGeometry() {
-    final boolean enbled = setFieldValidationEnabled(false);
-    try {
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-      property.reverseAttributesAndGeometry(object);
-    } finally {
-      setFieldValidationEnabled(enbled);
-      validateFields();
-    }
+    addUndo(new ReverseDataObjectUndo(object));
   }
 
   public void reverseGeometry() {
-    final boolean enbled = setFieldValidationEnabled(false);
-    try {
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(metaData);
-      property.reverseGeometry(object);
-    } finally {
-      setFieldValidationEnabled(enbled);
-      final String geometryAttributeName = getGeometryAttributeName();
-      validateField(geometryAttributeName);
-    }
+    addUndo(new ReverseDataObjectGeometryUndo(object));
   }
 
   public void revertChanges() {

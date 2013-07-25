@@ -537,10 +537,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void showProperties(final String tabName) {
-    final Window window = SwingUtilities.getWindowAncestor(MapPanel.get(this));
-    final TabbedValuePanel panel = createPropertiesPanel();
-    panel.setSelectdTab(tabName);
-    panel.showDialog(window);
+    final MapPanel map = MapPanel.get(this);
+    if (map != null) {
+      final Window window = SwingUtilities.getWindowAncestor(map);
+      final TabbedValuePanel panel = createPropertiesPanel();
+      panel.setSelectdTab(tabName);
+      panel.showDialog(window);
+    }
   }
 
   @SuppressWarnings("unchecked")

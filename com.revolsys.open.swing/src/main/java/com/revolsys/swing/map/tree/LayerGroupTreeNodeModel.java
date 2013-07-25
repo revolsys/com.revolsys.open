@@ -37,12 +37,13 @@ public class LayerGroupTreeNodeModel extends
   }
 
   @Override
+  public boolean isLeaf(final LayerGroup node) {
+    return false;
+  }
+
+  @Override
   public boolean removeChild(final LayerGroup parent, final Layer layer) {
     parent.remove(layer);
     return true;
-  }
-  @Override
-  public boolean isLeaf(LayerGroup node) {
-    return false;
   }
 }

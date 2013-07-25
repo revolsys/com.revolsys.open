@@ -1,15 +1,31 @@
 package com.revolsys.swing.map.layer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
+import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
+import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
+import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
+import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
@@ -321,6 +337,67 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   public ListIterator<Layer> listIterator(final int index) {
     // TODO avoid modification
     return layers.listIterator(index);
+  }
+
+  protected void loadLayer(final File file) {
+    final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
+      file.getParentFile()));
+
+    try {
+      final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
+      final Layer layer = LayerUtil.getLayer(properties);
+      if (layer != null) {
+        add(layer);
+      }
+    } catch (final Throwable t) {
+      LoggerFactory.getLogger(LayerUtil.class).error(
+        "Cannot load layer from " + file, t);
+    } finally {
+      SpringUtil.setBaseResource(oldResource);
+    }
+  }
+
+  public void loadLayerGroup(final File directory) {
+    for (final File file : directory.listFiles()) {
+      final String name = file.getName();
+      if (file.isDirectory()) {
+        final LayerGroup group = addLayerGroup(name);
+        group.loadLayerGroup(file);
+      } else {
+        final String fileExtension = FileUtil.getFileNameExtension(file);
+        if (fileExtension.equals("rglayer")) {
+          loadLayer(file);
+        }
+      }
+    }
+  }
+
+  public void openFile(final File file) {
+    final String extension = FileUtil.getFileNameExtension(file);
+    if ("rgmap".equals(extension)) {
+      loadLayerGroup(file);
+    } else if ("rglayer".equals(extension)) {
+      loadLayer(file);
+    } else {
+      final FileSystemResource resource = new FileSystemResource(file);
+      if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(resource)) {
+        final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+          resource);
+        add(layer);
+        layer.setEditable(true);
+      } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(resource)) {
+        final DataObjectFileLayer layer = new DataObjectFileLayer(resource);
+        final GeometryStyleRenderer renderer = layer.getRenderer();
+        renderer.setStyle(GeometryStyle.createStyle());
+        add(layer);
+      }
+    }
+  }
+
+  public void openFiles(final List<File> files) {
+    for (final File file : files) {
+      openFile(file);
+    }
   }
 
   @Override

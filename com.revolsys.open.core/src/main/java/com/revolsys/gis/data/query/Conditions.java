@@ -3,9 +3,15 @@ package com.revolsys.gis.data.query;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 
 public class Conditions {
+
+  public static Condition and(final Collection<Condition> conditions) {
+    return new MultipleCondition("AND", conditions);
+  }
 
   public static MultipleCondition and(final Condition... conditions) {
     return new MultipleCondition("AND", conditions);
@@ -108,6 +114,23 @@ public class Conditions {
   public static Condition like(final String name, final Object value) {
     final Value valueCondition = new Value(value);
     return like(name, valueCondition);
+  }
+
+  public static Condition likeRegEx(final DataObjectStore dataStore,
+    final String fieldName, final Object value) {
+    Condition left;
+    if (dataStore.getClass().getName().contains("Oracle")) {
+      left = new SqlCondition("regexp_replace(upper(" + fieldName
+        + "), '[^A-Z0-9]','')");
+    } else {
+      left = new SqlCondition("regexp_replace(upper(" + fieldName
+        + "), '[^A-Z0-9]','', 'g')");
+    }
+    final String right = "%"
+      + StringConverterRegistry.toString(value)
+        .toUpperCase()
+        .replaceAll("[^A-Z0-0]", "") + "%";
+    return like(left, right);
   }
 
   public static Condition likeUpper(final String left, final String right) {

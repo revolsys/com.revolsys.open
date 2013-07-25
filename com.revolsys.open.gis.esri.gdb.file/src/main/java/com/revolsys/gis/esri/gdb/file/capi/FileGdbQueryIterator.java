@@ -143,33 +143,37 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   protected DataObject getNext() throws NoSuchElementException {
-    synchronized (dataStore) {
-      Row row = null;
-      while (offset > 0 && count < offset) {
-        dataStore.nextRow(rows);
+    if (rows == null) {
+      throw new NoSuchElementException();
+    } else {
+      synchronized (dataStore) {
+        Row row = null;
+        while (offset > 0 && count < offset) {
+          dataStore.nextRow(rows);
+          count++;
+        }
+        if (limit > -1 && count >= offset + limit) {
+          throw new NoSuchElementException();
+        }
+        row = dataStore.nextRow(rows);
         count++;
-      }
-      if (limit > -1 && count >= offset + limit) {
-        throw new NoSuchElementException();
-      }
-      row = dataStore.nextRow(rows);
-      count++;
-      if (row == null) {
-        throw new NoSuchElementException();
-      } else {
-        try {
-          final DataObject object = dataObjectFactory.createDataObject(metaData);
-          object.setState(DataObjectState.Initalizing);
-          for (final Attribute attribute : metaData.getAttributes()) {
-            final String name = attribute.getName();
-            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-            final Object value = esriAttribute.getValue(row);
-            object.setValue(name, value);
+        if (row == null) {
+          throw new NoSuchElementException();
+        } else {
+          try {
+            final DataObject object = dataObjectFactory.createDataObject(metaData);
+            object.setState(DataObjectState.Initalizing);
+            for (final Attribute attribute : metaData.getAttributes()) {
+              final String name = attribute.getName();
+              final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+              final Object value = esriAttribute.getValue(row);
+              object.setValue(name, value);
+            }
+            object.setState(DataObjectState.Persisted);
+            return object;
+          } finally {
+            dataStore.closeRow(row);
           }
-          object.setState(DataObjectState.Persisted);
-          return object;
-        } finally {
-          dataStore.closeRow(row);
         }
       }
     }

@@ -8,7 +8,7 @@ public class StringEqualsIgnoreCase extends AbstractEquals<String> {
   public static boolean equal(final String value1, final String value2) {
     if (StringUtils.hasText(value1)) {
       if (StringUtils.hasText(value2)) {
-        return value1.equalsIgnoreCase(value2);
+        return value1.trim().equalsIgnoreCase(value2.trim());
       }
     }
     return false;

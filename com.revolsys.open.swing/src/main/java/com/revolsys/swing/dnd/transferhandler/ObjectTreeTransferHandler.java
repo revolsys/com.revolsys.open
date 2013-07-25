@@ -1,7 +1,9 @@
 package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +15,9 @@ import javax.swing.tree.TreePath;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
@@ -21,7 +26,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
 
   private final ObjectTreeModel model;
 
-  public ObjectTreeTransferHandler(ObjectTreeModel model) {
+  public ObjectTreeTransferHandler(final ObjectTreeModel model) {
     this.model = model;
   }
 
@@ -58,6 +63,8 @@ public class ObjectTreeTransferHandler extends TransferHandler {
         }
 
       }
+    } else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+      return true;
     }
     return false;
   }
@@ -67,7 +74,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
     if (c instanceof JTree) {
       final JTree tree = (JTree)c;
       final TreePath[] selectedPaths = tree.getSelectionPaths();
-      TreePathListTransferable transferable = new TreePathListTransferable(
+      final TreePathListTransferable transferable = new TreePathListTransferable(
         selectedPaths);
       return transferable;
     } else {
@@ -113,18 +120,18 @@ public class ObjectTreeTransferHandler extends TransferHandler {
 
   @Override
   public boolean importData(final TransferSupport support) {
-    if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
-      final Component c = support.getComponent();
-      if (c instanceof JTree) {
-        final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
-        final TreePath path = loc.getPath();
-        int index = loc.getChildIndex();
-        if (path != null) {
-          final Object node = path.getLastPathComponent();
-          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
-          if (nodeModel != null) {
-            try {
-              final Transferable transferable = support.getTransferable();
+    final Component component = support.getComponent();
+    if (component instanceof JTree) {
+      final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
+      final TreePath path = loc.getPath();
+      int index = loc.getChildIndex();
+      if (path != null) {
+        final Object node = path.getLastPathComponent();
+        final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+        if (nodeModel != null) {
+          final Transferable transferable = support.getTransferable();
+          try {
+            if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
               final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
               if (data instanceof TreePathListTransferable) {
                 final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
@@ -149,11 +156,23 @@ public class ObjectTreeTransferHandler extends TransferHandler {
               }
               return true;
 
-            } catch (final Exception e) {
-              LoggerFactory.getLogger(getClass())
-                .error("Cannot import data", e);
-              return false;
+            } else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+              LayerGroup group = null;
+              if (node instanceof LayerGroup) {
+                group = (LayerGroup)node;
+              } else if (node instanceof Layer) {
+                final Layer layer = (Layer)node;
+                group = layer.getLayerGroup();
+              }
+              if (group == null) {
+                group = Project.get();
+              }
+              final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
+              group.openFiles(files);
             }
+          } catch (final Exception e) {
+            LoggerFactory.getLogger(getClass()).error("Cannot import data", e);
+            return false;
           }
         }
       }

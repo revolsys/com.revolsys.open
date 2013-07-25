@@ -356,11 +356,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final List<LayerDataObject> allObjects = new ArrayList<LayerDataObject>();
     if (!queryObjects.isEmpty()) {
       final Polygon polygon = convertedBoundingBox.toPolygon();
-      for (final LayerDataObject object : queryObjects) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry.intersects(polygon)) {
-          allObjects.add(object);
+      try {
+        for (final LayerDataObject object : queryObjects) {
+          final Geometry geometry = object.getGeometryValue();
+          if (geometry.intersects(polygon)) {
+            allObjects.add(object);
+          }
         }
+      } catch (final ClassCastException e) {
+        LoggerFactory.getLogger(getClass()).error("error", e);
       }
     }
 
