@@ -7,8 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -18,6 +20,12 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public final class CollectionUtil {
+  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
+    final V value) {
+    final List<V> values = getList(map, key1);
+    return values.add(value);
+  }
+
   public static <T> Integer addCount(final Map<T, Integer> counts,
     final T object) {
     Integer count = counts.get(object);
@@ -28,6 +36,21 @@ public final class CollectionUtil {
     }
     counts.put(object, count);
     return count;
+  }
+
+  public static <V> boolean addIfNotNull(final Collection<V> collection,
+    final V value) {
+    if (value == null) {
+      return false;
+    } else {
+      return collection.add(value);
+    }
+  }
+
+  public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map,
+    final K1 key1, final V value) {
+    final Set<V> values = getSet(map, key1);
+    return values.add(value);
   }
 
   public static void append(final StringBuffer string,
@@ -212,6 +235,15 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> List<V> getList(final Map<K, List<V>> map, final K key) {
+    List<V> value = map.get(key);
+    if (value == null) {
+      value = new ArrayList<V>();
+      map.put(key, value);
+    }
+    return value;
+  }
+
   public static Long getLong(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = map.get(name);
@@ -232,6 +264,16 @@ public final class CollectionUtil {
         return null;
       }
     }
+  }
+
+  public static <K1, K2, V> Map<K2, V> getMap(final Map<K1, Map<K2, V>> map,
+    final K1 key) {
+    Map<K2, V> value = map.get(key);
+    if (value == null) {
+      value = new LinkedHashMap<K2, V>();
+      map.put(key, value);
+    }
+    return value;
   }
 
   public static <K, V> List<V> getNotNull(final Map<K, V> map,
@@ -262,6 +304,15 @@ public final class CollectionUtil {
     return values;
   }
 
+  public static <K, V> Set<V> getSet(final Map<K, Set<V>> map, final K key) {
+    Set<V> value = map.get(key);
+    if (value == null) {
+      value = new LinkedHashSet<V>();
+      map.put(key, value);
+    }
+    return value;
+  }
+
   public static String getString(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = map.get(name);
@@ -280,6 +331,12 @@ public final class CollectionUtil {
     } else {
       return true;
     }
+  }
+
+  public static <K1, K2, V> V put(final Map<K1, Map<K2, V>> map, final K1 key1,
+    final K2 key2, final V value) {
+    final Map<K2, V> values = getMap(map, key1);
+    return values.put(key2, value);
   }
 
   public static <K, V extends Comparable<V>> void putIfGreaterThan(
