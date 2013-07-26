@@ -8,7 +8,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
+import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;

@@ -28,7 +28,7 @@ public class GridLayer extends AbstractLayer {
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Mapsheet",
-      "magnifier_zoom_grid", null, "zoomTosheet"));
+      "magnifier_zoom_grid", "zoomTosheet"));
   }
 
   public static final LayerFactory<GridLayer> FACTORY = new InvokeMethodLayerFactory<GridLayer>(

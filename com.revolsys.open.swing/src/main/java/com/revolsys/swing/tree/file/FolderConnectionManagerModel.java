@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.revolsys.io.FolderConnectionManager;
-import com.revolsys.io.FolderConnectionRegistry;
+import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class FolderConnectionManagerModel
@@ -16,7 +16,6 @@ public class FolderConnectionManagerModel
     setSupportedClasses(FolderConnectionManager.class);
     setSupportedChildClasses(FolderConnectionRegistry.class);
     setObjectTreeNodeModels(new FolderConnectionRegistryModel());
-    setLazyLoad(true);
     final DefaultTreeCellRenderer renderer = getRenderer();
     renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
     renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
@@ -25,7 +24,7 @@ public class FolderConnectionManagerModel
   @Override
   protected List<FolderConnectionRegistry> getChildren(
     final FolderConnectionManager connectionRegistry) {
-    final List<FolderConnectionRegistry> registries = connectionRegistry.getVisibleRegistries();
+    final List<FolderConnectionRegistry> registries = connectionRegistry.getVisibleConnectionRegistries();
     return registries;
   }
 

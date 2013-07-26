@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
-import com.revolsys.io.FolderConnection;
+import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;

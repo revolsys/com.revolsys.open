@@ -105,7 +105,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addGroup(3, "dnd");
 
     menu.addMenuItem("table", TreeItemRunnable.createAction("View Records",
-      "table_go", null, "showRecordsTable"));
+      "table_go", "showRecordsTable"));
 
     final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
       "hasSelectedRecords");

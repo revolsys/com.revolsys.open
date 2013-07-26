@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.store;
+package com.revolsys.io.datastore;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

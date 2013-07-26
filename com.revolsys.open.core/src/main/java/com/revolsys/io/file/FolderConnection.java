@@ -1,4 +1,4 @@
-package com.revolsys.io;
+package com.revolsys.io.file;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 
 public class FolderConnection implements MapSerializer {

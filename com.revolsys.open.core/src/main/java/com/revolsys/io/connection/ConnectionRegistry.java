@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.store;
+package com.revolsys.io.connection;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,8 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
   List<T> getConections();
 
   T getConnection(final String connectionName);
+
+  ConnectionRegistryManager<ConnectionRegistry<T>> getConnectionManager();
 
   List<String> getConnectionNames();
 

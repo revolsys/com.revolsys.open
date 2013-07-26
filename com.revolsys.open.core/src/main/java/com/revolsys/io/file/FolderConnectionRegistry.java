@@ -1,4 +1,4 @@
-package com.revolsys.io;
+package com.revolsys.io.file;
 
 import java.io.File;
 import java.util.Map;
@@ -7,21 +7,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.store.AbstractConnectionRegistry;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class FolderConnectionRegistry extends
   AbstractConnectionRegistry<FolderConnection> {
 
-  public FolderConnectionRegistry(final String name) {
-    super("rgfolder", name);
+  protected FolderConnectionRegistry(
+    final FolderConnectionManager connectionManager, final String name) {
+    super(connectionManager, "rgfolder", name);
     init();
   }
 
-  public FolderConnectionRegistry(final String name, final boolean visible,
-    final FolderConnection... connections) {
-    super("rgfolder", name);
+  protected FolderConnectionRegistry(
+    final FolderConnectionManager connectionManager, final String name,
+    final boolean visible, final FolderConnection... connections) {
+    super(connectionManager, "rgfolder", name);
     setReadOnly(!visible);
     setVisible(visible);
     init();
@@ -30,8 +33,10 @@ public class FolderConnectionRegistry extends
     }
   }
 
-  public FolderConnectionRegistry(final String name, final File directory) {
-    super("rgfolder", name);
+  protected FolderConnectionRegistry(
+    final FolderConnectionManager connectionManager, final String name,
+    final File directory) {
+    super(connectionManager, "rgfolder", name);
     setDirectory(directory);
     init();
   }

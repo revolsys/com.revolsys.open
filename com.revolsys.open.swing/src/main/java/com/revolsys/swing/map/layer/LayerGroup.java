@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
@@ -19,6 +22,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -27,13 +31,17 @@ import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
-    menu.addMenuItem("layer", new AddFileLayerAction());
+    menu.addGroup(0, "group");
+    menu.addMenuItem("group",
+      TreeItemRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
+    menu.addMenuItem("group", new AddFileLayerAction());
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -118,6 +126,17 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
     return added;
+  }
+
+  public LayerGroup addLayerGroup() {
+    final String name = JOptionPane.showInputDialog(
+      SwingUtil.getActiveWindow(), "Enter the name of the new Layer Group.",
+      "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
+    if (StringUtils.hasText(name)) {
+      return addLayerGroup(name);
+    } else {
+      return null;
+    }
   }
 
   public LayerGroup addLayerGroup(final int index, final String name) {
@@ -491,4 +510,5 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   public <T> T[] toArray(final T[] a) {
     return layers.toArray(a);
   }
+
 }

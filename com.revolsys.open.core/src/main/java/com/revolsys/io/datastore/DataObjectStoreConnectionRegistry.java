@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.store;
+package com.revolsys.io.datastore;
 
 import java.io.File;
 import java.util.Collections;
@@ -9,22 +9,25 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class DataObjectStoreConnectionRegistry extends
   AbstractConnectionRegistry<DataObjectStoreConnection> {
 
-  public DataObjectStoreConnectionRegistry(final String name,
-    final boolean visible) {
-    super("rgdatastore", name);
+  protected DataObjectStoreConnectionRegistry(
+    final DataObjectStoreConnectionManager connectionManager,
+    final String name, final boolean visible) {
+    super(connectionManager, "rgdatastore", name);
     setVisible(visible);
     init();
   }
 
-  public DataObjectStoreConnectionRegistry(final String name,
-    final File directory) {
-    super("rgdatastore", name);
+  protected DataObjectStoreConnectionRegistry(
+    final DataObjectStoreConnectionManager connectionManager,
+    final String name, final File directory) {
+    super(connectionManager, "rgdatastore", name);
     setDirectory(directory);
     init();
   }

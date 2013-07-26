@@ -1,4 +1,4 @@
-package com.revolsys.io;
+package com.revolsys.io.file;
 
 import java.io.File;
 import java.util.Arrays;

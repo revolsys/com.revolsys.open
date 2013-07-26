@@ -2,6 +2,8 @@ package com.revolsys.swing.map;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.ResponseCache;
 import java.util.List;
@@ -10,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
@@ -22,21 +25,26 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.collection.PropertyChangeArrayList;
-import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
-import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
-import com.revolsys.io.FileSystemConnectionManager;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.FolderConnectionManager;
+import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.connection.ConnectionRegistryManager;
+import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
+import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.file.FileSystemConnectionManager;
+import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.action.file.Exit;
 import com.revolsys.swing.log4j.Log4jTableModel;
+import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionManagerModel;
 import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
@@ -82,7 +90,7 @@ public class ProjectFrame extends JFrame {
 
   protected void addCatalogPanel() {
 
-    final List<Object> connectionManagers = new PropertyChangeArrayList<Object>();
+    final PropertyChangeArrayList<Object> connectionManagers = new PropertyChangeArrayList<Object>();
 
     connectionManagers.add(DataObjectStoreConnectionManager.get());
     connectionManagers.add(FileSystemConnectionManager.get());
@@ -95,6 +103,28 @@ public class ProjectFrame extends JFrame {
       new FolderConnectionManagerModel());
     final ObjectTreePanel catalogPanel = new ObjectTreePanel(
       connectionManagers, listModel);
+    final ObjectTree tree = catalogPanel.getTree();
+    for (final Object connectionManager : connectionManagers) {
+      tree.expandPath(connectionManagers, connectionManager);
+      if (connectionManager instanceof ConnectionRegistryManager) {
+        final ConnectionRegistryManager<?> manager = (ConnectionRegistryManager<?>)connectionManager;
+        for (final Object registry : manager.getVisibleConnectionRegistries()) {
+          tree.expandPath(connectionManagers, connectionManager, registry);
+        }
+      }
+    }
+    connectionManagers.getPropertyChangeSupport().addPropertyChangeListener(
+      "registries", new PropertyChangeListener() {
+        @Override
+        public void propertyChange(final PropertyChangeEvent event) {
+          final Object newValue = event.getNewValue();
+          if (newValue instanceof ConnectionRegistry) {
+            final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+            final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
+            tree.expandPath(connectionManagers, connectionManager, registry);
+          }
+        }
+      });
     final Project project = getProject();
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
       "catalog", "Catalog", catalogPanel);
@@ -145,7 +175,26 @@ public class ProjectFrame extends JFrame {
 
     final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
     tocPanel = new ObjectTreePanel(project, model);
-    tocPanel.getTree().setRootVisible(true);
+    final ObjectTree tree = tocPanel.getTree();
+    tree.setRootVisible(true);
+    project.addPropertyChangeListener("layers", new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(final PropertyChangeEvent event) {
+        final Object source = event.getSource();
+        if (source instanceof LayerGroup) {
+          LayerGroup layerGroup = (LayerGroup)source;
+          final Object newValue = event.getNewValue();
+          if (newValue instanceof LayerGroup) {
+            layerGroup = (LayerGroup)newValue;
+          }
+          final List<Layer> pathList = layerGroup.getPathList();
+          final TreePath treePath = ObjectTree.createTreePath(pathList);
+          tree.expandPath(treePath);
+        }
+
+      }
+    });
     panel.add(tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
@@ -235,10 +284,10 @@ public class ProjectFrame extends JFrame {
 
   public void loadProject(final File projectFile) {
     final File dataStoresDirectory = new File(projectFile, "Data Stores");
-    final DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
+    final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
+    final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
       "Project", dataStoresDirectory);
     project.setDataStores(dataStores);
-    DataObjectStoreConnectionManager.get().addConnectionRegistry(dataStores);
 
     final File folderConnectionsDirectory = new File(projectFile,
       "Folder Connections");

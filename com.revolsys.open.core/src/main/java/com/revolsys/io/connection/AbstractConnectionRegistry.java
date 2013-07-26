@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.store;
+package com.revolsys.io.connection;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -37,8 +37,12 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   private final String fileExtension;
 
-  public AbstractConnectionRegistry(final String fileExtension,
-    final String name) {
+  private final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager;
+
+  public AbstractConnectionRegistry(
+    final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
+    final String fileExtension, final String name) {
+    this.connectionManager = connectionManager;
     this.fileExtension = fileExtension;
     this.name = name;
   }
@@ -117,6 +121,11 @@ public abstract class AbstractConnectionRegistry<T> implements
     final String lowerName = name.toLowerCase();
     final int index = new ArrayList<String>(connectionNames.keySet()).indexOf(lowerName);
     return index;
+  }
+
+  @Override
+  public ConnectionRegistryManager<ConnectionRegistry<T>> getConnectionManager() {
+    return (ConnectionRegistryManager)connectionManager;
   }
 
   @Override
@@ -217,7 +226,7 @@ public abstract class AbstractConnectionRegistry<T> implements
     this.readOnly = readOnly;
   }
 
-  protected void setVisible(final boolean visible) {
+  public void setVisible(final boolean visible) {
     this.visible = visible;
   }
 

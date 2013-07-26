@@ -4,7 +4,9 @@ import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -53,13 +55,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
     menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
-      null, "refresh"));
+      "refresh"));
 
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete Layer",
-      "delete", null, "deleteWithConfirm"));
+      "delete", "deleteWithConfirm"));
 
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Layer Properties",
-      "information", null, "showProperties"));
+      "information", "showProperties"));
   }
 
   protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
@@ -111,6 +113,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final Map<String, ? extends Object> properties) {
     this.name = name;
     setProperties(properties);
+  }
+
+  protected void addParent(final List<Layer> path) {
+    final LayerGroup parent = getLayerGroup();
+    if (parent != null) {
+      path.add(0, parent);
+      parent.addParent(path);
+    }
   }
 
   public ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
@@ -256,6 +266,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         return path + "/" + getName();
       }
     }
+  }
+
+  public List<Layer> getPathList() {
+    final List<Layer> path = new ArrayList<Layer>();
+    path.add(this);
+    addParent(path);
+    return path;
   }
 
   @Override

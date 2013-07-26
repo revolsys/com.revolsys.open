@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -266,6 +267,19 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     }
   }
 
+  public void initializePath(final TreePath path) {
+    final TreePath parent = path.getParentPath();
+    if (parent != null) {
+      initializePath(parent);
+    }
+    final Object object = path.getLastPathComponent();
+    synchronized (objectPathMap) {
+      if (!objectPathMap.containsKey(object)) {
+        objectPathMap.put(object, path);
+      }
+    }
+  }
+
   private boolean isInitialized(final TreePath path,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model == null) {
@@ -337,11 +351,18 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   protected void setObjectPathMap(final TreePath path, final Object node,
     final ObjectTreeNodeModel<Object, Object> nodeModel) {
-    if (nodeModel != null) {
-      for (int i = 0; i < nodeModel.getChildCount(node); i++) {
-        final Object child = nodeModel.getChild(node, i);
-        final TreePath childPath = path.pathByAddingChild(child);
-        objectPathMap.put(child, childPath);
+    synchronized (objectPathMap) {
+      if (!objectPathMap.containsKey(node)) {
+        objectPathMap.put(node, path);
+      }
+      if (nodeModel != null) {
+        for (int i = 0; i < nodeModel.getChildCount(node); i++) {
+          final Object child = nodeModel.getChild(node, i);
+          if (!objectPathMap.containsKey(child)) {
+            final TreePath childPath = path.pathByAddingChild(child);
+            objectPathMap.put(child, childPath);
+          }
+        }
       }
     }
   }
@@ -411,5 +432,4 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     // final Object value = path.getLastPathComponent();
     // TODO
   }
-
 }

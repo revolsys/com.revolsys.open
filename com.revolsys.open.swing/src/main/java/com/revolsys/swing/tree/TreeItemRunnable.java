@@ -29,6 +29,12 @@ public class TreeItemRunnable extends InvokeMethodRunnable {
     return createAction(name, icon, enableCheck, methodName, parameters);
   }
 
+  public static InvokeMethodAction createAction(final CharSequence name,
+    final String iconName, final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    return createAction(name, icon, null, methodName, parameters);
+  }
+
   protected TreeItemRunnable(final String methodName, final Object[] parameters) {
     super(methodName, parameters);
   }

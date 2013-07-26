@@ -6,9 +6,8 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.datastore.DataObjectStoreConnection;
+import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -17,16 +16,14 @@ import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class DataObjectStoreConnectionRegistryModel
   extends
-  AbstractObjectTreeNodeModel<ConnectionRegistry<DataObjectStore>, DataObjectStore> {
+  AbstractObjectTreeNodeModel<DataObjectStoreConnectionRegistry, DataObjectStoreConnection> {
 
   public DataObjectStoreConnectionRegistryModel() {
     setSupportedClasses(DataObjectStoreConnectionRegistry.class);
-    setSupportedChildClasses(DataObjectStore.class);
+    setSupportedChildClasses(DataObjectStoreConnection.class);
     setObjectTreeNodeModels(new DataObjectStoreConnectionTreeNodeModel());
-    setLazyLoad(true);
     final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
     final DefaultTreeCellRenderer renderer = getRenderer();
-    renderer.setLeafIcon(icon);
     renderer.setOpenIcon(icon);
     renderer.setClosedIcon(icon);
   }
@@ -41,16 +38,21 @@ public class DataObjectStoreConnectionRegistryModel
   }
 
   @Override
-  protected List<DataObjectStore> getChildren(
-    final ConnectionRegistry<DataObjectStore> connectionRegistry) {
-    final List<DataObjectStore> dataObjectStores = connectionRegistry.getConections();
+  protected List<DataObjectStoreConnection> getChildren(
+    final DataObjectStoreConnectionRegistry connectionRegistry) {
+    final List<DataObjectStoreConnection> dataObjectStores = connectionRegistry.getConections();
     return dataObjectStores;
   }
 
   @Override
   public void initialize(
-    final ConnectionRegistry<DataObjectStore> connectionRegistry) {
+    final DataObjectStoreConnectionRegistry connectionRegistry) {
     getChildren(connectionRegistry);
+  }
+
+  @Override
+  public boolean isLeaf(final DataObjectStoreConnectionRegistry node) {
+    return false;
   }
 
   @Override

@@ -8,8 +8,8 @@ import javax.swing.JTextField;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
+import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.PasswordUtil;

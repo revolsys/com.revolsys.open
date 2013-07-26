@@ -10,6 +10,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DropMode;
@@ -30,16 +32,29 @@ import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 public class ObjectTree extends JTree implements PropertyChangeListener,
   MouseListener {
 
+  private static Object mouseClickItem = null;
+
+  public static TreePath createTreePath(final Collection<? extends Object> path) {
+    final Object[] pathArray = path.toArray();
+    return new TreePath(pathArray);
+  }
+
+  public static TreePath createTreePath(final Object... path) {
+    return new TreePath(path);
+  }
+
+  public static TreePath createTreePathReverse(
+    final Collection<? extends Object> path) {
+    final List<Object> pathList = new ArrayList<Object>(path);
+    Collections.reverse(pathList);
+    final Object[] pathArray = pathList.toArray();
+    return new TreePath(pathArray);
+  }
+
   @SuppressWarnings("unchecked")
   public static <V> V getMouseClickItem() {
     return (V)mouseClickItem;
   }
-
-  private final ObjectTreeModel model;
-
-  private boolean menuEnabled = true;
-
-  private static Object mouseClickItem = null;
 
   public static void showMenu(final MenuFactory menuFactory,
     final Object object, final Component component, final int x, final int y) {
@@ -71,6 +86,10 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
       showMenu(menu, object, component, x, y);
     }
   }
+
+  private final ObjectTreeModel model;
+
+  private boolean menuEnabled = true;
 
   public ObjectTree(final ObjectTreeModel model) {
     super(model);
@@ -117,6 +136,19 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     }
     return super.convertValueToText(value, selected, expanded, leaf, row,
       hasFocus);
+  }
+
+  public void expandPath(final Object... objects) {
+    final TreePath path = new TreePath(objects);
+    expandPath(path);
+  }
+
+  @Override
+  public void expandPath(final TreePath path) {
+    if (path != null) {
+      model.initializePath(path);
+      super.expandPath(path);
+    }
   }
 
   @SuppressWarnings("unchecked")

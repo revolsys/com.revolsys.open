@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.revolsys.io.FileSystemConnectionManager;
+import com.revolsys.io.file.FileSystemConnectionManager;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class FileSystemConnectionManagerModel extends

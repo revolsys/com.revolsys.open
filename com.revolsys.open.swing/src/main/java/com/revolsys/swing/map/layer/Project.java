@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.store.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 

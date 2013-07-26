@@ -29,9 +29,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
-      "arrow_out", null, "fitToViewport"));
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Revert to Saved",
-      "arrow_revert", null, "revert"));
+      "arrow_out", "fitToViewport"));
+    menu.addMenuItem(
+      "edit",
+      TreeItemRunnable.createAction("Revert to Saved", "arrow_revert", "revert"));
 
   }
 

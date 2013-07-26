@@ -7,9 +7,9 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.data.store.ConnectionRegistry;
-import com.revolsys.gis.data.store.DataObjectStoreConnection;
-import com.revolsys.gis.data.store.DataObjectStoreConnectionManager;
+import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.datastore.DataObjectStoreConnection;
+import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.swing.map.layer.AbstractLayerFactory;
 import com.revolsys.swing.tree.datastore.AddDataStoreConnectionPanel;
 

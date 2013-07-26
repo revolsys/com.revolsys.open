@@ -7,8 +7,8 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.revolsys.io.FolderConnection;
-import com.revolsys.io.FolderConnectionRegistry;
+import com.revolsys.io.file.FolderConnection;
+import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.DirectoryNameField;
@@ -26,7 +26,6 @@ public class FolderConnectionRegistryModel extends
     setSupportedClasses(FolderConnectionRegistry.class);
     setSupportedChildClasses(File.class);
     setObjectTreeNodeModels(new FolderConnectionModel());
-    setLazyLoad(true);
     final DefaultTreeCellRenderer renderer = getRenderer();
     renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
     renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
