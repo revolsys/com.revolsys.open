@@ -79,7 +79,6 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerAttributesTableModel;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
@@ -233,7 +232,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void actionZoomToObject() {
-    LayerUtil.zoomToObject(getObject());
+    getLayer().zoomToObject(getObject());
   }
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {

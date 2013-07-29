@@ -45,6 +45,16 @@ public class Project extends LayerGroup {
     set(this);
   }
 
+  @Override
+  public void add(final int index, final Layer layer) {
+    if (layer.getName().equals("Base Maps")) {
+      final LayerGroup group = (LayerGroup)layer;
+      this.baseMapLayers.addAll(group.getLayers());
+    } else {
+      super.add(index, layer);
+    }
+  }
+
   private void addChangedLayers(final LayerGroup group,
     final List<Layer> layersWithChanges) {
     for (final Layer layer : group) {

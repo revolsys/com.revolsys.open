@@ -1347,6 +1347,25 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Geometry oldGeometry) {
   }
 
+  public void zoomTo(final Geometry geometry) {
+    if (geometry != null) {
+      final Project project = getProject();
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
+        geometryFactory, geometry)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
+
+      project.setViewBoundingBox(boundingBox);
+    }
+  }
+
+  public void zoomToObject(final DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+
+    zoomTo(geometry);
+  }
+
   public void zoomToSelected() {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();

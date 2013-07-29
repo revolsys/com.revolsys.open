@@ -12,10 +12,10 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -31,7 +31,7 @@ public class GridLayer extends AbstractLayer {
       "magnifier_zoom_grid", "zoomTosheet"));
   }
 
-  public static final LayerFactory<GridLayer> FACTORY = new InvokeMethodLayerFactory<GridLayer>(
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "grid", "Grid", GridLayer.class, "create");
 
   public static GridLayer create(final Map<String, Object> properties) {

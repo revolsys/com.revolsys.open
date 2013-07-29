@@ -35,15 +35,14 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   private boolean readOnly;
 
-  private final String fileExtension;
+  private final String fileExtension = "rgobject";
 
   private final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager;
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
-    final String fileExtension, final String name) {
+    final String name) {
     this.connectionManager = connectionManager;
-    this.fileExtension = fileExtension;
     this.name = name;
   }
 

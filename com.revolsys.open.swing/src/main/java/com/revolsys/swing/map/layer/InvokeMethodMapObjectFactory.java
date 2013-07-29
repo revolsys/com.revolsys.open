@@ -5,31 +5,30 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 
+import com.revolsys.io.map.AbstractMapObjectFactory;
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodLayerFactory<T extends Layer> extends
-  AbstractLayerFactory<T> {
+public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory {
 
   private final Object object;
 
   private final String methodName;
 
-  public InvokeMethodLayerFactory(final String typeName,
+  public InvokeMethodMapObjectFactory(final String typeName,
     final String description, final Object object, final String methodName) {
-   super(typeName,description);
+    super(typeName, description);
     this.object = object;
     this.methodName = methodName;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public T createLayer(final Map<String, Object> properties) {
+  public <V> V toObject(final Map<String, ? extends Object> properties) {
     try {
       if (object instanceof Class<?>) {
         final Class<?> clazz = (Class<?>)object;
-        return (T)MethodUtils.invokeStaticMethod(clazz, methodName, properties);
+        return (V)MethodUtils.invokeStaticMethod(clazz, methodName, properties);
       } else {
-        return (T)MethodUtils.invokeMethod(object, methodName, properties);
+        return (V)MethodUtils.invokeMethod(object, methodName, properties);
       }
     } catch (final NoSuchMethodException e) {
       return ExceptionUtil.throwUncheckedException(e);

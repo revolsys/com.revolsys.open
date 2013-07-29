@@ -19,7 +19,7 @@ public class DataObjectStoreConnectionRegistry extends
   protected DataObjectStoreConnectionRegistry(
     final DataObjectStoreConnectionManager connectionManager,
     final String name, final boolean visible) {
-    super(connectionManager, "rgdatastore", name);
+    super(connectionManager, name);
     setVisible(visible);
     init();
   }
@@ -27,7 +27,7 @@ public class DataObjectStoreConnectionRegistry extends
   protected DataObjectStoreConnectionRegistry(
     final DataObjectStoreConnectionManager connectionManager,
     final String name, final File directory) {
-    super(connectionManager, "rgdatastore", name);
+    super(connectionManager, name);
     setDirectory(directory);
     init();
   }

@@ -1,12 +1,12 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.io.map;
 
-public abstract class AbstractLayerFactory<T extends Layer> implements
-  LayerFactory<T> {
+
+public abstract class AbstractMapObjectFactory implements MapObjectFactory {
   private String description;
 
   private String typeName;
 
-  public AbstractLayerFactory(final String typeName, final String description) {
+  public AbstractMapObjectFactory(final String typeName, final String description) {
     this.typeName = typeName;
     this.description = description;
   }

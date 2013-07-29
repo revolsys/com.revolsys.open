@@ -14,8 +14,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Point;
 public class GeoNamesBoundingBoxLayerWorker extends
   SwingWorker<DataObjectQuadTree, Void> {
 
-  public static final LayerFactory<DataObjectBoundingBoxLayer> FACTORY = new InvokeMethodLayerFactory<DataObjectBoundingBoxLayer>(
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "geoname", "Geoname.org", GeoNamesBoundingBoxLayerWorker.class, "create");
 
   public static DataObjectBoundingBoxLayer create(

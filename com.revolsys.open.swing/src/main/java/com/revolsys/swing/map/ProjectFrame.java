@@ -32,6 +32,7 @@ import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.file.FileSystemConnectionManager;
 import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -41,6 +42,15 @@ import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayerFactory;
+import com.revolsys.swing.map.layer.bing.BingLayerFactory;
+import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
+import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayerFactory;
+import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
+import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayerFactory;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
+import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -55,6 +65,18 @@ import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 public class ProjectFrame extends JFrame {
   static {
     ResponseCache.setDefault(new FileResponseCache());
+
+    // TODO move to a file config
+    MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
+    MapObjectFactoryRegistry.addFactory(new DataObjectStoreLayerFactory());
+    MapObjectFactoryRegistry.addFactory(new ArcGisServerRestLayerFactory());
+    MapObjectFactoryRegistry.addFactory(new BingLayerFactory());
+    MapObjectFactoryRegistry.addFactory(new OpenStreetMapLayerFactory());
+    MapObjectFactoryRegistry.addFactory(DataObjectFileLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
   }
 
   private ObjectTreePanel tocPanel;
@@ -295,7 +317,7 @@ public class ProjectFrame extends JFrame {
       folderConnectionsDirectory);
 
     final File layersDir = new File(projectFile, "Layers");
-    project.loadLayerGroup(layersDir);
+    project.loadLayers(layersDir);
   }
 
 }

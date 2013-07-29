@@ -1,11 +1,12 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import com.revolsys.swing.map.layer.AbstractLayerFactory;
+import com.revolsys.io.map.AbstractMapObjectFactory;
 
-public abstract class AbstractDataObjectLayerFactory<T extends DataObjectLayer>
-  extends AbstractLayerFactory<T> {
+public abstract class AbstractDataObjectLayerFactory extends
+  AbstractMapObjectFactory {
 
-  public AbstractDataObjectLayerFactory(String typeName, String description) {
+  public AbstractDataObjectLayerFactory(final String typeName,
+    final String description) {
     super(typeName, description);
   }
 

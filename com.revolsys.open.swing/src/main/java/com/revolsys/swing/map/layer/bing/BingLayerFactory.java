@@ -5,16 +5,16 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.swing.map.layer.AbstractLayerFactory;
+import com.revolsys.io.map.AbstractMapObjectFactory;
 
-public class BingLayerFactory extends AbstractLayerFactory<BingLayer> {
+public class BingLayerFactory extends AbstractMapObjectFactory {
 
   public BingLayerFactory() {
     super("bing", "Bing Tiles");
   }
 
   @Override
-  public BingLayer createLayer(final Map<String, Object> properties) {
+  public <V> V toObject(final Map<String, ? extends Object> properties) {
     ImagerySet imagerySet = ImagerySet.Road;
     final String imagerySetName = (String)properties.remove("imagerySet");
     if (StringUtils.hasText(imagerySetName)) {
@@ -37,6 +37,6 @@ public class BingLayerFactory extends AbstractLayerFactory<BingLayer> {
     }
     final BingLayer layer = new BingLayer(imagerySet, mapLayer);
     layer.setProperties(properties);
-    return layer;
+    return (V)layer;
   }
 }

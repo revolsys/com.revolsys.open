@@ -21,6 +21,8 @@ import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -29,12 +31,14 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "layerGroup", "Layer Group", LayerGroup.class, "create");
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
@@ -42,6 +46,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     menu.addMenuItem("group",
       TreeItemRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
     menu.addMenuItem("group", new AddFileLayerAction());
+  }
+
+  public static LayerGroup create(final Map<String, Object> properties) {
+    final LayerGroup layerGroup = new LayerGroup();
+    layerGroup.loadLayers(properties);
+    return layerGroup;
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -74,6 +84,10 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   private List<Layer> layers = new ArrayList<Layer>();
+
+  public LayerGroup() {
+    setRenderer(new LayerGroupRenderer(this));
+  }
 
   public LayerGroup(final String name) {
     super(name);
@@ -364,28 +378,73 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
     try {
       final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
-      final Layer layer = LayerUtil.getLayer(properties);
+      final Layer layer = MapObjectFactoryRegistry.toObject(properties);
       if (layer != null) {
         add(layer);
       }
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(LayerUtil.class).error(
+      LoggerFactory.getLogger(getClass()).error(
         "Cannot load layer from " + file, t);
     } finally {
       SpringUtil.setBaseResource(oldResource);
     }
   }
 
-  public void loadLayerGroup(final File directory) {
-    for (final File file : directory.listFiles()) {
-      final String name = file.getName();
-      if (file.isDirectory()) {
-        final LayerGroup group = addLayerGroup(name);
-        group.loadLayerGroup(file);
+  public void loadLayers(final File directory) {
+    if (!directory.exists()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Directory not found: " + directory);
+    } else if (!directory.canRead()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Directory not readable: " + directory);
+    } else if (!directory.isDirectory()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "File is not a directory: " + directory);
+    } else {
+      final File layerGroupFile = new File(directory, "rgLayerGroup.rgobject");
+      if (!layerGroupFile.exists()) {
+        LoggerFactory.getLogger(getClass()).error(
+          "File not found: " + layerGroupFile);
+      } else if (!layerGroupFile.canRead()) {
+        LoggerFactory.getLogger(getClass()).error(
+          "File not readable: " + layerGroupFile);
       } else {
-        final String fileExtension = FileUtil.getFileNameExtension(file);
-        if (fileExtension.equals("rglayer")) {
-          loadLayer(file);
+
+        final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
+          directory));
+        try {
+          final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupFile);
+          loadLayers(properties);
+        } finally {
+          SpringUtil.setBaseResource(oldResource);
+        }
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void loadLayers(final Map<String, Object> properties) {
+    final List<String> layerFiles = (List<String>)properties.remove("layers");
+    setProperties(properties);
+    if (layerFiles != null) {
+      for (String fileName : layerFiles) {
+        if (!fileName.endsWith("rgobject")) {
+          fileName += "/rgLayerGroup.rgobject";
+        }
+        final Resource childResource = SpringUtil.getBaseResource(fileName);
+        if (childResource.exists()) {
+          final Object object = MapObjectFactoryRegistry.toObject(childResource);
+          if (object instanceof Layer) {
+            final Layer layer = (Layer)object;
+            add(layer);
+          } else if (object != null) {
+            LoggerFactory.getLogger(LayerGroup.class).error(
+              "Unexpected object type " + object.getClass() + " in "
+                + childResource);
+          }
+        } else {
+          LoggerFactory.getLogger(LayerGroup.class).error(
+            "Cannot find " + childResource);
         }
       }
     }
@@ -393,9 +452,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   public void openFile(final File file) {
     final String extension = FileUtil.getFileNameExtension(file);
-    if ("rgmap".equals(extension)) {
-      loadLayerGroup(file);
-    } else if ("rglayer".equals(extension)) {
+    if ("rgobject".equals(extension)) {
       loadLayer(file);
     } else {
       final FileSystemResource resource = new FileSystemResource(file);

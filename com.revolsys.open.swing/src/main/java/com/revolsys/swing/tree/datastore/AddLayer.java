@@ -10,7 +10,6 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
-import com.revolsys.swing.map.util.LayerUtil;
 import com.revolsys.swing.tree.TreeUtil;
 
 public class AddLayer extends I18nAction {

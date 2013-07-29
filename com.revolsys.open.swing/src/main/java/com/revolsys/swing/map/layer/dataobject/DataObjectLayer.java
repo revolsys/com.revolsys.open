@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
@@ -123,4 +124,8 @@ public interface DataObjectLayer extends Layer {
   void unselectRecords(Collection<? extends LayerDataObject> records);
 
   void unselectRecords(LayerDataObject... records);
+
+  void zoomTo(final Geometry geometry);
+
+  void zoomToObject(DataObject object);
 }

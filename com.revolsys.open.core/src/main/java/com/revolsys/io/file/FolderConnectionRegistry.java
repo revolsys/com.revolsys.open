@@ -17,14 +17,14 @@ public class FolderConnectionRegistry extends
 
   protected FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name) {
-    super(connectionManager, "rgfolder", name);
+    super(connectionManager, name);
     init();
   }
 
   protected FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
     final boolean visible, final FolderConnection... connections) {
-    super(connectionManager, "rgfolder", name);
+    super(connectionManager, name);
     setReadOnly(!visible);
     setVisible(visible);
     init();
@@ -36,7 +36,7 @@ public class FolderConnectionRegistry extends
   protected FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
     final File directory) {
-    super(connectionManager, "rgfolder", name);
+    super(connectionManager, name);
     setDirectory(directory);
     init();
   }
@@ -57,11 +57,6 @@ public class FolderConnectionRegistry extends
     final FolderConnection connection = new FolderConnection(this, name, file);
     addConnection(connection);
     return connection;
-  }
-
-  @Override
-  protected void doInit() {
-
   }
 
   @Override

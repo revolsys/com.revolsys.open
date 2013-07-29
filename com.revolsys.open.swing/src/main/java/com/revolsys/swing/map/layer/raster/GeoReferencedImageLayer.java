@@ -8,12 +8,12 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -21,7 +21,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public class GeoReferencedImageLayer extends AbstractLayer {
 
-  public static final LayerFactory<GeoReferencedImageLayer> FACTORY = new InvokeMethodLayerFactory<GeoReferencedImageLayer>(
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "geoReferencedImage", "Geo-referenced Image",
     GeoReferencedImageLayer.class, "create");
 

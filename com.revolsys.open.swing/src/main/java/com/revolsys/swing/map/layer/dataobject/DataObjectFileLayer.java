@@ -16,16 +16,16 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingWorkerManager;
-import com.revolsys.swing.map.layer.InvokeMethodLayerFactory;
-import com.revolsys.swing.map.layer.LayerFactory;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectFileLayer extends DataObjectListLayer {
-  public static final LayerFactory<DataObjectFileLayer> FACTORY = new InvokeMethodLayerFactory<DataObjectFileLayer>(
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "dataObjectFile", "File", DataObjectFileLayer.class, "create");
 
   public static DataObjectFileLayer create(final Map<String, Object> properties) {

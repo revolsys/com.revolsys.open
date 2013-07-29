@@ -805,4 +805,8 @@ public final class FileUtil {
    */
   private FileUtil() {
   }
+
+  public static File getCurrentDirectory() {
+    return getFile(System.getProperty("user.dir"));
+  }
 }

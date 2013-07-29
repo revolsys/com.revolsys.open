@@ -4,17 +4,16 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.swing.map.layer.AbstractLayerFactory;
+import com.revolsys.io.map.AbstractMapObjectFactory;
 
-public class OpenStreetMapLayerFactory extends
-  AbstractLayerFactory<OpenStreetMapLayer> {
+public class OpenStreetMapLayerFactory extends AbstractMapObjectFactory {
 
   public OpenStreetMapLayerFactory() {
     super("openStreetMap", "Open Street Map Tiles");
   }
 
   @Override
-  public OpenStreetMapLayer createLayer(final Map<String, Object> properties) {
+  public <V> V toObject(final Map<String, ? extends Object> properties) {
     OpenStreetMapClient client;
     final String serverUrl = (String)properties.remove("url");
     if (StringUtils.hasText(serverUrl)) {
@@ -24,6 +23,6 @@ public class OpenStreetMapLayerFactory extends
     }
     final OpenStreetMapLayer layer = new OpenStreetMapLayer(client);
     layer.setProperties(properties);
-    return layer;
+    return (V)layer;
   }
 }

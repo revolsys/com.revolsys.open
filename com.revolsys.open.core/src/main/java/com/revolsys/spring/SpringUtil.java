@@ -33,7 +33,7 @@ public class SpringUtil {
 
   public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
-  private static final ThreadLocal<Resource> baseResource = new ThreadLocal<Resource>();
+  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 
   public static void close(
     final ConfigurableApplicationContext applicationContext) {
@@ -85,10 +85,14 @@ public class SpringUtil {
     return applicationContext;
   }
 
+  public static String getBaseName(final Resource resource) {
+    return FileUtil.getBaseName(resource.getFilename());
+  }
+
   public static Resource getBaseResource() {
-    final Resource baseResource = SpringUtil.baseResource.get();
+    final Resource baseResource = SpringUtil.BASE_RESOURCE.get();
     if (baseResource == null) {
-      return new FileSystemResource(new File(""));
+      return new FileSystemResource(FileUtil.getCurrentDirectory());
     } else {
       return baseResource;
     }
@@ -129,21 +133,8 @@ public class SpringUtil {
     }
   }
 
-  public static File getOrDownloadFile(final Resource resource) {
-    try {
-      return resource.getFile();
-    } catch (final IOException e) {
-      if (resource.exists()) {
-        String baseName = getBaseName(resource);
-        String fileNameExtension = getFileNameExtension(resource);
-        File file = FileUtil.createTempFile(baseName, fileNameExtension);
-        FileUtil.copy(getInputStream(resource), file);
-        return file;
-      } else {
-        throw new IllegalArgumentException("Cannot get File for resource "
-          + resource, e);
-      }
-    }
+  public static String getFileNameExtension(final Resource resource) {
+    return FileUtil.getFileNameExtension(resource.getFilename());
   }
 
   public static File getFileOrCreateTempFile(final Resource resource) {
@@ -176,6 +167,23 @@ public class SpringUtil {
     }
   }
 
+  public static File getOrDownloadFile(final Resource resource) {
+    try {
+      return resource.getFile();
+    } catch (final IOException e) {
+      if (resource.exists()) {
+        final String baseName = getBaseName(resource);
+        final String fileNameExtension = getFileNameExtension(resource);
+        final File file = FileUtil.createTempFile(baseName, fileNameExtension);
+        FileUtil.copy(getInputStream(resource), file);
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource "
+          + resource, e);
+      }
+    }
+  }
+
   public static OutputStream getOutputStream(final Resource resource) {
     try {
       if (resource instanceof OutputStreamResource) {
@@ -196,6 +204,21 @@ public class SpringUtil {
       }
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open stream for " + resource, e);
+    }
+  }
+
+  public static Resource getParentResource(final Resource resource) {
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
+      final File file = fileResource.getFile();
+      final File parentFile = file.getParentFile();
+      if (parentFile == null) {
+        return null;
+      } else {
+        return new FileSystemResource(parentFile);
+      }
+    } else {
+      return null;
     }
   }
 
@@ -246,14 +269,6 @@ public class SpringUtil {
 
   }
 
-  public static String getFileNameExtension(final Resource resource) {
-    return FileUtil.getFileNameExtension(resource.getFilename());
-  }
-
-  public static String getBaseName(final Resource resource) {
-    return FileUtil.getBaseName(resource.getFilename());
-  }
-
   public static String getString(final Resource resource) {
     final Reader reader = getReader(resource);
     return FileUtil.getString(reader);
@@ -282,9 +297,8 @@ public class SpringUtil {
   }
 
   public static Resource setBaseResource(final Resource baseResource) {
-    final Resource oldResource = SpringUtil.baseResource.get();
-    SpringUtil.baseResource.set(baseResource);
+    final Resource oldResource = SpringUtil.BASE_RESOURCE.get();
+    SpringUtil.BASE_RESOURCE.set(baseResource);
     return oldResource;
   }
-
 }

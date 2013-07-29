@@ -10,18 +10,17 @@ import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
-import com.revolsys.swing.map.layer.AbstractLayerFactory;
+import com.revolsys.io.map.AbstractMapObjectFactory;
 import com.revolsys.swing.tree.datastore.AddDataStoreConnectionPanel;
 
-public class DataObjectStoreLayerFactory extends
-  AbstractLayerFactory<DataObjectStoreLayer> {
+public class DataObjectStoreLayerFactory extends AbstractMapObjectFactory {
 
   public DataObjectStoreLayerFactory() {
     super("dataStore", "Data Store");
   }
 
   @Override
-  public DataObjectStoreLayer createLayer(final Map<String, Object> properties) {
+  public <V> V toObject(final Map<String, ? extends Object> properties) {
     @SuppressWarnings("unchecked")
     final Map<String, String> connectionProperties = (Map<String, String>)properties.get("connection");
     if (connectionProperties == null) {
@@ -52,7 +51,7 @@ public class DataObjectStoreLayerFactory extends
         if (layer.getMetaData() == null) {
           return null;
         } else {
-          return layer;
+          return (V)layer;
         }
       }
     }
