@@ -11,6 +11,8 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.util.Reorderable;
 
 public class TableRowTransferHandler extends TransferHandler {
@@ -89,7 +91,7 @@ public class TableRowTransferHandler extends TransferHandler {
         return true;
       }
     } catch (final Exception e) {
-      e.printStackTrace();
+      LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
     }
     return false;
   }

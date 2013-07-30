@@ -163,7 +163,7 @@ public final class FileUtil {
     }
   }
 
-  public static void copy(final File src, final File dest) throws IOException {
+  public static void copy(final File src, final File dest) {
     if (src.isDirectory()) {
       dest.mkdirs();
       final File[] files = src.listFiles();
@@ -175,15 +175,19 @@ public final class FileUtil {
         }
       }
     } else {
-      final FileInputStream in = new FileInputStream(src);
-      File destFile;
-      if (dest.isDirectory()) {
-        final String name = src.getName();
-        destFile = new File(dest, name);
-      } else {
-        destFile = dest;
+      try {
+        final FileInputStream in = new FileInputStream(src);
+        File destFile;
+        if (dest.isDirectory()) {
+          final String name = src.getName();
+          destFile = new File(dest, name);
+        } else {
+          destFile = dest;
+        }
+        copy(in, destFile);
+      } catch (final FileNotFoundException e) {
+        ExceptionUtil.throwUncheckedException(e);
       }
-      copy(in, destFile);
     }
   }
 

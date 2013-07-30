@@ -1,7 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -885,7 +884,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             if (templateFile.isDirectory()) {
               try {
                 FileUtil.copy(templateFile, file);
-              } catch (final IOException e) {
+              } catch (final Throwable e) {
                 throw new IllegalArgumentException(
                   "Unable to copy template ESRI geodatabase " + template, e);
               }

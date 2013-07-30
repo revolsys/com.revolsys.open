@@ -134,8 +134,8 @@ public class SpringLayoutUtil {
     try {
       layout = (SpringLayout)parent.getLayout();
     } catch (final ClassCastException exc) {
-      System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
-      return;
+      layout = new SpringLayout();
+      parent.setLayout(layout);
     }
 
     // Align all cells in each column and make them the same width.
@@ -199,7 +199,7 @@ public class SpringLayoutUtil {
       layout = new SpringLayout();
       parent.setLayout(layout);
     }
-    SpringLayout springLayout = (SpringLayout)parent.getLayout();
+    final SpringLayout springLayout = (SpringLayout)parent.getLayout();
 
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);

@@ -2,13 +2,13 @@ package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
+
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.dnd.transferable.ObjectTransferable;
 import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
@@ -79,12 +79,8 @@ public class TreePathListTransferHandler extends TransferHandler {
           }
         }
       }
-    } catch (final UnsupportedFlavorException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (final IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
     }
   }
 
@@ -134,7 +130,7 @@ public class TreePathListTransferHandler extends TransferHandler {
             return true;
 
           } catch (final Exception e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
             return false;
           }
         }

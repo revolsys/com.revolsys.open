@@ -313,7 +313,10 @@ public class ProjectFrame extends JFrame {
   }
 
   public void loadProject(final File projectFile) {
-    project.readProject(new FileSystemResource(projectFile));
+    final FileSystemResource resource = new FileSystemResource(projectFile);
+    if (resource.exists()) {
+      project.readProject(resource);
+    }
   }
 
 }

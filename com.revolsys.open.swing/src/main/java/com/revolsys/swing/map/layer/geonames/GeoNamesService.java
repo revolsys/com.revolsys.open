@@ -63,20 +63,6 @@ public class GeoNamesService {
     WIKIPEDIA_METADATA = wikipediaMetaData;
   }
 
-  public static void main(final String[] args) {
-    try {
-      final GeoNamesService service = new GeoNamesService(new URL(
-        "http://ws.geonames.org"));
-      service.searchByName("Vancouver");
-      System.out.println(service.getWikipediaArticles(new BoundingBox(
-        com.revolsys.gis.cs.GeometryFactory.getFactory(4326), -110, 49, -109,
-        50)));
-    } catch (final MalformedURLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
   private URL searchJsonUrl;
 
   private URL wikipediaBoundingBoxJsonUrl;

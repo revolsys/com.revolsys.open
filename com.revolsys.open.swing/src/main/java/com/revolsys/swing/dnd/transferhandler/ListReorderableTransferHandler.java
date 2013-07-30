@@ -12,6 +12,8 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.util.Reorderable;
 
 public class ListReorderableTransferHandler extends TransferHandler {
@@ -106,8 +108,8 @@ public class ListReorderableTransferHandler extends TransferHandler {
           currentIndex - 1);
         return true;
       }
-    } catch (final Exception e) {
-      e.printStackTrace();
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
     }
     return false;
   }

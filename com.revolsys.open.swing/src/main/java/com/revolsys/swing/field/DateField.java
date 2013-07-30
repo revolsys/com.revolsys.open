@@ -77,10 +77,7 @@ public class DateField extends JXDatePicker implements Field,
 
   @Override
   public void setDate(final Date date) {
-
-    // System.out.println(date);
     super.setDate(date);
-    // setFieldValue(date);
   }
 
   @Override

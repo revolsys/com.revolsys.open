@@ -32,7 +32,6 @@ public class TiffImage extends GeoReferencedImage {
       reg.registerDescriptor(descriptor);
 
     } catch (final Throwable t) {
-      t.printStackTrace();
     }
   }
 

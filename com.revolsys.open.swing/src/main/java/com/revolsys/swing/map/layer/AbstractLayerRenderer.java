@@ -228,7 +228,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
         final Object defaultValue = entry.getValue();
         final Object newDefaultValue = newDefaults.get(name);
         defaultEqual = EqualsRegistry.equal(defaultValue, newDefaultValue);
-        System.out.println(name);
       }
       if (defaultEqual) {
         newDefaults.remove(name);
