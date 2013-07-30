@@ -32,6 +32,8 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.LineCap;
+import com.revolsys.swing.map.layer.dataobject.style.LineJoin;
 import com.revolsys.util.JavaBeanUtil;
 
 @SuppressWarnings("serial")
@@ -117,9 +119,9 @@ public class GeometryStylePanel extends ValueField implements
     final Object fieldValue = JavaBeanUtil.getValue(geometryStyle, fieldName);
     JComponent field;
     if (fieldName.equals("lineCap")) {
-      field = createLineCapField((String)fieldValue);
+      field = createLineCapField((LineCap)fieldValue);
     } else if (fieldName.equals("lineJoin")) {
-      field = createLineJoinField((String)fieldValue);
+      field = createLineJoinField((LineJoin)fieldValue);
     } else if (fieldName.endsWith("Measure")) {
       field = createMeasureField(fieldName, (Measure<Length>)fieldValue);
     } else {
@@ -150,7 +152,7 @@ public class GeometryStylePanel extends ValueField implements
     panel.setMinimumSize(new Dimension(300, 0));
     panel.setBorder(BorderFactory.createTitledBorder("Line Style"));
     addField(panel, "lineColor");
-    addField(panel, "lineWidthMeasure", "Line Width");
+    addField(panel, "lineWidth", "Line Width");
     addField(panel, "lineJoin");
     addField(panel, "lineCap");
     GroupLayoutUtil.makeColumns(panel, 2);
@@ -162,7 +164,7 @@ public class GeometryStylePanel extends ValueField implements
     panel.setMinimumSize(new Dimension(300, 0));
     panel.setBorder(BorderFactory.createTitledBorder("Marker Style"));
     addField(panel, "markerLineColor");
-    addField(panel, "markerLineWidthMeasure", "Line Width");
+    addField(panel, "markerLineWidth", "Line Width");
     addField(panel, "markerFill");
     GroupLayoutUtil.makeColumns(panel, 2);
     stylePanels.add(panel);
@@ -179,27 +181,28 @@ public class GeometryStylePanel extends ValueField implements
     stylePanels.add(panel);
   }
 
-  protected TogglePanel createLineCapField(final String lineCap) {
+  protected TogglePanel createLineCapField(final LineCap lineCap) {
     final I18nAction lineCapButtAction = new I18nAction("BUTT", null,
       "Butt Cap", SilkIconLoader.getIcon("line_cap_butt"));
     final I18nAction lineCapRoundAction = new I18nAction("ROUND", null,
       "Round Cap", SilkIconLoader.getIcon("line_cap_round"));
     final I18nAction lineCapSquareAction = new I18nAction("SQUARE", null,
       "Square Cap", SilkIconLoader.getIcon("line_cap_square"));
-    return new TogglePanel("lineCap", lineCap, new Dimension(28, 28),
-      lineCapButtAction, lineCapRoundAction, lineCapSquareAction);
+    return new TogglePanel("lineCap", lineCap.toString(),
+      new Dimension(28, 28), lineCapButtAction, lineCapRoundAction,
+      lineCapSquareAction);
 
   }
 
-  protected TogglePanel createLineJoinField(final String lineJoin) {
+  protected TogglePanel createLineJoinField(final LineJoin lineJoin) {
     final I18nAction miterAction = new I18nAction("MITER", null, "miterJoin",
       SilkIconLoader.getIcon("line_join_miter"));
     final I18nAction roundAction = new I18nAction("ROUND", null, "roundJoin",
       SilkIconLoader.getIcon("line_join_round"));
     final I18nAction bevel = new I18nAction("BEVEL", null, "bevelJoin",
       SilkIconLoader.getIcon("line_join_bevel"));
-    return new TogglePanel("lineJoin", lineJoin, new Dimension(28, 28),
-      miterAction, roundAction, bevel);
+    return new TogglePanel("lineJoin", lineJoin.toString(), new Dimension(28,
+      28), miterAction, roundAction, bevel);
   }
 
   protected LengthMeasureTextField createMeasureField(final String fieldName,

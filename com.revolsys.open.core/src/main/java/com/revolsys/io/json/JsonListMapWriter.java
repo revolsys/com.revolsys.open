@@ -47,6 +47,6 @@ public class JsonListMapWriter extends AbstractMapWriter {
       out.print("\n");
       written = true;
     }
-    JsonWriterUtil.write(out, values);
+    JsonWriterUtil.write(out, values, null);
   }
 }

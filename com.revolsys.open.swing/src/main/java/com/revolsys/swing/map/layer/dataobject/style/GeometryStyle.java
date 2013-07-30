@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -17,17 +15,9 @@ import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryStyle extends MarkerStyle {
-
-  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
-
-  private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
 
   private static int colorIndex = -1;
 
@@ -47,15 +37,16 @@ public class GeometryStyle extends MarkerStyle {
     // addProperty("compOp", String.class);
     // addProperty("fontDirectory", String.class);
     // addProperty("imageFilters", String.class);
-    addProperty("lineCap", String.class, LineCap.ROUND);
+    addProperty("lineCap", LineCap.class, LineCap.ROUND);
     addProperty("lineClip", Boolean.class, true);
-    addProperty("lineColor", Color.class, new Color(128, 128, 128, 255));
-    addProperty("lineCompOp", String.class, CompositionOperation.src_over);
+    addProperty("lineColor", Color.class, new Color(128, 128, 128));
+    addProperty("lineCompOp", CompositionOperation.class,
+      CompositionOperation.src_over);
     // addProperty("lineDashOffset", String.class);
     // addProperty("lineDasharray", String.class);
     addProperty("lineGamma", Double.class, 1.0);
-    addProperty("lineGammaMethod", String.class, GammaMethod.power);
-    addProperty("lineJoin", String.class, LineJoin.ROUND);
+    addProperty("lineGammaMethod", GammaMethod.class, GammaMethod.power);
+    addProperty("lineJoin", LineJoin.class, LineJoin.ROUND);
     addProperty("lineMiterlimit", Float.class, 4f);
     // addProperty("lineOffset", String.class);
     addProperty("lineOpacity", Integer.class, 255);
@@ -78,11 +69,12 @@ public class GeometryStyle extends MarkerStyle {
     // addProperty("pointTransform", String.class);
     // addProperty("polygon", String.class);
     addProperty("polygonClip", Boolean.class, true);
-    addProperty("polygonCompOp", String.class, CompositionOperation.src_over);
-    addProperty("polygonFill", Color.class, new Color(128, 128, 128, 255));
+    addProperty("polygonCompOp", CompositionOperation.class,
+      CompositionOperation.src_over);
+    addProperty("polygonFill", Color.class, new Color(128, 128, 128));
     addProperty("polygonFillOpacity", Integer.class, 255);
     addProperty("polygonGamma", Double.class, 1.0);
-    addProperty("polygonGammaMethod", String.class, GammaMethod.power);
+    addProperty("polygonGammaMethod", GammaMethod.class, GammaMethod.power);
     // addProperty("polygonPattern", String.class);
     // addProperty("polygonPatternAlignment", String.class);
     // addProperty("polygonPatternClip", String.class);
@@ -133,12 +125,6 @@ public class GeometryStyle extends MarkerStyle {
 
   }
 
-  private static final void addProperty(final String name,
-    final Class<?> dataClass, final Object defaultValue) {
-    PROPERTIES.put(name, dataClass);
-    DEFAULT_VALUES.put(name, defaultValue);
-  }
-
   public static GeometryStyle createStyle() {
     final GeometryStyle style = new GeometryStyle();
     Color color;
@@ -149,15 +135,6 @@ public class GeometryStyle extends MarkerStyle {
     style.setLineColor(color);
     style.setPolygonFill(ColorUtil.setAlpha(color, 127));
     return style;
-  }
-
-  private static Object getValue(final String propertyName, final Object value) {
-    final Class<?> dataClass = PROPERTIES.get(propertyName);
-    if (dataClass == null) {
-      return null;
-    } else {
-      return StringConverterRegistry.toObject(dataClass, value);
-    }
   }
 
   public static GeometryStyle line(final Color color) {
@@ -230,15 +207,7 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public GeometryStyle(final Map<String, Object> style) {
-    super(style);
-    for (final Entry<String, Object> entry : style.entrySet()) {
-      final String propertyName = entry.getKey();
-      final Object value = entry.getValue();
-      final Object propertyValue = getValue(propertyName, value);
-      if (propertyValue != null) {
-        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
-      }
-    }
+    setStyle(style);
   }
 
   @Override
@@ -406,7 +375,8 @@ public class GeometryStyle extends MarkerStyle {
         "Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
-      this.lineColor = getColorWithOpacity(lineColor, this.lineOpacity);
+      this.lineColor = WebColors.getColorWithOpacity(lineColor,
+        this.lineOpacity);
     }
   }
 
@@ -415,7 +385,8 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Line opacity must be between 0 - 255");
     } else {
       this.lineOpacity = lineOpacity;
-      this.lineColor = getColorWithOpacity(lineColor, this.lineOpacity);
+      this.lineColor = WebColors.getColorWithOpacity(lineColor,
+        this.lineOpacity);
     }
   }
 
@@ -482,7 +453,7 @@ public class GeometryStyle extends MarkerStyle {
         "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFill = getColorWithOpacity(polygonFill,
+      this.polygonFill = WebColors.getColorWithOpacity(polygonFill,
         this.polygonFillOpacity);
     }
   }
@@ -492,7 +463,7 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFill = getColorWithOpacity(polygonFill,
+      this.polygonFill = WebColors.getColorWithOpacity(polygonFill,
         this.polygonFillOpacity);
     }
   }
@@ -509,23 +480,4 @@ public class GeometryStyle extends MarkerStyle {
     this.polygonSmooth = polygonSmooth;
   }
 
-  @Override
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
-    final Map<String, Object> map = super.toMap(defaults);
-    for (final String name : PROPERTIES.keySet()) {
-      final Object value = JavaBeanUtil.getValue(this, name);
-
-      Object defaultValue = defaults.get(name);
-      if (defaultValue != null) {
-        defaultValue = getValue(name, defaultValue);
-      }
-      if (defaultValue == null) {
-        defaultValue = DEFAULT_VALUES.get(name);
-      }
-      if (!EqualsRegistry.equal(defaultValue, value)) {
-        MapSerializerUtil.add(map, name, value);
-      }
-    }
-    return map;
-  }
 }

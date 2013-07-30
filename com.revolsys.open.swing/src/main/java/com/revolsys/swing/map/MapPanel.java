@@ -404,16 +404,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
+    final String propertyName = event.getPropertyName();
     if (source == viewport) {
-      if ("scale".equals(event.getPropertyName())) {
+      if ("scale".equals(propertyName)) {
         final double scale = viewport.getScale();
         setScale(scale);
       }
     } else if (source == baseMapLayers) {
-      if (baseMapOverlay != null && baseMapOverlay.getLayer() == null) {
-        final Layer layer = (Layer)event.getNewValue();
-        if (layer != null) {
-          baseMapOverlay.setLayer(layer);
+      if ("layers".equals(propertyName)) {
+        if (baseMapOverlay != null && baseMapOverlay.getLayer() == null) {
+          final Layer layer = (Layer)event.getNewValue();
+          if (layer != null) {
+            baseMapOverlay.setLayer(layer);
+          }
         }
       }
     }

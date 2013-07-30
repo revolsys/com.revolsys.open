@@ -1,17 +1,29 @@
 package com.revolsys.swing.map.layer;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 
@@ -28,11 +40,15 @@ public class Project extends LayerGroup {
     Project.project = new WeakReference<Project>(project);
   }
 
+  private Resource resource;
+
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 
   private BoundingBox viewBoundingBox = new BoundingBox();
 
   private DataObjectStoreConnectionRegistry dataStores;
+
+  private FolderConnectionRegistry folderConnections;
 
   public Project() {
     this("Project");
@@ -43,16 +59,6 @@ public class Project extends LayerGroup {
     super(name);
     baseMapLayers.setLayerGroup(this);
     set(this);
-  }
-
-  @Override
-  public void add(final int index, final Layer layer) {
-    if (layer.getName().equals("Base Maps")) {
-      final LayerGroup group = (LayerGroup)layer;
-      this.baseMapLayers.addAll(group.getLayers());
-    } else {
-      super.add(index, layer);
-    }
   }
 
   private void addChangedLayers(final LayerGroup group,
@@ -79,6 +85,10 @@ public class Project extends LayerGroup {
     return dataStores;
   }
 
+  public FolderConnectionRegistry getFolderConnections() {
+    return folderConnections;
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
@@ -96,6 +106,65 @@ public class Project extends LayerGroup {
 
   public BoundingBox getViewBoundingBox() {
     return viewBoundingBox;
+  }
+
+  protected void readBaseMapsLayers(final Resource resource) {
+    final Resource baseMapsResource = SpringUtil.getResource(resource,
+      "Base Maps");
+    final Resource layerGroupResource = SpringUtil.getResource(
+      baseMapsResource, "rgLayerGroup.rgobject");
+    if (layerGroupResource.exists()) {
+      final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
+      try {
+        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        baseMapLayers.loadLayers(properties);
+        if (!baseMapLayers.isEmpty()) {
+          baseMapLayers.get(0).setVisible(true);
+        }
+      } finally {
+        SpringUtil.setBaseResource(oldResource);
+      }
+    }
+  }
+
+  protected void readLayers(final Resource resource) {
+    final Resource layerGroupResource = SpringUtil.getResource(resource,
+      "rgLayerGroup.rgobject");
+    if (!layerGroupResource.exists()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "File not found: " + layerGroupResource);
+    } else {
+      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      try {
+        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        loadLayers(properties);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to read: " + layerGroupResource, e);
+      } finally {
+        SpringUtil.setBaseResource(oldResource);
+      }
+    }
+  }
+
+  public void readProject(final Resource resource) {
+    this.resource = resource;
+    final Resource dataStoresDirectory = SpringUtil.getResource(resource,
+      "Data Stores");
+    final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
+    final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
+      "Project", dataStoresDirectory);
+    setDataStores(dataStores);
+
+    final Resource folderConnectionsDirectory = SpringUtil.getResource(
+      resource, "Folder Connections");
+    this.folderConnections = FolderConnectionManager.get()
+      .addConnectionRegistry("Project", folderConnectionsDirectory);
+
+    final Resource layersDir = SpringUtil.getResource(resource, "Layers");
+    readLayers(layersDir);
+
+    readBaseMapsLayers(resource);
   }
 
   public boolean saveChangesWithPrompt() {
@@ -148,6 +217,19 @@ public class Project extends LayerGroup {
     }
   }
 
+  public void saveProject() {
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
+      final File directory = fileResource.getFile();
+      if (directory.isDirectory()) {
+        final File layersDirectory = new File(directory, "Layers");
+        FileUtil.deleteDirectory(layersDirectory, false);
+        layersDirectory.mkdir();
+        saveLayerGroup(layersDirectory);
+      }
+    }
+  }
+
   public void setDataStores(final DataObjectStoreConnectionRegistry dataStores) {
     this.dataStores = dataStores;
   }
@@ -180,4 +262,5 @@ public class Project extends LayerGroup {
       firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
     }
   }
+
 }

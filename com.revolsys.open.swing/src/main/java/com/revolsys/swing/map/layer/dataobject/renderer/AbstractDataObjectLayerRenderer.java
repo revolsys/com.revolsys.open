@@ -54,7 +54,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   public static AbstractDataObjectLayerRenderer getRenderer(
     final DataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
-    final String type = (String)style.get("type");
+    final String type = (String)style.remove("type");
     if ("geometryStyle".equals(type)) {
       return new GeometryStyleRenderer(layer, parent, style);
     } else if ("textStyle".equals(type)) {

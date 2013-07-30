@@ -553,6 +553,10 @@ public final class FileUtil {
     }
   }
 
+  public static File getCurrentDirectory() {
+    return getFile(System.getProperty("user.dir"));
+  }
+
   public static List<File> getDirectories(final File directory) {
     final List<File> directories = new ArrayList<File>();
     final File[] files = directory.listFiles();
@@ -764,6 +768,16 @@ public final class FileUtil {
     return filePath;
   }
 
+  public static File getSafeFileName(final File directory, final String name) {
+    final String fileName = getSafeFileName(name);
+    final File file = new File(directory, fileName);
+    return file;
+  }
+
+  public static String getSafeFileName(final String name) {
+    return name.replaceAll("[^a-zA-Z0-9\\-_ \\.]", "_");
+  }
+
   public static String getString(final InputStream in) {
     final Reader reader = new InputStreamReader(in);
     return getString(reader);
@@ -804,9 +818,5 @@ public final class FileUtil {
    * Construct a new FileUtil.
    */
   private FileUtil() {
-  }
-
-  public static File getCurrentDirectory() {
-    return getFile(System.getProperty("user.dir"));
   }
 }

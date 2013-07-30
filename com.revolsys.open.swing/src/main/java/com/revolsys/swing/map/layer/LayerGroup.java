@@ -86,11 +86,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   private List<Layer> layers = new ArrayList<Layer>();
 
   public LayerGroup() {
-    setRenderer(new LayerGroupRenderer(this));
+    this(null);
   }
 
   public LayerGroup(final String name) {
     super(name);
+    setType("layerGroup");
     setRenderer(new LayerGroupRenderer(this));
   }
 
@@ -390,40 +391,8 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     }
   }
 
-  public void loadLayers(final File directory) {
-    if (!directory.exists()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Directory not found: " + directory);
-    } else if (!directory.canRead()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Directory not readable: " + directory);
-    } else if (!directory.isDirectory()) {
-      LoggerFactory.getLogger(getClass()).error(
-        "File is not a directory: " + directory);
-    } else {
-      final File layerGroupFile = new File(directory, "rgLayerGroup.rgobject");
-      if (!layerGroupFile.exists()) {
-        LoggerFactory.getLogger(getClass()).error(
-          "File not found: " + layerGroupFile);
-      } else if (!layerGroupFile.canRead()) {
-        LoggerFactory.getLogger(getClass()).error(
-          "File not readable: " + layerGroupFile);
-      } else {
-
-        final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
-          directory));
-        try {
-          final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupFile);
-          loadLayers(properties);
-        } finally {
-          SpringUtil.setBaseResource(oldResource);
-        }
-      }
-    }
-  }
-
   @SuppressWarnings("unchecked")
-  private void loadLayers(final Map<String, Object> properties) {
+  protected void loadLayers(final Map<String, Object> properties) {
     final List<String> layerFiles = (List<String>)properties.remove("layers");
     setProperties(properties);
     if (layerFiles != null) {
@@ -536,6 +505,24 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return saved;
   }
 
+  protected void saveLayerGroup(final File directory) {
+    final File file = new File(directory, "rgLayerGroup.rgobject");
+    MapObjectFactoryRegistry.write(file, this);
+    for (final Layer child : this) {
+      final String childName = child.getName();
+      final String childFileName = FileUtil.getSafeFileName(childName);
+      if (child instanceof LayerGroup) {
+        final LayerGroup childLayerGroup = (LayerGroup)child;
+        final File childDirectory = new File(directory, childFileName);
+        childDirectory.mkdirs();
+        childLayerGroup.saveLayerGroup(childDirectory);
+      } else {
+        final File childFile = new File(directory, childFileName + ".rgobject");
+        MapObjectFactoryRegistry.write(childFile, child);
+      }
+    }
+  }
+
   @Override
   public Layer set(final int index, final Layer element) {
     // TODO events
@@ -566,6 +553,25 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public <T> T[] toArray(final T[] a) {
     return layers.toArray(a);
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    final List<String> layerFiles = new ArrayList<String>();
+    final List<Layer> layers = getLayers();
+    for (final Layer layer : layers) {
+      final String layerName = layer.getName();
+      String layerFileName = FileUtil.getSafeFileName(layerName);
+      if (layer instanceof LayerGroup) {
+      } else {
+        layerFileName += ".rgobject";
+      }
+      layerFiles.add(layerFileName);
+
+    }
+    map.put("layers", layerFiles);
+    return map;
   }
 
 }

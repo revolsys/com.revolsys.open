@@ -14,6 +14,7 @@ import javax.measure.quantity.Length;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializer;
@@ -30,16 +31,17 @@ public class TextStyle implements MapSerializer {
   static {
     // addProperty("text-allow-overlap",DataTypes.);
     // addProperty("text-avoid-edges",DataTypes.);
-    addProperty("textBoxColor", Color.class, new Color(223, 223, 233, 127));
+    addProperty("textBoxColor", Color.class, WebColors.Gainsboro);
+    addProperty("textBoxOpacity", Integer.class, 255);
     // addProperty("text-character-spacing",DataTypes.);
     // addProperty("text-clip",DataTypes.);
     // addProperty("text-comp-op",DataTypes.);
     addProperty("textDx", Measure.class, GeometryStyle.ZERO_PIXEL);
     addProperty("textDy", Measure.class, GeometryStyle.ZERO_PIXEL);
     addProperty("textFaceName", String.class, "Arial");
-    addProperty("textFill", Color.class, new Color(0, 0, 0));
-    addProperty("textHaloFill", Color.class, new Color(255, 255, 255));
-    addProperty("textHaloRadius", Double.class, GeometryStyle.ZERO_PIXEL);
+    addProperty("textFill", Color.class, WebColors.Black);
+    addProperty("textHaloFill", Color.class, WebColors.White);
+    addProperty("textHaloRadius", Measure.class, GeometryStyle.ZERO_PIXEL);
     addProperty("textHorizontalAlignment", String.class, "auto");
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
@@ -87,7 +89,7 @@ public class TextStyle implements MapSerializer {
 
   private long lastScale = 0;
 
-  private Color textBoxColor = new Color(223, 223, 233, 127);
+  private Color textBoxColor = WebColors.Gainsboro;
 
   private Measure<Length> textDx = GeometryStyle.ZERO_PIXEL;
 
@@ -95,9 +97,9 @@ public class TextStyle implements MapSerializer {
 
   private String textFaceName = "Arial";
 
-  private Color textFill = new Color(0, 0, 0);
+  private Color textFill = WebColors.Black;
 
-  private Color textHaloFill = new Color(255, 255, 255);
+  private Color textHaloFill = WebColors.White;
 
   private Measure<Length> textHaloRadius = GeometryStyle.ZERO_PIXEL;
 
@@ -118,15 +120,17 @@ public class TextStyle implements MapSerializer {
 
   private String textVerticalAlignment = "auto";
 
+  private int textBoxOpacity = 255;
+
   public TextStyle() {
   }
 
   public TextStyle(final Map<String, Object> style) {
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String propertyName = entry.getKey();
-      final Object value = entry.getValue();
-      final Object propertyValue = getValue(propertyName, value);
-      if (propertyValue != null) {
+      if (PROPERTIES.containsKey(propertyName)) {
+        final Object value = entry.getValue();
+        final Object propertyValue = getValue(propertyName, value);
         JavaBeanUtil.setProperty(this, propertyName, propertyValue);
       }
     }
@@ -134,6 +138,10 @@ public class TextStyle implements MapSerializer {
 
   public Color getTextBoxColor() {
     return textBoxColor;
+  }
+
+  public int getTextBoxOpacity() {
+    return textBoxOpacity;
   }
 
   public Measure<Length> getTextDx() {
@@ -193,7 +201,24 @@ public class TextStyle implements MapSerializer {
   }
 
   public void setTextBoxColor(final Color textBoxColor) {
-    this.textBoxColor = textBoxColor;
+    if (textBoxColor == null) {
+      this.textBoxColor = null;
+      this.textOpacity = 255;
+    } else {
+      this.textBoxColor = textBoxColor;
+      this.textOpacity = textBoxColor.getAlpha();
+    }
+  }
+
+  public void setTextBoxOpacity(final int textBoxOpacity) {
+    if (textBoxOpacity < 0 || textBoxOpacity > 255) {
+      throw new IllegalArgumentException(
+        "Text box opacity must be between 0 - 255");
+    } else {
+      this.textBoxOpacity = textBoxOpacity;
+      this.textBoxColor = WebColors.getColorWithOpacity(textBoxColor,
+        this.textBoxOpacity);
+    }
   }
 
   public void setTextDx(final Measure<Length> textDx) {
@@ -247,12 +272,11 @@ public class TextStyle implements MapSerializer {
 
   public void setTextOpacity(final int textOpacity) {
     if (textOpacity < 0 || textOpacity > 255) {
-      throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
+      throw new IllegalArgumentException("Text opacity must be between 0 - 255");
     } else {
       this.textOpacity = textOpacity;
-      this.textFill = MarkerStyle.getColorWithOpacity(textFill,
-        this.textOpacity);
-      this.textHaloFill = MarkerStyle.getColorWithOpacity(textHaloFill,
+      this.textFill = WebColors.getColorWithOpacity(textFill, this.textOpacity);
+      this.textHaloFill = WebColors.getColorWithOpacity(textHaloFill,
         this.textOpacity);
     }
   }
@@ -313,19 +337,32 @@ public class TextStyle implements MapSerializer {
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
-      final Object value = JavaBeanUtil.getValue(this, name);
-
-      Object defaultValue = defaults.get(name);
-      if (defaultValue != null) {
+      Object value = JavaBeanUtil.getValue(this, name);
+      if (value instanceof Color) {
+        final Color color = (Color)value;
+        value = WebColors.getColorWithOpacity(color, 255);
+      }
+      boolean defaultEqual = false;
+      if (DEFAULT_VALUES.containsKey(name)) {
+        Object defaultValue = DEFAULT_VALUES.get(name);
         defaultValue = getValue(name, defaultValue);
+        defaultEqual = EqualsRegistry.equal(defaultValue, value);
       }
-      if (defaultValue == null) {
-        defaultValue = DEFAULT_VALUES.get(name);
+      if (defaults.containsKey(name)) {
+        Object defaultValue = defaults.get(name);
+        defaultValue = getValue(name, defaultValue);
+        defaultEqual = EqualsRegistry.equal(defaultValue, value);
       }
-      if (!EqualsRegistry.equal(defaultValue, value)) {
+      if (!defaultEqual) {
+
         MapSerializerUtil.add(map, name, value);
       }
     }
     return map;
+  }
+
+  @Override
+  public String toString() {
+    return toMap(DEFAULT_VALUES).toString();
   }
 }

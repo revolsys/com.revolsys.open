@@ -1,5 +1,6 @@
 package com.revolsys.io.map;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ public class MapSerializerUtil {
     if (value == null) {
       return null;
     } else {
+
       if (value instanceof MapSerializer) {
         final MapSerializer mapSerializer = (MapSerializer)value;
         final Map<String, Object> mapObject = mapSerializer.toMap();
@@ -86,6 +88,8 @@ public class MapSerializerUtil {
         } else {
           return null;
         }
+      } else if (value instanceof Component) {
+        return null;
       } else {
         final String string = StringConverterRegistry.toString(value);
         if (StringUtils.hasText(string)) {

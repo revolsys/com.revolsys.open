@@ -18,6 +18,7 @@ import javax.measure.unit.NonSI;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializer;
@@ -76,20 +77,16 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     addProperty("markerDy", Measure.class, ZERO_PIXEL);
   }
 
-  private static final void addProperty(final String name,
+  protected static final void addProperty(final String name,
     final Class<?> dataClass, final Object defaultValue) {
     PROPERTIES.put(name, dataClass);
     DEFAULT_VALUES.put(name, defaultValue);
   }
 
-  public static Color getColorWithOpacity(final Color color, final int opacity) {
-    return new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
-  }
-
   private static Object getValue(final String propertyName, final Object value) {
     final Class<?> dataClass = PROPERTIES.get(propertyName);
     if (dataClass == null) {
-      return null;
+      return value;
     } else {
       return StringConverterRegistry.toObject(dataClass, value);
     }
@@ -194,15 +191,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public MarkerStyle(final Map<String, Object> style) {
-    for (final Entry<String, Object> entry : style.entrySet()) {
-      final String propertyName = entry.getKey();
-      final Object value = entry.getValue();
-
-      final Object propertyValue = getValue(propertyName, value);
-      if (propertyValue != null) {
-        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
-      }
-    }
+    setStyle(style);
   }
 
   @Override
@@ -379,7 +368,8 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerFillOpacity = (int)(255 * markerFillOpacity);
-      this.markerFill = getColorWithOpacity(markerFill, this.markerFillOpacity);
+      this.markerFill = WebColors.getColorWithOpacity(markerFill,
+        this.markerFillOpacity);
     }
   }
 
@@ -388,7 +378,8 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
       this.markerFillOpacity = markerFillOpacity;
-      this.markerFill = getColorWithOpacity(markerFill, this.markerFillOpacity);
+      this.markerFill = WebColors.getColorWithOpacity(markerFill,
+        this.markerFillOpacity);
     }
   }
 
@@ -431,7 +422,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerLineOpacity = (int)(255 * markerLineOpacity);
-      this.markerLineColor = getColorWithOpacity(markerLineColor,
+      this.markerLineColor = WebColors.getColorWithOpacity(markerLineColor,
         this.markerLineOpacity);
     }
   }
@@ -441,7 +432,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
       this.markerLineOpacity = markerLineOpacity;
-      this.markerLineColor = getColorWithOpacity(markerLineColor,
+      this.markerLineColor = WebColors.getColorWithOpacity(markerLineColor,
         this.markerLineOpacity);
     }
   }
@@ -516,27 +507,51 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
   }
 
+  protected void setStyle(final Map<String, Object> style) {
+    for (final Entry<String, Object> entry : style.entrySet()) {
+      final String propertyName = entry.getKey();
+      if (PROPERTIES.containsKey(propertyName)) {
+        final Object value = entry.getValue();
+
+        final Object propertyValue = getValue(propertyName, value);
+        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+      }
+    }
+  }
+
   @Override
   public Map<String, Object> toMap() {
     return toMap(Collections.<String, Object> emptyMap());
   }
 
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
-      final Object value = JavaBeanUtil.getValue(this, name);
+      if (geometryStyle || name.startsWith("marker")) {
+        final Object value = JavaBeanUtil.getValue(this, name);
 
-      Object defaultValue = defaults.get(name);
-      if (defaultValue != null) {
-        defaultValue = getValue(name, defaultValue);
-      }
-      if (defaultValue == null) {
-        defaultValue = DEFAULT_VALUES.get(name);
-      }
-      if (!EqualsRegistry.equal(defaultValue, value)) {
-        MapSerializerUtil.add(map, name, value);
+        boolean defaultEqual = false;
+        if (DEFAULT_VALUES.containsKey(name)) {
+          Object defaultValue = DEFAULT_VALUES.get(name);
+          defaultValue = getValue(name, defaultValue);
+          defaultEqual = EqualsRegistry.equal(defaultValue, value);
+        }
+        if (defaults.containsKey(name)) {
+          Object defaultValue = defaults.get(name);
+          defaultValue = getValue(name, defaultValue);
+          defaultEqual = EqualsRegistry.equal(defaultValue, value);
+        }
+        if (!defaultEqual) {
+          MapSerializerUtil.add(map, name, value);
+        }
       }
     }
     return map;
+  }
+
+  @Override
+  public String toString() {
+    return toMap(DEFAULT_VALUES).toString();
   }
 }

@@ -29,6 +29,10 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   public MenuFactory() {
   }
 
+  public MenuFactory(final String name) {
+    this.name = name;
+  }
+
   public void addCheckboxMenuItem(final String groupName, final Action action,
     final EnableCheck itemChecked) {
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(

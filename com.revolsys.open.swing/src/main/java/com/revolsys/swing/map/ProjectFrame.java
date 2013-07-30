@@ -14,6 +14,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.tree.TreePath;
 
+import org.springframework.core.io.FileSystemResource;
+
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
@@ -36,7 +38,6 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.action.file.Exit;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -52,6 +53,7 @@ import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayerFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
@@ -242,10 +244,16 @@ public class ProjectFrame extends JFrame {
   }
 
   protected JMenu createFileMenu(final JMenuBar menuBar) {
-    final JMenu fileMenu = new JMenu(new I18nAction(ProjectFrame.class, "File"));
+    final MenuFactory file = new MenuFactory("File");
+
+    file.addMenuItemTitleIcon("project", "Save Project", "picture_save",
+      project, "saveProject");
+    file.addMenuItem("exit", new Exit());
+    // final JMenu fileMenu = new JMenu(new I18nAction(ProjectFrame.class,
+    // "File"));
+    final JMenu fileMenu = file.createComponent();
     menuBar.add(fileMenu);
 
-    fileMenu.add(new Exit());
     return fileMenu;
   }
 
@@ -305,19 +313,7 @@ public class ProjectFrame extends JFrame {
   }
 
   public void loadProject(final File projectFile) {
-    final File dataStoresDirectory = new File(projectFile, "Data Stores");
-    final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
-    final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
-      "Project", dataStoresDirectory);
-    project.setDataStores(dataStores);
-
-    final File folderConnectionsDirectory = new File(projectFile,
-      "Folder Connections");
-    FolderConnectionManager.get().addConnectionRegistry("Project",
-      folderConnectionsDirectory);
-
-    final File layersDir = new File(projectFile, "Layers");
-    project.loadLayers(layersDir);
+    project.readProject(new FileSystemResource(projectFile));
   }
 
 }

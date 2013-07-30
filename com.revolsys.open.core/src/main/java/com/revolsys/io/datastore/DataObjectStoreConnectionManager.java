@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OperatingSystemUtil;
@@ -17,7 +20,8 @@ public class DataObjectStoreConnectionManager extends
   static {
     INSTANCE = new DataObjectStoreConnectionManager();
     final File dataStoresDirectory = OperatingSystemUtil.getUserApplicationDataDirectory("com.revolsys.gis/Data Stores");
-    INSTANCE.addConnectionRegistry("User", dataStoresDirectory);
+    INSTANCE.addConnectionRegistry("User", new FileSystemResource(
+      dataStoresDirectory));
   }
 
   public static DataObjectStoreConnectionManager get() {
@@ -51,7 +55,7 @@ public class DataObjectStoreConnectionManager extends
   }
 
   public DataObjectStoreConnectionRegistry addConnectionRegistry(
-    final String name, final File dataStoresDirectory) {
+    final String name, final Resource dataStoresDirectory) {
     final DataObjectStoreConnectionRegistry registry = new DataObjectStoreConnectionRegistry(
       this, name, dataStoresDirectory);
     addConnectionRegistry(registry);

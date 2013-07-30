@@ -64,4 +64,9 @@ public class MapObjectFactoryRegistry {
       SpringUtil.setBaseResource(oldResource);
     }
   }
+
+  public static void write(final File file, final MapSerializer serializer) {
+    final Map<String, Object> properties = serializer.toMap();
+    JsonMapIoFactory.write(properties, file, true);
+  }
 }

@@ -33,7 +33,8 @@ public class WikipediaBoundingBoxLayerWorker extends
     final Map<String, Object> properties) {
     final GeometryFactory wgs84 = GeometryFactory.getFactory(4326);
     final DataObjectBoundingBoxLayer layer1 = new DataObjectBoundingBoxLayer(
-      "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
+      "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
+      wgs84);
 
     final BufferedImage image = SilkIconLoader.getImage("wikipedia");
     final ImageMarker marker = new ImageMarker(image);
@@ -43,20 +44,6 @@ public class WikipediaBoundingBoxLayerWorker extends
     final DataObjectBoundingBoxLayer layer = layer1;
     layer.setProperties(properties);
     return layer;
-  }
-
-  public static DataObjectBoundingBoxLayer createLayer() {
-    final GeometryFactory wgs84 = GeometryFactory.getFactory(4326);
-    final DataObjectBoundingBoxLayer layer = new DataObjectBoundingBoxLayer(
-      "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class, wgs84);
-
-    final BufferedImage image = SilkIconLoader.getImage("wikipedia");
-    final ImageMarker marker = new ImageMarker(image);
-    final MarkerStyle style = new MarkerStyle();
-    style.setMarker(marker);
-    layer.setRenderer(new MarkerStyleRenderer(layer, style));
-    return layer;
-
   }
 
   private final DataObjectBoundingBoxLayer layer;

@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OperatingSystemUtil;
 
@@ -15,7 +18,7 @@ public class FolderConnectionManager extends
   static {
     INSTANCE = new FolderConnectionManager();
     final File directory = OperatingSystemUtil.getUserApplicationDataDirectory("com.revolsys.gis/Folder Connections");
-    INSTANCE.addConnectionRegistry("User", directory);
+    INSTANCE.addConnectionRegistry("User", new FileSystemResource(directory));
   }
 
   public static FolderConnectionManager get() {
@@ -43,9 +46,12 @@ public class FolderConnectionManager extends
     addConnectionRegistry(new FolderConnectionRegistry(this, name));
   }
 
-  public synchronized void addConnectionRegistry(final String name,
-    final File directory) {
-    addConnectionRegistry(new FolderConnectionRegistry(this, name, directory));
+  public synchronized FolderConnectionRegistry addConnectionRegistry(
+    final String name, final Resource resource) {
+    final FolderConnectionRegistry registry = new FolderConnectionRegistry(
+      this, name, resource);
+    addConnectionRegistry(registry);
+    return registry;
   }
 
 }

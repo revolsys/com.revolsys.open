@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.SwingWorker;
 
@@ -35,9 +36,10 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
 
   private SwingWorker worker;
 
-  public DataObjectBoundingBoxLayer(final String name,
+  public DataObjectBoundingBoxLayer(final String type, final String name,
     final Class<?> workerClass, final GeometryFactory geometryFactory) {
     super(name, geometryFactory);
+    setType(type);
     this.workerClass = workerClass;
   }
 
@@ -116,4 +118,10 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
     firePropertyChange("visible", false, isVisible());
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    map.remove("style");
+    return map;
+  }
 }

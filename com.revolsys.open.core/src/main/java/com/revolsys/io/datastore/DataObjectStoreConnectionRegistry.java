@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -26,9 +27,9 @@ public class DataObjectStoreConnectionRegistry extends
 
   protected DataObjectStoreConnectionRegistry(
     final DataObjectStoreConnectionManager connectionManager,
-    final String name, final File directory) {
+    final String name, final Resource resource) {
     super(connectionManager, name);
-    setDirectory(directory);
+    setDirectory(resource);
     init();
   }
 

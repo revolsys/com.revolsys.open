@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -74,7 +75,7 @@ public abstract class AbstractConnectionRegistry<T> implements
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
       final FileSystemResource resource = new FileSystemResource(file);
-      JsonMapIoFactory.write(connectionParameters, resource);
+      JsonMapIoFactory.write(connectionParameters, resource, true);
       loadConnection(file);
     }
   }
@@ -202,10 +203,12 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   protected abstract boolean removeConnection(T connection);
 
-  protected void setDirectory(final File directory) {
-    if (directory != null) {
+  protected void setDirectory(final Resource resource) {
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
+      final File directory = fileResource.getFile();
       boolean readOnly;
-      if (directory.exists()) {
+      if (resource.exists()) {
         readOnly = !directory.canWrite();
       } else if (directory.mkdirs()) {
         readOnly = false;
@@ -213,8 +216,11 @@ public abstract class AbstractConnectionRegistry<T> implements
         readOnly = true;
       }
       setReadOnly(readOnly);
+      this.directory = directory;
+    } else {
+      setReadOnly(true);
+      this.directory = null;
     }
-    this.directory = directory;
   }
 
   public void setReadOnly(final boolean readOnly) {

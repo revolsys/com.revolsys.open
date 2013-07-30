@@ -58,7 +58,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.parent = parent;
     getPropertyChangeSupport().addPropertyChangeListener(parent);
     @SuppressWarnings("unchecked")
-    final Map<String, Object> styleDefaults = (Map<String, Object>)style.get("defaults");
+    final Map<String, Object> styleDefaults = (Map<String, Object>)style.remove("defaults");
     setDefaults(styleDefaults);
     final Number minimumScale = getValue(style, "minimumScale");
     if (minimumScale != null) {
@@ -72,7 +72,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     if (visible != null) {
       this.visible = visible;
     }
-    setName((String)style.get("name"));
+    setName((String)style.remove("name"));
   }
 
   @Override
@@ -82,14 +82,14 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   @Override
   public Map<String, Object> getAllDefaults() {
-
+    final Map<String, Object> allDefaults;
     if (parent == null) {
-      return new LinkedHashMap<String, Object>(defaults);
+      allDefaults = new LinkedHashMap<String, Object>(getDefaults());
     } else {
-      final Map<String, Object> allDefaults = parent.getAllDefaults();
+      allDefaults = parent.getAllDefaults();
       allDefaults.putAll(getDefaults());
-      return allDefaults;
     }
+    return allDefaults;
   }
 
   public Map<String, Object> getDefaults() {
@@ -223,13 +223,20 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
       this.defaults);
     for (final Entry<String, Object> entry : defaults.entrySet()) {
       final String name = entry.getKey();
-      final Object defaultValue = entry.getValue();
-      final Object newDefaultValue = newDefaults.get(name);
-      if (EqualsRegistry.equal(defaultValue, newDefaultValue)) {
+      boolean defaultEqual = false;
+      if (newDefaults.containsKey(name)) {
+        final Object defaultValue = entry.getValue();
+        final Object newDefaultValue = newDefaults.get(name);
+        defaultEqual = EqualsRegistry.equal(defaultValue, newDefaultValue);
+        System.out.println(name);
+      }
+      if (defaultEqual) {
         newDefaults.remove(name);
       }
     }
-    MapSerializerUtil.add(map, "defaults", newDefaults);
+    if (!newDefaults.isEmpty()) {
+      map.put("defaults", newDefaults);
+    }
     MapSerializerUtil.add(map, "maximumScale", maximumScale, 0);
     MapSerializerUtil.add(map, "minimumScale", minimumScale, Long.MAX_VALUE);
     return map;

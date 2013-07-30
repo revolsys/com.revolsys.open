@@ -15,4 +15,9 @@ public enum LineJoin {
   public int getAwtValue() {
     return awtValue;
   }
+
+  @Override
+  public String toString() {
+    return name().toLowerCase();
+  }
 }

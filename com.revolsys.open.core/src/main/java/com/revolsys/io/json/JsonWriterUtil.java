@@ -51,15 +51,17 @@ public final class JsonWriterUtil {
   }
 
   public static void endList(final PrintWriter out) {
-    out.print("]\n");
+    out.print("]");
   }
 
   public static void endObject(final PrintWriter out) {
-    out.print("\n}\n");
+    out.print("}");
   }
 
-  public static void label(final PrintWriter out, final String key) {
-    write(out, key);
+  public static void label(final PrintWriter out, final String key,
+    final String indent) {
+    out.print(indent);
+    write(out, key, null);
     out.print(":");
   }
 
@@ -72,32 +74,45 @@ public final class JsonWriterUtil {
   }
 
   public static void write(final PrintWriter out,
-    final Collection<? extends Object> values) {
+    final Collection<? extends Object> values, final String indent) {
     startList(out);
+    String newIndent = indent;
+    if (newIndent != null) {
+      newIndent += "  ";
+    }
     if (values != null) {
       int i = 0;
       final int size = values.size();
       final Iterator<? extends Object> iterator = values.iterator();
       while (i < size - 1) {
+        writeIndent(out, newIndent);
         final Object value = iterator.next();
-        write(out, value);
+        write(out, value, newIndent);
         endAttribute(out);
         i++;
       }
       if (iterator.hasNext()) {
+        writeIndent(out, newIndent);
         final Object value = iterator.next();
-        write(out, value);
-        out.print("\n");
+        write(out, value, newIndent);
+        if (indent != null) {
+          out.print("\n");
+        }
       }
     }
+    writeIndent(out, indent);
     endList(out);
   }
 
   public static void write(final PrintWriter out,
-    final Map<String, ? extends Object> values) {
+    final Map<String, ? extends Object> values, final String indent) {
 
     startObject(out);
     if (values != null) {
+      String newIndent = indent;
+      if (newIndent != null) {
+        newIndent += "  ";
+      }
       final Set<String> fields = values.keySet();
       int i = 0;
       final int size = fields.size();
@@ -105,27 +120,32 @@ public final class JsonWriterUtil {
       while (i < size - 1) {
         final String key = iterator.next();
         final Object value = values.get(key);
-        label(out, key);
-        write(out, value);
+        label(out, key, newIndent);
+        write(out, value, newIndent);
         endAttribute(out);
         i++;
       }
       if (iterator.hasNext()) {
         final String key = iterator.next();
         final Object value = values.get(key);
-        label(out, key);
-        write(out, value);
+        label(out, key, newIndent);
+        write(out, value, newIndent);
+        if (indent != null) {
+          out.print("\n");
+        }
       }
     }
+    writeIndent(out, indent);
     endObject(out);
   }
 
   @SuppressWarnings("unchecked")
-  public static void write(final PrintWriter out, final Object value) {
+  public static void write(final PrintWriter out, final Object value,
+    final String indent) {
     if (value == null) {
       out.print("null");
     } else if (value instanceof StringPrinter) {
-      StringPrinter printer = (StringPrinter)value;
+      final StringPrinter printer = (StringPrinter)value;
       printer.write(out);
     } else if (value instanceof Boolean) {
       out.print(value);
@@ -141,19 +161,25 @@ public final class JsonWriterUtil {
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;
-      write(out, list);
+      write(out, list, indent);
     } else if (value instanceof Map) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
-      write(out, map);
+      write(out, map, indent);
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
       out.write('"');
       charSequence(out, string);
       out.write('"');
     } else {
-      write(out, StringConverterRegistry.toString(value));
+      write(out, StringConverterRegistry.toString(value), indent);
     }
 
+  }
+
+  protected static void writeIndent(final PrintWriter out, final String indent) {
+    if (indent != null) {
+      out.print(indent);
+    }
   }
 
   private JsonWriterUtil() {

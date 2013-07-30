@@ -89,7 +89,17 @@ public class JsonMapWriter extends AbstractMapWriter {
     } else {
       writeHeader();
     }
-    JsonWriterUtil.write(out, values);
+    String indentString = null;
+    if (indent) {
+      if (singleObject) {
+        indentString = "";
+      } else {
+        indentString = "  ";
+        out.print(indentString);
+      }
+    }
+    JsonWriterUtil.write(out, values, indentString);
+    newLine();
   }
 
   private void writeHeader() {

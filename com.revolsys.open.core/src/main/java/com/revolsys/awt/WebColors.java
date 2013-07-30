@@ -315,4 +315,8 @@ public class WebColors {
       color.getBlue());
     return COLOR_NAMES.get(newColor);
   }
+
+  public static Color getColorWithOpacity(final Color color, final int opacity) {
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
+  }
 }

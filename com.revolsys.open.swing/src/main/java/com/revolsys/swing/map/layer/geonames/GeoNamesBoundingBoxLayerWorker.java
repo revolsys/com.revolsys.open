@@ -32,7 +32,7 @@ public class GeoNamesBoundingBoxLayerWorker extends
     final Map<String, Object> properties) {
     final GeometryFactory wgs84 = GeometryFactory.getFactory(4326);
     final DataObjectBoundingBoxLayer layer = new DataObjectBoundingBoxLayer(
-      "Geo Names", GeoNamesBoundingBoxLayerWorker.class, wgs84);
+      "geoname", "Geo Names", GeoNamesBoundingBoxLayerWorker.class, wgs84);
 
     final BufferedImage image = SilkIconLoader.getImage("world");
     final ImageMarker marker = new ImageMarker(image);

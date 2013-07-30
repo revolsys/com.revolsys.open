@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
@@ -35,9 +36,9 @@ public class FolderConnectionRegistry extends
 
   protected FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
-    final File directory) {
+    final Resource resource) {
     super(connectionManager, name);
-    setDirectory(directory);
+    setDirectory(resource);
     init();
   }
 
