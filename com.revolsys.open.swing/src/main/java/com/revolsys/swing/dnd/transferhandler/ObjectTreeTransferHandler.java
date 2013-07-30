@@ -18,6 +18,7 @@ import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
@@ -106,6 +107,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Cannot export data", e);
       }
+      c.repaint();
     }
   }
 
@@ -118,10 +120,11 @@ public class ObjectTreeTransferHandler extends TransferHandler {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean importData(final TransferSupport support) {
     final Component component = support.getComponent();
-    if (component instanceof JTree) {
+    if (component instanceof ObjectTree) {
       final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
       final TreePath path = loc.getPath();
       int index = loc.getChildIndex();
@@ -170,6 +173,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
               final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
               group.openFiles(files);
             }
+            component.repaint();
           } catch (final Exception e) {
             LoggerFactory.getLogger(getClass()).error("Cannot import data", e);
             return false;

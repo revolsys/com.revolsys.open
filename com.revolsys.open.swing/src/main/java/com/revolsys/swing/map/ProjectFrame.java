@@ -128,6 +128,8 @@ public class ProjectFrame extends JFrame {
     final ObjectTreePanel catalogPanel = new ObjectTreePanel(
       connectionManagers, listModel);
     final ObjectTree tree = catalogPanel.getTree();
+    tree.setDragEnabled(false);
+
     for (final Object connectionManager : connectionManagers) {
       tree.expandPath(connectionManagers, connectionManager);
       if (connectionManager instanceof ConnectionRegistryManager) {

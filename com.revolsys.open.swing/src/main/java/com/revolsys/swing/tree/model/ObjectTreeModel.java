@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -19,6 +18,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.ClassRegistry;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -317,7 +317,10 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         final Object oldValue = indexedEvent.getOldValue();
         final Object newValue = indexedEvent.getNewValue();
         if (oldValue != null) {
-          objectPathMap.remove(oldValue);
+          final TreePath childPath = parentPath.pathByAddingChild(oldValue);
+          if (EqualsRegistry.equal(childPath, objectPathMap.get(oldValue))) {
+            objectPathMap.remove(oldValue);
+          }
         }
         if (newValue != null) {
           objectPathMap.put(newValue, parentPath.pathByAddingChild(newValue));

@@ -19,7 +19,30 @@ public class ProjectTreeNodeModel extends
   }
 
   @Override
+  public int addChild(final Project project, final int index, final Layer layer) {
+    project.add(index, layer);
+    return index;
+  }
+
+  @Override
+  public int addChild(final Project project, final Layer layer) {
+    project.add(layer);
+    return getChildCount(project);
+  }
+
+  @Override
   protected List<Layer> getChildren(final Project project) {
     return project.getLayers();
+  }
+
+  @Override
+  public boolean isLeaf(final Project node) {
+    return false;
+  }
+
+  @Override
+  public boolean removeChild(final Project project, final Layer layer) {
+    project.remove(layer);
+    return true;
   }
 }
