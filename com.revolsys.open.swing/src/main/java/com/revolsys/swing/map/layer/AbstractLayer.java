@@ -73,7 +73,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private String name;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   private GeometryFactory geometryFactory;
@@ -171,10 +171,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     if (layerGroup != null) {
       layerGroup.remove(this);
     }
-    this.geometryFactory = null;
-    this.layerGroup = null;
-    this.propertyChangeSupport = null;
-    this.renderer = null;
   }
 
   public void deleteWithConfirm() {

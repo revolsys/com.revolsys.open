@@ -169,7 +169,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final Object editSync = new Object();
 
-  private Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
+  private final Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
 
   private DataObjectMetaData metaData;
 
@@ -414,13 +414,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
       }
     }
-    this.deletedRecords = null;
-    this.forms = null;
-    this.metaData = null;
-    this.modifiedRecords = null;
-    this.newRecords = null;
-    this.query = null;
-    this.selectedRecords = null;
     System.gc();
   }
 
@@ -1347,6 +1340,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Geometry oldGeometry) {
   }
 
+  @Override
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Project project = getProject();
@@ -1360,6 +1354,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
   public void zoomToObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
 

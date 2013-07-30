@@ -229,7 +229,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
         index++;
       }
       super.delete();
-      this.layers = null;
     }
   }
 
@@ -456,9 +455,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   public Layer remove(final int index) {
     synchronized (layers) {
       final Layer layer = layers.remove(index);
-      layer.setLayerGroup(null);
       layer.removePropertyChangeListener(this);
       fireIndexedPropertyChange("layers", index, layer, null);
+      if (layer.getLayerGroup() == this) {
+        layer.setLayerGroup(null);
+      }
       return layer;
     }
   }
