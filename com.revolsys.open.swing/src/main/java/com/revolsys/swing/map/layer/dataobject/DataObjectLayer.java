@@ -119,7 +119,7 @@ public interface DataObjectLayer extends Layer {
 
   <V extends JComponent> V showForm(final LayerDataObject record);
 
-  void showRecordsTable();
+  void showRecordsTable(String attributeFilterMode);
 
   void unselectRecords(Collection<? extends LayerDataObject> records);
 

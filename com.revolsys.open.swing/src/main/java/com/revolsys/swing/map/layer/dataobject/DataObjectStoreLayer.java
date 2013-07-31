@@ -34,6 +34,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingWorkerManager;
+import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -565,7 +566,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         }
       }
       if (!objects.isEmpty()) {
-        showRecordsTable();
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
       setSelectedRecords(objects);
     }
@@ -638,6 +639,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } finally {
       writer.close();
     }
+    refresh();
     return true;
   }
 
@@ -648,18 +650,22 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final String id = object.getString(getMetaData().getIdAttributeName());
       if (deletedObjectIds.contains(id) || super.isDeleted(object)) {
         removeDeletedObject(object);
+        index.remove(object);
         object.setState(DataObjectState.Deleted);
         writer.write(object);
       } else if (super.isModified(object)) {
         removeModifiedObject(object);
         writer.write(object);
+        index.insert(object);
       } else if (isNew(object)) {
         removeNewObject(object);
+        index.insert(object);
         writer.write(object);
       }
     } finally {
       writer.close();
     }
+    refresh();
     return true;
   }
 

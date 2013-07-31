@@ -46,6 +46,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final DataObjectLayerTableModel tableModel;
 
+  private final JToggleButton selectedButton;
+
   public DataObjectLayerTablePanel(final DataObjectLayer layer,
     final JTable table) {
     super(table);
@@ -58,21 +60,24 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       menu.addMenuItemTitleIcon("zoom", "Zoom to Record",
         "magnifier_zoom_selected", this, "zoomToRecord");
     }
-
-    menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit", this,
-      "editRecord");
-
     final EnableCheck deletableEnableCheck = new DataObjectRowPropertyEnableCheck(
       "deletable");
-    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
-      deletableEnableCheck, this, "deleteRecord");
 
     final EnableCheck modifiedEnableCheck = new DataObjectRowPropertyEnableCheck(
       "modified");
     final EnableCheck deletedEnableCheck = new DataObjectRowPropertyEnableCheck(
       "deleted");
+    final EnableCheck notEnableCheck = new DataObjectRowPropertyEnableCheck(
+      "deleted", false);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
       modifiedEnableCheck, deletedEnableCheck);
+
+    menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
+      notEnableCheck, this, "editRecord");
+
+    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
+      deletableEnableCheck, this, "deleteRecord");
+
     menu.addMenuItem("record", DataObjectRowRunnable.createAction(
       "Revert Record", "arrow_revert", modifiedOrDeleted, "revertChanges"));
 
@@ -106,9 +111,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       "change_table_filter", editableEnableCheck, tableModel,
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
 
-    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Selected Records",
-      "filter_selected", null, tableModel, "setAttributeFilterMode",
-      DataObjectLayerTableModel.MODE_SELECTED);
+    selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
+      "Show Only Selected Records", "filter_selected", null, tableModel,
+      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
 
@@ -131,7 +136,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public void editRecord() {
     final LayerDataObject object = getEventRowObject();
-    layer.showForm(object);
+    if (!object.isDeleted()) {
+      layer.showForm(object);
+    }
   }
 
   protected LayerDataObject getEventRowObject() {
@@ -199,6 +206,12 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   public void removeNotify() {
     super.removeNotify();
     layer.removePropertyChangeListener(this);
+  }
+
+  public void setAttributeFilterMode(final String mode) {
+    if (DataObjectLayerTableModel.MODE_SELECTED.equals(mode)) {
+      selectedButton.doClick();
+    }
   }
 
   public void zoomToRecord() {

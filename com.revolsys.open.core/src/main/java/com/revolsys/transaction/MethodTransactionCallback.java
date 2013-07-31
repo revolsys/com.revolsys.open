@@ -32,7 +32,9 @@ public class MethodTransactionCallback<T> extends MethodInvoker implements
       }
       return result;
     } catch (final Throwable e) {
-      transaction.setRollbackOnly();
+      if (transaction != null) {
+        transaction.setRollbackOnly();
+      }
       return ExceptionUtil.throwUncheckedException(e);
     }
   }

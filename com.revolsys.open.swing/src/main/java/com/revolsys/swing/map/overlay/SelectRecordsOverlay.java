@@ -10,6 +10,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.beans.PropertyChangeEvent;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -38,7 +40,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 @SuppressWarnings("serial")
-public class SelectFeaturesOverlay extends AbstractOverlay {
+public class SelectRecordsOverlay extends AbstractOverlay {
 
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
@@ -82,7 +84,7 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
 
   private java.awt.Point selectBoxFirstPoint;
 
-  public SelectFeaturesOverlay(final MapPanel map) {
+  public SelectRecordsOverlay(final MapPanel map) {
     super(map);
   }
 
@@ -309,7 +311,9 @@ public class SelectFeaturesOverlay extends AbstractOverlay {
     final BoundingBox boundingBox) {
 
     final double scale = getViewport().getScale();
-    for (final Layer layer : group.getLayers()) {
+    final List<Layer> layers = group.getLayers();
+    Collections.reverse(layers);
+    for (final Layer layer : layers) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         selectRecords(childGroup, boundingBox);

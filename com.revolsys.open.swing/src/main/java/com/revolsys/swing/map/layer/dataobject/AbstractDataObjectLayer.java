@@ -976,7 +976,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (isLayerObject(object)) {
         removeModifiedObject(object);
         deletedRecords.remove(object);
-        object.revertChanges();
       }
     }
   }
@@ -1128,9 +1127,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           iterator.remove();
         }
       }
-      if (!objects.isEmpty()) {
-        showRecordsTable();
-      }
       setSelectedRecords(objects);
     }
   }
@@ -1141,7 +1137,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     clearSelectedRecordsIndex();
     this.selectedRecords = new LinkedHashSet<LayerDataObject>(selectedRecords);
     if (!selectedRecords.isEmpty()) {
-      showRecordsTable();
+      showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
     }
     fireSelected();
   }
@@ -1262,12 +1258,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void showRecordsTable() {
+  public void showRecordsTable(final String attributeFilterMode) {
     DefaultSingleCDockable dockable = getProperty("TableView");
+    final Component component;
     if (dockable == null) {
       final Project project = getProject();
 
-      final Component component = createTablePanel();
+      component = createTablePanel();
+
       if (component != null) {
         final String id = getClass().getName() + "." + getId();
         dockable = DockingFramesUtil.addDockable(project,
@@ -1296,7 +1294,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           dockable.toFront();
         }
       }
+    } else {
+      component = dockable.getContentPane().getComponent(0);
+      dockable.toFront();
     }
+
+    if (component instanceof DataObjectLayerTablePanel) {
+      final DataObjectLayerTablePanel tablePanel = (DataObjectLayerTablePanel)component;
+      tablePanel.setAttributeFilterMode(attributeFilterMode);
+    }
+
   }
 
   public void toggleEditable() {

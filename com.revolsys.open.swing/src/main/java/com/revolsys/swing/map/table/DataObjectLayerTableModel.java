@@ -356,7 +356,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public void setAttributeFilterMode(final String mode) {
-
     if (attributeFilterModes.contains(mode)) {
       if (!mode.equals(this.attributeFilterMode)) {
         this.attributeFilterMode = mode;

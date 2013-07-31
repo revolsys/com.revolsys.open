@@ -297,7 +297,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   public List<Layer> getLayers() {
-    return this;
+    return new ArrayList<Layer>(this);
   }
 
   @SuppressWarnings("unchecked")

@@ -63,7 +63,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 @SuppressWarnings("serial")
-public class EditGeometryOverlay extends SelectFeaturesOverlay implements
+public class EditGeometryOverlay extends SelectRecordsOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
 
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {

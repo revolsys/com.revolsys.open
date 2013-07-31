@@ -964,21 +964,30 @@ public class DataObjectLayerForm extends JPanel implements
           object.setValueByPath(fieldName, fieldValue);
         }
       }
-    } else if (source == getObject()) {
-      final String propertyName = event.getPropertyName();
-      final Object value = event.getNewValue();
-      final DataObjectMetaData metaData = getMetaData();
-      if ("errorsUpdated".equals(propertyName)) {
-        updateErrors();
-      } else if (metaData.hasAttribute(propertyName)) {
-        setFieldValue(propertyName, value, isFieldValidationEnabled());
+    } else {
+      final LayerDataObject object = getObject();
+      if (source == object) {
+        if (object.isDeleted()) {
+          final Window window = SwingUtilities.getWindowAncestor(this);
+          if (window != null) {
+            window.setVisible(false);
+          }
+        }
+        final String propertyName = event.getPropertyName();
+        final Object value = event.getNewValue();
+        final DataObjectMetaData metaData = getMetaData();
+        if ("errorsUpdated".equals(propertyName)) {
+          updateErrors();
+        } else if (metaData.hasAttribute(propertyName)) {
+          setFieldValue(propertyName, value, isFieldValidationEnabled());
+        }
+        final boolean modifiedOrDeleted = isModifiedOrDeleted();
+        propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+          !modifiedOrDeleted, modifiedOrDeleted);
+        final boolean deletable = isDeletable();
+        propertyChangeSupport.firePropertyChange("deletable", !deletable,
+          deletable);
       }
-      final boolean modifiedOrDeleted = isModifiedOrDeleted();
-      propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-        !modifiedOrDeleted, modifiedOrDeleted);
-      final boolean deletable = isDeletable();
-      propertyChangeSupport.firePropertyChange("deletable", !deletable,
-        deletable);
     }
   }
 

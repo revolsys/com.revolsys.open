@@ -45,7 +45,7 @@ public class ArrayDataObject extends BaseDataObject {
     final int attributeCount = metaData.getAttributeCount();
     attributes = new Object[attributeCount];
     final Map<String, Object> defaultValues = metaData.getDefaultValues();
-    setValues(defaultValues);
+    setValuesByPath(defaultValues);
     setValues(values);
     setState(DataObjectState.New);
   }

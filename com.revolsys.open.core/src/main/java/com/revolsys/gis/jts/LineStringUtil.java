@@ -454,6 +454,11 @@ public final class LineStringUtil {
     return null;
   }
 
+  public static Coordinates getCoordinates(final LineString line, final int i) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    return points.get(i);
+  }
+
   /**
    * Get the coordinate where two lines cross, or null if they don't cross.
    * 
@@ -534,8 +539,11 @@ public final class LineStringUtil {
   }
 
   public static Coordinates getFromCoordinates(final LineString line) {
-    final int i = 0;
-    return getPoint(line, i);
+    return getCoordinates(line, 0);
+  }
+
+  public static Point getFromPoint(final LineString line) {
+    return getPoint(line, 0);
   }
 
   public static double getLength(final MultiLineString lines) {
@@ -564,14 +572,15 @@ public final class LineStringUtil {
     return null;
   }
 
-  public static Coordinates getPoint(final LineString line, final int i) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    return points.get(i);
+  public static Point getPoint(final LineString line, final int index) {
+    final Coordinates coordinates = getCoordinates(line, index);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    return geometryFactory.createPoint(coordinates);
   }
 
   public static Coordinates getToCoordinates(final LineString line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    return points.get(points.size() - 1);
+    final int index = line.getNumPoints() - 1;
+    return getCoordinates(line, index);
   }
 
   public static Point getToPoint(final LineString line) {

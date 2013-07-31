@@ -11,7 +11,6 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -44,10 +43,11 @@ public class DeletedPredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final LayerDataObject object = model.getObject(rowIndex);
-      final DataObjectLayer layer = model.getLayer();
-      return layer.isDeleted(object);
-    } catch (final IndexOutOfBoundsException e) {
-      return false;
+      if (object != null) {
+        return object.isDeleted();
+      }
+    } catch (final Throwable e) {
     }
+    return false;
   }
 }
