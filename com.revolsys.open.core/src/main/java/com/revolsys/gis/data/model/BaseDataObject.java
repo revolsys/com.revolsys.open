@@ -567,6 +567,18 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
         values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
+        setValue(name, value);
+      }
+    }
+  }
+
+  @Override
+  public void setValuesByPath(final Map<String, ? extends Object> values) {
+    if (values != null) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
+        values).entrySet()) {
+        final String name = defaultValue.getKey();
+        final Object value = defaultValue.getValue();
         setValueByPath(name, value);
       }
     }

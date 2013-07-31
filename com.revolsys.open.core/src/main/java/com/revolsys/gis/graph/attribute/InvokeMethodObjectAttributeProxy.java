@@ -22,35 +22,35 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
 
   private Object[] parameters;
 
+  private Object object;
+
   public InvokeMethodObjectAttributeProxy() {
   }
 
-  /**
-   * Construct a new InvokeMethodRunnable.
-   * 
-   * @param methodName The name of the method to invoke.
-   * @param parameters The parameters to pass to the method.
-   */
-  public InvokeMethodObjectAttributeProxy(final Class<?> clazz,
+  public InvokeMethodObjectAttributeProxy(final Object object,
     final String methodName, final Class<?> parameterClass,
     final Object... parameters) {
-    this.clazz = clazz;
+    if (object instanceof Class) {
+      this.clazz = (Class<?>)object;
+    } else {
+      this.object = object;
+      this.clazz = object.getClass();
+    }
     this.methodName = methodName;
     this.parameterClass = parameterClass;
     this.parameters = parameters;
     init();
-
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public T createValue(final O object) {
+  public T createValue(final O value) {
     try {
       if (parameters == null) {
-        return (T)method.invoke(object, object);
+        return (T)method.invoke(object, value);
       } else {
         final Object[] parameters = new Object[this.parameters.length + 1];
-        parameters[0] = object;
+        parameters[0] = value;
         for (int i = 0; i < this.parameters.length; i++) {
           final Object parameter = this.parameters[i];
           parameters[i + 1] = parameter;

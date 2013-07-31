@@ -31,4 +31,8 @@ public abstract class AbstractDataObjectMetaDataProperty implements
     }
   }
 
+  public String getTypePath() {
+    return getMetaData().getPath();
+  }
+
 }

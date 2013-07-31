@@ -358,17 +358,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     super.close();
   }
 
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
-
   public synchronized void closeEnumRows(EnumRows rows) {
     if (rows != null) {
       if (enumRowsToClose.remove(rows)) {
@@ -382,6 +371,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
     }
   }
+
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
 
   protected synchronized void closeRow(final Row row) {
     row.delete();
@@ -934,6 +934,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return createMissingDataStore;
   }
 
+  public synchronized boolean isCreateMissingTables() {
+    return createMissingTables;
+  }
+
   // @Override
   // public synchronized Reader<DataObject> query(final String typePath) {
   // final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
@@ -942,10 +946,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // iterator);
   // return reader;
   // }
-
-  public synchronized boolean isCreateMissingTables() {
-    return createMissingTables;
-  }
 
   public synchronized boolean isNull(final Row row, final String name) {
     return row.isNull(name);
@@ -1131,6 +1131,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   protected synchronized void setWriteLock(final Table table) {
     table.setWriteLock();
+  }
+
+  @Override
+  public String toString() {
+    return fileName;
   }
 
   @Override

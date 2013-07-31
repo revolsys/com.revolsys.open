@@ -144,11 +144,13 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   void setValues(DataObject object, Collection<String> attributeNames);
 
+  void setValues(Map<String, ? extends Object> values);
+
   /**
    * Set the values on the object based on the values in the map.
    * 
    * @param values The values to set.
    */
-  void setValues(Map<String, ? extends Object> values);
+  void setValuesByPath(Map<String, ? extends Object> values);
 
 }

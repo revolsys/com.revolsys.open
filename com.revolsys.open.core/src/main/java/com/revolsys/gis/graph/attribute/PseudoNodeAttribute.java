@@ -28,7 +28,9 @@ public class PseudoNodeAttribute {
   public PseudoNodeAttribute(final Node<DataObject> node,
     final String typePath, final Collection<String> equalExcludeAttributes) {
     this.typePath = typePath;
-    this.equalExcludeAttributes.addAll(equalExcludeAttributes);
+    if (equalExcludeAttributes != null) {
+      this.equalExcludeAttributes.addAll(equalExcludeAttributes);
+    }
     final Map<String, Map<LineString, Set<Edge<DataObject>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
     init(node, edgesByLine);
@@ -65,7 +67,7 @@ public class PseudoNodeAttribute {
     }
   }
 
-  private boolean isPseudoNode(final Node<DataObject> node,
+  protected boolean isPseudoNode(final Node<DataObject> node,
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
     final Set<LineString> lines = edgesByLine.keySet();
     if (!LineStringUtil.hasLoop(lines)) {

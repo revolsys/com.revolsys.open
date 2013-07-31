@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -618,7 +619,7 @@ public abstract class AbstractDataObjectStore extends
       final String typePath = typeProperties.getKey();
       Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typePath);
       if (currentProperties == null) {
-        currentProperties = new HashMap<String, Object>();
+        currentProperties = new LinkedHashMap<String, Object>();
         this.typeMetaDataProperties.put(typePath, currentProperties);
       }
       final List<DataObjectMetaDataProperty> properties = typeProperties.getValue();

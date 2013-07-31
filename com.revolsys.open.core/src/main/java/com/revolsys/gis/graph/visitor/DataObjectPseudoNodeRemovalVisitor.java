@@ -1,8 +1,5 @@
 package com.revolsys.gis.graph.visitor;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -11,7 +8,9 @@ import javax.annotation.PreDestroy;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
+import com.revolsys.gis.data.model.property.PseudoNodeProperty;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
@@ -19,7 +18,6 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -31,11 +29,6 @@ import com.revolsys.util.ObjectProcessor;
 public class DataObjectPseudoNodeRemovalVisitor extends
   AbstractNodeListenerVisitor<DataObject> implements
   FilterProxy<Node<DataObject>>, ObjectProcessor<DataObjectGraph> {
-
-  private static final List<String> EQUAL_EXCLUDE = Arrays.asList(
-    DataObjectEquals.EXCLUDE_ID, DataObjectEquals.EXCLUDE_GEOMETRY);
-
-  private Collection<String> equalExcludeAttributes;
 
   private Filter<Node<DataObject>> filter;
 
@@ -61,9 +54,6 @@ public class DataObjectPseudoNodeRemovalVisitor extends
   public void init() {
     mergedStatistics = new Statistics("Merged at psuedo node");
     mergedStatistics.connect();
-    if (equalExcludeAttributes == null) {
-      equalExcludeAttributes = new HashSet<String>(EQUAL_EXCLUDE);
-    }
   }
 
   private void mergeEdgePairs(final Node<DataObject> node,
@@ -107,9 +97,10 @@ public class DataObjectPseudoNodeRemovalVisitor extends
   }
 
   private void processPseudoNodes(final Node<DataObject> node) {
-    for (final String typePath : NodeAttributes.getEdgeTypeNames(node)) {
-      final PseudoNodeAttribute pseudoNodeAttribute = new PseudoNodeAttribute(
-        node, typePath, equalExcludeAttributes);
+    for (final DataObjectMetaData metaData : NodeAttributes.getEdgeMetaDatas(node)) {
+      final PseudoNodeProperty property = PseudoNodeProperty.getProperty(metaData);
+
+      final PseudoNodeAttribute pseudoNodeAttribute = property.getAttribute(node);
       processPseudoNodesForType(node, pseudoNodeAttribute);
     }
   }

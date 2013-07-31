@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NumberComparator;
@@ -47,6 +49,19 @@ public class NodeAttributes {
         angles.add(fromAngle);
       }
       return anglesByType;
+    }
+
+    public static Set<DataObjectMetaData> edgeMetaDatas(final Node<?> node) {
+      final Set<DataObjectMetaData> metaDatas = new HashSet<DataObjectMetaData>();
+      for (final Edge<?> edge : node.getEdges()) {
+        final Object object = edge.getObject();
+        if (object instanceof DataObject) {
+          final DataObject dataObject = (DataObject)object;
+          final DataObjectMetaData metaData = dataObject.getMetaData();
+          metaDatas.add(metaData);
+        }
+      }
+      return metaDatas;
     }
 
     public static <T> Map<LineString, Map<String, Set<Edge<T>>>> edgesByLineAndTypeName(
@@ -144,6 +159,8 @@ public class NodeAttributes {
 
   private static String EDGE_TYPE_NAMES = "edgeTypeNames";
 
+  private static String EDGE_META_DATAS = "edgeMetaDatas";
+
   private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
 
   private static String EDGES_BY_TYPE = "edgesByType";
@@ -175,6 +192,11 @@ public class NodeAttributes {
     final Map<String, Set<Double>> anglesByType = getEdgeAnglesByType(node);
     final Set<Double> angles = anglesByType.get(typePath);
     return angles;
+  }
+
+  public static Set<DataObjectMetaData> getEdgeMetaDatas(
+    final Node<? extends Object> node) {
+    return getAttribute(node, EDGE_META_DATAS);
   }
 
   /**

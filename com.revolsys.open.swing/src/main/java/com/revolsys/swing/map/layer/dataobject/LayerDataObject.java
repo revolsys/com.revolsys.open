@@ -24,6 +24,13 @@ public class LayerDataObject extends ArrayDataObject {
     this.layer = layer;
   }
 
+  protected void clearOriginalValues() {
+    if (originalValues != null) {
+      super.setValues(originalValues);
+    }
+    originalValues = null;
+  }
+
   protected void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
     final DataObjectLayer layer = getLayer();
@@ -110,13 +117,6 @@ public class LayerDataObject extends ArrayDataObject {
       firePropertyChange("state", DataObjectState.Modified,
         DataObjectState.Persisted);
     }
-  }
-
-  protected void clearOriginalValues() {
-    if (originalValues != null) {
-      super.setValues(originalValues);
-    }
-    originalValues = null;
   }
 
   @Override
