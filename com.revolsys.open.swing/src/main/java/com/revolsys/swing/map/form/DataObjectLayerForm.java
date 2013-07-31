@@ -1043,7 +1043,9 @@ public class DataObjectLayerForm extends JPanel implements
       tabs.setSelectedIndex(tabIndex);
     }
     final JComponent field = getField(fieldName);
-    field.requestFocusInWindow();
+    if (field != null) {
+      field.requestFocusInWindow();
+    }
   }
 
   public void setFieldInvalid(final String fieldName, String message) {

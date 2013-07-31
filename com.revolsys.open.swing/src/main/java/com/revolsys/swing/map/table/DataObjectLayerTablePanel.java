@@ -187,6 +187,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       tableModel.setSearchCondition(condition);
     } else if (source instanceof LayerDataObject) {
       repaint();
+    } else if (source == layer) {
+      final String propertyName = event.getPropertyName();
+      if ("recordsChanged".equals(propertyName)) {
+        tableModel.refresh();
+      }
     }
   }
 
