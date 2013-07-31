@@ -162,7 +162,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   @Override
   public LayerDataObject getObject(final int row) {
-    if (attributeFilterMode.equals(MODE_SELECTED)) {
+    if (row < 0) {
+      return null;
+    } else if (attributeFilterMode.equals(MODE_SELECTED)) {
       final List<LayerDataObject> selectedObjects = getSelectedObjects();
       if (row < selectedObjects.size()) {
         return selectedObjects.get(row);

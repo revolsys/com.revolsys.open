@@ -52,14 +52,14 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     addProperty("markerFile", String.class, null);
     addProperty("markerOpacity", Integer.class, 255);
     addProperty("markerFillOpacity", Integer.class, 255);
-    addProperty("markerLineColor", Color.class, new Color(255, 255, 255, 255));
+    addProperty("markerLineColor", Color.class, new Color(255, 255, 255));
     addProperty("markerLineWidth", Measure.class, ONE_PIXEL);
     addProperty("markerLineOpacity", Double.class, 255);
     addProperty("markerPlacement", String.class, "point");
     addProperty("markerType", String.class, "ellipse");
     addProperty("markerWidth", Measure.class, TEN_PIXELS);
     addProperty("markerHeight", Measure.class, TEN_PIXELS);
-    addProperty("markerFill", Color.class, new Color(0, 0, 255, 255));
+    addProperty("markerFill", Color.class, new Color(0, 0, 255));
     addProperty("markerAllowOverlap", Boolean.class, false);
     addProperty("markerIgnorePlacement", String.class, null);
     /*
