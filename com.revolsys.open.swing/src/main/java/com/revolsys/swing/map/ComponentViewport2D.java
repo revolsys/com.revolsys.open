@@ -15,7 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.LayerGroup;
 
 public class ComponentViewport2D extends Viewport2D {
 
@@ -25,7 +25,7 @@ public class ComponentViewport2D extends Viewport2D {
 
   private int maxDecimalDigits;
 
-  public ComponentViewport2D(final Project project, final JComponent component) {
+  public ComponentViewport2D(final LayerGroup project, final JComponent component) {
     super(project);
     this.component = component;
     project.getPropertyChangeSupport().addPropertyChangeListener(
@@ -273,7 +273,7 @@ public class ComponentViewport2D extends Viewport2D {
   }
 
   public void updateCachedFields() {
-    final Project project = getProject();
+    final LayerGroup project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     if (geometryFactory != null) {
       if (geometryFactory != getGeometryFactory()) {

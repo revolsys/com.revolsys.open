@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
@@ -384,6 +385,25 @@ public final class LineStringUtil {
     final LineString line, final Coordinates point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return CoordinatesListUtil.findClosestSegmentAndCoordinate(points, point);
+  }
+
+  public static List<LineString> getAll(final Geometry geometry) {
+    final List<LineString> lines = new ArrayList<LineString>();
+    for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+      final Geometry part = geometry.getGeometryN(partIndex);
+      if (part instanceof LineString) {
+        final LineString line = (LineString)part;
+        lines.add(line);
+      } else if (part instanceof Polygon) {
+        final Polygon polygon = (Polygon)part;
+        lines.add(polygon.getExteriorRing());
+        for (int ringIndex = 0; ringIndex < polygon.getNumInteriorRing(); ringIndex++) {
+          final LineString ring = polygon.getInteriorRingN(ringIndex);
+          lines.add(ring);
+        }
+      }
+    }
+    return lines;
   }
 
   public static Coordinates getClosestCoordinateOnLineString(
@@ -1211,4 +1231,5 @@ public final class LineStringUtil {
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
   }
+
 }

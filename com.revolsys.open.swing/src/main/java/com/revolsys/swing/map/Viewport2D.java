@@ -22,7 +22,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -94,7 +94,7 @@ public class Viewport2D {
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
-  private Project project;
+  private LayerGroup project;
 
   private AffineTransform modelToScreenTransform;
 
@@ -120,12 +120,12 @@ public class Viewport2D {
   public Viewport2D() {
   }
 
-  public Viewport2D(final Project project) {
+  public Viewport2D(final LayerGroup project) {
     this.project = project;
     this.geometryFactory = project.getGeometryFactory();
   }
 
-  public Viewport2D(final Project project, final int width, final int height,
+  public Viewport2D(final LayerGroup project, final int width, final int height,
     final BoundingBox boundingBox) {
     this(project);
     this.viewWidth = width;
@@ -226,7 +226,7 @@ public class Viewport2D {
     return boundingBox.getWidthLength();
   }
 
-  public Project getProject() {
+  public LayerGroup getProject() {
     return project;
   }
 

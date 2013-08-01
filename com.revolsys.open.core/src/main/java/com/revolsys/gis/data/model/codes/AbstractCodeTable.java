@@ -209,15 +209,19 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
   }
 
   protected List<Object> getValueById(Object id) {
-    List<Object> values = idValueCache.get(id);
-    if (values == null) {
-      final String lowerId = id.toString().toLowerCase();
-      if (stringIdMap.containsKey(lowerId)) {
-        id = stringIdMap.get(lowerId);
-        values = idValueCache.get(id);
+    if (valueIdCache.containsKey(Collections.singletonList(id))) {
+      return Collections.singletonList(id);
+    } else {
+      List<Object> values = idValueCache.get(id);
+      if (values == null) {
+        final String lowerId = id.toString().toLowerCase();
+        if (stringIdMap.containsKey(lowerId)) {
+          id = stringIdMap.get(lowerId);
+          values = idValueCache.get(id);
+        }
       }
+      return values;
     }
-    return values;
   }
 
   @Override

@@ -1335,8 +1335,10 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected boolean validateFields(final Collection<String> fieldNames) {
     boolean valid = true;
-    for (final String fieldName : fieldNames) {
-      valid &= validateFieldInternal(fieldName);
+    if (isFieldValidationEnabled()) {
+      for (final String fieldName : fieldNames) {
+        valid &= validateFieldInternal(fieldName);
+      }
     }
     return valid;
   }

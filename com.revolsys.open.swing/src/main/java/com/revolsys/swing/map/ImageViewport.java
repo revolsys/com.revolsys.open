@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.LayerGroup;
 
 public class ImageViewport extends Viewport2D {
 
@@ -12,7 +12,7 @@ public class ImageViewport extends Viewport2D {
 
   private final Graphics2D graphics;
 
-  public ImageViewport(final Project project, final int width,
+  public ImageViewport(final LayerGroup project, final int width,
     final int height, final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);
     image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

@@ -65,7 +65,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (layer == null) {
       return null;
     } else {
-      final Project project = layer.getProject();
+      final LayerGroup project = layer.getProject();
       if (project == null) {
         return null;
       } else {
@@ -369,7 +369,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return overlays;
   }
 
-  public Project getProject() {
+  public LayerGroup getProject() {
     return project;
   }
 
@@ -426,7 +426,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   @Override
   public void removeNotify() {
     super.removeNotify();
-    final Project project = this.project;
+    final LayerGroup project = this.project;
     this.project = null;
     project.delete();
   }

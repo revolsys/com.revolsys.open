@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 
 public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
@@ -32,7 +32,7 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
     try {
       final Layer layer = overlay.getLayer();
       if (layer != null) {
-        final Project project = overlay.getProject();
+        final LayerGroup project = overlay.getProject();
         final int imageWidth = referencedImage.getImageWidth();
         final int imageHeight = referencedImage.getImageHeight();
         if (imageWidth > 0 && imageHeight > 0 && project != null) {

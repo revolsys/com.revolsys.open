@@ -38,6 +38,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   Integer getIdInteger();
 
+  String getIdString();
+
   /**
    * Get the value of the unique identifier attribute.
    * 

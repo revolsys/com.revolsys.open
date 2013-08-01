@@ -75,6 +75,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.component.MergeObjectsDialog;
@@ -1127,6 +1128,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           iterator.remove();
         }
       }
+      if (!selectedRecords.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
       setSelectedRecords(objects);
     }
   }
@@ -1136,9 +1140,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Collection<LayerDataObject> selectedRecords) {
     clearSelectedRecordsIndex();
     this.selectedRecords = new LinkedHashSet<LayerDataObject>(selectedRecords);
-    if (!selectedRecords.isEmpty()) {
-      showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
-    }
     fireSelected();
   }
 
@@ -1258,11 +1259,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public void showRecordsTable() {
+    showRecordsTable(DataObjectLayerTableModel.MODE_ALL);
+  }
+
+  @Override
   public void showRecordsTable(final String attributeFilterMode) {
     DefaultSingleCDockable dockable = getProperty("TableView");
     final Component component;
     if (dockable == null) {
-      final Project project = getProject();
+      final LayerGroup project = getProject();
 
       component = createTablePanel();
 

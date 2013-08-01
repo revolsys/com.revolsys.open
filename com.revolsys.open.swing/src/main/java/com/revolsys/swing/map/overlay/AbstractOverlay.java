@@ -24,7 +24,7 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Point;
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
   MouseWheelListener, KeyListener {
-  private final Project project;
+  private final LayerGroup project;
 
   private final MapPanel map;
 
@@ -148,7 +148,7 @@ public class AbstractOverlay extends JComponent implements
     return point;
   }
 
-  public Project getProject() {
+  public LayerGroup getProject() {
     return project;
   }
 

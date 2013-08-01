@@ -128,8 +128,15 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
           rows = dataStore.search(table, fields, whereClause, true);
         }
       } else {
-        final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope boundingBox = GeometryConverter.toEsri(this.boundingBox);
-        rows = dataStore.search(table, fields, whereClause, boundingBox, true);
+        BoundingBox boundingBox = this.boundingBox;
+        if (boundingBox.getWidth() == 0) {
+          boundingBox = boundingBox.expand(1, 0);
+        }
+        if (boundingBox.getHeight() == 0) {
+          boundingBox = boundingBox.expand(0, 1);
+        }
+        final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
+        rows = dataStore.search(table, fields, whereClause, envelope, true);
       }
     }
   }

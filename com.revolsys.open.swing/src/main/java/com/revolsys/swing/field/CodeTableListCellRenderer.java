@@ -22,7 +22,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
     final int index, final boolean isSelected, final boolean cellHasFocus) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
-    } else {
+    } else if (index >= 0) {
       final List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         value = "-";

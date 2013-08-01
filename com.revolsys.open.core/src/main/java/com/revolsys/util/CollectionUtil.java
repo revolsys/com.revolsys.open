@@ -20,12 +20,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public final class CollectionUtil {
-  public static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1,
-    final V value) {
-    final List<V> values = getList(map, key1);
-    return values.add(value);
-  }
-
   public static <T> Integer addCount(final Map<T, Integer> counts,
     final T object) {
     Integer count = counts.get(object);
@@ -45,6 +39,12 @@ public final class CollectionUtil {
     } else {
       return collection.add(value);
     }
+  }
+
+  public static <K1, V> boolean addToList(final Map<K1, List<V>> map,
+    final K1 key1, final V value) {
+    final List<V> values = getList(map, key1);
+    return values.add(value);
   }
 
   public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map,
@@ -436,6 +436,14 @@ public final class CollectionUtil {
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
+  }
+
+  public static List<String> split(final String text, final String regex) {
+    if (StringUtils.hasText(text)) {
+      return Arrays.asList(text.split(regex));
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   public static <T> List<T> subList(final Iterable<T> iterable, final int size) {

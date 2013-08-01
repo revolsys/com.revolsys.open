@@ -136,7 +136,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public void editRecord() {
     final LayerDataObject object = getEventRowObject();
-    if (!object.isDeleted()) {
+    if (object != null && !object.isDeleted()) {
       layer.showForm(object);
     }
   }

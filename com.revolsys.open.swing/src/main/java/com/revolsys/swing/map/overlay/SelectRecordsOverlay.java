@@ -28,7 +28,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -71,7 +70,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
 
   protected static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker(
-    "ellipse", 6, COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
+    "ellipse", 6, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   static {
     MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
@@ -182,7 +181,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void paintComponent(final Graphics2D graphics) {
-    final Project layerGroup = getProject();
+    final LayerGroup layerGroup = getProject();
     paint(graphics, layerGroup);
     paintSelectBox(graphics);
   }
@@ -204,13 +203,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       final Viewport2D viewport = getViewport();
       final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
       geometry = viewport.getGeometry(geometry);
-      MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d, geometry,
-        vertexStyle);
 
       GeometryStyleRenderer.renderGeometry(viewport, graphics2d, geometry,
         highlightStyle);
       GeometryStyleRenderer.renderOutline(viewport, graphics2d, geometry,
         outlineStyle);
+      MarkerStyleRenderer.renderMarkerVertices(viewport, graphics2d, geometry,
+        vertexStyle);
       final IsValidOp validOp = new IsValidOp(geometry);
       if (validOp.isValid()) {
         final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
@@ -301,7 +300,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void selectRecords(final BoundingBox boundingBox) {
-    final Project project = getProject();
+    final LayerGroup project = getProject();
     selectRecords(project, boundingBox);
     final LayerRendererOverlay overlay = getMap().getLayerOverlay();
     overlay.redraw();

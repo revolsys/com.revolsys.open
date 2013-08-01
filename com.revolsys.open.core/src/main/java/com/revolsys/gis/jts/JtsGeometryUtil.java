@@ -922,6 +922,23 @@ public final class JtsGeometryUtil {
     return range;
   }
 
+  public static Coordinates getPointOnLine(final Geometry geometry,
+    final Point point, final double maxDistance) {
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    Coordinates pointOnLine = null;
+    final double closestDistance = Double.MAX_VALUE;
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    for (final LineString line : LineStringUtil.getAll(geometry)) {
+      final Coordinates closestPoint = LineStringUtil.getClosestCoordinateOnLineString(
+        geometryFactory, line, coordinates, maxDistance);
+      final double distance = coordinates.distance(closestPoint);
+      if (distance < closestDistance) {
+        pointOnLine = closestPoint;
+      }
+    }
+    return pointOnLine;
+  }
+
   public static Point getToPoint(final Geometry geometry) {
     if (geometry instanceof Point) {
       return (Point)geometry;
@@ -1593,4 +1610,5 @@ public final class JtsGeometryUtil {
 
   private JtsGeometryUtil() {
   }
+
 }

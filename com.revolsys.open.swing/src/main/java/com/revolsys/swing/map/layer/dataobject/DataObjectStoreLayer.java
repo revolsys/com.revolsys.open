@@ -33,6 +33,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.transaction.TransactionUtils;
@@ -665,7 +666,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } finally {
       writer.close();
     }
-    refresh();
+    InvokeMethodAfterCommit.invoke(this, "refresh");
     return true;
   }
 

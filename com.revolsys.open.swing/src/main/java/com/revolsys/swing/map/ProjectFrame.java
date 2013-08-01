@@ -151,7 +151,7 @@ public class ProjectFrame extends JFrame {
           }
         }
       });
-    final Project project = getProject();
+    final LayerGroup project = getProject();
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
       "catalog", "Catalog", catalogPanel);
 

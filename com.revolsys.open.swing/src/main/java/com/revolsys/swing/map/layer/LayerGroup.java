@@ -34,6 +34,7 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.CollectionUtil;
 
 public class LayerGroup extends AbstractLayer implements List<Layer> {
 
@@ -283,6 +284,29 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     return (V)getLayer(this, name);
+  }
+
+  public Layer getLayerByPath(final List<String> path) {
+    if (path.isEmpty()) {
+      return this;
+    } else {
+      final Layer layer = getLayer(path.get(0));
+      if (path.size() == 1) {
+        return layer;
+      } else {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          return layerGroup.getLayerByPath(path.subList(1, path.size()));
+        }
+        return null;
+      }
+    }
+  }
+
+  public Layer getLayerByPath(final String layerPath) {
+    final List<String> path = CollectionUtil.split(
+      layerPath.replaceAll("^\\s*/+\\s*", ""), "(\\s*/+\\s*)+");
+    return getLayerByPath(path);
   }
 
   public List<LayerGroup> getLayerGroups() {

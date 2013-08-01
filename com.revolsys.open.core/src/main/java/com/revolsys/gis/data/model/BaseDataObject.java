@@ -182,6 +182,11 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     return getInteger(metaData.getIdAttributeName());
   }
 
+  @Override
+  public String getIdString() {
+    return getString(metaData.getIdAttributeName());
+  }
+
   /**
    * Get the value of the unique identifier attribute.
    * 

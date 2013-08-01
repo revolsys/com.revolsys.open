@@ -12,8 +12,8 @@ import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 
@@ -57,7 +57,7 @@ public class LayerRendererOverlay extends JComponent implements
     return layer;
   }
 
-  public Project getProject() {
+  public LayerGroup getProject() {
     return layer.getProject();
   }
 

@@ -47,7 +47,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -147,7 +146,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   private static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
 
   private static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker("ellipse",
-    6, COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);;
+    6, COLOR_OUTLINE, 1, COLOR);
 
   static {
     MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
@@ -667,6 +666,18 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     return boundingBox;
   }
 
+  protected DataObjectLayer getLayer() {
+    final DataObjectLayer layer;
+    if (isModeAddGeometry()) {
+      layer = this.addLayer;
+    } else if (this.mouseOverObject == null) {
+      return null;
+    } else {
+      layer = this.mouseOverObject.getLayer();
+    }
+    return layer;
+  }
+
   private double getMaxDistance(final BoundingBox boundingBox) {
     return Math.max(boundingBox.getWidth() / 2, boundingBox.getHeight()) / 2;
   }
@@ -697,41 +708,75 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     return objects;
   }
 
-  private boolean hasSnapPoint(final BoundingBox boundingBox) {
-    final GeometryFactory geometryFactory = getCurrentGeometryFactory();
-    final Point point = boundingBox.getCentrePoint();
-    final DataObjectLayer layer;
-    if (isModeAddGeometry()) {
-      layer = this.addLayer;
-    } else if (this.mouseOverObject == null) {
-      return false;
-    } else {
-      layer = this.mouseOverObject.getLayer();
-    }
-    final List<LayerDataObject> objects = layer.getDataObjects(boundingBox);
-    snapPoint = null;
-    final double maxDistance = getMaxDistance(boundingBox);
-    double closestDistance = Double.MAX_VALUE;
-    for (final LayerDataObject object : objects) {
-      if (object != this.mouseOverObject) {
-        final Geometry geometry = geometryFactory.copy(object.getGeometryValue());
-        if (geometry != null) {
-          final QuadTree<IndexedLineSegment> index = GeometryEditUtil.createLineSegmentQuadTree(geometry);
-          final IndexedLineSegment closeSegment = getClosetSegment(index,
-            boundingBox, maxDistance, closestDistance);
-          if (closeSegment != null) {
-            snapPoint = getClosestPoint(geometryFactory, closeSegment, point,
-              maxDistance);
-            if (JtsGeometryUtil.isFromPoint(geometry, snapPoint)
-              || JtsGeometryUtil.isToPoint(geometry, snapPoint)) {
-              setMapCursor(CURSOR_NODE_SNAP);
-            } else {
-              setMapCursor(CURSOR_LINE_SNAP);
+  @SuppressWarnings("unchecked")
+  protected List<DataObjectLayer> getSnapLayers() {
+    final DataObjectLayer layer = getLayer();
+    final List<DataObjectLayer> layers = new ArrayList<DataObjectLayer>();
+    if (layer != null) {
+      final List<String> layerNames = (List<String>)layer.getProperty("snapLayers");
+      if (layerNames == null) {
+        layers.add(layer);
+      } else {
+        final LayerGroup project = layer.getProject();
+        final MapPanel map = MapPanel.get(project);
+        final double scale = map.getScale();
+        for (final String layerName : layerNames) {
+          final Layer snapLayer = project.getLayer(layerName);
+          if (snapLayer instanceof DataObjectLayer) {
+            if (snapLayer.isVisible(scale)) {
+              layers.add((DataObjectLayer)snapLayer);
             }
-            closestDistance = point.distance(snapPoint);
           }
         }
       }
+    }
+    return layers;
+  }
+
+  private boolean hasSnapPoint(final BoundingBox boundingBox) {
+    final GeometryFactory geometryFactory = getCurrentGeometryFactory();
+    final Point point = boundingBox.getCentrePoint();
+    final List<DataObjectLayer> layers = getSnapLayers();
+    snapPoint = null;
+    Boolean nodeSnap = null;
+    for (final DataObjectLayer layer : layers) {
+      final List<LayerDataObject> objects = layer.getDataObjects(boundingBox);
+      final double maxDistance = getMaxDistance(boundingBox);
+      double closestDistance = Double.MAX_VALUE;
+      for (final LayerDataObject object : objects) {
+        if (object != this.mouseOverObject) {
+          final Geometry geometry = geometryFactory.copy(object.getGeometryValue());
+          if (geometry != null) {
+            final QuadTree<IndexedLineSegment> index = GeometryEditUtil.createLineSegmentQuadTree(geometry);
+            final IndexedLineSegment closeSegment = getClosetSegment(index,
+              boundingBox, maxDistance, Double.MAX_VALUE);
+            if (closeSegment != null) {
+              final Point closestPoint = getClosestPoint(geometryFactory,
+                closeSegment, point, maxDistance);
+              final double distance = point.distance(closestPoint);
+              if (JtsGeometryUtil.isFromPoint(geometry, snapPoint)
+                || JtsGeometryUtil.isToPoint(geometry, snapPoint)) {
+                if (distance < closestDistance || nodeSnap != Boolean.TRUE) {
+                  snapPoint = closestPoint;
+                  closestDistance = distance;
+                }
+                nodeSnap = true;
+              } else if (nodeSnap != Boolean.TRUE) {
+                if (distance < closestDistance) {
+                  snapPoint = closestPoint;
+                  nodeSnap = false;
+                  closestDistance = distance;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (nodeSnap == Boolean.FALSE) {
+      setMapCursor(CURSOR_LINE_SNAP);
+    } else if (nodeSnap == Boolean.TRUE) {
+      setMapCursor(CURSOR_NODE_SNAP);
     }
     return snapPoint != null;
 
@@ -1044,7 +1089,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   @Override
   public void paintComponent(final Graphics2D graphics) {
-    final Project layerGroup = getProject();
+    final LayerGroup layerGroup = getProject();
     paint(graphics, layerGroup);
     if (moveGeometryStart != null) {
       final AffineTransform transform = graphics.getTransform();

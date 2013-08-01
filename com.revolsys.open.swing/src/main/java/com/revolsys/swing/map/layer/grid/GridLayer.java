@@ -16,6 +16,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -82,7 +83,7 @@ public class GridLayer extends AbstractLayer {
   }
 
   public void zoomTosheet() {
-    final Project project = getProject();
+    final LayerGroup project = getProject();
     if (project != null) {
       final MapPanel map = MapPanel.get(this);
       final RectangularMapGrid grid = getGrid();
