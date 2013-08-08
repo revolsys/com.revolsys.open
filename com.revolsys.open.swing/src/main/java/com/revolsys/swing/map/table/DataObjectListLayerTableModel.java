@@ -8,26 +8,16 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.RowFilter;
-import javax.swing.RowFilter.ComparisonType;
 import javax.swing.table.TableCellRenderer;
 
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.query.BinaryCondition;
-import com.revolsys.gis.data.query.Cast;
-import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Function;
-import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
-import com.revolsys.swing.table.filter.ContainsFilter;
-import com.revolsys.swing.table.filter.EqualFilter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
@@ -35,13 +25,12 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   private static final long serialVersionUID = 1L;
 
   public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
-    final DataObjectListLayerTableModel model = new DataObjectListLayerTableModel(
+    final DataObjectLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
     final TableCellRenderer cellRenderer = new DataObjectLayerTableCellRenderer(
       model);
     final DataObjectRowTable table = new DataObjectRowTable(model, cellRenderer);
 
-    table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
     layer.addPropertyChangeListener("selected",
       new InvokeMethodPropertyChangeListener(table, "repaint"));
 
@@ -141,59 +130,12 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public void setSearchCondition(final Condition searchCondition) {
-    super.setSearchCondition(searchCondition);
-    final DataObjectRowTable table = getTable();
-    if (searchCondition == null) {
-      table.setRowFilter(null);
+  public boolean setSearchCondition(final Condition searchCondition) {
+    if (super.setSearchCondition(searchCondition)) {
+      setRowSorter(searchCondition);
+      return true;
     } else {
-      if (searchCondition instanceof BinaryCondition) {
-        final BinaryCondition binaryCondition = (BinaryCondition)searchCondition;
-        final String operator = binaryCondition.getOperator();
-        Condition left = binaryCondition.getLeft();
-        final Condition right = binaryCondition.getRight();
-        int columnIndex = -1;
-        while (columnIndex == -1) {
-          if (left instanceof Column) {
-            final Column column = (Column)left;
-            final String columnName = column.getName();
-            columnIndex = getMetaData().getAttributeIndex(columnName);
-          } else if (left instanceof Function) {
-            final Function function = (Function)left;
-            left = function.getConditions().get(0);
-          } else if (left instanceof Cast) {
-            final Cast cast = (Cast)left;
-            left = cast.getCondition();
-          } else {
-            return;
-          }
-        }
-
-        if (columnIndex > -1) {
-          Object value = null;
-          if (right instanceof Value) {
-            final Value valueObject = (Value)right;
-            value = valueObject.getValue();
-
-          }
-          if (operator.equals("=")) {
-            RowFilter<Object, Object> filter;
-            if (value instanceof Number) {
-              final Number number = (Number)value;
-              filter = RowFilter.numberFilter(ComparisonType.EQUAL, number,
-                columnIndex);
-            } else {
-              filter = new EqualFilter(StringConverterRegistry.toString(value),
-                columnIndex);
-            }
-            table.setRowFilter(filter);
-          } else if (operator.equals("LIKE")) {
-            final RowFilter<Object, Object> filter = new ContainsFilter(
-              StringConverterRegistry.toString(value), columnIndex);
-            table.setRowFilter(filter);
-          }
-        }
-      }
+      return false;
     }
   }
 

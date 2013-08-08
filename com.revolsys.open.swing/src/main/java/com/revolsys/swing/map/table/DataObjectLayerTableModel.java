@@ -11,15 +11,25 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.RowFilter.ComparisonType;
 import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
 
 import com.revolsys.collection.LruMap;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.BinaryCondition;
+import com.revolsys.gis.data.query.Cast;
+import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
@@ -32,6 +42,8 @@ import com.revolsys.swing.map.table.predicate.NewPredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
+import com.revolsys.swing.table.filter.ContainsFilter;
+import com.revolsys.swing.table.filter.EqualFilter;
 import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
@@ -61,12 +73,16 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      table.setSelectionModel(new DataObjectLayerListSelectionModel(model));
       layer.addPropertyChangeListener("selected",
         new InvokeMethodPropertyChangeListener(table, "repaint"));
       return table;
     }
   }
+
+  private ListSelectionModel defaultSelectionModel = new DefaultListSelectionModel();
+
+  private final DataObjectLayerListSelectionModel selectionModel = new DataObjectLayerListSelectionModel(
+    this);
 
   private Condition searchCondition;
 
@@ -356,6 +372,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public void setAttributeFilterMode(final String mode) {
+    final DataObjectRowTable table = getTable();
+    if (MODE_SELECTED.equals(mode)) {
+      table.setSelectionModel(defaultSelectionModel);
+    } else {
+      table.setSelectionModel(selectionModel);
+    }
     if (attributeFilterModes.contains(mode)) {
       if (!mode.equals(this.attributeFilterMode)) {
         this.attributeFilterMode = mode;
@@ -375,10 +397,72 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     this.attributeFilterModes = Arrays.asList(modes);
   }
 
-  public void setSearchCondition(final Condition searchCondition) {
-    if (!EqualsRegistry.equal(searchCondition, this.searchCondition)) {
+  protected void setRowSorter(final Condition searchCondition) {
+    final DataObjectRowTable table = getTable();
+    if (searchCondition == null) {
+      table.setRowFilter(null);
+    } else {
+      if (searchCondition instanceof BinaryCondition) {
+        final BinaryCondition binaryCondition = (BinaryCondition)searchCondition;
+        final String operator = binaryCondition.getOperator();
+        Condition left = binaryCondition.getLeft();
+        final Condition right = binaryCondition.getRight();
+        int columnIndex = -1;
+        while (columnIndex == -1) {
+          if (left instanceof Column) {
+            final Column column = (Column)left;
+            final String columnName = column.getName();
+            columnIndex = getMetaData().getAttributeIndex(columnName);
+          } else if (left instanceof Function) {
+            final Function function = (Function)left;
+            left = function.getConditions().get(0);
+          } else if (left instanceof Cast) {
+            final Cast cast = (Cast)left;
+            left = cast.getCondition();
+          } else {
+            return;
+          }
+        }
+
+        if (columnIndex > -1) {
+          Object value = null;
+          if (right instanceof Value) {
+            final Value valueObject = (Value)right;
+            value = valueObject.getValue();
+
+          }
+          if (operator.equals("=")) {
+            RowFilter<Object, Object> filter;
+            if (value instanceof Number) {
+              final Number number = (Number)value;
+              filter = RowFilter.numberFilter(ComparisonType.EQUAL, number,
+                columnIndex);
+            } else {
+              filter = new EqualFilter(StringConverterRegistry.toString(value),
+                columnIndex);
+            }
+            table.setRowFilter(filter);
+          } else if (operator.equals("LIKE")) {
+            final RowFilter<Object, Object> filter = new ContainsFilter(
+              StringConverterRegistry.toString(value), columnIndex);
+            table.setRowFilter(filter);
+          }
+        }
+      }
+    }
+  }
+
+  public boolean setSearchCondition(final Condition searchCondition) {
+    if (EqualsRegistry.equal(searchCondition, this.searchCondition)) {
+      return false;
+    } else {
       this.searchCondition = searchCondition;
-      refresh();
+      if (MODE_SELECTED.equals(getAttributeFilterMode())) {
+        setRowSorter(searchCondition);
+      } else {
+        refresh();
+      }
+      return true;
     }
   }
 
@@ -404,6 +488,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       refresh();
     }
     return sortOrder;
+  }
+
+  @Override
+  public void setTable(final DataObjectRowTable table) {
+    super.setTable(table);
+    defaultSelectionModel = table.getSelectionModel();
+    table.setSelectionModel(selectionModel);
   }
 
   public void updateRowCount() {

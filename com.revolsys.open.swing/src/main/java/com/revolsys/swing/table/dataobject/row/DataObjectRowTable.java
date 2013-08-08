@@ -5,6 +5,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
@@ -22,6 +23,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   private static final long serialVersionUID = 1L;
+
+  private final ListSelectionModel defaultSeletionModel = getSelectionModel();
 
   public DataObjectRowTable(final DataObjectRowTableModel model) {
     this(model, new DataObjectRowTableCellRenderer());
@@ -67,6 +70,18 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       final DataObjectRowTableModel tableModel = getTableModel();
       return tableModel.getObject(row);
     }
+  }
+
+  @Override
+  public ListSelectionModel getSelectionModel() {
+    if (getTableModel() instanceof DataObjectLayerTableModel) {
+      final DataObjectLayerTableModel layerTableModel = (DataObjectLayerTableModel)getTableModel();
+      if (layerTableModel.getAttributeFilterMode().equals(
+        DataObjectLayerTableModel.MODE_SELECTED)) {
+        return defaultSeletionModel;
+      }
+    }
+    return super.getSelectionModel();
   }
 
   public DataObjectRowTableModel getTableModel() {
