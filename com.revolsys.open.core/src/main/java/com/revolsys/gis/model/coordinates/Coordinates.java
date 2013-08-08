@@ -21,6 +21,8 @@ public interface Coordinates extends Comparable<Coordinates>, Cloneable {
 
   boolean equals2d(Coordinates coordinates);
 
+  boolean equals3d(Coordinates coordinates);
+
   double[] getCoordinates();
 
   double getM();

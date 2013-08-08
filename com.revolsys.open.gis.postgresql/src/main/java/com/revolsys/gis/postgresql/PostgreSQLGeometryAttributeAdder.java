@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -49,11 +50,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, String dataTypeName, final int sqlType,
+    final String name, final String dataTypeName, final int sqlType,
     final int length, final int scale, final boolean required) {
     final String typePath = metaData.getPath();
     String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
-    if (owner.equals("")) {
+    if (!StringUtils.hasText(owner)) {
       owner = "public";
     }
     final String tableName = dataStore.getDatabaseTableName(typePath);

@@ -7,6 +7,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Dimension;
@@ -123,6 +124,18 @@ public class PointImpl extends GeometryImpl implements Point {
     if (getX() == coordinates.getX()) {
       if (getY() == coordinates.getY()) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean equals3d(final Coordinates coordinates) {
+    if (EqualsRegistry.equal(getX(), coordinates.getX())) {
+      if (EqualsRegistry.equal(getY(), coordinates.getY())) {
+        if (EqualsRegistry.equal(getZ(), coordinates.getZ())) {
+          return true;
+        }
       }
     }
     return false;

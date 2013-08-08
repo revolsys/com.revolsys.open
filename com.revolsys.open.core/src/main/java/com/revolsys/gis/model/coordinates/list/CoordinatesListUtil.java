@@ -512,6 +512,20 @@ public class CoordinatesListUtil {
     return pointSet;
   }
 
+  public static List<List<CoordinatesList>> getParts(final Geometry geometry) {
+    final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
+    if (geometry != null) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (!part.isEmpty()) {
+          final List<CoordinatesList> pointsList = getAll(part);
+          partsList.add(pointsList);
+        }
+      }
+    }
+    return partsList;
+  }
+
   public static List<CoordinatesList> intersection(
     final GeometryFactory geometryFactory, final CoordinatesList points1,
     final CoordinatesList points2, final double maxDistance) {

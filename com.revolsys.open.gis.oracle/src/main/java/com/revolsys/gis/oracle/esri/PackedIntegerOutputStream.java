@@ -3,10 +3,8 @@ package com.revolsys.gis.oracle.esri;
 import java.io.ByteArrayOutputStream;
 
 public class PackedIntegerOutputStream extends ByteArrayOutputStream {
-  public PackedIntegerOutputStream(
-    final int numCoordinates,
-    final int numAxis) {
-    super(numCoordinates * numAxis);
+  public PackedIntegerOutputStream() {
+    super(8000);
   }
 
   @Override
@@ -19,8 +17,7 @@ public class PackedIntegerOutputStream extends ByteArrayOutputStream {
     return data;
   }
 
-  public void writeLong(
-    final long value) {
+  public void writeLong(final long value) {
     final boolean positive = value >= 0;
     long newValue;
     byte nextByte;
@@ -49,8 +46,7 @@ public class PackedIntegerOutputStream extends ByteArrayOutputStream {
     }
   }
 
-  public void writeLong5(
-    final long value) {
+  public void writeLong5(final long value) {
     byte count = 1;
     final boolean positive = value >= 0;
     long newValue;

@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -74,6 +75,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
+  final List<Double> scales = new ArrayList<Double>();
+
   private final LayerGroup baseMapLayers;
 
   private final LayerRendererOverlay baseMapOverlay;
@@ -127,6 +130,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     this.viewport = new ComponentViewport2D(project, layeredPane);
     viewport.addPropertyChangeListener(this);
+
+    createScales();
+    this.viewport.setScales(getScales());
 
     layeredPane.setBorder(new MapRulerBorder(viewport));
 
@@ -222,19 +228,22 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new EditGeoReferencedImageOverlay(this);
   }
 
-  private void addPointerLocation(final String title, final int srid,
-    final double scaleFactor) {
-    final MapPointerLocation location = new MapPointerLocation(viewport, title,
-      GeometryFactory.getFactory(srid, 2, scaleFactor, scaleFactor));
-    mouseOverlay.addMouseMotionListener(location);
+  private void addPointerLocation(final boolean geographics) {
+    final MapPointerLocation location = new MapPointerLocation(this,
+      geographics);
     statusBar.add(location);
+  }
+
+  protected void addScale(final double metresPerPixel) {
+    final double scale = viewport.getScaleForMetresPerPixel(metresPerPixel);
+    scales.add(scale);
   }
 
   protected void addStatusBar() {
     add(statusBar, BorderLayout.SOUTH);
 
-    addPointerLocation("Albers", 3005, 1000.0);
-    addPointerLocation("Lat/Lon", 4269, 10000000.0);
+    addPointerLocation(false);
+    addPointerLocation(true);
   }
 
   protected void addToolBar() {
@@ -300,6 +309,17 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void clearZoomHistory() {
     zoomHistory.clear();
     zoomHistoryIndex = -1;
+  }
+
+  public void createScales() {
+    double multiplier = 0.001;
+    for (int i = 0; i < 9; i++) {
+      addScale(1 * multiplier);
+      addScale(2 * multiplier);
+      addScale(5 * multiplier);
+      multiplier *= 10;
+    }
+    Collections.reverse(scales);
   }
 
   public void dispose() {
@@ -369,12 +389,20 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return overlays;
   }
 
+  public MouseOverlay getMouseOverlay() {
+    return mouseOverlay;
+  }
+
   public LayerGroup getProject() {
     return project;
   }
 
   public double getScale() {
     return scale;
+  }
+
+  public List<Double> getScales() {
+    return scales;
   }
 
   public JXStatusBar getStatusBar() {
@@ -391,6 +419,30 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public Viewport2D getViewport() {
     return viewport;
+  }
+
+  public double getZoomInScale(final double scale) {
+    final long scaleCeil = (long)Math.floor(scale);
+    for (final double nextScale : scales) {
+      final long newScale = (long)Math.floor(nextScale);
+      if (newScale < scaleCeil) {
+        return nextScale;
+      }
+    }
+    return scales.get(scales.size() - 1);
+  }
+
+  public double getZoomOutScale(final double scale) {
+    final long scaleCeil = (long)Math.floor(scale);
+    final List<Double> scales = new ArrayList<Double>(this.scales);
+    Collections.reverse(scales);
+    for (final double nextScale : scales) {
+      final long newScale = (long)Math.floor(nextScale);
+      if (newScale > scaleCeil) {
+        return nextScale;
+      }
+    }
+    return scales.get(0);
   }
 
   public boolean isZoomNextEnabled() {
@@ -568,9 +620,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomIn() {
-    BoundingBox boundingBox = getBoundingBox();
-    boundingBox = boundingBox.expandPercent(-0.5);
-    setBoundingBox(boundingBox);
+    final double scale = getScale();
+    final double newScale = getZoomInScale(scale);
+    setScale(newScale);
   }
 
   public void zoomNext() {
@@ -578,9 +630,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomOut() {
-    BoundingBox boundingBox = getBoundingBox();
-    boundingBox = boundingBox.expandPercent(1);
-    setBoundingBox(boundingBox);
+    final double scale = getScale();
+    final double newScale = getZoomOutScale(scale);
+    setScale(newScale);
   }
 
   public void zoomPrevious() {

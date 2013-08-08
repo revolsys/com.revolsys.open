@@ -7,6 +7,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.measure.Measurable;
 import javax.measure.Measure;
@@ -117,6 +120,8 @@ public class Viewport2D {
   private double metresPerPixel;
 
   private double scale;
+
+  private List<Double> scales = new ArrayList<Double>();
 
   public Viewport2D() {
   }
@@ -282,6 +287,10 @@ public class Viewport2D {
     return (metresPerPixel * getScreenResolution()) / 0.0254;
   }
 
+  public List<Double> getScales() {
+    return scales;
+  }
+
   public int getScreenResolution() {
     final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
     final int screenResolution = defaultToolkit.getScreenResolution();
@@ -335,6 +344,19 @@ public class Viewport2D {
 
   public int getViewWidthPixels() {
     return viewWidth;
+  }
+
+  public double getZoomOutScale(final double scale) {
+    final long scaleCeil = (long)Math.floor(scale);
+    final List<Double> scales = new ArrayList<Double>(this.scales);
+    Collections.reverse(scales);
+    for (final double nextScale : scales) {
+      final long newScale = (long)Math.floor(nextScale);
+      if (newScale >= scaleCeil) {
+        return nextScale;
+      }
+    }
+    return scales.get(0);
   }
 
   private void internalSetBoundingBox(final BoundingBox boundingBox,
@@ -422,17 +444,24 @@ public class Viewport2D {
             }
           }
         }
+        final Measurable<Length> viewWidthLength = getViewWidthLength();
         final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
-        double metresPerPixel = modelWidthLength.doubleValue(SI.METRE)
+        final double metresPerPixel = modelWidthLength.doubleValue(SI.METRE)
           / viewWidthPixels;
-        if (viewWidthPixels > 0 && viewHeightPixels > 0) {
-          if (metresPerPixel < 0.000999) {
-            return setBoundingBox(newBoundingBox, 0.001);
-          } else if (metresPerPixel < 0.001) {
-            metresPerPixel = 0.001;
+        double scale = getScale(viewWidthLength, modelWidthLength);
+        if (!scales.isEmpty() && viewWidthPixels > 0 && viewHeightPixels > 0) {
+          final double minScale = scales.get(scales.size() - 1);
+          final double maxScale = scales.get(0);
+          if (scale < minScale) {
+            scale = minScale;
+            return setBoundingBox(newBoundingBox, scale);
+          } else if (scale > maxScale) {
+            scale = maxScale;
+            return setBoundingBox(newBoundingBox, scale);
           } else {
-            // TODO normalize metres per pixel
+            // scale = getZoomOutScale(scale);
           }
+
         }
         internalSetBoundingBox(newBoundingBox, metresPerPixel);
       }
@@ -441,16 +470,22 @@ public class Viewport2D {
   }
 
   private BoundingBox setBoundingBox(final BoundingBox boundingBox,
-    final double metresPerPixel) {
+    final double scale) {
+    final Coordinates centre = boundingBox.getCentre();
+    return setBoundingBox(centre, scale);
+  }
+
+  private BoundingBox setBoundingBox(final Coordinates centre,
+    final double scale) {
+    final double metresPerPixel = getMetresPerPixel(scale);
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final int viewWidthPixels = getViewWidthPixels();
     final double viewWidth = viewWidthPixels * metresPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * metresPerPixel;
-    final Coordinates centre = boundingBox.getCentre();
     final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
       1 / metresPerPixel);
     precisionModel.makePrecise(centre);
-    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final double centreX = centre.getX();
     final double centreY = centre.getY();
 
@@ -489,11 +524,13 @@ public class Viewport2D {
   public void setScale(final double scale) {
     final double oldValue = getScale();
     if (Math.abs(oldValue - scale) > 0.0001) {
-      System.out.println(scale);
-      final double metresPerPixel = getMetresPerPixel(scale);
-      setBoundingBox(boundingBox, metresPerPixel);
+      setBoundingBox(boundingBox, scale);
       propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
     }
+  }
+
+  public void setScales(final List<Double> scales) {
+    this.scales = scales;
   }
 
   public void setUseModelCoordinates(final boolean useModelCoordinates,

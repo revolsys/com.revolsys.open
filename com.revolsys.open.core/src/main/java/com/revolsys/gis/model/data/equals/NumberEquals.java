@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class NumberEquals implements Equals<Object> {
-  private boolean equal(final double number1, final double number2) {
+  public static boolean equal(final double number1, final double number2) {
     if (Double.isNaN(number1)) {
       return Double.isNaN(number2);
     } else if (Double.isInfinite(number1)) {
@@ -24,9 +24,9 @@ public class NumberEquals implements Equals<Object> {
       } else if (object2 == null) {
         return false;
       } else {
-        final double number1 = StringConverterRegistry.toObject(Double.class,
+        final Double number1 = StringConverterRegistry.toObject(Double.class,
           object1);
-        final double number2 = StringConverterRegistry.toObject(Double.class,
+        final Double number2 = StringConverterRegistry.toObject(Double.class,
           object2);
         return equal(number1, number2);
       }

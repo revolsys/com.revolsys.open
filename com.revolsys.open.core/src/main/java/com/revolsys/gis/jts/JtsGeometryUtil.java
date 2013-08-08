@@ -377,16 +377,14 @@ public final class JtsGeometryUtil {
   }
 
   public static boolean equalsExact3D(final Point point1, final Point point2) {
-    final Coordinate coordinate1 = point1.getCoordinate();
-    final Coordinate coordinate2 = point2.getCoordinate();
+    final Coordinates coordinate1 = CoordinatesUtil.get(point1);
+    final Coordinates coordinate2 = CoordinatesUtil.get(point2);
     if (coordinate1 == null) {
       return coordinate2 == null;
     } else if (coordinate2 == null) {
       return false;
     } else {
-      return (coordinate1.x == coordinate2.x)
-        && (coordinate1.y == coordinate2.y)
-        && equalsZ(coordinate1.z, coordinate2.z);
+      return coordinate1.equals3d(coordinate2);
     }
   }
 

@@ -22,9 +22,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
@@ -40,10 +37,11 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   private final SpatialReference spatialReference;
 
-  private GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   public ArcSdeOracleStGeometryJdbcAttribute(final String name,
-    final DataType type, final boolean required, final Map<String, Object> properties,
+    final DataType type, final boolean required,
+    final Map<String, Object> properties,
     final SpatialReference spatialReference, final int dimension) {
     super(name, type, -1, 0, 0, required, properties);
     this.spatialReference = spatialReference;
@@ -55,18 +53,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public ArcSdeOracleStGeometryJdbcAttribute clone() {
-    return new ArcSdeOracleStGeometryJdbcAttribute(getName(), getType(),
-      isRequired(), getProperties(), spatialReference, dimension);
-  }
-
-  @Override
-  public void addStatementPlaceHolder(final StringBuffer sql) {
-    sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-  }
-
-  @Override
-  public void addColumnName(StringBuffer sql, String tablePrefix) {
+  public void addColumnName(final StringBuffer sql, final String tablePrefix) {
     sql.append(tablePrefix);
     sql.append(".GEOMETRY.ENTITY, ");
     sql.append(tablePrefix);
@@ -76,14 +63,25 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
+  public void addStatementPlaceHolder(final StringBuffer sql) {
+    sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  }
+
+  @Override
+  public ArcSdeOracleStGeometryJdbcAttribute clone() {
+    return new ArcSdeOracleStGeometryJdbcAttribute(getName(), getType(),
+      isRequired(), getProperties(), spatialReference, dimension);
+  }
+
+  @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
-    final int entity = resultSet.getInt(columnIndex);
+    final int geometryType = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
-      InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(),
-        32000);
+      final InputStream pointsIn = new BufferedInputStream(
+        blob.getBinaryStream(), 32000);
 
       final Double xOffset = spatialReference.getXOffset();
       final Double yOffset = spatialReference.getYOffset();
@@ -95,7 +93,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
       final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
-        geometryFactory, entity, numPoints, xOffset, yOffset, xyScale, zOffset,
+        geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale, zOffset,
         zScale, mOffset, mScale);
       object.setValue(getIndex(), geometry);
     }
@@ -131,7 +129,6 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final double maxY = envelope.getMaxY();
       final double area = geometry.getArea();
       final double length = geometry.getLength();
-      int entityType = 0;
 
       final boolean hasZ = dimension > 2 && zOffset != null && zScale != null;
       final boolean hasM = dimension > 3 && mOffset != null && mScale != null;
@@ -139,30 +136,11 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       int numPoints = 0;
       byte[] data;
 
-      if (value instanceof Point) {
-        entityType = ArcSdeConstants.ST_GEOMETRY_POINT;
-        CoordinatesList points = CoordinatesListUtil.get(geometry);
-        numPoints = points.size();
-
-        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
-          hasZ, zOffset, zScale, hasM, mScale, mOffset, points, numPoints);
-      } else if (value instanceof LineString) {
-        entityType = ArcSdeConstants.ST_GEOMETRY_LINESTRING;
-        CoordinatesList points = CoordinatesListUtil.get(geometry);
-        numPoints = points.size();
-        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
-          hasZ, zOffset, zScale, hasM, mScale, mOffset, points, numPoints);
-      } else if (value instanceof Polygon) {
-        entityType = ArcSdeConstants.ST_GEOMETRY_POLYGON;
-        List<CoordinatesList> pointsList = PackedCoordinateUtil.getPointsList((Polygon)value);
-        numPoints = PackedCoordinateUtil.getPolygonNumPoints(pointsList);
-        data = PackedCoordinateUtil.getPolygonPackedBytes(xOffset, yOffset,
-          xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, pointsList,
-          numPoints);
-      } else {
-        throw new IllegalArgumentException("Cannot convert: "
-          + value.getClass());
-      }
+      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry);
+      final int entityType = ArcSdeConstants.getStGeometryType(geometry);
+      numPoints = PackedCoordinateUtil.getNumPoints(parts);
+      data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
+        hasZ, zOffset, zScale, hasM, mScale, mOffset, parts);
 
       statement.setInt(index++, entityType);
       statement.setInt(index++, numPoints);

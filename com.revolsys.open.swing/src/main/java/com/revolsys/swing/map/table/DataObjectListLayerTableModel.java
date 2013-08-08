@@ -75,8 +75,13 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public LayerDataObject getObject(final int index) {
-    return layer.getRecord(index);
+  public LayerDataObject getObject(final int row) {
+    final String attributeFilterMode = getAttributeFilterMode();
+    if (attributeFilterMode.equals(MODE_SELECTED)) {
+      return super.getObject(row);
+    } else {
+      return layer.getRecord(row);
+    }
   }
 
   public List<LayerDataObject> getObjects() {
@@ -89,7 +94,12 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
   @Override
   public int getRowCount() {
-    return layer.getRowCount();
+    final String attributeFilterMode = getAttributeFilterMode();
+    if (attributeFilterMode.equals(MODE_SELECTED)) {
+      return super.getRowCount();
+    } else {
+      return layer.getRowCount();
+    }
   }
 
   @Override

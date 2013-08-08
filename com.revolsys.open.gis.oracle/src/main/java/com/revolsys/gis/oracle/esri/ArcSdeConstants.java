@@ -8,6 +8,13 @@ import oracle.sql.SQLName;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public final class ArcSdeConstants {
 
@@ -16,6 +23,12 @@ public final class ArcSdeConstants {
   public static final int ST_GEOMETRY_POINT = 1;
 
   public static final int ST_GEOMETRY_POLYGON = 8;
+
+  public static final int ST_GEOMETRY_MULTI_LINESTRING = 260;
+
+  public static final int ST_GEOMETRY_MULTI_POINT = 257;
+
+  public static final int ST_GEOMETRY_MULTI_POLYGON = 264;
 
   public static final SQLName ST_GEOMETRY_SQL_NAME;
 
@@ -45,6 +58,8 @@ public final class ArcSdeConstants {
 
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
 
+  public static final Map<Class<?>, Integer> GEOMETRY_CLASS_ST_TYPE = new HashMap<Class<?>, Integer>();
+
   static {
     try {
       ST_GEOMETRY_SQL_NAME = new SQLName("SDE", "ST_GEOMETRY", null);
@@ -58,15 +73,33 @@ public final class ArcSdeConstants {
     DATA_TYPE_MAP.put(MULTI_POINT, DataTypes.MULTI_POINT);
     DATA_TYPE_MAP.put(MULTI_LINESTRING, DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put(MULTI_POLYGON, DataTypes.MULTI_POLYGON);
+
+    GEOMETRY_CLASS_ST_TYPE.put(Point.class, ST_GEOMETRY_POINT);
+    GEOMETRY_CLASS_ST_TYPE.put(MultiPoint.class, ST_GEOMETRY_MULTI_POINT);
+    GEOMETRY_CLASS_ST_TYPE.put(LineString.class, ST_GEOMETRY_LINESTRING);
+    GEOMETRY_CLASS_ST_TYPE.put(MultiLineString.class,
+      ST_GEOMETRY_MULTI_LINESTRING);
+    GEOMETRY_CLASS_ST_TYPE.put(Polygon.class, ST_GEOMETRY_POLYGON);
+    GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
   }
 
-  public static DataType getGeometryDataType(
-    int geometryType) {
+  public static DataType getGeometryDataType(final int geometryType) {
     final DataType dataType = DATA_TYPE_MAP.get(geometryType);
     if (dataType == null) {
       return DataTypes.GEOMETRY;
     } else {
       return dataType;
+    }
+  }
+
+  public static Integer getStGeometryType(final Geometry geometry) {
+    final Class<? extends Geometry> geometryClass = geometry.getClass();
+    final Integer type = GEOMETRY_CLASS_ST_TYPE.get(geometryClass);
+    if (type == null) {
+      throw new IllegalArgumentException("Unsupported geometry type "
+        + geometryClass);
+    } else {
+      return type;
     }
   }
 }

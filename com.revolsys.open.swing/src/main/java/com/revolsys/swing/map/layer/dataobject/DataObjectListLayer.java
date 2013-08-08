@@ -189,7 +189,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerDataObject> records = (List)index.query(convertedBoundingBox);
+      final List<LayerDataObject> records = (List)index.queryIntersects(convertedBoundingBox);
       return records;
     }
   }

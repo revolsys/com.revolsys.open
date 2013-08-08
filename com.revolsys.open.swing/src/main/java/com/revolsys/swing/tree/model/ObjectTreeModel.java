@@ -139,13 +139,17 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public Object getChild(final Object parent, final int index) {
     final TreePath path = getPath(parent);
     if (path == null) {
-      return null;
+      return "";
     } else {
       final ObjectTreeNodeModel<Object, Object> nodeModel = getNodeModel(path);
       if (!isInitialized(path, nodeModel, parent)) {
         return new String("Loading...");
       } else {
-        return nodeModel.getChild(parent, index);
+        final Object child = nodeModel.getChild(parent, index);
+        if (child == null) {
+          return "";
+        }
+        return child;
       }
     }
   }

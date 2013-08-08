@@ -30,8 +30,8 @@ public class GeometryCoordinatesPanel extends ValueField implements
     setLayout(new BorderLayout());
 
     this.form = form;
-    this.model.setForm(form);
     this.model.addTableModelListener(this);
+    this.model.setForm(form);
     this.table = new BaseJxTable(model);
     table.setAutoResizeMode(BaseJxTable.AUTO_RESIZE_OFF);
 
@@ -78,13 +78,15 @@ public class GeometryCoordinatesPanel extends ValueField implements
   @Override
   public void tableChanged(final TableModelEvent e) {
     for (int i = 0; i < model.getColumnCount(); i++) {
+      int width;
       if (i < model.getNumIndexItems() - 1) {
-        table.setColumnWidth(i, (model.getRowCount() / 10 + 1) * 20);
+        width = (model.getRowCount() / 10 + 1) + 20;
       } else if (i < model.getNumIndexItems()) {
-        table.setColumnWidth(i, (model.getRowCount() / 10 + 2) * 20);
+        width = (model.getRowCount() / 10 + 2) + 20;
       } else {
-        table.setColumnWidth(i, 120);
+        width = 120;
       }
+      table.setColumnWidth(i, width);
     }
   }
 }

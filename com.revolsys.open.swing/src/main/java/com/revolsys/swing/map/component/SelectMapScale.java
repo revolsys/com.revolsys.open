@@ -7,7 +7,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JComboBox;
 
@@ -18,17 +18,13 @@ import com.revolsys.swing.map.MapPanel;
 @SuppressWarnings("serial")
 public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
-  private static final Object[] SCALES = {
-    500000000.0, 250000000.0, 100000000.0, 50000000.0, 25000000.0, 10000000.0,
-    5000000.0, 2500000.0, 1000000.0, 500000.0, 250000.0, 125000.0, 50000.0,
-    20000.0, 10000.0, 5000.0, 2500.0, 2000.0, 1000.0
-  };
 
   private final MapPanel map;
 
   public SelectMapScale(final MapPanel map) {
-    super(SCALES);
+    super(new Vector<Double>(map.getScales()));
     this.map = map;
+
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       MapScale.class, "formatScale");
@@ -77,8 +73,4 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     }
   }
 
-  public void setScales(final List<Double> resolutionList) {
-    // TODO Auto-generated method stub
-
-  }
 }
