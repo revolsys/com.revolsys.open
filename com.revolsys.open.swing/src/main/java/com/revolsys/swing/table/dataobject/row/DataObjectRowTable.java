@@ -51,7 +51,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       removeColumn(column);
     }
     tableHeader.addMouseListener(this);
-    model.addTableModelListener(this);
+    model.setTable(this);
   }
 
   public DataObjectMetaData getMetaData() {

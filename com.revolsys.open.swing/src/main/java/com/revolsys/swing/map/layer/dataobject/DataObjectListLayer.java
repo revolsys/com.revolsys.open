@@ -196,7 +196,11 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public LayerDataObject getRecord(final int index) {
-    return records.get(index);
+    if (index < 0) {
+      return null;
+    } else {
+      return records.get(index);
+    }
   }
 
   @Override

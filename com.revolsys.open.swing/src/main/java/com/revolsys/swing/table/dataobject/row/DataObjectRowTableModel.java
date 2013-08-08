@@ -31,6 +31,8 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   private boolean editable;
 
+  private DataObjectRowTable table;
+
   public DataObjectRowTableModel(final DataObjectMetaData metaData,
     final Collection<String> attributeNames) {
     this.metaData = metaData;
@@ -120,6 +122,10 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
     }
   }
 
+  public DataObjectRowTable getTable() {
+    return table;
+  }
+
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
     final LayerDataObject object = getObject(rowIndex);
@@ -183,6 +189,11 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
       fireTableDataChanged();
       return sortOrder;
     }
+  }
+
+  public void setTable(final DataObjectRowTable table) {
+    this.table = table;
+    addTableModelListener(table);
   }
 
   @Override
