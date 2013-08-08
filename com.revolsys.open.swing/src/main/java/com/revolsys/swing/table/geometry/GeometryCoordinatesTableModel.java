@@ -12,6 +12,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.table.TablePanel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -45,6 +46,12 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private int numIndexItems;
 
+  private DataObjectLayerForm form;
+
+  private int vertexIndexColumn;
+
+  private int segmentIndexColumn;
+
   public GeometryCoordinatesTableModel() {
     this(null);
   }
@@ -77,6 +84,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     }
   }
 
+  public DataObjectLayerForm getForm() {
+    return form;
+  }
+
   public Geometry getGeometry() {
     return geometry;
   }
@@ -94,21 +105,17 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return vertexIndices.size();
   }
 
+  public int getSegmentIndexColumn() {
+    return segmentIndexColumn;
+  }
+
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (columnIndex < numIndexItems) {
-      final int[] vertexIndex = getVertexIndex(rowIndex);
-      if (vertexIndex.length == numIndexItems) {
-        return vertexIndex[columnIndex];
-      } else {
-        if (columnIndex == 0) {
-          return vertexIndex[0];
-        } else if (columnIndex == 2) {
-          return vertexIndex[1];
-        } else {
-          return 0;
-        }
-      }
+    final int[] vertexIndex = getVertexIndex(rowIndex);
+    if (columnIndex < vertexIndex.length) {
+      return vertexIndex[columnIndex];
+    } else if (columnIndex == segmentIndexColumn) {
+      return vertexIndex[vertexIndex.length - 1] + " \u2193";
     } else {
       final int axisIndex = columnIndex - numIndexItems;
       final Coordinates point = getCoordinates(rowIndex);
@@ -126,6 +133,14 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return vertexIndices.get(rowIndex);
   }
 
+  public int getVertexIndexColumn() {
+    return vertexIndexColumn;
+  }
+
+  public void setForm(final DataObjectLayerForm form) {
+    this.form = form;
+  }
+
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
     if (geometry == null) {
@@ -137,27 +152,39 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       this.vertexIndices = new ArrayList<int[]>(vertexIndexMap.keySet());
     }
     numAxis = geometryFactory.getNumAxis();
+    axisNames = new ArrayList<String>();
     if (geometry instanceof Polygon) {
-      axisNames = Arrays.asList("R", "#", "X", "Y", "Z", "M");
-      numIndexItems = 2;
+      axisNames.add("R");
     } else if (geometry instanceof MultiPoint) {
-      axisNames = Arrays.asList("P", "#", "X", "Y", "Z", "M");
-      numIndexItems = 2;
+      axisNames.add("P");
     } else if (geometry instanceof MultiLineString) {
-      axisNames = Arrays.asList("P", "#", "X", "Y", "Z", "M");
-      numIndexItems = 2;
+      axisNames.add("P");
     } else if (geometry instanceof MultiPolygon) {
-      axisNames = Arrays.asList("P", "R", "#", "X", "Y", "Z", "M");
-      numIndexItems = 3;
+      axisNames.add("P");
+      axisNames.add("R");
     } else if (geometry instanceof GeometryCollection) {
-      axisNames = Arrays.asList("P", "R", "#", "X", "Y", "Z", "M");
-      numIndexItems = 3;
+      axisNames.add("P");
+      axisNames.add("R");
     } else {
-      axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
-      numIndexItems = 1;
     }
-    columnCount = numAxis + numIndexItems;
+    vertexIndexColumn = axisNames.size();
+    axisNames.add("#");
+    segmentIndexColumn = axisNames.size();
+    axisNames.add("S #");
+    numIndexItems = axisNames.size();
+    axisNames.add("X");
+    axisNames.add("Y");
+    if (numAxis > 2) {
+      axisNames.add("Z");
+    }
+    if (numAxis > 3) {
+      axisNames.add("M");
+    }
+    columnCount = axisNames.size();
     fireTableStructureChanged();
   }
 
+  public void setVertexIndexColumn(final int vertexIndexColumn) {
+    this.vertexIndexColumn = vertexIndexColumn;
+  }
 }

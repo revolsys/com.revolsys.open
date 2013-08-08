@@ -410,7 +410,12 @@ public class CoordinatesListUtil {
   }
 
   public static CoordinatesList get(final LineString line) {
-    return get(line.getCoordinateSequence());
+    if (line == null) {
+      return null;
+    } else {
+      final CoordinateSequence coordinateSequence = line.getCoordinateSequence();
+      return get(coordinateSequence);
+    }
   }
 
   public static Coordinates get(final LineString line, final int i) {
@@ -1138,7 +1143,7 @@ public class CoordinatesListUtil {
     boolean startEqual = false;
     boolean endEqual = false;
     if (startPoint != null) {
-      Coordinates p1 = points.get(start);
+      final Coordinates p1 = points.get(start);
       startEqual = startPoint.equals2d(p1);
       if (!startEqual) {
         size++;
@@ -1147,7 +1152,7 @@ public class CoordinatesListUtil {
       }
     }
     if (endPoint != null) {
-      Coordinates pointsEnd = points.get(start + length - 1);
+      final Coordinates pointsEnd = points.get(start + length - 1);
       endEqual = endPoint.equals2d(pointsEnd);
       if (!endEqual) {
         size++;

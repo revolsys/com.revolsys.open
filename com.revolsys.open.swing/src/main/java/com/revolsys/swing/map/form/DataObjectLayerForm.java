@@ -495,7 +495,7 @@ public class DataObjectLayerForm extends JPanel implements
   protected void addTabGeometry() {
     final String geometryAttributeName = metaData.getGeometryAttributeName();
     if (geometryCoordinatesPanel == null && geometryAttributeName != null) {
-      geometryCoordinatesPanel = new GeometryCoordinatesPanel(
+      geometryCoordinatesPanel = new GeometryCoordinatesPanel(this,
         geometryAttributeName);
       addField(geometryAttributeName, geometryCoordinatesPanel);
       final JPanel panel = new JPanel(new GridLayout(1, 1));

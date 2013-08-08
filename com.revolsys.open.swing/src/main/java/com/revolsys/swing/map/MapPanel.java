@@ -590,12 +590,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   /**
    * Zoom to the bounding box with a 5% padding on each side
    * 
-   * @param boudingBox
+   * @param boundingBox
    */
-  public void zoomTo(final BoundingBox boudingBox) {
+  public void zoomTo(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = boudingBox.convert(geometryFactory)
-      .expandPercent(0.1);
+    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1);
     setBoundingBox(boundingBox);
   }
 

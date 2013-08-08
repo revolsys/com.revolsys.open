@@ -588,6 +588,21 @@ public class GeometryEditUtil {
     return getVertex(geometry, vertexId);
   }
 
+  public static int getVertexIndex(final int[] index) {
+    final int length = index.length;
+    final int lastIndex = length - 1;
+    return index[lastIndex];
+  }
+
+  public static int[] incrementVertexIndex(final int[] index) {
+    final int length = index.length;
+    final int lastIndex = length - 1;
+    final int[] newIndex = new int[length];
+    System.arraycopy(index, 0, newIndex, 0, lastIndex);
+    newIndex[lastIndex] = index[lastIndex] + 1;
+    return newIndex;
+  }
+
   protected static ListCoordinatesList insertVertex(
     final CoordinatesList coordinatesList, final int pointIndex,
     final Coordinates newPoint) {
@@ -842,10 +857,35 @@ public class GeometryEditUtil {
     return geometryFactory.createPolygon(rings);
   }
 
+  @SuppressWarnings("unchecked")
+  public static <G extends Geometry> G moveVertexIfEqual(final G geometry,
+    final Coordinates originalLocation, final Coordinates newLocation,
+    final int... vertexId) {
+    final Coordinates coordinates = getVertex(geometry, vertexId);
+    CoordinatesUtil.setElevation(newLocation, originalLocation);
+    if (coordinates.equals2d(originalLocation)) {
+      final Coordinates newCoordinates = CoordinatesUtil.setElevation(
+        newLocation, originalLocation);
+      return (G)moveVertex(geometry, newCoordinates, vertexId);
+    } else {
+      return geometry;
+    }
+
+  }
+
   public static void setVertex(final CoordinatesList points,
     final int pointIndex, final Coordinates point) {
     if (pointIndex >= 0 && pointIndex < points.size()) {
       points.setPoint(pointIndex, point);
     }
+  }
+
+  public static int[] setVertexIndex(final int[] index, final int vertexIndex) {
+    final int length = index.length;
+    final int lastIndex = length - 1;
+    final int[] newIndex = new int[length];
+    System.arraycopy(index, 0, newIndex, 0, lastIndex);
+    newIndex[lastIndex] = vertexIndex;
+    return newIndex;
   }
 }

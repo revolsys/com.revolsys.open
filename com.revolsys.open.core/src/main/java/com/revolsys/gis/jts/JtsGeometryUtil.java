@@ -1367,6 +1367,25 @@ public final class JtsGeometryUtil {
 
   }
 
+  public static Point setElevation(final Point newLocation,
+    final Point originalLocation) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(originalLocation);
+    final Point convertedNewPoint = geometryFactory.project(newLocation);
+    if (geometryFactory.hasZ()) {
+      final Coordinates coordinates = CoordinatesUtil.get(originalLocation);
+      final double z = coordinates.getZ();
+      if (Double.isNaN(z)) {
+        return convertedNewPoint;
+      } else {
+        final Coordinates newCoordinates = geometryFactory.createCoordinates(CoordinatesUtil.get(newLocation));
+        newCoordinates.setZ(z);
+        return geometryFactory.createPoint(newCoordinates);
+      }
+    } else {
+      return convertedNewPoint;
+    }
+  }
+
   public static void setGeometryFeature(final Geometry geometry,
     final DataObject feature) {
     setGeometryProperty(geometry, FEATURE_PROPERTY, feature);

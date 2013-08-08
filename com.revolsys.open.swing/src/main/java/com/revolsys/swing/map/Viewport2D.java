@@ -22,6 +22,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -125,8 +126,8 @@ public class Viewport2D {
     this.geometryFactory = project.getGeometryFactory();
   }
 
-  public Viewport2D(final LayerGroup project, final int width, final int height,
-    final BoundingBox boundingBox) {
+  public Viewport2D(final LayerGroup project, final int width,
+    final int height, final BoundingBox boundingBox) {
     this(project);
     this.viewWidth = width;
     this.viewHeight = height;
@@ -198,6 +199,10 @@ public class Viewport2D {
 
   public double getMetresPerPixel() {
     return metresPerPixel;
+  }
+
+  public double getMetresPerPixel(final double scale) {
+    return (scale * 0.0254) / getScreenResolution();
   }
 
   public double getModelHeight() {
@@ -273,6 +278,10 @@ public class Viewport2D {
     return scale;
   }
 
+  public double getScaleForMetresPerPixel(final double metresPerPixel) {
+    return (metresPerPixel * getScreenResolution()) / 0.0254;
+  }
+
   public int getScreenResolution() {
     final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
     final int screenResolution = defaultToolkit.getScreenResolution();
@@ -328,6 +337,39 @@ public class Viewport2D {
     return viewWidth;
   }
 
+  private void internalSetBoundingBox(final BoundingBox boundingBox,
+    final double metresPerPixel) {
+    final double oldScale = getScale();
+    final BoundingBox oldBoundingBox = this.boundingBox;
+    synchronized (this) {
+      final int screenResolution = getScreenResolution();
+      final int viewWidthPixels = getViewWidthPixels();
+      final int viewHeightPixels = getViewHeightPixels();
+      final Measurable<Length> viewWidthLength = getViewWidthLength();
+      final Measurable<Length> modelWidthLength = boundingBox.getWidthLength();
+
+      if (Double.isInfinite(metresPerPixel) || Double.isNaN(metresPerPixel)) {
+        this.metresPerPixel = 0;
+        this.standardPixelScaleFactor = 0;
+        this.modelToScreenTransform = null;
+        this.screenToModelTransform = null;
+        this.scale = 0;
+      } else {
+        this.metresPerPixel = metresPerPixel;
+        this.standardPixelScaleFactor = screenResolution / 72.0;
+        this.modelToScreenTransform = createModelToScreenTransform(boundingBox,
+          viewWidthPixels, viewHeightPixels);
+        this.screenToModelTransform = createScreenToModelTransform(boundingBox,
+          viewWidthPixels, viewHeightPixels);
+        this.scale = getScale(viewWidthLength, modelWidthLength);
+      }
+      this.boundingBox = boundingBox;
+    }
+    propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
+      boundingBox);
+    propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
+  }
+
   public boolean isUseModelCoordinates() {
     return savedTransform != null;
   }
@@ -357,52 +399,79 @@ public class Viewport2D {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
       if (!convertedBoundingBox.isNull()) {
-        final BoundingBox oldBoundingBox = this.boundingBox;
-        final double oldScale = getScale();
-        this.boundingBox = convertedBoundingBox;
+        BoundingBox newBoundingBox = convertedBoundingBox;
 
-        final double viewWidth = getViewWidthPixels();
-        final double viewHeight = getViewHeightPixels();
-        if (viewWidth > 0) {
+        final int viewWidthPixels = getViewWidthPixels();
+        final int viewHeightPixels = getViewHeightPixels();
+        if (viewWidthPixels > 0) {
           final double viewAspectRatio = getViewAspectRatio();
-          final double aspectRatio = this.boundingBox.getAspectRatio();
+          final double aspectRatio = newBoundingBox.getAspectRatio();
           if (viewAspectRatio != aspectRatio) {
             if (aspectRatio < viewAspectRatio) {
-              final double width = this.boundingBox.getWidth();
-              final double height = this.boundingBox.getHeight();
+              final double width = newBoundingBox.getWidth();
+              final double height = newBoundingBox.getHeight();
               final double newWidth = height * viewAspectRatio;
               final double expandX = (newWidth - width) / 2;
-              this.boundingBox = this.boundingBox.expand(expandX, 0);
-
+              newBoundingBox = newBoundingBox.expand(expandX, 0);
             } else if (aspectRatio > viewAspectRatio) {
-              final double width = this.boundingBox.getWidth();
-              final double height = this.boundingBox.getHeight();
+              final double width = newBoundingBox.getWidth();
+              final double height = newBoundingBox.getHeight();
               final double newHeight = width / viewAspectRatio;
               final double expandY = (newHeight - height) / 2;
-              this.boundingBox = this.boundingBox.expand(0, expandY);
-
+              newBoundingBox = newBoundingBox.expand(0, expandY);
             }
           }
-
-          final int screenResolution = getScreenResolution();
-          standardPixelScaleFactor = screenResolution / 72.0;
-
-          modelToScreenTransform = createModelToScreenTransform(
-            this.boundingBox, viewWidth, viewHeight);
-          screenToModelTransform = createScreenToModelTransform(
-            this.boundingBox, viewWidth, viewHeight);
-          metresPerPixel = getModelHeightLength().doubleValue(SI.METRE)
-            / getViewHeightPixels();
         }
-        final Measurable<Length> modelWidth = getModelWidthLength();
-        scale = getScale(getViewHeightLength(), modelWidth);
-        propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
-          this.boundingBox);
-        propertyChangeSupport.firePropertyChange("scale", oldScale, scale);
-
+        final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
+        double metresPerPixel = modelWidthLength.doubleValue(SI.METRE)
+          / viewWidthPixels;
+        if (viewWidthPixels > 0 && viewHeightPixels > 0) {
+          if (metresPerPixel < 0.000999) {
+            return setBoundingBox(newBoundingBox, 0.001);
+          } else if (metresPerPixel < 0.001) {
+            metresPerPixel = 0.001;
+          } else {
+            // TODO normalize metres per pixel
+          }
+        }
+        internalSetBoundingBox(newBoundingBox, metresPerPixel);
       }
     }
     return this.boundingBox;
+  }
+
+  private BoundingBox setBoundingBox(final BoundingBox boundingBox,
+    final double metresPerPixel) {
+    final int viewWidthPixels = getViewWidthPixels();
+    final double viewWidth = viewWidthPixels * metresPerPixel;
+    final int viewHeightPixels = getViewHeightPixels();
+    final double viewHeight = viewHeightPixels * metresPerPixel;
+    final Coordinates centre = boundingBox.getCentre();
+    final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      1 / metresPerPixel);
+    precisionModel.makePrecise(centre);
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final double centreX = centre.getX();
+    final double centreY = centre.getY();
+
+    double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
+    if (viewWidthPixels % 2 == 1) {
+      leftOffset -= metresPerPixel;
+    }
+    final double rightOffset = precisionModel.makeXyPrecise(viewWidth / 2);
+    final double topOffset = precisionModel.makeXyPrecise(viewHeight / 2);
+    double bottomOffset = precisionModel.makeXyPrecise(viewHeight / 2);
+    if (viewHeightPixels % 2 == 1) {
+      bottomOffset -= metresPerPixel;
+    }
+    final double x1 = centreX - leftOffset;
+    final double y1 = centreY - bottomOffset;
+    final double x2 = centreX + rightOffset;
+    final double y2 = centreY + topOffset;
+    final BoundingBox newBoundingBox = new BoundingBox(geometryFactory, x1, y1,
+      x2, y2);
+    internalSetBoundingBox(newBoundingBox, metresPerPixel);
+    return newBoundingBox;
   }
 
   /**
@@ -419,7 +488,12 @@ public class Viewport2D {
 
   public void setScale(final double scale) {
     final double oldValue = getScale();
-    propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
+    if (Math.abs(oldValue - scale) > 0.0001) {
+      System.out.println(scale);
+      final double metresPerPixel = getMetresPerPixel(scale);
+      setBoundingBox(boundingBox, metresPerPixel);
+      propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
+    }
   }
 
   public void setUseModelCoordinates(final boolean useModelCoordinates,

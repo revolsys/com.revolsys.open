@@ -732,6 +732,11 @@ public class GeometryFactory extends
     return createPolygon(rings);
   }
 
+  public Coordinates getCoordinates(final Point point) {
+    final Point convertedPoint = project(point);
+    return CoordinatesUtil.get(convertedPoint);
+  }
+
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
     return coordinatesPrecisionModel;
   }

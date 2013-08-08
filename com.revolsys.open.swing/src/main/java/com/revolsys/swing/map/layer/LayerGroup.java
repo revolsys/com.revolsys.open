@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -333,6 +334,21 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
     return layers;
+  }
+
+  public <V extends Layer> List<V> getLayers(final List<String> names) {
+    final List<V> layers = new ArrayList<V>();
+    for (final String name : names) {
+      final V layer = getLayer(name);
+      if (layer != null) {
+        layers.add(layer);
+      }
+    }
+    return layers;
+  }
+
+  public <V extends Layer> List<V> getLayers(final String... names) {
+    return getLayers(Arrays.asList(names));
   }
 
   @Override

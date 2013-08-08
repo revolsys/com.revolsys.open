@@ -92,7 +92,9 @@ public class ComboBox extends JComboBox implements Field {
         setFieldValue(selectedItem);
       }
     });
-    AutoCompleteDecorator.decorate(this, converter);
+    if (converter != null) {
+      AutoCompleteDecorator.decorate(this, converter);
+    }
     undoManager.addKeyMap(getEditor().getEditorComponent());
   }
 

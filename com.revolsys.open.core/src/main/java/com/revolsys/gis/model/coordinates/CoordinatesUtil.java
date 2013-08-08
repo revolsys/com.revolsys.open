@@ -299,6 +299,23 @@ public class CoordinatesUtil {
     return new HCoordinate(l1, l2);
   }
 
+  public static Coordinates setElevation(final Coordinates newLocation,
+    final Coordinates originalLocation) {
+    if (originalLocation.getNumAxis() > 2) {
+      final double z = originalLocation.getZ();
+      if (Double.isNaN(z)) {
+        return newLocation;
+      } else {
+        final Coordinates newCoordinates = new DoubleCoordinates(newLocation,
+          originalLocation.getNumAxis());
+        newCoordinates.setZ(z);
+        return newCoordinates;
+      }
+    } else {
+      return newLocation;
+    }
+  }
+
   public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
     final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
     final Coordinates newPoint = new DoubleCoordinates(numAxis);

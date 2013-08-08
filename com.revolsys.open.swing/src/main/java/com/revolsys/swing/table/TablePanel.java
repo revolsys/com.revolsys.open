@@ -34,6 +34,8 @@ public class TablePanel extends JPanel implements MouseListener {
 
   private int eventRow;
 
+  private int eventColumn;
+
   public TablePanel(final JTable table) {
     super(new BorderLayout());
     this.table = table;
@@ -55,6 +57,10 @@ public class TablePanel extends JPanel implements MouseListener {
       final Component component = e.getComponent();
       popupMenu.show(component, x, y);
     }
+  }
+
+  public int getEventColumn() {
+    return eventColumn;
   }
 
   public int getEventRow() {
@@ -104,8 +110,12 @@ public class TablePanel extends JPanel implements MouseListener {
   protected void setEventRow(final MouseEvent e) {
     final Point point = e.getPoint();
     eventRow = table.rowAtPoint(point);
+    eventColumn = table.columnAtPoint(point);
     if (eventRow > -1) {
       eventRow = table.convertRowIndexToModel(eventRow);
+    }
+    if (eventColumn > -1) {
+      eventColumn = table.convertColumnIndexToModel(eventColumn);
     }
   }
 }

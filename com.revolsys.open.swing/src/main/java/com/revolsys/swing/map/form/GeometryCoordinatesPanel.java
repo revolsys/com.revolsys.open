@@ -2,9 +2,11 @@ package com.revolsys.swing.map.form;
 
 import java.awt.BorderLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
@@ -20,17 +22,26 @@ public class GeometryCoordinatesPanel extends ValueField implements
 
   private final TablePanel tablePanel;
 
-  public GeometryCoordinatesPanel(final String fieldName) {
+  private final DataObjectLayerForm form;
+
+  public GeometryCoordinatesPanel(final DataObjectLayerForm form,
+    final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
 
-    model.addTableModelListener(this);
-    table = new BaseJxTable(model);
+    this.form = form;
+    this.model.setForm(form);
+    this.model.addTableModelListener(this);
+    this.table = new BaseJxTable(model);
     table.setAutoResizeMode(BaseJxTable.AUTO_RESIZE_OFF);
 
     tablePanel = new TablePanel(table);
 
     add(tablePanel, BorderLayout.WEST);
+  }
+
+  public DataObjectLayerForm getForm() {
+    return form;
   }
 
   public BaseJxTable getTable() {
@@ -39,6 +50,20 @@ public class GeometryCoordinatesPanel extends ValueField implements
 
   public TablePanel getTablePanel() {
     return tablePanel;
+  }
+
+  @Override
+  public void setFieldInvalid(final String message) {
+    super.setFieldInvalid(message);
+    setForeground(null);
+    setBackground(null);
+    tablePanel.setBorder(BorderFactory.createLineBorder(WebColors.Red, 3));
+  }
+
+  @Override
+  public void setFieldValid() {
+    tablePanel.setBorder(null);
+    super.setFieldValid();
   }
 
   @Override
@@ -53,8 +78,10 @@ public class GeometryCoordinatesPanel extends ValueField implements
   @Override
   public void tableChanged(final TableModelEvent e) {
     for (int i = 0; i < model.getColumnCount(); i++) {
-      if (i < model.getNumIndexItems()) {
+      if (i < model.getNumIndexItems() - 1) {
         table.setColumnWidth(i, (model.getRowCount() / 10 + 1) * 20);
+      } else if (i < model.getNumIndexItems()) {
+        table.setColumnWidth(i, (model.getRowCount() / 10 + 2) * 20);
       } else {
         table.setColumnWidth(i, 120);
       }

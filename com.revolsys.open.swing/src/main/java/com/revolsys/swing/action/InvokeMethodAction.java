@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -40,6 +41,16 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, object,
       methodName, parameters);
+    final JMenuItem menuItem = new JMenuItem(action);
+    return menuItem;
+  }
+
+  public static JMenuItem createMenuItem(final String name,
+    final String iconName, final Object object, final String methodName,
+    final Object... parameters) {
+    final Icon icon = SilkIconLoader.getIcon(iconName);
+    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
+      object, methodName, parameters);
     final JMenuItem menuItem = new JMenuItem(action);
     return menuItem;
   }
