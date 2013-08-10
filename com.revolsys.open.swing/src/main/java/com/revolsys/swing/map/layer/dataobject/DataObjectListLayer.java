@@ -176,12 +176,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public LayerDataObject get(final int index) {
-    return records.get(index);
-  }
-
-  @Override
-  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
+  public List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
     final double width = boundingBox.getWidth();
     final double height = boundingBox.getHeight();
     if (boundingBox.isNull() || width == 0 || height == 0) {
@@ -192,6 +187,17 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
       final List<LayerDataObject> records = (List)index.queryIntersects(convertedBoundingBox);
       return records;
     }
+  }
+
+  @Override
+  public List<LayerDataObject> doQuery(Geometry geometry, final double distance) {
+    geometry = getGeometryFactory().createGeometry(geometry);
+    return (List)index.queryDistance(geometry, distance);
+  }
+
+  @Override
+  public LayerDataObject get(final int index) {
+    return records.get(index);
   }
 
   @Override
@@ -243,12 +249,6 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public ListIterator<LayerDataObject> listIterator(final int index) {
     return records.listIterator(index);
-  }
-
-  @Override
-  public List<LayerDataObject> query(Geometry geometry, final double distance) {
-    geometry = getGeometryFactory().createGeometry(geometry);
-    return (List)index.queryDistance(geometry, distance);
   }
 
   @Override

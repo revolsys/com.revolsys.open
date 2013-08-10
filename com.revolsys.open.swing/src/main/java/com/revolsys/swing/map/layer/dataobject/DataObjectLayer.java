@@ -39,8 +39,6 @@ public interface DataObjectLayer extends Layer {
 
   List<String> getColumnNames();
 
-  List<LayerDataObject> getDataObjects(BoundingBox boundingBox);
-
   DataObjectStore getDataStore();
 
   DataType getGeometryType();
@@ -93,6 +91,8 @@ public interface DataObjectLayer extends Layer {
   boolean isSelected(LayerDataObject record);
 
   boolean isVisible(LayerDataObject record);
+
+  List<LayerDataObject> query(BoundingBox boundingBox);
 
   List<LayerDataObject> query(Geometry geometry, double distance);
 

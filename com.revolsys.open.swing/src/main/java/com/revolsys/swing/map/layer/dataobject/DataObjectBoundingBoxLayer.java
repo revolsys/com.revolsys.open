@@ -44,12 +44,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    return boundingBox;
-  }
-
-  @Override
-  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
+  public List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
@@ -98,6 +93,11 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
         return Collections.emptyList();
       }
     }
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
   }
 
   @Override

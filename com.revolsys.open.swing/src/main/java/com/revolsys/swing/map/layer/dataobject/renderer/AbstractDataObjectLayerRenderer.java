@@ -118,7 +118,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final DataObjectLayer layer) {
     viewport.setUseModelCoordinates(true, graphics);
     final BoundingBox boundingBox = viewport.getBoundingBox();
-    final List<LayerDataObject> dataObjects = layer.getDataObjects(boundingBox);
+    final List<LayerDataObject> dataObjects = layer.query(boundingBox);
     renderObjects(viewport, graphics, layer, dataObjects);
   }
 

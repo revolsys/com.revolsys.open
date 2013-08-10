@@ -79,10 +79,13 @@ public class GeometryCoordinatesPanel extends ValueField implements
   public void tableChanged(final TableModelEvent e) {
     for (int i = 0; i < model.getColumnCount(); i++) {
       int width;
-      if (i < model.getNumIndexItems() - 1) {
-        width = (model.getRowCount() / 10 + 1) + 20;
-      } else if (i < model.getNumIndexItems()) {
-        width = (model.getRowCount() / 10 + 2) + 20;
+      if (i < model.getNumIndexItems()) {
+        width = (int)(Math.ceil(model.getRowCount() / 10.0)) * 20;
+        if (i < model.getNumIndexItems() - 1) {
+        } else {
+          width += 20;
+        }
+        width = Math.max(50, width);
       } else {
         width = 120;
       }

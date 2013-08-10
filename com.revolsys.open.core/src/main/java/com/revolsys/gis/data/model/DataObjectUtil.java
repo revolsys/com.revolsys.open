@@ -73,6 +73,20 @@ public final class DataObjectUtil {
     return newObject;
   }
 
+  public static <D extends DataObject> List<D> filter(
+    final Collection<D> objects, final Geometry geometry,
+    final double maxDistance) {
+    final List<D> results = new ArrayList<D>();
+    for (final D object : objects) {
+      final Geometry objectGeometry = object.getGeometryValue();
+      final double distance = objectGeometry.distance(geometry);
+      if (distance < maxDistance) {
+        results.add(object);
+      }
+    }
+    return results;
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getAttributeByPath(final DataObject object,
     final String path) {

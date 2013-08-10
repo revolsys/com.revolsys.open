@@ -162,6 +162,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
+    eventsEnabled = false;
     final DefaultSingleCDockable dockable = getProperty("TableView");
     if (dockable != null) {
       // TODO all this should be done by listeners

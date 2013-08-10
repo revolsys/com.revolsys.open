@@ -199,6 +199,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       if ("recordsChanged".equals(propertyName)) {
         tableModel.refresh();
       }
+      repaint();
     }
   }
 

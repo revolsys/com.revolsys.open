@@ -524,8 +524,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
               + firstGeometry.getClass());
         }
       } else {
-        throw new RuntimeException(
-          "GeometryCollection has more than one geometry");
+        throw new RuntimeException("Expecting a single Polygon not a "
+          + object.getClass() + " with more than one geometry");
       }
     } else if (object == null) {
       return null;

@@ -43,6 +43,7 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -56,6 +57,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
@@ -166,7 +169,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private boolean canEditRecords = true;
 
-  private Set<LayerDataObject> deletedRecords = new LinkedHashSet<LayerDataObject>();
+  private final Set<LayerDataObject> deletedRecords = new LinkedHashSet<LayerDataObject>();
 
   private final Object editSync = new Object();
 
@@ -174,13 +177,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private DataObjectMetaData metaData;
 
-  private Set<LayerDataObject> modifiedRecords = new LinkedHashSet<LayerDataObject>();
+  private final Set<LayerDataObject> modifiedRecords = new LinkedHashSet<LayerDataObject>();
 
-  private Set<LayerDataObject> newRecords = new LinkedHashSet<LayerDataObject>();
+  private final Set<LayerDataObject> newRecords = new LinkedHashSet<LayerDataObject>();
 
   protected Query query;
 
-  private Set<LayerDataObject> selectedRecords = new LinkedHashSet<LayerDataObject>();
+  private final Set<LayerDataObject> selectedRecords = new LinkedHashSet<LayerDataObject>();
 
   private DataObjectQuadTree selectedRecordsIndex;
 
@@ -278,14 +281,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void clearChanges() {
     clearSelectedRecords();
-    newRecords = new LinkedHashSet<LayerDataObject>();
-    modifiedRecords = new LinkedHashSet<LayerDataObject>();
-    deletedRecords = new LinkedHashSet<LayerDataObject>();
+    removeForm(newRecords);
+    removeForm(modifiedRecords);
+    removeForm(deletedRecords);
+    newRecords.clear();
+    modifiedRecords.clear();
+    deletedRecords.clear();
+    fireRecordsChanged();
   }
 
   @Override
   public void clearSelectedRecords() {
-    selectedRecords = new LinkedHashSet<LayerDataObject>();
+    selectedRecords.clear();
+    ;
     fireSelected();
   }
 
@@ -407,6 +415,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void delete() {
+    clearChanges();
     super.delete();
     if (forms != null) {
       for (final Window window : forms.values()) {
@@ -459,9 +468,38 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     deleteRecords(selectedRecords);
   }
 
+  protected List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
+    return Collections.emptyList();
+  }
+
+  protected List<LayerDataObject> doQuery(final Geometry geometry,
+    final double maxDistance) {
+    return Collections.emptyList();
+  }
+
   @Override
   protected boolean doSaveChanges() {
     return true;
+  }
+
+  protected void filter(final List<LayerDataObject> results,
+    final Set<LayerDataObject> records, final Filter<DataObject> filter) {
+    for (final LayerDataObject record : records) {
+      if (filter.accept(record)) {
+        if (!results.contains(record)) {
+          results.add(record);
+        }
+      } else {
+        results.remove(record);
+      }
+    }
+  }
+
+  protected void filterUpdates(final List<LayerDataObject> results,
+    final Filter<DataObject> filter) {
+    results.remove(deletedRecords);
+    filter(results, modifiedRecords, filter);
+    filter(results, newRecords, filter);
   }
 
   protected void fireRecordsChanged() {
@@ -523,11 +561,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
-    return Collections.emptyList();
-  }
-
-  @Override
   public DataObjectStore getDataStore() {
     return getMetaData().getDataObjectStore();
   }
@@ -577,11 +610,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public Set<LayerDataObject> getModifiedRecords() {
-    if (modifiedRecords == null) {
-      return Collections.emptySet();
-    } else {
-      return new LinkedHashSet<LayerDataObject>(modifiedRecords);
-    }
+    return new LinkedHashSet<LayerDataObject>(modifiedRecords);
   }
 
   @Override
@@ -595,11 +624,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public List<LayerDataObject> getNewRecords() {
-    if (newRecords == null) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<LayerDataObject>(newRecords);
-    }
+    return new ArrayList<LayerDataObject>(newRecords);
   }
 
   @Override
@@ -651,11 +676,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public List<LayerDataObject> getSelectedRecords() {
-    if (selectedRecords == null) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<LayerDataObject>(selectedRecords);
-    }
+    return new ArrayList<LayerDataObject>(selectedRecords);
   }
 
   @Override
@@ -825,7 +846,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isSelected(final LayerDataObject object) {
-    if (object == null || selectedRecords == null) {
+    if (object == null) {
       return false;
     } else {
       return selectedRecords.contains(object);
@@ -934,9 +955,22 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public final List<LayerDataObject> query(final BoundingBox boundingBox) {
+    final List<LayerDataObject> results = doQuery(boundingBox);
+    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
+      boundingBox);
+    filterUpdates(results, filter);
+    return results;
+  }
+
+  @Override
   public List<LayerDataObject> query(final Geometry geometry,
-    final double distance) {
-    throw new UnsupportedOperationException();
+    final double maxDistance) {
+    final List<LayerDataObject> results = doQuery(geometry, maxDistance);
+    final Filter<DataObject> filter = new DataObjectGeometryDistanceFilter(
+      geometry, maxDistance);
+    filterUpdates(results, filter);
+    return results;
   }
 
   @Override
@@ -956,6 +990,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       form.dispose();
       form.removeNotify();
 
+    }
+  }
+
+  public void removeForm(final Set<LayerDataObject> records) {
+    for (final LayerDataObject object : records) {
+      removeForm(object);
     }
   }
 
@@ -1120,7 +1160,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerDataObject> objects = getDataObjects(boundingBox);
+      final List<LayerDataObject> objects = query(boundingBox);
       for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
         final LayerDataObject layerDataObject = iterator.next();
         if (!isVisible(layerDataObject)
@@ -1138,8 +1178,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void setSelectedRecords(
     final Collection<LayerDataObject> selectedRecords) {
-    clearSelectedRecordsIndex();
-    this.selectedRecords = new LinkedHashSet<LayerDataObject>(selectedRecords);
+    synchronized (selectedRecords) {
+      clearSelectedRecordsIndex();
+      this.selectedRecords.clear();
+      this.selectedRecords.addAll(selectedRecords);
+    }
     fireSelected();
   }
 

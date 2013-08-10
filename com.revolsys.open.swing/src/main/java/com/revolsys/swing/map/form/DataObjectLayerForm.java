@@ -987,6 +987,7 @@ public class DataObjectLayerForm extends JPanel implements
         final boolean deletable = isDeletable();
         propertyChangeSupport.firePropertyChange("deletable", !deletable,
           deletable);
+        repaint();
       }
     }
   }

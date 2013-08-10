@@ -1,10 +1,13 @@
 package com.revolsys.gis.algorithm.index;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -56,6 +59,34 @@ public class PointQuadTreeNode<T> {
       }
     }
     return false;
+  }
+
+  public void findEntriesWithin(final List<Entry<Coordinates, T>> results,
+    final Envelope envelope) {
+    final double minX = envelope.getMinX();
+    final double maxX = envelope.getMaxX();
+    final double minY = envelope.getMinY();
+    final double maxY = envelope.getMaxY();
+    if (envelope.contains(x, y)) {
+      final DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
+      results.add(new SimpleImmutableEntry<Coordinates, T>(coordinates, value));
+    }
+    final boolean minXLess = isLessThanX(minX);
+    final boolean maxXLess = isLessThanX(maxX);
+    final boolean minYLess = isLessThanY(minY);
+    final boolean maxYLess = isLessThanY(maxY);
+    if (southWest != null && minXLess && minYLess) {
+      southWest.findEntriesWithin(results, envelope);
+    }
+    if (northWest != null && minXLess && !maxYLess) {
+      northWest.findEntriesWithin(results, envelope);
+    }
+    if (southEast != null && !maxXLess && minYLess) {
+      southEast.findEntriesWithin(results, envelope);
+    }
+    if (northEast != null && !maxXLess && !maxYLess) {
+      northEast.findEntriesWithin(results, envelope);
+    }
   }
 
   public void findWithin(final List<T> results, final double x, final double y,

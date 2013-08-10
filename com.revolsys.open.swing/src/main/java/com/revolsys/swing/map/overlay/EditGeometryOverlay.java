@@ -452,7 +452,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     final Geometry convertedGeometry = viewportGeometryFactory.copy(geometry);
 
     final double maxDistance = getMaxDistance(boundingBox);
-    final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.createLineSegmentQuadTree(convertedGeometry);
+    final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
 
     final IndexedLineSegment closetSegment = getClosetSegment(lineSegments,
       boundingBox, maxDistance, previousDistance);
@@ -479,7 +479,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
     Coordinates currentCoordinates = CoordinatesUtil.get(geometryFactory.copy(previousPoint));
-    final PointQuadTree<int[]> index = GeometryEditUtil.createPointQuadTree(geometry);
+    final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
     if (index != null) {
       final Coordinates centre = boundingBox.getCentre();
 
@@ -740,14 +740,14 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     snapPoint = null;
     Boolean nodeSnap = null;
     for (final DataObjectLayer layer : layers) {
-      final List<LayerDataObject> objects = layer.getDataObjects(boundingBox);
+      final List<LayerDataObject> objects = layer.query(boundingBox);
       final double maxDistance = getMaxDistance(boundingBox);
       double closestDistance = Double.MAX_VALUE;
       for (final LayerDataObject object : objects) {
         if (object != this.mouseOverObject) {
           final Geometry geometry = geometryFactory.copy(object.getGeometryValue());
           if (geometry != null) {
-            final QuadTree<IndexedLineSegment> index = GeometryEditUtil.createLineSegmentQuadTree(geometry);
+            final QuadTree<IndexedLineSegment> index = GeometryEditUtil.getLineSegmentQuadTree(geometry);
             final IndexedLineSegment closeSegment = getClosetSegment(index,
               boundingBox, maxDistance, Double.MAX_VALUE);
             if (closeSegment != null) {

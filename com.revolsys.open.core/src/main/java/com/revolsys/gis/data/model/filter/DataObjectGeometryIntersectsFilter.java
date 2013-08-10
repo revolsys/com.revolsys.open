@@ -20,7 +20,12 @@
  */
 package com.revolsys.gis.data.model.filter;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.revolsys.filter.Filter;
+import com.revolsys.filter.FilterUtil;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
@@ -30,6 +35,10 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   private final Geometry geometry;
 
   private final GeometryFactory geometryFactory;
+
+  public DataObjectGeometryIntersectsFilter(final BoundingBox boundingBox) {
+    this(boundingBox.toPolygon());
+  }
 
   /**
    * Construct a new DataObjectGeometryIntersectsFilter.
@@ -58,5 +67,14 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
    */
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static <D extends DataObject> List<D> filter(
+    final Collection<D> collection, final BoundingBox boundingBox) {
+    Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+    return FilterUtil.filter(collection, filter);
   }
 }

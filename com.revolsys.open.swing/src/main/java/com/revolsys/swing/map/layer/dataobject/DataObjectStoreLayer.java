@@ -58,7 +58,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private Method saveObjectChangesMethod;
 
-  private Object sync = new Object();
+  private final Object sync = new Object();
 
   private String typePath;
 
@@ -134,10 +134,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           ids.add(id);
         }
       }
-      for (final DataObject object : index.queryAll()) {
-        final String id = getId((LayerDataObject)object);
-        if (id != null) {
-          ids.add(id);
+      if (index != null) {
+        for (final DataObject object : index.queryAll()) {
+          final String id = getId((LayerDataObject)object);
+          if (id != null) {
+            ids.add(id);
+          }
         }
       }
       cachedObjects.keySet().retainAll(ids);
@@ -147,8 +149,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   protected void clearChanges() {
     super.clearChanges();
-    cachedObjects.clear();
     deletedObjectIds.clear();
+    cleanCachedObjects();
+    for (final LayerDataObject object : cachedObjects.values()) {
+      removeForm(object);
+    }
+    cachedObjects.clear();
   }
 
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
@@ -178,7 +184,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public void delete() {
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
-    this.sync = null;
     this.beanPropertyListener = null;
     this.boundingBox = null;
     this.cachedObjects.clear();
@@ -209,6 +214,67 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         removeFromIndex(object);
         super.deleteObject(object);
       }
+    }
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  @Override
+  protected List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
+    if (boundingBox.isNull()) {
+      return Collections.emptyList();
+    } else {
+      synchronized (sync) {
+        final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
+        if (!this.boundingBox.contains(boundingBox)
+          && !this.loadingBoundingBox.contains(boundingBox)) {
+          if (loadingWorker != null) {
+            loadingWorker.cancel(true);
+          }
+          this.loadingBoundingBox = loadBoundingBox;
+          loadingWorker = createLoadingWorker(loadBoundingBox);
+          SwingWorkerManager.execute(loadingWorker);
+        }
+      }
+      Polygon polygon = boundingBox.toPolygon();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      polygon = geometryFactory.project(polygon);
+
+      final List objects = index.queryIntersects(polygon);
+      return objects;
+    }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  @Override
+  public List<LayerDataObject> doQuery(final Geometry geometry,
+    final double distance) {
+    final boolean enabled = setEventsEnabled(false);
+    try {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry queryGeometry = geometryFactory.copy(geometry);
+      BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
+      boundingBox = boundingBox.expand(distance);
+      if (this.boundingBox.contains(boundingBox)) {
+        return (List)index.queryDistance(queryGeometry, distance);
+      } else {
+        final String typePath = getTypePath();
+        final DataObjectStore dataStore = getDataStore();
+        final Reader reader = dataStore.query(this, typePath, queryGeometry,
+          distance);
+        try {
+          final List<LayerDataObject> readObjects = reader.read();
+          final List<LayerDataObject> objects = getCachedObjects(readObjects);
+          return objects;
+        } finally {
+          reader.close();
+        }
+      }
+    } finally {
+      setEventsEnabled(enabled);
     }
   }
 
@@ -282,37 +348,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     } else {
       return null;
-    }
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  @Override
-  public List<LayerDataObject> getDataObjects(final BoundingBox boundingBox) {
-    if (boundingBox.isNull()) {
-      return Collections.emptyList();
-    } else if (sync == null) {
-      return Collections.emptyList();
-    } else {
-      synchronized (sync) {
-        final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-        if (!this.boundingBox.contains(boundingBox)
-          && !this.loadingBoundingBox.contains(boundingBox)) {
-          if (loadingWorker != null) {
-            loadingWorker.cancel(true);
-          }
-          this.loadingBoundingBox = loadBoundingBox;
-          loadingWorker = createLoadingWorker(loadBoundingBox);
-          SwingWorkerManager.execute(loadingWorker);
-        }
-      }
-      Polygon polygon = boundingBox.toPolygon();
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      polygon = geometryFactory.project(polygon);
-
-      final List objects = index.queryIntersects(polygon);
-      return objects;
     }
   }
 
@@ -437,38 +472,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
     return false;
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  @Override
-  public List<LayerDataObject> query(final Geometry geometry,
-    final double distance) {
-    final boolean enabled = setEventsEnabled(false);
-    try {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry queryGeometry = geometryFactory.copy(geometry);
-      BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
-      boundingBox = boundingBox.expand(distance);
-      if (this.boundingBox.contains(boundingBox)) {
-        return (List)index.queryDistance(queryGeometry, distance);
-      } else {
-        final String typePath = getTypePath();
-        final DataObjectStore dataStore = getDataStore();
-        final Reader reader = dataStore.query(this, typePath, queryGeometry,
-          distance);
-        try {
-          final List<LayerDataObject> readObjects = reader.read();
-          final List<LayerDataObject> objects = getCachedObjects(readObjects);
-          return objects;
-        } finally {
-          reader.close();
-        }
-      }
-    } finally {
-      setEventsEnabled(enabled);
-    }
   }
 
   public List<LayerDataObject> query(final Map<String, ? extends Object> filter) {

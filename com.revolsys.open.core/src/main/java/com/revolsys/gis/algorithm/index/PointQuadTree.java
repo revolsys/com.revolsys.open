@@ -1,12 +1,15 @@
 package com.revolsys.gis.algorithm.index;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
@@ -30,6 +33,22 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     }
   }
 
+  public List<Entry<Coordinates, T>> findEntriesWithinDistance(
+    final Coordinates from, final Coordinates to, final double maxDistance) {
+    final BoundingBox boundingBox = new BoundingBox(geometryFactory, from, to);
+    final List<Entry<Coordinates, T>> entries = new ArrayList<Entry<Coordinates, T>>();
+    root.findEntriesWithin(entries, boundingBox);
+    for (final Iterator<Entry<Coordinates, T>> iterator = entries.iterator(); iterator.hasNext();) {
+      final Entry<Coordinates, T> entry = iterator.next();
+      final Coordinates coordinates = entry.getKey();
+      final double distance = LineSegmentUtil.distance(from, to, coordinates);
+      if (distance >= maxDistance) {
+        iterator.remove();
+      }
+    }
+    return entries;
+  }
+
   public List<T> findWithin(BoundingBox boundingBox) {
     if (geometryFactory != null) {
       boundingBox = boundingBox.convert(geometryFactory);
@@ -41,6 +60,18 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final List<T> results = new ArrayList<T>();
     if (root != null) {
       root.findWithin(results, envelope);
+    }
+    return results;
+  }
+
+  public List<T> findWithinDistance(final Coordinates from,
+    final Coordinates to, final double maxDistance) {
+    final List<Entry<Coordinates, T>> entries = findEntriesWithinDistance(from,
+      to, maxDistance);
+    final List<T> results = new ArrayList<T>();
+    for (final Entry<Coordinates, T> entry : entries) {
+      final T value = entry.getValue();
+      results.add(value);
     }
     return results;
   }
