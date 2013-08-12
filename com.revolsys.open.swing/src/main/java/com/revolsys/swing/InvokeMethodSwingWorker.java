@@ -9,16 +9,17 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.InvokeMethodCallable;
+import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.util.ExceptionUtil;
 
 public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
   private Callable<T> backgroundTask;
 
-  private Object object;
+  private Object doneObject;
 
   private String doneMethodName;
 
@@ -38,7 +39,7 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     final String doneMethodName,
     final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
-    this.object = object;
+    this.doneObject = object;
     if (StringUtils.hasText(backgroundMethodName)) {
       this.backgroundTask = new InvokeMethodCallable<T>(object,
         backgroundMethodName, backgroundMethodParameters.toArray());
@@ -46,6 +47,9 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     if (StringUtils.hasText(doneMethodName)) {
       this.doneMethodName = doneMethodName;
       this.doneMethodParameters = new ArrayList<Object>(doneMethodParameters);
+      if (object == null) {
+        throw new IllegalArgumentException("doneObject cannot be null");
+      }
     }
   }
 
@@ -80,28 +84,26 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     } catch (final InterruptedException e) {
       return;
     } catch (final ExecutionException e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to get result", e);
+      final Throwable cause = e.getCause();
+      ExceptionUtil.log(getClass(), "Error running " + description + " using "
+        + backgroundTask, cause);
       return;
     }
     if (doneMethodName != null) {
+      final List<Object> parameters = new ArrayList<Object>(
+        doneMethodParameters);
+      if (result != null) {
+        parameters.add(result);
+      }
       try {
-        final List<Object> parameters = new ArrayList<Object>(
-          doneMethodParameters);
-        if (result != null) {
-          parameters.add(result);
-        }
-        if (object == null) {
-          throw new RuntimeException("Object cannot be null " + this);
-        } else if (object instanceof Class<?>) {
-          final Class<?> clazz = (Class<?>)object;
-          MethodUtils.invokeStaticMethod(clazz, doneMethodName,
-            parameters.toArray());
-        } else {
-          MethodUtils.invokeMethod(object, doneMethodName, parameters.toArray());
-        }
+        InvokeMethodRunnable.run(doneObject, doneMethodName, parameters);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
-          "Unable to invoke done method " + this, e);
+          "Error running "
+            + description
+            + " using "
+            + InvokeMethodRunnable.toString(doneObject, doneMethodName,
+              parameters), e);
       }
     }
   }

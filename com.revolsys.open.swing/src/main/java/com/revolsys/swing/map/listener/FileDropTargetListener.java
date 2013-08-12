@@ -113,7 +113,7 @@ public class FileDropTargetListener implements DropTargetListener,
         }
       }
       if (files != null && !files.isEmpty()) {
-        SwingWorkerManager.execute("Open Files", Project.class, "openFiles",
+        SwingWorkerManager.execute("Open Files", Project.get(), "openFiles",
           files);
       }
       event.getDropTargetContext().dropComplete(true);

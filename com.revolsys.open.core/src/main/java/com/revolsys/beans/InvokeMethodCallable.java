@@ -1,9 +1,11 @@
 package com.revolsys.beans;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.beanutils.MethodUtils;
 
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -64,6 +66,7 @@ public class InvokeMethodCallable<T> implements Callable<T> {
 
   @Override
   public String toString() {
-    return object.getClass() + "." + methodName + parameters;
+    return InvokeMethodRunnable.toString(object, methodName,
+      Arrays.asList(parameters));
   }
 }

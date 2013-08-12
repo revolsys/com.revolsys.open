@@ -2,12 +2,14 @@ package com.revolsys.parallel.process;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -44,6 +46,46 @@ public class InvokeMethodRunnable implements Runnable {
     } else {
       SwingUtilities.invokeLater(runnable);
     }
+  }
+
+  public static void run(final Object object, final String methodName,
+    final List<Object> parameters) {
+    final Object[] parameterArray = parameters.toArray();
+    run(object, methodName, parameterArray);
+  }
+
+  public static void run(final Object object, final String methodName,
+    final Object... parameterArray) {
+    try {
+      if (object instanceof Class<?>) {
+        final Class<?> clazz = (Class<?>)object;
+        MethodUtils.invokeStaticMethod(clazz, methodName, parameterArray);
+      } else {
+        MethodUtils.invokeMethod(object, methodName, parameterArray);
+      }
+    } catch (final InvocationTargetException e) {
+      ExceptionUtil.throwCauseException(e);
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unable to invoke "
+        + toString(object, methodName, parameterArray), e);
+    }
+  }
+
+  public static String toString(final Object object, final String methodName,
+    final List<Object> parameters) {
+    Class<?> clazz;
+    if (object instanceof Class) {
+      clazz = (Class<?>)object;
+    } else {
+      clazz = object.getClass();
+    }
+    return clazz.getName() + "." + methodName + "("
+      + CollectionUtil.toString(parameters) + ")";
+  }
+
+  public static String toString(final Object object, final String methodName,
+    final Object... parameters) {
+    return toString(object, methodName, Arrays.asList(parameters));
   }
 
   /** The object to invoke the method on. */
@@ -91,21 +133,12 @@ public class InvokeMethodRunnable implements Runnable {
    */
   @Override
   public void run() {
-    try {
-      final Object object = getObject();
-      if (object == null) {
-        LoggerFactory.getLogger(getClass()).debug(
-          "Object cannot be null " + this);
-      } else if (object instanceof Class<?>) {
-        final Class<?> clazz = (Class<?>)object;
-        MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
-      } else {
-        MethodUtils.invokeMethod(object, methodName, parameters);
-      }
-    } catch (final InvocationTargetException e) {
-      throw new RuntimeException("Unable to invoke " + this, e.getCause());
-    } catch (final Throwable e) {
-      throw new RuntimeException("Unable to invoke " + this, e);
+    final Object object = getObject();
+    if (object == null) {
+      LoggerFactory.getLogger(getClass())
+        .debug("Object cannot be null " + this);
+    } else {
+      run(object, methodName, parameters);
     }
   }
 

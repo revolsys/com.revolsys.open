@@ -4,7 +4,18 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.LoggerFactory;
+
 public final class ExceptionUtil {
+  public static void log(final Class<?> clazz, final String message,
+    final Throwable exception) {
+    LoggerFactory.getLogger(clazz).error(message, exception);
+  }
+
+  public static void log(final Class<?> clazz, final Throwable exception) {
+    log(clazz, exception.getMessage(), exception);
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T throwCauseException(final Throwable e) {
     final Throwable cause = e.getCause();
@@ -20,7 +31,7 @@ public final class ExceptionUtil {
     } else if (exception instanceof Error) {
       throw (Error)exception;
     } else {
-      throw new RuntimeException(exception);
+      throw new WrappedException(exception);
     }
   }
 
