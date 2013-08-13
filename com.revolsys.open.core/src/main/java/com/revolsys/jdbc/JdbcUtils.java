@@ -25,6 +25,7 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -32,6 +33,7 @@ import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.io.JdbcDataObjectStore;
 
 public final class JdbcUtils {
   private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
@@ -209,10 +211,12 @@ public final class JdbcUtils {
   }
 
   public static int executeUpdate(final DataSource dataSource,
-    final String sql, final Object... parameters) throws SQLException {
+    final String sql, final Object... parameters) {
     final Connection connection = getConnection(dataSource);
     try {
       return executeUpdate(connection, sql, parameters);
+    } catch (final SQLException e) {
+      throw getException(dataSource, connection, "Update", sql, e);
     } finally {
       release(connection, dataSource);
     }
@@ -351,6 +355,18 @@ public final class JdbcUtils {
     } finally {
       close(statement);
     }
+  }
+
+  public static void lockTable(final DataObjectStore dataStore,
+    final String typePath) {
+    if (dataStore instanceof JdbcDataObjectStore) {
+      final JdbcDataObjectStore jdbcDataStore = (JdbcDataObjectStore)dataStore;
+      final DataSource dataSource = jdbcDataStore.getDataSource();
+      final String tableName = getQualifiedTableName(typePath);
+      final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
+      executeUpdate(dataSource, sql);
+    }
+
   }
 
   public static Map<String, Object> readMap(final ResultSet rs)

@@ -1,6 +1,5 @@
 package com.revolsys.jdbc.process;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -29,13 +28,7 @@ public class JdbcUpdateStatementRunnable implements Runnable {
 
   @Override
   public void run() {
-    try {
-      JdbcUtils.executeUpdate(dataSource, sql, parameters.toArray());
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to execute statement " + sql
-        + " with parameters " + parameters, e);
-    }
-
+    JdbcUtils.executeUpdate(dataSource, sql, parameters.toArray());
   }
 
   public void setDataSource(final DataSource dataSource) {

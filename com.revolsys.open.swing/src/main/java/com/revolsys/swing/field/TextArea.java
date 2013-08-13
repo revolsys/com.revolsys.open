@@ -32,7 +32,7 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   public TextArea(final int rows, final int columns) {
-    this(null);
+    this("text");
     setRows(rows);
     setColumns(columns);
   }

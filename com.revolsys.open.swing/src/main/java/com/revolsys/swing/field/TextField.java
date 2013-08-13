@@ -36,7 +36,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
   public TextField(final int columns) {
-    this(null);
+    this("text");
     setColumns(columns);
   }
 

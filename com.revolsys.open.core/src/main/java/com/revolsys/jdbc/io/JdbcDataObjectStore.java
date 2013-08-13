@@ -19,6 +19,8 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   Connection getConnection();
 
+  String getDatabaseTableName(final String typePath);
+
   DataSource getDataSource();
 
   String getGeneratePrimaryKeySql(DataObjectMetaData metaData);
