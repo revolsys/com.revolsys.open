@@ -38,7 +38,9 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.action.file.Exit;
+import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -64,7 +66,7 @@ import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
-public class ProjectFrame extends JFrame {
+public class ProjectFrame extends BaseFrame {
   static {
     ResponseCache.setDefault(new FileResponseCache());
 
@@ -264,6 +266,7 @@ public class ProjectFrame extends JFrame {
     setJMenuBar(menuBar);
 
     createFileMenu(menuBar);
+    WindowManager.addMenu(menuBar);
     return menuBar;
   }
 

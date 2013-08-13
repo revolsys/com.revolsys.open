@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -70,6 +69,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -1271,7 +1271,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                 dataObjectForm.setEditable(false);
               }
             }
-            window = new JFrame(title);
+            Window parent = SwingUtil.getActiveWindow();
+            window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
             window.setLocation(50, 50);

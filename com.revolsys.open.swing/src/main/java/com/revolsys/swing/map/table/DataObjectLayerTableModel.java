@@ -309,16 +309,21 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (pageNumber == null) {
         return;
       } else {
+        final Map<Integer, List<LayerDataObject>> pageCache;
         synchronized (getSync()) {
-          final Map<Integer, List<LayerDataObject>> pageCache = this.pageCache;
-          final List<LayerDataObject> objects;
-          if (getFilterQuery() == null) {
-            objects = Collections.emptyList();
-          } else {
-            objects = loadPage(pageNumber);
+          pageCache = this.pageCache;
+        }
+        final List<LayerDataObject> objects;
+        if (getFilterQuery() == null) {
+          objects = Collections.emptyList();
+        } else {
+          objects = loadPage(pageNumber);
+        }
+        pageCache.put(pageNumber, objects);
+        synchronized (getSync()) {
+          if (this.pageCache == pageCache) {
+            loadingPageNumbers.remove(pageNumber);
           }
-          pageCache.put(pageNumber, objects);
-          loadingPageNumbers.remove(pageNumber);
         }
         fireTableRowsUpdated(pageNumber * pageSize,
           Math.min(getRowCount(), (pageNumber + 1) * pageSize - 1));
@@ -351,8 +356,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       rowCount = 0;
       pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
       countLoaded = false;
-      fireTableDataChanged();
     }
+    fireTableDataChanged();
   }
 
   protected void replaceCachedObject(final LayerDataObject oldObject,
@@ -503,7 +508,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       this.rowCount = rowCount;
       countLoaded = true;
       rowCountWorker = null;
-      fireTableDataChanged();
     }
+    fireTableDataChanged();
   }
 }

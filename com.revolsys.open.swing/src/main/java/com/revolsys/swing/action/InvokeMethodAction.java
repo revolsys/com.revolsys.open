@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
@@ -37,6 +38,22 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     return button;
   }
 
+  public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, object,
+      methodName, parameters);
+    final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
+    return menuItem;
+  }
+
+  public static JMenuItem createMenuItem(final String name, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
+      object, methodName, parameters);
+    final JMenuItem menuItem = new JMenuItem(action);
+    return menuItem;
+  }
+
   public static JMenuItem createMenuItem(final String name,
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, object,
@@ -50,14 +67,6 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final Object... parameters) {
     final Icon icon = SilkIconLoader.getIcon(iconName);
     return createMenuItem(name, icon, object, methodName, parameters);
-  }
-
-  public static JMenuItem createMenuItem(final String name, final Icon icon,
-    final Object object, final String methodName, final Object... parameters) {
-    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
-      object, methodName, parameters);
-    final JMenuItem menuItem = new JMenuItem(action);
-    return menuItem;
   }
 
   private boolean invokeLater;
@@ -205,4 +214,5 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public String toString() {
     return runnable.toString();
   }
+
 }
