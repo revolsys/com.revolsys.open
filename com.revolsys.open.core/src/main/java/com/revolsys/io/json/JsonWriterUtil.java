@@ -3,11 +3,13 @@ package com.revolsys.io.json;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.StringPrinter;
+import com.revolsys.util.CollectionUtil;
 
 public final class JsonWriterUtil {
   public static void charSequence(final PrintWriter out,
@@ -46,8 +48,9 @@ public final class JsonWriterUtil {
     }
   }
 
-  public static void endAttribute(final PrintWriter out) {
-    out.print(",\n");
+  public static void endAttribute(final PrintWriter out, final String indent) {
+    out.print(",");
+    newLine(out, indent);
   }
 
   public static void endList(final PrintWriter out) {
@@ -60,22 +63,30 @@ public final class JsonWriterUtil {
 
   public static void label(final PrintWriter out, final String key,
     final String indent) {
-    out.print(indent);
+    writeIndent(out, indent);
     write(out, key, null);
     out.print(":");
   }
 
-  public static void startList(final PrintWriter out) {
-    out.print("[\n");
+  public static void newLine(final PrintWriter out, final String indent) {
+    if (indent != null) {
+      out.print("\n");
+    }
   }
 
-  public static void startObject(final PrintWriter out) {
-    out.print("{\n");
+  public static void startList(final PrintWriter out, final String indent) {
+    out.print("[");
+    newLine(out, indent);
+  }
+
+  public static void startObject(final PrintWriter out, final String indent) {
+    out.print("{");
+    newLine(out, indent);
   }
 
   public static void write(final PrintWriter out,
     final Collection<? extends Object> values, final String indent) {
-    startList(out);
+    startList(out, indent);
     String newIndent = indent;
     if (newIndent != null) {
       newIndent += "  ";
@@ -88,16 +99,14 @@ public final class JsonWriterUtil {
         writeIndent(out, newIndent);
         final Object value = iterator.next();
         write(out, value, newIndent);
-        endAttribute(out);
+        endAttribute(out, indent);
         i++;
       }
       if (iterator.hasNext()) {
         writeIndent(out, newIndent);
         final Object value = iterator.next();
         write(out, value, newIndent);
-        if (indent != null) {
-          out.print("\n");
-        }
+        newLine(out, indent);
       }
     }
     writeIndent(out, indent);
@@ -107,7 +116,7 @@ public final class JsonWriterUtil {
   public static void write(final PrintWriter out,
     final Map<String, ? extends Object> values, final String indent) {
 
-    startObject(out);
+    startObject(out, indent);
     if (values != null) {
       String newIndent = indent;
       if (newIndent != null) {
@@ -122,7 +131,7 @@ public final class JsonWriterUtil {
         final Object value = values.get(key);
         label(out, key, newIndent);
         write(out, value, newIndent);
-        endAttribute(out);
+        endAttribute(out, indent);
         i++;
       }
       if (iterator.hasNext()) {
@@ -130,9 +139,7 @@ public final class JsonWriterUtil {
         final Object value = values.get(key);
         label(out, key, newIndent);
         write(out, value, newIndent);
-        if (indent != null) {
-          out.print("\n");
-        }
+        newLine(out, indent);
       }
     }
     writeIndent(out, indent);
@@ -170,6 +177,9 @@ public final class JsonWriterUtil {
       out.write('"');
       charSequence(out, string);
       out.write('"');
+    } else if (value.getClass().isArray()) {
+      final List<? extends Object> list = CollectionUtil.arrayToList(value);
+      write(out, list, indent);
     } else {
       write(out, StringConverterRegistry.toString(value), indent);
     }

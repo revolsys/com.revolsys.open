@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.Action;
@@ -53,6 +54,7 @@ import javax.swing.undo.UndoableEdit;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -177,6 +179,8 @@ public class DataObjectLayerForm extends JPanel implements
   private JButton addOkButton;
 
   private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
+
+  private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<Integer, Set<String>>();
 
   private final Map<String, Object> fieldValues = new HashMap<String, Object>();
 
@@ -372,11 +376,13 @@ public class DataObjectLayerForm extends JPanel implements
     if (init) {
       tabs.setSelectedIndex(0);
     }
+    final JLabel label = new JLabel(name);
+    tabs.setTabComponentAt(index, label);
     return scrollPane;
   }
 
   public JScrollPane addTab(final String name, final Component component) {
-    return addTab(tabs.getComponentCount(), name, component);
+    return addTab(tabs.getTabCount(), name, component);
   }
 
   protected void addTabAllFields() {
@@ -725,6 +731,10 @@ public class DataObjectLayerForm extends JPanel implements
     return fields.values();
   }
 
+  protected Map<String, Integer> getFieldTabIndex() {
+    return fieldTabIndex;
+  }
+
   public String getFieldTitle(final String fieldName) {
     final DataObjectMetaData metaData = getMetaData();
     return metaData.getAttributeTitle(fieldName);
@@ -910,21 +920,8 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  protected boolean isTabValid(final int index) {
-    if (index < 0) {
-      return false;
-    } else {
-      for (final Entry<String, Integer> entry : fieldTabIndex.entrySet()) {
-        final Integer tabIndex = entry.getValue();
-        if (tabIndex == index) {
-          final String name = entry.getKey();
-          if (!isFieldValid(name)) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
+  protected boolean isTabValid(final int tabIndex) {
+    return tabInvalidFieldMap.get(tabIndex) == null;
   }
 
   public void pasteValues(final Map<String, Object> map) {
@@ -1062,16 +1059,20 @@ public class DataObjectLayerForm extends JPanel implements
     if (message == null) {
       message = "Invalid value";
     }
-    fieldInValidMessage.put(fieldName, message);
-    if (SwingUtilities.isEventDispatchThread()) {
-      fieldsValid = false;
-      final Field field = getField(fieldName);
-      field.setFieldInvalid(message);
+    if (!EqualsRegistry.equal(message, fieldInValidMessage.equals(message))) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        fieldInValidMessage.put(fieldName, message);
+        fieldsValid = false;
+        final Field field = getField(fieldName);
+        field.setFieldInvalid(message, WebColors.Red);
 
-      fieldValidMap.put(fieldName, false);
-      updateTabsValid(fieldName);
-    } else {
-      SwingUtil.invokeLater(this, "setFieldInvalid", fieldName, message);
+        fieldValidMap.put(fieldName, false);
+        final int tabIndex = getTabIndex(fieldName);
+        CollectionUtil.addToSet(tabInvalidFieldMap, tabIndex, fieldName);
+        updateTabValid(tabIndex);
+      } else {
+        SwingUtil.invokeLater(this, "setFieldInvalid", fieldName, message);
+      }
     }
   }
 
@@ -1084,30 +1085,35 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public boolean setFieldValid(final String fieldName) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      final Field field = getField(fieldName);
-      field.setFieldValid();
-      if (object.isModified(fieldName)) {
-        final Object originalValue = object.getOriginalValue(fieldName);
-        String originalString;
-        if (originalValue == null) {
-          originalString = "-";
+    if (!isFieldValid(fieldName)) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final Field field = getField(fieldName);
+        field.setFieldValid();
+        if (object.isModified(fieldName)) {
+          final Object originalValue = object.getOriginalValue(fieldName);
+          String originalString;
+          if (originalValue == null) {
+            originalString = "-";
+          } else {
+            originalString = StringConverterRegistry.toString(originalValue);
+          }
+          field.setFieldToolTip(originalString);
+          field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
         } else {
-          originalString = StringConverterRegistry.toString(originalValue);
+          field.setFieldToolTip("");
         }
-        field.setFieldToolTip(originalString);
-        field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
+        fieldValidMap.put(fieldName, true);
+        fieldInValidMessage.remove(fieldName);
+        final int tabIndex = getTabIndex(fieldName);
+        CollectionUtil.removeFromSet(tabInvalidFieldMap, tabIndex, fieldName);
+        updateTabValid(tabIndex);
+        return true;
       } else {
-        field.setFieldToolTip("");
+        SwingUtil.invokeLater(this, "setFieldValid", fieldName);
+        return false;
       }
-      fieldValidMap.put(fieldName, true);
-      fieldInValidMessage.remove(fieldName);
-      updateTabsValid(fieldName);
-      return true;
-    } else {
-      SwingUtil.invokeLater(this, "setFieldValid", fieldName);
-      return false;
     }
+    return false;
   }
 
   protected boolean setFieldValidationEnabled(
@@ -1194,13 +1200,27 @@ public class DataObjectLayerForm extends JPanel implements
     this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
   }
 
-  protected void setTabValid(final int index, final boolean valid) {
-    if (valid) {
-      tabs.setForegroundAt(index, null);
-      tabs.setBackgroundAt(index, null);
-    } else {
-      tabs.setForegroundAt(index, Color.RED);
-      tabs.setBackgroundAt(index, Color.PINK);
+  public void setTabColor(final int index) {
+    if (index > -1) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        tabs.setBackgroundAt(index, null);
+      } else {
+        SwingUtil.invokeLater(this, "setTabColor", index);
+      }
+    }
+  }
+
+  public void setTabColor(final int index, final Color color) {
+    if (index > -1) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        tabs.setBackgroundAt(index, color);
+      } else {
+        if (color == null) {
+          SwingUtil.invokeLater(this, "setTabColor", index);
+        } else {
+          SwingUtil.invokeLater(this, "setTabColor", index, color);
+        }
+      }
     }
   }
 
@@ -1271,12 +1291,14 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  public void updateTabsValid(final String fieldName) {
-    final int index = getTabIndex(fieldName);
-    if (index >= 0) {
-      final boolean valid = isTabValid(index);
-      setTabValid(index, valid);
+  public boolean updateTabValid(final int tabIndex) {
+    final boolean tabValid = isTabValid(tabIndex);
+    if (tabValid) {
+      setTabColor(tabIndex, null);
+    } else {
+      setTabColor(tabIndex, WebColors.Red);
     }
+    return tabValid;
   }
 
   public boolean validateField(final String fieldName) {
@@ -1324,7 +1346,8 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
     if (oldValid != valid) {
-      SwingUtil.invokeLater(this, "updateTabsValid", fieldName);
+      final int tabIndex = getTabIndex(fieldName);
+      updateTabValid(tabIndex);
     }
     return valid;
   }

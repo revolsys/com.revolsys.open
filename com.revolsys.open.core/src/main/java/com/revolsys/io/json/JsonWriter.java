@@ -7,10 +7,12 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.util.CollectionUtil;
 
 public final class JsonWriter {
   private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
@@ -112,26 +114,8 @@ public final class JsonWriter {
     startAttribute = true;
   }
 
-  public void list(final Collection<? extends Object> values) {
-    startList();
-    int i = 0;
-    final int size = values.size();
-    final Iterator<? extends Object> iterator = values.iterator();
-    while (i < size - 1) {
-      final Object value = iterator.next();
-      value(value);
-      endAttribute();
-      i++;
-    }
-    if (iterator.hasNext()) {
-      final Object value = iterator.next();
-      value(value);
-    }
-    endList();
-  }
-
   public void list(final Object... values) {
-    list(Arrays.asList(values));
+    write(Arrays.asList(values));
   }
 
   public void newLine() {
@@ -188,7 +172,7 @@ public final class JsonWriter {
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;
-      list(list);
+      write(list);
     } else if (value instanceof Map) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
       write(map);
@@ -197,9 +181,30 @@ public final class JsonWriter {
       out.print('"');
       charSequence(string);
       out.print('"');
+    } else if (value.getClass().isArray()) {
+      final List<? extends Object> list = CollectionUtil.arrayToList(value);
+      write(list);
     } else {
       value(StringConverterRegistry.toString(value));
     }
+  }
+
+  public void write(final Collection<? extends Object> values) {
+    startList();
+    int i = 0;
+    final int size = values.size();
+    final Iterator<? extends Object> iterator = values.iterator();
+    while (i < size - 1) {
+      final Object value = iterator.next();
+      value(value);
+      endAttribute();
+      i++;
+    }
+    if (iterator.hasNext()) {
+      final Object value = iterator.next();
+      value(value);
+    }
+    endList();
   }
 
   public void write(final Map<String, ? extends Object> values) {

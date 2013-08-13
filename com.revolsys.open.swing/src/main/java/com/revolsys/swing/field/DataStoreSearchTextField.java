@@ -26,6 +26,7 @@ import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
@@ -364,10 +365,10 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    setForeground(Color.RED);
-    setSelectedTextColor(Color.RED);
-    setBackground(Color.PINK);
+  public void setFieldInvalid(final String message, final Color color) {
+    setForeground(color);
+    setSelectedTextColor(color);
+    setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(errorMessage);
   }

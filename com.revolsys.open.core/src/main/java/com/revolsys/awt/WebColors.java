@@ -69,7 +69,7 @@ public class WebColors {
 
   public static final Color DarkOliveGreen = new Color(85, 107, 47);
 
-  public static final Color Darkorange = new Color(255, 140, 0);
+  public static final Color DarkOrange = new Color(255, 140, 0);
 
   public static final Color DarkOrchid = new Color(153, 50, 204);
 

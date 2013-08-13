@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.layout.SpringLayoutUtil;
@@ -147,10 +148,10 @@ public class DirectoryNameField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    directoryName.setForeground(Color.RED);
-    directoryName.setSelectedTextColor(Color.RED);
-    directoryName.setBackground(Color.PINK);
+  public void setFieldInvalid(final String message, final Color color) {
+    directoryName.setForeground(color);
+    directoryName.setSelectedTextColor(color);
+    directoryName.setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(errorMessage);
   }

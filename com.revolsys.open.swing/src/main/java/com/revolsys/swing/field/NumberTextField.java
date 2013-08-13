@@ -10,6 +10,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.JXTextField;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -285,10 +286,10 @@ public class NumberTextField extends JXTextField implements Field,
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    setForeground(Color.RED);
-    setSelectedTextColor(Color.RED);
-    setBackground(Color.PINK);
+  public void setFieldInvalid(final String message, final Color color) {
+    setForeground(color);
+    setSelectedTextColor(color);
+    setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(errorMessage);
   }

@@ -76,6 +76,46 @@ public final class CollectionUtil {
     }
   }
 
+  public static List<? extends Object> arrayToList(final Object value) {
+    final List<Object> list = new ArrayList<Object>();
+    if (value instanceof boolean[]) {
+      for (final Object item : (boolean[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof Object[]) {
+      for (final Object item : (Object[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof byte[]) {
+      for (final Object item : (byte[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof short[]) {
+      for (final Object item : (short[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof int[]) {
+      for (final Object item : (int[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof long[]) {
+      for (final Object item : (long[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof float[]) {
+      for (final Object item : (float[])value) {
+        list.add(item);
+      }
+    } else if (value instanceof double[]) {
+      for (final Object item : (double[])value) {
+        list.add(item);
+      }
+    } else {
+      list.add(value);
+    }
+    return list;
+  }
+
   public static <T> boolean containsReference(
     final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
@@ -346,6 +386,20 @@ public final class CollectionUtil {
       if (lastValue == null || value.compareTo(lastValue) > 1) {
         map.put(key, value);
       }
+    }
+  }
+
+  public static <K, V> boolean removeFromSet(final Map<K, Set<V>> map,
+    final K key, final V value) {
+    final Set<V> values = map.get(key);
+    if (values == null) {
+      return false;
+    } else {
+      final boolean removed = values.remove(value);
+      if (values.isEmpty()) {
+        map.remove(key);
+      }
+      return removed;
     }
   }
 

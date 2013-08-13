@@ -1,12 +1,12 @@
 package com.revolsys.swing.map.form;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
@@ -53,11 +53,11 @@ public class GeometryCoordinatesPanel extends ValueField implements
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    super.setFieldInvalid(message);
+  public void setFieldInvalid(final String message, final Color color) {
+    super.setFieldInvalid(message, color);
     setForeground(null);
     setBackground(null);
-    tablePanel.setBorder(BorderFactory.createLineBorder(WebColors.Red, 3));
+    tablePanel.setBorder(BorderFactory.createLineBorder(color, 3));
   }
 
   @Override

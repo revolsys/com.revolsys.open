@@ -7,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
+import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -92,9 +93,9 @@ public class ObjectLabelField extends JLabel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    setForeground(Color.RED);
-    setBackground(Color.PINK);
+  public void setFieldInvalid(final String message, final Color color) {
+    setForeground(color);
+    setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(errorMessage);
   }

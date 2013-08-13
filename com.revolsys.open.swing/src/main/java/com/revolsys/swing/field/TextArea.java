@@ -5,6 +5,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import org.jdesktop.swingx.JXTextArea;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -110,10 +111,10 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
-    setForeground(Color.RED);
-    setSelectedTextColor(Color.RED);
-    setBackground(Color.PINK);
+  public void setFieldInvalid(final String message, final Color color) {
+    setForeground(color);
+    setSelectedTextColor(color);
+    setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(errorMessage);
   }

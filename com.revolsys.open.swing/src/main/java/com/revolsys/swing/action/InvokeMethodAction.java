@@ -49,6 +49,11 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final Icon icon = SilkIconLoader.getIcon(iconName);
+    return createMenuItem(name, icon, object, methodName, parameters);
+  }
+
+  public static JMenuItem createMenuItem(final String name, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, icon,
       object, methodName, parameters);
     final JMenuItem menuItem = new JMenuItem(action);

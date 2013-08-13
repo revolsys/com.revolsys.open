@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.swing.JFormattedTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -99,11 +100,11 @@ public class DateField extends JXDatePicker implements Field,
   }
 
   @Override
-  public void setFieldInvalid(final String message) {
+  public void setFieldInvalid(final String message, final Color color) {
     final JFormattedTextField editor = getEditor();
-    editor.setForeground(Color.RED);
-    editor.setSelectedTextColor(Color.RED);
-    editor.setBackground(Color.PINK);
+    editor.setForeground(color);
+    editor.setSelectedTextColor(color);
+    editor.setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     setFieldToolTip(errorMessage);
   }
