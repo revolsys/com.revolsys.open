@@ -66,6 +66,10 @@ public class LayerDataObject extends ArrayDataObject {
     return getState() == DataObjectState.Deleted;
   }
 
+  public boolean isGeometryEditable() {
+    return true;
+  }
+
   @Override
   public boolean isModified() {
     return originalValues != null;
@@ -88,6 +92,7 @@ public class LayerDataObject extends ArrayDataObject {
     }
   }
 
+  @Override
   public boolean isValid(final int index) {
     final DataObjectMetaData metaData = getMetaData();
     final String name = metaData.getAttributeName(index);
