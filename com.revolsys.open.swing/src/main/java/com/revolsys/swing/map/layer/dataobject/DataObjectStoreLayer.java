@@ -685,8 +685,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Geometry oldGeometry) {
     if (oldGeometry != null) {
       final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
-      index.remove(oldBoundingBox, object);
+      if (index.remove(oldBoundingBox, object)) {
+        addToIndex(object);
+      }
     }
-    addToIndex(object);
+
   }
 }

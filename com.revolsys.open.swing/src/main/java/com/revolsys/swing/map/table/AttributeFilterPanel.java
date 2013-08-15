@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXSearchField;
 import org.slf4j.LoggerFactory;
@@ -23,11 +25,13 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.util.JavaBeanUtil;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
   ItemListener {
@@ -93,7 +97,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         final Object searchValue = getSearchValue();
         final Object oldValue = previousSearchValue;
         previousSearchValue = searchValue;
-        firePropertyChange("searchValue", oldValue, searchValue);
+        fireSearchChanged("searchValue", oldValue, searchValue);
       } else if (source == nameField) {
         final String searchAttribute = getSearchAttribute();
         final Object oldValue = previousAttributeName;
@@ -144,7 +148,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           searchFieldPanel.add(searchField);
           GroupLayoutUtil.makeColumns(searchFieldPanel, 1);
 
-          firePropertyChange("searchAttribute", oldValue, searchAttribute);
+          fireSearchChanged("searchAttribute", oldValue, searchAttribute);
         }
       }
     } catch (final Throwable e) {
@@ -155,6 +159,20 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   public void clear() {
     nameField.setSelectedIndex(0);
     SwingUtil.setFieldValue(searchField, null);
+  }
+
+  public void fireSearchChanged(final String propertyName,
+    final Object oldValue, final Object newValue) {
+    if (!EqualsRegistry.equal(oldValue, newValue)) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final Method method = JavaBeanUtil.getMethod(getClass(),
+          "fireSearchChanged", String.class, Object.class, Object.class);
+        SwingWorkerManager.execute("Change search", this, method, propertyName,
+          oldValue, newValue);
+      } else {
+        firePropertyChange(propertyName, oldValue, newValue);
+      }
+    }
   }
 
   public List<String> getAttributeNames() {
@@ -185,17 +203,17 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       final Object searchValue = getSearchValue();
       final Object oldValue = previousSearchValue;
       previousSearchValue = searchValue;
-      firePropertyChange("searchValue", oldValue, searchValue);
+      fireSearchChanged("searchValue", oldValue, searchValue);
     } else if (source == operatorField) {
       final String searchOperator = getSearchOperator();
       final String oldValue = previousSearchOperator;
       previousSearchOperator = searchOperator;
-      firePropertyChange("searchOperator", oldValue, searchOperator);
+      fireSearchChanged("searchOperator", oldValue, searchOperator);
     } else if (source == nameField) {
       final String searchAttribute = getSearchAttribute();
       final String oldValue = previousAttributeName;
       previousAttributeName = searchAttribute;
-      firePropertyChange("searchAttribute", oldValue, searchAttribute);
+      fireSearchChanged("searchAttribute", oldValue, searchAttribute);
     }
   }
 

@@ -24,7 +24,8 @@ public class TransactionUtils {
     final Method method, final Object... parameters) {
     final MethodTransactionCallback<V> callback = new MethodTransactionCallback<V>(
       rollback, object, method, parameters);
-    return invoke(transactionManager, propagationBehavior, callback);
+    return invoke(transactionManager, propagationBehavior,
+      (TransactionCallback<V>)callback);
   }
 
   public static void invoke(

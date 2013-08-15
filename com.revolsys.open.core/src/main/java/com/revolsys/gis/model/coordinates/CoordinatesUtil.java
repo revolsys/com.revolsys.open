@@ -26,6 +26,18 @@ public class CoordinatesUtil {
     return newPoint;
   }
 
+  public static Coordinates add(final Coordinates coordinates,
+    final double... deltas) {
+    final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
+    for (int i = 0; i < deltas.length; i++) {
+      final double delta = deltas[i];
+      final double oldValue = coordinates.getValue(i);
+      final double newValue = oldValue + delta;
+      newCoordinates.setValue(i, newValue);
+    }
+    return null;
+  }
+
   public static Point add(final Point c1, final Point c2) {
     final GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);

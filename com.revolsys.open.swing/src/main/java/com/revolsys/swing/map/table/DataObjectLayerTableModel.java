@@ -73,9 +73,20 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      layer.addPropertyChangeListener("selected",
-        new InvokeMethodPropertyChangeListener(table, "repaint"));
+      layer.addPropertyChangeListener("hasSelectedRecords",
+        new InvokeMethodPropertyChangeListener(DataObjectLayerTableModel.class,
+          "selectionChanged", table, model));
       return table;
+    }
+  }
+
+  public static final void selectionChanged(final DataObjectRowTable table,
+    final DataObjectLayerTableModel tableModel) {
+    final String attributeFilterMode = tableModel.getAttributeFilterMode();
+    if (MODE_SELECTED.equals(attributeFilterMode)) {
+      tableModel.fireTableDataChanged();
+    } else {
+      table.repaint();
     }
   }
 

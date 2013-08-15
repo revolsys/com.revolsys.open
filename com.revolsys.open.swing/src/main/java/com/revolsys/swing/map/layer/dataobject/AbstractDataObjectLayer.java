@@ -449,13 +449,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void deleteRecords(final Collection<? extends LayerDataObject> objects) {
-    synchronized (editSync) {
-      unselectRecords(objects);
-      for (final LayerDataObject object : objects) {
-        deleteObject(object);
+    if (isCanDeleteRecords()) {
+      synchronized (editSync) {
+        unselectRecords(objects);
+        for (final LayerDataObject object : objects) {
+          deleteObject(object);
+        }
       }
+      fireRecordsChanged();
     }
-    fireRecordsChanged();
   }
 
   @Override
@@ -507,12 +509,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void fireSelected() {
-    final boolean selected = !selectedRecords.isEmpty();
-    firePropertyChange("selected", !selected, selected);
-    firePropertyChange("selectionCount", -1, selectedRecords.size());
-    final boolean hasSelectedRecords = isHasSelectedRecords();
-    firePropertyChange("hasSelectedRecords", !hasSelectedRecords,
-      hasSelectedRecords);
+    final int selectionCount = selectedRecords.size();
+    final boolean selected = selectionCount > 0;
+    firePropertyChange("hasSelectedRecords", !selected, selected);
+    firePropertyChange("selectionCount", -1, selectionCount);
   }
 
   @Override
@@ -981,6 +981,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void removeDeletedObject(final LayerDataObject object) {
     synchronized (deletedRecords) {
       deletedRecords.remove(object);
+      unselectRecords(object);
     }
   }
 
@@ -1271,7 +1272,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                 dataObjectForm.setEditable(false);
               }
             }
-            Window parent = SwingUtil.getActiveWindow();
+            final Window parent = SwingUtil.getActiveWindow();
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();

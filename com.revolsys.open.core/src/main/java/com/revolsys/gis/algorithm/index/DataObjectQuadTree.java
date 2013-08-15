@@ -75,9 +75,11 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
 
   public List<DataObject> queryDistance(final Geometry geometry,
     final double distance) {
+    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    boundingBox = boundingBox.expand(distance);
     final DataObjectGeometryDistanceFilter filter = new DataObjectGeometryDistanceFilter(
       geometry, distance);
-    return queryList(geometry, filter);
+    return queryList(boundingBox, filter);
   }
 
   public List<DataObject> queryEnvelope(

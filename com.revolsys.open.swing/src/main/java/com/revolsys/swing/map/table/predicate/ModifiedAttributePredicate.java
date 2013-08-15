@@ -17,26 +17,26 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 
 public class ModifiedAttributePredicate implements HighlightPredicate {
   public static void add(final DataObjectRowTable table) {
-    final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
+    final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }
 
-  public static Highlighter getHighlighter(final DataObjectLayerTableModel model) {
+  public static Highlighter getHighlighter(final DataObjectRowTableModel model) {
     final ModifiedAttributePredicate predicate = new ModifiedAttributePredicate(
       model);
     return new ColorHighlighter(predicate, ColorUtil.setAlpha(WebColors.Green,
       64), WebColors.Green, WebColors.Green, Color.WHITE);
   }
 
-  private final DataObjectLayerTableModel model;
+  private final DataObjectRowTableModel model;
 
-  public ModifiedAttributePredicate(final DataObjectLayerTableModel model) {
+  public ModifiedAttributePredicate(final DataObjectRowTableModel model) {
     this.model = model;
   }
 

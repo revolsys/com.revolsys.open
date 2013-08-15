@@ -166,13 +166,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public void deleteRecords(final Collection<? extends LayerDataObject> records) {
-    super.deleteRecords(records);
-    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
-      this.records);
-    this.records.removeAll(records);
-    this.index.remove(records);
-    firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
-      this.records));
+    if (isCanDeleteRecords()) {
+      super.deleteRecords(records);
+      final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
+        this.records);
+      this.records.removeAll(records);
+      this.index.remove(records);
+      firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
+        this.records));
+    }
   }
 
   @Override

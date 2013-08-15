@@ -31,8 +31,9 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
       model);
     final DataObjectRowTable table = new DataObjectRowTable(model, cellRenderer);
 
-    layer.addPropertyChangeListener("selected",
-      new InvokeMethodPropertyChangeListener(table, "repaint"));
+    layer.addPropertyChangeListener("hasSelectedRecords",
+      new InvokeMethodPropertyChangeListener(DataObjectLayerTableModel.class,
+        "selectionChanged", table, model));
 
     return table;
   }

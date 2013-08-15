@@ -10,27 +10,26 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
 
 public class ErrorPredicate implements HighlightPredicate {
 
   public static void add(final DataObjectRowTable table) {
-    final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
+    final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }
 
-  public static Highlighter getHighlighter(final DataObjectLayerTableModel model) {
+  public static Highlighter getHighlighter(final DataObjectRowTableModel model) {
     final ErrorPredicate predicate = new ErrorPredicate(model);
     return new ColorHighlighter(predicate, ColorUtil.setAlpha(Color.RED, 64),
       Color.RED, Color.RED, Color.YELLOW);
   }
 
-  private final DataObjectLayerTableModel model;
+  private final DataObjectRowTableModel model;
 
-  public ErrorPredicate(final DataObjectLayerTableModel model) {
+  public ErrorPredicate(final DataObjectRowTableModel model) {
     this.model = model;
   }
 
@@ -40,10 +39,9 @@ public class ErrorPredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final DataObject object = model.getObject(rowIndex);
-      if (object instanceof LayerDataObject) {
-        final LayerDataObject layerDataObject = (LayerDataObject)object;
+      if (object != null) {
         final int columnIndex = adapter.convertRowIndexToModel(adapter.column);
-        if (!layerDataObject.isValid(columnIndex)) {
+        if (!object.isValid(columnIndex)) {
           return true;
         }
       }

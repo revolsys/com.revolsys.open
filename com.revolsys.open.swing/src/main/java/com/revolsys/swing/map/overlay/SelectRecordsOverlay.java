@@ -243,7 +243,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       repaint();
     } else if ("updateObject".equals(propertyName)) {
       repaint();
-    } else if ("selected".equals(propertyName)) {
+    } else if ("hasSelectedRecords".equals(propertyName)) {
       clearUndoHistory();
     }
   }

@@ -2,9 +2,9 @@ package com.revolsys.beans;
 
 import java.lang.reflect.Method;
 
-import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.JavaBeanUtil;
 
-public class MethodInvoker {
+public class MethodInvoker implements Runnable {
 
   /** The object to invoke the method on. */
   private final Object object;
@@ -31,11 +31,12 @@ public class MethodInvoker {
 
   @SuppressWarnings("unchecked")
   public <T> T invoke() {
-    try {
-      return (T)method.invoke(object, parameters);
-    } catch (final Throwable e) {
-      return (T)ExceptionUtil.throwUncheckedException(e);
-    }
+    return (T)JavaBeanUtil.invokeMethod(method, object, parameters);
+  }
+
+  @Override
+  public void run() {
+    invoke();
   }
 
   @Override

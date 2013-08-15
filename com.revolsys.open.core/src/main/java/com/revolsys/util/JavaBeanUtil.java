@@ -415,10 +415,10 @@ public final class JavaBeanUtil {
       } else if (t instanceof Error) {
         throw (Error)t;
       } else {
-        throw new RuntimeException(t.getMessage(), t);
+        throw new WrappedException(t);
       }
     } catch (final Exception e) {
-      throw new RuntimeException(e);
+      throw new WrappedException(e);
     }
   }
 

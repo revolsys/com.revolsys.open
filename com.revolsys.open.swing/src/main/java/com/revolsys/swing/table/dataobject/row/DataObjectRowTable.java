@@ -14,10 +14,16 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.map.table.predicate.ErrorPredicate;
+import com.revolsys.swing.map.table.predicate.ModifiedAttributePredicate;
 import com.revolsys.swing.table.BaseJxTable;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -55,6 +61,11 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     }
     tableHeader.addMouseListener(this);
     model.setTable(this);
+    ModifiedAttributePredicate.add(this);
+    ErrorPredicate.add(this);
+    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
+      WebColors.LightGray, null, WebColors.Navy, null));
+
   }
 
   public DataObjectMetaData getMetaData() {

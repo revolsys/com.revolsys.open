@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import javax.swing.SwingWorker.StateValue;
 
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.revolsys.beans.MethodInvoker;
 import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
 
@@ -67,6 +69,13 @@ public class SwingWorkerManager {
     execute(new RunnableSwingWorker(backgroundTask));
   }
 
+  public static void execute(final String description, final Object object,
+    final Method method, final Object... parameters) {
+    final MethodInvoker backgroundTask = new MethodInvoker(method, object,
+      parameters);
+    execute(description, backgroundTask);
+  }
+
   public static SwingWorker<?, ?> execute(final String description,
     final Object object, final String backgroundMethodName) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
@@ -94,6 +103,11 @@ public class SwingWorkerManager {
       description, object, backgroundMethodName, Arrays.asList(parameters));
     execute(worker);
     return worker;
+  }
+
+  public static void execute(final String description,
+    final Runnable backgroundTask) {
+    execute(new RunnableSwingWorker(description, backgroundTask));
   }
 
   public static void execute(

@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -36,7 +35,6 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
     final boolean selected = layer.isSelected(object);
     final DataObjectMetaData metaData = model.getMetaData();
     final String attributeName = model.getAttributeName(column);
-    final boolean required = metaData.isAttributeRequired(column);
     boolean hasValue;
     String text = "-";
     if (value == null) {
@@ -65,34 +63,12 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
     if (isNew && !hasValue) {
       if (metaData.getIdAttributeIndex() == column) {
         text = "NEW";
-        hasValue = true;
       }
     }
 
     final Component component = super.getTableCellRendererComponent(table,
       text, selected, hasFocus, row, column);
 
-    final boolean valid = !required || hasValue;
-
-    setColors(component, row, selected, valid, getBackground(), Color.RED,
-      Color.LIGHT_GRAY, WebColors.DarkSalmon, Color.WHITE, Color.PINK);
-    if (layer.isModified(object)) {
-      if (object instanceof LayerDataObject) {
-        final LayerDataObject layerDataObject = object;
-        if (layerDataObject.isModified(attributeName)) {
-          if (selected) {
-            component.setBackground(WebColors.Green);
-          } else {
-            final boolean even = row % 2 == 0;
-            if (even) {
-              component.setBackground(WebColors.GreenYellow);
-            } else {
-              component.setBackground(WebColors.YellowGreen);
-            }
-          }
-        }
-      }
-    }
     return component;
   }
 

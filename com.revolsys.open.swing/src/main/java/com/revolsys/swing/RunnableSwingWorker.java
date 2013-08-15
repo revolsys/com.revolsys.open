@@ -3,9 +3,17 @@ package com.revolsys.swing;
 import javax.swing.SwingWorker;
 
 public class RunnableSwingWorker extends SwingWorker<Void, Void> {
+  private final String description;
+
   private final Runnable backgroundTask;
 
   public RunnableSwingWorker(final Runnable backgroundTask) {
+    this(backgroundTask.toString(), backgroundTask);
+  }
+
+  public RunnableSwingWorker(final String description,
+    final Runnable backgroundTask) {
+    this.description = description;
     this.backgroundTask = backgroundTask;
   }
 
@@ -22,8 +30,12 @@ public class RunnableSwingWorker extends SwingWorker<Void, Void> {
 
   }
 
+  public String getDescription() {
+    return description;
+  }
+
   @Override
   public String toString() {
-    return backgroundTask.toString();
+    return description;
   }
 }
