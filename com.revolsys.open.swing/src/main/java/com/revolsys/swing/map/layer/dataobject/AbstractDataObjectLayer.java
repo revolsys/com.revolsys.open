@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.UndoableEdit;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -95,6 +96,7 @@ import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.undo.SetObjectProperty;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
@@ -372,6 +374,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     return propertiesPanel;
+  }
+
+  @Override
+  public UndoableEdit createPropertyEdit(final LayerDataObject object,
+    final String propertyName, final Object oldValue, final Object newValue) {
+    return new SetObjectProperty(object, propertyName, oldValue, newValue);
   }
 
   @Override
@@ -1309,52 +1317,58 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public void showRecordsTable(final String attributeFilterMode) {
-    DefaultSingleCDockable dockable = getProperty("TableView");
-    final Component component;
-    if (dockable == null) {
-      final LayerGroup project = getProject();
+  public void showRecordsTable(String attributeFilterMode) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      DefaultSingleCDockable dockable = getProperty("TableView");
+      final Component component;
+      if (dockable == null) {
+        final LayerGroup project = getProject();
 
-      component = createTablePanel();
+        component = createTablePanel();
 
-      if (component != null) {
-        final String id = getClass().getName() + "." + getId();
-        dockable = DockingFramesUtil.addDockable(project,
-          MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), component);
+        if (component != null) {
+          final String id = getClass().getName() + "." + getId();
+          dockable = DockingFramesUtil.addDockable(project,
+            MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), component);
 
-        if (dockable != null) {
-          dockable.setCloseable(true);
-          setProperty("TableView", dockable);
-          dockable.addCDockableStateListener(new CDockableStateListener() {
-            @Override
-            public void extendedModeChanged(final CDockable dockable,
-              final ExtendedMode mode) {
-            }
-
-            @Override
-            public void visibilityChanged(final CDockable dockable) {
-              final boolean visible = dockable.isVisible();
-              if (!visible) {
-                dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
-                setProperty("TableView", null);
+          if (dockable != null) {
+            dockable.setCloseable(true);
+            setProperty("TableView", dockable);
+            dockable.addCDockableStateListener(new CDockableStateListener() {
+              @Override
+              public void extendedModeChanged(final CDockable dockable,
+                final ExtendedMode mode) {
               }
-            }
-          });
-          dockable.toFront();
+
+              @Override
+              public void visibilityChanged(final CDockable dockable) {
+                final boolean visible = dockable.isVisible();
+                if (!visible) {
+                  dockable.getControl()
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
+                  setProperty("TableView", null);
+                }
+              }
+            });
+            dockable.toFront();
+          }
         }
+      } else {
+        component = dockable.getContentPane().getComponent(0);
+        dockable.toFront();
+      }
+
+      if (component instanceof DataObjectLayerTablePanel) {
+        final DataObjectLayerTablePanel tablePanel = (DataObjectLayerTablePanel)component;
+        tablePanel.setAttributeFilterMode(attributeFilterMode);
       }
     } else {
-      component = dockable.getContentPane().getComponent(0);
-      dockable.toFront();
+      if (!StringUtils.hasText(attributeFilterMode)) {
+        attributeFilterMode = DataObjectLayerTableModel.MODE_ALL;
+      }
+      SwingUtil.invokeLater(this, "showRecordsTable", attributeFilterMode);
     }
-
-    if (component instanceof DataObjectLayerTablePanel) {
-      final DataObjectLayerTablePanel tablePanel = (DataObjectLayerTablePanel)component;
-      tablePanel.setAttributeFilterMode(attributeFilterMode);
-    }
-
   }
 
   public void toggleEditable() {

@@ -61,10 +61,16 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     }
     tableHeader.addMouseListener(this);
     model.setTable(this);
+    addHighlighter(new ColorHighlighter(WebColors.White, WebColors.Black,
+      WebColors.Blue, WebColors.White));
+
     ModifiedAttributePredicate.add(this);
     ErrorPredicate.add(this);
+
     addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
       WebColors.LightGray, null, WebColors.Navy, null));
+    addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
+      WebColors.White, null, WebColors.Blue, null));
 
   }
 

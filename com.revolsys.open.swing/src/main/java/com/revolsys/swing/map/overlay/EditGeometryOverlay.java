@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.SwingUtilities;
+import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.color.ColorUtil;
 
@@ -36,7 +37,6 @@ import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -58,6 +58,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
+import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -271,12 +272,15 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       text.append("<div style=\"padding: 1px 3px 1px 3px\">");
       for (final Entry<String, Set<CloseLocation>> entry : vertexLocations.entrySet()) {
         final String typePath = entry.getKey();
+        final Set<CloseLocation> locations = entry.getValue();
+        final CloseLocation firstLocation = CollectionUtil.get(locations, 0);
+        final String idAttributeName = firstLocation.getIdAttributeName();
         text.append("<b><i>");
         text.append(typePath);
         text.append("</i></b>\n");
-        text.append("<table cellspacing=\"0\" cellpadding=\"1\"style=\"border: solid #999999 1px;margin: 3px 0px 3px 0px;width: 100%\"><thead style=\"background-color:#dddddd\"><tr><th style=\"border-right: solid #999999 1px\">ID</th><th>INDEX</th></tr></th><tbody>");
-        // text.append("<ul style=\"margin: 3px 0px 3px 12px\">");
-        for (final CloseLocation location : entry.getValue()) {
+        text.append("<table cellspacing=\"0\" cellpadding=\"1\"style=\"border: solid #999999 1px;margin: 3px 0px 3px 0px;width: 100%\"><thead style=\"background-color:#dddddd\"><tr><th style=\"border-right: solid #999999 1px\">"
+          + idAttributeName + "</th><th>INDEX</th></tr></th><tbody>");
+        for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-top: solid #999999 1px\"><td style=\"border-right: solid #999999 1px\">");
           text.append(location.getId());
           text.append("</td></td>");
@@ -445,7 +449,6 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   protected CloseLocation findCloseVertexLocation(final DataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
     final BoundingBox boundingBox) {
-
     final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
     if (index != null) {
       int[] closestVertexIndex = null;
@@ -1057,7 +1060,8 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       final double deltaY = endPoint.getY() - startPoint.getY();
       final Geometry newGeometry = GeometryEditUtil.moveGeometry(
         location.getGeometry(), deltaX, deltaY);
-      setGeometry(location, newGeometry);
+      final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+      addUndo(geometryEdit);
       clearMoveGeometry();
     }
   }
@@ -1104,7 +1108,8 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       }
     } else if (source instanceof LayerDataObject) {
       if (event.getNewValue() instanceof Geometry) {
-        clearMouseOverLocations();
+        // TODO update mouse over locations
+        // clearMouseOverLocations();
       }
     }
   }
@@ -1121,21 +1126,26 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     this.addGeometryPartDataType = getGeometryPartDataType(dataType);
   }
 
-  protected void setGeometry(final CloseLocation location,
+  protected UndoableEdit setGeometry(final CloseLocation location,
     final Geometry newGeometry) {
     if (isModeAddGeometry()) {
-      if (!JtsGeometryUtil.equalsExact3D(newGeometry, addGeometry)) {
-        addUndo(new AddGeometryUndoEdit(newGeometry));
+      if (JtsGeometryUtil.equalsExact3D(newGeometry, addGeometry)) {
+        return null;
+      } else {
+        return new AddGeometryUndoEdit(newGeometry);
       }
     } else {
-      final DataObject object = location.getObject();
+      final LayerDataObject object = location.getObject();
       final DataObjectMetaData metaData = location.getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Geometry oldValue = object.getValue(geometryAttributeName);
-      if (!JtsGeometryUtil.equalsExact3D(newGeometry, oldValue)) {
+      if (JtsGeometryUtil.equalsExact3D(newGeometry, oldValue)) {
+        return null;
+      } else {
         // TODO update location
-        // TODO multiple undo
-        createPropertyUndo(object, geometryAttributeName, oldValue, newGeometry);
+        final DataObjectLayer layer = location.getLayer();
+        return layer.createPropertyEdit(object, geometryAttributeName,
+          oldValue, newGeometry);
       }
     }
   }
@@ -1204,6 +1214,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   protected void vertexDragFinish(final MouseEvent event) {
     try {
       if (event != null) {
+        final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : mouseOverLocations) {
           final Geometry geometry = location.getGeometry();
           final GeometryFactory geometryFactory = location.getGeometryFactory();
@@ -1226,7 +1237,11 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
             newGeometry = GeometryEditUtil.moveVertex(geometry, newPoint,
               vertexIndex);
           }
-          setGeometry(location, newGeometry);
+          final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+          edit.addEdit(geometryEdit);
+        }
+        if (!edit.isEmpty()) {
+          addUndo(edit);
         }
       }
     } finally {

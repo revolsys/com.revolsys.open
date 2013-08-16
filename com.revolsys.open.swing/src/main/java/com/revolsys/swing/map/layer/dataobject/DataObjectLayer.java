@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -24,6 +25,9 @@ public interface DataObjectLayer extends Layer {
   void addSelectedRecords(LayerDataObject... records);
 
   void clearSelectedRecords();
+
+  UndoableEdit createPropertyEdit(LayerDataObject object, String propertyName,
+    Object oldValue, Object newValue);
 
   LayerDataObject createRecord();
 

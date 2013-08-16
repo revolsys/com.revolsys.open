@@ -269,6 +269,12 @@ public class SpringUtil {
 
   }
 
+  public static Resource getResource(final File directory,
+    final String fileName) {
+    final File file = FileUtil.getFile(directory, fileName);
+    return new FileSystemResource(file);
+  }
+
   public static String getString(final Resource resource) {
     final Reader reader = getReader(resource);
     return FileUtil.getString(reader);

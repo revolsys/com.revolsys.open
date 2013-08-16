@@ -198,9 +198,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public void clear() {
-    final List<Layer> oldLayers = layers;
+    for (final Layer layer : new ArrayList<Layer>(layers)) {
+      layer.delete();
+    }
     layers = new ArrayList<Layer>();
-    firePropertyChange("layers", oldLayers, layers);
+
   }
 
   public boolean contains(final Layer layer) {
@@ -391,8 +393,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
 
   @Override
   public Iterator<Layer> iterator() {
-    // TODO avoid modification
-    return layers.iterator();
+    return getLayers().iterator();
   }
 
   @Override

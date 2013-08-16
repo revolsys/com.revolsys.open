@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.table;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
 
@@ -70,40 +69,5 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
       text, selected, hasFocus, row, column);
 
     return component;
-  }
-
-  protected void setColors(final Component component, final int row,
-    final boolean selected, final boolean valid,
-    final Color selectedBackground, final Color invalidSelectedBackground,
-    final Color oddBackground, final Color invalidOddBackground,
-    final Color evenBackground, final Color invalidEvenBackground) {
-    if (selected) {
-      if (valid) {
-        component.setBackground(selectedBackground);
-        component.setForeground(Color.WHITE);
-      } else {
-        component.setBackground(invalidSelectedBackground);
-        component.setForeground(Color.WHITE);
-      }
-    } else {
-      final boolean even = row % 2 == 0;
-      if (even) {
-        if (valid) {
-          component.setBackground(evenBackground);
-          component.setForeground(Color.BLACK);
-        } else {
-          component.setBackground(invalidEvenBackground);
-          component.setForeground(Color.RED);
-        }
-      } else {
-        if (valid) {
-          component.setBackground(oddBackground);
-          component.setForeground(Color.BLACK);
-        } else {
-          component.setBackground(invalidOddBackground);
-          component.setForeground(Color.RED);
-        }
-      }
-    }
   }
 }

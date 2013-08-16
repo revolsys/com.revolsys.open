@@ -27,6 +27,7 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.collection.PropertyChangeArrayList;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
@@ -195,6 +196,11 @@ public class ProjectFrame extends BaseFrame {
     return mapPanel;
   }
 
+  protected void addMenu(final JMenuBar menuBar, final MenuFactory menu) {
+    final JMenu fileMenu = menu.createComponent();
+    menuBar.add(fileMenu);
+  }
+
   protected DefaultSingleCDockable addTableOfContents() {
     final JPanel panel = new JPanel(new BorderLayout());
 
@@ -247,27 +253,23 @@ public class ProjectFrame extends BaseFrame {
     addTableWorkingArea();
   }
 
-  protected JMenu createFileMenu(final JMenuBar menuBar) {
-    final MenuFactory file = new MenuFactory("File");
-
-    file.addMenuItemTitleIcon("project", "Save Project", "picture_save",
-      project, "saveProject");
-    file.addMenuItem("exit", new Exit());
-    // final JMenu fileMenu = new JMenu(new I18nAction(ProjectFrame.class,
-    // "File"));
-    final JMenu fileMenu = file.createComponent();
-    menuBar.add(fileMenu);
-
-    return fileMenu;
-  }
-
   protected JMenuBar createMenuBar() {
     final JMenuBar menuBar = new JMenuBar();
     setJMenuBar(menuBar);
 
-    createFileMenu(menuBar);
+    addMenu(menuBar, createMenuFile());
+
     WindowManager.addMenu(menuBar);
     return menuBar;
+  }
+
+  protected MenuFactory createMenuFile() {
+    final MenuFactory file = new MenuFactory("File");
+
+    file.addMenuItem("project", "Save Project Project", "Save Project Project",
+      SilkIconLoader.getIconWithBadge("layout", "save"), project, "saveProject");
+    file.addMenuItem("exit", new Exit());
+    return file;
   }
 
   @Override
@@ -319,9 +321,7 @@ public class ProjectFrame extends BaseFrame {
 
   public void loadProject(final File projectFile) {
     final FileSystemResource resource = new FileSystemResource(projectFile);
-    if (resource.exists()) {
-      project.readProject(resource);
-    }
+    project.readProject(resource);
   }
 
 }

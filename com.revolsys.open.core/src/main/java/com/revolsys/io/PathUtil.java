@@ -42,11 +42,13 @@ public final class PathUtil {
     }
   }
 
-  public static List<String> getPathElements(String path) {
+  public static List<String> getPathElements(final String path) {
     if (path == null) {
       return Collections.emptyList();
+    } else if (path.equals("/")) {
+      return Collections.emptyList();
     } else {
-      return Arrays.asList(path.replaceAll("^/*","").split("/+"));
+      return Arrays.asList(path.replaceAll("^/*", "").split("/+"));
     }
   }
 

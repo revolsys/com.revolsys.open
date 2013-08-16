@@ -81,6 +81,10 @@ public class Project extends LayerGroup {
     this.viewBoundingBox = null;
   }
 
+  public LayerGroup getBaseMapLayers() {
+    return baseMapLayers;
+  }
+
   public DataObjectStoreConnectionRegistry getDataStores() {
     return dataStores;
   }
@@ -149,22 +153,24 @@ public class Project extends LayerGroup {
 
   public void readProject(final Resource resource) {
     this.resource = resource;
-    final Resource dataStoresDirectory = SpringUtil.getResource(resource,
-      "Data Stores");
-    final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
-    final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
-      "Project", dataStoresDirectory);
-    setDataStores(dataStores);
+    if (resource.exists()) {
+      final Resource dataStoresDirectory = SpringUtil.getResource(resource,
+        "Data Stores");
+      final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
+      final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
+        "Project", dataStoresDirectory);
+      setDataStores(dataStores);
 
-    final Resource folderConnectionsDirectory = SpringUtil.getResource(
-      resource, "Folder Connections");
-    this.folderConnections = FolderConnectionManager.get()
-      .addConnectionRegistry("Project", folderConnectionsDirectory);
+      final Resource folderConnectionsDirectory = SpringUtil.getResource(
+        resource, "Folder Connections");
+      this.folderConnections = FolderConnectionManager.get()
+        .addConnectionRegistry("Project", folderConnectionsDirectory);
 
-    final Resource layersDir = SpringUtil.getResource(resource, "Layers");
-    readLayers(layersDir);
+      final Resource layersDir = SpringUtil.getResource(resource, "Layers");
+      readLayers(layersDir);
 
-    readBaseMapsLayers(resource);
+      readBaseMapsLayers(resource);
+    }
   }
 
   public boolean saveChangesWithPrompt() {
@@ -221,17 +227,29 @@ public class Project extends LayerGroup {
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       final File directory = fileResource.getFile();
+      if (!directory.exists()) {
+        directory.mkdirs();
+      }
       if (directory.isDirectory()) {
         final File layersDirectory = new File(directory, "Layers");
         FileUtil.deleteDirectory(layersDirectory, false);
         layersDirectory.mkdir();
         saveLayerGroup(layersDirectory);
+        final File baseMapsDirectory = new File(directory, "Base Maps");
+        FileUtil.deleteDirectory(baseMapsDirectory, false);
+        baseMapsDirectory.mkdir();
+        getBaseMapLayers().saveLayerGroup(baseMapsDirectory);
       }
     }
   }
 
   public void setDataStores(final DataObjectStoreConnectionRegistry dataStores) {
     this.dataStores = dataStores;
+  }
+
+  public void setFolderConnections(
+    final FolderConnectionRegistry folderConnections) {
+    this.folderConnections = folderConnections;
   }
 
   @Override

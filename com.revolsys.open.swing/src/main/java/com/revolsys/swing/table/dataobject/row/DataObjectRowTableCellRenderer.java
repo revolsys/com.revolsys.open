@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.dataobject.row;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
 
@@ -71,11 +70,6 @@ public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
 
     super.getTableCellRendererComponent(table, text, selected, hasFocus, row,
       column);
-
-    if (required && !hasValue) {
-      setBackground(new Color(255, 0, 0, 100));
-      setForeground(table.getForeground());
-    }
     return this;
   }
 }

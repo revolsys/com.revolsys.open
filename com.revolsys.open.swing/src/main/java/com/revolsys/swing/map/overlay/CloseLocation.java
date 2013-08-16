@@ -1,16 +1,16 @@
 package com.revolsys.swing.map.overlay;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class CloseLocation {
 
-  private final DataObject object;
+  private final LayerDataObject object;
 
   private final int[] vertexIndex;
 
@@ -20,9 +20,9 @@ public class CloseLocation {
 
   private final Geometry geometry;
 
-  public CloseLocation(final DataObjectLayer layer, final DataObject object,
-    final Geometry geometry, final int[] vertexIndex,
-    final IndexedLineSegment segment) {
+  public CloseLocation(final DataObjectLayer layer,
+    final LayerDataObject object, final Geometry geometry,
+    final int[] vertexIndex, final IndexedLineSegment segment) {
     this.object = object;
     this.layer = layer;
     this.geometry = geometry;
@@ -68,6 +68,10 @@ public class CloseLocation {
     return id;
   }
 
+  public String getIdAttributeName() {
+    return getMetaData().getIdAttributeName();
+  }
+
   public String getIndexString() {
     int[] index = vertexIndex;
     if (index != null) {
@@ -85,7 +89,7 @@ public class CloseLocation {
     return layer.getMetaData();
   }
 
-  public DataObject getObject() {
+  public LayerDataObject getObject() {
     return object;
   }
 
@@ -110,4 +114,5 @@ public class CloseLocation {
     appendIdAndIndex(string);
     return string.toString();
   }
+
 }
