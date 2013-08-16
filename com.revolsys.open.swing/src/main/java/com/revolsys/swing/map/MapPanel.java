@@ -44,6 +44,7 @@ import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
+import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
@@ -110,6 +111,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private final FileDropTargetListener fileDropListener;
 
   private boolean updateZoomHistory = true;
+
+  private ToolTipOverlay toolTipOverlay;
 
   public MapPanel() {
     this(new Project());
@@ -226,6 +229,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(layeredPane);
     new EditGeoReferencedImageOverlay(this);
+    toolTipOverlay = new ToolTipOverlay(this);
+    layeredPane.add(toolTipOverlay, new Integer(100000));
   }
 
   private void addPointerLocation(final boolean geographics) {
@@ -304,6 +309,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     selectMapScale = new SelectMapScale(this);
     toolBar.addComponent("zoom", selectMapScale);
+  }
+
+  public void clearToolTipText() {
+    toolTipOverlay.clearText();
   }
 
   public void clearZoomHistory() {
@@ -558,6 +567,17 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       firePropertyChange("scale", oldValue, scale);
       repaint();
     }
+  }
+
+  public void setToolTipText(final Point location, final CharSequence text) {
+    toolTipOverlay.setText(location, text);
+  }
+
+  public void setToolTipText(Point location, final int dx, final int dy,
+    final CharSequence text) {
+    location = new Point(location);
+    location.translate(dx, dy);
+    toolTipOverlay.setText(location, text);
   }
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {

@@ -19,7 +19,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.SwingUtilities;
 
@@ -55,6 +58,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
+import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -255,6 +259,33 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
           objects.addAll(selectedObjects);
         }
       }
+    }
+  }
+
+  protected void appendLocations(final StringBuffer text, final String title,
+    final Map<String, Set<CloseLocation>> vertexLocations) {
+    if (!vertexLocations.isEmpty()) {
+      text.append("<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
+      text.append(title);
+      text.append("</div>");
+      text.append("<div style=\"padding: 1px 3px 1px 3px\">");
+      for (final Entry<String, Set<CloseLocation>> entry : vertexLocations.entrySet()) {
+        final String typePath = entry.getKey();
+        text.append("<b><i>");
+        text.append(typePath);
+        text.append("</i></b>\n");
+        text.append("<table cellspacing=\"0\" cellpadding=\"1\"style=\"border: solid #999999 1px;margin: 3px 0px 3px 0px;width: 100%\"><thead style=\"background-color:#dddddd\"><tr><th style=\"border-right: solid #999999 1px\">ID</th><th>INDEX</th></tr></th><tbody>");
+        // text.append("<ul style=\"margin: 3px 0px 3px 12px\">");
+        for (final CloseLocation location : entry.getValue()) {
+          text.append("<tr style=\"border-top: solid #999999 1px\"><td style=\"border-right: solid #999999 1px\">");
+          text.append(location.getId());
+          text.append("</td></td>");
+          text.append(location.getIndexString());
+          text.append("</td></tr>");
+        }
+        text.append("</tbody></table>");
+      }
+      text.append("</div>");
     }
   }
 
@@ -850,14 +881,14 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   protected boolean modeAddMouseMoved(final MouseEvent event) {
     if (isModeAddGeometry()) {
-      final Graphics2D graphics = getGraphics();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       Point point = getPoint(event);
       // TODO make work with multi-part
       final Point fromPoint = JtsGeometryUtil.getFromPoint(addGeometry);
       final boolean snapToFirst = !event.isControlDown()
         && boundingBox.contains(fromPoint);
-      if (snapToFirst || !updateAddMouseOverGeometry(graphics, boundingBox)) {
+      if (snapToFirst
+        || !updateAddMouseOverGeometry(event.getPoint(), boundingBox)) {
         if (snapToFirst) {
           setMapCursor(CURSOR_NODE_SNAP);
           snapPoint = fromPoint;
@@ -894,6 +925,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
           }
         }
+        final Graphics2D graphics = getGraphics();
         setXorGeometry(graphics, xorGeometry);
       }
       return true;
@@ -964,18 +996,19 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   @Override
   public void mouseMoved(final MouseEvent event) {
+    final java.awt.Point point = event.getPoint();
     if (modeAddMouseMoved(event)) {
     } else {
       final Graphics2D graphics = getGraphics();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
-      if (updateMouseOverGeometry(graphics, boundingBox)) {
+      if (updateMouseOverGeometry(point, graphics, boundingBox)) {
 
       } else {
         clearMapCursor();
       }
     }
     if (event.isAltDown()) {
-      if (mouseOverLocations.isEmpty()) {
+      if (!mouseOverLocations.isEmpty()) {
         setMapCursor(CURSOR_MOVE);
       }
     }
@@ -1011,6 +1044,10 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   }
 
   protected void moveGeometryFinish(final MouseEvent event) {
+    // TODO revert record doesn't always work
+    // TODO on Govt site keeps the old ones
+    // TODO move geometry
+    // TODO delete vertex doesn't work
     for (final CloseLocation location : mouseOverLocations) {
       final GeometryFactory geometryFactory = location.getGeometryFactory();
       final Point startPoint = geometryFactory.copy(getViewportPoint(moveGeometryStart));
@@ -1103,27 +1140,43 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     }
   }
 
-  protected boolean setMouseOverLocations(
-    final List<CloseLocation> closeLocations, final Graphics2D graphics) {
+  protected boolean setMouseOverLocations(final java.awt.Point eventPoint,
+    final List<CloseLocation> closeLocations) {
     this.mouseOverLocations = closeLocations;
     if (mouseOverLocations.isEmpty()) {
       clearMapCursor();
       return false;
     } else {
       snapPoint = null;
+      final Graphics2D graphics = getGraphics();
       setXorGeometry(graphics, null);
+      final Map<String, Set<CloseLocation>> vertexLocations = new TreeMap<String, Set<CloseLocation>>();
+      final Map<String, Set<CloseLocation>> segmentLocations = new TreeMap<String, Set<CloseLocation>>();
+
       for (final CloseLocation location : closeLocations) {
-        if (location.getVertexIndex() != null) {
-          setMapCursor(CURSOR_NODE_EDIT);
-          return true;
+        final String typePath = location.getTypePath();
+        if (location.getVertexIndex() == null) {
+          CollectionUtil.addToSet(segmentLocations, typePath, location);
+        } else {
+          CollectionUtil.addToSet(vertexLocations, typePath, location);
         }
       }
-      setMapCursor(CURSOR_LINE_ADD_NODE);
+      final StringBuffer text = new StringBuffer("<html>");
+      appendLocations(text, "Move Verticies", vertexLocations);
+      appendLocations(text, "Insert Verticies", segmentLocations);
+      text.append("</html>");
+      getMap().setToolTipText(eventPoint, 18, -12, text);
+
+      if (vertexLocations.isEmpty()) {
+        setMapCursor(CURSOR_LINE_ADD_NODE);
+      } else {
+        setMapCursor(CURSOR_NODE_EDIT);
+      }
       return true;
     }
   }
 
-  private boolean updateAddMouseOverGeometry(final Graphics2D graphics,
+  private boolean updateAddMouseOverGeometry(final java.awt.Point eventPoint,
     final BoundingBox boundingBox) {
     final CloseLocation location = findCloseLocation(addLayer, null,
       addGeometry, boundingBox);
@@ -1132,11 +1185,11 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       locations.add(location);
     }
 
-    return setMouseOverLocations(locations, graphics);
+    return setMouseOverLocations(eventPoint, locations);
   }
 
-  private boolean updateMouseOverGeometry(final Graphics2D graphics,
-    final BoundingBox boundingBox) {
+  private boolean updateMouseOverGeometry(final java.awt.Point eventPoint,
+    final Graphics2D graphics, final BoundingBox boundingBox) {
     final List<LayerDataObject> selectedObjects = getSelectedObjects(boundingBox);
     final List<CloseLocation> closeLocations = new ArrayList<CloseLocation>();
     for (final LayerDataObject object : selectedObjects) {
@@ -1145,7 +1198,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
         closeLocations.add(closeLocation);
       }
     }
-    return setMouseOverLocations(closeLocations, graphics);
+    return setMouseOverLocations(eventPoint, closeLocations);
   }
 
   protected void vertexDragFinish(final MouseEvent event) {
