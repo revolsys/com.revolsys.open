@@ -813,14 +813,21 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_BACK_SPACE) {
       if (!mouseOverLocations.isEmpty()) {
-        // TODO delete vertex
-        // final Geometry geometry = getGeometry();
-        // final Geometry newGeometry = GeometryEditUtil.deleteVertex(geometry,
-        // mouseOverVertexIndex);
-        // clearMouseOverVertex();
-        // if (newGeometry != null && !geometry.isEmpty()) {
-        // setGeometry(newGeometry);
-        // }
+        final MultipleUndo edit = new MultipleUndo();
+        for (final CloseLocation location : mouseOverLocations) {
+          final Geometry geometry = location.getGeometry();
+          final int[] vertexIndex = location.getVertexIndex();
+          if (vertexIndex != null) {
+            final Geometry newGeometry = GeometryEditUtil.deleteVertex(
+              geometry, vertexIndex);
+            final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+            edit.addEdit(geometryEdit);
+          }
+        }
+        if (!edit.isEmpty()) {
+          addUndo(edit);
+        }
+        clearMouseOverLocations();
       }
     } else if (keyCode == KeyEvent.VK_ESCAPE) {
       if (!mouseOverLocations.isEmpty()) {
@@ -1047,10 +1054,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   }
 
   protected void moveGeometryFinish(final MouseEvent event) {
-    // TODO revert record doesn't always work
-    // TODO on Govt site keeps the old ones
     // TODO move geometry
-    // TODO delete vertex doesn't work
     for (final CloseLocation location : mouseOverLocations) {
       final GeometryFactory geometryFactory = location.getGeometryFactory();
       final Point startPoint = geometryFactory.copy(getViewportPoint(moveGeometryStart));
@@ -1142,7 +1146,6 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       if (JtsGeometryUtil.equalsExact3D(newGeometry, oldValue)) {
         return null;
       } else {
-        // TODO update location
         final DataObjectLayer layer = location.getLayer();
         return layer.createPropertyEdit(object, geometryAttributeName,
           oldValue, newGeometry);
