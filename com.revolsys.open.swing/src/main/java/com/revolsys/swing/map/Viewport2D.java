@@ -95,7 +95,7 @@ public class Viewport2D {
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  private AffineTransform savedTransform;
+  private final ThreadLocal<AffineTransform> savedTransform = new ThreadLocal<AffineTransform>();
 
   private AffineTransform screenToModelTransform;
 
@@ -418,7 +418,7 @@ public class Viewport2D {
   }
 
   public boolean isUseModelCoordinates() {
-    return savedTransform != null;
+    return savedTransform.get() != null;
   }
 
   /**
@@ -558,18 +558,21 @@ public class Viewport2D {
     this.scales = scales;
   }
 
-  public void setUseModelCoordinates(final boolean useModelCoordinates,
+  public boolean setUseModelCoordinates(final boolean useModelCoordinates,
     final Graphics2D graphics) {
-    if (savedTransform != null) {
-      graphics.setTransform(savedTransform);
+    boolean savedUseModelCoordinates = false;
+    final AffineTransform previousTransform = savedTransform.get();
+    if (previousTransform != null) {
+      graphics.setTransform(previousTransform);
+      savedUseModelCoordinates = true;
     }
     if (useModelCoordinates && modelToScreenTransform != null) {
-      savedTransform = graphics.getTransform();
+      savedTransform.set(graphics.getTransform());
       graphics.transform(modelToScreenTransform);
     } else {
-      savedTransform = null;
+      savedTransform.remove();
     }
-
+    return savedUseModelCoordinates;
   }
 
   protected void setViewHeight(final int height) {
@@ -589,7 +592,6 @@ public class Viewport2D {
       if (isUseModelCoordinates()) {
         convertedValue = convertedValue * modelUnitsPerViewUnit;
       }
-      convertedValue *= standardPixelScaleFactor;
     } else {
       convertedValue = value.doubleValue(SI.METRE);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

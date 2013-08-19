@@ -38,6 +38,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -855,19 +856,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if ((e.getKeyCode() == KeyEvent.VK_K)
-      && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-      if (!isModeAddGeometry() && !mouseOverLocations.isEmpty()) {
-        for (final CloseLocation mouseLocation : mouseOverLocations) {
-          final LayerDataObject object = mouseLocation.getObject();
-          final Geometry geometry = mouseLocation.getGeometry();
-          if (geometry instanceof LineString) {
-            final LineString line = (LineString)geometry;
-
-          }
-
-        }
-      }
+    if (splitLineKeyPress(e)) {
     } else {
       super.keyTyped(e);
     }
@@ -1211,6 +1200,45 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       }
       return true;
     }
+  }
+
+  protected boolean splitLineKeyPress(final KeyEvent e) {
+    if ((e.getKeyCode() == KeyEvent.VK_K)
+      && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+      if (!isModeAddGeometry() && !mouseOverLocations.isEmpty()) {
+        for (final CloseLocation mouseLocation : mouseOverLocations) {
+          final LayerDataObject object = mouseLocation.getObject();
+          final DataObjectLayer layer = object.getLayer();
+          final Geometry geometry = mouseLocation.getGeometry();
+          if (geometry instanceof LineString) {
+            final LineString line = (LineString)geometry;
+            final int[] vertexIndex = mouseLocation.getVertexIndex();
+            final Coordinates coordinates = mouseLocation.getPoint();
+            final LineString[] lines = null;
+            if (vertexIndex == null) {
+
+            } else {
+
+            }
+            final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
+            final LineString line1 = lines[0];
+            final LineString line2 = lines[2];
+
+            final LayerDataObject object2 = layer.copyObject(object);
+            object.setGeometryValue(line1);
+            object2.setGeometryValue(line1);
+
+            property.setSplitAttributes(line, coordinates, object);
+            property.setSplitAttributes(line, coordinates, object2);
+
+            layer.saveChanges(object2);
+          }
+          e.consume();
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private boolean updateAddMouseOverGeometry(final java.awt.Point eventPoint,

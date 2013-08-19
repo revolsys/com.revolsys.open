@@ -178,26 +178,28 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
       if (point != null) {
         final double orientation = point.getOrientation();
 
-        final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
+        final boolean savedUseModelUnits = viewport.setUseModelCoordinates(
+          false, graphics);
         final Paint paint = graphics.getPaint();
-        viewport.setUseModelCoordinates(true, graphics);
         try {
           graphics.setBackground(Color.BLACK);
           style.setTextStyle(viewport, graphics);
           graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
 
-          // TODO prevent upside down text
           final double x = point.getX();
           final double y = point.getY();
+          final double[] location = viewport.toViewCoordinates(x, y);
 
-          graphics.translate(x, y);
           final AffineTransform savedTransform = graphics.getTransform();
+          final double screenX = location[0];
+          final double screenY = location[1];
+          graphics.translate(screenX, screenY);
 
           style.setTextStyle(viewport, graphics);
 
           if (orientation != 0) {
-            graphics.rotate(Math.toRadians(orientation), 0, 0);
+            graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
           double dx = 0;
           double dy = 0;
@@ -206,20 +208,22 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           dx += Viewport2D.toDisplayValue(viewport, textDx);
 
           final Measure<Length> textDy = style.getTextDy();
-          dy += Viewport2D.toDisplayValue(viewport, textDy);
+          dy -= Viewport2D.toDisplayValue(viewport, textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
           final Rectangle2D bounds = fontMetrics.getStringBounds(label,
             graphics);
           final double width = bounds.getWidth();
           final double height = bounds.getHeight();
-          dy += fontMetrics.getDescent();
+          dy -= fontMetrics.getDescent();
 
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
-            dy -= height;
+            dy += height;
           } else if ("middle".equals(verticalAlignment)) {
             dy -= height / 2;
+          } else if ("bottom".equals(verticalAlignment)) {
+            dy -= height;
           }
           final String horizontalAlignment = style.getTextHorizontalAlignment();
           if ("right".equals(horizontalAlignment)) {
@@ -227,9 +231,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           } else if ("center".equals(horizontalAlignment)) {
             dx -= width / 2;
           }
-
           graphics.translate(dx, dy);
-          graphics.scale(1, -1);
+          graphics.scale(1, 1);
           if (Math.abs(orientation) > 90) {
             graphics.rotate(Math.PI, width / 2, -height / 4);
           }
@@ -265,8 +268,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           graphics.setTransform(savedTransform);
 
         } finally {
-          viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
           graphics.setPaint(paint);
+          viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
         }
       }
     }

@@ -116,10 +116,14 @@ public abstract class AbstractDataObjectLayerRenderer extends
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final DataObjectLayer layer) {
-    viewport.setUseModelCoordinates(true, graphics);
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    final List<LayerDataObject> dataObjects = layer.query(boundingBox);
-    renderObjects(viewport, graphics, layer, dataObjects);
+    final boolean saved = viewport.setUseModelCoordinates(true, graphics);
+    try {
+      final BoundingBox boundingBox = viewport.getBoundingBox();
+      final List<LayerDataObject> dataObjects = layer.query(boundingBox);
+      renderObjects(viewport, graphics, layer, dataObjects);
+    } finally {
+      viewport.setUseModelCoordinates(saved, graphics);
+    }
   }
 
   protected void renderObject(final Viewport2D viewport,

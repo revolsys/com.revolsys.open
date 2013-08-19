@@ -72,8 +72,8 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, lineString);
     if (shape != null) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(false, graphics);
+      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
+        graphics);
       final Paint paint = graphics.getPaint();
       try {
         style.setLineStyle(viewport, graphics);
@@ -113,8 +113,8 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, polygon);
     if (shape != null) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(false, graphics);
+      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
+        graphics);
       final Paint paint = graphics.getPaint();
       try {
         style.setFillStyle(viewport, graphics);

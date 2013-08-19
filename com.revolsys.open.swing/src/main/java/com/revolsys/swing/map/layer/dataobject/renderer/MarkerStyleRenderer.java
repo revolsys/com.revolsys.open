@@ -140,8 +140,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Coordinates point,
     final MarkerStyle style, final double orientation) {
     if (viewport.getBoundingBox().contains(point)) {
-      final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(false, graphics);
+      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
+        graphics);
       final Paint paint = graphics.getPaint();
       try {
         final Marker marker = style.getMarker();
@@ -149,8 +149,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         final double y = point.getY();
         marker.render(viewport, graphics, style, x, y, orientation);
       } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
         graphics.setPaint(paint);
+        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
       }
     }
   }
@@ -212,8 +212,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   public static void renderMarkers(final Viewport2D viewport,
     final Graphics2D graphics, final CoordinatesList points,
     final MarkerStyle style) {
-    final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-    viewport.setUseModelCoordinates(false, graphics);
+    final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
+      graphics);
     final Paint paint = graphics.getPaint();
     try {
       final Marker marker = style.getMarker();
@@ -223,8 +223,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         marker.render(viewport, graphics, style, x, y, 0);
       }
     } finally {
-      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
       graphics.setPaint(paint);
+      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
     }
   }
 

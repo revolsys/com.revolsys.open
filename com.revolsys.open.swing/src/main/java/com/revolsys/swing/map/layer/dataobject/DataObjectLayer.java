@@ -26,6 +26,8 @@ public interface DataObjectLayer extends Layer {
 
   void clearSelectedRecords();
 
+  <V extends LayerDataObject> V copyObject(final V object);
+
   UndoableEdit createPropertyEdit(LayerDataObject object, String propertyName,
     Object oldValue, Object newValue);
 
