@@ -141,7 +141,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final MarkerStyle style, final double orientation) {
     if (viewport.getBoundingBox().contains(point)) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-      viewport.setUseModelCoordinates(true, graphics);
+      viewport.setUseModelCoordinates(false, graphics);
       final Paint paint = graphics.getPaint();
       try {
         final Marker marker = style.getMarker();
@@ -213,7 +213,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final CoordinatesList points,
     final MarkerStyle style) {
     final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
-    viewport.setUseModelCoordinates(true, graphics);
+    viewport.setUseModelCoordinates(false, graphics);
     final Paint paint = graphics.getPaint();
     try {
       final Marker marker = style.getMarker();

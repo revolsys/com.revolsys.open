@@ -14,21 +14,28 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public final class GeometryShapeUtil {
-  public static void addCoordinateSequence(final GeneralPath path,
-    final CoordinateSequence sequence) {
+  public static void addCoordinateSequence(final Viewport2D viewport,
+    final GeneralPath path, final CoordinateSequence sequence) {
     double x = sequence.getOrdinate(0, 0);
     double y = sequence.getOrdinate(0, 1);
-    path.moveTo((float)x, (float)y);
+    double[] screenCoords = viewport.toViewCoordinates(x, y);
+    float screenX = (float)screenCoords[0];
+    float screenY = (float)screenCoords[1];
+    path.moveTo(screenX, screenY);
     for (int i = 0; i < sequence.size(); i++) {
       x = sequence.getOrdinate(i, 0);
       y = sequence.getOrdinate(i, 1);
-      path.lineTo((float)x, (float)y);
+      screenCoords = viewport.toViewCoordinates(x, y);
+      screenX = (float)screenCoords[0];
+      screenY = (float)screenCoords[1];
+      path.lineTo(screenX, screenY);
     }
   }
 
-  public static void addLineString(final GeneralPath path, final LineString line) {
+  public static void addLineString(final Viewport2D viewport,
+    final GeneralPath path, final LineString line) {
     final CoordinateSequence sequence = line.getCoordinateSequence();
-    addCoordinateSequence(path, sequence);
+    addCoordinateSequence(viewport, path, sequence);
   }
 
   public static Shape toShape(final Viewport2D viewport,
@@ -57,7 +64,7 @@ public final class GeometryShapeUtil {
 
   public static Shape toShape(final Viewport2D viewport, final LineString line) {
     final GeneralPath path = new GeneralPath(PathIterator.WIND_EVEN_ODD);
-    addLineString(path, line);
+    addLineString(viewport, path, line);
     return path;
   }
 
@@ -71,10 +78,10 @@ public final class GeometryShapeUtil {
   public static Shape toShape(final Viewport2D viewport, final Polygon polygon) {
     final GeneralPath path = new GeneralPath(PathIterator.WIND_EVEN_ODD);
     final LineString exteriorRing = polygon.getExteriorRing();
-    addLineString(path, exteriorRing);
+    addLineString(viewport, path, exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       final LineString interiorRing = polygon.getInteriorRingN(i);
-      addLineString(path, interiorRing);
+      addLineString(viewport, path, interiorRing);
     }
     return path;
   }

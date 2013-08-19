@@ -11,10 +11,12 @@ import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 public abstract class AbstractMarker implements Marker {
 
   protected void translateMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final MarkerStyle style,double x, double y, final double width,
-    final double height, double orientation) {
+    final Graphics2D graphics, final MarkerStyle style, final double x,
+    final double y, final double width, final double height,
+    final double orientation) {
 
-    graphics.translate(x, y);
+    final double[] viewCoordinates = viewport.toViewCoordinates(x, y);
+    graphics.translate(viewCoordinates[0], viewCoordinates[1]);
     if (orientation != 0) {
       graphics.rotate(Math.toRadians(orientation));
     }
@@ -38,7 +40,6 @@ public abstract class AbstractMarker implements Marker {
       || "center".equals(horizontalAlignment)) {
       dx -= width / 2;
     }
-
     graphics.translate(dx, dy);
   }
 }

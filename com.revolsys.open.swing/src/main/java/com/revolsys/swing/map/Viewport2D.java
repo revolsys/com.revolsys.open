@@ -35,25 +35,6 @@ public class Viewport2D {
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
     .createEmptyGeometry();
 
-  public static AffineTransform createModelToScreenTransform(
-    final BoundingBox boundingBox, final double viewWidth,
-    final double viewHeight) {
-    final AffineTransform modelToScreenTransform = new AffineTransform();
-    final double mapWidth = boundingBox.getWidth();
-    final double mapHeight = boundingBox.getHeight();
-    final double pixelsPerXUnit = viewWidth / mapWidth;
-    final double pixelsPerYUnit = viewHeight / mapHeight;
-
-    final double originX = boundingBox.getMinX();
-    final double originY = boundingBox.getMaxY();
-
-    modelToScreenTransform.concatenate(AffineTransform.getScaleInstance(
-      pixelsPerXUnit, -pixelsPerYUnit));
-    modelToScreenTransform.concatenate(AffineTransform.getTranslateInstance(
-      -originX, -originY));
-    return modelToScreenTransform;
-  }
-
   public static AffineTransform createScreenToModelTransform(
     final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
@@ -92,6 +73,14 @@ public class Viewport2D {
       return viewport.toDisplayValue(measure);
     }
   }
+
+  private double pixelsPerXUnit;
+
+  private double pixelsPerYUnit;
+
+  private double originX;
+
+  private double originY;
 
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = new BoundingBox();
@@ -158,6 +147,26 @@ public class Viewport2D {
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+  }
+
+  public AffineTransform createModelToScreenTransform(
+    final BoundingBox boundingBox, final double viewWidth,
+    final double viewHeight) {
+    final AffineTransform modelToScreenTransform = new AffineTransform();
+    final double mapWidth = boundingBox.getWidth();
+    pixelsPerXUnit = viewWidth / mapWidth;
+
+    final double mapHeight = boundingBox.getHeight();
+    pixelsPerYUnit = -viewHeight / mapHeight;
+
+    originX = boundingBox.getMinX();
+    originY = boundingBox.getMaxY();
+
+    modelToScreenTransform.concatenate(AffineTransform.getScaleInstance(
+      pixelsPerXUnit, pixelsPerYUnit));
+    modelToScreenTransform.concatenate(AffineTransform.getTranslateInstance(
+      -originX, -originY));
+    return modelToScreenTransform;
   }
 
   public BoundingBox getBoundingBox() {
@@ -234,6 +243,22 @@ public class Viewport2D {
 
   public Measurable<Length> getModelWidthLength() {
     return boundingBox.getWidthLength();
+  }
+
+  public double getOriginX() {
+    return originX;
+  }
+
+  public double getOriginY() {
+    return originY;
+  }
+
+  public double getPixelsPerXUnit() {
+    return pixelsPerXUnit;
+  }
+
+  public double getPixelsPerYUnit() {
+    return pixelsPerYUnit;
   }
 
   public LayerGroup getProject() {

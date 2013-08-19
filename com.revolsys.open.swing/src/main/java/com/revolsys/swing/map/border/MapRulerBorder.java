@@ -9,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,8 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.swing.map.Viewport2D;
 
-public class MapRulerBorder extends AbstractBorder {
+public class MapRulerBorder extends AbstractBorder implements
+  PropertyChangeListener {
   private final int rulerSize = 25;
 
   /**
@@ -116,6 +119,7 @@ public class MapRulerBorder extends AbstractBorder {
     this.viewport = viewport;
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     setRulerGeometryFactory(geometryFactory);
+    viewport.addPropertyChangeListener("geometryFactory", this);
   }
 
   private <Q extends Quantity> void drawLabel(final Graphics2D graphics,
@@ -416,6 +420,12 @@ public class MapRulerBorder extends AbstractBorder {
       g.setTransform(transform);
       g.setClip(clip);
     }
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final GeometryFactory geometryFactory = (GeometryFactory)event.getNewValue();
+    setRulerGeometryFactory(geometryFactory);
   }
 
   public void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {

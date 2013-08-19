@@ -266,7 +266,7 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItem("project", "Save Project Project", "Save Project Project",
+    file.addMenuItem("project", "Save Project", "Save Project",
       SilkIconLoader.getIconWithBadge("layout", "save"), project, "saveProject");
     file.addMenuItem("exit", new Exit());
     return file;

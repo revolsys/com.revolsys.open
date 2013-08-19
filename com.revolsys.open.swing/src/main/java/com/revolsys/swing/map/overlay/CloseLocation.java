@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -20,14 +21,18 @@ public class CloseLocation {
 
   private final Geometry geometry;
 
+  private final Coordinates point;
+
   public CloseLocation(final DataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
-    final int[] vertexIndex, final IndexedLineSegment segment) {
+    final int[] vertexIndex, final IndexedLineSegment segment,
+    final Coordinates point) {
     this.object = object;
     this.layer = layer;
     this.geometry = geometry;
     this.vertexIndex = vertexIndex;
     this.segment = segment;
+    this.point = point;
   }
 
   public void appendIdAndIndex(final StringBuffer string) {
@@ -91,6 +96,10 @@ public class CloseLocation {
 
   public LayerDataObject getObject() {
     return object;
+  }
+
+  public Coordinates getPoint() {
+    return point;
   }
 
   public IndexedLineSegment getSegment() {

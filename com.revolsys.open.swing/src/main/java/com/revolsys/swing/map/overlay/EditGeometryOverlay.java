@@ -440,7 +440,8 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
         }
       }
       if (closestSegment != null) {
-        return new CloseLocation(layer, object, geometry, null, closestSegment);
+        return new CloseLocation(layer, object, geometry, null, closestSegment,
+          null);
       }
     }
     return null;
@@ -452,6 +453,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
     if (index != null) {
       int[] closestVertexIndex = null;
+      Coordinates closeVertex = null;
       final Coordinates centre = boundingBox.getCentre();
 
       final List<int[]> closeVertices = index.findWithin(boundingBox);
@@ -465,12 +467,13 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
           if (distance < minDistance) {
             minDistance = distance;
             closestVertexIndex = vertexIndex;
+            closeVertex = vertex;
           }
         }
       }
       if (closestVertexIndex != null) {
         return new CloseLocation(layer, object, geometry, closestVertexIndex,
-          null);
+          null, closeVertex);
       }
     }
     return null;
@@ -811,7 +814,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
     final int keyCode = e.getKeyCode();
-    if (keyCode == KeyEvent.VK_BACK_SPACE) {
+    if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (!mouseOverLocations.isEmpty()) {
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : mouseOverLocations) {
@@ -847,6 +850,20 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       if (moveGeometryStart != null) {
         mouseMoved(e);
       }
+    }
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
+    if ((e.getKeyCode() == KeyEvent.VK_K)
+      && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+      if (!isModeAddGeometry() && !mouseOverLocations.isEmpty()) {
+        for (final CloseLocation mouseLocation : mouseOverLocations) {
+
+        }
+      }
+    } else {
+      super.keyTyped(e);
     }
   }
 
@@ -1030,7 +1047,8 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       dragged = false;
     }
     if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
-      if (isModeAddGeometry() || !mouseOverLocations.isEmpty()) {
+      if (isModeAddGeometry()) {
+      } else if (!mouseOverLocations.isEmpty()) {
         repaint();
         event.consume();
         return;
