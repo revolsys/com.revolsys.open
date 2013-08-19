@@ -18,7 +18,7 @@ public abstract class AbstractMarker implements Marker {
     final double[] viewCoordinates = viewport.toViewCoordinates(x, y);
     graphics.translate(viewCoordinates[0], viewCoordinates[1]);
     if (orientation != 0) {
-      graphics.rotate(Math.toRadians(orientation));
+      graphics.rotate(-Math.toRadians(orientation));
     }
 
     final Measure<Length> deltaX = style.getMarkerDeltaX();

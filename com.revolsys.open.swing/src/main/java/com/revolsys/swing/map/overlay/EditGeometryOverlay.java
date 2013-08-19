@@ -859,6 +859,12 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
       if (!isModeAddGeometry() && !mouseOverLocations.isEmpty()) {
         for (final CloseLocation mouseLocation : mouseOverLocations) {
+          final LayerDataObject object = mouseLocation.getObject();
+          final Geometry geometry = mouseLocation.getGeometry();
+          if (geometry instanceof LineString) {
+            final LineString line = (LineString)geometry;
+
+          }
 
         }
       }
