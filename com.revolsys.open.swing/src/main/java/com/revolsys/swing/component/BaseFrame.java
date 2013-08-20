@@ -5,10 +5,14 @@ import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
 
+import com.revolsys.logging.Slf4jUncaughtExceptionHandler;
 import com.revolsys.swing.WindowManager;
 
 @SuppressWarnings("serial")
 public class BaseFrame extends JFrame {
+  static {
+    Slf4jUncaughtExceptionHandler.init();
+  }
 
   public BaseFrame() throws HeadlessException {
     super();

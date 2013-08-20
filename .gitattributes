@@ -1,0 +1,29 @@
+* text=auto
+
+# text lf
+*.c text eol=lf
+*.cxx text eol=lf
+*.h text eol=lf
+*.i text eol=lf
+*.java text eol=lf
+*.properties text eol=lf
+*.txt text eol=lf
+*.xml text eol=lf
+*.xsd text eol=lf
+
+#text crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+#binary
+*.png binary
+*.jpg binary
+*.exe binary
+*.ddl binary
+*.exp binary
+*.lib binary
+*.jar binary
+*.zip binary
+*.dylib binary
+*.pdb binary
+

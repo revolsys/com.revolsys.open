@@ -18,7 +18,6 @@ import javax.swing.SwingWorker.StateValue;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.beans.MethodInvoker;
-import com.revolsys.parallel.LoggingRunnable;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
@@ -170,11 +169,10 @@ public class SwingWorkerManager {
   }
 
   public static void invokeLater(final Runnable runnable) {
-    final LoggingRunnable logRunnable = new LoggingRunnable(runnable);
     if (SwingUtilities.isEventDispatchThread()) {
-      logRunnable.run();
+      runnable.run();
     } else {
-      SwingUtilities.invokeLater(logRunnable);
+      SwingUtilities.invokeLater(runnable);
     }
   }
 
