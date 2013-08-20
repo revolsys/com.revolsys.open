@@ -1,8 +1,8 @@
 package com.revolsys.swing.field;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ItemSelectable;
-import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
@@ -22,14 +22,20 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -37,6 +43,8 @@ import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
@@ -44,7 +52,8 @@ import com.revolsys.swing.undo.UndoManager;
 
 public class DataStoreSearchTextField extends JXSearchField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable, Field {
+  ListDataListener, ItemSelectable, Field, ListSelectionListener,
+  HighlightPredicate {
   private static final long serialVersionUID = 1L;
 
   private final String displayAttributeName;
@@ -90,7 +99,9 @@ public class DataStoreSearchTextField extends JXSearchField implements
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
     this.listModel.addListDataListener(this);
-
+    this.list.addListSelectionListener(this);
+    this.list.addHighlighter(new ColorHighlighter(this, WebColors.Blue,
+      WebColors.White));
     this.menu.add(this.list);
     this.menu.setFocusable(false);
     this.menu.setBorderPainted(true);
@@ -216,6 +227,19 @@ public class DataStoreSearchTextField extends JXSearchField implements
     return true;
   }
 
+  @Override
+  public boolean isHighlighted(final Component renderer,
+    final ComponentAdapter adapter) {
+    final DataObject object = this.listModel.getElementAt(adapter.row);
+    final String text = getText();
+    final String value = object.getString(displayAttributeName);
+    if (StringEqualsIgnoreCase.equal(text, value)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public boolean isTextSameAsSelected() {
     if (this.selectedItem == null) {
       return false;
@@ -287,19 +311,19 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getSource() == this.list) {
-      final Point point = e.getPoint();
-      final int index = this.list.locationToIndex(point);
-      if (index > -1) {
-        this.list.setSelectedIndex(index);
-        final DataObject value = this.listModel.getElementAt(index);
-        if (value != null) {
-          final String label = value.getString(this.displayAttributeName);
-          setText(label);
-        }
-        requestFocus();
-      }
-    }
+    // if (e.getSource() == this.list) {
+    // final Point point = e.getPoint();
+    // final int index = this.list.locationToIndex(point);
+    // if (index > -1) {
+    // this.list.setSelectedIndex(index);
+    // final DataObject value = this.listModel.getElementAt(index);
+    // if (value != null) {
+    // final String label = value.getString(this.displayAttributeName);
+    // setText(label);
+    // }
+    // requestFocus();
+    // }
+    // }
   }
 
   @Override
@@ -427,16 +451,6 @@ public class DataStoreSearchTextField extends JXSearchField implements
       this.menu.pack();
       if (objects.size() == 1) {
         this.list.setSelectedIndex(0);
-      } else {
-        int i = 0;
-        for (final DataObject object : objects) {
-          final String value = object.getString(this.displayAttributeName);
-          final String text = getText();
-          if (value.equals(text)) {
-            this.list.setSelectedIndex(i);
-          }
-          i++;
-        }
       }
     }
   }
@@ -446,4 +460,19 @@ public class DataStoreSearchTextField extends JXSearchField implements
     return getFieldName() + "=" + getFieldValue();
   }
 
+  @Override
+  public void valueChanged(final ListSelectionEvent e) {
+    if (!e.getValueIsAdjusting()) {
+      final DataObject value = (DataObject)this.list.getSelectedValue();
+      if (value != null) {
+        final String label = value.getString(this.displayAttributeName);
+        if (!EqualsRegistry.equal(label, getText())) {
+          setText(label);
+        }
+      }
+      menu.setVisible(false);
+      requestFocus();
+    }
+
+  }
 }
