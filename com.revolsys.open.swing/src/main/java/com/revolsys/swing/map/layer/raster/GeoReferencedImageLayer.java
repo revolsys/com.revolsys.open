@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
@@ -16,6 +15,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 

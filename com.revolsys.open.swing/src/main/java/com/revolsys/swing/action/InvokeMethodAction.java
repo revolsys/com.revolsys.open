@@ -10,12 +10,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 

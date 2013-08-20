@@ -3,8 +3,8 @@ package com.revolsys.swing.listener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 /**
  * An ActionListener that invokes the method on the object when the action is

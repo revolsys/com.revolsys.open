@@ -41,7 +41,6 @@ import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
@@ -92,6 +91,7 @@ import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.table.DataObjectMetaDataTableModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -253,7 +253,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void addSelectedObject(final LayerDataObject object) {
+  protected void addSelectedRecord(final LayerDataObject object) {
     if (isLayerObject(object)) {
       clearSelectedRecordsIndex();
       this.selectedRecords.add(object);
@@ -261,10 +261,28 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
+  public void addSelectedRecords(final BoundingBox boundingBox) {
+    if (isSelectable()) {
+      final List<LayerDataObject> objects = query(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject)
+          || this.deletedRecords.contains(layerDataObject)) {
+          iterator.remove();
+        }
+      }
+      addSelectedRecords(objects);
+      if (!this.selectedRecords.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
+    }
+  }
+
+  @Override
   public void addSelectedRecords(
     final Collection<? extends LayerDataObject> objects) {
     for (final LayerDataObject object : objects) {
-      addSelectedObject(object);
+      addSelectedRecord(object);
     }
     fireSelected();
   }
@@ -1022,6 +1040,37 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  protected void removeSelectedRecord(final LayerDataObject object) {
+    this.selectedRecords.remove(object);
+    clearSelectedRecordsIndex();
+  }
+
+  @Override
+  public void removeSelectedRecords(final BoundingBox boundingBox) {
+    if (isSelectable()) {
+      final List<LayerDataObject> objects = query(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject)
+          || this.deletedRecords.contains(layerDataObject)) {
+          iterator.remove();
+        }
+      }
+      removeSelectedRecords(objects);
+      if (!this.selectedRecords.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
+    }
+  }
+
+  public void removeSelectedRecords(
+    final Collection<? extends LayerDataObject> objects) {
+    for (final LayerDataObject object : objects) {
+      removeSelectedRecord(object);
+    }
+    fireSelected();
+  }
+
   @Override
   public void revertChanges(final LayerDataObject object) {
     synchronized (this.modifiedRecords) {
@@ -1180,10 +1229,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           iterator.remove();
         }
       }
+      setSelectedRecords(objects);
       if (!this.selectedRecords.isEmpty()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
-      setSelectedRecords(objects);
     }
   }
 

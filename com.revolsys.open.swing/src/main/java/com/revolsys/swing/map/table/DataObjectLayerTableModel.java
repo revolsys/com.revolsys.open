@@ -19,7 +19,6 @@ import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
@@ -39,6 +38,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.table.predicate.NewPredicate;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;

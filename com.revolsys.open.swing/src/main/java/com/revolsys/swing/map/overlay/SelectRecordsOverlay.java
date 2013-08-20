@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.color.ColorUtil;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -34,6 +33,7 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
@@ -90,6 +90,32 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
+  }
+
+  public void addSelectedRecords(final BoundingBox boundingBox) {
+    final LayerGroup project = getProject();
+    addSelectedRecords(project, boundingBox);
+    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    overlay.redraw();
+  }
+
+  private void addSelectedRecords(final LayerGroup group,
+    final BoundingBox boundingBox) {
+
+    final double scale = getViewport().getScale();
+    final List<Layer> layers = group.getLayers();
+    Collections.reverse(layers);
+    for (final Layer layer : layers) {
+      if (layer instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)layer;
+        addSelectedRecords(childGroup, boundingBox);
+      } else if (layer instanceof DataObjectLayer) {
+        final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+        if (dataObjectLayer.isSelectable(scale)) {
+          dataObjectLayer.addSelectedRecords(boundingBox);
+        }
+      }
+    }
   }
 
   protected Collection<LayerDataObject> getSelectedObjects(
@@ -253,6 +279,32 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  public void removeSelectedRecords(final BoundingBox boundingBox) {
+    final LayerGroup project = getProject();
+    removeSelectedRecords(project, boundingBox);
+    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    overlay.redraw();
+  }
+
+  private void removeSelectedRecords(final LayerGroup group,
+    final BoundingBox boundingBox) {
+
+    final double scale = getViewport().getScale();
+    final List<Layer> layers = group.getLayers();
+    Collections.reverse(layers);
+    for (final Layer layer : layers) {
+      if (layer instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)layer;
+        removeSelectedRecords(childGroup, boundingBox);
+      } else if (layer instanceof DataObjectLayer) {
+        final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+        if (dataObjectLayer.isSelectable(scale)) {
+          dataObjectLayer.removeSelectedRecords(boundingBox);
+        }
+      }
+    }
+  }
+
   public void selectBoxDrag(final MouseEvent event) {
     final double width = Math.abs(event.getX()
       - this.selectBoxFirstPoint.getX());
@@ -294,8 +346,15 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     this.selectBox = null;
     clearMapCursor();
     repaint();
-    SwingWorkerManager.execute("Select records", this, "selectRecords",
-      boundingBox);
+    String methodName;
+    if (event.isAltDown()) {
+      methodName = "removeSelectedRecords";
+    } else if (event.isShiftDown()) {
+      methodName = "addSelectedRecords";
+    } else {
+      methodName = "selectRecords";
+    }
+    SwingWorkerManager.execute("Select records", this, methodName, boundingBox);
     event.consume();
   }
 

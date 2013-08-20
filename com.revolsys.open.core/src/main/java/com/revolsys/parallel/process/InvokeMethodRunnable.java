@@ -4,12 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -20,30 +17,6 @@ import com.revolsys.util.ExceptionUtil;
  * @author Paul Austin
  */
 public class InvokeMethodRunnable implements Runnable {
-
-  public static void invokeAndWait(final Object object,
-    final String methodName, final Object... parameters) {
-    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
-      methodName, parameters);
-    if (SwingUtilities.isEventDispatchThread()) {
-      runnable.run();
-    } else {
-      try {
-        SwingUtilities.invokeAndWait(runnable);
-      } catch (final InterruptedException e) {
-        ExceptionUtil.throwUncheckedException(e);
-      } catch (final InvocationTargetException e) {
-        ExceptionUtil.throwCauseException(e);
-      }
-    }
-  }
-
-  public static void invokeLater(final Object object, final String methodName,
-    final Object... parameters) {
-    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
-      methodName, parameters);
-    SwingWorkerManager.invokeLater(runnable);
-  }
 
   public static void run(final Object object, final String methodName,
     final List<Object> parameters) {

@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class FileDropTargetListener implements DropTargetListener,
   HierarchyListener {

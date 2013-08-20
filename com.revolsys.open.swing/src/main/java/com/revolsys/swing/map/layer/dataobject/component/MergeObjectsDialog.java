@@ -17,7 +17,6 @@ import javax.swing.WindowConstants;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -26,9 +25,10 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.log4j.Log4jTableModel;
+import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectListTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;

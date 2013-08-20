@@ -1,4 +1,4 @@
-package com.revolsys.swing.log4j;
+package com.revolsys.swing.logging;
 
 import java.util.LinkedList;
 import java.util.List;

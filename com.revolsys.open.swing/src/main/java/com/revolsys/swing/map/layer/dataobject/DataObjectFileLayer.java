@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
@@ -22,6 +21,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectFileLayer extends DataObjectListLayer {

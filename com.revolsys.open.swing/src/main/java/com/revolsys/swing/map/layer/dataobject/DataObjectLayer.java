@@ -20,6 +20,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectLayer extends Layer {
   void addNewRecord();
 
+  void addSelectedRecords(BoundingBox boundingBox);
+
   void addSelectedRecords(Collection<? extends LayerDataObject> records);
 
   void addSelectedRecords(LayerDataObject... records);
@@ -103,6 +105,8 @@ public interface DataObjectLayer extends Layer {
   List<LayerDataObject> query(Geometry geometry, double distance);
 
   List<LayerDataObject> query(Query query);
+
+  void removeSelectedRecords(BoundingBox boundingBox);
 
   void revertChanges(LayerDataObject record);
 

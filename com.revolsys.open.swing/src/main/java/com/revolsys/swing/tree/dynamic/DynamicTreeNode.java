@@ -13,7 +13,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import com.revolsys.awt.SwingWorkerManager;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public abstract class DynamicTreeNode extends DefaultMutableTreeNode implements
   Runnable {

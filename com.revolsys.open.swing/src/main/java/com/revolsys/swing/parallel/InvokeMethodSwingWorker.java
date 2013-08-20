@@ -1,4 +1,4 @@
-package com.revolsys.awt;
+package com.revolsys.swing.parallel;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements

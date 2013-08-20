@@ -20,7 +20,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
@@ -36,6 +35,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -94,10 +94,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void addSelectedObject(final LayerDataObject object) {
+  protected void addSelectedRecord(final LayerDataObject object) {
     final DataObject cachedObject = getCacheObject(object);
     if (cachedObject != null) {
-      super.addSelectedObject(object);
+      super.addSelectedRecord(object);
     }
   }
 
@@ -529,6 +529,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   protected void removeFromIndex(final LayerDataObject object) {
     this.index.remove(object);
+  }
+
+  @Override
+  protected void removeSelectedRecord(final LayerDataObject object) {
+    final DataObject cachedObject = getCacheObject(object);
+    if (cachedObject != null) {
+      super.removeSelectedRecord(object);
+    }
   }
 
   @Override

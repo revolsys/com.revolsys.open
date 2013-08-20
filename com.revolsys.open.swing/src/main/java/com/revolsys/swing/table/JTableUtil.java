@@ -9,7 +9,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.revolsys.awt.SwingWorkerManager;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class JTableUtil {
 

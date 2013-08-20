@@ -42,7 +42,7 @@ import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.component.BaseFrame;
-import com.revolsys.swing.log4j.Log4jTableModel;
+import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;

@@ -10,12 +10,12 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {

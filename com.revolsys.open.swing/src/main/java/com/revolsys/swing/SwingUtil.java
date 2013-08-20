@@ -38,7 +38,6 @@ import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.beans.MethodRunnable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
@@ -57,6 +56,7 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -463,4 +463,5 @@ public class SwingUtil {
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
   }
+
 }

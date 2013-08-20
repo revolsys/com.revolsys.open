@@ -7,7 +7,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -16,6 +15,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>

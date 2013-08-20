@@ -3,8 +3,8 @@ package com.revolsys.swing.listener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class InvokeMethodSelectedItemListener implements ItemListener {
 

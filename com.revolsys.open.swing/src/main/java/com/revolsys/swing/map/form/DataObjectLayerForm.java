@@ -55,7 +55,6 @@ import javax.swing.undo.UndoableEdit;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -83,6 +82,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerAttributesTableModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;

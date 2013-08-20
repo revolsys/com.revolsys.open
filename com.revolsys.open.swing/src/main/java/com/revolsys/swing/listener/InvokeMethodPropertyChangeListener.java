@@ -32,8 +32,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {

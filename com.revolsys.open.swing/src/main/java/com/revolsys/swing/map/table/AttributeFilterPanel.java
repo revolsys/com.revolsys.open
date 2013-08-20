@@ -19,7 +19,6 @@ import org.jdesktop.swingx.JXSearchField;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -31,6 +30,7 @@ import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.util.JavaBeanUtil;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,

@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
@@ -21,6 +20,7 @@ import com.revolsys.i18n.I18n;
 import com.revolsys.swing.i18n.NamedJPanel;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.util.PasswordUtil;
 
 public class AddDataObjectStoreLayerPanel extends NamedJPanel {

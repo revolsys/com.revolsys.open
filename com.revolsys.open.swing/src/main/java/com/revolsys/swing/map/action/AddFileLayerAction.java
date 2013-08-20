@@ -16,7 +16,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
@@ -25,6 +24,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.util.CollectionUtil;
 

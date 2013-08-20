@@ -13,8 +13,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.table.BaseJxTable;
 
 @SuppressWarnings("serial")

@@ -3,8 +3,8 @@ package com.revolsys.swing.listener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
-import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.parallel.SwingWorkerManager;
 
 /**
  * An ActionListener that invokes the method on the object when the action is
