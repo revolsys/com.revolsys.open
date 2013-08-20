@@ -2,10 +2,12 @@
 
 # text lf
 *.c text eol=lf
+*.css text eol=lf
 *.cxx text eol=lf
 *.h text eol=lf
 *.i text eol=lf
 *.java text eol=lf
+*.jsp text eol=lf
 *.properties text eol=lf
 *.txt text eol=lf
 *.xml text eol=lf
