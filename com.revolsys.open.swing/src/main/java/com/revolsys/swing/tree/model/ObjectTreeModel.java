@@ -25,6 +25,7 @@ import com.revolsys.swing.parallel.SwingWorkerManager;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.StringTreeNodeModel;
+import com.revolsys.util.ExceptionUtil;
 
 public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   TreeExpansionListener, PropertyChangeListener {
@@ -113,25 +114,33 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   public void fireTreeNodesInserted(final TreePath path, final int index,
     final Object newValue) {
-    if (newValue != null) {
-      final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
-        index
-      }, new Object[] {
-        newValue
-      });
-      this.eventHandler.treeNodesInserted(e);
+    try {
+      if (newValue != null) {
+        final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
+          index
+        }, new Object[] {
+          newValue
+        });
+        this.eventHandler.treeNodesInserted(e);
+      }
+    } catch (final Throwable t) {
+      ExceptionUtil.log(getClass(), t);
     }
   }
 
   public void fireTreeNodesRemoved(final TreePath path, final int index,
     final Object newValue) {
-    if (newValue != null) {
-      final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
-        index
-      }, new Object[] {
-        newValue
-      });
-      this.eventHandler.treeNodesRemoved(e);
+    try {
+      if (newValue != null) {
+        final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
+          index
+        }, new Object[] {
+          newValue
+        });
+        this.eventHandler.treeNodesRemoved(e);
+      }
+    } catch (final Throwable t) {
+      ExceptionUtil.log(getClass(), t);
     }
   }
 
