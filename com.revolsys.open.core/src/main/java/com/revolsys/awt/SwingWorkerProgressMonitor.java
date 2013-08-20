@@ -1,4 +1,4 @@
-package com.revolsys.swing;
+package com.revolsys.awt;
 
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 public class SwingWorkerProgressMonitor {
@@ -63,18 +62,6 @@ public class SwingWorkerProgressMonitor {
     return tasks;
   }
 
-  public ProgressMonitor getProgress() {
-    return progress;
-  }
-
-  public boolean isCancelled() {
-    if (progress == null) {
-      return true;
-    } else {
-      return progress.isCanceled();
-    }
-  }
-
   public SwingWorker<?, ?> add(final String description, final Object object,
     final String backgroundMethodName,
     final Collection<? extends Object> backgrounMethodParameters,
@@ -111,7 +98,7 @@ public class SwingWorkerProgressMonitor {
   }
 
   public void execute() {
-    SwingUtilities.invokeLater(new Runnable() {
+    SwingWorkerManager.invokeLater(new Runnable() {
       @Override
       public void run() {
         if (progress == null) {
@@ -126,6 +113,10 @@ public class SwingWorkerProgressMonitor {
         }
       }
     });
+  }
+
+  public ProgressMonitor getProgress() {
+    return progress;
   }
 
   public PropertyChangeSupport getPropertyChangeSupport() {
@@ -151,6 +142,14 @@ public class SwingWorkerProgressMonitor {
 
   public int getWorkerCount() {
     return getTasks().size();
+  }
+
+  public boolean isCancelled() {
+    if (progress == null) {
+      return true;
+    } else {
+      return progress.isCanceled();
+    }
   }
 
   public SwingWorker<?, ?> setDoneTask(final String description,

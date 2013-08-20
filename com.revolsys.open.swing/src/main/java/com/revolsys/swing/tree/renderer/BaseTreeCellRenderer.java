@@ -30,8 +30,9 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
     final boolean leaf, final int row, final boolean hasFocus) {
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
-    if (labelPropertyName != null) {
-      final String text = JavaBeanUtil.getProperty(value, labelPropertyName);
+    if (this.labelPropertyName != null) {
+      final String text = JavaBeanUtil.getProperty(value,
+        this.labelPropertyName);
       label.setText(text);
     }
     return label;

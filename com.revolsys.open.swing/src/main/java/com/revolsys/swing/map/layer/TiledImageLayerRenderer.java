@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
@@ -38,24 +38,24 @@ public class TiledImageLayerRenderer extends
     final Object newValue = event.getNewValue();
     if (newValue instanceof BoundingBox) {
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
-      synchronized (cachedTiles) {
+      synchronized (this.cachedTiles) {
         final List<MapTile> mapTiles = new ArrayList<MapTile>(
-          cachedTiles.keySet());
+          this.cachedTiles.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
             || !newBoundingBox.intersects(boundingBox)) {
-            cachedTiles.remove(boundingBox);
+            this.cachedTiles.remove(boundingBox);
           }
         }
       }
     } else if (!"loading".equals(event.getPropertyName())) {
-      synchronized (cachedTiles) {
-        cachedTiles.clear();
-        if (tileLoaderProcess != null) {
-          tileLoaderProcess.cancel(true);
+      synchronized (this.cachedTiles) {
+        this.cachedTiles.clear();
+        if (this.tileLoaderProcess != null) {
+          this.tileLoaderProcess.cancel(true);
         }
       }
     }
@@ -66,12 +66,12 @@ public class TiledImageLayerRenderer extends
     final AbstractTiledImageLayer layer) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
-    synchronized (cachedTiles) {
+    synchronized (this.cachedTiles) {
       if (resolution != this.resolution
         || geometryFactory != this.geometryFactory) {
         this.resolution = resolution;
         this.geometryFactory = geometryFactory;
-        cachedTiles.clear();
+        this.cachedTiles.clear();
       }
     }
     final List<MapTile> tilesToLoad = new ArrayList<MapTile>();
@@ -79,11 +79,11 @@ public class TiledImageLayerRenderer extends
     for (final MapTile mapTile : mapTiles) {
       if (mapTile != null) {
         MapTile cachedTile = null;
-        synchronized (cachedTiles) {
-          cachedTile = cachedTiles.get(mapTile);
+        synchronized (this.cachedTiles) {
+          cachedTile = this.cachedTiles.get(mapTile);
           if (cachedTile == null) {
             cachedTile = mapTile;
-            cachedTiles.put(cachedTile, cachedTile);
+            this.cachedTiles.put(cachedTile, cachedTile);
             tilesToLoad.add(cachedTile);
           }
         }
@@ -93,17 +93,18 @@ public class TiledImageLayerRenderer extends
     }
     if (!tilesToLoad.isEmpty()) {
       boolean scheduled = false;
-      if (tileLoaderProcess != null) {
-        scheduled = tileLoaderProcess.addMapTiles(resolution, geometryFactory,
-          tilesToLoad);
+      if (this.tileLoaderProcess != null) {
+        scheduled = this.tileLoaderProcess.addMapTiles(resolution,
+          geometryFactory, tilesToLoad);
         if (!scheduled) {
-          tileLoaderProcess.cancel(true);
+          this.tileLoaderProcess.cancel(true);
         }
       }
       if (!scheduled) {
-        tileLoaderProcess = layer.createTileLoaderProcess();
-        tileLoaderProcess.addMapTiles(resolution, geometryFactory, tilesToLoad);
-        SwingWorkerManager.execute(tileLoaderProcess);
+        this.tileLoaderProcess = layer.createTileLoaderProcess();
+        this.tileLoaderProcess.addMapTiles(resolution, geometryFactory,
+          tilesToLoad);
+        SwingWorkerManager.execute(this.tileLoaderProcess);
       }
     }
   }

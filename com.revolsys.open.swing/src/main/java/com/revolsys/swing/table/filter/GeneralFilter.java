@@ -21,9 +21,9 @@ public abstract class GeneralFilter extends RowFilter<Object, Object> {
   @Override
   public boolean include(final Entry<? extends Object, ? extends Object> value) {
     int count = value.getValueCount();
-    if (columns.length > 0) {
-      for (int i = columns.length - 1; i >= 0; i--) {
-        final int index = columns[i];
+    if (this.columns.length > 0) {
+      for (int i = this.columns.length - 1; i >= 0; i--) {
+        final int index = this.columns[i];
         if (index < count) {
           if (include(value, index)) {
             return true;

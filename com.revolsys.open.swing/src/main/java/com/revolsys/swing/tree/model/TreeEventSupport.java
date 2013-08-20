@@ -16,52 +16,52 @@ public class TreeEventSupport implements TreeSelectionListener,
 
   public void addTreeModelListener(final TreeModelListener listener) {
     if (listener != null) {
-      modelListeners.add(listener);
+      this.modelListeners.add(listener);
     }
   }
 
   public void addTreeSelectionListener(final TreeSelectionListener listener) {
     if (listener != null) {
-      selectionListeners.add(listener);
+      this.selectionListeners.add(listener);
     }
   }
 
   public void removeTreeModelListener(final TreeModelListener listener) {
     if (listener != null) {
-      modelListeners.remove(listener);
+      this.modelListeners.remove(listener);
     }
   }
 
   public void removeTreeSelectionListener(final TreeSelectionListener listener) {
     if (listener != null) {
-      selectionListeners.remove(listener);
+      this.selectionListeners.remove(listener);
     }
   }
 
   @Override
   public void treeNodesChanged(final TreeModelEvent e) {
-    for (final TreeModelListener listener : modelListeners) {
+    for (final TreeModelListener listener : this.modelListeners) {
       listener.treeNodesChanged(e);
     }
   }
 
   @Override
   public void treeNodesInserted(final TreeModelEvent e) {
-    for (final TreeModelListener listener : modelListeners) {
+    for (final TreeModelListener listener : this.modelListeners) {
       listener.treeNodesInserted(e);
     }
   }
 
   @Override
   public void treeNodesRemoved(final TreeModelEvent e) {
-    for (final TreeModelListener listener : modelListeners) {
+    for (final TreeModelListener listener : this.modelListeners) {
       listener.treeNodesRemoved(e);
     }
   }
 
   @Override
   public void treeStructureChanged(final TreeModelEvent e) {
-    for (final TreeModelListener listener : modelListeners) {
+    for (final TreeModelListener listener : this.modelListeners) {
       listener.treeStructureChanged(e);
     }
 
@@ -69,7 +69,7 @@ public class TreeEventSupport implements TreeSelectionListener,
 
   @Override
   public void valueChanged(final TreeSelectionEvent e) {
-    for (final TreeSelectionListener listener : selectionListeners) {
+    for (final TreeSelectionListener listener : this.selectionListeners) {
       listener.valueChanged(e);
     }
 

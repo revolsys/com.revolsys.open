@@ -47,7 +47,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public void addListDataListener(final ListDataListener l) {
-    listenerList.add(ListDataListener.class, l);
+    this.listenerList.add(ListDataListener.class, l);
   }
 
   @Override
@@ -61,7 +61,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   protected void fireContentsChanged(final Object source, final int index0,
     final int index1) {
-    final Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = this.listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -77,7 +77,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   protected void fireIntervalAdded(final Object source, final int index0,
     final int index1) {
-    final Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = this.listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -93,7 +93,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   protected void fireIntervalRemoved(final Object source, final int index0,
     final int index1) {
-    final Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = this.listenerList.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -113,11 +113,11 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   public ListDataListener[] getListDataListeners() {
-    return listenerList.getListeners(ListDataListener.class);
+    return this.listenerList.getListeners(ListDataListener.class);
   }
 
   public <V extends EventListener> V[] getListeners(final Class<V> listenerType) {
-    return listenerList.getListeners(listenerType);
+    return this.listenerList.getListeners(listenerType);
   }
 
   @Override
@@ -154,7 +154,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public void removeListDataListener(final ListDataListener l) {
-    listenerList.remove(ListDataListener.class, l);
+    this.listenerList.remove(ListDataListener.class, l);
   }
 
   @Override

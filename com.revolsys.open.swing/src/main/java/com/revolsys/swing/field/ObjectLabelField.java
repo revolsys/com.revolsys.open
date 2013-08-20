@@ -56,18 +56,18 @@ public class ObjectLabelField extends JLabel implements Field {
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
-    final Object value = fieldValue;
+    final Object value = this.fieldValue;
     return (T)value;
   }
 
@@ -79,7 +79,7 @@ public class ObjectLabelField extends JLabel implements Field {
   @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = defaultBackground;
+      color = this.defaultBackground;
     }
     setBackground(color);
   }
@@ -87,7 +87,7 @@ public class ObjectLabelField extends JLabel implements Field {
   @Override
   public void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = defaultForeground;
+      color = this.defaultForeground;
     }
     setForeground(color);
   }
@@ -97,7 +97,7 @@ public class ObjectLabelField extends JLabel implements Field {
     setForeground(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -107,10 +107,10 @@ public class ObjectLabelField extends JLabel implements Field {
 
   @Override
   public void setFieldValid() {
-    setForeground(defaultForeground);
-    setBackground(defaultBackground);
+    setForeground(this.defaultForeground);
+    setBackground(this.defaultBackground);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
@@ -120,10 +120,10 @@ public class ObjectLabelField extends JLabel implements Field {
     String text;
     if (object == null) {
       text = "-";
-    } else if (codeTable == null) {
+    } else if (this.codeTable == null) {
       text = StringConverterRegistry.toString(object);
     } else {
-      final List<Object> values = codeTable.getValues(object);
+      final List<Object> values = this.codeTable.getValues(object);
       if (values == null || values.isEmpty()) {
         text = "-";
       } else {
@@ -131,13 +131,13 @@ public class ObjectLabelField extends JLabel implements Field {
       }
     }
     setText(text);
-    firePropertyChange(fieldName, oldValue, object);
+    firePropertyChange(this.fieldName, oldValue, object);
   }
 
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

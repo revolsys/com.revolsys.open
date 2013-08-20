@@ -38,6 +38,7 @@ import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.beans.MethodRunnable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
@@ -46,7 +47,6 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
@@ -366,16 +366,6 @@ public class SwingUtil {
     }
   }
 
-  public static void invokeAndWait(final Object object,
-    final String methodName, final Object... parameters) {
-    InvokeMethodRunnable.invokeAndWait(object, methodName, parameters);
-  }
-
-  public static void invokeLater(final Object object, final String methodName,
-    final Object... parameters) {
-    InvokeMethodRunnable.invokeLater(object, methodName, parameters);
-  }
-
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
@@ -436,7 +426,7 @@ public class SwingUtil {
           JComponent.class, Object.class);
         final MethodRunnable runnable = new MethodRunnable(method,
           SwingUtil.class, field, value);
-        SwingUtilities.invokeLater(runnable);
+        SwingWorkerManager.invokeLater(runnable);
       } catch (final Throwable t) {
         ExceptionUtil.throwUncheckedException(t);
       }

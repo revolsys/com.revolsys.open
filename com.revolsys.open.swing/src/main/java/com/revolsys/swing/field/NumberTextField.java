@@ -196,7 +196,7 @@ public class NumberTextField extends JXTextField implements Field,
     getDocument().addDocumentListener(this);
     addFocusListener(this);
     PopupMenu.getPopupMenuFactory(this);
-    undoManager.addKeyMap(this);
+    this.undoManager.addKeyMap(this);
   }
 
   @Override
@@ -212,46 +212,46 @@ public class NumberTextField extends JXTextField implements Field,
 
   @Override
   public void focusGained(final FocusEvent e) {
-    undoManager.discardAllEdits();
+    this.undoManager.discardAllEdits();
   }
 
   @Override
   public void focusLost(final FocusEvent e) {
     final String text = getText();
     setFieldValue(text);
-    undoManager.discardAllEdits();
+    this.undoManager.discardAllEdits();
   }
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return fieldValidationMessage;
+    return this.fieldValidationMessage;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)fieldValue;
+    return (T)this.fieldValue;
   }
 
   public int getLength() {
-    return length;
+    return this.length;
   }
 
   public Number getMaximumValue() {
-    return maximumValue;
+    return this.maximumValue;
   }
 
   public Number getMinimumValue() {
-    return minimumValue;
+    return this.minimumValue;
   }
 
   public int getScale() {
-    return scale;
+    return this.scale;
   }
 
   @Override
@@ -261,7 +261,7 @@ public class NumberTextField extends JXTextField implements Field,
 
   @Override
   public boolean isFieldValid() {
-    return fieldValid;
+    return this.fieldValid;
   }
 
   @Override
@@ -291,7 +291,7 @@ public class NumberTextField extends JXTextField implements Field,
     setSelectedTextColor(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -305,12 +305,12 @@ public class NumberTextField extends JXTextField implements Field,
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
-    undoManager.discardAllEdits();
+    this.undoManager.discardAllEdits();
     Object newValue;
     if (value == null) {
       newValue = null;
@@ -327,7 +327,7 @@ public class NumberTextField extends JXTextField implements Field,
         setText(string);
       }
     }
-    undoManager.discardAllEdits();
+    this.undoManager.discardAllEdits();
 
     validateField();
     final String text = getText();
@@ -335,7 +335,7 @@ public class NumberTextField extends JXTextField implements Field,
       try {
         final BigDecimal bigNumber = new BigDecimal(text);
         final Number number = (Number)StringConverterRegistry.toObject(
-          dataType, bigNumber);
+          this.dataType, bigNumber);
         newValue = number;
       } catch (final Throwable t) {
         newValue = value;
@@ -344,10 +344,10 @@ public class NumberTextField extends JXTextField implements Field,
       newValue = null;
     }
 
-    final Object oldValue = fieldValue;
+    final Object oldValue = this.fieldValue;
     if (!EqualsRegistry.equal(oldValue, newValue)) {
       this.fieldValue = newValue;
-      firePropertyChange(fieldName, oldValue, newValue);
+      firePropertyChange(this.fieldName, oldValue, newValue);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
         oldValue, newValue);
     }
@@ -372,7 +372,7 @@ public class NumberTextField extends JXTextField implements Field,
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
@@ -388,24 +388,26 @@ public class NumberTextField extends JXTextField implements Field,
   }
 
   private void validateField() {
-    final boolean oldValid = fieldValid;
+    final boolean oldValid = this.fieldValid;
     boolean valid = true;
     final String text = getText();
     if (StringUtils.hasText(text)) {
       try {
         BigDecimal number = new BigDecimal(text.trim());
         if (number.scale() < 0) {
-          number = number.setScale(scale);
+          number = number.setScale(this.scale);
         }
-        if (number.scale() > scale) {
-          fieldValidationMessage = "Number of decimal places must be < "
-            + scale;
+        if (number.scale() > this.scale) {
+          this.fieldValidationMessage = "Number of decimal places must be < "
+            + this.scale;
           valid = false;
-        } else if (minimumValue != null && minimumValue.compareTo(number) > 0) {
-          fieldValidationMessage = "Value must be >= " + minimumValue;
+        } else if (this.minimumValue != null
+          && this.minimumValue.compareTo(number) > 0) {
+          this.fieldValidationMessage = "Value must be >= " + this.minimumValue;
           valid = false;
-        } else if (maximumValue != null && maximumValue.compareTo(number) < 0) {
-          fieldValidationMessage = "Value must be <= " + maximumValue;
+        } else if (this.maximumValue != null
+          && this.maximumValue.compareTo(number) < 0) {
+          this.fieldValidationMessage = "Value must be <= " + this.maximumValue;
           valid = false;
         } else {
           // number = number.setScale(scale);
@@ -413,19 +415,19 @@ public class NumberTextField extends JXTextField implements Field,
           // if (!newText.equals(text)) {
           // setText(newText);
           // }
-          fieldValidationMessage = "";
+          this.fieldValidationMessage = "";
         }
       } catch (final Throwable t) {
-        fieldValidationMessage = t.getMessage();
+        this.fieldValidationMessage = t.getMessage();
         valid = false;
       }
     } else {
-      fieldValidationMessage = "";
+      this.fieldValidationMessage = "";
     }
 
     if (valid != oldValid) {
-      fieldValid = valid;
-      firePropertyChange("fieldValid", oldValid, fieldValid);
+      this.fieldValid = valid;
+      firePropertyChange("fieldValid", oldValid, this.fieldValid);
     }
   }
 }

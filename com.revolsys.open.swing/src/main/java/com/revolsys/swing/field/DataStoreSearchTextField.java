@@ -81,26 +81,27 @@ public class DataStoreSearchTextField extends JXSearchField implements
     addKeyListener(this);
     addMouseListener(this);
 
-    listModel = new DataStoreQueryListModel(dataStore, displayAttributeName,
-      queries);
-    list = new JXList(listModel);
-    list.setCellRenderer(new DataObjectListCellRenderer(displayAttributeName));
-    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
-    list.addMouseListener(this);
-    listModel.addListDataListener(this);
+    this.listModel = new DataStoreQueryListModel(dataStore,
+      displayAttributeName, queries);
+    this.list = new JXList(this.listModel);
+    this.list.setCellRenderer(new DataObjectListCellRenderer(
+      displayAttributeName));
+    this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
+    this.list.addMouseListener(this);
+    this.listModel.addListDataListener(this);
 
-    menu.add(list);
-    menu.setFocusable(false);
-    menu.setBorderPainted(true);
-    menu.setBorder(BorderFactory.createCompoundBorder(
+    this.menu.add(this.list);
+    this.menu.setFocusable(false);
+    this.menu.setBorderPainted(true);
+    this.menu.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createLineBorder(Color.DARK_GRAY),
       BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
     setEditable(true);
     setSearchMode(SearchMode.REGULAR);
     PopupMenu.getPopupMenuFactory(this);
-    undoManager.addKeyMap(this);
+    this.undoManager.addKeyMap(this);
   }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
@@ -118,7 +119,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void addItemListener(final ItemListener l) {
-    listenerList.add(ItemListener.class, l);
+    this.listenerList.add(ItemListener.class, l);
   }
 
   @Override
@@ -132,7 +133,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   protected void fireItemStateChanged(final ItemEvent e) {
-    final Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = this.listenerList.getListenerList();
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
       if (listeners[i] == ItemListener.class) {
         ((ItemListener)listeners[i + 1]).itemStateChanged(e);
@@ -153,34 +154,34 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void focusLost(final FocusEvent e) {
-    menu.setVisible(false);
+    this.menu.setVisible(false);
   }
 
   @Override
   public String getFieldName() {
-    return displayAttributeName;
+    return this.displayAttributeName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @Override
   public <T> T getFieldValue() {
-    if (selectedItem == null) {
+    if (this.selectedItem == null) {
       return null;
     } else {
-      return selectedItem.getIdValue();
+      return this.selectedItem.getIdValue();
     }
   }
 
   public ItemListener[] getItemListeners() {
-    return listenerList.getListeners(ItemListener.class);
+    return this.listenerList.getListeners(ItemListener.class);
   }
 
   public DataObject getSelectedItem() {
-    return selectedItem;
+    return this.selectedItem;
   }
 
   @Override
@@ -202,7 +203,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void intervalAdded(final ListDataEvent e) {
-    list.getSelectionModel().clearSelection();
+    this.list.getSelectionModel().clearSelection();
   }
 
   @Override
@@ -216,12 +217,12 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   public boolean isTextSameAsSelected() {
-    if (selectedItem == null) {
+    if (this.selectedItem == null) {
       return false;
     } else {
       final String text = getText();
       if (StringUtils.hasText(text)) {
-        final String value = selectedItem.getString(displayAttributeName);
+        final String value = this.selectedItem.getString(this.displayAttributeName);
         return text.equalsIgnoreCase(value);
       } else {
         return false;
@@ -233,8 +234,8 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public void keyPressed(final KeyEvent e) {
     final int keyCode = e.getKeyCode();
     int increment = 1;
-    final int size = listModel.getSize();
-    int selectedIndex = list.getSelectedIndex();
+    final int size = this.listModel.getSize();
+    int selectedIndex = this.list.getSelectedIndex();
     switch (keyCode) {
       case KeyEvent.VK_UP:
         increment = -1;
@@ -248,14 +249,14 @@ public class DataStoreSearchTextField extends JXSearchField implements
         } else if (selectedIndex >= size) {
           selectedIndex = size - 1;
         }
-        list.setSelectedIndex(selectedIndex);
+        this.list.setSelectedIndex(selectedIndex);
         e.consume();
       break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
-            final DataObject selectedItem = listModel.getElementAt(selectedIndex);
-            final String text = selectedItem.getString(displayAttributeName);
+            final DataObject selectedItem = this.listModel.getElementAt(selectedIndex);
+            final String text = selectedItem.getString(this.displayAttributeName);
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
               setText(text);
@@ -264,7 +265,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
             }
           }
         }
-        if (listModel.getSelectedItem() != null) {
+        if (this.listModel.getSelectedItem() != null) {
           final JButton findButton = getFindButton();
           findButton.doClick();
           setText("");
@@ -286,14 +287,14 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getSource() == list) {
+    if (e.getSource() == this.list) {
       final Point point = e.getPoint();
-      final int index = list.locationToIndex(point);
+      final int index = this.list.locationToIndex(point);
       if (index > -1) {
-        list.setSelectedIndex(index);
-        final DataObject value = listModel.getElementAt(index);
+        this.list.setSelectedIndex(index);
+        final DataObject value = this.listModel.getElementAt(index);
         if (value != null) {
-          final String label = value.getString(displayAttributeName);
+          final String label = value.getString(this.displayAttributeName);
           setText(label);
         }
         requestFocus();
@@ -322,7 +323,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void removeItemListener(final ItemListener l) {
-    listenerList.remove(ItemListener.class, l);
+    this.listenerList.remove(ItemListener.class, l);
   }
 
   @Override
@@ -331,20 +332,20 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   protected void search() {
-    if (selectedItem != null) {
-      final DataObject oldValue = selectedItem;
-      selectedItem = null;
+    if (this.selectedItem != null) {
+      final DataObject oldValue = this.selectedItem;
+      this.selectedItem = null;
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
         oldValue, ItemEvent.DESELECTED));
     }
     final String text = getText();
-    listModel.setSearchText(text);
+    this.listModel.setSearchText(text);
     showMenu();
 
-    selectedItem = listModel.getSelectedItem();
-    if (selectedItem != null) {
+    this.selectedItem = this.listModel.getSelectedItem();
+    if (this.selectedItem != null) {
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-        selectedItem, ItemEvent.SELECTED));
+        this.selectedItem, ItemEvent.SELECTED));
     }
   }
 
@@ -370,7 +371,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     setSelectedTextColor(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -384,7 +385,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
@@ -394,7 +395,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   public void setMaxResults(final int maxResults) {
-    listModel.setMaxResults(maxResults);
+    this.listModel.setMaxResults(maxResults);
   }
 
   @Override
@@ -406,7 +407,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
@@ -417,22 +418,22 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   private void showMenu() {
-    final List<DataObject> objects = listModel.getObjects();
+    final List<DataObject> objects = this.listModel.getObjects();
     if (objects.isEmpty()) {
-      menu.setVisible(false);
+      this.menu.setVisible(false);
     } else {
-      menu.setVisible(true);
-      menu.show(this, 0, this.getHeight());
-      menu.pack();
+      this.menu.setVisible(true);
+      this.menu.show(this, 0, this.getHeight());
+      this.menu.pack();
       if (objects.size() == 1) {
-        list.setSelectedIndex(0);
+        this.list.setSelectedIndex(0);
       } else {
         int i = 0;
         for (final DataObject object : objects) {
-          final String value = object.getString(displayAttributeName);
+          final String value = object.getString(this.displayAttributeName);
           final String text = getText();
           if (value.equals(text)) {
-            list.setSelectedIndex(i);
+            this.list.setSelectedIndex(i);
           }
           i++;
         }

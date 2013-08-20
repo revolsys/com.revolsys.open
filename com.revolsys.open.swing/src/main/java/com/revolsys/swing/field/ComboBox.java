@@ -26,6 +26,11 @@ import com.revolsys.swing.undo.UndoManager;
 @SuppressWarnings("serial")
 public class ComboBox extends JComboBox implements Field {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private String fieldName;
 
   private Object fieldValue;
@@ -96,7 +101,7 @@ public class ComboBox extends JComboBox implements Field {
     if (converter != null) {
       AutoCompleteDecorator.decorate(this, converter);
     }
-    undoManager.addKeyMap(getEditor().getEditorComponent());
+    this.undoManager.addKeyMap(getEditor().getEditorComponent());
   }
 
   @Override
@@ -107,12 +112,12 @@ public class ComboBox extends JComboBox implements Field {
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
@@ -153,7 +158,7 @@ public class ComboBox extends JComboBox implements Field {
     component.setForeground(color);
     component.setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    setFieldToolTip(errorMessage);
+    setFieldToolTip(this.errorMessage);
   }
 
   @Override
@@ -170,18 +175,18 @@ public class ComboBox extends JComboBox implements Field {
     component.setForeground(TextField.DEFAULT_FOREGROUND);
     component.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    setFieldToolTip(originalToolTip);
+    setFieldToolTip(this.originalToolTip);
   }
 
   @Override
   public synchronized void setFieldValue(final Object value) {
-    final Object oldValue = fieldValue;
+    final Object oldValue = this.fieldValue;
     if (!EqualsRegistry.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
     if (!EqualsRegistry.equal(oldValue, value)) {
       this.fieldValue = value;
-      firePropertyChange(fieldName, oldValue, value);
+      firePropertyChange(this.fieldName, oldValue, value);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
         oldValue, value);
     }
@@ -190,7 +195,7 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

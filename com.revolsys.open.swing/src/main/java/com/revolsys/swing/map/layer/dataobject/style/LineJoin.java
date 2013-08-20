@@ -13,7 +13,7 @@ public enum LineJoin {
   }
 
   public int getAwtValue() {
-    return awtValue;
+    return this.awtValue;
   }
 
   @Override

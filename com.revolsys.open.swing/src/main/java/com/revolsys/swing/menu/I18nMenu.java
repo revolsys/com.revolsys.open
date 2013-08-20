@@ -5,6 +5,11 @@ import javax.swing.JMenu;
 
 @SuppressWarnings("serial")
 public class I18nMenu extends JMenu {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private CharSequence label;
 
   public I18nMenu() {
@@ -25,10 +30,10 @@ public class I18nMenu extends JMenu {
 
   @Override
   public String getText() {
-    if (label == null) {
+    if (this.label == null) {
       return super.getText();
     } else {
-      return label.toString();
+      return this.label.toString();
     }
   }
 }

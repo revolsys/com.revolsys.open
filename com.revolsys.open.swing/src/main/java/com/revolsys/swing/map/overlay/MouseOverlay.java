@@ -19,6 +19,11 @@ import javax.swing.JLayeredPane;
 public class MouseOverlay extends JComponent implements MouseListener,
   MouseMotionListener, MouseWheelListener, KeyListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public MouseOverlay(final JLayeredPane pane) {
     setFocusable(true);
     pane.add(this, new Integer(Integer.MAX_VALUE));

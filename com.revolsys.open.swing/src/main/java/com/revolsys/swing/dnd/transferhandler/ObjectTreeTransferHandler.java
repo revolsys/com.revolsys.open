@@ -39,7 +39,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
         final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
         final TreePath path = loc.getPath();
         if (path != null) {
-          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
           if (nodeModel != null) {
             final Set<Class<?>> supportedClasses = nodeModel.getSupportedChildClasses();
             try {
@@ -96,7 +96,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
             final TreePath parentPath = treePath.getParentPath();
             final Object parent = parentPath.getLastPathComponent();
             if (!pathTransferable.isSameParent(treePath)) {
-              final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(parentPath);
+              final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(parentPath);
               if (nodeModel != null) {
                 final Object child = treePath.getLastPathComponent();
                 nodeModel.removeChild(parent, child);
@@ -130,7 +130,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
       int index = loc.getChildIndex();
       if (path != null) {
         final Object node = path.getLastPathComponent();
-        final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+        final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
         if (nodeModel != null) {
           final Transferable transferable = support.getTransferable();
           try {

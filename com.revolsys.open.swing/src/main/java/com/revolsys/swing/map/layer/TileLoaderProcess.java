@@ -32,7 +32,7 @@ public class TileLoaderProcess extends SwingWorker<Void, Void> {
 
   public synchronized boolean addMapTiles(final double resolution,
     final GeometryFactory geometryFactory, final List<MapTile> mapTiles) {
-    if (running) {
+    if (this.running) {
       if (this.resolution < 0 || resolution == this.resolution) {
         if (this.geometryFactory == null
           || this.geometryFactory == geometryFactory) {
@@ -42,24 +42,24 @@ public class TileLoaderProcess extends SwingWorker<Void, Void> {
         }
       }
     }
-    return running;
+    return this.running;
   }
 
   @Override
   protected Void doInBackground() throws Exception {
     do {
-      mapTile = getNextMapTile();
-      if (mapTile != null) {
+      this.mapTile = getNextMapTile();
+      if (this.mapTile != null) {
         try {
-          mapTile.loadImage(geometryFactory);
+          this.mapTile.loadImage(this.geometryFactory);
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
-            "Unable to load " + mapTile, e);
+            "Unable to load " + this.mapTile, e);
         }
       }
-    } while (!isCancelled() && mapTile != null);
+    } while (!isCancelled() && this.mapTile != null);
     if (!isCancelled()) {
-      renderer.setLoaded();
+      this.renderer.setLoaded();
     }
     return null;
   }
@@ -70,9 +70,9 @@ public class TileLoaderProcess extends SwingWorker<Void, Void> {
   }
 
   private synchronized MapTile getNextMapTile() {
-    final MapTile mapTile = mapTiles.poll();
+    final MapTile mapTile = this.mapTiles.poll();
     if (mapTile == null) {
-      running = false;
+      this.running = false;
     }
     return mapTile;
   }

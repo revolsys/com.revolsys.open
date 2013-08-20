@@ -19,6 +19,11 @@ import com.revolsys.swing.map.MapPanel;
 public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final MapPanel map;
 
   public SelectMapScale(final MapPanel map) {
@@ -47,7 +52,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
       String string = StringConverterRegistry.toString(item);
       string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
       final double scale = Double.parseDouble(string);
-      map.setScale(scale);
+      this.map.setScale(scale);
     } catch (final Throwable t) {
     }
   }
@@ -55,12 +60,12 @@ public class SelectMapScale extends JComboBox implements ItemListener,
   @Override
   public void itemStateChanged(final ItemEvent e) {
     if (e.getStateChange() == ItemEvent.SELECTED) {
-      double scale = map.getScale();
+      double scale = this.map.getScale();
       final Object value = e.getItem();
       if (value instanceof Double) {
         scale = (Double)value;
       }
-      map.setScale(scale);
+      this.map.setScale(scale);
     }
   }
 
@@ -68,7 +73,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     if ("scale".equals(propertyName)) {
-      final double scale = map.getScale();
+      final double scale = this.map.getScale();
       setSelectedItem(scale);
     }
   }

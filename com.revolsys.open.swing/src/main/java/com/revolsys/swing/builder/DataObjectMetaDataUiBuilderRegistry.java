@@ -39,13 +39,13 @@ public class DataObjectMetaDataUiBuilderRegistry {
   }
 
   private List<ValueUiBuilder> getUiBuilders(final DataObjectMetaData schema) {
-    List<ValueUiBuilder> builders = uiBuilders.get(schema);
+    List<ValueUiBuilder> builders = this.uiBuilders.get(schema);
     if (builders == null) {
       builders = new ArrayList<ValueUiBuilder>(schema.getAttributeCount());
       for (int i = 0; i < schema.getAttributeCount(); i++) {
         builders.add(null);
       }
-      uiBuilders.put(schema, builders);
+      this.uiBuilders.put(schema, builders);
     }
     return builders;
   }

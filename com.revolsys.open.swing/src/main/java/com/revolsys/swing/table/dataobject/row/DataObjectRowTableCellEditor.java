@@ -15,6 +15,11 @@ import com.revolsys.swing.builder.ValueUiBuilder;
 @SuppressWarnings("serial")
 public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
   private final JTextField editorComponent = new JTextField();
@@ -32,10 +37,10 @@ public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public Object getCellEditorValue() {
-    if (uiBuilder != null) {
-      return uiBuilder.getCellEditorValue();
+    if (this.uiBuilder != null) {
+      return this.uiBuilder.getCellEditorValue();
     } else {
-      return editorComponent.getText();
+      return this.editorComponent.getText();
     }
   }
 
@@ -45,9 +50,9 @@ public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
     final int column) {
     final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
     final DataObjectMetaData metaData = model.getMetaData();
-    uiBuilder = uiBuilderRegistry.getValueUiBuilder(metaData, column);
-    if (uiBuilder != null) {
-      return uiBuilder.getEditorComponent(value);
+    this.uiBuilder = this.uiBuilderRegistry.getValueUiBuilder(metaData, column);
+    if (this.uiBuilder != null) {
+      return this.uiBuilder.getEditorComponent(value);
     } else {
       final String fieldName = metaData.getAttributeName(column);
       return SwingUtil.createField(metaData, fieldName, true);

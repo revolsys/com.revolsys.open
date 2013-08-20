@@ -24,6 +24,6 @@ public enum CompositionOperation {
 
   @Override
   public String toString() {
-    return label;
+    return this.label;
   }
 }

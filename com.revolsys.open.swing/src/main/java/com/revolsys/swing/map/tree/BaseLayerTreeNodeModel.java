@@ -42,7 +42,7 @@ public class BaseLayerTreeNodeModel extends
       setSupportedClasses(supportedClasses);
     }
 
-    setSupportedChildClasses(SUPPORTED_CHILD_CLASSES);
+    setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
     setObjectTreeNodeModels(new MultipleLayerRendererTreeNodeModel(),
       new BaseLayerRendererTreeNodeModel());
     setRenderer(new LayerTreeCellRenderer());
@@ -128,7 +128,7 @@ public class BaseLayerTreeNodeModel extends
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 
 }

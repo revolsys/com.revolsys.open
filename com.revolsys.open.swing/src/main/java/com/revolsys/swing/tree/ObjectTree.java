@@ -32,6 +32,11 @@ import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 public class ObjectTree extends JTree implements PropertyChangeListener,
   MouseListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static Object mouseClickItem = null;
 
   public static TreePath createTreePath(final Collection<? extends Object> path) {
@@ -122,11 +127,11 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   public String convertValueToText(final Object value, final boolean selected,
     final boolean expanded, final boolean leaf, final int row,
     final boolean hasFocus) {
-    if (model != null) {
+    if (this.model != null) {
       if (value != null) {
-        final TreePath path = model.getPath(value);
+        final TreePath path = this.model.getPath(value);
         if (path != null) {
-          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
           if (nodeModel != null) {
             return nodeModel.convertValueToText(value, selected, expanded,
               leaf, row, hasFocus);
@@ -146,7 +151,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   @Override
   public void expandPath(final TreePath path) {
     if (path != null) {
-      model.initializePath(path);
+      this.model.initializePath(path);
       super.expandPath(path);
     }
   }
@@ -168,7 +173,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   }
 
   public boolean isMenuEnabled() {
-    return menuEnabled;
+    return this.menuEnabled;
   }
 
   @Override
@@ -177,7 +182,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     final int y = e.getY();
     final TreePath path = ObjectTree.this.getPathForLocation(x, y);
     if (path != null) {
-      final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+      final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
       if (nodeModel != null) {
         final Object node = path.getLastPathComponent();
         final MouseListener listener = nodeModel.getMouseListener(node);
@@ -203,7 +208,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   @Override
   public void mousePressed(final MouseEvent e) {
     if (e.isPopupTrigger()) {
-      popup(model, e);
+      popup(this.model, e);
       repaint();
     }
   }
@@ -211,13 +216,13 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   @Override
   public void mouseReleased(final MouseEvent e) {
     if (e.isPopupTrigger()) {
-      popup(model, e);
+      popup(this.model, e);
       repaint();
     }
   }
 
   private void popup(final ObjectTreeModel model, final MouseEvent e) {
-    if (menuEnabled) {
+    if (this.menuEnabled) {
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = ObjectTree.this.getPathForLocation(x, y);
@@ -251,14 +256,14 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
       final Object oldValue = event.getOldValue();
       final Object newValue = event.getNewValue();
       if (oldValue == null) {
-        final TreePath path = model.getPath(source);
+        final TreePath path = this.model.getPath(source);
         if (path != null) {
-          model.fireTreeNodesInserted(path, index, newValue);
+          this.model.fireTreeNodesInserted(path, index, newValue);
         }
       } else if (newValue == null) {
-        final TreePath path = model.getPath(source);
+        final TreePath path = this.model.getPath(source);
         if (path != null) {
-          model.fireTreeNodesRemoved(path, index, oldValue);
+          this.model.fireTreeNodesRemoved(path, index, oldValue);
         }
       }
 

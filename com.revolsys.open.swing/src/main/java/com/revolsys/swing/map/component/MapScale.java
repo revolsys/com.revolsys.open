@@ -16,6 +16,11 @@ import com.revolsys.swing.map.Viewport2D;
 
 @SuppressWarnings("serial")
 public class MapScale extends JLabel implements PropertyChangeListener {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final DecimalFormat FORMAT = new DecimalFormat("#,###");
 
   static {
@@ -58,7 +63,7 @@ public class MapScale extends JLabel implements PropertyChangeListener {
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     if ("scale".equals(event.getPropertyName())) {
-      final double scale = viewport.getScale();
+      final double scale = this.viewport.getScale();
       setText(formatScale(scale));
     }
   }

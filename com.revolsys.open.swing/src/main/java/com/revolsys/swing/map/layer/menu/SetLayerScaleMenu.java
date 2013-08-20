@@ -42,7 +42,7 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
   @Override
   public JMenu createComponent() {
     String name;
-    if (min) {
+    if (this.min) {
       name = "Hide zoomed out beyond (minimum) scale";
     } else {
       name = "Hide zoomed in beyond (maximum) scale";
@@ -52,7 +52,7 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
       if (layer.isHasGeometry()) {
         final JMenu menu = new JMenu(name);
         double layerScale;
-        if (min) {
+        if (this.min) {
           layerScale = layer.getMinimumScale();
         } else {
           layerScale = layer.getMaximumScale();
@@ -98,7 +98,7 @@ public class SetLayerScaleMenu implements ComponentFactory<JMenu> {
   public void setScale(final double scale) {
     final Layer layer = ObjectTree.getMouseClickItem();
     if (layer != null) {
-      if (min) {
+      if (this.min) {
         layer.setMinimumScale((long)scale);
       } else {
         layer.setMaximumScale((long)scale);

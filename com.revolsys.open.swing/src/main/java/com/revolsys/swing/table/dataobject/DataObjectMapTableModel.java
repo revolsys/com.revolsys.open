@@ -9,6 +9,11 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 @SuppressWarnings("serial")
 public class DataObjectMapTableModel extends AbstractDataObjectTableModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static JComponent create(final DataObjectMetaData metaData,
     final Map<String, Object> values, final boolean editable) {
     final DataObjectMapTableModel model = new DataObjectMapTableModel(metaData,
@@ -27,23 +32,23 @@ public class DataObjectMapTableModel extends AbstractDataObjectTableModel {
   @Override
   protected Object getValue(final int rowIndex) {
     final String name = getAttributeName(rowIndex);
-    return values.get(name);
+    return this.values.get(name);
   }
 
   public Map<String, ? extends Object> getValues() {
-    return values;
+    return this.values;
   }
 
   @Override
   protected Object setValue(final Object value, final int rowIndex) {
     final String name = getAttributeName(rowIndex);
-    final Object oldValue = values.get(name);
-    values.put(name, value);
+    final Object oldValue = this.values.get(name);
+    this.values.put(name, value);
     return oldValue;
   }
 
   public void setValue(final String fieldName, final Object fieldValue) {
-    values.put(fieldName, fieldValue);
+    this.values.put(fieldName, fieldValue);
     fireTableDataChanged();
   }
 

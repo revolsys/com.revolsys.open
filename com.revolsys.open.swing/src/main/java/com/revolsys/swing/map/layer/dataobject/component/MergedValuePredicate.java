@@ -49,13 +49,13 @@ public class MergedValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final LayerDataObject object = model.getObject(rowIndex);
-      if (object == mergedObject || mergedObject == null) {
+      final LayerDataObject object = this.model.getObject(rowIndex);
+      if (object == this.mergedObject || this.mergedObject == null) {
         return false;
       } else {
-        final String attributeName = model.getAttributeName(columnIndex);
+        final String attributeName = this.model.getAttributeName(columnIndex);
         final Object value = object.getValue(attributeName);
-        final Object mergedValue = mergedObject.getValue(attributeName);
+        final Object mergedValue = this.mergedObject.getValue(attributeName);
         return !EqualsRegistry.equal(value, mergedValue);
       }
     } catch (final IndexOutOfBoundsException e) {

@@ -19,6 +19,11 @@ import com.revolsys.swing.table.BaseJxTable;
 @SuppressWarnings("serial")
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final String[] COLUMN_NAMES = {
     "#", "Name", "Value"
   };
@@ -94,7 +99,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
   }
 
   public String getAttributeName(final int rowIndex) {
-    return metaData.getAttributeName(rowIndex);
+    return this.metaData.getAttributeName(rowIndex);
   }
 
   @Override
@@ -108,20 +113,20 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
   }
 
   public DataObjectMetaData getMetaData() {
-    return metaData;
+    return this.metaData;
   }
 
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   public Set<String> getReadOnlyFieldNames() {
-    return readOnlyFieldNames;
+    return this.readOnlyFieldNames;
   }
 
   @Override
   public int getRowCount() {
-    return metaData.getAttributeCount();
+    return this.metaData.getAttributeCount();
 
   }
 
@@ -134,7 +139,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
         return rowIndex;
       case 1:
         final String attributeName = getAttributeName(rowIndex);
-        final String title = metaData.getAttributeTitle(attributeName);
+        final String title = this.metaData.getAttributeTitle(attributeName);
         return title;
       case 2:
         return getValue(rowIndex);
@@ -146,12 +151,12 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
-      if (editable) {
-        if (rowIndex == metaData.getIdAttributeIndex()) {
+      if (this.editable) {
+        if (rowIndex == this.metaData.getIdAttributeIndex()) {
           return false;
         } else {
           final String attributeName = getAttributeName(rowIndex);
-          return !readOnlyFieldNames.contains(attributeName);
+          return !this.readOnlyFieldNames.contains(attributeName);
         }
       } else {
         return false;
@@ -162,7 +167,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
   }
 
   public boolean isEditable() {
-    return editable;
+    return this.editable;
   }
 
   public void removePropertyChangeListener(
@@ -193,7 +198,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel {
     if (isCellEditable(rowIndex, columnIndex)) {
       final Object oldValue = setValue(value, rowIndex);
       final String propertyName = getAttributeName(rowIndex);
-      propertyChangeSupport.firePropertyChange(propertyName, oldValue, value);
+      this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+        value);
     }
   }
 }

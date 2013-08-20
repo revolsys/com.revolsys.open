@@ -216,87 +216,87 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public LineCap getLineCap() {
-    return lineCap;
+    return this.lineCap;
   }
 
   public LineCap getLineCapEnum() {
-    return lineCap;
+    return this.lineCap;
   }
 
   public Color getLineColor() {
-    return lineColor;
+    return this.lineColor;
   }
 
   public CompositionOperation getLineCompOp() {
-    return lineCompOp;
+    return this.lineCompOp;
   }
 
   public double getLineGamma() {
-    return lineGamma;
+    return this.lineGamma;
   }
 
   public GammaMethod getLineGammaMethod() {
-    return lineGammaMethod;
+    return this.lineGammaMethod;
   }
 
   public LineJoin getLineJoin() {
-    return lineJoin;
+    return this.lineJoin;
   }
 
   public LineJoin getLineJoinEnum() {
-    return lineJoin;
+    return this.lineJoin;
   }
 
   public float getLineMiterlimit() {
-    return lineMiterlimit;
+    return this.lineMiterlimit;
   }
 
   public int getLineOpacity() {
-    return lineOpacity;
+    return this.lineOpacity;
   }
 
   public double getLineSmooth() {
-    return lineSmooth;
+    return this.lineSmooth;
   }
 
   public Measure<Length> getLineWidth() {
-    return lineWidth;
+    return this.lineWidth;
   }
 
   public CompositionOperation getPolygonCompOp() {
-    return polygonCompOp;
+    return this.polygonCompOp;
   }
 
   public Color getPolygonFill() {
-    return polygonFill;
+    return this.polygonFill;
   }
 
   public int getPolygonFillOpacity() {
-    return polygonFillOpacity;
+    return this.polygonFillOpacity;
   }
 
   public double getPolygonGamma() {
-    return polygonGamma;
+    return this.polygonGamma;
   }
 
   public GammaMethod getPolygonGammaMethod() {
-    return polygonGammaMethod;
+    return this.polygonGammaMethod;
   }
 
   public double getPolygonSmooth() {
-    return polygonSmooth;
+    return this.polygonSmooth;
   }
 
   public boolean isLineClip() {
-    return lineClip;
+    return this.lineClip;
   }
 
   public boolean isPolygonClip() {
-    return polygonClip;
+    return this.polygonClip;
   }
 
   public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    graphics.setPaint(polygonFill);
+    graphics.setPaint(this.polygonFill);
     // final Graphic fillPattern = fill.getPattern();
     // if (fillPattern != null) {
     // TODO fillPattern
@@ -330,7 +330,7 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setLineColor(final Color lineColor) {
     if (lineColor == null) {
-      this.lineColor = new Color(128, 128, 128, lineOpacity);
+      this.lineColor = new Color(128, 128, 128, this.lineOpacity);
     } else {
       this.lineColor = lineColor;
       this.lineOpacity = lineColor.getAlpha();
@@ -375,7 +375,7 @@ public class GeometryStyle extends MarkerStyle {
         "Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
-      this.lineColor = WebColors.getColorWithOpacity(lineColor,
+      this.lineColor = WebColors.getColorWithOpacity(this.lineColor,
         this.lineOpacity);
     }
   }
@@ -385,7 +385,7 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Line opacity must be between 0 - 255");
     } else {
       this.lineOpacity = lineOpacity;
-      this.lineColor = WebColors.getColorWithOpacity(lineColor,
+      this.lineColor = WebColors.getColorWithOpacity(this.lineColor,
         this.lineOpacity);
     }
   }
@@ -398,7 +398,8 @@ public class GeometryStyle extends MarkerStyle {
     final Color color = getLineColor();
     graphics.setColor(color);
 
-    final float width = (float)Viewport2D.toDisplayValue(viewport, lineWidth);
+    final float width = (float)Viewport2D.toDisplayValue(viewport,
+      this.lineWidth);
 
     final float dashPhase = 0;
     /*
@@ -418,7 +419,7 @@ public class GeometryStyle extends MarkerStyle {
     final int lineCap = this.lineCap.getAwtValue();
     final int lineJoin = this.lineJoin.getAwtValue();
     final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
-      lineMiterlimit, dashArray, dashPhase);
+      this.lineMiterlimit, dashArray, dashPhase);
     graphics.setStroke(basicStroke);
   }
 
@@ -440,7 +441,7 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setPolygonFill(final Color fill) {
     if (fill == null) {
-      this.polygonFill = new Color(128, 128, 128, polygonFillOpacity);
+      this.polygonFill = new Color(128, 128, 128, this.polygonFillOpacity);
     } else {
       this.polygonFill = fill;
       this.polygonFillOpacity = fill.getAlpha();
@@ -453,7 +454,7 @@ public class GeometryStyle extends MarkerStyle {
         "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFill = WebColors.getColorWithOpacity(polygonFill,
+      this.polygonFill = WebColors.getColorWithOpacity(this.polygonFill,
         this.polygonFillOpacity);
     }
   }
@@ -463,7 +464,7 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFill = WebColors.getColorWithOpacity(polygonFill,
+      this.polygonFill = WebColors.getColorWithOpacity(this.polygonFill,
         this.polygonFillOpacity);
     }
   }

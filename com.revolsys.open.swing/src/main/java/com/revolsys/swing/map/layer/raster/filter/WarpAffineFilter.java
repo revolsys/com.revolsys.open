@@ -56,15 +56,15 @@ public class WarpAffineFilter extends WarpFilter {
       final AffineTransform transform = new AffineTransform(scaleX, shearY,
         shearX, scaleY, translateX, translateY);
       final AffineTransform invTransform = transform.createInverse();
-      inverseTranslateX = invTransform.getTranslateX();
-      inverseScaleX = invTransform.getScaleX();
-      inverseShearX = invTransform.getShearX();
+      this.inverseTranslateX = invTransform.getTranslateX();
+      this.inverseScaleX = invTransform.getScaleX();
+      this.inverseShearX = invTransform.getShearX();
 
-      inverseTranslateY = invTransform.getTranslateY();
-      inverseShearY = invTransform.getShearY();
-      inverseScaleY = invTransform.getScaleY();
+      this.inverseTranslateY = invTransform.getTranslateY();
+      this.inverseShearY = invTransform.getShearY();
+      this.inverseScaleY = invTransform.getScaleY();
     } catch (final java.awt.geom.NoninvertibleTransformException e) {
-      hasInverse = false;
+      this.hasInverse = false;
     }
   }
 
@@ -106,12 +106,12 @@ public class WarpAffineFilter extends WarpFilter {
   }
 
   public boolean isIdentityTransform() {
-    if (translateX == 0) {
-      if (translateY == 0) {
-        if (scaleX == 1) {
-          if (scaleY == 0) {
-            if (shearX == 0) {
-              if (shearY == 0) {
+    if (this.translateX == 0) {
+      if (this.translateY == 0) {
+        if (this.scaleX == 1) {
+          if (this.scaleY == 0) {
+            if (this.shearX == 0) {
+              if (this.shearY == 0) {
                 return true;
               }
             }
@@ -124,11 +124,11 @@ public class WarpAffineFilter extends WarpFilter {
 
   @Override
   public Coordinates toDestPoint(final double sourceX, final double sourceY) {
-    if (hasInverse) {
-      final double destX = inverseTranslateX + inverseScaleX * sourceX
-        + inverseShearX * sourceY;
-      final double destY = inverseTranslateY + inverseShearY * sourceX
-        + inverseScaleY * sourceY;
+    if (this.hasInverse) {
+      final double destX = this.inverseTranslateX + this.inverseScaleX
+        * sourceX + this.inverseShearX * sourceY;
+      final double destY = this.inverseTranslateY + this.inverseShearY
+        * sourceX + this.inverseScaleY * sourceY;
       return new DoubleCoordinates(destX, destY);
     } else {
       return null;
@@ -137,8 +137,10 @@ public class WarpAffineFilter extends WarpFilter {
 
   @Override
   public Coordinates toSourcePoint(final double destX, final double destY) {
-    final double sourceX = translateX + scaleX * destX + shearX * destY;
-    final double sourceY = translateY + shearY * destX + scaleY * destY;
+    final double sourceX = this.translateX + this.scaleX * destX + this.shearX
+      * destY;
+    final double sourceY = this.translateY + this.shearY * destX + this.scaleY
+      * destY;
     return new DoubleCoordinates(sourceX, sourceY);
   }
 }

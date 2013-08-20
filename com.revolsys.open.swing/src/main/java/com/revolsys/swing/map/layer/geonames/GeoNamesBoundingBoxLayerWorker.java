@@ -69,7 +69,7 @@ public class GeoNamesBoundingBoxLayerWorker extends
       geometryFactory = GeometryFactory.getFactory(geoCs);
       boundingBox = new BoundingBox(geometryFactory, boundingBox);
     }
-    final List<DataObject> results = geoNamesService.getNames(boundingBox);
+    final List<DataObject> results = this.geoNamesService.getNames(boundingBox);
     for (final DataObject dataObject : results) {
       final String name = dataObject.getValue("name");
       final Point point = dataObject.getGeometryValue();
@@ -89,9 +89,9 @@ public class GeoNamesBoundingBoxLayerWorker extends
   protected void done() {
     try {
       final DataObjectQuadTree index = get();
-      layer.setIndex(boundingBox, index);
+      this.layer.setIndex(this.boundingBox, index);
     } catch (final Throwable e) {
-      layer.setIndex(boundingBox, null);
+      this.layer.setIndex(this.boundingBox, null);
     }
   }
 

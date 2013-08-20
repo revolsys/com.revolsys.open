@@ -26,11 +26,10 @@ public class DataObjectStoreSchemaTreeNodeModel extends
     setSupportedChildClasses(DataObjectMetaData.class);
     setObjectTreeNodeModels(new DataObjectMetaDataTreeNodeModel());
     setLazyLoad(true);
-    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder",
-        "database");
-    renderer.setLeafIcon(icon);
-    renderer.setOpenIcon(icon);
-    renderer.setClosedIcon(icon);
+    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
+    this.renderer.setLeafIcon(icon);
+    this.renderer.setOpenIcon(icon);
+    this.renderer.setClosedIcon(icon);
   }
 
   @Override
@@ -67,7 +66,7 @@ public class DataObjectStoreSchemaTreeNodeModel extends
 
   @Override
   public MenuFactory getMenu(final DataObjectStoreSchema schema) {
-    return menu;
+    return this.menu;
   }
 
   @Override
@@ -77,7 +76,7 @@ public class DataObjectStoreSchemaTreeNodeModel extends
 
   @Override
   public TreeCellRenderer getRenderer(final DataObjectStoreSchema schema) {
-    return renderer;
+    return this.renderer;
   }
 
   @Override

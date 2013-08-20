@@ -67,11 +67,11 @@ public class GridLayer extends AbstractLayer {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return grid.getGeometryFactory();
+    return this.grid.getGeometryFactory();
   }
 
   public RectangularMapGrid getGrid() {
-    return grid;
+    return this.grid;
   }
 
   @Override

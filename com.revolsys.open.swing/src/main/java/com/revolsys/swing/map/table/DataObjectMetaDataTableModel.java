@@ -12,6 +12,11 @@ import com.revolsys.swing.table.BaseJxTable;
 @SuppressWarnings("serial")
 public class DataObjectMetaDataTableModel extends AbstractTableModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Column",
     "Type", "Length", "Scale", "Required");
 
@@ -54,12 +59,12 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return metaData.getAttributeCount();
+    return this.metaData.getAttributeCount();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final Attribute attribute = metaData.getAttribute(rowIndex);
+    final Attribute attribute = this.metaData.getAttribute(rowIndex);
     if (attribute == null) {
       return "...";
     } else {

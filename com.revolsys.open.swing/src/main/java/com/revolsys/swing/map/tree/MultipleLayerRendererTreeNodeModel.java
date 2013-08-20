@@ -28,7 +28,7 @@ public class MultipleLayerRendererTreeNodeModel
   public MultipleLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractMultipleRenderer.class);
 
-    setSupportedChildClasses(SUPPORTED_CHILD_CLASSES);
+    setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
     setRenderer(new LayerRendererTreeCellRenderer());
     setObjectTreeNodeModels(this, new BaseLayerRendererTreeNodeModel());
     setMouseListener(this);

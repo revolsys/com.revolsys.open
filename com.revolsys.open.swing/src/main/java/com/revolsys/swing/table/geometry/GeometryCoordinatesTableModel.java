@@ -67,12 +67,12 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return columnCount;
+    return this.columnCount;
   }
 
   @Override
   public String getColumnName(final int column) {
-    return axisNames.get(column);
+    return this.axisNames.get(column);
   }
 
   private Coordinates getCoordinates(final int rowIndex) {
@@ -80,33 +80,33 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     if (vertexIndex == null) {
       return null;
     } else {
-      return vertexIndexMap.get(vertexIndex);
+      return this.vertexIndexMap.get(vertexIndex);
     }
   }
 
   public DataObjectLayerForm getForm() {
-    return form;
+    return this.form;
   }
 
   public Geometry getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
   public int getNumAxis() {
-    return numAxis;
+    return this.numAxis;
   }
 
   public int getNumIndexItems() {
-    return numIndexItems;
+    return this.numIndexItems;
   }
 
   @Override
   public int getRowCount() {
-    return vertexIndices.size();
+    return this.vertexIndices.size();
   }
 
   public int getSegmentIndexColumn() {
-    return segmentIndexColumn;
+    return this.segmentIndexColumn;
   }
 
   @Override
@@ -114,10 +114,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     final int[] vertexIndex = getVertexIndex(rowIndex);
     if (columnIndex < vertexIndex.length) {
       return vertexIndex[columnIndex];
-    } else if (columnIndex == segmentIndexColumn) {
+    } else if (columnIndex == this.segmentIndexColumn) {
       return vertexIndex[vertexIndex.length - 1] + " \u2193";
     } else {
-      final int axisIndex = columnIndex - numIndexItems;
+      final int axisIndex = columnIndex - this.numIndexItems;
       final Coordinates point = getCoordinates(rowIndex);
       if (point != null) {
         final double coordinate = point.getValue(axisIndex);
@@ -130,11 +130,11 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   public int[] getVertexIndex(final int rowIndex) {
-    return vertexIndices.get(rowIndex);
+    return this.vertexIndices.get(rowIndex);
   }
 
   public int getVertexIndexColumn() {
-    return vertexIndexColumn;
+    return this.vertexIndexColumn;
   }
 
   public void setForm(final DataObjectLayerForm form) {
@@ -149,38 +149,38 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       this.vertexIndices = Collections.emptyList();
     } else {
       this.vertexIndexMap = GeometryEditUtil.getIndexOfVertices(geometry);
-      this.vertexIndices = new ArrayList<int[]>(vertexIndexMap.keySet());
+      this.vertexIndices = new ArrayList<int[]>(this.vertexIndexMap.keySet());
     }
-    numAxis = geometryFactory.getNumAxis();
-    axisNames = new ArrayList<String>();
+    this.numAxis = this.geometryFactory.getNumAxis();
+    this.axisNames = new ArrayList<String>();
     if (geometry instanceof Polygon) {
-      axisNames.add("R");
+      this.axisNames.add("R");
     } else if (geometry instanceof MultiPoint) {
-      axisNames.add("P");
+      this.axisNames.add("P");
     } else if (geometry instanceof MultiLineString) {
-      axisNames.add("P");
+      this.axisNames.add("P");
     } else if (geometry instanceof MultiPolygon) {
-      axisNames.add("P");
-      axisNames.add("R");
+      this.axisNames.add("P");
+      this.axisNames.add("R");
     } else if (geometry instanceof GeometryCollection) {
-      axisNames.add("P");
-      axisNames.add("R");
+      this.axisNames.add("P");
+      this.axisNames.add("R");
     } else {
     }
-    vertexIndexColumn = axisNames.size();
-    axisNames.add("#");
-    segmentIndexColumn = axisNames.size();
-    axisNames.add("S #");
-    numIndexItems = axisNames.size();
-    axisNames.add("X");
-    axisNames.add("Y");
-    if (numAxis > 2) {
-      axisNames.add("Z");
+    this.vertexIndexColumn = this.axisNames.size();
+    this.axisNames.add("#");
+    this.segmentIndexColumn = this.axisNames.size();
+    this.axisNames.add("S #");
+    this.numIndexItems = this.axisNames.size();
+    this.axisNames.add("X");
+    this.axisNames.add("Y");
+    if (this.numAxis > 2) {
+      this.axisNames.add("Z");
     }
-    if (numAxis > 3) {
-      axisNames.add("M");
+    if (this.numAxis > 3) {
+      this.axisNames.add("M");
     }
-    columnCount = axisNames.size();
+    this.columnCount = this.axisNames.size();
     fireTableStructureChanged();
   }
 

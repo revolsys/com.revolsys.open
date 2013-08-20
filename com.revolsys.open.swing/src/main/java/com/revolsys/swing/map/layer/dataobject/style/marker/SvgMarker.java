@@ -25,7 +25,7 @@ public class SvgMarker extends AbstractMarker {
   public SvgMarker(final Resource resource) {
     if (resource != null) {
       try {
-        shape = new SVGUniverse().getDiagram(resource.getURI());
+        this.shape = new SVGUniverse().getDiagram(resource.getURI());
       } catch (final IOException e) {
         throw new IllegalArgumentException("Cannot get URI for " + resource, e);
       }
@@ -75,7 +75,7 @@ public class SvgMarker extends AbstractMarker {
     // TODO scale image
 
     try {
-      shape.render(graphics);
+      this.shape.render(graphics);
     } catch (final SVGException e) {
       LoggerFactory.getLogger(getClass()).error("Unable to render", e);
     }
@@ -84,10 +84,10 @@ public class SvgMarker extends AbstractMarker {
 
   @Override
   public String toString() {
-    if (name == null) {
+    if (this.name == null) {
       return "unknown";
     } else {
-      return name;
+      return this.name;
     }
   }
 }

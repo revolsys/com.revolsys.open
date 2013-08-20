@@ -23,9 +23,9 @@ public class EnableComponentListener implements ItemListener,
   @Override
   public void changedUpdate(final DocumentEvent e) {
     if (e.getDocument().getLength() == 0) {
-      component.setEnabled(false);
+      this.component.setEnabled(false);
     } else {
-      component.setEnabled(true);
+      this.component.setEnabled(true);
     }
   }
 
@@ -39,9 +39,9 @@ public class EnableComponentListener implements ItemListener,
     final ItemSelectable itemSelectable = e.getItemSelectable();
     final Object[] selectedObjects = itemSelectable.getSelectedObjects();
     if (selectedObjects == null) {
-      component.setEnabled(false);
+      this.component.setEnabled(false);
     } else {
-      component.setEnabled(true);
+      this.component.setEnabled(true);
     }
   }
 
@@ -50,7 +50,7 @@ public class EnableComponentListener implements ItemListener,
     final Object newValue = event.getNewValue();
     if (newValue instanceof Boolean) {
       final Boolean enabled = (Boolean)newValue;
-      component.setEnabled(enabled);
+      this.component.setEnabled(enabled);
 
     }
   }
@@ -66,9 +66,9 @@ public class EnableComponentListener implements ItemListener,
 
       final int firstIndex = e.getFirstIndex();
       if (firstIndex == -1) {
-        component.setEnabled(false);
+        this.component.setEnabled(false);
       } else {
-        component.setEnabled(true);
+        this.component.setEnabled(true);
       }
     }
   }

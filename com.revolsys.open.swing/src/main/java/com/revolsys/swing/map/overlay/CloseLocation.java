@@ -42,12 +42,12 @@ public class CloseLocation {
     final Object id = getId();
     string.append(id);
     string.append(", ");
-    int[] index = vertexIndex;
+    int[] index = this.vertexIndex;
     if (index != null) {
       string.append("vertexIndex=");
     } else {
       string.append("segmentIndex=");
-      index = segment.getIndex();
+      index = this.segment.getIndex();
     }
     final String indexString = CollectionUtil.toString(CollectionUtil.arrayToList(index));
     string.append(indexString);
@@ -55,17 +55,17 @@ public class CloseLocation {
 
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G getGeometry() {
-    return (G)geometry;
+    return (G)this.geometry;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return layer.getGeometryFactory();
+    return this.layer.getGeometryFactory();
   }
 
   public Object getId() {
     Object id = null;
-    if (object != null) {
-      id = object.getIdValue();
+    if (this.object != null) {
+      id = this.object.getIdValue();
     }
     if (id == null) {
       id = "NEW";
@@ -78,32 +78,36 @@ public class CloseLocation {
   }
 
   public String getIndexString() {
-    int[] index = vertexIndex;
+    int[] index = this.vertexIndex;
     if (index != null) {
     } else {
-      index = segment.getIndex();
+      index = this.segment.getIndex();
     }
     return CollectionUtil.toString(CollectionUtil.arrayToList(index));
   }
 
   public DataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public DataObjectMetaData getMetaData() {
-    return layer.getMetaData();
+    return this.layer.getMetaData();
   }
 
   public LayerDataObject getObject() {
-    return object;
+    return this.object;
   }
 
   public Coordinates getPoint() {
-    return point;
+    return this.point;
   }
 
   public IndexedLineSegment getSegment() {
-    return segment;
+    return this.segment;
+  }
+
+  public int[] getSegmentIndex() {
+    return this.segment.getIndex();
   }
 
   public String getTypePath() {
@@ -112,7 +116,7 @@ public class CloseLocation {
   }
 
   public int[] getVertexIndex() {
-    return vertexIndex;
+    return this.vertexIndex;
   }
 
   @Override

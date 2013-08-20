@@ -57,7 +57,7 @@ public class Project extends LayerGroup {
 
   public Project(final String name) {
     super(name);
-    baseMapLayers.setLayerGroup(this);
+    this.baseMapLayers.setLayerGroup(this);
     set(this);
   }
 
@@ -82,22 +82,22 @@ public class Project extends LayerGroup {
   }
 
   public LayerGroup getBaseMapLayers() {
-    return baseMapLayers;
+    return this.baseMapLayers;
   }
 
   public DataObjectStoreConnectionRegistry getDataStores() {
-    return dataStores;
+    return this.dataStores;
   }
 
   public FolderConnectionRegistry getFolderConnections() {
-    return folderConnections;
+    return this.folderConnections;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     if (name.equals("Base Maps")) {
-      return (V)baseMapLayers;
+      return (V)this.baseMapLayers;
     } else {
       return (V)super.getLayer(name);
     }
@@ -109,7 +109,7 @@ public class Project extends LayerGroup {
   }
 
   public BoundingBox getViewBoundingBox() {
-    return viewBoundingBox;
+    return this.viewBoundingBox;
   }
 
   protected void readBaseMapsLayers(final Resource resource) {
@@ -121,9 +121,9 @@ public class Project extends LayerGroup {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
-        baseMapLayers.loadLayers(properties);
-        if (!baseMapLayers.isEmpty()) {
-          baseMapLayers.get(0).setVisible(true);
+        this.baseMapLayers.loadLayers(properties);
+        if (!this.baseMapLayers.isEmpty()) {
+          this.baseMapLayers.get(0).setVisible(true);
         }
       } finally {
         SpringUtil.setBaseResource(oldResource);
@@ -201,6 +201,7 @@ public class Project extends LayerGroup {
             iterator.remove();
           }
         }
+        saveProject();
         if (layersWithChanges.isEmpty()) {
           return true;
         } else {
@@ -224,8 +225,8 @@ public class Project extends LayerGroup {
   }
 
   public void saveProject() {
-    if (resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)resource;
+    if (this.resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)this.resource;
       final File directory = fileResource.getFile();
       if (!directory.exists()) {
         directory.mkdirs();

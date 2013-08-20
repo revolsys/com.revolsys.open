@@ -35,6 +35,11 @@ import com.vividsolutions.jts.geom.Point;
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
   MouseWheelListener, KeyListener {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final LayerGroup project;
 
   private final MapPanel map;
@@ -59,7 +64,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected void addUndo(final UndoableEdit edit) {
-    map.addUndo(edit);
+    this.map.addUndo(edit);
   }
 
   protected void clearMapCursor() {
@@ -79,7 +84,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {
-    final Geometry geometry = xorGeometry;
+    final Geometry geometry = this.xorGeometry;
     drawXorGeometry(graphics, geometry);
   }
 
@@ -91,7 +96,7 @@ public class AbstractOverlay extends JComponent implements
         graphics.setXORMode(Color.WHITE);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          final Point2D screenPoint = viewport.toViewPoint(point);
+          final Point2D screenPoint = this.viewport.toViewPoint(point);
 
           final double x = screenPoint.getX() - getHotspotPixels();
           final double y = screenPoint.getY() - getHotspotPixels();
@@ -101,8 +106,8 @@ public class AbstractOverlay extends JComponent implements
           graphics.setPaint(new Color(0, 0, 255));
           graphics.fill(shape);
         } else {
-          GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
-            XOR_LINE_STYLE);
+          GeometryStyleRenderer.renderGeometry(this.viewport, graphics,
+            geometry, XOR_LINE_STYLE);
         }
       } finally {
         graphics.setPaint(paint);
@@ -114,18 +119,18 @@ public class AbstractOverlay extends JComponent implements
     final int x = event.getX();
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point p1 = geometryFactory.project(viewport.toModelPoint(x, y));
-    final Point p2 = geometryFactory.project(viewport.toModelPoint(x
+    final Point p1 = geometryFactory.project(this.viewport.toModelPoint(x, y));
+    final Point p2 = geometryFactory.project(this.viewport.toModelPoint(x
       + getHotspotPixels(), y + getHotspotPixels()));
 
     return p1.distance(p2);
   }
 
   protected GeometryFactory getGeometryFactory() {
-    if (geometryFactory == null) {
-      return project.getGeometryFactory();
+    if (this.geometryFactory == null) {
+      return this.project.getGeometryFactory();
     }
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   @Override
@@ -134,39 +139,39 @@ public class AbstractOverlay extends JComponent implements
   }
 
   public int getHotspotPixels() {
-    return hotspotPixels;
+    return this.hotspotPixels;
   }
 
   public MapPanel getMap() {
-    return map;
+    return this.map;
   }
 
   protected Point getPoint(final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point point = viewport.toModelPointRounded(geometryFactory,
+    final Point point = this.viewport.toModelPointRounded(geometryFactory,
       eventPoint);
     return point;
   }
 
   public LayerGroup getProject() {
-    return project;
+    return this.project;
   }
 
   public Viewport2D getViewport() {
-    return viewport;
+    return this.viewport;
   }
 
   protected GeometryFactory getViewportGeometryFactory() {
-    if (viewport == null) {
+    if (this.viewport == null) {
       return GeometryFactory.getFactory();
     } else {
-      return viewport.getGeometryFactory();
+      return this.viewport.getGeometryFactory();
     }
   }
 
   protected Point getViewportPoint(final java.awt.Point eventPoint) {
-    final Point point = viewport.toModelPoint(eventPoint);
+    final Point point = this.viewport.toModelPoint(eventPoint);
     return point;
   }
 
@@ -176,7 +181,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   public Geometry getXorGeometry() {
-    return xorGeometry;
+    return this.xorGeometry;
   }
 
   @Override
@@ -241,8 +246,8 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected void setMapCursor(final Cursor cursor) {
-    if (map != null) {
-      map.setCursor(cursor);
+    if (this.map != null) {
+      this.map.setCursor(cursor);
     }
   }
 

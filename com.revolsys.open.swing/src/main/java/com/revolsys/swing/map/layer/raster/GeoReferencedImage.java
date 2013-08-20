@@ -56,34 +56,34 @@ public class GeoReferencedImage {
   }
 
   protected BufferedImage createBufferedImage() {
-    final File file = SpringUtil.getOrDownloadFile(imageResource);
-    jaiImage = JAI.create("fileload", file.getAbsolutePath());
-    return jaiImage.getAsBufferedImage();
+    final File file = SpringUtil.getOrDownloadFile(this.imageResource);
+    this.jaiImage = JAI.create("fileload", file.getAbsolutePath());
+    return this.jaiImage.getAsBufferedImage();
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof MapTile) {
       final MapTile tile = (MapTile)obj;
-      return tile.getBoundingBox().equals(boundingBox);
+      return tile.getBoundingBox().equals(this.boundingBox);
     }
     return false;
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   public CoordinateSystem getCoordinateSystem() {
-    return geometryFactory.getCoordinateSystem();
+    return this.geometryFactory.getCoordinateSystem();
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public BufferedImage getImage() {
-    return image;
+    return this.image;
   }
 
   public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
@@ -113,37 +113,37 @@ public class GeoReferencedImage {
   }
 
   public int getImageHeight() {
-    if (imageHeight == -1) {
-      imageHeight = image.getHeight();
+    if (this.imageHeight == -1) {
+      this.imageHeight = this.image.getHeight();
     }
-    return imageHeight;
+    return this.imageHeight;
   }
 
   public Resource getImageResource() {
-    return imageResource;
+    return this.imageResource;
   }
 
   public int getImageWidth() {
-    if (imageWidth == -1) {
-      imageWidth = image.getWidth();
+    if (this.imageWidth == -1) {
+      this.imageWidth = this.image.getWidth();
     }
-    return imageWidth;
+    return this.imageWidth;
   }
 
   public PlanarImage getJaiImage() {
-    if (jaiImage == null && image != null) {
-      jaiImage = PlanarImage.wrapRenderedImage(image);
+    if (this.jaiImage == null && this.image != null) {
+      this.jaiImage = PlanarImage.wrapRenderedImage(this.image);
     }
-    return jaiImage;
+    return this.jaiImage;
   }
 
   @Override
   public int hashCode() {
-    return boundingBox.hashCode();
+    return this.boundingBox.hashCode();
   }
 
   public BufferedImage loadImage() {
-    return image;
+    return this.image;
   }
 
   protected void loadImageMetaData() {
@@ -189,7 +189,7 @@ public class GeoReferencedImage {
   }
 
   public void revert() {
-    if (imageResource != null) {
+    if (this.imageResource != null) {
       loadImageMetaData();
     }
   }

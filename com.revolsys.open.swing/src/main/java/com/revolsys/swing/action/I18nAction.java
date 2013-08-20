@@ -98,13 +98,6 @@ public class I18nAction extends AbstractAction {
     }
   }
 
-  private void setName(final Class<?> clazz, final String nameKey) {
-    if (nameKey != null) {
-      final CharSequence name = I18n.getCharSequence(clazz, nameKey);
-      setName(name);
-    }
-  }
-
   public void setShortDescription(final CharSequence shortDescription) {
     if (shortDescription != null) {
       putValue(SHORT_DESCRIPTION, shortDescription.toString());

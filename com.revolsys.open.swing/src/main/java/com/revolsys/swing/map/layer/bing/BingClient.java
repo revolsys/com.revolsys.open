@@ -49,7 +49,7 @@ public class BingClient {
 
   private Map<String, Object> createParameterMap() {
     final Map<String, Object> parameters = new TreeMap<String, Object>();
-    parameters.put("key", bingMapsKey);
+    parameters.put("key", this.bingMapsKey);
     return parameters;
   }
 
@@ -63,12 +63,12 @@ public class BingClient {
   }
 
   public Map<String, Object> getImageryMetadata(final ImagerySet imagerySet) {
-    Map<String, Object> cachedMetaData = metaDataCache.get(imagerySet);
+    Map<String, Object> cachedMetaData = this.metaDataCache.get(imagerySet);
     if (cachedMetaData == null) {
       final String url = getImageryMetadataUrl(imagerySet);
       try {
         cachedMetaData = JsonMapIoFactory.toMap(new UrlResource(url));
-        metaDataCache.put(imagerySet, cachedMetaData);
+        this.metaDataCache.put(imagerySet, cachedMetaData);
       } catch (final MalformedURLException e) {
         return Collections.emptyMap();
       }
@@ -202,7 +202,7 @@ public class BingClient {
     final StringBuilder quadKey = new StringBuilder();
     for (int i = zoomLevel; i > 0; i--) {
       char digit = '0';
-      final int mask = 1 << (i - 1);
+      final int mask = 1 << i - 1;
       if ((tileX & mask) != 0) {
         digit++;
       }

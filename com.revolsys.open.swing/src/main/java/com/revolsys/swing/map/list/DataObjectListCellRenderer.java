@@ -10,6 +10,11 @@ import com.revolsys.gis.data.model.DataObject;
 
 @SuppressWarnings("serial")
 public class DataObjectListCellRenderer extends DefaultListCellRenderer {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final String attributeName;
 
   public DataObjectListCellRenderer(final String attributeName) {
@@ -24,7 +29,7 @@ public class DataObjectListCellRenderer extends DefaultListCellRenderer {
       cellHasFocus);
     if (cellValue instanceof DataObject) {
       final DataObject object = (DataObject)cellValue;
-      final Object value = object.getValue(attributeName);
+      final Object value = object.getValue(this.attributeName);
       final String text = StringConverterRegistry.toString(value);
       setText(text);
     }

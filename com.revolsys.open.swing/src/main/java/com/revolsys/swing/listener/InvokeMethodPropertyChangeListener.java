@@ -32,8 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodPropertyChangeListener implements
@@ -53,7 +52,7 @@ public class InvokeMethodPropertyChangeListener implements
     this.object = object;
     this.methodName = methodName;
     if (!Arrays.asList(parameters).equals(EVENT_PARAMETERS)) {
-      runnable = new InvokeMethodRunnable(object, methodName, parameters);
+      this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     }
     this.invokeLater = invokeLater;
   }
@@ -67,10 +66,10 @@ public class InvokeMethodPropertyChangeListener implements
   public void propertyChange(final PropertyChangeEvent evt) {
     Runnable runnable = this.runnable;
     if (runnable == null) {
-      runnable = new InvokeMethodRunnable(object, methodName, evt);
+      runnable = new InvokeMethodRunnable(this.object, this.methodName, evt);
     }
-    if (invokeLater) {
-      SwingUtilities.invokeLater(runnable);
+    if (this.invokeLater) {
+      SwingWorkerManager.invokeLater(runnable);
     } else {
       runnable.run();
     }

@@ -14,18 +14,18 @@ import com.revolsys.util.JavaBeanUtil;
  */
 public class BeanPropertyListener implements PropertyChangeListener {
 
-  private Reference<Object> reference;
+  private final Reference<Object> reference;
 
-  public BeanPropertyListener(Object object) {
-    reference = new WeakReference<Object>(object);
+  public BeanPropertyListener(final Object object) {
+    this.reference = new WeakReference<Object>(object);
   }
 
   @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    Object object = reference.get();
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object object = this.reference.get();
     if (object != null) {
-      String propertyName = event.getPropertyName();
-      Object value = event.getNewValue();
+      final String propertyName = event.getPropertyName();
+      final Object value = event.getNewValue();
       JavaBeanUtil.setProperty(object, propertyName, value);
     }
   }

@@ -15,6 +15,6 @@ public class ContainsFilter extends GeneralFilter {
   @Override
   protected boolean include(
     final Entry<? extends Object, ? extends Object> value, final int index) {
-    return value.getStringValue(index).toUpperCase().contains(text);
+    return value.getStringValue(index).toUpperCase().contains(this.text);
   }
 }

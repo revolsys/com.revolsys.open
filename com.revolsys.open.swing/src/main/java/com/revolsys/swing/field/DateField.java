@@ -36,7 +36,7 @@ public class DateField extends JXDatePicker implements Field,
   public DateField(final String fieldName) {
     this.fieldName = fieldName;
     addPropertyChangeListener("date", this);
-    undoManager.addKeyMap(getEditor());
+    this.undoManager.addKeyMap(getEditor());
   }
 
   @Override
@@ -47,18 +47,18 @@ public class DateField extends JXDatePicker implements Field,
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)fieldValue;
+    return (T)this.fieldValue;
   }
 
   @Override
@@ -106,7 +106,7 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(color);
     editor.setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    setFieldToolTip(errorMessage);
+    setFieldToolTip(this.errorMessage);
   }
 
   public void setFieldName(final String fieldName) {
@@ -126,19 +126,19 @@ public class DateField extends JXDatePicker implements Field,
     editor.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     editor.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    setFieldToolTip(originalToolTip);
+    setFieldToolTip(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
-    final Date oldValue = fieldValue;
+    final Date oldValue = this.fieldValue;
     final Date date = (Date)value;
     if (!EqualsRegistry.equal(getDate(), value)) {
       setDate(date);
     }
     if (!EqualsRegistry.equal(oldValue, value)) {
       this.fieldValue = (Date)value;
-      firePropertyChange(fieldName, oldValue, value);
+      firePropertyChange(this.fieldName, oldValue, value);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
         oldValue, value);
     }
@@ -147,7 +147,7 @@ public class DateField extends JXDatePicker implements Field,
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

@@ -19,6 +19,11 @@ import com.revolsys.swing.undo.UndoManager;
 @SuppressWarnings("serial")
 public class TextField extends JXTextField implements Field, FocusListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final String fieldName;
 
   private String fieldValue;
@@ -59,7 +64,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setText(this.fieldValue);
     addFocusListener(this);
-    undoManager.addKeyMap(this);
+    this.undoManager.addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
   }
 
@@ -81,12 +86,12 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
@@ -122,7 +127,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setSelectedTextColor(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -136,15 +141,15 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = fieldValue;
+    final String oldValue = this.fieldValue;
     final String text = getText();
-    undoManager.discardAllEdits();
+    this.undoManager.discardAllEdits();
     if (!EqualsRegistry.equal(text, newValue)) {
       if (newValue == null) {
         if (StringUtils.hasText(text)) {
@@ -153,11 +158,11 @@ public class TextField extends JXTextField implements Field, FocusListener {
       } else {
         setText(newValue);
       }
-      undoManager.discardAllEdits();
+      this.undoManager.discardAllEdits();
     }
     if (!EqualsRegistry.equal(oldValue, newValue)) {
       this.fieldValue = newValue;
-      firePropertyChange(fieldName, oldValue, newValue);
+      firePropertyChange(this.fieldName, oldValue, newValue);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
         oldValue, newValue);
     }
@@ -166,7 +171,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

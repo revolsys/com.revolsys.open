@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -41,11 +42,7 @@ public class InvokeMethodRunnable implements Runnable {
     final Object... parameters) {
     final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
       methodName, parameters);
-    if (SwingUtilities.isEventDispatchThread()) {
-      runnable.run();
-    } else {
-      SwingUtilities.invokeLater(runnable);
-    }
+    SwingWorkerManager.invokeLater(runnable);
   }
 
   public static void run(final Object object, final String methodName,

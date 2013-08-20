@@ -22,7 +22,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
   private final DataFlavor localObjectFlavor = new DataFlavor(int[].class,
     "Integer[]");
 
-  private final String mimeType = localObjectFlavor.getMimeType();
+  private final String mimeType = this.localObjectFlavor.getMimeType();
 
   private final JList list;
 
@@ -32,24 +32,24 @@ public class ListReorderableTransferHandler extends TransferHandler {
 
   @Override
   public boolean canImport(final TransferHandler.TransferSupport info) {
-    if (info.getComponent() == list) {
+    if (info.getComponent() == this.list) {
       if (info.isDrop()) {
-        if (info.isDataFlavorSupported(localObjectFlavor)) {
-          list.setCursor(DragSource.DefaultMoveDrop);
+        if (info.isDataFlavorSupported(this.localObjectFlavor)) {
+          this.list.setCursor(DragSource.DefaultMoveDrop);
           return true;
         }
       }
     }
-    list.setCursor(DragSource.DefaultMoveNoDrop);
+    this.list.setCursor(DragSource.DefaultMoveNoDrop);
     return false;
   }
 
   @Override
   protected Transferable createTransferable(final JComponent c) {
-    assert (c == list);
-    final int[] selectedRows = list.getSelectedIndices();
-    if (c == list) {
-      return new DataHandler(selectedRows, mimeType);
+    assert c == this.list;
+    final int[] selectedRows = this.list.getSelectedIndices();
+    if (c == this.list) {
+      return new DataHandler(selectedRows, this.mimeType);
     } else {
       return null;
     }
@@ -59,7 +59,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
   protected void exportDone(final JComponent c, final Transferable t,
     final int action) {
     if (action == TransferHandler.MOVE) {
-      list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+      this.list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
   }
 
@@ -73,7 +73,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
     final JList target = (JList)info.getComponent();
     final JList.DropLocation dropLocation = (JList.DropLocation)info.getDropLocation();
     int dropIndex = dropLocation.getIndex();
-    final ListModel model = list.getModel();
+    final ListModel model = this.list.getModel();
     final int max = model.getSize();
     if (dropIndex < 0 || dropIndex > max) {
       dropIndex = max;
@@ -81,7 +81,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
     target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     try {
       final Transferable transferable = info.getTransferable();
-      final int[] indices = (int[])transferable.getTransferData(localObjectFlavor);
+      final int[] indices = (int[])transferable.getTransferData(this.localObjectFlavor);
       if (indices.length > 0) {
         final Reorderable reorderable = (Reorderable)model;
         int currentIndex = dropIndex;

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXList;
@@ -54,33 +55,33 @@ public class StringListField extends ValueField {
     final JPanel fieldPanel = new JPanel(new VerticalLayout(2));
     add(fieldPanel);
 
-    toolBar.setOrientation(ToolBar.VERTICAL);
-    add(toolBar);
+    this.toolBar.setOrientation(SwingConstants.VERTICAL);
+    add(this.toolBar);
 
-    valueEntry.setPreferredSize(new Dimension(600, 25));
-    fieldPanel.add(valueEntry);
+    this.valueEntry.setPreferredSize(new Dimension(600, 25));
+    fieldPanel.add(this.valueEntry);
 
-    addButton = toolBar.addButtonTitleIcon("add", "Add", "add", this,
+    this.addButton = this.toolBar.addButtonTitleIcon("add", "Add", "add", this,
       "addValue");
 
-    valueEntry.addActionListener(addButton.getAction());
+    this.valueEntry.addActionListener(this.addButton.getAction());
 
-    toolBar.addButtonTitleIcon(SELECTED, "Remove Selected", "delete", this,
-      "removeSelectedValues");
+    this.toolBar.addButtonTitleIcon(SELECTED, "Remove Selected", "delete",
+      this, "removeSelectedValues");
 
-    valuesField = new JXList(values);
-    valuesField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    valuesField.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
+    this.valuesField = new JXList(this.values);
+    this.valuesField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.valuesField.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
 
-    final JScrollPane namesPane = new JScrollPane(valuesField);
+    final JScrollPane namesPane = new JScrollPane(this.valuesField);
     namesPane.setPreferredSize(new Dimension(100, 3 * 20));
     fieldPanel.add(namesPane);
     updateFields();
 
-    valueEntry.getDocument().addDocumentListener(
+    this.valueEntry.getDocument().addDocumentListener(
       new InvokeMethodListener(this, "updateFields"));
 
-    valuesField.addListSelectionListener(new InvokeMethodListener(this,
+    this.valuesField.addListSelectionListener(new InvokeMethodListener(this,
       "updateFields"));
 
   }
@@ -90,72 +91,72 @@ public class StringListField extends ValueField {
   }
 
   public void addValue() {
-    final String value = valueEntry.getText();
+    final String value = this.valueEntry.getText();
     if (addValue(value)) {
-      valueEntry.setText("");
+      this.valueEntry.setText("");
     }
   }
 
   public boolean addValue(final String value) {
     if (StringUtils.hasText(value)) {
-      if (!values.contains(value)) {
+      if (!this.values.contains(value)) {
 
-        if (comparator == null || values.isEmpty()) {
-          values.add(value);
-          valuesField.setSelectedIndex(values.size() - 1);
+        if (this.comparator == null || this.values.isEmpty()) {
+          this.values.add(value);
+          this.valuesField.setSelectedIndex(this.values.size() - 1);
         } else {
           boolean inserted = false;
-          for (int i = 0; i < values.size() && !inserted; i++) {
-            final String listValue = values.get(i);
-            if (comparator.compare(value, listValue) < 0) {
-              values.add(i, value);
+          for (int i = 0; i < this.values.size() && !inserted; i++) {
+            final String listValue = this.values.get(i);
+            if (this.comparator.compare(value, listValue) < 0) {
+              this.values.add(i, value);
               inserted = true;
-              valuesField.setSelectedIndex(i);
+              this.valuesField.setSelectedIndex(i);
             }
           }
           if (!inserted) {
-            values.add(value);
-            valuesField.setSelectedIndex(values.size() - 1);
+            this.values.add(value);
+            this.valuesField.setSelectedIndex(this.values.size() - 1);
           }
         }
         updateFields();
         return true;
       }
     }
-    valueEntry.requestFocusInWindow();
+    this.valueEntry.requestFocusInWindow();
     return false;
   }
 
   public String getSelected() {
-    return (String)valuesField.getSelectedValue();
+    return (String)this.valuesField.getSelectedValue();
   }
 
   public ToolBar getToolBar() {
-    return toolBar;
+    return this.toolBar;
   }
 
   public void removeSelectedValues() {
-    final int[] selectedRows = valuesField.getSelectedIndices();
+    final int[] selectedRows = this.valuesField.getSelectedIndices();
     if (selectedRows.length > 0) {
       for (final int selectedRow : selectedRows) {
-        values.remove(selectedRow);
+        this.values.remove(selectedRow);
       }
-      final int index = Math.min(selectedRows[0], values.size() - 1);
+      final int index = Math.min(selectedRows[0], this.values.size() - 1);
       if (index >= -1) {
-        final ListSelectionModel selectionModel = valuesField.getSelectionModel();
+        final ListSelectionModel selectionModel = this.valuesField.getSelectionModel();
         selectionModel.setSelectionInterval(index, index);
       }
     }
     updateFields();
-    valueEntry.requestFocusInWindow();
+    this.valueEntry.requestFocusInWindow();
   }
 
   @Override
   public void setFieldValue(final Object value) {
     if (!EqualsRegistry.equal(value, getFieldValue())) {
-      if (values != null) {
+      if (this.values != null) {
         if (value == null) {
-          values.clear();
+          this.values.clear();
         } else {
           final String string = value.toString();
           if (StringUtils.hasText(string)) {
@@ -165,37 +166,37 @@ public class StringListField extends ValueField {
                 newValues.add(item);
               }
             }
-            if (comparator != null) {
-              Collections.sort(newValues, comparator);
+            if (this.comparator != null) {
+              Collections.sort(newValues, this.comparator);
             }
-            if (!EqualsRegistry.equal(values, newValues)) {
-              values.clear();
-              values.addAll(newValues);
+            if (!EqualsRegistry.equal(this.values, newValues)) {
+              this.values.clear();
+              this.values.addAll(newValues);
               if (!newValues.isEmpty()) {
-                valuesField.setSelectedIndex(0);
+                this.valuesField.setSelectedIndex(0);
               }
             }
           }
         }
-        super.setFieldValue(CollectionUtil.toString(values));
+        super.setFieldValue(CollectionUtil.toString(this.values));
       }
     }
   }
 
   private void setSelectedButtonsEnabled(final boolean enabled) {
-    for (final Component component : toolBar.getGroup(SELECTED)) {
+    for (final Component component : this.toolBar.getGroup(SELECTED)) {
       component.setEnabled(enabled);
     }
   }
 
   public void updateFields() {
-    valueEntry.setEnabled(true);
-    if (StringUtils.hasText(valueEntry.getText())) {
-      addButton.setEnabled(true);
+    this.valueEntry.setEnabled(true);
+    if (StringUtils.hasText(this.valueEntry.getText())) {
+      this.addButton.setEnabled(true);
     } else {
-      addButton.setEnabled(false);
+      this.addButton.setEnabled(false);
     }
-    if (values.size() == 0) {
+    if (this.values.size() == 0) {
       setSelectedButtonsEnabled(false);
     } else {
       setSelectedButtonsEnabled(true);

@@ -27,19 +27,19 @@ public class MapTransferable implements Transferable {
   }
 
   public Map<String, Object> getMap() {
-    return map;
+    return this.map;
   }
 
   @Override
   public Object getTransferData(final DataFlavor flavor)
     throws UnsupportedFlavorException, IOException {
     if (MAP_FLAVOR.equals(flavor)) {
-      return map;
+      return this.map;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
-      final Collection<String> attributeNames = map.keySet();
+      final Collection<String> attributeNames = this.map.keySet();
       CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      final Collection<Object> values = map.values();
+      final Collection<Object> values = this.map.values();
       CsvUtil.writeColumns(out, values, '\t', '\n');
       final String text = out.toString();
       return text;

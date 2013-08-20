@@ -25,7 +25,8 @@ public class ComponentViewport2D extends Viewport2D {
 
   private int maxDecimalDigits;
 
-  public ComponentViewport2D(final LayerGroup project, final JComponent component) {
+  public ComponentViewport2D(final LayerGroup project,
+    final JComponent component) {
     super(project);
     this.component = component;
     project.getPropertyChangeSupport().addPropertyChangeListener(
@@ -202,9 +203,9 @@ public class ComponentViewport2D extends Viewport2D {
       modelUnitsPerViewUnit = modelHeight / getViewHeightPixels();
     }
     final double logUnits = Math.log10(Math.abs(modelUnitsPerViewUnit));
-    if (logUnits < 0 && Math.abs(Math.floor(logUnits)) > maxDecimalDigits) {
+    if (logUnits < 0 && Math.abs(Math.floor(logUnits)) > this.maxDecimalDigits) {
       validBoundingBox = new BoundingBox(validBoundingBox);
-      modelUnitsPerViewUnit = 2 * Math.pow(10, -maxDecimalDigits);
+      modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
       final double minModelHeight = getViewHeightPixels()
         * modelUnitsPerViewUnit;
@@ -215,7 +216,7 @@ public class ComponentViewport2D extends Viewport2D {
   }
 
   public void repaint() {
-    component.repaint();
+    this.component.repaint();
   }
 
   /**
@@ -240,8 +241,8 @@ public class ComponentViewport2D extends Viewport2D {
       final double logMaxY = Math.log10(Math.abs(maxY));
       final double maxLog = Math.abs(Math.max(Math.max(logMinX, logMinY),
         Math.max(logMaxX, logMaxY)));
-      maxIntegerDigits = (int)Math.floor(maxLog + 1);
-      maxDecimalDigits = 15 - maxIntegerDigits;
+      this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
+      this.maxDecimalDigits = 15 - this.maxIntegerDigits;
       getPropertyChangeSupport().firePropertyChange("geometryFactory",
         oldGeometryFactory, geometryFactory);
       final BoundingBox boundingBox = getBoundingBox();
@@ -281,13 +282,13 @@ public class ComponentViewport2D extends Viewport2D {
 
       }
 
-      final Insets insets = component.getInsets();
+      final Insets insets = this.component.getInsets();
 
-      setViewWidth(component.getWidth() - insets.left - insets.right);
-      setViewHeight(component.getHeight() - insets.top - insets.bottom);
+      setViewWidth(this.component.getWidth() - insets.left - insets.right);
+      setViewHeight(this.component.getHeight() - insets.top - insets.bottom);
       setBoundingBox(getBoundingBox());
 
-      component.repaint();
+      this.component.repaint();
     }
   }
 }

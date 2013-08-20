@@ -46,8 +46,8 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   public AbstractObjectTreeNodeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
-    renderer.setClosedIcon(ICON_FOLDER);
-    renderer.setOpenIcon(ICON_FOLDER);
+    this.renderer.setClosedIcon(ICON_FOLDER);
+    this.renderer.setOpenIcon(ICON_FOLDER);
   }
 
   @Override
@@ -63,9 +63,9 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   protected void addObjectTreeNodeModels(
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     this.objectTreeNodeModels.addAll(Arrays.asList(objectTreeNodeModels));
-    if (objectTreeModel != null) {
+    if (this.objectTreeModel != null) {
       for (final ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
-        nodeModel.setObjectTreeModel(objectTreeModel);
+        nodeModel.setObjectTreeModel(this.objectTreeModel);
       }
     }
   }
@@ -92,7 +92,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   }
 
   protected Set<Class<?>> getChildClasses() {
-    return supportedChildClasses;
+    return this.supportedChildClasses;
   }
 
   @Override
@@ -118,27 +118,27 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public MenuFactory getMenu(final NODE node) {
-    if (node == null || objectTreeModel == null) {
+    if (node == null || this.objectTreeModel == null) {
       return null;
     } else {
-      return objectTreeModel.getMenu(node);
+      return this.objectTreeModel.getMenu(node);
     }
   }
 
   @Override
   public MouseListener getMouseListener(final NODE node) {
-    return mouseListener;
+    return this.mouseListener;
   }
 
   public ObjectTreeModel getObjectTreeModel() {
-    return objectTreeModel;
+    return this.objectTreeModel;
   }
 
   @Override
   public ObjectTreeNodeModel<?, ?> getObjectTreeNodeModel(final Class<?> clazz) {
     final Set<Class<?>> classes = ClassUtil.getSuperClassesAndInterfaces(clazz);
 
-    for (final ObjectTreeNodeModel<?, ?> objectTreeNodeModel : objectTreeNodeModels) {
+    for (final ObjectTreeNodeModel<?, ?> objectTreeNodeModel : this.objectTreeNodeModels) {
       final Set<Class<?>> supportedClasses = objectTreeNodeModel.getSupportedClasses();
       if (CollectionUtils.containsAny(supportedClasses, classes)) {
         return objectTreeNodeModel;
@@ -149,26 +149,26 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public List<ObjectTreeNodeModel<?, ?>> getObjectTreeNodeModels() {
-    return objectTreeNodeModels;
+    return this.objectTreeNodeModels;
   }
 
   protected DefaultTreeCellRenderer getRenderer() {
-    return renderer;
+    return this.renderer;
   }
 
   @Override
   public TreeCellRenderer getRenderer(final NODE node) {
-    return renderer;
+    return this.renderer;
   }
 
   @Override
   public Set<Class<?>> getSupportedChildClasses() {
-    return supportedChildClasses;
+    return this.supportedChildClasses;
   }
 
   @Override
   public Set<Class<?>> getSupportedClasses() {
-    return supportedClasses;
+    return this.supportedClasses;
   }
 
   @Override
@@ -177,12 +177,12 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public boolean isLazyLoad() {
-    return lazyLoad;
+    return this.lazyLoad;
   }
 
   @Override
   public boolean isLeaf(final NODE node) {
-    return leaf;
+    return this.leaf;
   }
 
   @Override
@@ -206,7 +206,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
     if (this.objectTreeModel != objectTreeModel) {
       this.objectTreeModel = objectTreeModel;
-      for (final ObjectTreeNodeModel<?, ?> nodeModel : objectTreeNodeModels) {
+      for (final ObjectTreeNodeModel<?, ?> nodeModel : this.objectTreeNodeModels) {
         nodeModel.setObjectTreeModel(objectTreeModel);
       }
     }

@@ -28,10 +28,10 @@ public class OpenStreetMapTile extends MapTile {
   public boolean equals(final Object obj) {
     if (obj instanceof OpenStreetMapTile) {
       final OpenStreetMapTile tile = (OpenStreetMapTile)obj;
-      if (tile.layer == layer) {
-        if (tile.zoomLevel == zoomLevel) {
-          if (tile.tileX == tileX) {
-            if (tile.tileY == tileY) {
+      if (tile.layer == this.layer) {
+        if (tile.zoomLevel == this.zoomLevel) {
+          if (tile.tileX == this.tileX) {
+            if (tile.tileY == this.tileY) {
               return true;
             }
           }
@@ -42,27 +42,28 @@ public class OpenStreetMapTile extends MapTile {
   }
 
   public int getTileX() {
-    return tileX;
+    return this.tileX;
   }
 
   public int getTileY() {
-    return tileY;
+    return this.tileY;
   }
 
   public int getZoomLevel() {
-    return zoomLevel;
+    return this.zoomLevel;
   }
 
   @Override
   public int hashCode() {
-    return zoomLevel + tileX + tileY;
+    return this.zoomLevel + this.tileX + this.tileY;
   }
 
   @Override
   public BufferedImage loadBuffferedImage() {
     try {
-      final OpenStreetMapClient client = layer.getClient();
-      final BufferedImage image = client.getMapImage(zoomLevel, tileX, tileY);
+      final OpenStreetMapClient client = this.layer.getClient();
+      final BufferedImage image = client.getMapImage(this.zoomLevel,
+        this.tileX, this.tileY);
       return image;
     } catch (final Throwable e) {
       return null;
@@ -71,6 +72,7 @@ public class OpenStreetMapTile extends MapTile {
 
   @Override
   public String toString() {
-    return layer + " " + zoomLevel + "/" + tileX + "/" + tileY;
+    return this.layer + " " + this.zoomLevel + "/" + this.tileX + "/"
+      + this.tileY;
   }
 }

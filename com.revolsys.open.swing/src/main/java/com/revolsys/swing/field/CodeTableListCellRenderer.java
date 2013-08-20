@@ -11,6 +11,11 @@ import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
 public class CodeTableListCellRenderer extends DefaultListCellRenderer {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final CodeTable codeTable;
 
   public CodeTableListCellRenderer(final CodeTable codeTable) {
@@ -23,7 +28,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else if (index >= 0) {
-      final List<Object> values = codeTable.getValues(value);
+      final List<Object> values = this.codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {

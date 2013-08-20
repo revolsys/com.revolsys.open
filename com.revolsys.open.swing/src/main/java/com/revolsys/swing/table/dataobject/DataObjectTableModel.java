@@ -7,6 +7,11 @@ import com.revolsys.gis.data.model.DataObject;
 @SuppressWarnings("serial")
 public class DataObjectTableModel extends AbstractDataObjectTableModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static JComponent create(final DataObject object,
     final boolean editable) {
     final DataObjectTableModel model = new DataObjectTableModel(object,
@@ -22,12 +27,12 @@ public class DataObjectTableModel extends AbstractDataObjectTableModel {
   }
 
   public DataObject getObject() {
-    return object;
+    return this.object;
   }
 
   @Override
   protected Object getValue(final int rowIndex) {
-    return object.getValue(rowIndex);
+    return this.object.getValue(rowIndex);
   }
 
   public void setObject(final DataObject object) {
@@ -41,8 +46,8 @@ public class DataObjectTableModel extends AbstractDataObjectTableModel {
 
   @Override
   protected Object setValue(final Object value, final int rowIndex) {
-    final Object oldValue = object.getValue(rowIndex);
-    object.setValue(rowIndex, value);
+    final Object oldValue = this.object.getValue(rowIndex);
+    this.object.setValue(rowIndex, value);
     return oldValue;
   }
 

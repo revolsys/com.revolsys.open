@@ -101,8 +101,8 @@ public class GeoNamesService {
     params.put("lng", geographicBoundingBox.getCentreX());
     params.put("radius", radiusKm);
     params.put("maxRows", "50");
-    final String searchUrlString = UrlUtil.getUrl(findNearbyBoundingBoxJsonUrl,
-      params);
+    final String searchUrlString = UrlUtil.getUrl(
+      this.findNearbyBoundingBoxJsonUrl, params);
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());
@@ -122,8 +122,8 @@ public class GeoNamesService {
     params.put("south", geographicBoundingBox.getMinY());
     params.put("west", geographicBoundingBox.getMinX());
     params.put("maxRows", "50");
-    final String searchUrlString = UrlUtil.getUrl(wikipediaBoundingBoxJsonUrl,
-      params);
+    final String searchUrlString = UrlUtil.getUrl(
+      this.wikipediaBoundingBoxJsonUrl, params);
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());
@@ -183,7 +183,7 @@ public class GeoNamesService {
     params.put("name", name);
     params.put("style", "FULL");
     params.put("type", "json");
-    final String searchUrlString = UrlUtil.getUrl(searchJsonUrl, params);
+    final String searchUrlString = UrlUtil.getUrl(this.searchJsonUrl, params);
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());

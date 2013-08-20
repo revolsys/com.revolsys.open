@@ -14,9 +14,9 @@ public class ObjectListTableCellRenderer implements TableCellRenderer {
   private final JLabel valueComponent;
 
   public ObjectListTableCellRenderer() {
-    valueComponent = new JLabel();
-    valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
-    valueComponent.setOpaque(true);
+    this.valueComponent = new JLabel();
+    this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
+    this.valueComponent.setOpaque(true);
   }
 
   @Override
@@ -32,8 +32,8 @@ public class ObjectListTableCellRenderer implements TableCellRenderer {
       } else {
         text = StringConverterRegistry.toString(value);
       }
-      valueComponent.setText(text);
-      component = valueComponent;
+      this.valueComponent.setText(text);
+      component = this.valueComponent;
     }
     final int[] selectedRows = table.getSelectedRows();
     boolean selected = false;

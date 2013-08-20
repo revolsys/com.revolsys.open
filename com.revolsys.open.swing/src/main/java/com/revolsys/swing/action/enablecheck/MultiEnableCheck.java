@@ -23,12 +23,12 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
   }
 
   public List<EnableCheck> getEnableChecks() {
-    return enableChecks;
+    return this.enableChecks;
   }
 
   @Override
   public Iterator<EnableCheck> iterator() {
-    return enableChecks.iterator();
+    return this.enableChecks.iterator();
   }
 
   public void setEnableChecks(
@@ -39,6 +39,6 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck implements
 
   @Override
   public String toString() {
-    return enableChecks.toString();
+    return this.enableChecks.toString();
   }
 }

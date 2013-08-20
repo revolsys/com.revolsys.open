@@ -94,12 +94,12 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final DataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     super(type, layer, parent, style);
-    filter = getFilter(style);
+    this.filter = getFilter(style);
   }
 
   protected boolean isFilterAccept(final LayerDataObject object) {
     try {
-      return filter.accept(object);
+      return this.filter.accept(object);
     } catch (final Throwable e) {
       return false;
     }
@@ -145,8 +145,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
   @Override
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = super.toMap(defaults);
-    if (!(filter instanceof AcceptAllFilter)) {
-      MapSerializerUtil.add(map, "filter", filter);
+    if (!(this.filter instanceof AcceptAllFilter)) {
+      MapSerializerUtil.add(map, "filter", this.filter);
     }
     return map;
   }

@@ -22,8 +22,8 @@ public class BingMapTile extends MapTile {
   public boolean equals(final Object obj) {
     if (obj instanceof BingMapTile) {
       final BingMapTile tile = (BingMapTile)obj;
-      if (tile.layer == layer) {
-        if (tile.quadKey.equals(quadKey)) {
+      if (tile.layer == this.layer) {
+        if (tile.quadKey.equals(this.quadKey)) {
           return true;
         }
       }
@@ -32,31 +32,31 @@ public class BingMapTile extends MapTile {
   }
 
   public String getQuadKey() {
-    return quadKey;
+    return this.quadKey;
   }
 
   @Override
   public int hashCode() {
-    return quadKey.hashCode();
+    return this.quadKey.hashCode();
   }
 
   @Override
   public BufferedImage loadBuffferedImage() {
     try {
-      final BingClient client = layer.getClient();
-      final ImagerySet imagerySet = layer.getImagerySet();
-      final MapLayer mapLayer = layer.getMapLayer();
+      final BingClient client = this.layer.getClient();
+      final ImagerySet imagerySet = this.layer.getImagerySet();
+      final MapLayer mapLayer = this.layer.getMapLayer();
       final BufferedImage image = client.getMapImage(imagerySet, mapLayer,
-        quadKey);
+        this.quadKey);
       return image;
     } catch (final Throwable t) {
-      layer.setError(t);
+      this.layer.setError(t);
       return null;
     }
   }
 
   @Override
   public String toString() {
-    return layer + " " + quadKey;
+    return this.layer + " " + this.quadKey;
   }
 }

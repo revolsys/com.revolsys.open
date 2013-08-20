@@ -1,4 +1,4 @@
-package com.revolsys.swing;
+package com.revolsys.awt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,8 +67,8 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
 
   @Override
   protected T doInBackground() throws Exception {
-    if (backgroundTask != null) {
-      return backgroundTask.call();
+    if (this.backgroundTask != null) {
+      return this.backgroundTask.call();
     } else {
       return null;
     }
@@ -85,35 +85,36 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
       return;
     } catch (final ExecutionException e) {
       final Throwable cause = e.getCause();
-      ExceptionUtil.log(getClass(), "Error running " + description + " using "
-        + backgroundTask, cause);
+      ExceptionUtil.log(getClass(), "Error running " + this.description
+        + " using " + this.backgroundTask, cause);
       return;
     }
-    if (doneMethodName != null) {
+    if (this.doneMethodName != null) {
       final List<Object> parameters = new ArrayList<Object>(
-        doneMethodParameters);
+        this.doneMethodParameters);
       if (result != null) {
         parameters.add(result);
       }
       try {
-        InvokeMethodRunnable.run(doneObject, doneMethodName, parameters);
+        InvokeMethodRunnable.run(this.doneObject, this.doneMethodName,
+          parameters);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
           "Error running "
-            + description
+            + this.description
             + " using "
-            + InvokeMethodRunnable.toString(doneObject, doneMethodName,
-              parameters), e);
+            + InvokeMethodRunnable.toString(this.doneObject,
+              this.doneMethodName, parameters), e);
       }
     }
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   @Override
   public String toString() {
-    return description;
+    return this.description;
   }
 }

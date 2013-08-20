@@ -33,11 +33,11 @@ public class DirectoryNameField extends JPanel implements Field {
   public DirectoryNameField() {
     super(new SpringLayout());
 
-    add(directoryName);
-    browseButton.setText("Browse...");
-    browseButton.addActionListener(new InvokeMethodActionListener(this,
+    add(this.directoryName);
+    this.browseButton.setText("Browse...");
+    this.browseButton.addActionListener(new InvokeMethodActionListener(this,
       "browseClick"));
-    add(browseButton);
+    add(this.browseButton);
     SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
   }
 
@@ -60,7 +60,7 @@ public class DirectoryNameField extends JPanel implements Field {
       if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(SwingUtilities.windowForComponent(this))) {
         final File file = fileChooser.getSelectedFile();
         if (file != null) {
-          directoryName.setText(file.getCanonicalPath());
+          this.directoryName.setText(file.getCanonicalPath());
         }
       }
     } catch (final Throwable t) {
@@ -85,12 +85,12 @@ public class DirectoryNameField extends JPanel implements Field {
   }
 
   public String getDirectoryPath() {
-    return directoryName.getText();
+    return this.directoryName.getText();
   }
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
@@ -108,27 +108,27 @@ public class DirectoryNameField extends JPanel implements Field {
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)directoryName.getText();
+    return (T)this.directoryName.getText();
   }
 
   @Override
   public boolean isFieldValid() {
     final File directory = getDirectoryFile();
     if (directory == null || !directory.exists()) {
-      directoryName.setForeground(Color.RED);
-      directoryName.setSelectedTextColor(Color.RED);
-      directoryName.setBackground(Color.PINK);
+      this.directoryName.setForeground(Color.RED);
+      this.directoryName.setSelectedTextColor(Color.RED);
+      this.directoryName.setBackground(Color.PINK);
       return false;
     } else {
-      directoryName.setForeground(Color.BLACK);
-      directoryName.setSelectedTextColor(Color.BLACK);
-      directoryName.setBackground(Color.WHITE);
+      this.directoryName.setForeground(Color.BLACK);
+      this.directoryName.setSelectedTextColor(Color.BLACK);
+      this.directoryName.setBackground(Color.WHITE);
       return true;
     }
   }
 
   public void setDirectoryPath(final String directoryPath) {
-    directoryName.setText(directoryPath);
+    this.directoryName.setText(directoryPath);
   }
 
   @Override
@@ -149,11 +149,11 @@ public class DirectoryNameField extends JPanel implements Field {
 
   @Override
   public void setFieldInvalid(final String message, final Color color) {
-    directoryName.setForeground(color);
-    directoryName.setSelectedTextColor(color);
-    directoryName.setBackground(ColorUtil.setAlpha(color, 50));
+    this.directoryName.setForeground(color);
+    this.directoryName.setSelectedTextColor(color);
+    this.directoryName.setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -163,11 +163,11 @@ public class DirectoryNameField extends JPanel implements Field {
 
   @Override
   public void setFieldValid() {
-    directoryName.setForeground(TextField.DEFAULT_FOREGROUND);
-    directoryName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    directoryName.setBackground(TextField.DEFAULT_BACKGROUND);
+    this.directoryName.setForeground(TextField.DEFAULT_FOREGROUND);
+    this.directoryName.setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
+    this.directoryName.setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
@@ -178,14 +178,14 @@ public class DirectoryNameField extends JPanel implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
 
   @Override
   public void setUndoManager(final UndoManager undoManager) {
-    directoryName.setUndoManager(undoManager);
+    this.directoryName.setUndoManager(undoManager);
   }
 
   @Override

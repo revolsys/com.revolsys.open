@@ -27,14 +27,14 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   private AbstractDataObjectLayerRenderer getRenderer(final Viewport2D viewport) {
     final long scale = (long)viewport.getScale();
-    if (scale == lastScale) {
-      if (renderer.isVisible(scale)) {
-        return renderer;
+    if (scale == this.lastScale) {
+      if (this.renderer.isVisible(scale)) {
+        return this.renderer;
       } else {
         return null;
       }
     } else {
-      lastScale = scale;
+      this.lastScale = scale;
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         if (renderer.isVisible(scale)) {
           return renderer;
@@ -47,8 +47,8 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   public boolean isVisible(final LayerDataObject object) {
     if (super.isVisible() && super.isVisible(object)) {
-      if (renderer != null) {
-        return renderer.isVisible(object);
+      if (this.renderer != null) {
+        return this.renderer.isVisible(object);
       }
     }
     return false;

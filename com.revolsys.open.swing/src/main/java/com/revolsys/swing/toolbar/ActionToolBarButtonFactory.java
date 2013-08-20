@@ -48,7 +48,7 @@ public class ActionToolBarButtonFactory extends AbstractAction implements
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    actionListener.actionPerformed(event);
+    this.actionListener.actionPerformed(event);
 
   }
 

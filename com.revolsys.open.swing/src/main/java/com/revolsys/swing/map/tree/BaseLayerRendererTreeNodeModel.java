@@ -25,7 +25,7 @@ public class BaseLayerRendererTreeNodeModel extends
 
   public BaseLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractLayerRenderer.class);
-    setSupportedChildClasses(SUPPORTED_CHILD_CLASSES);
+    setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
     setRenderer(new LayerRendererTreeCellRenderer());
     setMouseListener(this);
   }

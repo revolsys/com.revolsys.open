@@ -100,6 +100,8 @@ public class AbstractMapWrapper {
       Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
       if (srid == 102100) {
         srid = 3857;
+      } else if (srid == 102190) {
+        srid = 3005;
       }
       return GeometryFactory.getFactory(srid);
     }

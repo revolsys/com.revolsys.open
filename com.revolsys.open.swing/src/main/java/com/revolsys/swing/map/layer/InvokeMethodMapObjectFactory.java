@@ -24,11 +24,13 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory {
   @Override
   public <V> V toObject(final Map<String, ? extends Object> properties) {
     try {
-      if (object instanceof Class<?>) {
-        final Class<?> clazz = (Class<?>)object;
-        return (V)MethodUtils.invokeStaticMethod(clazz, methodName, properties);
+      if (this.object instanceof Class<?>) {
+        final Class<?> clazz = (Class<?>)this.object;
+        return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName,
+          properties);
       } else {
-        return (V)MethodUtils.invokeMethod(object, methodName, properties);
+        return (V)MethodUtils.invokeMethod(this.object, this.methodName,
+          properties);
       }
     } catch (final NoSuchMethodException e) {
       return ExceptionUtil.throwUncheckedException(e);

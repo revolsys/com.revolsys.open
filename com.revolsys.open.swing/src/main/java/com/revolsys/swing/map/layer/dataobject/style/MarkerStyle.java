@@ -204,103 +204,103 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public Marker getMarker() {
-    return marker;
+    return this.marker;
   }
 
   public String getMarkerCompOp() {
-    return markerCompOp;
+    return this.markerCompOp;
   }
 
   public Measure<Length> getMarkerDeltaX() {
-    return markerDeltaX;
+    return this.markerDeltaX;
   }
 
   public Measure<Length> getMarkerDeltaY() {
-    return markerDeltaY;
+    return this.markerDeltaY;
   }
 
   public Measure<Length> getMarkerDx() {
-    return markerDeltaX;
+    return this.markerDeltaX;
   }
 
   public Measure<Length> getMarkerDy() {
-    return markerDeltaY;
+    return this.markerDeltaY;
   }
 
   public String getMarkerFile() {
-    return markerFile;
+    return this.markerFile;
   }
 
   public Color getMarkerFill() {
-    return markerFill;
+    return this.markerFill;
   }
 
   public int getMarkerFillOpacity() {
-    return markerFillOpacity;
+    return this.markerFillOpacity;
   }
 
   public Measure<Length> getMarkerHeight() {
-    return markerHeight;
+    return this.markerHeight;
   }
 
   public String getMarkerHorizontalAlignment() {
-    return markerHorizontalAlignment;
+    return this.markerHorizontalAlignment;
   }
 
   public String getMarkerIgnorePlacement() {
-    return markerIgnorePlacement;
+    return this.markerIgnorePlacement;
   }
 
   public Color getMarkerLineColor() {
-    return markerLineColor;
+    return this.markerLineColor;
   }
 
   public int getMarkerLineOpacity() {
-    return markerLineOpacity;
+    return this.markerLineOpacity;
   }
 
   public Measure<Length> getMarkerLineWidth() {
-    return markerLineWidth;
+    return this.markerLineWidth;
   }
 
   public int getMarkerOpacity() {
-    return markerOpacity;
+    return this.markerOpacity;
   }
 
   public String getMarkerOrientationType() {
-    return markerOrientationType;
+    return this.markerOrientationType;
   }
 
   public String getMarkerPlacement() {
-    return markerPlacement;
+    return this.markerPlacement;
   }
 
   public double getMarkerSmooth() {
-    return markerSmooth;
+    return this.markerSmooth;
   }
 
   public String getMarkerTransform() {
-    return markerTransform;
+    return this.markerTransform;
   }
 
   public String getMarkerType() {
-    return markerType;
+    return this.markerType;
   }
 
   public String getMarkerVerticalAlignment() {
-    return markerVerticalAlignment;
+    return this.markerVerticalAlignment;
   }
 
   public Measure<Length> getMarkerWidth() {
-    return markerWidth;
+    return this.markerWidth;
   }
 
   public boolean isMarkerAllowOverlap() {
-    return markerAllowOverlap;
+    return this.markerAllowOverlap;
   }
 
   public boolean isMarkerClip() {
-    return markerClip;
+    return this.markerClip;
   }
 
   public void setMarker(final Marker marker) {
@@ -355,7 +355,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   public void setMarkerFill(final Color markerFill) {
     if (markerFill == null) {
-      this.markerFill = new Color(128, 128, 128, markerFillOpacity);
+      this.markerFill = new Color(128, 128, 128, this.markerFillOpacity);
     } else {
       this.markerFill = markerFill;
       this.markerFillOpacity = markerFill.getAlpha();
@@ -368,7 +368,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerFillOpacity = (int)(255 * markerFillOpacity);
-      this.markerFill = WebColors.getColorWithOpacity(markerFill,
+      this.markerFill = WebColors.getColorWithOpacity(this.markerFill,
         this.markerFillOpacity);
     }
   }
@@ -378,17 +378,17 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
       this.markerFillOpacity = markerFillOpacity;
-      this.markerFill = WebColors.getColorWithOpacity(markerFill,
+      this.markerFill = WebColors.getColorWithOpacity(this.markerFill,
         this.markerFillOpacity);
     }
   }
 
   public boolean setMarkerFillStyle(final Viewport2D viewport,
     final Graphics2D graphics) {
-    if (markerFill.getAlpha() == 0) {
+    if (this.markerFill.getAlpha() == 0) {
       return false;
     } else {
-      graphics.setPaint(markerFill);
+      graphics.setPaint(this.markerFill);
       return true;
     }
   }
@@ -409,7 +409,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   public void setMarkerLineColor(final Color markerLineColor) {
     if (markerLineColor == null) {
-      this.markerLineColor = new Color(128, 128, 128, markerLineOpacity);
+      this.markerLineColor = new Color(128, 128, 128, this.markerLineOpacity);
     } else {
       this.markerLineColor = markerLineColor;
       this.markerLineOpacity = markerLineColor.getAlpha();
@@ -422,8 +422,8 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerLineOpacity = (int)(255 * markerLineOpacity);
-      this.markerLineColor = WebColors.getColorWithOpacity(markerLineColor,
-        this.markerLineOpacity);
+      this.markerLineColor = WebColors.getColorWithOpacity(
+        this.markerLineColor, this.markerLineOpacity);
     }
   }
 
@@ -432,8 +432,8 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
       this.markerLineOpacity = markerLineOpacity;
-      this.markerLineColor = WebColors.getColorWithOpacity(markerLineColor,
-        this.markerLineOpacity);
+      this.markerLineColor = WebColors.getColorWithOpacity(
+        this.markerLineColor, this.markerLineOpacity);
     }
   }
 
@@ -445,7 +445,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     } else {
       graphics.setColor(color);
       final float width = (float)Viewport2D.toDisplayValue(viewport,
-        markerLineWidth);
+        this.markerLineWidth);
       final BasicStroke basicStroke = new BasicStroke(width);
       graphics.setStroke(basicStroke);
       return true;
@@ -457,7 +457,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarkerOpacity(final double markerOpacity) {
-    if (markerLineOpacity < 0 || markerLineOpacity > 1) {
+    if (this.markerLineOpacity < 0 || this.markerLineOpacity > 1) {
       throw new IllegalArgumentException(
         "The opacity must be between 0.0 - 1.0");
     } else {

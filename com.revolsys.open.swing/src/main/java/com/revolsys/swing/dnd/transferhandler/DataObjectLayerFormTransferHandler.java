@@ -38,7 +38,7 @@ public class DataObjectLayerFormTransferHandler extends TransferHandler {
 
   @Override
   protected Transferable createTransferable(final JComponent component) {
-    final Map<String, Object> values = form.getValues();
+    final Map<String, Object> values = this.form.getValues();
     final Transferable transferable = new MapTransferable(values);
     return transferable;
   }
@@ -48,7 +48,7 @@ public class DataObjectLayerFormTransferHandler extends TransferHandler {
     return COPY;
   }
 
-   @Override
+  @Override
   public boolean importData(final JComponent comp,
     final Transferable transferable) {
     for (final DataFlavor dataFlavor : Arrays.asList(
@@ -60,13 +60,13 @@ public class DataObjectLayerFormTransferHandler extends TransferHandler {
     return false;
   }
 
-   @SuppressWarnings("unchecked")
-    public boolean pasteValues(final Transferable transferable,
+  @SuppressWarnings("unchecked")
+  public boolean pasteValues(final Transferable transferable,
     final DataFlavor dataFlavor) {
     if (transferable.isDataFlavorSupported(dataFlavor)) {
       try {
         final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(dataFlavor);
-        form.pasteValues(map);
+        this.form.pasteValues(map);
         return true;
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to paste data",

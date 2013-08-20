@@ -13,6 +13,11 @@ import com.revolsys.util.CollectionUtil;
 public class CodeTableComboBoxModel extends AbstractListModel implements
   ComboBoxModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final Object NULL = new Object();
 
   public static ComboBox create(final String fieldName,
@@ -47,14 +52,14 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
 
   @Override
   public Object getElementAt(int index) {
-    if (allowNull) {
+    if (this.allowNull) {
       if (index == 0) {
         return NULL;
       }
       index--;
     }
     if (index < getSize()) {
-      final Map<Object, List<Object>> codes = codeTable.getCodes();
+      final Map<Object, List<Object>> codes = this.codeTable.getCodes();
       final Set<Object> keys = codes.keySet();
       return CollectionUtil.get(keys, index);
     } else {
@@ -64,17 +69,17 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
 
   @Override
   public Object getSelectedItem() {
-    if (selectedItem == NULL) {
+    if (this.selectedItem == NULL) {
       return null;
     } else {
-      return selectedItem;
+      return this.selectedItem;
     }
   }
 
   @Override
   public int getSize() {
-    int size = codeTable.getCodes().size();
-    if (allowNull) {
+    int size = this.codeTable.getCodes().size();
+    if (this.allowNull) {
       size++;
     }
     return size;
@@ -82,9 +87,9 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
 
   @Override
   public void setSelectedItem(final Object item) {
-    if ((selectedItem != null && !selectedItem.equals(item))
-      || selectedItem == null && item != null) {
-      selectedItem = item;
+    if (this.selectedItem != null && !this.selectedItem.equals(item)
+      || this.selectedItem == null && item != null) {
+      this.selectedItem = item;
       fireContentsChanged(this, -1, -1);
     }
   }

@@ -32,7 +32,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   public SearchField(final String fieldName) {
     this.fieldName = fieldName;
-    undoManager.addKeyMap(this);
+    this.undoManager.addKeyMap(this);
   }
 
   @Override
@@ -53,12 +53,12 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @SuppressWarnings("unchecked")
@@ -94,7 +94,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     setSelectedTextColor(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   @Override
@@ -108,19 +108,19 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
-    super.setToolTipText(originalToolTip);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = fieldValue;
+    final String oldValue = this.fieldValue;
     if (!EqualsRegistry.equal(getText(), newValue)) {
       setText(newValue);
     }
     if (!EqualsRegistry.equal(oldValue, value)) {
       this.fieldValue = (String)value;
-      firePropertyChange(fieldName, oldValue, value);
+      firePropertyChange(this.fieldName, oldValue, value);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
         oldValue, value);
     }
@@ -129,7 +129,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

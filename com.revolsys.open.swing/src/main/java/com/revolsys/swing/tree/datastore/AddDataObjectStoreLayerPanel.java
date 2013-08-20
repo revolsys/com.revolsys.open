@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
@@ -33,12 +33,9 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
 
   private final JPanel storePanel = new JPanel(new BorderLayout());
 
-  private final LayerGroup layerGroup;
-
   public AddDataObjectStoreLayerPanel(final LayerGroup layerGroup) {
     super(I18n.getInstance(AddDataObjectStoreLayerPanel.class).getCharSequence(
       "addDataStoreLayer"), SilkIconLoader.getIcon("database_table"));
-    this.layerGroup = layerGroup;
     setLayout(new BorderLayout());
     final JPanel connectionPanel = new JPanel(new SpringLayout());
     add(connectionPanel, BorderLayout.NORTH);
@@ -54,7 +51,7 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
     connectionPanel.add(passwordField);
     SpringLayoutUtil.makeColumns(connectionPanel, 2, 5, 5, 5, 5);
 
-    add(storePanel, BorderLayout.CENTER);
+    add(this.storePanel, BorderLayout.CENTER);
 
     final JButton connectButton = new JButton("Connect");
     add(connectButton, BorderLayout.SOUTH);
@@ -62,7 +59,7 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
 
       @Override
       public void actionPerformed(final ActionEvent e) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingWorkerManager.invokeLater(new Runnable() {
           @Override
           public void run() {
             final Map<String, Object> connectionProperties = new LinkedHashMap<String, Object>();
@@ -72,8 +69,8 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
             connectionProperties.put("password", password);
 
             final DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
-            storePanel.add(new DataObjectStoreTreePanel(dataStore),
-              BorderLayout.CENTER);
+            AddDataObjectStoreLayerPanel.this.storePanel.add(
+              new DataObjectStoreTreePanel(dataStore), BorderLayout.CENTER);
             revalidate();
           }
         });

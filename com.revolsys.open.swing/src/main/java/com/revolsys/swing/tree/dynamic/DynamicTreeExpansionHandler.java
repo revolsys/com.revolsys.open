@@ -18,7 +18,7 @@ public class DynamicTreeExpansionHandler implements TreeExpansionListener {
 
   @Override
   public void treeCollapsed(final TreeExpansionEvent event) {
-    if (event.getSource() != tree) {
+    if (event.getSource() != this.tree) {
       return;
     }
 
@@ -32,7 +32,7 @@ public class DynamicTreeExpansionHandler implements TreeExpansionListener {
 
   @Override
   public void treeExpanded(final TreeExpansionEvent event) {
-    if (event.getSource() != tree) {
+    if (event.getSource() != this.tree) {
       return;
     }
 
@@ -40,7 +40,7 @@ public class DynamicTreeExpansionHandler implements TreeExpansionListener {
     final Object node = path.getLastPathComponent();
     if (node instanceof DynamicTreeNode) {
       final DynamicTreeNode dynamicNode = (DynamicTreeNode)node;
-      dynamicNode.populateChildren(tree);
+      dynamicNode.populateChildren(this.tree);
     }
   }
 }

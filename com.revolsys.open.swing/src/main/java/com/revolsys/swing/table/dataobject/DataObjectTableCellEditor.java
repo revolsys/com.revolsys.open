@@ -19,6 +19,11 @@ import com.revolsys.swing.builder.ValueUiBuilder;
 @SuppressWarnings("serial")
 public class DataObjectTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
   private JComponent editorComponent;
@@ -37,15 +42,15 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   }
 
   public String getAttributeName() {
-    return attributeName;
+    return this.attributeName;
   }
 
   @Override
   public Object getCellEditorValue() {
-    if (uiBuilder != null) {
-      return uiBuilder.getCellEditorValue();
+    if (this.uiBuilder != null) {
+      return this.uiBuilder.getCellEditorValue();
     } else {
-      return SwingUtil.getValue(editorComponent);
+      return SwingUtil.getValue(this.editorComponent);
     }
   }
 
@@ -64,21 +69,23 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       this.attributeName = metaData.getAttributeName(attributeIndex);
-      uiBuilder = uiBuilderRegistry.getValueUiBuilder(metaData, attributeIndex);
-      if (uiBuilder != null) {
-        return uiBuilder.getEditorComponent(value);
+      this.uiBuilder = this.uiBuilderRegistry.getValueUiBuilder(metaData,
+        attributeIndex);
+      if (this.uiBuilder != null) {
+        return this.uiBuilder.getEditorComponent(value);
       } else {
-        editorComponent = SwingUtil.createField(metaData, attributeName, true);
-        if (editorComponent instanceof JTextField) {
-          final JTextField textField = (JTextField)editorComponent;
+        this.editorComponent = SwingUtil.createField(metaData,
+          this.attributeName, true);
+        if (this.editorComponent instanceof JTextField) {
+          final JTextField textField = (JTextField)this.editorComponent;
           textField.setHorizontalAlignment(SwingConstants.LEFT);
         }
-        SwingUtil.setFieldValue(editorComponent, value);
+        SwingUtil.setFieldValue(this.editorComponent, value);
       }
     } else {
-      editorComponent = null;
+      this.editorComponent = null;
     }
-    return editorComponent;
+    return this.editorComponent;
   }
 
   public void setUiBuilderRegistry(

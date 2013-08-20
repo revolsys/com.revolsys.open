@@ -38,6 +38,11 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DataObjectLayerTablePanel extends TablePanel implements
   PropertyChangeListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final String FILTER_GEOMETRY = "filter_geometry";
 
   public static final String FILTER_ATTRIBUTE = "filter_attribute";
@@ -88,7 +93,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
         ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
     }
-    toolBar.addComponent("count", new TableRowCount(tableModel));
+    toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       layer);
@@ -101,29 +106,30 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     // Filter buttons
 
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
-      FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter", tableModel,
-      "setAttributeFilterMode", DataObjectLayerTableModel.MODE_ALL);
+      FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter",
+      this.tableModel, "setAttributeFilterMode",
+      DataObjectLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
-      "change_table_filter", editableEnableCheck, tableModel,
+      "change_table_filter", editableEnableCheck, this.tableModel,
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
 
-    selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
-      "Show Only Selected Records", "filter_selected", null, tableModel,
+    this.selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
+      "Show Only Selected Records", "filter_selected", null, this.tableModel,
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
 
       final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(
-        FILTER_GEOMETRY, -1, "Show All Records ", "world_filter", tableModel,
-        "setFilterByBoundingBox", false);
+        FILTER_GEOMETRY, -1, "Show All Records ", "world_filter",
+        this.tableModel, "setFilterByBoundingBox", false);
       showAllGeometries.doClick();
 
       toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
-        "Show Records on Map", "map_filter", tableModel,
+        "Show Records on Map", "map_filter", this.tableModel,
         "setFilterByBoundingBox", true);
     }
     layer.addPropertyChangeListener(this);
@@ -131,13 +137,13 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public void deleteRecord() {
     final LayerDataObject object = getEventRowObject();
-    layer.deleteRecords(object);
+    this.layer.deleteRecords(object);
   }
 
   public void editRecord() {
     final LayerDataObject object = getEventRowObject();
     if (object != null && !object.isDeleted()) {
-      layer.showForm(object);
+      this.layer.showForm(object);
     }
   }
 
@@ -149,7 +155,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   }
 
   public DataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   @SuppressWarnings("unchecked")
@@ -184,20 +190,20 @@ public class DataObjectLayerTablePanel extends TablePanel implements
             condition = Conditions.likeUpper(searchAttribute, searchText);
           }
         } else {
-          final DataObjectMetaData metaData = tableModel.getMetaData();
+          final DataObjectMetaData metaData = this.tableModel.getMetaData();
           final Class<?> attributeClass = metaData.getAttributeClass(searchAttribute);
           final Object value = StringConverterRegistry.toObject(attributeClass,
             searchValue);
           condition = Conditions.equal(searchAttribute, value);
         }
       }
-      tableModel.setSearchCondition(condition);
+      this.tableModel.setSearchCondition(condition);
     } else if (source instanceof LayerDataObject) {
       repaint();
-    } else if (source == layer) {
+    } else if (source == this.layer) {
       final String propertyName = event.getPropertyName();
       if ("recordsChanged".equals(propertyName)) {
-        tableModel.refresh();
+        this.tableModel.refresh();
       }
       repaint();
     }
@@ -206,18 +212,18 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   @Override
   public void removeNotify() {
     super.removeNotify();
-    layer.removePropertyChangeListener(this);
+    this.layer.removePropertyChangeListener(this);
   }
 
   public void setAttributeFilterMode(final String mode) {
     if (DataObjectLayerTableModel.MODE_SELECTED.equals(mode)) {
-      selectedButton.doClick();
+      this.selectedButton.doClick();
     }
   }
 
   public void zoomToRecord() {
     final DataObject object = getEventRowObject();
-    final Project project = layer.getProject();
+    final Project project = this.layer.getProject();
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();

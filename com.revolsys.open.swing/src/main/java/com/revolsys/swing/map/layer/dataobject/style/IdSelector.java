@@ -9,11 +9,11 @@ public class IdSelector implements Selector {
   }
 
   public String getId() {
-    return id;
+    return this.id;
   }
 
   @Override
   public String toString() {
-    return '#' + id;
+    return '#' + this.id;
   }
 }

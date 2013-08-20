@@ -20,27 +20,27 @@ public class ListLog4jAppender extends AppenderSkeleton {
 
   @Override
   protected void append(final LoggingEvent event) {
-    final int index = loggingEvents.size();
-    loggingEvents.add(event);
-    tableModel.fireTableRowsInserted(index, index);
-    while (loggingEvents.size() > maxSize) {
-      loggingEvents.removeFirst();
-      tableModel.fireTableRowsDeleted(0, 0);
+    final int index = this.loggingEvents.size();
+    this.loggingEvents.add(event);
+    this.tableModel.fireTableRowsInserted(index, index);
+    while (this.loggingEvents.size() > this.maxSize) {
+      this.loggingEvents.removeFirst();
+      this.tableModel.fireTableRowsDeleted(0, 0);
     }
   }
 
   @Override
   public void close() {
-    tableModel.fireTableDataChanged();
-    loggingEvents.clear();
+    this.tableModel.fireTableDataChanged();
+    this.loggingEvents.clear();
   }
 
   public List<LoggingEvent> getLoggingEvents() {
-    return loggingEvents;
+    return this.loggingEvents;
   }
 
   public int getMaxSize() {
-    return maxSize;
+    return this.maxSize;
   }
 
   @Override

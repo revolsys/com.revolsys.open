@@ -13,6 +13,11 @@ import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 public class DataObjectLayerAttributesTableModel extends
   AbstractDataObjectTableModel implements PropertyChangeListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private LayerDataObject object;
 
   private final DataObjectLayer layer;
@@ -24,7 +29,7 @@ public class DataObjectLayerAttributesTableModel extends
     this.form = form;
     this.layer = form.getLayer();
     this.object = form.getObject();
-    layer.addPropertyChangeListener(this);
+    this.layer.addPropertyChangeListener(this);
   }
 
   @Override
@@ -42,25 +47,25 @@ public class DataObjectLayerAttributesTableModel extends
   }
 
   public LayerDataObject getObject() {
-    return object;
+    return this.object;
   }
 
   @Override
   protected Object getValue(final int rowIndex) {
-    if (object == null) {
+    if (this.object == null) {
       return "-";
     } else {
-      return object.getValue(rowIndex);
+      return this.object.getValue(rowIndex);
     }
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (object == null) {
+    if (this.object == null) {
       return null;
     } else if (columnIndex == 3) {
       final String attributeName = getAttributeName(rowIndex);
-      return object.getOriginalValue(attributeName);
+      return this.object.getOriginalValue(attributeName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
     }
@@ -69,13 +74,13 @@ public class DataObjectLayerAttributesTableModel extends
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
-      if (form.isEditable()) {
+      if (this.form.isEditable()) {
         final String idAttributeName = getMetaData().getIdAttributeName();
         final String attributeName = getAttributeName(rowIndex);
         if (attributeName.equals(idAttributeName)) {
           return false;
         } else {
-          return form.isEditable(attributeName);
+          return this.form.isEditable(attributeName);
         }
       } else {
         return false;
@@ -88,7 +93,7 @@ public class DataObjectLayerAttributesTableModel extends
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
-    if (source == object) {
+    if (source == this.object) {
       final String propertyName = event.getPropertyName();
       final DataObjectMetaData metaData = getMetaData();
       final int index = metaData.getAttributeIndex(propertyName);
@@ -102,7 +107,7 @@ public class DataObjectLayerAttributesTableModel extends
   }
 
   public void removeListener() {
-    layer.removePropertyChangeListener(this);
+    this.layer.removePropertyChangeListener(this);
   }
 
   public void setObject(final LayerDataObject object) {
@@ -111,8 +116,8 @@ public class DataObjectLayerAttributesTableModel extends
 
   @Override
   protected Object setValue(final Object value, final int rowIndex) {
-    final Object oldValue = object.getValue(rowIndex);
-    object.setValue(rowIndex, value);
+    final Object oldValue = this.object.getValue(rowIndex);
+    this.object.setValue(rowIndex, value);
     return oldValue;
   }
 }

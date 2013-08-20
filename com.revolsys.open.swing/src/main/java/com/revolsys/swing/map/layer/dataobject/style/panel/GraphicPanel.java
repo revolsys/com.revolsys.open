@@ -5,6 +5,11 @@ import com.revolsys.swing.component.ValueField;
 public class GraphicPanel extends ValueField
 // implements PropertyChangeListener
 {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
   // /**
   // *
   // */

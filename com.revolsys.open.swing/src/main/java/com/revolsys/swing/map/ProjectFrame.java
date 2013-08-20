@@ -2,6 +2,7 @@ package com.revolsys.swing.map;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -40,7 +41,6 @@ import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
-import com.revolsys.swing.action.file.Exit;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -68,6 +68,11 @@ import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
 public class ProjectFrame extends BaseFrame {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   static {
     ResponseCache.setDefault(new FileResponseCache());
 
@@ -102,15 +107,15 @@ public class ProjectFrame extends BaseFrame {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
-    dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
-    final CEclipseTheme theme = (CEclipseTheme)dockControl.getController()
+    this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
+    final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
       .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
-    final CContentArea dockContentArea = dockControl.getContentArea();
+    final CContentArea dockContentArea = this.dockControl.getContentArea();
     add(dockContentArea, BorderLayout.CENTER);
-    DockingFramesUtil.setFlapSizes(dockControl);
+    DockingFramesUtil.setFlapSizes(this.dockControl);
 
     initUi();
   }
@@ -164,7 +169,7 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addControlWorkingArea() {
     final CLocation location = CLocation.base().normalWest(0.20);
-    DockingFramesUtil.createCWorkingArea(dockControl, project,
+    DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
       MapPanel.MAP_CONTROLS_WORKING_AREA, location);
   }
 
@@ -177,23 +182,23 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addLogPanel() {
     final JPanel panel = Log4jTableModel.createPanel();
-    DockingFramesUtil.addDockable(project, MapPanel.MAP_TABLE_WORKING_AREA,
-      "log4j", "Logging", panel);
+    DockingFramesUtil.addDockable(this.project,
+      MapPanel.MAP_TABLE_WORKING_AREA, "log4j", "Logging", panel);
   }
 
   protected MapPanel addMapPanel() {
-    mapPanel = new MapPanel(this.project);
+    this.mapPanel = new MapPanel(this.project);
 
     final DefaultSingleCDockable dockable = new DefaultSingleCDockable("map",
-      "Map", mapPanel);
+      "Map", this.mapPanel);
     dockable.setStackable(false);
     dockable.setCloseable(false);
     dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
       .minimalWest());
 
-    dockControl.addDockable(dockable);
+    this.dockControl.addDockable(dockable);
     dockable.setVisible(true);
-    return mapPanel;
+    return this.mapPanel;
   }
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menu) {
@@ -208,44 +213,45 @@ public class ProjectFrame extends BaseFrame {
     panel.add(toolBar, BorderLayout.NORTH);
 
     final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
-    tocPanel = new ObjectTreePanel(project, model);
-    final ObjectTree tree = tocPanel.getTree();
+    this.tocPanel = new ObjectTreePanel(this.project, model);
+    final ObjectTree tree = this.tocPanel.getTree();
     tree.setRootVisible(true);
-    project.addPropertyChangeListener("layers", new PropertyChangeListener() {
+    this.project.addPropertyChangeListener("layers",
+      new PropertyChangeListener() {
 
-      @Override
-      public void propertyChange(final PropertyChangeEvent event) {
-        final Object source = event.getSource();
-        if (source instanceof LayerGroup) {
-          LayerGroup layerGroup = (LayerGroup)source;
-          final Object newValue = event.getNewValue();
-          if (newValue instanceof LayerGroup) {
-            layerGroup = (LayerGroup)newValue;
+        @Override
+        public void propertyChange(final PropertyChangeEvent event) {
+          final Object source = event.getSource();
+          if (source instanceof LayerGroup) {
+            LayerGroup layerGroup = (LayerGroup)source;
+            final Object newValue = event.getNewValue();
+            if (newValue instanceof LayerGroup) {
+              layerGroup = (LayerGroup)newValue;
+            }
+            final List<Layer> pathList = layerGroup.getPathList();
+            final TreePath treePath = ObjectTree.createTreePath(pathList);
+            tree.expandPath(treePath);
           }
-          final List<Layer> pathList = layerGroup.getPathList();
-          final TreePath treePath = ObjectTree.createTreePath(pathList);
-          tree.expandPath(treePath);
-        }
 
-      }
-    });
-    panel.add(tocPanel, BorderLayout.CENTER);
+        }
+      });
+    panel.add(this.tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
-      project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
+      this.project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
     tableOfContents.toFront();
     return tableOfContents;
   }
 
   protected void addTableWorkingArea() {
     final TreeLocationRoot location = CLocation.base().normalSouth(0.25);
-    DockingFramesUtil.createCWorkingArea(dockControl, project,
+    DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
       MapPanel.MAP_TABLE_WORKING_AREA, location);
   }
 
   protected void addTasksPanel() {
     final JPanel panel = SwingWorkerTableModel.createPanel();
-    DockingFramesUtil.addDockable(project, MapPanel.MAP_TABLE_WORKING_AREA,
-      "tasks", "Background Tasks", panel);
+    DockingFramesUtil.addDockable(this.project,
+      MapPanel.MAP_TABLE_WORKING_AREA, "tasks", "Background Tasks", panel);
   }
 
   protected void addWorkingAreas() {
@@ -267,39 +273,49 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItem("project", "Save Project", "Save Project",
-      SilkIconLoader.getIconWithBadge("layout", "save"), project, "saveProject");
-    file.addMenuItem("exit", new Exit());
+      SilkIconLoader.getIconWithBadge("layout", "save"), this.project,
+      "saveProject");
+    file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
   }
 
   @Override
   public void dispose() {
     super.dispose();
-    if (project != null) {
-      final DataObjectStoreConnectionRegistry dataStores = project.getDataStores();
+    if (this.project != null) {
+      final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
       DataObjectStoreConnectionManager.get().removeConnectionRegistry(
         dataStores);
-      tocPanel = null;
-      project = null;
-      dockControl = null;
-      mapPanel = null;
+      this.tocPanel = null;
+      this.project = null;
+      this.dockControl = null;
+      this.mapPanel = null;
+    }
+  }
+
+  public void exit() {
+    if (getProject().saveChangesWithPrompt()) {
+      final Window[] windows = Window.getOwnerlessWindows();
+      for (final Window window : windows) {
+        window.dispose();
+      }
     }
   }
 
   public CControl getDockControl() {
-    return dockControl;
+    return this.dockControl;
   }
 
   public MapPanel getMapPanel() {
-    return mapPanel;
+    return this.mapPanel;
   }
 
   public Project getProject() {
-    return project;
+    return this.project;
   }
 
   public ObjectTreePanel getTocPanel() {
-    return tocPanel;
+    return this.tocPanel;
   }
 
   protected void initUi() {
@@ -321,7 +337,7 @@ public class ProjectFrame extends BaseFrame {
 
   public void loadProject(final File projectFile) {
     final FileSystemResource resource = new FileSystemResource(projectFile);
-    project.readProject(resource);
+    this.project.readProject(resource);
   }
 
 }

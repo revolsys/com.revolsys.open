@@ -26,24 +26,24 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
 
   public ColorAlphaPanel() {
     setLayout(new BorderLayout());
-    alphaSlider = new JSlider(0, 255, 255);
-    alphaSlider.setMajorTickSpacing(64);
-    alphaSlider.setMinorTickSpacing(16);
-    alphaSlider.setPaintTicks(true);
-    alphaSlider.setToolTipText("Alpha");
-    alphaSlider.addChangeListener(this);
-    alphaSlider.setPaintLabels(true);
+    this.alphaSlider = new JSlider(0, 255, 255);
+    this.alphaSlider.setMajorTickSpacing(64);
+    this.alphaSlider.setMinorTickSpacing(16);
+    this.alphaSlider.setPaintTicks(true);
+    this.alphaSlider.setToolTipText("Alpha");
+    this.alphaSlider.addChangeListener(this);
+    this.alphaSlider.setPaintLabels(true);
     final Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
     labels.put(0, new JLabel("0"));
     labels.put(64, new JLabel("64"));
     labels.put(128, new JLabel("128"));
     labels.put(192, new JLabel("192"));
     labels.put(255, new JLabel("255"));
-    alphaSlider.setLabelTable(labels);
+    this.alphaSlider.setLabelTable(labels);
 
     add(new JLabel("Alpha (Opacity)"));
 
-    add(alphaSlider);
+    add(this.alphaSlider);
     GroupLayoutUtil.makeColumns(this, 2);
   }
 
@@ -69,7 +69,8 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   @Override
   public void stateChanged(final ChangeEvent e) {
     final Color color = getColorFromModel();
-    final Color newColor = ColorUtil.setAlpha(color, alphaSlider.getValue());
+    final Color newColor = ColorUtil.setAlpha(color,
+      this.alphaSlider.getValue());
     final ColorSelectionModel colorSelectionModel = getColorSelectionModel();
     colorSelectionModel.setSelectedColor(newColor);
   }
@@ -77,6 +78,6 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   @Override
   public void updateChooser() {
     final Color color = getColorFromModel();
-    alphaSlider.setValue(color.getAlpha());
+    this.alphaSlider.setValue(color.getAlpha());
   }
 }

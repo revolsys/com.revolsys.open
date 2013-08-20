@@ -17,10 +17,10 @@ import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
@@ -79,7 +79,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public ObjectTreeModel(final Object root) {
     this();
     this.root = root;
-    objectPathMap.put(root, new TreePath(root));
+    this.objectPathMap.put(root, new TreePath(root));
   }
 
   public void addMenuItem(final Class<?> clazz, final JMenuItem menuItem) {
@@ -96,7 +96,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public void addNodeModel(final Class<?> clazz,
     final ObjectTreeNodeModel<?, ?> model) {
     model.setObjectTreeModel(this);
-    classNodeModels.put(clazz, (ObjectTreeNodeModel<Object, Object>)model);
+    this.classNodeModels.put(clazz, (ObjectTreeNodeModel<Object, Object>)model);
   }
 
   public void addNodeModel(final ObjectTreeNodeModel<?, ?> model) {
@@ -108,30 +108,30 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   @Override
   public void addTreeModelListener(final TreeModelListener listener) {
-    eventHandler.addTreeModelListener(listener);
+    this.eventHandler.addTreeModelListener(listener);
   }
 
   public void fireTreeNodesInserted(final TreePath path, final int index,
     final Object newValue) {
     if (newValue != null) {
-      final TreeModelEvent e = new TreeModelEvent(root, path, new int[] {
+      final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
         index
       }, new Object[] {
         newValue
       });
-      eventHandler.treeNodesInserted(e);
+      this.eventHandler.treeNodesInserted(e);
     }
   }
 
   public void fireTreeNodesRemoved(final TreePath path, final int index,
     final Object newValue) {
     if (newValue != null) {
-      final TreeModelEvent e = new TreeModelEvent(root, path, new int[] {
+      final TreeModelEvent e = new TreeModelEvent(this.root, path, new int[] {
         index
       }, new Object[] {
         newValue
       });
-      eventHandler.treeNodesRemoved(e);
+      this.eventHandler.treeNodesRemoved(e);
     }
   }
 
@@ -189,8 +189,8 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public MenuFactory getMenu(final Object object) {
-    synchronized (objectMenus) {
-      final MenuFactory popupMenu = objectMenus.get(object);
+    synchronized (this.objectMenus) {
+      final MenuFactory popupMenu = this.objectMenus.get(object);
       if (popupMenu != null) {
         return popupMenu;
       }
@@ -199,7 +199,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public ObjectTreeNodeModel<Object, Object> getNodeModel(final Class<?> clazz) {
-    final ObjectTreeNodeModel<Object, Object> model = classNodeModels.find(clazz);
+    final ObjectTreeNodeModel<Object, Object> model = this.classNodeModels.find(clazz);
     if (model == null) {
       final Class<?> superClass = clazz.getSuperclass();
       if (superClass != null) {
@@ -244,30 +244,30 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   public MenuFactory getObjectMenu(final Object object) {
     MenuFactory menu;
-    synchronized (objectMenus) {
-      menu = objectMenus.get(object);
+    synchronized (this.objectMenus) {
+      menu = this.objectMenus.get(object);
       if (menu == null) {
         menu = new MenuFactory();
-        objectMenus.put(object, menu);
+        this.objectMenus.put(object, menu);
       }
     }
     return menu;
   }
 
   public TreePath getPath(final Object source) {
-    return objectPathMap.get(source);
+    return this.objectPathMap.get(source);
   }
 
   @Override
   public Object getRoot() {
-    return root;
+    return this.root;
   }
 
   public void initializeNode(final TreePath path,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model != null) {
       model.initialize(node);
-      SwingUtil.invokeLater(this, "setNodeInitialized", path, node);
+      SwingWorkerManager.invokeLater(this, "setNodeInitialized", path, node);
     }
   }
 
@@ -277,9 +277,9 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       initializePath(parent);
     }
     final Object object = path.getLastPathComponent();
-    synchronized (objectPathMap) {
-      if (!objectPathMap.containsKey(object)) {
-        objectPathMap.put(object, path);
+    synchronized (this.objectPathMap) {
+      if (!this.objectPathMap.containsKey(object)) {
+        this.objectPathMap.put(object, path);
       }
     }
   }
@@ -322,12 +322,13 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         final Object newValue = indexedEvent.getNewValue();
         if (oldValue != null) {
           final TreePath childPath = parentPath.pathByAddingChild(oldValue);
-          if (EqualsRegistry.equal(childPath, objectPathMap.get(oldValue))) {
-            objectPathMap.remove(oldValue);
+          if (EqualsRegistry.equal(childPath, this.objectPathMap.get(oldValue))) {
+            this.objectPathMap.remove(oldValue);
           }
         }
         if (newValue != null) {
-          objectPathMap.put(newValue, parentPath.pathByAddingChild(newValue));
+          this.objectPathMap.put(newValue,
+            parentPath.pathByAddingChild(newValue));
         }
       }
     }
@@ -345,7 +346,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   @Override
   public void removeTreeModelListener(final TreeModelListener listener) {
-    eventHandler.removeTreeModelListener(listener);
+    this.eventHandler.removeTreeModelListener(listener);
   }
 
   public void setNodeInitialized(final TreePath path, final Object node) {
@@ -353,21 +354,21 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final TreeModelEvent event = new TreeModelEvent(node, path);
     final ObjectTreeNodeModel<Object, Object> nodeModel = getNodeModel(path);
     setObjectPathMap(path, node, nodeModel);
-    eventHandler.treeStructureChanged(event);
+    this.eventHandler.treeStructureChanged(event);
   }
 
   protected void setObjectPathMap(final TreePath path, final Object node,
     final ObjectTreeNodeModel<Object, Object> nodeModel) {
-    synchronized (objectPathMap) {
-      if (!objectPathMap.containsKey(node)) {
-        objectPathMap.put(node, path);
+    synchronized (this.objectPathMap) {
+      if (!this.objectPathMap.containsKey(node)) {
+        this.objectPathMap.put(node, path);
       }
       if (nodeModel != null) {
         for (int i = 0; i < nodeModel.getChildCount(node); i++) {
           final Object child = nodeModel.getChild(node, i);
-          if (!objectPathMap.containsKey(child)) {
+          if (!this.objectPathMap.containsKey(child)) {
             final TreePath childPath = path.pathByAddingChild(child);
-            objectPathMap.put(child, childPath);
+            this.objectPathMap.put(child, childPath);
           }
         }
       }
@@ -378,7 +379,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     if (root != this.root) {
       this.root = root;
       final TreeModelEvent e = new TreeModelEvent(root, new TreePath(root));
-      eventHandler.treeStructureChanged(e);
+      this.eventHandler.treeStructureChanged(e);
     }
   }
 
@@ -392,7 +393,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         if (isInitialized(path, nodeModel, node)) {
           for (int i = 0; i < nodeModel.getChildCount(node); i++) {
             final Object child = nodeModel.getChild(node, i);
-            objectPathMap.remove(child);
+            this.objectPathMap.remove(child);
           }
         }
       }

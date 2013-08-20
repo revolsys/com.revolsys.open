@@ -15,6 +15,6 @@ public class EqualFilter extends GeneralFilter {
   @Override
   protected boolean include(
     final Entry<? extends Object, ? extends Object> value, final int index) {
-    return value.getStringValue(index).equalsIgnoreCase(text);
+    return value.getStringValue(index).equalsIgnoreCase(this.text);
   }
 }

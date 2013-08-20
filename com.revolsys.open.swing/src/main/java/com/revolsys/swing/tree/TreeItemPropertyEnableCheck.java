@@ -28,7 +28,7 @@ public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
       return disabled();
     } else {
       try {
-        final Object value = JavaBeanUtil.getValue(object, propertyName);
+        final Object value = JavaBeanUtil.getValue(object, this.propertyName);
         if (EqualsRegistry.equal(value, this.value)) {
           return enabled();
         } else {
@@ -43,6 +43,6 @@ public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return propertyName + "=" + value;
+    return this.propertyName + "=" + this.value;
   }
 }

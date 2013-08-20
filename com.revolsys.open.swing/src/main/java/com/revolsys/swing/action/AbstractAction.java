@@ -7,6 +7,11 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 
 public abstract class AbstractAction extends javax.swing.AbstractAction {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final ActionEnabledPropertyChangeListener enabledListener = new ActionEnabledPropertyChangeListener(
     this);
 
@@ -15,7 +20,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   private EnableCheck enableCheck;
 
   public EnableCheck getEnableCheck() {
-    return enableCheck;
+    return this.enableCheck;
   }
 
   public Icon getIcon() {
@@ -35,13 +40,13 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public boolean isCheckBox() {
-    return checkBox;
+    return this.checkBox;
   }
 
   @Override
   public boolean isEnabled() {
-    if (enableCheck != null) {
-      enableCheck.isEnabled();
+    if (this.enableCheck != null) {
+      this.enableCheck.isEnabled();
     }
     return super.isEnabled();
   }
@@ -52,11 +57,13 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   public void setEnableCheck(final EnableCheck enableCheck) {
     if (this.enableCheck != null) {
-      this.enableCheck.removePropertyChangeListener("enabled", enabledListener);
+      this.enableCheck.removePropertyChangeListener("enabled",
+        this.enabledListener);
     }
     this.enableCheck = enableCheck;
     if (this.enableCheck != null) {
-      this.enableCheck.addPropertyChangeListener("enabled", enabledListener);
+      this.enableCheck.addPropertyChangeListener("enabled",
+        this.enabledListener);
       enableCheck.isEnabled();
     }
   }

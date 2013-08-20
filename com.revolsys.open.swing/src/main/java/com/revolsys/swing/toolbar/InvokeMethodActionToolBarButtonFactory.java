@@ -109,7 +109,7 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
 
   @Override
   public Component createToolbarButton() {
-    if (checkBox) {
+    if (this.checkBox) {
       final JToggleButton button = new JToggleButton(this);
       return button;
     } else {
@@ -120,7 +120,7 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
 
   @Override
   public boolean isCheckBox() {
-    return checkBox;
+    return this.checkBox;
   }
 
   @Override

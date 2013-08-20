@@ -1,12 +1,9 @@
 package com.revolsys.parallel;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LoggingRunnable implements Runnable {
-  private static final Logger LOG = LoggerFactory.getLogger(LoggingRunnable.class);
-
-  Runnable runnable;
+  private final Runnable runnable;
 
   public LoggingRunnable(final Runnable runnable) {
     this.runnable = runnable;
@@ -16,12 +13,14 @@ public class LoggingRunnable implements Runnable {
   public void run() {
     try {
       runnable.run();
-    } catch (final RuntimeException e) {
-      LOG.error(e.getMessage(), e);
-      throw e;
-    } catch (final Error e) {
-      LOG.error(e.getMessage(), e);
-      throw e;
+    } catch (final Throwable e) {
+      Class<? extends Runnable> logClass;
+      if (runnable == null) {
+        logClass = getClass();
+      } else {
+        logClass = runnable.getClass();
+      }
+      LoggerFactory.getLogger(logClass).error(e.getMessage(), e);
     }
 
   }

@@ -3,8 +3,7 @@ package com.revolsys.swing.listener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.SwingUtilities;
-
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodSelectedItemListener implements ItemListener {
@@ -30,10 +29,10 @@ public class InvokeMethodSelectedItemListener implements ItemListener {
   @Override
   public void itemStateChanged(final ItemEvent e) {
     if (e.getStateChange() == ItemEvent.SELECTED) {
-      final Runnable runnable = new InvokeMethodRunnable(object, methodName,
-        e.getItem());
-      if (invokeLater) {
-        SwingUtilities.invokeLater(runnable);
+      final Runnable runnable = new InvokeMethodRunnable(this.object,
+        this.methodName, e.getItem());
+      if (this.invokeLater) {
+        SwingWorkerManager.invokeLater(runnable);
       } else {
         runnable.run();
       }

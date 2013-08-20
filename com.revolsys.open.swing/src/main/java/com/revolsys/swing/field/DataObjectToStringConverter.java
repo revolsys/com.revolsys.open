@@ -31,7 +31,7 @@ public class DataObjectToStringConverter extends ObjectToStringConverter {
     } else if (value instanceof DataObject) {
       final DataObject object = (DataObject)value;
       final List<String> values = new ArrayList<String>();
-      for (final String attributeName : attributeNames) {
+      for (final String attributeName : this.attributeNames) {
         final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
           object, attributeName));
         values.add(text);

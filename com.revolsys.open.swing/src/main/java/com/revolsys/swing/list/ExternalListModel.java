@@ -25,8 +25,8 @@ public class ExternalListModel<T> extends AbstractListModel implements
 
   @Override
   public T getElementAt(final int index) {
-    if (index < list.size()) {
-      return list.get(index);
+    if (index < this.list.size()) {
+      return this.list.get(index);
     } else {
       return null;
     }
@@ -34,11 +34,11 @@ public class ExternalListModel<T> extends AbstractListModel implements
 
   @Override
   public int getSize() {
-    return list.size();
+    return this.list.size();
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    fireContentsChanged(this, 0, list.size());
+    fireContentsChanged(this, 0, this.list.size());
   }
 }

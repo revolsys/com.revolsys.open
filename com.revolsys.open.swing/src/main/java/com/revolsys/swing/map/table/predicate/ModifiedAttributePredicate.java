@@ -45,11 +45,11 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = model.getObject(rowIndex);
+      final DataObject object = this.model.getObject(rowIndex);
       if (object instanceof LayerDataObject) {
         final LayerDataObject layerObject = (LayerDataObject)object;
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        final String attributeName = model.getAttributeName(columnIndex);
+        final String attributeName = this.model.getAttributeName(columnIndex);
         final boolean highlighted = layerObject.isModified(attributeName);
         if (highlighted) {
           final DataObjectMetaData metaData = layerObject.getMetaData();

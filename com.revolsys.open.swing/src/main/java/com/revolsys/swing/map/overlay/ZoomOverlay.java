@@ -25,6 +25,11 @@ import com.vividsolutions.jts.geom.Point;
 @SuppressWarnings("serial")
 public class ZoomOverlay extends AbstractOverlay {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
 
   private java.awt.Point zoomBoxFirstPoint;
@@ -45,11 +50,11 @@ public class ZoomOverlay extends AbstractOverlay {
   public void keyPressed(final KeyEvent e) {
     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
       clearMapCursor();
-      panning = false;
-      panFirstPoint = null;
-      panImage = null;
-      zoomBox = null;
-      zoomBoxFirstPoint = null;
+      this.panning = false;
+      this.panFirstPoint = null;
+      this.panImage = null;
+      this.zoomBox = null;
+      this.zoomBoxFirstPoint = null;
       repaint();
     }
   }
@@ -83,9 +88,9 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (zoomBoxFirstPoint != null) {
+    if (this.zoomBoxFirstPoint != null) {
       zoomBoxDrag(event);
-    } else if (panning) {
+    } else if (this.panning) {
       panDrag(event);
     }
   }
@@ -115,9 +120,9 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (panning) {
+    if (this.panning) {
       panFinish(event);
-    } else if (zoomBox != null) {
+    } else if (this.zoomBox != null) {
       zoomBoxFinish(event);
     }
   }
@@ -138,26 +143,26 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void paintComponent(final Graphics graphics) {
-    if (zoomBox != null) {
+    if (this.zoomBox != null) {
       final Graphics2D g = (Graphics2D)graphics;
       g.setColor(Color.DARK_GRAY);
       g.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE,
         BasicStroke.JOIN_MITER, 2, new float[] {
           6, 6
         }, 0f));
-      g.draw(zoomBox);
+      g.draw(this.zoomBox);
       g.setPaint(TRANS_BG);
-      g.fill(zoomBox);
+      g.fill(this.zoomBox);
     }
   }
 
   public void panDrag(final MouseEvent event) {
-    if (panFirstPoint == null) {
+    if (this.panFirstPoint == null) {
       panStart(event);
     }
     final java.awt.Point p = event.getPoint();
-    final int dx = (int)(p.getX() - panFirstPoint.getX());
-    final int dy = (int)(p.getY() - panFirstPoint.getY());
+    final int dx = (int)(p.getX() - this.panFirstPoint.getX());
+    final int dy = (int)(p.getY() - this.panFirstPoint.getY());
 
     final Container parent = getParent();
     final Graphics2D graphics = getGraphics();
@@ -165,13 +170,13 @@ public class ZoomOverlay extends AbstractOverlay {
     final int height = getViewport().getViewHeightPixels();
     graphics.setColor(Color.WHITE);
     graphics.fillRect(0, 0, width, height);
-    graphics.drawImage(panImage, dx, dy, parent);
+    graphics.drawImage(this.panImage, dx, dy, parent);
     event.consume();
   }
 
   public void panFinish(final MouseEvent event) {
     final java.awt.Point point = event.getPoint();
-    final Point fromPoint = getViewport().toModelPoint(panFirstPoint);
+    final Point fromPoint = getViewport().toModelPoint(this.panFirstPoint);
     final Point toPoint = getViewport().toModelPoint(point);
 
     final double deltaX = fromPoint.getX() - toPoint.getX();
@@ -181,10 +186,10 @@ public class ZoomOverlay extends AbstractOverlay {
     final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
     getMap().setBoundingBox(newBoundingBox);
 
-    panFirstPoint = null;
-    panning = false;
+    this.panFirstPoint = null;
+    this.panning = false;
     clearMapCursor();
-    panImage = null;
+    this.panImage = null;
     getParent().repaint();
     event.consume();
   }
@@ -193,51 +198,51 @@ public class ZoomOverlay extends AbstractOverlay {
     final int width = getViewport().getViewWidthPixels();
     final int height = getViewport().getViewHeightPixels();
     final JComponent parent = (JComponent)getParent();
-    panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    final Graphics2D graphics = (Graphics2D)panImage.getGraphics();
+    this.panImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    final Graphics2D graphics = (Graphics2D)this.panImage.getGraphics();
     final Insets insets = parent.getInsets();
     graphics.translate(-insets.left, -insets.top);
     graphics.setColor(Color.WHITE);
     graphics.fillRect(insets.left, insets.top, width, height);
     parent.paintComponents(graphics);
     graphics.dispose();
-    panning = true;
+    this.panning = true;
     setMapCursor(new Cursor(Cursor.HAND_CURSOR));
-    panFirstPoint = event.getPoint();
+    this.panFirstPoint = event.getPoint();
     event.consume();
   }
 
   public void zoomBoxDrag(final MouseEvent event) {
     final int eventX = event.getX();
     final int eventY = event.getY();
-    final double width = Math.abs(eventX - zoomBoxFirstPoint.getX());
-    final double height = Math.abs(eventY - zoomBoxFirstPoint.getY());
+    final double width = Math.abs(eventX - this.zoomBoxFirstPoint.getX());
+    final double height = Math.abs(eventY - this.zoomBoxFirstPoint.getY());
     final java.awt.Point topLeft = new java.awt.Point(); // java.awt.Point
-    if (zoomBoxFirstPoint.getX() < eventX) {
-      topLeft.setLocation(zoomBoxFirstPoint.getX(), 0);
+    if (this.zoomBoxFirstPoint.getX() < eventX) {
+      topLeft.setLocation(this.zoomBoxFirstPoint.getX(), 0);
     } else {
       topLeft.setLocation(eventX, 0);
     }
 
-    if (zoomBoxFirstPoint.getY() < eventY) {
-      topLeft.setLocation(topLeft.getX(), zoomBoxFirstPoint.getY());
+    if (this.zoomBoxFirstPoint.getY() < eventY) {
+      topLeft.setLocation(topLeft.getX(), this.zoomBoxFirstPoint.getY());
     } else {
       topLeft.setLocation(topLeft.getX(), eventY);
     }
-    zoomBox.setRect(topLeft.getX(), topLeft.getY(), width, height);
+    this.zoomBox.setRect(topLeft.getX(), topLeft.getY(), width, height);
     repaint();
     event.consume();
   }
 
   public void zoomBoxFinish(final MouseEvent event) {
     // Convert first point to envelope top left in map coords.
-    final int minX = (int)zoomBox.getMinX();
-    final int minY = (int)zoomBox.getMinY();
+    final int minX = (int)this.zoomBox.getMinX();
+    final int minY = (int)this.zoomBox.getMinY();
     final Point topLeft = getViewport().toModelPoint(minX, minY);
 
     // Convert second point to envelope bottom right in map coords.
-    final int maxX = (int)zoomBox.getMaxX();
-    final int maxY = (int)zoomBox.getMaxY();
+    final int maxX = (int)this.zoomBox.getMaxX();
+    final int maxY = (int)this.zoomBox.getMaxY();
     final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
     final GeometryFactory geometryFactory = getMap().getGeometryFactory();
@@ -245,16 +250,16 @@ public class ZoomOverlay extends AbstractOverlay {
       topLeft.getY(), bottomRight.getX(), bottomRight.getY());
     getMap().setBoundingBox(extent);
 
-    zoomBoxFirstPoint = null;
-    zoomBox = null;
+    this.zoomBoxFirstPoint = null;
+    this.zoomBox = null;
     clearMapCursor();
     event.consume();
   }
 
   public void zoomBoxStart(final MouseEvent event) {
     setMapCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-    zoomBoxFirstPoint = event.getPoint();
-    zoomBox = new Rectangle2D.Double();
+    this.zoomBoxFirstPoint = event.getPoint();
+    this.zoomBox = new Rectangle2D.Double();
     event.consume();
   }
 }

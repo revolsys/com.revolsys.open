@@ -19,13 +19,13 @@ import org.jdesktop.swingx.JXSearchField;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.field.SearchField;
@@ -63,26 +63,28 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   public AttributeFilterPanel(final DataObjectLayer layer) {
     this.layer = layer;
     this.metaData = layer.getMetaData();
-    this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
-    attributeNames.remove(metaData.getGeometryAttributeName());
+    this.attributeNames = new ArrayList<String>(
+      this.metaData.getAttributeNames());
+    this.attributeNames.remove(this.metaData.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
-      metaData);
-    nameField = new ComboBox(converter, false, attributeNames.toArray());
-    nameField.setRenderer(converter);
-    nameField.addActionListener(this);
-    add(nameField);
+      this.metaData);
+    this.nameField = new ComboBox(converter, false,
+      this.attributeNames.toArray());
+    this.nameField.setRenderer(converter);
+    this.nameField.addActionListener(this);
+    add(this.nameField);
 
-    operatorField = new ComboBox("=", "Like");
-    operatorField.setSelectedIndex(0);
-    operatorField.addItemListener(this);
-    add(operatorField);
+    this.operatorField = new ComboBox("=", "Like");
+    this.operatorField.setSelectedIndex(0);
+    this.operatorField.addItemListener(this);
+    add(this.operatorField);
 
     this.searchTextField = new SearchField();
-    this.searchField = searchTextField;
-    searchTextField.addActionListener(this);
-    searchTextField.setPreferredSize(new Dimension(200,
-      searchTextField.getHeight()));
-    add(searchFieldPanel);
+    this.searchField = this.searchTextField;
+    this.searchTextField.addActionListener(this);
+    this.searchTextField.setPreferredSize(new Dimension(200,
+      this.searchTextField.getHeight()));
+    add(this.searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 3);
 
     final String searchField = layer.getProperty("searchField");
@@ -93,60 +95,60 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   public void actionPerformed(final ActionEvent event) {
     try {
       final Object source = event.getSource();
-      if (source == searchField) {
+      if (source == this.searchField) {
         final Object searchValue = getSearchValue();
-        final Object oldValue = previousSearchValue;
-        previousSearchValue = searchValue;
+        final Object oldValue = this.previousSearchValue;
+        this.previousSearchValue = searchValue;
         fireSearchChanged("searchValue", oldValue, searchValue);
-      } else if (source == nameField) {
+      } else if (source == this.nameField) {
         final String searchAttribute = getSearchAttribute();
-        final Object oldValue = previousAttributeName;
-        previousAttributeName = searchAttribute;
+        final Object oldValue = this.previousAttributeName;
+        this.previousAttributeName = searchAttribute;
         if (!EqualsRegistry.equal(searchAttribute, oldValue)) {
-          final CodeTable codeTable = metaData.getCodeTableByColumn(searchAttribute);
-          searchFieldPanel.removeAll();
-          if (searchField instanceof DataStoreSearchTextField) {
-            final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)searchField;
+          final CodeTable codeTable = this.metaData.getCodeTableByColumn(searchAttribute);
+          this.searchFieldPanel.removeAll();
+          if (this.searchField instanceof DataStoreSearchTextField) {
+            final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)this.searchField;
             dataStoreSearchTextField.removeItemListener(this);
-          } else if (searchField instanceof JXSearchField) {
-            final JXSearchField searchTextField = (JXSearchField)searchField;
+          } else if (this.searchField instanceof JXSearchField) {
+            final JXSearchField searchTextField = (JXSearchField)this.searchField;
             searchTextField.removeActionListener(this);
-          } else if (searchField instanceof JComboBox) {
-            final JComboBox comboField = (JComboBox)searchField;
+          } else if (this.searchField instanceof JComboBox) {
+            final JComboBox comboField = (JComboBox)this.searchField;
             comboField.removeActionListener(this);
           }
-          final Attribute attribute = metaData.getAttribute(searchAttribute);
+          final Attribute attribute = this.metaData.getAttribute(searchAttribute);
           final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
           if (StringUtils.hasText(searchFieldFactory)) {
             final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
-            searchField = SpelUtil.getValue(searchFieldFactory, attribute,
+            this.searchField = SpelUtil.getValue(searchFieldFactory, attribute,
               searchFieldFactoryParameters);
           } else if (codeTable == null) {
-            searchField = this.searchTextField;
+            this.searchField = this.searchTextField;
           } else {
-            searchField = SwingUtil.createComboBox(codeTable, false);
+            this.searchField = SwingUtil.createComboBox(codeTable, false);
           }
-          operatorField.setSelectedItem("=");
-          if (searchField instanceof DataStoreSearchTextField) {
-            final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)searchField;
+          this.operatorField.setSelectedItem("=");
+          if (this.searchField instanceof DataStoreSearchTextField) {
+            final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)this.searchField;
             dataStoreSearchTextField.addItemListener(this);
             dataStoreSearchTextField.setMaxResults(5);
-            operatorField.setEnabled(false);
+            this.operatorField.setEnabled(false);
             dataStoreSearchTextField.setPreferredSize(new Dimension(200,
-              searchTextField.getHeight()));
-          } else if (searchField instanceof JXSearchField) {
-            final JXSearchField searchTextField = (JXSearchField)searchField;
+              this.searchTextField.getHeight()));
+          } else if (this.searchField instanceof JXSearchField) {
+            final JXSearchField searchTextField = (JXSearchField)this.searchField;
             searchTextField.addActionListener(this);
-            operatorField.setEnabled(true);
+            this.operatorField.setEnabled(true);
             searchTextField.setPreferredSize(new Dimension(200,
               searchTextField.getHeight()));
-          } else if (searchField instanceof JComboBox) {
-            final JComboBox comboField = (JComboBox)searchField;
+          } else if (this.searchField instanceof JComboBox) {
+            final JComboBox comboField = (JComboBox)this.searchField;
             comboField.addActionListener(this);
-            operatorField.setEnabled(false);
+            this.operatorField.setEnabled(false);
           }
-          searchFieldPanel.add(searchField);
-          GroupLayoutUtil.makeColumns(searchFieldPanel, 1);
+          this.searchFieldPanel.add(this.searchField);
+          GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1);
 
           fireSearchChanged("searchAttribute", oldValue, searchAttribute);
         }
@@ -157,8 +159,8 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public void clear() {
-    nameField.setSelectedIndex(0);
-    SwingUtil.setFieldValue(searchField, null);
+    this.nameField.setSelectedIndex(0);
+    SwingUtil.setFieldValue(this.searchField, null);
   }
 
   public void fireSearchChanged(final String propertyName,
@@ -176,52 +178,52 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public List<String> getAttributeNames() {
-    return attributeNames;
+    return this.attributeNames;
   }
 
   public DataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public String getSearchAttribute() {
-    return (String)nameField.getSelectedItem();
+    return (String)this.nameField.getSelectedItem();
   }
 
   public final String getSearchOperator() {
-    return (String)operatorField.getSelectedItem();
+    return (String)this.operatorField.getSelectedItem();
   }
 
   public Object getSearchValue() {
-    final Object value = SwingUtil.getValue(searchField);
+    final Object value = SwingUtil.getValue(this.searchField);
     return value;
   }
 
   @Override
   public void itemStateChanged(final ItemEvent e) {
     final Object source = e.getSource();
-    if (source == searchField) {
+    if (source == this.searchField) {
       final Object searchValue = getSearchValue();
-      final Object oldValue = previousSearchValue;
-      previousSearchValue = searchValue;
+      final Object oldValue = this.previousSearchValue;
+      this.previousSearchValue = searchValue;
       fireSearchChanged("searchValue", oldValue, searchValue);
-    } else if (source == operatorField) {
+    } else if (source == this.operatorField) {
       final String searchOperator = getSearchOperator();
-      final String oldValue = previousSearchOperator;
-      previousSearchOperator = searchOperator;
+      final String oldValue = this.previousSearchOperator;
+      this.previousSearchOperator = searchOperator;
       fireSearchChanged("searchOperator", oldValue, searchOperator);
-    } else if (source == nameField) {
+    } else if (source == this.nameField) {
       final String searchAttribute = getSearchAttribute();
-      final String oldValue = previousAttributeName;
-      previousAttributeName = searchAttribute;
+      final String oldValue = this.previousAttributeName;
+      this.previousAttributeName = searchAttribute;
       fireSearchChanged("searchAttribute", oldValue, searchAttribute);
     }
   }
 
   public void setSearchField(final String searchField) {
     if (StringUtils.hasText(searchField)) {
-      nameField.setSelectedItem(searchField);
+      this.nameField.setSelectedItem(searchField);
     } else {
-      nameField.setSelectedIndex(0);
+      this.nameField.setSelectedIndex(0);
     }
   }
 

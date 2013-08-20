@@ -7,8 +7,8 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
@@ -23,6 +23,11 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 @SuppressWarnings("serial")
 public class LayerRendererOverlay extends JComponent implements
   PropertyChangeListener {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   private Layer layer;
 
@@ -41,47 +46,47 @@ public class LayerRendererOverlay extends JComponent implements
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
     setLayer(layer);
-    viewport.addPropertyChangeListener(this);
+    this.viewport.addPropertyChangeListener(this);
     addPropertyChangeListener(mapPanel);
   }
 
   public void dispose() {
-    if (layer != null) {
-      layer.removePropertyChangeListener(this);
-      layer = null;
+    if (this.layer != null) {
+      this.layer.removePropertyChangeListener(this);
+      this.layer = null;
     }
-    viewport = null;
+    this.viewport = null;
   }
 
   public Layer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public LayerGroup getProject() {
-    return layer.getProject();
+    return this.layer.getProject();
   }
 
   public Viewport2D getViewport() {
-    return viewport;
+    return this.viewport;
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     GeoReferencedImage image;
-    synchronized (loadSync) {
+    synchronized (this.loadSync) {
       image = this.image;
 
       if (image == null) {
-        final BoundingBox boundingBox = viewport.getBoundingBox();
-        final int viewWidthPixels = viewport.getViewWidthPixels();
-        final int viewHeightPixels = viewport.getViewHeightPixels();
+        final BoundingBox boundingBox = this.viewport.getBoundingBox();
+        final int viewWidthPixels = this.viewport.getViewWidthPixels();
+        final int viewHeightPixels = this.viewport.getViewHeightPixels();
         final GeoReferencedImage loadImage = new GeoReferencedImage(
           boundingBox, viewWidthPixels, viewHeightPixels);
-        imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
-        SwingWorkerManager.execute(imageWorker);
+        this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
+        SwingWorkerManager.execute(this.imageWorker);
       }
     }
-    GeoReferencedImageLayerRenderer.render(viewport, (Graphics2D)g, image);
+    GeoReferencedImageLayerRenderer.render(this.viewport, (Graphics2D)g, image);
   }
 
   @Override
@@ -96,21 +101,21 @@ public class LayerRendererOverlay extends JComponent implements
   }
 
   public void redraw() {
-    synchronized (loadSync) {
-      image = null;
-      if (imageWorker != null) {
-        imageWorker.cancel(true);
-        imageWorker = null;
+    synchronized (this.loadSync) {
+      this.image = null;
+      if (this.imageWorker != null) {
+        this.imageWorker.cancel(true);
+        this.imageWorker = null;
       }
       firePropertyChange("imageLoaded", true, false);
     }
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {
-    synchronized (loadSync) {
+    synchronized (this.loadSync) {
       if (this.imageWorker == imageWorker) {
         this.image = imageWorker.getReferencedImage();
-        if (image != null) {
+        if (this.image != null) {
           this.imageWorker = null;
         }
         firePropertyChange("imageLoaded", false, true);

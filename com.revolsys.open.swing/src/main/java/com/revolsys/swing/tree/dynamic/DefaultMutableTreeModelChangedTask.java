@@ -17,6 +17,6 @@ public class DefaultMutableTreeModelChangedTask implements Runnable {
 
   @Override
   public void run() {
-    ((DefaultTreeModel)tree.getModel()).nodeStructureChanged(node);
+    ((DefaultTreeModel)this.tree.getModel()).nodeStructureChanged(this.node);
   }
 }

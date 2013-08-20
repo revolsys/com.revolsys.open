@@ -77,13 +77,13 @@ public class Log4jTableModel extends AbstractTableModel {
   private final ListLog4jAppender appender = new ListLog4jAppender(this);
 
   public Log4jTableModel() {
-    Logger.getRootLogger().addAppender(appender);
+    Logger.getRootLogger().addAppender(this.appender);
   }
 
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    Logger.getRootLogger().removeAppender(appender);
+    Logger.getRootLogger().removeAppender(this.appender);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class Log4jTableModel extends AbstractTableModel {
 
   public LoggingEvent getLoggingEvent(final int rowIndex) {
     LoggingEvent event;
-    final List<LoggingEvent> loggingEvents = appender.getLoggingEvents();
+    final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
     if (rowIndex < loggingEvents.size()) {
       event = loggingEvents.get(rowIndex);
     } else {
@@ -109,7 +109,7 @@ public class Log4jTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    final List<LoggingEvent> loggingEvents = appender.getLoggingEvents();
+    final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
     return loggingEvents.size();
   }
 

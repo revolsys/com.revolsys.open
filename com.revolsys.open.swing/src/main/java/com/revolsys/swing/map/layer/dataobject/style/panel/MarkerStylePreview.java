@@ -14,10 +14,10 @@ import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 public class MarkerStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
 
-  private MarkerStyle markerStyle;
+  private final MarkerStyle markerStyle;
 
-  public MarkerStylePreview(MarkerStyle markerStyle) {
-    Dimension size = new Dimension(100, 100);
+  public MarkerStylePreview(final MarkerStyle markerStyle) {
+    final Dimension size = new Dimension(100, 100);
     setPreferredSize(size);
     setMinimumSize(size);
     setMaximumSize(size);
@@ -27,10 +27,10 @@ public class MarkerStylePreview extends JPanel {
   }
 
   @Override
-  protected void paintComponent(Graphics g) {
+  protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    Graphics2D graphics = (Graphics2D)g;
-    final Marker marker = markerStyle.getMarker();
-    marker.render(null, graphics, markerStyle, 49, 49, 0);
+    final Graphics2D graphics = (Graphics2D)g;
+    final Marker marker = this.markerStyle.getMarker();
+    marker.render(null, graphics, this.markerStyle, 49, 49, 0);
   }
 }

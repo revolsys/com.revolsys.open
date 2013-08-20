@@ -43,8 +43,8 @@ public class ModifiedPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final LayerDataObject object = model.getObject(rowIndex);
-      final DataObjectLayer layer = model.getLayer();
+      final LayerDataObject object = this.model.getObject(rowIndex);
+      final DataObjectLayer layer = this.model.getLayer();
       return layer.isModified(object);
     } catch (final IndexOutOfBoundsException e) {
       return false;

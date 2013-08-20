@@ -36,12 +36,12 @@ public class TextStyle implements MapSerializer {
     // addProperty("text-character-spacing",DataTypes.);
     // addProperty("text-clip",DataTypes.);
     // addProperty("text-comp-op",DataTypes.);
-    addProperty("textDx", Measure.class, GeometryStyle.ZERO_PIXEL);
-    addProperty("textDy", Measure.class, GeometryStyle.ZERO_PIXEL);
+    addProperty("textDx", Measure.class, MarkerStyle.ZERO_PIXEL);
+    addProperty("textDy", Measure.class, MarkerStyle.ZERO_PIXEL);
     addProperty("textFaceName", String.class, "Arial");
     addProperty("textFill", Color.class, WebColors.Black);
     addProperty("textHaloFill", Color.class, WebColors.White);
-    addProperty("textHaloRadius", Measure.class, GeometryStyle.ZERO_PIXEL);
+    addProperty("textHaloRadius", Measure.class, MarkerStyle.ZERO_PIXEL);
     addProperty("textHorizontalAlignment", String.class, "auto");
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
@@ -57,7 +57,7 @@ public class TextStyle implements MapSerializer {
     addProperty("textPlacementType", String.class, "dummy");
     // addProperty("text-placements",DataTypes.);
     // addProperty("text-ratio",DataTypes.);
-    addProperty("textSize", Measure.class, GeometryStyle.TEN_PIXELS);
+    addProperty("textSize", Measure.class, MarkerStyle.TEN_PIXELS);
     // addProperty("text-spacing",DataTypes.);
     // addProperty("text-transform",DataTypes.);
     addProperty("textVerticalAlignment", String.class, "auto");
@@ -137,67 +137,67 @@ public class TextStyle implements MapSerializer {
   }
 
   public Color getTextBoxColor() {
-    return textBoxColor;
+    return this.textBoxColor;
   }
 
   public int getTextBoxOpacity() {
-    return textBoxOpacity;
+    return this.textBoxOpacity;
   }
 
   public Measure<Length> getTextDx() {
-    return textDx;
+    return this.textDx;
   }
 
   public Measure<Length> getTextDy() {
-    return textDy;
+    return this.textDy;
   }
 
   public String getTextFaceName() {
-    return textFaceName;
+    return this.textFaceName;
   }
 
   public Color getTextFill() {
-    return textFill;
+    return this.textFill;
   }
 
   public Color getTextHaloFill() {
-    return textHaloFill;
+    return this.textHaloFill;
   }
 
   public Measure<Length> getTextHaloRadius() {
-    return textHaloRadius;
+    return this.textHaloRadius;
   }
 
   public String getTextHorizontalAlignment() {
-    return textHorizontalAlignment;
+    return this.textHorizontalAlignment;
   }
 
   public String getTextName() {
-    return textName;
+    return this.textName;
   }
 
   public int getTextOpacity() {
-    return textOpacity;
+    return this.textOpacity;
   }
 
   public double getTextOrientation() {
-    return textOrientation;
+    return this.textOrientation;
   }
 
   public String getTextOrientationType() {
-    return textOrientationType;
+    return this.textOrientationType;
   }
 
   public String getTextPlacementType() {
-    return textPlacementType;
+    return this.textPlacementType;
   }
 
   public Measure<Length> getTextSize() {
-    return textSizeMeasure;
+    return this.textSizeMeasure;
   }
 
   public String getTextVerticalAlignment() {
-    return textVerticalAlignment;
+    return this.textVerticalAlignment;
   }
 
   public void setTextBoxColor(final Color textBoxColor) {
@@ -216,7 +216,7 @@ public class TextStyle implements MapSerializer {
         "Text box opacity must be between 0 - 255");
     } else {
       this.textBoxOpacity = textBoxOpacity;
-      this.textBoxColor = WebColors.getColorWithOpacity(textBoxColor,
+      this.textBoxColor = WebColors.getColorWithOpacity(this.textBoxColor,
         this.textBoxOpacity);
     }
   }
@@ -235,7 +235,7 @@ public class TextStyle implements MapSerializer {
 
   public void setTextFill(final Color fill) {
     if (fill == null) {
-      this.textFill = new Color(0, 0, 0, textOpacity);
+      this.textFill = new Color(0, 0, 0, this.textOpacity);
     } else {
       this.textFill = fill;
       this.textOpacity = fill.getAlpha();
@@ -244,7 +244,7 @@ public class TextStyle implements MapSerializer {
 
   public void setTextHaloFill(final Color fill) {
     if (fill == null) {
-      this.textHaloFill = new Color(0, 0, 0, textOpacity);
+      this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
     } else {
       this.textHaloFill = fill;
     }
@@ -275,8 +275,9 @@ public class TextStyle implements MapSerializer {
       throw new IllegalArgumentException("Text opacity must be between 0 - 255");
     } else {
       this.textOpacity = textOpacity;
-      this.textFill = WebColors.getColorWithOpacity(textFill, this.textOpacity);
-      this.textHaloFill = WebColors.getColorWithOpacity(textHaloFill,
+      this.textFill = WebColors.getColorWithOpacity(this.textFill,
+        this.textOpacity);
+      this.textHaloFill = WebColors.getColorWithOpacity(this.textHaloFill,
         this.textOpacity);
     }
   }
@@ -305,8 +306,8 @@ public class TextStyle implements MapSerializer {
   public synchronized void setTextStyle(final Viewport2D viewport,
     final Graphics2D graphics) {
     final long scale = (long)viewport.getScale();
-    if (font == null || lastScale != scale) {
-      lastScale = scale;
+    if (this.font == null || this.lastScale != scale) {
+      this.lastScale = scale;
       final int style = 0;
       // if (textStyle.getFontWeight() == FontWeight.BOLD) {
       // style += Font.BOLD;
@@ -315,10 +316,10 @@ public class TextStyle implements MapSerializer {
       // style += Font.ITALIC;
       // }
       final double fontSize = Viewport2D.toDisplayValue(viewport,
-        textSizeMeasure);
-      font = new Font(textFaceName, style, (int)Math.ceil(fontSize));
+        this.textSizeMeasure);
+      this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
     }
-    graphics.setFont(font);
+    graphics.setFont(this.font);
   }
 
   public void setTextVerticalAlignment(final String textVerticalAlignment) {

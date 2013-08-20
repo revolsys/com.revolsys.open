@@ -7,6 +7,11 @@ import javax.swing.undo.UndoableEdit;
 @SuppressWarnings("serial")
 public class CascadingUndoManager extends UndoManager {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private UndoManager parent;
 
   public CascadingUndoManager() {
@@ -26,10 +31,10 @@ public class CascadingUndoManager extends UndoManager {
   public synchronized boolean canRedo() {
     if (super.canRedo()) {
       return true;
-    } else if (parent == null) {
+    } else if (this.parent == null) {
       return false;
     } else {
-      return parent.canRedo();
+      return this.parent.canRedo();
     }
   }
 
@@ -37,10 +42,10 @@ public class CascadingUndoManager extends UndoManager {
   public synchronized boolean canUndo() {
     if (super.canUndo()) {
       return true;
-    } else if (parent == null) {
+    } else if (this.parent == null) {
       return false;
     } else {
-      return parent.canUndo();
+      return this.parent.canUndo();
     }
   }
 
@@ -48,23 +53,23 @@ public class CascadingUndoManager extends UndoManager {
   public synchronized boolean canUndoOrRedo() {
     if (super.canUndoOrRedo()) {
       return true;
-    } else if (parent == null) {
+    } else if (this.parent == null) {
       return false;
     } else {
-      return parent.canUndoOrRedo();
+      return this.parent.canUndoOrRedo();
     }
   }
 
   public UndoManager getParent() {
-    return parent;
+    return this.parent;
   }
 
   @Override
   public synchronized void redo() throws CannotRedoException {
     if (super.canRedo()) {
       super.redo();
-    } else if (parent != null && parent.canRedo()) {
-      parent.redo();
+    } else if (this.parent != null && this.parent.canRedo()) {
+      this.parent.redo();
     }
   }
 
@@ -76,8 +81,8 @@ public class CascadingUndoManager extends UndoManager {
   public synchronized void undo() throws CannotUndoException {
     if (super.canUndo()) {
       super.undo();
-    } else if (parent != null && parent.canUndo()) {
-      parent.undo();
+    } else if (this.parent != null && this.parent.canUndo()) {
+      this.parent.undo();
     }
   }
 }

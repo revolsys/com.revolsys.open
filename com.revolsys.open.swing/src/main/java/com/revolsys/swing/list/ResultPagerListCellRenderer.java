@@ -39,11 +39,11 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     String label;
     if (value == ResultPagerComboBoxModel.NULL || value == null) {
       label = "-";
-    } else if (attributeNames.isEmpty()) {
+    } else if (this.attributeNames.isEmpty()) {
       label = StringConverterRegistry.toString(value);
     } else {
       final List<String> values = new ArrayList<String>();
-      for (final String attributeName : attributeNames) {
+      for (final String attributeName : this.attributeNames) {
         final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
           value, attributeName));
         values.add(text);

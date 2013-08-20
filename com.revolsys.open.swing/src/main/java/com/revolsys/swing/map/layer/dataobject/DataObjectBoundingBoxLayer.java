@@ -10,21 +10,18 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.io.Reader;
-import com.revolsys.swing.SwingWorkerManager;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   private static final Logger LOG = Logger.getLogger(DataObjectBoundingBoxLayer.class);
 
   private DataObjectQuadTree index;
-
-  private Reader<LayerDataObject> reader;
 
   private boolean loading = false;
 
@@ -48,24 +45,25 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
-      synchronized (sync) {
-        if (loading) {
+      synchronized (this.sync) {
+        if (this.loading) {
           if (!boundingBox.equals(this.boundingBox)) {
             this.boundingBox = null;
-            worker.cancel(true);
-            loading = false;
+            this.worker.cancel(true);
+            this.loading = false;
           }
         }
         if (this.boundingBox == null || !boundingBox.equals(this.boundingBox)
-          && !loading) {
-          loading = true;
+          && !this.loading) {
+          this.loading = true;
           this.boundingBox = boundingBox;
           firePropertyChange("visible", super.isVisible(), false);
           try {
-            final Constructor<?> constructor = workerClass.getConstructor(
+            final Constructor<?> constructor = this.workerClass.getConstructor(
               DataObjectBoundingBoxLayer.class, BoundingBox.class);
-            worker = (SwingWorker)constructor.newInstance(this, boundingBox);
-            SwingWorkerManager.execute(worker);
+            this.worker = (SwingWorker)constructor.newInstance(this,
+              boundingBox);
+            SwingWorkerManager.execute(this.worker);
           } catch (final NoSuchMethodException e) {
             LOG.error("Worker Constructor not found", e);
           } catch (final InvocationTargetException e) {
@@ -76,7 +74,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           }
         }
       }
-      if (index != null) {
+      if (this.index != null) {
         Polygon polygon = boundingBox.toPolygon();
         final GeometryFactory geometryFactory = getGeometryFactory();
         final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
@@ -88,7 +86,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
             polygon = operation.perform(polygon);
           }
         }
-        return (List)index.queryIntersects(polygon);
+        return (List)this.index.queryIntersects(polygon);
       } else {
         return Collections.emptyList();
       }
@@ -97,21 +95,21 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @Override
   public boolean isVisible() {
-    return !loading && super.isVisible();
+    return !this.loading && super.isVisible();
   }
 
   public void setIndex(final BoundingBox boundingBox,
     final DataObjectQuadTree index) {
-    synchronized (sync) {
+    synchronized (this.sync) {
       if (this.boundingBox.equals(boundingBox)) {
         this.index = index;
-        worker = null;
-        loading = false;
+        this.worker = null;
+        this.loading = false;
       }
     }
     firePropertyChange("index", null, index);

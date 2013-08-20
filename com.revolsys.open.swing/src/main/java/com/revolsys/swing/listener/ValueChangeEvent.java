@@ -46,7 +46,7 @@ public class ValueChangeEvent extends EventObject {
    * @return the value
    */
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
 }

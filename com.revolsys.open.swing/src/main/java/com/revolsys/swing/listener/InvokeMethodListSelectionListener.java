@@ -26,10 +26,10 @@
  ******************************************************************************/
 package com.revolsys.swing.listener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 /**
@@ -61,16 +61,16 @@ public class InvokeMethodListSelectionListener implements ListSelectionListener 
   public InvokeMethodListSelectionListener(final Object object,
     final String methodName, final Object[] parameters,
     final boolean invokeLater) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    if (invokeLater) {
-      SwingUtilities.invokeLater(runnable);
+    if (this.invokeLater) {
+      SwingWorkerManager.invokeLater(this.runnable);
     } else {
-      runnable.run();
+      this.runnable.run();
     }
   }
 

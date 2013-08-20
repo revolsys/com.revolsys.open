@@ -20,7 +20,7 @@ public class StringTransferable implements Transferable {
   public Object getTransferData(final DataFlavor flavor)
     throws UnsupportedFlavorException, IOException {
     if (isDataFlavorSupported(flavor)) {
-      return value;
+      return this.value;
     } else {
       throw new UnsupportedFlavorException(flavor);
     }
@@ -29,7 +29,7 @@ public class StringTransferable implements Transferable {
   @Override
   public DataFlavor[] getTransferDataFlavors() {
     return new DataFlavor[] {
-      dataFlavor
+      this.dataFlavor
     };
   }
 

@@ -74,7 +74,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public void add(final int index, final LayerDataObject element) {
     // TODO events
-    records.add(index, element);
+    this.records.add(index, element);
   }
 
   @Override
@@ -93,13 +93,13 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public boolean addAll(final int index,
     final Collection<? extends LayerDataObject> c) {
     // TODO events
-    return records.addAll(index, c);
+    return this.records.addAll(index, c);
   }
 
   private void addAllInternal(
     final Collection<? extends LayerDataObject> records) {
     this.records.addAll(records);
-    index.insert(records);
+    this.index.insert(records);
   }
 
   public void addAllRecords(final Collection<? extends LayerDataObject> records) {
@@ -119,9 +119,9 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   private void addObjectInternal(final LayerDataObject object) {
-    if (!records.contains(object)) {
-      records.add(object);
-      index.insert(object);
+    if (!this.records.contains(object)) {
+      this.records.add(object);
+      this.index.insert(object);
     }
   }
 
@@ -132,12 +132,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public boolean contains(final Object o) {
-    return records.contains(o);
+    return this.records.contains(o);
   }
 
   @Override
   public boolean containsAll(final Collection<?> c) {
-    return records.containsAll(c);
+    return this.records.containsAll(c);
   }
 
   @Override
@@ -158,10 +158,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   public void deleteAll() {
     final List<LayerDataObject> oldRecords = new ArrayList<LayerDataObject>(
-      records);
-    records = new ArrayList<LayerDataObject>();
-    index = new DataObjectQuadTree();
-    firePropertyChange("records", oldRecords, records);
+      this.records);
+    this.records = new ArrayList<LayerDataObject>();
+    this.index = new DataObjectQuadTree();
+    firePropertyChange("records", oldRecords, this.records);
   }
 
   @Override
@@ -186,7 +186,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerDataObject> records = (List)index.queryIntersects(convertedBoundingBox);
+      final List<LayerDataObject> records = (List)this.index.queryIntersects(convertedBoundingBox);
       return records;
     }
   }
@@ -194,12 +194,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public List<LayerDataObject> doQuery(Geometry geometry, final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
-    return (List)index.queryDistance(geometry, distance);
+    return (List)this.index.queryDistance(geometry, distance);
   }
 
   @Override
   public LayerDataObject get(final int index) {
-    return records.get(index);
+    return this.records.get(index);
   }
 
   @Override
@@ -207,56 +207,56 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     if (index < 0) {
       return null;
     } else {
-      return records.get(index);
+      return this.records.get(index);
     }
   }
 
   @Override
   public List<LayerDataObject> getRecords() {
     final ArrayList<LayerDataObject> returnRecords = new ArrayList<LayerDataObject>(
-      records);
+      this.records);
     return returnRecords;
   }
 
   @Override
   public int getRowCount() {
-    return records.size();
+    return this.records.size();
   }
 
   @Override
   public int indexOf(final Object o) {
-    return records.indexOf(o);
+    return this.records.indexOf(o);
   }
 
   @Override
   public boolean isEmpty() {
-    return records.isEmpty();
+    return this.records.isEmpty();
   }
 
   @Override
   public Iterator<LayerDataObject> iterator() {
-    return records.iterator();
+    return this.records.iterator();
   }
 
   @Override
   public int lastIndexOf(final Object o) {
-    return records.lastIndexOf(o);
+    return this.records.lastIndexOf(o);
   }
 
   @Override
   public ListIterator<LayerDataObject> listIterator() {
-    return records.listIterator();
+    return this.records.listIterator();
   }
 
   @Override
   public ListIterator<LayerDataObject> listIterator(final int index) {
-    return records.listIterator(index);
+    return this.records.listIterator(index);
   }
 
   @Override
   public LayerDataObject remove(final int index) {
     // TODO events
-    return records.remove(index);
+    return this.records.remove(index);
   }
 
   @Override
@@ -285,19 +285,19 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public boolean retainAll(final Collection<?> c) {
     // TODO events
-    return records.retainAll(c);
+    return this.records.retainAll(c);
   }
 
   @Override
   public LayerDataObject set(final int index, final LayerDataObject element) {
     // TODO events
-    return records.set(index, element);
+    return this.records.set(index, element);
   }
 
   public void setRecords(final Collection<LayerDataObject> records) {
     final List<LayerDataObject> oldRecords = this.records;
     this.records = new ArrayList<LayerDataObject>();
-    index = new DataObjectQuadTree();
+    this.index = new DataObjectQuadTree();
     addAllRecords(records);
     firePropertyChange("records", oldRecords, this.records);
   }
@@ -308,21 +308,21 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public int size() {
-    return records.size();
+    return this.records.size();
   }
 
   @Override
   public List<LayerDataObject> subList(final int fromIndex, final int toIndex) {
-    return records.subList(fromIndex, toIndex);
+    return this.records.subList(fromIndex, toIndex);
   }
 
   @Override
   public Object[] toArray() {
-    return records.toArray();
+    return this.records.toArray();
   }
 
   @Override
   public <T> T[] toArray(final T[] a) {
-    return records.toArray(a);
+    return this.records.toArray(a);
   }
 }

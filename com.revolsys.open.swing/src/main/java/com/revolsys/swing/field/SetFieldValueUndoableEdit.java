@@ -9,6 +9,11 @@ import com.revolsys.swing.undo.UndoManager;
 @SuppressWarnings("serial")
 public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static SetFieldValueUndoableEdit create(final UndoManager undoManager,
     final Field field, final Object oldValue, final Object newValue) {
     if (undoManager == null) {
@@ -38,8 +43,8 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Object value = field.getFieldValue();
-      if (EqualsRegistry.equal(value, oldValue)) {
+      final Object value = this.field.getFieldValue();
+      if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -49,8 +54,8 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Object value = field.getFieldValue();
-      if (EqualsRegistry.equal(value, newValue)) {
+      final Object value = this.field.getFieldValue();
+      if (EqualsRegistry.equal(value, this.newValue)) {
         return true;
       }
     }
@@ -59,18 +64,19 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
 
   @Override
   public void doRedo() {
-    field.setFieldValue(newValue);
-    ((JComponent)field).requestFocusInWindow();
+    this.field.setFieldValue(this.newValue);
+    ((JComponent)this.field).requestFocusInWindow();
   }
 
   @Override
   public void doUndo() {
-    field.setFieldValue(oldValue);
-    ((JComponent)field).requestFocusInWindow();
+    this.field.setFieldValue(this.oldValue);
+    ((JComponent)this.field).requestFocusInWindow();
   }
 
   @Override
   public String toString() {
-    return field.getFieldName() + " old=" + oldValue + ", new=" + newValue;
+    return this.field.getFieldName() + " old=" + this.oldValue + ", new="
+      + this.newValue;
   }
 }

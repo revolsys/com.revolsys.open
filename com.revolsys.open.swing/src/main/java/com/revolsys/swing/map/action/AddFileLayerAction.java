@@ -16,13 +16,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.tree.ObjectTree;
@@ -30,6 +30,11 @@ import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
 public class AddFileLayerAction extends AbstractAction {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   public AddFileLayerAction() {
     putValue(NAME, "Open File Layer");

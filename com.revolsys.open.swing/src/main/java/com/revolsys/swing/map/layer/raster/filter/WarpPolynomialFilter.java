@@ -16,9 +16,10 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class WarpPolynomialFilter extends WholeImageFilter {
 
-  private final List<Point> destinationPoints;
-
-  private final CoordinatesList imagePoints;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   private final BoundingBox boundingBox;
 
@@ -27,8 +28,6 @@ public class WarpPolynomialFilter extends WholeImageFilter {
   public WarpPolynomialFilter(final BoundingBox boundingBox,
     final CoordinatesList imagePoints, final List<Point> destinationPoints) {
     this.boundingBox = boundingBox;
-    this.imagePoints = imagePoints;
-    this.destinationPoints = destinationPoints;
   }
 
   public BufferedImage filter(final BufferedImage source) {
@@ -45,11 +44,11 @@ public class WarpPolynomialFilter extends WholeImageFilter {
     final int[] outPixels = new int[transformedSpace.width
       * transformedSpace.height];
 
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMaxY();
-    final double maxY = boundingBox.getMaxY();
-    final double pixelWidth = boundingBox.getWidth() / imageWidth;
-    final double pixelHeight = boundingBox.getHeight() / imageHeight;
+    final double minX = this.boundingBox.getMinX();
+    final double minY = this.boundingBox.getMaxY();
+    final double maxY = this.boundingBox.getMaxY();
+    final double pixelWidth = this.boundingBox.getWidth() / imageWidth;
+    final double pixelHeight = this.boundingBox.getHeight() / imageHeight;
 
     final Coordinates dest = new DoubleCoordinates(2);
     for (int i = 0; i < imageWidth; i++) {
@@ -83,7 +82,7 @@ public class WarpPolynomialFilter extends WholeImageFilter {
     final double sourceY = 0.0;
     int count = 0;
 
-    for (int nx = 0; nx <= degree; nx++) {
+    for (int nx = 0; nx <= this.degree; nx++) {
       for (int ny = 0; ny <= nx; ny++) {
         final double t = Math.pow(destX, nx - ny) * Math.pow(destY, ny);
         // sx += xCoeffs[c] * t;

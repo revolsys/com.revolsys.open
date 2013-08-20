@@ -4,7 +4,7 @@ public abstract class AbstractUiBuilder implements UiBuilder {
   public final static String escapeHTML(final String value,
     final boolean escapeSpaces, final boolean escapeNewlines) {
     if (value == null) {
-      return (null);
+      return null;
     }
 
     final char[] content = new char[value.length()];
@@ -12,8 +12,8 @@ public abstract class AbstractUiBuilder implements UiBuilder {
 
     final StringBuffer result = new StringBuffer();
 
-    for (int i = 0; i < content.length; i++) {
-      switch (content[i]) {
+    for (final char element : content) {
+      switch (element) {
         case ' ':
           result.append(escapeSpaces ? "&#32;" : " ");
 
@@ -186,11 +186,11 @@ public abstract class AbstractUiBuilder implements UiBuilder {
         break;
 
         default:
-          result.append(content[i]);
+          result.append(element);
       }
     }
 
-    return (result.toString());
+    return result.toString();
   }
 
   private UiBuilderRegistry registry;
@@ -200,7 +200,7 @@ public abstract class AbstractUiBuilder implements UiBuilder {
    */
   @Override
   public UiBuilderRegistry getRegistry() {
-    return registry;
+    return this.registry;
   }
 
   /**

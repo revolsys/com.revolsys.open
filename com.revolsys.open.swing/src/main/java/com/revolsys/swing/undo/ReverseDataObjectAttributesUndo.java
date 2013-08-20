@@ -7,6 +7,11 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final DataObject object;
 
   private final Geometry oldValue;
@@ -19,8 +24,8 @@ public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Geometry value = object.getGeometryValue();
-      if (EqualsRegistry.equal(value, oldValue)) {
+      final Geometry value = this.object.getGeometryValue();
+      if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -30,8 +35,8 @@ public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Geometry value = object.getGeometryValue();
-      if (EqualsRegistry.equal(value, oldValue)) {
+      final Geometry value = this.object.getGeometryValue();
+      if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -40,14 +45,14 @@ public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
-    property.reverseAttributes(object);
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.object);
+    property.reverseAttributes(this.object);
   }
 
   @Override
   protected void doUndo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
-    property.reverseAttributes(object);
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.object);
+    property.reverseAttributes(this.object);
   }
 
   @Override

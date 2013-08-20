@@ -12,6 +12,11 @@ import com.revolsys.util.ExceptionUtil;
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   implements ComponentFactory<JMenuItem> {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public AbstractActionMainMenuItemFactory clone() {
     try {

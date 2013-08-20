@@ -25,13 +25,13 @@ public class InvokeMethodComponentFactory<T extends Component> extends
 
   @Override
   public void close(final Component component) {
-    callable = null;
+    this.callable = null;
   }
 
   @Override
   public T createComponent() {
     try {
-      return callable.call();
+      return this.callable.call();
     } catch (final Exception e) {
       ExceptionUtil.throwUncheckedException(e);
       return null;
@@ -55,7 +55,7 @@ public class InvokeMethodComponentFactory<T extends Component> extends
 
   @Override
   public String toString() {
-    return callable.toString();
+    return this.callable.toString();
   }
 
 }

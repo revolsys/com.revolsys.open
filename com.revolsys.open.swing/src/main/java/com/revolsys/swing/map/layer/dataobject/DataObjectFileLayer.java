@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
@@ -19,7 +20,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.vividsolutions.jts.geom.Geometry;
@@ -50,18 +50,19 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     this.resource = resource;
     this.url = SpringUtil.getUrl(resource).toString();
     setType("dataObjectFile");
-    setName(FileUtil.getBaseName(url));
-    SwingWorkerManager.execute("Loading file: " + url, this, "revert");
+    setName(FileUtil.getBaseName(this.url));
+    SwingWorkerManager.execute("Loading file: " + this.url, this, "revert");
   }
 
   public String getUrl() {
-    return url;
+    return this.url;
   }
 
   public void revert() {
-    final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+    final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(this.resource);
     if (reader == null) {
-      throw new IllegalArgumentException("Cannot find reader for: " + resource);
+      throw new IllegalArgumentException("Cannot find reader for: "
+        + this.resource);
     } else {
       try {
         final DataObjectMetaData metaData = reader.getMetaData();
@@ -89,7 +90,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "url", url);
+    MapSerializerUtil.add(map, "url", this.url);
     return map;
   }
 }

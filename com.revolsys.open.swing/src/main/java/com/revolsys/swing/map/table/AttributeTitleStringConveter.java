@@ -27,7 +27,7 @@ public class AttributeTitleStringConveter extends ObjectToStringConverter
     final Object value, final int index, final boolean isSelected,
     final boolean cellHasFocus) {
     final String title = getPreferredStringForItem(value);
-    return renderer.getListCellRendererComponent(list, title, index,
+    return this.renderer.getListCellRendererComponent(list, title, index,
       isSelected, cellHasFocus);
   }
 
@@ -38,7 +38,7 @@ public class AttributeTitleStringConveter extends ObjectToStringConverter
       return attribute.getTitle();
     } else if (item instanceof String) {
       final String attributeName = (String)item;
-      final Attribute attribute = metaData.getAttribute(attributeName);
+      final Attribute attribute = this.metaData.getAttribute(attributeName);
       if (attribute == null) {
         return attributeName;
       } else {

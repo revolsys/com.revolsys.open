@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
@@ -150,7 +149,8 @@ public class MapRulerBorder extends AbstractBorder implements
    */
   @Override
   public Insets getBorderInsets(final Component c) {
-    return new Insets(rulerSize, rulerSize, rulerSize, rulerSize);
+    return new Insets(this.rulerSize, this.rulerSize, this.rulerSize,
+      this.rulerSize);
   }
 
   /** 
@@ -160,15 +160,15 @@ public class MapRulerBorder extends AbstractBorder implements
    */
   @Override
   public Insets getBorderInsets(final Component c, final Insets insets) {
-    insets.left = rulerSize;
-    insets.top = rulerSize;
-    insets.right = rulerSize;
-    insets.bottom = rulerSize;
+    insets.left = this.rulerSize;
+    insets.top = this.rulerSize;
+    insets.right = this.rulerSize;
+    insets.bottom = this.rulerSize;
     return insets;
   }
 
   public GeometryFactory getRulerGeometryFactory() {
-    return rulerGeometryFactory;
+    return this.rulerGeometryFactory;
   }
 
   private <Q extends Quantity> int getStepLevel(final List<Unit<Q>> steps,
@@ -191,11 +191,13 @@ public class MapRulerBorder extends AbstractBorder implements
   private void paintBackground(final Graphics2D g, final int x, final int y,
     final int width, final int height) {
     g.setColor(Color.WHITE);
-    g.fillRect(x, y, rulerSize - 1, height); // left
-    g.fillRect(x + width - rulerSize + 1, y, rulerSize - 1, height - 1); // right
-    g.fillRect(x + rulerSize - 1, y, width - 2 * rulerSize + 2, rulerSize - 1); // top
-    g.fillRect(x + rulerSize - 1, y + height - rulerSize + 1, width - 2
-      * rulerSize + 2, rulerSize - 1); // bottom
+    g.fillRect(x, y, this.rulerSize - 1, height); // left
+    g.fillRect(x + width - this.rulerSize + 1, y, this.rulerSize - 1,
+      height - 1); // right
+    g.fillRect(x + this.rulerSize - 1, y, width - 2 * this.rulerSize + 2,
+      this.rulerSize - 1); // top
+    g.fillRect(x + this.rulerSize - 1, y + height - this.rulerSize + 1, width
+      - 2 * this.rulerSize + 2, this.rulerSize - 1); // bottom
   }
 
   @Override
@@ -205,17 +207,17 @@ public class MapRulerBorder extends AbstractBorder implements
 
     graphics.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
     final FontMetrics fontMetrics = graphics.getFontMetrics();
-    labelHeight = fontMetrics.getHeight();
+    this.labelHeight = fontMetrics.getHeight();
 
     paintBackground(graphics, x, y, width, height);
 
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    if (rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
+    final BoundingBox boundingBox = this.viewport.getBoundingBox();
+    if (this.rulerCoordinateSystem instanceof GeographicCoordinateSystem) {
       final Unit<Angle> displayUnit = NonSI.DEGREE_ANGLE;
       paintRuler(graphics, boundingBox, displayUnit, METRIC_GEOGRAPHICS_STEPS,
         true, x, y, width, height);
-    } else if (rulerCoordinateSystem instanceof ProjectedCoordinateSystem) {
-      if (baseUnit.equals(NonSI.FOOT)) {
+    } else if (this.rulerCoordinateSystem instanceof ProjectedCoordinateSystem) {
+      if (this.baseUnit.equals(NonSI.FOOT)) {
         final Unit<Length> displayUnit = NonSI.FOOT;
         paintRuler(graphics, boundingBox, displayUnit, IMPERIAL_FOOT_STEPS,
           true, x, y, width, height);
@@ -226,8 +228,8 @@ public class MapRulerBorder extends AbstractBorder implements
       }
     }
     graphics.setColor(Color.BLACK);
-    graphics.drawRect(rulerSize - 1, rulerSize - 1, width - 2 * rulerSize + 1,
-      height - 2 * rulerSize + 1);
+    graphics.drawRect(this.rulerSize - 1, this.rulerSize - 1, width - 2
+      * this.rulerSize + 1, height - 2 * this.rulerSize + 1);
 
   }
 
@@ -242,28 +244,28 @@ public class MapRulerBorder extends AbstractBorder implements
       int textY;
       LineSegment line;
       if (top) {
-        g.translate(rulerSize, 0);
-        textY = labelHeight;
+        g.translate(this.rulerSize, 0);
+        textY = this.labelHeight;
         line = boundingBox.getNorthLine();
       } else {
-        g.translate(rulerSize, height - rulerSize);
-        textY = rulerSize - 3;
+        g.translate(this.rulerSize, height - this.rulerSize);
+        textY = this.rulerSize - 3;
         line = boundingBox.getSouthLine();
       }
-      line = line.convert(rulerGeometryFactory);
+      line = line.convert(this.rulerGeometryFactory);
 
-      g.setClip(0, 0, width - 2 * rulerSize, rulerSize);
+      g.setClip(0, 0, width - 2 * this.rulerSize, this.rulerSize);
 
       final double mapSize = boundingBox.getWidth();
-      final double viewSize = viewport.getViewWidthPixels();
+      final double viewSize = this.viewport.getViewWidthPixels();
       final double minX = line.getX(0);
       double maxX = line.getX(1);
-      if (maxX > areaMaxX) {
-        maxX = areaMaxX;
+      if (maxX > this.areaMaxX) {
+        maxX = this.areaMaxX;
       }
 
       if (mapSize > 0) {
-        final Unit<Q> screenToModelUnit = viewport.getViewToModelUnit(baseUnit);
+        final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
         final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
           screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
@@ -272,7 +274,7 @@ public class MapRulerBorder extends AbstractBorder implements
 
         final double pixelsPerUnit = viewSize / mapSize;
 
-        final long minIndex = (long)Math.floor(areaMinX / step);
+        final long minIndex = (long)Math.floor(this.areaMinX / step);
         final long maxIndex = (long)Math.floor(maxX / step);
         long startIndex = (long)Math.floor(minX / step);
         if (startIndex < minIndex) {
@@ -292,7 +294,7 @@ public class MapRulerBorder extends AbstractBorder implements
             final double stepValue = measureValue.doubleValue(scaleUnit);
 
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
-              barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
+              barSize = 4 + (int)((this.rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
               found = true;
               drawLabel(g, pixel + 3, textY, displayUnit, displayValue,
                 scaleUnit);
@@ -301,7 +303,8 @@ public class MapRulerBorder extends AbstractBorder implements
           }
 
           if (top) {
-            g.drawLine(pixel, rulerSize - 1 - barSize, pixel, rulerSize - 1);
+            g.drawLine(pixel, this.rulerSize - 1 - barSize, pixel,
+              this.rulerSize - 1);
           } else {
             g.drawLine(pixel, 0, pixel, barSize);
           }
@@ -342,28 +345,29 @@ public class MapRulerBorder extends AbstractBorder implements
       int textX;
       LineSegment line;
       if (left) {
-        g.translate(0, -rulerSize);
-        textX = labelHeight;
+        g.translate(0, -this.rulerSize);
+        textX = this.labelHeight;
         line = boundingBox.getWestLine();
       } else {
-        g.translate(width - rulerSize, -rulerSize);
-        textX = rulerSize - 3;
+        g.translate(width - this.rulerSize, -this.rulerSize);
+        textX = this.rulerSize - 3;
         line = boundingBox.getEastLine();
       }
-      line = line.convert(rulerGeometryFactory);
+      line = line.convert(this.rulerGeometryFactory);
 
-      g.setClip(0, rulerSize * 2, rulerSize, height - 2 * rulerSize);
+      g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2
+        * this.rulerSize);
 
       final double mapSize = boundingBox.getHeight();
-      final double viewSize = viewport.getViewHeightPixels();
+      final double viewSize = this.viewport.getViewHeightPixels();
       final double minY = line.getY(0);
       double maxY = line.getY(1);
-      if (maxY > areaMaxY) {
-        maxY = areaMaxY;
+      if (maxY > this.areaMaxY) {
+        maxY = this.areaMaxY;
       }
 
       if (mapSize > 0) {
-        final Unit<Q> screenToModelUnit = viewport.getViewToModelUnit(baseUnit);
+        final Unit<Q> screenToModelUnit = this.viewport.getViewToModelUnit(this.baseUnit);
         final Measure<Q> modelUnitsPer6ViewUnits = Measure.valueOf(6,
           screenToModelUnit);
         final int stepLevel = getStepLevel(steps, modelUnitsPer6ViewUnits);
@@ -372,7 +376,7 @@ public class MapRulerBorder extends AbstractBorder implements
 
         final double pixelsPerUnit = viewSize / mapSize;
 
-        final long minIndex = (long)Math.ceil(areaMinY / step);
+        final long minIndex = (long)Math.ceil(this.areaMinY / step);
         final long maxIndex = (long)Math.ceil(maxY / step);
         long startIndex = (long)Math.floor(minY / step);
         if (startIndex < minIndex) {
@@ -392,7 +396,7 @@ public class MapRulerBorder extends AbstractBorder implements
             final double stepValue = measureValue.doubleValue(scaleUnit);
 
             if (Math.abs(stepValue - Math.round(stepValue)) < 0.000001) {
-              barSize = 4 + (int)((rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
+              barSize = 4 + (int)((this.rulerSize - 4) * (((double)stepLevel - i) / stepLevel));
               found = true;
               final AffineTransform transform2 = g.getTransform();
               try {
@@ -407,8 +411,8 @@ public class MapRulerBorder extends AbstractBorder implements
           }
 
           if (left) {
-            g.drawLine(rulerSize - 1 - barSize, height - pixel, rulerSize - 1,
-              height - pixel);
+            g.drawLine(this.rulerSize - 1 - barSize, height - pixel,
+              this.rulerSize - 1, height - pixel);
           } else {
             g.drawLine(0, height - pixel, barSize, height - pixel);
           }
@@ -431,29 +435,24 @@ public class MapRulerBorder extends AbstractBorder implements
   public void setRulerGeometryFactory(final GeometryFactory rulerGeometryFactory) {
     this.rulerGeometryFactory = rulerGeometryFactory;
     if (rulerGeometryFactory == null) {
-      this.rulerGeometryFactory = viewport.getGeometryFactory();
+      this.rulerGeometryFactory = this.viewport.getGeometryFactory();
     } else {
       this.rulerGeometryFactory = rulerGeometryFactory;
     }
-    rulerCoordinateSystem = this.rulerGeometryFactory.getCoordinateSystem();
-    baseUnit = rulerCoordinateSystem.getUnit();
+    this.rulerCoordinateSystem = this.rulerGeometryFactory.getCoordinateSystem();
+    this.baseUnit = this.rulerCoordinateSystem.getUnit();
 
-    final BoundingBox areaBoundingBox = rulerCoordinateSystem.getAreaBoundingBox();
+    final BoundingBox areaBoundingBox = this.rulerCoordinateSystem.getAreaBoundingBox();
 
-    areaMinX = areaBoundingBox.getMinX();
-    areaMaxX = areaBoundingBox.getMaxX();
-    areaMinY = areaBoundingBox.getMinY();
-    areaMaxY = areaBoundingBox.getMaxY();
-  }
-
-  @SuppressWarnings("unchecked")
-  private <Q extends Quantity> double toBaseUnit(final Measurable<Q> value) {
-    return value.doubleValue(baseUnit);
+    this.areaMinX = areaBoundingBox.getMinX();
+    this.areaMaxX = areaBoundingBox.getMaxX();
+    this.areaMinY = areaBoundingBox.getMinY();
+    this.areaMaxY = areaBoundingBox.getMaxY();
   }
 
   @SuppressWarnings("unchecked")
   private <Q extends Quantity> double toBaseUnit(final Measure<Q> value) {
-    return value.doubleValue(baseUnit);
+    return value.doubleValue(this.baseUnit);
   }
 
 }

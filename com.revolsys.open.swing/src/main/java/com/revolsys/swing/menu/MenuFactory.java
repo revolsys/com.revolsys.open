@@ -62,8 +62,8 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   public void addGroup(final int index, final String groupName) {
-    if (!groupNames.contains(groupName)) {
-      groupNames.add(index, groupName);
+    if (!this.groupNames.contains(groupName)) {
+      this.groupNames.add(index, groupName);
     }
 
   }
@@ -161,8 +161,8 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   @Override
   public MenuFactory clone() {
     final MenuFactory clone = new MenuFactory();
-    for (final String groupName : groupNames) {
-      for (final ComponentFactory<?> factory : groups.get(groupName)) {
+    for (final String groupName : this.groupNames) {
+      for (final ComponentFactory<?> factory : this.groups.get(groupName)) {
         final ComponentFactory<?> cloneFactory = factory.clone();
         clone.addComponentFactory(groupName, cloneFactory);
       }
@@ -182,10 +182,10 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public JMenu createComponent() {
-    final JMenu menu = new JMenu(name);
+    final JMenu menu = new JMenu(this.name);
     boolean first = true;
-    for (final String groupName : groupNames) {
-      final List<ComponentFactory<?>> factories = groups.get(groupName);
+    for (final String groupName : this.groupNames) {
+      final List<ComponentFactory<?>> factories = this.groups.get(groupName);
       if (!factories.isEmpty()) {
         if (first) {
           first = false;
@@ -204,11 +204,11 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   public JPopupMenu createJPopupMenu() {
-    final JPopupMenu menu = new JPopupMenu(name);
+    final JPopupMenu menu = new JPopupMenu(this.name);
     boolean first = true;
-    for (final String groupName : groupNames) {
+    for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
-      final List<ComponentFactory<?>> factories = groups.get(groupName);
+      final List<ComponentFactory<?>> factories = this.groups.get(groupName);
       if (!factories.isEmpty()) {
 
         for (final ComponentFactory<?> factory : factories) {
@@ -241,12 +241,12 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
   }
 
   public List<ComponentFactory<?>> getGroup(final String groupName) {
-    List<ComponentFactory<?>> factories = groups.get(groupName);
+    List<ComponentFactory<?>> factories = this.groups.get(groupName);
     if (factories == null) {
       factories = new ArrayList<ComponentFactory<?>>();
-      groups.put(groupName, factories);
-      if (!groupNames.contains(groupName)) {
-        groupNames.add(groupName);
+      this.groups.put(groupName, factories);
+      if (!this.groupNames.contains(groupName)) {
+        this.groupNames.add(groupName);
       }
     }
     return factories;
@@ -259,7 +259,7 @@ public class MenuFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override

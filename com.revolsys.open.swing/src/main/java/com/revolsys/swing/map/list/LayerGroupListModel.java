@@ -34,24 +34,24 @@ public class LayerGroupListModel extends AbstractListModel implements
 
   @Override
   public Layer getElementAt(int index) {
-    if (allowNull) {
+    if (this.allowNull) {
       if (index == 0) {
         return NullLayer.INSTANCE;
       }
       index--;
     }
-    return group.get(index);
+    return this.group.get(index);
   }
 
   @Override
   public Object getSelectedItem() {
-    return selectedItem;
+    return this.selectedItem;
   }
 
   @Override
   public int getSize() {
-    int size = group.size();
-    if (allowNull) {
+    int size = this.group.size();
+    if (this.allowNull) {
       size++;
     }
     return size;
@@ -59,7 +59,7 @@ public class LayerGroupListModel extends AbstractListModel implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event.getSource() == group) {
+    if (event.getSource() == this.group) {
       final String propertyName = event.getPropertyName();
       if (propertyName.equals("layers")) {
         final Object oldValue = event.getOldValue();
@@ -69,13 +69,13 @@ public class LayerGroupListModel extends AbstractListModel implements
           final int index = indexedEvent.getIndex();
           if (oldValue == null) {
             if (newValue != null) {
-              fireIntervalAdded(group, index, index);
+              fireIntervalAdded(this.group, index, index);
             }
           }
           if (newValue == null) {
-            fireIntervalRemoved(group, index, index);
+            fireIntervalRemoved(this.group, index, index);
           } else {
-            fireContentsChanged(group, index, index);
+            fireContentsChanged(this.group, index, index);
           }
         }
       }
@@ -88,8 +88,8 @@ public class LayerGroupListModel extends AbstractListModel implements
       toIndex--;
     }
     final Layer layer = getElementAt(fromIndex);
-    group.remove(fromIndex);
-    group.add(toIndex, layer);
+    this.group.remove(fromIndex);
+    this.group.add(toIndex, layer);
   }
 
   @Override

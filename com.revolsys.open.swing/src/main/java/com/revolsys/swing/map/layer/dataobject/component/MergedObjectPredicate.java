@@ -46,8 +46,8 @@ public class MergedObjectPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final LayerDataObject object = model.getObject(rowIndex);
-      if (object == mergedObject) {
+      final LayerDataObject object = this.model.getObject(rowIndex);
+      if (object == this.mergedObject) {
         return true;
       } else {
         return false;

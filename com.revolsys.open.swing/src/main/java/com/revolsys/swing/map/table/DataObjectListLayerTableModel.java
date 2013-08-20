@@ -64,14 +64,14 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   @PreDestroy
   public void dispose() {
     super.dispose();
-    layer = null;
+    this.layer = null;
   }
 
   private void firePropertyChange(final DataObject object, final String name,
     final Object oldValue, final Object newValue) {
     final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
       oldValue, newValue);
-    for (final PropertyChangeListener listener : propertyChangeListeners) {
+    for (final PropertyChangeListener listener : this.propertyChangeListeners) {
       listener.propertyChange(event);
     }
   }
@@ -82,16 +82,16 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     if (attributeFilterMode.equals(MODE_SELECTED)) {
       return super.getObject(row);
     } else {
-      return layer.getRecord(row);
+      return this.layer.getRecord(row);
     }
   }
 
   public List<LayerDataObject> getObjects() {
-    return layer.getRecords();
+    return this.layer.getRecords();
   }
 
   public Set<PropertyChangeListener> getPropertyChangeListeners() {
-    return Collections.unmodifiableSet(propertyChangeListeners);
+    return Collections.unmodifiableSet(this.propertyChangeListeners);
   }
 
   @Override
@@ -100,7 +100,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     if (attributeFilterMode.equals(MODE_SELECTED)) {
       return super.getRowCount();
     } else {
-      return layer.getRowCount();
+      return this.layer.getRowCount();
     }
   }
 

@@ -51,20 +51,20 @@ public class ComponentGroup {
   }
 
   public ButtonGroup getButtonGroup(final String groupName) {
-    ButtonGroup buttonGroup = buttonGroups.get(groupName);
+    ButtonGroup buttonGroup = this.buttonGroups.get(groupName);
     if (buttonGroup == null) {
       buttonGroup = new ButtonGroup();
-      buttonGroups.put(groupName, buttonGroup);
+      this.buttonGroups.put(groupName, buttonGroup);
     }
     return buttonGroup;
   }
 
   public List<Component> getGroup(final String groupName) {
-    List<Component> components = groups.get(groupName);
+    List<Component> components = this.groups.get(groupName);
     if (components == null) {
       components = new ArrayList<Component>();
-      groups.put(groupName, components);
-      groupNames.add(groupName);
+      this.groups.put(groupName, components);
+      this.groupNames.add(groupName);
     }
     return components;
   }
@@ -79,9 +79,9 @@ public class ComponentGroup {
   }
 
   public void removeGroup(final Container container, final String groupName) {
-    buttonGroups.remove(groupName);
-    groupNames.remove(groupName);
-    for (final Component component : groups.remove(groupName)) {
+    this.buttonGroups.remove(groupName);
+    this.groupNames.remove(groupName);
+    for (final Component component : this.groups.remove(groupName)) {
       container.remove(component);
     }
   }
@@ -96,8 +96,8 @@ public class ComponentGroup {
   public void updateComponents(final JComponent container) {
     container.removeAll();
     boolean first = true;
-    for (final String groupName : groupNames) {
-      final List<Component> components = groups.get(groupName);
+    for (final String groupName : this.groupNames) {
+      final List<Component> components = this.groups.get(groupName);
       if (!components.isEmpty()) {
         if (first) {
           first = false;

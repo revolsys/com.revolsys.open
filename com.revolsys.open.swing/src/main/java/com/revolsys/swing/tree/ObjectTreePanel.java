@@ -17,6 +17,11 @@ import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
 @SuppressWarnings("serial")
 public class ObjectTreePanel extends JPanel {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final List<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
   private PropertyChangeSupport propertyChangeSupport;
@@ -31,25 +36,25 @@ public class ObjectTreePanel extends JPanel {
       model.addNodeModel(objectTreeNodeModel);
     }
 
-    tree = new ObjectTree(model);
-    tree.setMenuEnabled(menuEnabled);
-    tree.setRootVisible(false);
-    tree.setShowsRootHandles(true);
-    tree.setLargeModel(true);
-    final JScrollPane scrollPane = new JScrollPane(tree);
+    this.tree = new ObjectTree(model);
+    this.tree.setMenuEnabled(menuEnabled);
+    this.tree.setRootVisible(false);
+    this.tree.setShowsRootHandles(true);
+    this.tree.setLargeModel(true);
+    final JScrollPane scrollPane = new JScrollPane(this.tree);
     add(scrollPane, BorderLayout.CENTER);
 
     if (object instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy propertyChangeSupportProxy = (PropertyChangeSupportProxy)object;
-      propertyChangeSupport = propertyChangeSupportProxy.getPropertyChangeSupport();
+      this.propertyChangeSupport = propertyChangeSupportProxy.getPropertyChangeSupport();
 
-      listeners.add(model);
+      this.listeners.add(model);
       final InvokeMethodPropertyChangeListener repaintListener = new InvokeMethodPropertyChangeListener(
-        tree, "repaint");
-      listeners.add(repaintListener);
+        this.tree, "repaint");
+      this.listeners.add(repaintListener);
 
-      for (final PropertyChangeListener listener : listeners) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+      for (final PropertyChangeListener listener : this.listeners) {
+        this.propertyChangeSupport.addPropertyChangeListener(listener);
       }
     }
   }
@@ -61,21 +66,21 @@ public class ObjectTreePanel extends JPanel {
 
   @Override
   protected void finalize() throws Throwable {
-    for (final PropertyChangeListener listener : listeners) {
-      propertyChangeSupport.removePropertyChangeListener(listener);
+    for (final PropertyChangeListener listener : this.listeners) {
+      this.propertyChangeSupport.removePropertyChangeListener(listener);
     }
   }
 
   public ObjectTree getTree() {
-    return tree;
+    return this.tree;
   }
 
   public ObjectTreeModel getTreeModel() {
-    return (ObjectTreeModel)tree.getModel();
+    return (ObjectTreeModel)this.tree.getModel();
   }
 
   public void setSelectionMode(final int mode) {
-    final TreeSelectionModel selectionModel = tree.getSelectionModel();
+    final TreeSelectionModel selectionModel = this.tree.getSelectionModel();
     selectionModel.setSelectionMode(mode);
   }
 

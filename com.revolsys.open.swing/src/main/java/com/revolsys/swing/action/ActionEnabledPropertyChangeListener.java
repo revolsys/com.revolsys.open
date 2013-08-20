@@ -17,9 +17,9 @@ public class ActionEnabledPropertyChangeListener implements
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     if (Boolean.TRUE == event.getNewValue()) {
-      action.setEnabled(true);
+      this.action.setEnabled(true);
     } else {
-      action.setEnabled(false);
+      this.action.setEnabled(false);
     }
   }
 }

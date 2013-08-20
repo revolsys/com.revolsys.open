@@ -42,20 +42,20 @@ public abstract class AbstractMultipleRenderer extends
     if (renderer == null) {
       return -1;
     } else {
-      renderers.add(renderer);
-      return renderers.size() - 1;
+      this.renderers.add(renderer);
+      return this.renderers.size() - 1;
     }
 
   }
 
   public int addRenderer(final int index,
     final AbstractDataObjectLayerRenderer renderer) {
-    renderers.add(index, renderer);
+    this.renderers.add(index, renderer);
     return index;
   }
 
   public List<AbstractDataObjectLayerRenderer> getRenderers() {
-    return renderers;
+    return this.renderers;
   }
 
   @Override
@@ -71,7 +71,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public void removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
-    renderers.remove(renderer);
+    this.renderers.remove(renderer);
   }
 
   public void setRenderers(
@@ -85,7 +85,7 @@ public abstract class AbstractMultipleRenderer extends
     final Map<String, Object> allDefaults = getAllDefaults();
     if (!this.renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
-      for (final AbstractDataObjectLayerRenderer renderer : renderers) {
+      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
         rendererMaps.add(renderer.toMap(allDefaults));
       }
       MapSerializerUtil.add(map, "styles", rendererMaps);

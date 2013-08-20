@@ -41,7 +41,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   }
 
   public OpenStreetMapClient getClient() {
-    return client;
+    return this.client;
   }
 
   @Override
@@ -49,7 +49,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
       final double metresPerPixel = viewport.getMetresPerPixel();
-      final int zoomLevel = client.getZoomLevel(metresPerPixel);
+      final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
         .convert(GEOMETRY_FACTORY)
@@ -60,10 +60,10 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
       final double maxY = geographicBoundingBox.getMaxY();
 
       // Tiles start at the North-West corner of the map
-      final int minTileY = client.getTileY(zoomLevel, maxY);
-      final int maxTileY = client.getTileY(zoomLevel, minY);
-      final int minTileX = client.getTileX(zoomLevel, minX);
-      final int maxTileX = client.getTileX(zoomLevel, maxX);
+      final int minTileY = this.client.getTileY(zoomLevel, maxY);
+      final int maxTileY = this.client.getTileY(zoomLevel, minY);
+      final int minTileX = this.client.getTileX(zoomLevel, minX);
+      final int maxTileX = this.client.getTileX(zoomLevel, maxX);
 
       for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
         for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
@@ -83,14 +83,14 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   @Override
   public double getResolution(final Viewport2D viewport) {
     final double metresPerPixel = viewport.getMetresPerPixel();
-    final int zoomLevel = client.getZoomLevel(metresPerPixel);
-    return client.getResolution(zoomLevel);
+    final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
+    return this.client.getResolution(zoomLevel);
   }
 
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "url", client.getServerUrl());
+    MapSerializerUtil.add(map, "url", this.client.getServerUrl());
     return map;
   }
 }

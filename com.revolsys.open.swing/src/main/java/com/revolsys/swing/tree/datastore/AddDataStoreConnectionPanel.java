@@ -41,24 +41,24 @@ public class AddDataStoreConnectionPanel extends ValueField {
     this.registry = registry;
     this.name = name;
     add(new JLabel("Name:"));
-    nameField = new JTextField("", 50);
+    this.nameField = new JTextField("", 50);
     if (StringUtils.hasText(name)) {
       setTitle("Add Data Store " + name);
-      nameField.setText(name);
-      nameField.setEditable(false);
+      this.nameField.setText(name);
+      this.nameField.setEditable(false);
     } else {
       setTitle("Add Data Store");
     }
-    add(nameField);
+    add(this.nameField);
     add(new JLabel("URL:"));
-    urlField = new JTextField("jdbc:<driver>:<connection>", 50);
-    add(urlField);
+    this.urlField = new JTextField("jdbc:<driver>:<connection>", 50);
+    add(this.urlField);
     add(new JLabel("Username:"));
-    usernameField = new JTextField("", 20);
-    add(usernameField);
+    this.usernameField = new JTextField("", 20);
+    add(this.usernameField);
     add(new JLabel("Password:"));
-    passwordField = new JTextField("", 20);
-    add(passwordField);
+    this.passwordField = new JTextField("", 20);
+    add(this.passwordField);
     GroupLayoutUtil.makeColumns(this, 2);
 
   }
@@ -67,23 +67,23 @@ public class AddDataStoreConnectionPanel extends ValueField {
   public void save() {
     super.save();
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    if (StringUtils.hasText(name)) {
-      properties.put("name", name);
+    if (StringUtils.hasText(this.name)) {
+      properties.put("name", this.name);
     } else {
-      properties.put("name", nameField.getText());
+      properties.put("name", this.nameField.getText());
 
     }
     final Map<String, String> connectionParameters = new LinkedHashMap<String, String>();
     properties.put("connection", connectionParameters);
 
-    final String url = urlField.getText();
+    final String url = this.urlField.getText();
     connectionParameters.put("url", url);
 
-    final String username = usernameField.getText();
+    final String username = this.usernameField.getText();
     connectionParameters.put("username", username);
 
-    final String password = passwordField.getText();
+    final String password = this.passwordField.getText();
     connectionParameters.put("password", PasswordUtil.encrypt(password));
-    registry.createConnection(properties);
+    this.registry.createConnection(properties);
   }
 }

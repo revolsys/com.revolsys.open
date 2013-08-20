@@ -40,7 +40,7 @@ public class ImageMarker extends AbstractMarker {
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final MarkerStyle style, final double modelX, final double modelY,
     double orientation) {
-    if (image != null) {
+    if (this.image != null) {
       final AffineTransform savedTransform = graphics.getTransform();
       final Measure<Length> markerWidth = style.getMarkerWidth();
       final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
@@ -55,8 +55,9 @@ public class ImageMarker extends AbstractMarker {
         mapHeight, orientation);
 
       final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-        mapWidth / image.getWidth(null), mapHeight / image.getHeight(null));
-      graphics.drawImage(image, shapeTransform, null);
+        mapWidth / this.image.getWidth(null),
+        mapHeight / this.image.getHeight(null));
+      graphics.drawImage(this.image, shapeTransform, null);
       graphics.setTransform(savedTransform);
     }
   }

@@ -34,19 +34,19 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
   public abstract double getResolution(final Viewport2D viewport);
 
   public boolean isHasError() {
-    return hasError;
+    return this.hasError;
   }
 
   @Override
   public void refresh() {
-    hasError = false;
+    this.hasError = false;
     super.refresh();
     firePropertyChange("refresh", false, true);
   }
 
   public void setError(final Throwable e) {
-    if (!hasError) {
-      hasError = true;
+    if (!this.hasError) {
+      this.hasError = true;
       LoggerFactory.getLogger(getClass()).error("Unable to get map tiles", e);
     }
   }

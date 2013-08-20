@@ -27,13 +27,13 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
   @Override
   protected DataObjectQuadTree doInBackground() throws Exception {
     final DataObjectQuadTree index = new DataObjectQuadTree();
-    final GeometryFactory geometryFactory = layer.getGeometryFactory();
-    final BoundingBox queryBoundingBox = viewportBoundingBox.convert(geometryFactory);
-    Query query = layer.getQuery();
+    final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
+    final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
+    Query query = this.layer.getQuery();
     if (query != null) {
       query = query.clone();
       query.setBoundingBox(queryBoundingBox);
-      final List<LayerDataObject> objects = layer.query(query);
+      final List<LayerDataObject> objects = this.layer.query(query);
       index.insertAll(objects);
     }
     return index;
@@ -45,29 +45,29 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
       if (!isCancelled()) {
         final DataObjectQuadTree index = get();
 
-        layer.setIndex(viewportBoundingBox, index);
+        this.layer.setIndex(this.viewportBoundingBox, index);
       }
     } catch (final CancellationException e) {
-      layer.clearLoading(viewportBoundingBox);
+      this.layer.clearLoading(this.viewportBoundingBox);
     } catch (final Throwable t) {
-      final String typePath = layer.getTypePath();
+      final String typePath = this.layer.getTypePath();
       LoggerFactory.getLogger(getClass())
         .error("Unable to load " + typePath, t);
-      layer.clearLoading(viewportBoundingBox);
+      this.layer.clearLoading(this.viewportBoundingBox);
     }
   }
 
   public AbstractDataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public BoundingBox getViewportBoundingBox() {
-    return viewportBoundingBox;
+    return this.viewportBoundingBox;
   }
 
   @Override
   public String toString() {
-    final String typePath = layer.getTypePath();
+    final String typePath = this.layer.getTypePath();
     return "Loading: " + typePath;
   }
 }

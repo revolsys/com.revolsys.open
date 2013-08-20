@@ -20,6 +20,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
@@ -34,7 +35,6 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.InvokeMethodAfterCommit;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -69,13 +69,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public DataObjectStoreLayer(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
     setType("dataStore");
-    saveChangesMethod = ReflectionUtils.findMethod(getClass(),
+    this.saveChangesMethod = ReflectionUtils.findMethod(getClass(),
       "transactionSaveChanges");
-    saveChangesMethod.setAccessible(true);
+    this.saveChangesMethod.setAccessible(true);
 
-    saveObjectChangesMethod = ReflectionUtils.findMethod(getClass(),
+    this.saveObjectChangesMethod = ReflectionUtils.findMethod(getClass(),
       "transactionSaveObjectChanges", LayerDataObject.class);
-    saveObjectChangesMethod.setAccessible(true);
+    this.saveObjectChangesMethod.setAccessible(true);
   }
 
   public DataObjectStoreLayer(final DataObjectStore dataStore,
@@ -102,7 +102,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected void addToIndex(final LayerDataObject object) {
-    index.insert(object);
+    this.index.insert(object);
   }
 
   protected void cacheObjects(final Collection<? extends DataObject> objects) {
@@ -118,10 +118,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
    * Remove any cached objects that are currently not used.
    */
   private void cleanCachedObjects() {
-    synchronized (cachedObjects) {
+    synchronized (this.cachedObjects) {
       final Set<String> ids = new HashSet<String>();
-      ids.addAll(deletedObjectIds);
-      ids.addAll(formObjectIds);
+      ids.addAll(this.deletedObjectIds);
+      ids.addAll(this.formObjectIds);
       for (final LayerDataObject object : getSelectedRecords()) {
         final String id = getId(object);
         if (id != null) {
@@ -134,36 +134,36 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           ids.add(id);
         }
       }
-      if (index != null) {
-        for (final DataObject object : index.queryAll()) {
+      if (this.index != null) {
+        for (final DataObject object : this.index.queryAll()) {
           final String id = getId((LayerDataObject)object);
           if (id != null) {
             ids.add(id);
           }
         }
       }
-      cachedObjects.keySet().retainAll(ids);
+      this.cachedObjects.keySet().retainAll(ids);
     }
   }
 
   @Override
   protected void clearChanges() {
     super.clearChanges();
-    deletedObjectIds.clear();
+    this.deletedObjectIds.clear();
     cleanCachedObjects();
-    for (final LayerDataObject object : cachedObjects.values()) {
+    for (final LayerDataObject object : this.cachedObjects.values()) {
       removeForm(object);
     }
-    cachedObjects.clear();
+    this.cachedObjects.clear();
   }
 
   protected void clearLoading(final BoundingBox loadedBoundingBox) {
-    synchronized (sync) {
-      if (loadedBoundingBox == loadingBoundingBox) {
+    synchronized (this.sync) {
+      if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
-        boundingBox = loadingBoundingBox;
-        loadingBoundingBox = new BoundingBox();
-        loadingWorker = null;
+        this.boundingBox = this.loadingBoundingBox;
+        this.loadingBoundingBox = new BoundingBox();
+        this.loadingWorker = null;
       }
 
     }
@@ -171,7 +171,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void clearSelectedRecords() {
-    synchronized (cachedObjects) {
+    synchronized (this.cachedObjects) {
       super.clearSelectedRecords();
       cleanCachedObjects();
     }
@@ -206,7 +206,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final LayerDataObject cacheObject = getCacheObject(object);
       final String id = getId(cacheObject);
       if (StringUtils.hasText(id)) {
-        deletedObjectIds.add(id);
+        this.deletedObjectIds.add(id);
         deleteObject(cacheObject, true);
         removeFromIndex(object);
         removeFromIndex(cacheObject);
@@ -225,23 +225,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
-      synchronized (sync) {
+      synchronized (this.sync) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
         if (!this.boundingBox.contains(boundingBox)
           && !this.loadingBoundingBox.contains(boundingBox)) {
-          if (loadingWorker != null) {
-            loadingWorker.cancel(true);
+          if (this.loadingWorker != null) {
+            this.loadingWorker.cancel(true);
           }
           this.loadingBoundingBox = loadBoundingBox;
-          loadingWorker = createLoadingWorker(loadBoundingBox);
-          SwingWorkerManager.execute(loadingWorker);
+          this.loadingWorker = createLoadingWorker(loadBoundingBox);
+          SwingWorkerManager.execute(this.loadingWorker);
         }
       }
       Polygon polygon = boundingBox.toPolygon();
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      final List objects = index.queryIntersects(polygon);
+      final List objects = this.index.queryIntersects(polygon);
       return objects;
     }
   }
@@ -259,7 +259,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
       boundingBox = boundingBox.expand(distance);
       if (this.boundingBox.contains(boundingBox)) {
-        return (List)index.queryDistance(queryGeometry, distance);
+        return (List)this.index.queryDistance(queryGeometry, distance);
       } else {
         final String typePath = getTypePath();
         final DataObjectStore dataStore = getDataStore();
@@ -280,7 +280,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected boolean doSaveChanges() {
-    return invokeInTransaction(saveChangesMethod);
+    return invokeInTransaction(this.saveChangesMethod);
   }
 
   @Override
@@ -293,8 +293,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (final LayerDataObject object : readObjects) {
       final String id = getId(object);
-      synchronized (cachedObjects) {
-        final LayerDataObject cachedObject = cachedObjects.get(id);
+      synchronized (this.cachedObjects) {
+        final LayerDataObject cachedObject = this.cachedObjects.get(id);
         if (cachedObject == null) {
           objects.add(object);
         } else {
@@ -315,15 +315,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected LayerDataObject getCacheObject(final String id) {
-    synchronized (cachedObjects) {
+    synchronized (this.cachedObjects) {
       if (id == null) {
         return null;
       } else {
-        LayerDataObject object = cachedObjects.get(id);
+        LayerDataObject object = this.cachedObjects.get(id);
         if (object == null) {
           object = getRecordById(id);
           if (object != null) {
-            cachedObjects.put(id, object);
+            this.cachedObjects.put(id, object);
           }
         }
         return object;
@@ -337,11 +337,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (object.getState() == DataObjectState.New) {
         return object;
       } else {
-        synchronized (cachedObjects) {
-          if (cachedObjects.containsKey(id)) {
-            return cachedObjects.get(id);
+        synchronized (this.cachedObjects) {
+          if (this.cachedObjects.containsKey(id)) {
+            return this.cachedObjects.get(id);
           } else {
-            cachedObjects.put(id, object);
+            this.cachedObjects.put(id, object);
             return object;
           }
         }
@@ -353,7 +353,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public DataObjectStore getDataStore() {
-    return dataStore;
+    return this.dataStore;
   }
 
   protected String getId(final LayerDataObject object) {
@@ -365,12 +365,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   public BoundingBox getLoadingBoundingBox() {
-    return loadingBoundingBox;
+    return this.loadingBoundingBox;
   }
 
   @Override
   public DataObjectMetaData getMetaData() {
-    return dataStore.getMetaData(typePath);
+    return this.dataStore.getMetaData(this.typePath);
   }
 
   @SuppressWarnings({
@@ -380,7 +380,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
     BoundingBox loadedBoundingBox;
     DataObjectQuadTree index;
-    synchronized (sync) {
+    synchronized (this.sync) {
       loadedBoundingBox = this.boundingBox;
       index = this.index;
     }
@@ -414,7 +414,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected List<LayerDataObject> getObjectsFromDataStore(
     final BoundingBox boundingBox) {
     List<LayerDataObject> queryObjects;
-    final Reader reader = dataStore.query(this, typePath, boundingBox);
+    final Reader reader = this.dataStore.query(this, this.typePath, boundingBox);
     try {
       queryObjects = reader.read();
     } finally {
@@ -429,11 +429,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final String idAttributeName = metaData.getIdAttributeName();
     if (idAttributeName == null) {
       LoggerFactory.getLogger(getClass()).error(
-        typePath + " does not have a primary key");
+        this.typePath + " does not have a primary key");
       return null;
     } else {
       final String idString = StringConverterRegistry.toString(id);
-      final LayerDataObject object = cachedObjects.get(idString);
+      final LayerDataObject object = this.cachedObjects.get(idString);
       if (object == null) {
         final Query query = Query.equal(metaData, idAttributeName, id);
         query.setProperty("dataObjectFactory", this);
@@ -448,11 +448,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public int getRowCount(final Query query) {
-    return dataStore.getRowCount(query);
+    return this.dataStore.getRowCount(query);
   }
 
   public String getTypePath() {
-    return typePath;
+    return this.typePath;
   }
 
   protected boolean invokeInTransaction(final Method method,
@@ -488,7 +488,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final boolean enabled = setEventsEnabled(false);
     try {
       query.setProperty("dataObjectFactory", this);
-      final Reader reader = dataStore.query(query);
+      final Reader reader = this.dataStore.query(query);
       try {
         final List<LayerDataObject> readObjects = reader.read();
         final List<LayerDataObject> objects = getCachedObjects(readObjects);
@@ -504,12 +504,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public void refresh() {
     super.refresh();
-    synchronized (sync) {
-      if (loadingWorker != null) {
-        loadingWorker.cancel(true);
+    synchronized (this.sync) {
+      if (this.loadingWorker != null) {
+        this.loadingWorker.cancel(true);
       }
       this.boundingBox = new BoundingBox();
-      this.loadingBoundingBox = boundingBox;
+      this.loadingBoundingBox = this.boundingBox;
       this.index = new DataObjectQuadTree();
     }
     fireRecordsChanged();
@@ -517,10 +517,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected void removeForm(final LayerDataObject object) {
-    synchronized (formObjectIds) {
+    synchronized (this.formObjectIds) {
       final String id = getId(object);
       if (id != null) {
-        formObjectIds.remove(id);
+        this.formObjectIds.remove(id);
         cleanCachedObjects();
       }
       super.removeForm(object);
@@ -528,26 +528,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected void removeFromIndex(final LayerDataObject object) {
-    index.remove(object);
+    this.index.remove(object);
   }
 
   @Override
   public void revertChanges(final LayerDataObject object) {
     final String id = getId(object);
-    deletedObjectIds.remove(id);
+    this.deletedObjectIds.remove(id);
     super.revertChanges(object);
   }
 
   @Override
   public boolean saveChanges(final LayerDataObject object) {
-    return invokeInTransaction(saveObjectChangesMethod, object);
+    return invokeInTransaction(this.saveObjectChangesMethod, object);
   }
 
   protected void setIndex(final BoundingBox loadedBoundingBox,
     final DataObjectQuadTree index) {
-    if (sync != null) {
-      synchronized (sync) {
-        if (loadedBoundingBox == loadingBoundingBox) {
+    if (this.sync != null) {
+      synchronized (this.sync) {
+        if (loadedBoundingBox == this.loadingBoundingBox) {
           this.index = index;
           cacheObjects(index.queryAll());
           final List<LayerDataObject> newObjects = getNewRecords();
@@ -588,26 +588,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       setName(PathUtil.getName(typePath));
     }
     if (StringUtils.hasText(typePath)) {
-      final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+      final DataObjectMetaData metaData = this.dataStore.getMetaData(typePath);
       if (metaData != null) {
 
         setMetaData(metaData);
-        query = new Query(metaData);
+        this.query = new Query(metaData);
         return;
       }
     }
     setMetaData(null);
-    query = null;
+    this.query = null;
   }
 
   @Override
   public <V extends JComponent> V showForm(final LayerDataObject object) {
-    synchronized (formObjectIds) {
+    synchronized (this.formObjectIds) {
       final String id = getId(object);
       if (id == null) {
         return null;
       } else {
-        formObjectIds.add(id);
+        this.formObjectIds.add(id);
         final LayerDataObject cachedObject = getCacheObject(id, object);
         return super.showForm(cachedObject);
       }
@@ -617,12 +617,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "typePath", typePath);
+    MapSerializerUtil.add(map, "typePath", this.typePath);
     return map;
   }
 
   protected synchronized boolean transactionSaveChanges() {
-    final Writer<DataObject> writer = dataStore.createWriter();
+    final Writer<DataObject> writer = this.dataStore.createWriter();
     try {
       final Set<LayerDataObject> deletedObjects = getDeletedRecords();
 
@@ -649,21 +649,21 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   protected synchronized boolean transactionSaveObjectChanges(
     final LayerDataObject object) {
-    final Writer<DataObject> writer = dataStore.createWriter();
+    final Writer<DataObject> writer = this.dataStore.createWriter();
     try {
       final String id = object.getString(getMetaData().getIdAttributeName());
-      if (deletedObjectIds.contains(id) || super.isDeleted(object)) {
+      if (this.deletedObjectIds.contains(id) || super.isDeleted(object)) {
         removeDeletedObject(object);
-        index.remove(object);
+        this.index.remove(object);
         object.setState(DataObjectState.Deleted);
         writer.write(object);
       } else if (super.isModified(object)) {
         removeModifiedObject(object);
         writer.write(object);
-        index.insert(object);
+        this.index.insert(object);
       } else if (isNew(object)) {
         removeNewObject(object);
-        index.insert(object);
+        this.index.insert(object);
         writer.write(object);
       }
     } finally {
@@ -685,7 +685,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Geometry oldGeometry) {
     if (oldGeometry != null) {
       final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
-      if (index.remove(oldBoundingBox, object)) {
+      if (this.index.remove(oldBoundingBox, object)) {
         addToIndex(object);
       }
     }

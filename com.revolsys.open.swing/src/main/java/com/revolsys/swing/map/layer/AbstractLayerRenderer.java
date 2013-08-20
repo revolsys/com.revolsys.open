@@ -43,7 +43,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
   public AbstractLayerRenderer(final String type, final T layer) {
     this.type = type;
     this.layer = layer;
-    propertyChangeSupport.addPropertyChangeListener(layer);
+    this.propertyChangeSupport.addPropertyChangeListener(layer);
     this.name = CaseConverter.toCapitalizedWords(type);
   }
 
@@ -83,47 +83,47 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
   @Override
   public Map<String, Object> getAllDefaults() {
     final Map<String, Object> allDefaults;
-    if (parent == null) {
+    if (this.parent == null) {
       allDefaults = new LinkedHashMap<String, Object>(getDefaults());
     } else {
-      allDefaults = parent.getAllDefaults();
+      allDefaults = this.parent.getAllDefaults();
       allDefaults.putAll(getDefaults());
     }
     return allDefaults;
   }
 
   public Map<String, Object> getDefaults() {
-    return defaults;
+    return this.defaults;
   }
 
   public T getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public double getMaximumScale() {
-    return maximumScale;
+    return this.maximumScale;
   }
 
   public double getMinimumScale() {
-    return minimumScale;
+    return this.minimumScale;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public LayerRenderer<?> getParent() {
-    return parent;
+    return this.parent;
   }
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   public String getType() {
-    return type;
+    return this.type;
   }
 
   @SuppressWarnings("unchecked")
@@ -138,16 +138,16 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final String name) {
-    Object value = defaults.get(name);
-    if (value == null && parent != null) {
-      value = parent.getValue(name);
+    Object value = this.defaults.get(name);
+    if (value == null && this.parent != null) {
+      value = this.parent.getValue(name);
     }
     return (V)value;
   }
 
   @Override
   public boolean isVisible() {
-    return visible;
+    return this.visible;
   }
 
   public boolean isVisible(final double scale) {
@@ -162,7 +162,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    propertyChangeSupport.firePropertyChange(event);
+    this.propertyChangeSupport.firePropertyChange(event);
   }
 
   @Override
@@ -197,16 +197,17 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     if (StringUtils.hasText(name)) {
       this.name = name;
     } else {
-      this.name = CaseConverter.toCapitalizedWords(type);
+      this.name = CaseConverter.toCapitalizedWords(this.type);
     }
-    propertyChangeSupport.firePropertyChange("name", oldName, this.name);
+    this.propertyChangeSupport.firePropertyChange("name", oldName, this.name);
   }
 
   @Override
   public void setVisible(final boolean visible) {
     final boolean oldVisible = this.visible;
     this.visible = visible;
-    propertyChangeSupport.firePropertyChange("visible", oldVisible, visible);
+    this.propertyChangeSupport.firePropertyChange("visible", oldVisible,
+      visible);
   }
 
   @Override
@@ -216,9 +217,9 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    MapSerializerUtil.add(map, "type", type);
-    MapSerializerUtil.add(map, "name", name);
-    MapSerializerUtil.add(map, "visible", visible, true);
+    MapSerializerUtil.add(map, "type", this.type);
+    MapSerializerUtil.add(map, "name", this.name);
+    MapSerializerUtil.add(map, "visible", this.visible, true);
     final Map<String, Object> newDefaults = new LinkedHashMap<String, Object>(
       this.defaults);
     for (final Entry<String, Object> entry : defaults.entrySet()) {
@@ -236,17 +237,18 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     if (!newDefaults.isEmpty()) {
       map.put("defaults", newDefaults);
     }
-    MapSerializerUtil.add(map, "maximumScale", maximumScale, 0);
-    MapSerializerUtil.add(map, "minimumScale", minimumScale, Long.MAX_VALUE);
+    MapSerializerUtil.add(map, "maximumScale", this.maximumScale, 0);
+    MapSerializerUtil.add(map, "minimumScale", this.minimumScale,
+      Long.MAX_VALUE);
     return map;
   }
 
   @Override
   public String toString() {
-    if (StringUtils.hasText(name)) {
-      return name;
+    if (StringUtils.hasText(this.name)) {
+      return this.name;
     } else {
-      return type;
+      return this.type;
     }
   }
 

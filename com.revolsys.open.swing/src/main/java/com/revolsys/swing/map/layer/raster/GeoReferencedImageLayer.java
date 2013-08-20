@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.Project;
@@ -65,12 +65,12 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     this.resource = resource;
     this.url = SpringUtil.getUrl(resource).toString();
     setType("geoReferencedImage");
-    setName(FileUtil.getBaseName(url));
-    SwingWorkerManager.execute("Loading file: " + url, this, "revert");
+    setName(FileUtil.getBaseName(this.url));
+    SwingWorkerManager.execute("Loading file: " + this.url, this, "revert");
   }
 
   public BoundingBox fitToViewport() {
-    final BoundingBox oldValue = image.getBoundingBox();
+    final BoundingBox oldValue = this.image.getBoundingBox();
     final Project project = getProject();
     if (project == null) {
       return new BoundingBox();
@@ -80,18 +80,18 @@ public class GeoReferencedImageLayer extends AbstractLayer {
         return viewBoundingBox;
       } else {
         final double viewRatio = viewBoundingBox.getAspectRatio();
-        final double imageRatio = image.getImageAspectRatio();
+        final double imageRatio = this.image.getImageAspectRatio();
         BoundingBox boundingBox;
         if (viewRatio > imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(-1
-            + (imageRatio / viewRatio), 0.0);
+          boundingBox = viewBoundingBox.expandPercent(-1 + imageRatio
+            / viewRatio, 0.0);
         } else if (viewRatio < imageRatio) {
-          boundingBox = viewBoundingBox.expandPercent(0.0, -1
-            + (viewRatio / imageRatio));
+          boundingBox = viewBoundingBox.expandPercent(0.0, -1 + viewRatio
+            / imageRatio);
         } else {
           boundingBox = viewBoundingBox;
         }
-        image.setBoundingBox(boundingBox);
+        this.image.setBoundingBox(boundingBox);
         firePropertyChange("boundingBox", oldValue, boundingBox);
         return boundingBox;
       }
@@ -122,37 +122,37 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   public GeoReferencedImage getImage() {
-    return image;
+    return this.image;
   }
 
   public void revert() {
-    if (image == null && resource != null) {
-      final Resource imageResource = SpringUtil.getResource(url);
+    if (this.image == null && this.resource != null) {
+      final Resource imageResource = SpringUtil.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
-          if (image == null) {
+          this.image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+          if (this.image == null) {
             LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-              "Cannot load image:" + url);
+              "Cannot load image:" + this.url);
           } else {
-            setGeometryFactory(image.getGeometryFactory());
+            setGeometryFactory(this.image.getGeometryFactory());
           }
         } catch (final RuntimeException e) {
           LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-            "Unable to load image" + url, e);
+            "Unable to load image" + this.url, e);
         }
       } else {
         LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-          "Image does not exist:" + url);
+          "Image does not exist:" + this.url);
       }
     } else {
-      image.revert();
+      this.image.revert();
     }
     firePropertyChange("revert", false, true);
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    image.setBoundingBox(boundingBox);
+    this.image.setBoundingBox(boundingBox);
   }
 
   public void setImage(final GeoReferencedImage image) {
@@ -164,7 +164,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final Map<String, Object> map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
-    MapSerializerUtil.add(map, "url", url);
+    MapSerializerUtil.add(map, "url", this.url);
     // TODO add geo-referencing information
     return map;
   }

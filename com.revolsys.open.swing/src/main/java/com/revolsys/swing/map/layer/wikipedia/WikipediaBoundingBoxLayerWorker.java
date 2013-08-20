@@ -71,7 +71,7 @@ public class WikipediaBoundingBoxLayerWorker extends
       geometryFactory = GeometryFactory.getFactory(projCs.getGeographicCoordinateSystem());
       boundingBox = new BoundingBox(geometryFactory, boundingBox);
     }
-    final List<DataObject> results = geoNamesService.getWikipediaArticles(boundingBox);
+    final List<DataObject> results = this.geoNamesService.getWikipediaArticles(boundingBox);
     for (final DataObject dataObject : results) {
       final String title = dataObject.getValue("title");
       final String wikipediaUrl = dataObject.getValue("wikipediaUrl");
@@ -100,9 +100,9 @@ public class WikipediaBoundingBoxLayerWorker extends
   protected void done() {
     try {
       final DataObjectQuadTree index = get();
-      layer.setIndex(boundingBox, index);
+      this.layer.setIndex(this.boundingBox, index);
     } catch (final Throwable e) {
-      layer.setIndex(boundingBox, null);
+      this.layer.setIndex(this.boundingBox, null);
     }
   }
 

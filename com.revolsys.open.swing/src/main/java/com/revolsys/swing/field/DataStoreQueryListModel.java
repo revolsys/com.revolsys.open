@@ -54,12 +54,12 @@ public class DataStoreQueryListModel implements ListModel {
 
   @Override
   public void addListDataListener(final ListDataListener l) {
-    listDataListeners.add(ListDataListener.class, l);
+    this.listDataListeners.add(ListDataListener.class, l);
   }
 
   protected void fireContentsChanged(final Object source, final int index0,
     final int index1) {
-    final Object[] listeners = listDataListeners.getListenerList();
+    final Object[] listeners = this.listDataListeners.getListenerList();
     ListDataEvent e = null;
 
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -74,28 +74,28 @@ public class DataStoreQueryListModel implements ListModel {
   }
 
   public String getDisplayAttributeName() {
-    return displayAttributeName;
+    return this.displayAttributeName;
   }
 
   @Override
   public DataObject getElementAt(final int index) {
-    return objects.get(index);
+    return this.objects.get(index);
   }
 
   public ListDataListener[] getListDataListeners() {
-    return listDataListeners.getListeners(ListDataListener.class);
+    return this.listDataListeners.getListeners(ListDataListener.class);
   }
 
   public List<DataObject> getObjects() {
-    return objects;
+    return this.objects;
   }
 
   protected List<DataObject> getObjects(final String searchParam) {
     final Map<String, DataObject> allObjects = new TreeMap<String, DataObject>();
-    for (Query query : queries) {
-      if (allObjects.size() < maxResults) {
+    for (Query query : this.queries) {
+      if (allObjects.size() < this.maxResults) {
         query = query.clone();
-        query.addOrderBy(displayAttributeName, true);
+        query.addOrderBy(this.displayAttributeName, true);
         final Condition whereCondition = query.getWhereCondition();
         if (whereCondition instanceof BinaryCondition) {
           final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
@@ -107,16 +107,16 @@ public class DataStoreQueryListModel implements ListModel {
             Conditions.setValue(0, binaryCondition, searchParam);
           }
         }
-        query.setLimit(maxResults);
-        final Reader<DataObject> reader = dataStore.query(query);
+        query.setLimit(this.maxResults);
+        final Reader<DataObject> reader = this.dataStore.query(query);
         try {
           final List<DataObject> objects = reader.read();
           for (final DataObject object : objects) {
-            if (allObjects.size() < maxResults) {
-              final String key = object.getString(displayAttributeName);
+            if (allObjects.size() < this.maxResults) {
+              final String key = object.getString(this.displayAttributeName);
               if (!allObjects.containsKey(key)) {
                 if (searchParam.equalsIgnoreCase(key)) {
-                  selectedItem = object;
+                  this.selectedItem = object;
                 }
                 allObjects.put(key, object);
               }
@@ -131,21 +131,21 @@ public class DataStoreQueryListModel implements ListModel {
   }
 
   public String getSearchText() {
-    return searchText;
+    return this.searchText;
   }
 
   public DataObject getSelectedItem() {
-    return selectedItem;
+    return this.selectedItem;
   }
 
   @Override
   public int getSize() {
-    return objects.size();
+    return this.objects.size();
   }
 
   @Override
   public void removeListDataListener(final ListDataListener l) {
-    listDataListeners.remove(ListDataListener.class, l);
+    this.listDataListeners.remove(ListDataListener.class, l);
   }
 
   public void setMaxResults(final int maxResults) {
@@ -156,14 +156,14 @@ public class DataStoreQueryListModel implements ListModel {
     if (StringUtils.hasText(searchText)) {
       if (!this.searchText.equalsIgnoreCase(searchText)) {
         this.searchText = searchText.toUpperCase();
-        objects = getObjects(this.searchText);
-        fireContentsChanged(this, 0, objects.size());
+        this.objects = getObjects(this.searchText);
+        fireContentsChanged(this, 0, this.objects.size());
       }
     } else {
       this.searchText = "";
-      objects = Collections.emptyList();
-      fireContentsChanged(this, 0, objects.size());
-      selectedItem = null;
+      this.objects = Collections.emptyList();
+      fireContentsChanged(this, 0, this.objects.size());
+      this.selectedItem = null;
     }
   }
 }

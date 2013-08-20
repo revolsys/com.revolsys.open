@@ -40,6 +40,11 @@ import com.revolsys.util.JavaBeanUtil;
 public class GeometryStylePanel extends ValueField implements
   PropertyChangeListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final GeometryStyleRenderer geometryStyleRenderer;
 
   private final GeometryStyle geometryStyle;
@@ -57,15 +62,15 @@ public class GeometryStylePanel extends ValueField implements
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     setFieldValue(geometryStyleRenderer);
     if (geometryAttribute != null) {
-      geometryDataType = geometryAttribute.getType();
-      if (DataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {
-        geometryDataType = DataTypes.GEOMETRY;
-      } else if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
-        geometryDataType = DataTypes.POINT;
-      } else if (DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        geometryDataType = DataTypes.LINE_STRING;
-      } else if (DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
-        geometryDataType = DataTypes.POLYGON;
+      this.geometryDataType = geometryAttribute.getType();
+      if (DataTypes.GEOMETRY_COLLECTION.equals(this.geometryDataType)) {
+        this.geometryDataType = DataTypes.GEOMETRY;
+      } else if (DataTypes.MULTI_POINT.equals(this.geometryDataType)) {
+        this.geometryDataType = DataTypes.POINT;
+      } else if (DataTypes.MULTI_LINE_STRING.equals(this.geometryDataType)) {
+        this.geometryDataType = DataTypes.LINE_STRING;
+      } else if (DataTypes.MULTI_POLYGON.equals(this.geometryDataType)) {
+        this.geometryDataType = DataTypes.POLYGON;
       }
 
       final boolean hasLineStyle = false;
@@ -74,24 +79,24 @@ public class GeometryStylePanel extends ValueField implements
       final JPanel stylePanels = new JPanel();
       add(stylePanels);
 
-      previews = new JPanel(new GridLayout(1, 1));
-      previews.setBorder(BorderFactory.createTitledBorder("Preview"));
-      add(previews);
+      this.previews = new JPanel(new GridLayout(1, 1));
+      this.previews.setBorder(BorderFactory.createTitledBorder("Preview"));
+      add(this.previews);
 
-      if (DataTypes.GEOMETRY.equals(geometryDataType)) {
+      if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels);
         addLineStylePanel(stylePanels);
         addPolygonStylePanel(stylePanels);
-        previews.add(new MarkerStylePreview(geometryStyle));
+        this.previews.add(new MarkerStylePreview(this.geometryStyle));
         addGeometryPreview(DataTypes.LINE_STRING);
         addGeometryPreview(DataTypes.POLYGON);
-      } else if (DataTypes.POINT.equals(geometryDataType)) {
+      } else if (DataTypes.POINT.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels);
-        previews.add(new MarkerStylePreview(geometryStyle));
-      } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
+        this.previews.add(new MarkerStylePreview(this.geometryStyle));
+      } else if (DataTypes.LINE_STRING.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels);
         addGeometryPreview(DataTypes.LINE_STRING);
-      } else if (DataTypes.POLYGON.equals(geometryDataType)) {
+      } else if (DataTypes.POLYGON.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels);
         addPolygonStylePanel(stylePanels);
         addGeometryPreview(DataTypes.POLYGON);
@@ -116,7 +121,8 @@ public class GeometryStylePanel extends ValueField implements
   protected void addField(final JPanel panel, final String fieldName,
     final String label) {
     addLabel(panel, label);
-    final Object fieldValue = JavaBeanUtil.getValue(geometryStyle, fieldName);
+    final Object fieldValue = JavaBeanUtil.getValue(this.geometryStyle,
+      fieldName);
     JComponent field;
     if (fieldName.equals("lineCap")) {
       field = createLineCapField((LineCap)fieldValue);
@@ -138,8 +144,8 @@ public class GeometryStylePanel extends ValueField implements
 
   protected void addGeometryPreview(final DataType geometryDataType) {
     final GeometryStylePreview linePreview = new GeometryStylePreview(
-      geometryStyle, geometryDataType);
-    previews.add(linePreview);
+      this.geometryStyle, geometryDataType);
+    this.previews.add(linePreview);
   }
 
   protected void addLabel(final JPanel panel, final String text) {
@@ -221,9 +227,9 @@ public class GeometryStylePanel extends ValueField implements
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
-      JavaBeanUtil.setProperty(geometryStyle, fieldName, fieldValue);
+      JavaBeanUtil.setProperty(this.geometryStyle, fieldName, fieldValue);
     }
-    for (final Component preview : previews.getComponents()) {
+    for (final Component preview : this.previews.getComponents()) {
       preview.repaint();
     }
   }
@@ -231,7 +237,7 @@ public class GeometryStylePanel extends ValueField implements
   @Override
   public void save() {
     super.save();
-    geometryStyleRenderer.setStyle(geometryStyle);
+    this.geometryStyleRenderer.setStyle(this.geometryStyle);
   }
 
   public void setLineWidthField(final ValueField panel,

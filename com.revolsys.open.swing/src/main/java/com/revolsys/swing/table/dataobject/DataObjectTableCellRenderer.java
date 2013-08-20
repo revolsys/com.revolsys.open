@@ -32,13 +32,13 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
   public DataObjectTableCellRenderer(
     final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
-    labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
-    labelComponent.setFont(SwingUtil.BOLD_FONT);
-    labelComponent.setOpaque(true);
+    this.labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
+    this.labelComponent.setFont(SwingUtil.BOLD_FONT);
+    this.labelComponent.setOpaque(true);
 
-    valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
-    valueComponent.setFont(SwingUtil.FONT);
-    valueComponent.setOpaque(true);
+    this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
+    this.valueComponent.setFont(SwingUtil.FONT);
+    this.valueComponent.setOpaque(true);
   }
 
   @Override
@@ -60,11 +60,11 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
     final String name = metaData.getAttributeName(attributeIndex);
     final String title = metaData.getAttributeTitle(name);
     if (column == 0) {
-      valueComponent.setText(String.valueOf(attributeIndex));
-      component = valueComponent;
+      this.valueComponent.setText(String.valueOf(attributeIndex));
+      component = this.valueComponent;
     } else if (column == 1) {
-      labelComponent.setText(title);
-      component = labelComponent;
+      this.labelComponent.setText(title);
+      component = this.labelComponent;
     } else {
       if (component == null) {
         String text;
@@ -86,8 +86,8 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
             }
           }
         }
-        valueComponent.setText(text);
-        component = valueComponent;
+        this.valueComponent.setText(text);
+        component = this.valueComponent;
       }
     }
     if (required && model.getValue(attributeIndex) == null) {

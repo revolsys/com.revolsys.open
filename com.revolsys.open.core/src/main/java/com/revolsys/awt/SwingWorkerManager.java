@@ -1,4 +1,4 @@
-package com.revolsys.swing;
+package com.revolsys.awt;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,12 +11,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.beans.MethodInvoker;
+import com.revolsys.parallel.LoggingRunnable;
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
 
@@ -154,6 +157,25 @@ public class SwingWorkerManager {
 
   public static List<SwingWorker<?, ?>> getWorkers() {
     return CollectionUtil.getReferences(WORKERS);
+  }
+
+  public static void invokeAndWait(final Object object,
+    final String methodName, final Object... parameters) {
+    InvokeMethodRunnable.invokeAndWait(object, methodName, parameters);
+  }
+
+  public static void invokeLater(final Object object, final String methodName,
+    final Object... parameters) {
+    InvokeMethodRunnable.invokeLater(object, methodName, parameters);
+  }
+
+  public static void invokeLater(final Runnable runnable) {
+    final LoggingRunnable logRunnable = new LoggingRunnable(runnable);
+    if (SwingUtilities.isEventDispatchThread()) {
+      logRunnable.run();
+    } else {
+      SwingUtilities.invokeLater(logRunnable);
+    }
   }
 
   public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {

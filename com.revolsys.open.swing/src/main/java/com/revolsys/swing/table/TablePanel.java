@@ -19,6 +19,11 @@ import com.revolsys.swing.toolbar.ToolBar;
 
 @SuppressWarnings("serial")
 public class TablePanel extends JPanel implements MouseListener {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
     null);
 
@@ -40,7 +45,7 @@ public class TablePanel extends JPanel implements MouseListener {
     super(new BorderLayout());
     this.table = table;
 
-    add(toolBar, BorderLayout.NORTH);
+    add(this.toolBar, BorderLayout.NORTH);
 
     final JScrollPane scrollPane = new JScrollPane(table);
     table.addMouseListener(this);
@@ -53,36 +58,36 @@ public class TablePanel extends JPanel implements MouseListener {
       popupMouseEvent = new WeakReference<MouseEvent>(e);
       final int x = e.getX();
       final int y = e.getY();
-      final JPopupMenu popupMenu = menu.createJPopupMenu();
+      final JPopupMenu popupMenu = this.menu.createJPopupMenu();
       final Component component = e.getComponent();
       popupMenu.show(component, x, y);
     }
   }
 
   public int getEventColumn() {
-    return eventColumn;
+    return this.eventColumn;
   }
 
   public int getEventRow() {
-    return eventRow;
+    return this.eventRow;
   }
 
   public MenuFactory getMenu() {
-    return menu;
+    return this.menu;
   }
 
   @SuppressWarnings("unchecked")
   public <T extends JTable> T getTable() {
-    return (T)table;
+    return (T)this.table;
   }
 
   @SuppressWarnings("unchecked")
   public <T extends TableModel> T getTableModel() {
-    return (T)table.getModel();
+    return (T)this.table.getModel();
   }
 
   public ToolBar getToolBar() {
-    return toolBar;
+    return this.toolBar;
   }
 
   @Override
@@ -109,13 +114,13 @@ public class TablePanel extends JPanel implements MouseListener {
 
   protected void setEventRow(final MouseEvent e) {
     final Point point = e.getPoint();
-    eventRow = table.rowAtPoint(point);
-    eventColumn = table.columnAtPoint(point);
-    if (eventRow > -1) {
-      eventRow = table.convertRowIndexToModel(eventRow);
+    this.eventRow = this.table.rowAtPoint(point);
+    this.eventColumn = this.table.columnAtPoint(point);
+    if (this.eventRow > -1) {
+      this.eventRow = this.table.convertRowIndexToModel(this.eventRow);
     }
-    if (eventColumn > -1) {
-      eventColumn = table.convertColumnIndexToModel(eventColumn);
+    if (this.eventColumn > -1) {
+      this.eventColumn = this.table.convertColumnIndexToModel(this.eventColumn);
     }
   }
 }

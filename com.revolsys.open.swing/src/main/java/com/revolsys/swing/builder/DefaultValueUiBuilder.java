@@ -13,26 +13,26 @@ public class DefaultValueUiBuilder implements ValueUiBuilder {
   private JComponent component;
 
   public DefaultValueUiBuilder() {
-    defaultRenderer = new JLabel();
-    defaultRenderer.setBorder(new EmptyBorder(1, 2, 1, 2));
-    defaultRenderer.setOpaque(true);
+    this.defaultRenderer = new JLabel();
+    this.defaultRenderer.setBorder(new EmptyBorder(1, 2, 1, 2));
+    this.defaultRenderer.setOpaque(true);
   }
 
   @Override
   public Object getCellEditorValue() {
-    return SwingUtil.getValue(component);
+    return SwingUtil.getValue(this.component);
   }
 
   @Override
   public JComponent getEditorComponent(final Object value) {
-    return SwingUtil.getValue(component);
+    return SwingUtil.getValue(this.component);
   }
 
   @Override
   public JComponent getRendererComponent(final Object value) {
     final String text = getText(value);
-    defaultRenderer.setText(text);
-    return defaultRenderer;
+    this.defaultRenderer.setText(text);
+    return this.defaultRenderer;
   }
 
   public String getText(final Object value) {

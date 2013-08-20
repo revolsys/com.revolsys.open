@@ -8,6 +8,11 @@ import javax.swing.undo.UndoableEdit;
 
 @SuppressWarnings("serial")
 public class MultipleUndo extends AbstractUndoableEdit {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final List<UndoableEdit> edits;
 
   public MultipleUndo() {
@@ -27,14 +32,14 @@ public class MultipleUndo extends AbstractUndoableEdit {
     if (edit == null || isHasBeenDone()) {
       return false;
     } else {
-      edits.add(edit);
+      this.edits.add(edit);
       return true;
     }
   }
 
   @Override
   public boolean canRedo() {
-    for (final UndoableEdit edit : edits) {
+    for (final UndoableEdit edit : this.edits) {
       if (!edit.canRedo()) {
         return false;
       }
@@ -44,7 +49,7 @@ public class MultipleUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canUndo() {
-    for (final UndoableEdit edit : edits) {
+    for (final UndoableEdit edit : this.edits) {
       if (!edit.canUndo()) {
         return false;
       }
@@ -54,19 +59,19 @@ public class MultipleUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    for (final UndoableEdit edit : edits) {
+    for (final UndoableEdit edit : this.edits) {
       edit.redo();
     }
   }
 
   @Override
   protected void doUndo() {
-    for (final UndoableEdit edit : edits) {
+    for (final UndoableEdit edit : this.edits) {
       edit.undo();
     }
   }
 
   public boolean isEmpty() {
-    return edits.isEmpty();
+    return this.edits.isEmpty();
   }
 }

@@ -11,7 +11,7 @@ public class TiffImageFactory extends AbstractGeoReferencedImageFactory {
   }
 
   @Override
-  public GeoReferencedImage loadImage(Resource resource) {
+  public GeoReferencedImage loadImage(final Resource resource) {
     return new TiffImage(resource);
   }
 

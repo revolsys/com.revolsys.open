@@ -14,8 +14,8 @@ public class FileSystemLoader implements DynamicNodeLoader {
     final List nodes = new ArrayList();
     final File[] fileSystems = File.listRoots();
 
-    for (int i = 0; i < fileSystems.length; i++) {
-      final DirectoryTreeNode node = new DirectoryTreeNode(fileSystems[i],
+    for (final File fileSystem : fileSystems) {
+      final DirectoryTreeNode node = new DirectoryTreeNode(fileSystem,
         childLoader);
       nodes.add(node);
     }

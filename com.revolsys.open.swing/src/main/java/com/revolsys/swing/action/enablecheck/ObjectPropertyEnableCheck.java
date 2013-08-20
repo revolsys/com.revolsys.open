@@ -43,8 +43,8 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public boolean isEnabled() {
-    final Object value = JavaBeanUtil.getValue(object, propertyName);
-    if (EqualsRegistry.equal(value, this.value) == !inverse) {
+    final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+    if (EqualsRegistry.equal(value, this.value) == !this.inverse) {
       return enabled();
     } else {
       return disabled();
@@ -53,6 +53,6 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return object + "." + propertyName + "=" + value;
+    return this.object + "." + this.propertyName + "=" + this.value;
   }
 }

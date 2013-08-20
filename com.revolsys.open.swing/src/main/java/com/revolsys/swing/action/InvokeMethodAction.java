@@ -9,8 +9,8 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
@@ -84,7 +84,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction(final CharSequence name, final Icon icon,
     final boolean invokeLater, final Object object, final String methodName,
     final Object... parameters) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
     if (name != null) {
       putValue(NAME, name.toString());
@@ -174,10 +174,10 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    if (invokeLater) {
-      SwingUtilities.invokeLater(runnable);
+    if (this.invokeLater) {
+      SwingWorkerManager.invokeLater(this.runnable);
     } else {
-      runnable.run();
+      this.runnable.run();
     }
   }
 
@@ -212,7 +212,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
   @Override
   public String toString() {
-    return runnable.toString();
+    return this.runnable.toString();
   }
 
 }

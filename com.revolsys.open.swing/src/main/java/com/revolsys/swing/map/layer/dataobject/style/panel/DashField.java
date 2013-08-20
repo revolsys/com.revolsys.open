@@ -38,28 +38,28 @@ public class DashField extends ValueField implements ItemListener {
     setFieldValue(dash);
     this.dash = dash;
 
-    dashField = new ComboBox(null, createDash(1), createDash(3), createDash(5),
-      createDash(7), createDash(1, 3), createDash(3, 5), createDash(5, 7),
-      createDash(1, 2, 4, 2), createDash(3, 5, 9, 5));
-    dashField.setSelectedItem(dash);
-    dashField.setRenderer(new DashListCellRenderer());
-    dashField.addItemListener(this);
+    this.dashField = new ComboBox(null, createDash(1), createDash(3),
+      createDash(5), createDash(7), createDash(1, 3), createDash(3, 5),
+      createDash(5, 7), createDash(1, 2, 4, 2), createDash(3, 5, 9, 5));
+    this.dashField.setSelectedItem(dash);
+    this.dashField.setRenderer(new DashListCellRenderer());
+    this.dashField.addItemListener(this);
 
-    add(dashField);
+    add(this.dashField);
     SpringLayoutUtil.makeColumns(this, 2, 0, 0, 5, 5);
   }
 
   public List<Measure<Length>> getDash() {
-    return (List<Measure<Length>>)dashField.getSelectedItem();
+    return (List<Measure<Length>>)this.dashField.getSelectedItem();
   }
 
   @Override
   public void itemStateChanged(final ItemEvent event) {
-    if (event.getSource() == dashField
+    if (event.getSource() == this.dashField
       && event.getStateChange() == ItemEvent.SELECTED) {
       final Object oldValue = this.dash;
-      this.dash = (List<Measure<Length>>)dashField.getSelectedItem();
-      firePropertyChange("dash", oldValue, dash);
+      this.dash = (List<Measure<Length>>)this.dashField.getSelectedItem();
+      firePropertyChange("dash", oldValue, this.dash);
     }
   }
 

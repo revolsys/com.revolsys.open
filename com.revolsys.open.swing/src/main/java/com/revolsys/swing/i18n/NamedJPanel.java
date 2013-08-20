@@ -19,13 +19,13 @@ public class NamedJPanel extends JPanel {
   }
 
   public Icon getIcon() {
-    return icon;
+    return this.icon;
   }
 
   @Override
   public String getName() {
-    if (name != null) {
-      return name.toString();
+    if (this.name != null) {
+      return this.name.toString();
     } else {
       return super.getName();
     }

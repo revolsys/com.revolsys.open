@@ -13,12 +13,17 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.swing.SwingWorkerManager;
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.table.BaseJxTable;
 
 @SuppressWarnings("serial")
 public class SwingWorkerTableModel extends AbstractTableModel {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
     final BaseJxTable table = SwingWorkerTableModel.createTable();
@@ -53,10 +58,10 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   private final InvokeMethodPropertyChangeListener listener;
 
   public SwingWorkerTableModel() {
-    listener = new InvokeMethodPropertyChangeListener(this,
+    this.listener = new InvokeMethodPropertyChangeListener(this,
       "fireTableDataChanged");
     final PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
-    propertyChangeSupport.addPropertyChangeListener(listener);
+    propertyChangeSupport.addPropertyChangeListener(this.listener);
   }
 
   @Override
@@ -71,7 +76,7 @@ public class SwingWorkerTableModel extends AbstractTableModel {
 
   @Override
   public String getColumnName(final int columnIndex) {
-    return columnTitles.get(columnIndex);
+    return this.columnTitles.get(columnIndex);
   }
 
   @Override

@@ -24,26 +24,26 @@ public class JLabelListCellRenderer extends BasicComboBoxRenderer {
     final boolean cellHasFocus) {
     super.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);
-    final String label = labels.get(value);
+    final String label = this.labels.get(value);
     if (label != null) {
       setText(label);
     }
-    final Icon icon = icons.get(value);
+    final Icon icon = this.icons.get(value);
     setIcon(icon);
     return this;
   }
 
   public void setIcon(final Object value, final Icon icon) {
-    icons.put(value, icon);
+    this.icons.put(value, icon);
   }
 
   public void setLabel(final Object value, final String label) {
-    labels.put(value, label);
+    this.labels.put(value, label);
 
   }
 
   public void setLabel(final Object value, final String label, final Icon icon) {
-    labels.put(value, label);
-    icons.put(value, icon);
+    this.labels.put(value, label);
+    this.icons.put(value, icon);
   }
 }

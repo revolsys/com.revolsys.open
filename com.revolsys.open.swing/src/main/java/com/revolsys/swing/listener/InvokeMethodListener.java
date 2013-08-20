@@ -9,12 +9,12 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodListener extends InvokeMethodRunnable implements
@@ -56,13 +56,23 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
   }
 
   @Override
+  public void focusGained(final FocusEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
+    invokeMethod();
+  }
+
+  @Override
   public void insertUpdate(final DocumentEvent e) {
     invokeMethod();
   }
 
   protected void invokeMethod() {
-    if (invokeLater) {
-      SwingUtilities.invokeLater(this);
+    if (this.invokeLater) {
+      SwingWorkerManager.invokeLater(this);
     } else {
       run();
     }
@@ -85,16 +95,6 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    invokeMethod();
-  }
-
-  @Override
-  public void focusGained(FocusEvent e) {
-    invokeMethod();
-  }
-
-  @Override
-  public void focusLost(FocusEvent e) {
     invokeMethod();
   }
 }

@@ -45,7 +45,8 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
   public boolean isEnabled() {
     try {
       final DataObject object = getObject();
-      final Object value = JavaBeanUtil.getSimpleProperty(object, propertyName);
+      final Object value = JavaBeanUtil.getSimpleProperty(object,
+        this.propertyName);
       if (EqualsRegistry.equal(value, this.value)) {
         return enabled();
       }
@@ -59,6 +60,6 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return propertyName + "=" + value;
+    return this.propertyName + "=" + this.value;
   }
 }

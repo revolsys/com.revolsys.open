@@ -30,12 +30,12 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
   public Component getTreeCellRendererComponent(final JTree tree,
     final Object value, final boolean selected, final boolean expanded,
     final boolean leaf, final int row, final boolean hasFocus) {
-    final TreePath path = model.getPath(value);
+    final TreePath path = this.model.getPath(value);
     ObjectTreeNodeModel<Object, Object> nodeModel;
     if (path == null) {
-      nodeModel = model.getNodeModel(value);
+      nodeModel = this.model.getNodeModel(value);
     } else {
-      nodeModel = model.getNodeModel(path);
+      nodeModel = this.model.getNodeModel(path);
     }
     Object label = value;
     if (nodeModel != null) {

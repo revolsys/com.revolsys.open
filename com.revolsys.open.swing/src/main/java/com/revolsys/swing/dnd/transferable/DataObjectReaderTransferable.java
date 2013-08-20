@@ -30,17 +30,17 @@ public class DataObjectReaderTransferable implements Transferable {
   @Override
   public Object getTransferData(final DataFlavor flavor)
     throws UnsupportedFlavorException, IOException {
-    if (reader == null) {
+    if (this.reader == null) {
       return null;
     } else if (DATA_OBJECT_READER_FLAVOR.equals(flavor)
       || MapTransferable.MAP_FLAVOR.equals(flavor)) {
-      return reader;
+      return this.reader;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
-      final Collection<String> attributeNames = reader.getMetaData()
+      final Collection<String> attributeNames = this.reader.getMetaData()
         .getAttributeNames();
       CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      for (final DataObject object : reader) {
+      for (final DataObject object : this.reader) {
         if (object != null) {
           final Collection<Object> values = object.values();
           CsvUtil.writeColumns(out, values, '\t', '\n');

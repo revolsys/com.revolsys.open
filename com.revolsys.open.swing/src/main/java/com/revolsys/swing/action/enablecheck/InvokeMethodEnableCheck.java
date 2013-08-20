@@ -32,8 +32,8 @@ public class InvokeMethodEnableCheck extends AbstractEnableCheck {
   @Override
   public boolean isEnabled() {
     try {
-      final Object value = callable.call();
-      if (EqualsRegistry.equal(value, this.value) == !inverse) {
+      final Object value = this.callable.call();
+      if (EqualsRegistry.equal(value, this.value) == !this.inverse) {
         return enabled();
       } else {
         return disabled();
@@ -46,6 +46,6 @@ public class InvokeMethodEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return callable + "=" + value;
+    return this.callable + "=" + this.value;
   }
 }

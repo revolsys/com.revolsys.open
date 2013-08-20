@@ -43,32 +43,32 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public JMenuItem createComponent() {
-    if (checkBoxSelectedCheck != null) {
-      final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
-      menuItem.setSelected(checkBoxSelectedCheck.isEnabled());
+    if (this.checkBoxSelectedCheck != null) {
+      final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(this.action);
+      menuItem.setSelected(this.checkBoxSelectedCheck.isEnabled());
       return menuItem;
     } else {
-      return new JMenuItem(action);
+      return new JMenuItem(this.action);
     }
   }
 
   @Override
   public final Icon getIcon() {
-    return (Icon)action.getValue(Action.SMALL_ICON);
+    return (Icon)this.action.getValue(Action.SMALL_ICON);
   }
 
   @Override
   public String getName() {
-    return (String)action.getValue(Action.NAME);
+    return (String)this.action.getValue(Action.NAME);
   }
 
   @Override
   public String getToolTip() {
-    return (String)action.getValue(Action.SHORT_DESCRIPTION);
+    return (String)this.action.getValue(Action.SHORT_DESCRIPTION);
   }
 
   @Override
   public String toString() {
-    return action.toString();
+    return this.action.toString();
   }
 }

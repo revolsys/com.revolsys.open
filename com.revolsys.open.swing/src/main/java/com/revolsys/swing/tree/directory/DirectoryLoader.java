@@ -27,8 +27,7 @@ public class DirectoryLoader implements DynamicNodeLoader {
     final File directory = (File)parentUserObject;
     if (directory.isDirectory()) {
       final File[] directories = directory.listFiles(new DirectoryFilenameFilter());
-      for (int i = 0; i < directories.length; i++) {
-        final File childDirectory = directories[i];
+      for (final File childDirectory : directories) {
         final DirectoryTreeNode node = new DirectoryTreeNode(childDirectory,
           childDirectory.getName(), childLoader);
         nodes.add(node);

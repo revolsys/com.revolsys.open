@@ -42,7 +42,7 @@ public class TreePathListTransferable implements Transferable {
   }
 
   public List<TreePath> getPaths() {
-    return paths;
+    return this.paths;
   }
 
   @Override
@@ -67,10 +67,10 @@ public class TreePathListTransferable implements Transferable {
   }
 
   public boolean isSameParent(final TreePath path) {
-    return sameParent.containsKey(path);
+    return this.sameParent.containsKey(path);
   }
 
   public void setSameParent(final TreePath path) {
-    sameParent.put(path, Boolean.TRUE);
+    this.sameParent.put(path, Boolean.TRUE);
   }
 }

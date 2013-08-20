@@ -29,7 +29,7 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
 
   @Override
   public Component createComponent() {
-    return component;
+    return this.component;
   }
 
   @Override

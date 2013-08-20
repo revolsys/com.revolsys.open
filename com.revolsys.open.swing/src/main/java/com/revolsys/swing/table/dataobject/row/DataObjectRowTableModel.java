@@ -41,20 +41,20 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public void clearSortedColumns() {
-    synchronized (sortedColumns) {
-      sortedColumns.clear();
+    synchronized (this.sortedColumns) {
+      this.sortedColumns.clear();
       fireTableDataChanged();
     }
   }
 
   @PreDestroy
   public void dispose() {
-    metaData = null;
-    sortedColumns = null;
+    this.metaData = null;
+    this.sortedColumns = null;
   }
 
   public String getAttributeName(final int columnIndex) {
-    final String attributeName = attributeNames.get(columnIndex);
+    final String attributeName = this.attributeNames.get(columnIndex);
     final int index = attributeName.indexOf('.');
     if (index == -1) {
       return attributeName;
@@ -64,18 +64,18 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public List<String> getAttributeTitles() {
-    return attributeTitles;
+    return this.attributeTitles;
   }
 
   public Attribute getColumnAttribute(final int columnIndex) {
     final String name = getAttributeName(columnIndex);
-    return metaData.getAttribute(name);
+    return this.metaData.getAttribute(name);
   }
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     final String name = getAttributeName(columnIndex);
-    final DataType type = metaData.getAttributeType(name);
+    final DataType type = this.metaData.getAttributeType(name);
     if (type == null) {
       return Object.class;
     } else {
@@ -85,17 +85,17 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   @Override
   public int getColumnCount() {
-    final int numColumns = attributeNames.size();
+    final int numColumns = this.attributeNames.size();
     return numColumns;
   }
 
   @Override
   public String getColumnName(final int columnIndex) {
-    return attributeTitles.get(columnIndex);
+    return this.attributeTitles.get(columnIndex);
   }
 
   public DataObjectMetaData getMetaData() {
-    return metaData;
+    return this.metaData;
   }
 
   public abstract LayerDataObject getObject(final int row);
@@ -112,18 +112,18 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public Map<Integer, SortOrder> getSortedColumns() {
-    return sortedColumns;
+    return this.sortedColumns;
   }
 
   @Override
   public SortOrder getSortOrder(final int columnIndex) {
-    synchronized (sortedColumns) {
-      return sortedColumns.get(columnIndex);
+    synchronized (this.sortedColumns) {
+      return this.sortedColumns.get(columnIndex);
     }
   }
 
   public DataObjectRowTable getTable() {
-    return table;
+    return this.table;
   }
 
   @Override
@@ -143,12 +143,13 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
   }
 
   public boolean isEditable() {
-    return editable;
+    return this.editable;
   }
 
   public void setAttributeNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
-      this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
+      this.attributeNames = new ArrayList<String>(
+        this.metaData.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }
@@ -176,15 +177,15 @@ public abstract class DataObjectRowTableModel extends AbstractTableModel
 
   @Override
   public SortOrder setSortOrder(final int columnIndex) {
-    synchronized (sortedColumns) {
-      SortOrder sortOrder = sortedColumns.get(columnIndex);
-      sortedColumns.clear();
+    synchronized (this.sortedColumns) {
+      SortOrder sortOrder = this.sortedColumns.get(columnIndex);
+      this.sortedColumns.clear();
       if (sortOrder == SortOrder.ASCENDING) {
         sortOrder = SortOrder.DESCENDING;
       } else {
         sortOrder = SortOrder.ASCENDING;
       }
-      sortedColumns.put(columnIndex, sortOrder);
+      this.sortedColumns.put(columnIndex, sortOrder);
 
       fireTableDataChanged();
       return sortOrder;

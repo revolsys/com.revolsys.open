@@ -50,38 +50,39 @@ public class ArcGisServerRestMapTile extends MapTile {
   }
 
   public MapServer getMapServer() {
-    return mapServer;
+    return this.mapServer;
   }
 
   public int getTileX() {
-    return tileX;
+    return this.tileX;
   }
 
   public int getTileY() {
-    return tileY;
+    return this.tileY;
   }
 
   public int getZoomLevel() {
-    return zoomLevel;
+    return this.zoomLevel;
   }
 
   @Override
   public int hashCode() {
-    return zoomLevel << 24 & tileX << 16 & tileY << 8;
+    return this.zoomLevel << 24 & this.tileX << 16 & this.tileY << 8;
   }
 
   @Override
   protected BufferedImage loadBuffferedImage() {
     try {
-      return mapServer.getTileImage(zoomLevel, tileX, tileY);
+      return this.mapServer.getTileImage(this.zoomLevel, this.tileX, this.tileY);
     } catch (final Throwable t) {
-      layer.setError(t);
+      this.layer.setError(t);
       return null;
     }
   }
 
   @Override
   public String toString() {
-    return mapServer.getMapName() + " " + zoomLevel + "/" + tileX + "/" + tileY;
+    return this.mapServer.getMapName() + " " + this.zoomLevel + "/"
+      + this.tileX + "/" + this.tileY;
   }
 }

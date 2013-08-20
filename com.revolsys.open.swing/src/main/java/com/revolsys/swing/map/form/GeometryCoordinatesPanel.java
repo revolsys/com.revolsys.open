@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -16,6 +17,11 @@ import com.vividsolutions.jts.geom.Geometry;
 @SuppressWarnings("serial")
 public class GeometryCoordinatesPanel extends ValueField implements
   TableModelListener {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
 
   private final BaseJxTable table;
@@ -32,24 +38,24 @@ public class GeometryCoordinatesPanel extends ValueField implements
     this.form = form;
     this.model.addTableModelListener(this);
     this.model.setForm(form);
-    this.table = new BaseJxTable(model);
-    table.setAutoResizeMode(BaseJxTable.AUTO_RESIZE_OFF);
+    this.table = new BaseJxTable(this.model);
+    this.table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-    tablePanel = new TablePanel(table);
+    this.tablePanel = new TablePanel(this.table);
 
-    add(tablePanel, BorderLayout.WEST);
+    add(this.tablePanel, BorderLayout.WEST);
   }
 
   public DataObjectLayerForm getForm() {
-    return form;
+    return this.form;
   }
 
   public BaseJxTable getTable() {
-    return table;
+    return this.table;
   }
 
   public TablePanel getTablePanel() {
-    return tablePanel;
+    return this.tablePanel;
   }
 
   @Override
@@ -57,12 +63,12 @@ public class GeometryCoordinatesPanel extends ValueField implements
     super.setFieldInvalid(message, color);
     setForeground(null);
     setBackground(null);
-    tablePanel.setBorder(BorderFactory.createLineBorder(color, 3));
+    this.tablePanel.setBorder(BorderFactory.createLineBorder(color, 3));
   }
 
   @Override
   public void setFieldValid() {
-    tablePanel.setBorder(null);
+    this.tablePanel.setBorder(null);
     super.setFieldValid();
   }
 
@@ -70,18 +76,18 @@ public class GeometryCoordinatesPanel extends ValueField implements
   public void setFieldValue(final Object value) {
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      model.setGeometry(geometry);
+      this.model.setGeometry(geometry);
     }
     super.setFieldValue(value);
   }
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    for (int i = 0; i < model.getColumnCount(); i++) {
+    for (int i = 0; i < this.model.getColumnCount(); i++) {
       int width;
-      if (i < model.getNumIndexItems()) {
-        width = (int)(Math.ceil(model.getRowCount() / 10.0)) * 20;
-        if (i < model.getNumIndexItems() - 1) {
+      if (i < this.model.getNumIndexItems()) {
+        width = (int)Math.ceil(this.model.getRowCount() / 10.0) * 20;
+        if (i < this.model.getNumIndexItems() - 1) {
         } else {
           width += 20;
         }
@@ -89,7 +95,7 @@ public class GeometryCoordinatesPanel extends ValueField implements
       } else {
         width = 120;
       }
-      table.setColumnWidth(i, width);
+      this.table.setColumnWidth(i, width);
     }
   }
 }

@@ -132,10 +132,10 @@ public abstract class WarpFilter extends WholeImageFilter {
     final int imageHeight) {
     final Coordinates destImagePoint = toDestPoint(sourceImagePoint);
 
-    double destImageX = destImagePoint.getX();
-    double destImageY = destImagePoint.getY();
-    final Coordinates modelPoint = toModelPoint(boundingBox,
-      destImageX, destImageY, imageWidth, imageHeight);
+    final double destImageX = destImagePoint.getX();
+    final double destImageY = destImagePoint.getY();
+    final Coordinates modelPoint = toModelPoint(boundingBox, destImageX,
+      destImageY, imageWidth, imageHeight);
     return modelPoint;
   }
 

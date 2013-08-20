@@ -31,11 +31,11 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
   public Component getListCellRendererComponent(final JList list,
     final Object value, final int index, final boolean isSelected,
     final boolean cellHasFocus) {
-    renderer.getListCellRendererComponent(list, value, index, isSelected,
+    this.renderer.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);
     final String text = getPreferredStringForItem(value);
-    renderer.setText(text);
-    return renderer;
+    this.renderer.setText(text);
+    return this.renderer;
   }
 
   @Override
@@ -44,14 +44,14 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
       return "";
     } else {
       try {
-        if (object instanceof Class<?>) {
-          final Class<?> clazz = (Class<?>)object;
-          return (String)MethodUtils.invokeStaticMethod(clazz, methodName,
+        if (this.object instanceof Class<?>) {
+          final Class<?> clazz = (Class<?>)this.object;
+          return (String)MethodUtils.invokeStaticMethod(clazz, this.methodName,
             new Object[] {
               item
             });
         } else {
-          return (String)MethodUtils.invokeMethod(object, methodName,
+          return (String)MethodUtils.invokeMethod(this.object, this.methodName,
             new Object[] {
               item
             });

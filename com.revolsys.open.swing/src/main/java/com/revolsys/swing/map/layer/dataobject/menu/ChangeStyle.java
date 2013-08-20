@@ -13,6 +13,11 @@ import com.revolsys.swing.tree.TreeUtil;
 
 public class ChangeStyle extends AbstractAction {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public ChangeStyle() {
     putValue(NAME, "Change Style");
   }
@@ -31,7 +36,7 @@ public class ChangeStyle extends AbstractAction {
     final GeometryStyleRenderer renderer = TreeUtil.getFirstSelectedNode(
       source, GeometryStyleRenderer.class);
     if (renderer != null) {
-      GeometryStylePanel panel = renderer.createStylePanel();
+      final GeometryStylePanel panel = renderer.createStylePanel();
       panel.showDialog(window);
     }
   }

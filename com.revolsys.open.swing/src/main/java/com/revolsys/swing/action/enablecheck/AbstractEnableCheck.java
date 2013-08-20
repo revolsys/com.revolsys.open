@@ -12,28 +12,28 @@ public abstract class AbstractEnableCheck implements EnableCheck,
 
   @Override
   public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(listener);
+    this.propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
   @Override
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   public boolean disabled() {
-    propertyChangeSupport.firePropertyChange("enabled", true, false);
+    this.propertyChangeSupport.firePropertyChange("enabled", true, false);
     return false;
   }
 
   public boolean enabled() {
-    propertyChangeSupport.firePropertyChange("enabled", false, true);
+    this.propertyChangeSupport.firePropertyChange("enabled", false, true);
     return true;
   }
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   @Override
@@ -43,12 +43,13 @@ public abstract class AbstractEnableCheck implements EnableCheck,
 
   @Override
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(listener);
+    this.propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
   @Override
   public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    this.propertyChangeSupport.removePropertyChangeListener(propertyName,
+      listener);
   }
 }

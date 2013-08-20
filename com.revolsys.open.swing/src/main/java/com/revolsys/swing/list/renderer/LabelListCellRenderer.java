@@ -12,6 +12,11 @@ import javax.swing.border.EmptyBorder;
 
 public class LabelListCellRenderer extends DefaultListCellRenderer {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public Component getListCellRendererComponent(final JList list,
     final Object value, final int index, final boolean isSelected,

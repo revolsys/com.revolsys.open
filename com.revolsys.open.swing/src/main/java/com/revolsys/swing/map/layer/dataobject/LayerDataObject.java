@@ -25,10 +25,10 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   protected void clearOriginalValues() {
-    if (originalValues != null) {
-      super.setValues(originalValues);
+    if (this.originalValues != null) {
+      super.setValues(this.originalValues);
     }
-    originalValues = null;
+    this.originalValues = null;
   }
 
   public void firePropertyChange(final String attributeName,
@@ -42,21 +42,21 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public DataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String name) {
-    if (originalValues != null) {
-      if (originalValues.containsKey(name)) {
-        return (T)originalValues.get(name);
+    if (this.originalValues != null) {
+      if (this.originalValues.containsKey(name)) {
+        return (T)this.originalValues.get(name);
       }
     }
     return (T)getValue(name);
   }
 
   public boolean isDeletable() {
-    if (layer.isCanDeleteRecords()) {
+    if (this.layer.isCanDeleteRecords()) {
       return isDeleted();
     }
     return false;
@@ -72,11 +72,11 @@ public class LayerDataObject extends ArrayDataObject {
 
   @Override
   public boolean isModified() {
-    return originalValues != null;
+    return this.originalValues != null;
   }
 
   public boolean isModified(final int index) {
-    if (originalValues == null) {
+    if (this.originalValues == null) {
       return false;
     } else {
       final String attributeName = getMetaData().getAttributeName(index);
@@ -85,10 +85,10 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public boolean isModified(final String name) {
-    if (originalValues == null) {
+    if (this.originalValues == null) {
       return false;
     } else {
-      return originalValues.containsKey(name);
+      return this.originalValues.containsKey(name);
     }
   }
 
@@ -104,8 +104,8 @@ public class LayerDataObject extends ArrayDataObject {
     final Attribute attribute = getMetaData().getAttribute(name);
     if (attribute.isRequired()) {
       final Object value = getValue(name);
-      if (value == null
-        || ((value instanceof String) && !StringUtils.hasText((String)value))) {
+      if (value == null || value instanceof String
+        && !StringUtils.hasText((String)value)) {
         return false;
       }
     }
@@ -113,7 +113,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public void revertChanges() {
-    if (originalValues != null || getState() == DataObjectState.Deleted) {
+    if (this.originalValues != null || getState() == DataObjectState.Deleted) {
       setState(DataObjectState.Persisted);
       clearOriginalValues();
       setState(DataObjectState.Persisted);
@@ -147,18 +147,18 @@ public class LayerDataObject extends ArrayDataObject {
         if (layer.isCanEditRecords()) {
           final Object originalValue = getOriginalValue(attributeName);
           if (EqualsRegistry.equal(value, originalValue)) {
-            if (originalValues != null) {
-              originalValues.remove(attributeName);
-              if (originalValues.isEmpty()) {
-                originalValues = null;
+            if (this.originalValues != null) {
+              this.originalValues.remove(attributeName);
+              if (this.originalValues.isEmpty()) {
+                this.originalValues = null;
                 setState(DataObjectState.Persisted);
               }
             }
           } else {
-            if (originalValues == null) {
-              originalValues = new HashMap<String, Object>();
+            if (this.originalValues == null) {
+              this.originalValues = new HashMap<String, Object>();
             }
-            originalValues.put(attributeName, originalValue);
+            this.originalValues.put(attributeName, originalValue);
           }
         } else {
           throw new IllegalStateException(

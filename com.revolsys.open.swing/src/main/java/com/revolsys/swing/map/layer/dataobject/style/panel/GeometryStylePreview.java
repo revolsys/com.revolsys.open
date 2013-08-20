@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 
 public class GeometryStylePreview extends JPanel {
- private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   public static GeneralPath getLineShape() {
     final GeneralPath path = new GeneralPath();
@@ -43,13 +43,13 @@ public class GeometryStylePreview extends JPanel {
 
   private Shape shape = getLineShape();
 
-  private GeometryStyle geometryStyle;
+  private final GeometryStyle geometryStyle;
 
-  private DataType geometryDataType;
+  private final DataType geometryDataType;
 
-  public GeometryStylePreview(GeometryStyle geometryStyle,
-    DataType geometryDataType) {
-    Dimension size = new Dimension(100, 100);
+  public GeometryStylePreview(final GeometryStyle geometryStyle,
+    final DataType geometryDataType) {
+    final Dimension size = new Dimension(100, 100);
     setPreferredSize(size);
     setMinimumSize(size);
     setMaximumSize(size);
@@ -58,24 +58,24 @@ public class GeometryStylePreview extends JPanel {
     this.geometryStyle = geometryStyle;
     this.geometryDataType = geometryDataType;
     if (DataTypes.LINE_STRING.equals(geometryDataType)) {
-      shape = getLineShape();
+      this.shape = getLineShape();
     } else if (DataTypes.POLYGON.equals(geometryDataType)) {
-      shape = getPolygonShape();
+      this.shape = getPolygonShape();
     }
   }
 
   @Override
-  protected void paintComponent(Graphics g) {
+  protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
 
-    if (DataTypes.POLYGON.equals(geometryDataType)) {
-      geometryStyle.setFillStyle(null, graphics);
-      graphics.fill(shape);
+    if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+      this.geometryStyle.setFillStyle(null, graphics);
+      graphics.fill(this.shape);
     }
-    geometryStyle.setLineStyle(null, graphics);
-    graphics.draw(shape);
+    this.geometryStyle.setLineStyle(null, graphics);
+    graphics.draw(this.shape);
   }
 }

@@ -14,7 +14,7 @@ public class TabbedValuePanel extends ValueField {
 
   public TabbedValuePanel() {
     super(new BorderLayout());
-    add(tabs, BorderLayout.CENTER);
+    add(this.tabs, BorderLayout.CENTER);
   }
 
   public TabbedValuePanel(final Object value) {
@@ -28,24 +28,24 @@ public class TabbedValuePanel extends ValueField {
   }
 
   public void addTab(final String title, final Component component) {
-    tabs.addTab(title, component);
+    this.tabs.addTab(title, component);
   }
 
   public void addTab(final ValueField panel) {
     final String title = panel.getTitle();
-    tabs.addTab(title, panel);
+    this.tabs.addTab(title, panel);
   }
 
   public JTabbedPane getTabs() {
-    return tabs;
+    return this.tabs;
   }
 
   public void setSelectdTab(final String tabName) {
     if (StringUtils.hasText(tabName)) {
-      for (int i = 0; i < tabs.getTabCount(); i++) {
-        final String name = tabs.getTitleAt(i);
+      for (int i = 0; i < this.tabs.getTabCount(); i++) {
+        final String name = this.tabs.getTitleAt(i);
         if (tabName.equals(name)) {
-          tabs.setSelectedIndex(i);
+          this.tabs.setSelectedIndex(i);
         }
       }
     }

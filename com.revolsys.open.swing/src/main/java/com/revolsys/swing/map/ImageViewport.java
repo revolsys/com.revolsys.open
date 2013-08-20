@@ -15,15 +15,15 @@ public class ImageViewport extends Viewport2D {
   public ImageViewport(final LayerGroup project, final int width,
     final int height, final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);
-    image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    graphics = (Graphics2D)image.getGraphics();
+    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    this.graphics = (Graphics2D)this.image.getGraphics();
   }
 
   public Graphics2D getGraphics() {
-    return graphics;
+    return this.graphics;
   }
 
   public BufferedImage getImage() {
-    return image;
+    return this.image;
   }
 }

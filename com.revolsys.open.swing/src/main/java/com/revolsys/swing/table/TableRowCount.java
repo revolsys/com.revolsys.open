@@ -12,9 +12,14 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 public class TableRowCount extends JLabel implements TableModelListener {
-  private TableModel model;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
-  public TableRowCount(TableModel model) {
+  private final TableModel model;
+
+  public TableRowCount(final TableModel model) {
     setToolTipText("Number of records");
     setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createBevelBorder(BevelBorder.LOWERED),
@@ -26,10 +31,10 @@ public class TableRowCount extends JLabel implements TableModelListener {
   }
 
   @Override
-  public void tableChanged(TableModelEvent e) {
+  public void tableChanged(final TableModelEvent e) {
     setMaximumSize(new Dimension(100, 50));
-      NumberFormat FORMAT = new DecimalFormat("#,##0");
-    String text = FORMAT.format(model.getRowCount());
+    final NumberFormat FORMAT = new DecimalFormat("#,##0");
+    final String text = FORMAT.format(this.model.getRowCount());
     setText(text);
   }
 }

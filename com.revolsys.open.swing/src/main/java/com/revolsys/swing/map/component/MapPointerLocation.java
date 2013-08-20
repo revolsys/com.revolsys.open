@@ -23,6 +23,11 @@ import com.vividsolutions.jts.geom.Point;
 @SuppressWarnings("serial")
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final NumberFormat FORMAT = new DecimalFormat(
     "############.############");
 
@@ -57,15 +62,16 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
   @Override
   public void mouseMoved(final MouseEvent e) {
     final java.awt.Point point = e.getPoint();
-    final Point mapPoint = viewport.toModelPointRounded(geometryFactory, point);
+    final Point mapPoint = this.viewport.toModelPointRounded(
+      this.geometryFactory, point);
     if (!mapPoint.isEmpty()) {
       final double projectedX = mapPoint.getX();
       final double projectedY = mapPoint.getY();
-      if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-        setText(title + ": " + FORMAT.format(projectedY) + ", "
+      if (this.geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+        setText(this.title + ": " + FORMAT.format(projectedY) + ", "
           + FORMAT.format(projectedX));
       } else {
-        setText(title + ": " + FORMAT.format(projectedX) + ", "
+        setText(this.title + ": " + FORMAT.format(projectedX) + ", "
           + FORMAT.format(projectedY));
       }
     }
@@ -73,14 +79,14 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    setGeometryFactory(map.getGeometryFactory());
+    setGeometryFactory(this.map.getGeometryFactory());
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     double scaleFactor;
     CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
 
-    if (geographics) {
+    if (this.geographics) {
       if (coordinateSystem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
         coordinateSystem = projectedCoordinateSystem.getGeographicCoordinateSystem();

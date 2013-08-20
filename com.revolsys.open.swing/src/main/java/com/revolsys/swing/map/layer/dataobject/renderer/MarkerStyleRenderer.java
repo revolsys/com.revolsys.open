@@ -276,7 +276,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   public MarkerStyle getStyle() {
-    return style;
+    return this.style;
   }
 
   @Override
@@ -285,7 +285,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final DataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       final Geometry geometry = object.getGeometryValue();
-      renderMarker(viewport, graphics, geometry, style);
+      renderMarker(viewport, graphics, geometry, this.style);
     }
   }
 
@@ -296,9 +296,9 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = super.toMap(defaults);
-    if (style != null) {
+    if (this.style != null) {
       final Map<String, Object> allDefaults = getAllDefaults();
-      final Map<String, Object> styleMap = style.toMap(allDefaults);
+      final Map<String, Object> styleMap = this.style.toMap(allDefaults);
       map.putAll(styleMap);
     }
     return map;

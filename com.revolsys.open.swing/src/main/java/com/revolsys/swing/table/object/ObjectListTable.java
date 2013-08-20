@@ -37,6 +37,10 @@ public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
     return (ObjectListTableModel<T>)super.getModel();
   }
 
+  public List<T> getObjects() {
+    return getObjectListTableModel().getObjects();
+  }
+
   @SuppressWarnings("unchecked")
   public <V> V getSelectedObject() {
     final int selectedRow = getSelectedRow();
@@ -53,19 +57,15 @@ public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
     return getObjects().iterator();
   }
 
-  @Override
-  public void tableChanged(final TableModelEvent e) {
-    super.tableChanged(e);
-    if (tableHeader != null) {
-      tableHeader.resizeAndRepaint();
-    }
-  }
-
-  public void setObjects(Collection<? extends T> objects) {
+  public void setObjects(final Collection<? extends T> objects) {
     getObjectListTableModel().setObjects(objects);
   }
 
-  public List<T> getObjects() {
-    return getObjectListTableModel().getObjects();
+  @Override
+  public void tableChanged(final TableModelEvent e) {
+    super.tableChanged(e);
+    if (this.tableHeader != null) {
+      this.tableHeader.resizeAndRepaint();
+    }
   }
 }

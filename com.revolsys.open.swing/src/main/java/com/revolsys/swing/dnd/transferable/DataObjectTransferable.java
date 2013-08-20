@@ -29,17 +29,17 @@ public class DataObjectTransferable implements Transferable {
   @Override
   public Object getTransferData(final DataFlavor flavor)
     throws UnsupportedFlavorException, IOException {
-    if (object == null) {
+    if (this.object == null) {
       return null;
     } else if (DATA_OBJECT_FLAVOR.equals(flavor)
       || MapTransferable.MAP_FLAVOR.equals(flavor)) {
-      return object;
+      return this.object;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
-      final Collection<String> attributeNames = object.getMetaData()
+      final Collection<String> attributeNames = this.object.getMetaData()
         .getAttributeNames();
       CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      final Collection<Object> values = object.values();
+      final Collection<Object> values = this.object.values();
       CsvUtil.writeColumns(out, values, '\t', '\n');
       final String text = out.toString();
       return text;

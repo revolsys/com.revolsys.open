@@ -41,7 +41,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   public LengthMeasureTextField(final String fieldName,
     final Measure<Length> value, final Unit<Length> unit) {
     super(fieldName, value);
-    valueField = new NumberTextField(fieldName, DataTypes.DOUBLE, 6, 2);
+    this.valueField = new NumberTextField(fieldName, DataTypes.DOUBLE, 6, 2);
     if (value == null) {
       this.number = 0;
       if (unit == null) {
@@ -53,27 +53,27 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
       this.number = value.getValue();
       this.unit = value.getUnit();
     }
-    valueField.setFieldValue(this.number);
+    this.valueField.setFieldValue(this.number);
     final InvokeMethodListener updateNumberListener = new InvokeMethodListener(
       this, "updateNumber");
-    valueField.addFocusListener(updateNumberListener);
-    add(valueField);
-    valueField.addActionListener(updateNumberListener);
+    this.valueField.addFocusListener(updateNumberListener);
+    add(this.valueField);
+    this.valueField.addActionListener(updateNumberListener);
 
-    unitField = new ComboBox(NonSI.PIXEL, SI.METRE, SI.KILOMETRE, NonSI.FOOT,
-      NonSI.MILE);
-    unitField.addItemListener(this);
-    unitField.setSelectedItem(unit);
-    add(unitField);
+    this.unitField = new ComboBox(NonSI.PIXEL, SI.METRE, SI.KILOMETRE,
+      NonSI.FOOT, NonSI.MILE);
+    this.unitField.addItemListener(this);
+    this.unitField.setSelectedItem(unit);
+    add(this.unitField);
     GroupLayoutUtil.makeColumns(this, 2);
   }
 
   public Measure<Length> getLength() {
-    return Measure.valueOf(number.doubleValue(), unit);
+    return Measure.valueOf(this.number.doubleValue(), this.unit);
   }
 
   public Number getNumber() {
-    final String text = valueField.getText();
+    final String text = this.valueField.getText();
     if (text == null) {
       return 0.0;
     } else {
@@ -88,8 +88,9 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   @SuppressWarnings("unchecked")
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    if (e.getSource() == unitField && e.getStateChange() == ItemEvent.SELECTED) {
-      setUnit((Unit<Length>)unitField.getSelectedItem());
+    if (e.getSource() == this.unitField
+      && e.getStateChange() == ItemEvent.SELECTED) {
+      setUnit((Unit<Length>)this.unitField.getSelectedItem());
     }
   }
 
@@ -100,36 +101,36 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   @Override
   public void setEnabled(final boolean enabled) {
-    valueField.setEnabled(enabled);
-    unitField.setEnabled(enabled);
+    this.valueField.setEnabled(enabled);
+    this.unitField.setEnabled(enabled);
   }
 
   public void setNumber(final Number value) {
-    final Object oldValue = number;
+    final Object oldValue = this.number;
     this.number = value.doubleValue();
-    valueField.setText(value.toString());
-    firePropertyChange("number", oldValue, number);
-    setFieldValue(Measure.valueOf(number.doubleValue(), unit));
+    this.valueField.setText(value.toString());
+    firePropertyChange("number", oldValue, this.number);
+    setFieldValue(Measure.valueOf(this.number.doubleValue(), this.unit));
   }
 
   public void setText(final CharSequence text) {
     if (text == null) {
-      valueField.setText(null);
+      this.valueField.setText(null);
     } else {
-      valueField.setText(text.toString());
+      this.valueField.setText(text.toString());
     }
   }
 
   public void setUnit(final Unit<Length> unit) {
     final Object oldValue = this.unit;
     this.unit = unit;
-    unitField.setSelectedItem(this.unit);
+    this.unitField.setSelectedItem(this.unit);
     firePropertyChange("unit", oldValue, this.unit);
-    setFieldValue(Measure.valueOf(number.doubleValue(), unit));
+    setFieldValue(Measure.valueOf(this.number.doubleValue(), unit));
   }
 
   public void updateNumber() {
-    final Number number = valueField.getFieldValue();
+    final Number number = this.valueField.getFieldValue();
     if (number == null) {
       setNumber(0);
     } else {

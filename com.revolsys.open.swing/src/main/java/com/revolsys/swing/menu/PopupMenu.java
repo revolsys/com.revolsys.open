@@ -72,7 +72,7 @@ public class PopupMenu implements MouseListener {
   }
 
   public MenuFactory getMenu() {
-    return menu;
+    return this.menu;
   }
 
   @Override
@@ -100,7 +100,7 @@ public class PopupMenu implements MouseListener {
   protected void showMenu(final MouseEvent e) {
     if (e.isPopupTrigger()) {
 
-      final JPopupMenu popupMenu = menu.createJPopupMenu();
+      final JPopupMenu popupMenu = this.menu.createJPopupMenu();
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();

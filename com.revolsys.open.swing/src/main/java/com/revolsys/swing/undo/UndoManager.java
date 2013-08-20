@@ -22,6 +22,11 @@ import com.revolsys.util.OperatingSystemUtil;
 public class UndoManager extends javax.swing.undo.UndoManager implements
   PropertyChangeSupportProxy {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
@@ -47,7 +52,7 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
       } finally {
         setEventsEnabled(enabled);
       }
-      if (eventsEnabled) {
+      if (this.eventsEnabled) {
         final boolean added = super.addEdit(edit);
         fireEvents();
         return added;
@@ -97,13 +102,13 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
   protected synchronized void fireEvents() {
     final boolean canUndo = isCanUndo();
     final boolean canRedo = isCanRedo();
-    propertyChangeSupport.firePropertyChange("canUndo", !canUndo, canUndo);
-    propertyChangeSupport.firePropertyChange("canRedo", !canRedo, canRedo);
+    this.propertyChangeSupport.firePropertyChange("canUndo", !canUndo, canUndo);
+    this.propertyChangeSupport.firePropertyChange("canRedo", !canRedo, canRedo);
   }
 
   @Override
   public synchronized PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   public synchronized boolean isCanRedo() {
@@ -115,19 +120,19 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
   }
 
   public boolean isEventsEnabled() {
-    return eventsEnabled;
+    return this.eventsEnabled;
   }
 
   @Override
   public synchronized void redo() throws CannotRedoException {
-    final boolean enabled = eventsEnabled;
+    final boolean enabled = this.eventsEnabled;
     try {
-      eventsEnabled = false;
+      this.eventsEnabled = false;
       if (canRedo()) {
         super.redo();
       }
     } finally {
-      eventsEnabled = enabled;
+      this.eventsEnabled = enabled;
       fireEvents();
     }
   }
@@ -140,14 +145,14 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
 
   @Override
   public synchronized void undo() throws CannotUndoException {
-    final boolean enabled = eventsEnabled;
+    final boolean enabled = this.eventsEnabled;
     try {
-      eventsEnabled = false;
+      this.eventsEnabled = false;
       if (canUndo()) {
         super.undo();
       }
     } finally {
-      eventsEnabled = enabled;
+      this.eventsEnabled = enabled;
       fireEvents();
     }
   }

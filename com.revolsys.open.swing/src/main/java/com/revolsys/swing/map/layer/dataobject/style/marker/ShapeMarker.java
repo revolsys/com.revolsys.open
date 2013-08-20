@@ -171,7 +171,7 @@ public class ShapeMarker extends AbstractMarker {
   public ShapeMarker(final String name) {
     this(SHAPES.get(name));
     this.name = name;
-    if (shape == null) {
+    if (this.shape == null) {
       throw new IllegalArgumentException("Unknown shape " + name);
     }
   }
@@ -196,7 +196,7 @@ public class ShapeMarker extends AbstractMarker {
 
     final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
       mapWidth, mapHeight);
-    final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
+    final Shape newShape = new GeneralPath(this.shape).createTransformedShape(shapeTransform);
     if (style.setMarkerFillStyle(viewport, graphics)) {
       graphics.fill(newShape);
     }
@@ -208,10 +208,10 @@ public class ShapeMarker extends AbstractMarker {
 
   @Override
   public String toString() {
-    if (name == null) {
+    if (this.name == null) {
       return "unknown";
     } else {
-      return name;
+      return this.name;
     }
   }
 }

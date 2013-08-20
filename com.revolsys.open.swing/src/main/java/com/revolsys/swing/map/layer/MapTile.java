@@ -29,15 +29,15 @@ public abstract class MapTile {
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return boundingBox.getGeometryFactory();
+    return this.boundingBox.getGeometryFactory();
   }
 
   public int getHeight() {
-    return height;
+    return this.height;
   }
 
   public GeoReferencedImage getImage() {
@@ -46,7 +46,7 @@ public abstract class MapTile {
   }
 
   public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem) {
-    final GeoReferencedImage projectedImage = projectedImages.get(coordinateSystem);
+    final GeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
     return projectedImage;
   }
 
@@ -57,11 +57,11 @@ public abstract class MapTile {
   }
 
   public double getResolution() {
-    return resolution;
+    return this.resolution;
   }
 
   public int getWidth() {
-    return width;
+    return this.width;
   }
 
   protected abstract BufferedImage loadBuffferedImage();
@@ -77,18 +77,18 @@ public abstract class MapTile {
   }
 
   public GeoReferencedImage loadImage(final CoordinateSystem coordinateSystem) {
-    synchronized (projectedImages) {
-      GeoReferencedImage projectedImage = projectedImages.get(coordinateSystem);
+    synchronized (this.projectedImages) {
+      GeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
       if (projectedImage == null) {
         final GeometryFactory geometryFactory = getGeometryFactory();
         GeoReferencedImage image = getImage();
         if (image == null) {
           image = loadImage();
-          projectedImages.put(geometryFactory.getCoordinateSystem(), image);
+          this.projectedImages.put(geometryFactory.getCoordinateSystem(), image);
         }
         if (image != null) {
-          projectedImage = image.getImage(coordinateSystem, resolution);
-          projectedImages.put(coordinateSystem, projectedImage);
+          projectedImage = image.getImage(coordinateSystem, this.resolution);
+          this.projectedImages.put(coordinateSystem, projectedImage);
         }
       }
       return projectedImage;

@@ -30,13 +30,13 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
   @Override
   protected Void doInBackground() throws Exception {
     try {
-      final Layer layer = overlay.getLayer();
+      final Layer layer = this.overlay.getLayer();
       if (layer != null) {
-        final LayerGroup project = overlay.getProject();
-        final int imageWidth = referencedImage.getImageWidth();
-        final int imageHeight = referencedImage.getImageHeight();
+        final LayerGroup project = this.overlay.getProject();
+        final int imageWidth = this.referencedImage.getImageWidth();
+        final int imageHeight = this.referencedImage.getImageHeight();
         if (imageWidth > 0 && imageHeight > 0 && project != null) {
-          final BoundingBox boundingBox = referencedImage.getBoundingBox();
+          final BoundingBox boundingBox = this.referencedImage.getBoundingBox();
           final ImageViewport viewport = new ImageViewport(project, imageWidth,
             imageHeight, boundingBox);
 
@@ -61,10 +61,10 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
 
   @Override
   protected void done() {
-    overlay.setImage(this);
+    this.overlay.setImage(this);
   }
 
   public GeoReferencedImage getReferencedImage() {
-    return referencedImage;
+    return this.referencedImage;
   }
 }

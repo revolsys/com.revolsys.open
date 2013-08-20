@@ -54,18 +54,18 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   public synchronized MapServer getMapServer() {
-    if (mapServer == null) {
+    if (this.mapServer == null) {
       try {
         // TODO initialize in background?
-        this.mapServer = ArcGisServerRestClient.getMapServer(url);
-        final TileInfo tileInfo = mapServer.getTileInfo();
+        this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
+        final TileInfo tileInfo = this.mapServer.getTileInfo();
         this.geometryFactory = tileInfo.getSpatialReference();
       } catch (final Throwable e) {
         setError(e);
         return null;
       }
     }
-    return mapServer;
+    return this.mapServer;
   }
 
   @Override
@@ -81,7 +81,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
           final BoundingBox viewBoundingBox = viewport.getBoundingBox();
           final BoundingBox maxBoundingBox = getBoundingBox();
           final BoundingBox boundingBox = viewBoundingBox.convert(
-            geometryFactory).intersection(maxBoundingBox);
+            this.geometryFactory).intersection(maxBoundingBox);
           final double minX = boundingBox.getMinX();
           final double minY = boundingBox.getMinY();
           final double maxX = boundingBox.getMaxX();
@@ -132,7 +132,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "url", url);
+    MapSerializerUtil.add(map, "url", this.url);
     return map;
   }
 

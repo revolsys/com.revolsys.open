@@ -129,7 +129,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
     final JComponent nameField = SwingUtil.addField(panel, this, "name");
     if (nameField instanceof Field) {
-      nameField.addPropertyChangeListener("name", beanPropertyListener);
+      nameField.addPropertyChangeListener("name", this.beanPropertyListener);
     }
 
     GroupLayoutUtil.makeColumns(panel, 2);
@@ -138,13 +138,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(listener);
+    this.propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
   @Override
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   @Override
@@ -162,15 +162,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
-    eventsEnabled = false;
+    this.eventsEnabled = false;
     final DefaultSingleCDockable dockable = getProperty("TableView");
     if (dockable != null) {
       // TODO all this should be done by listeners
       dockable.setVisible(false);
     }
     firePropertyChange("deleted", false, true);
-    if (layerGroup != null) {
-      layerGroup.remove(this);
+    if (this.layerGroup != null) {
+      this.layerGroup.remove(this);
     }
   }
 
@@ -189,16 +189,17 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   protected void fireIndexedPropertyChange(final String propertyName,
     final int index, final Object oldValue, final Object newValue) {
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
+    if (this.propertyChangeSupport != null) {
+      this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
         oldValue, newValue);
     }
   }
 
   protected void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
-    if (propertyChangeSupport != null && isEventsEnabled()) {
-      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    if (this.propertyChangeSupport != null && isEventsEnabled()) {
+      this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+        newValue);
     }
   }
 
@@ -209,7 +210,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    if (visible || !visibleLayersOnly) {
+    if (this.visible || !visibleLayersOnly) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return new BoundingBox(geometryFactory);
     } else {
@@ -219,36 +220,36 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (geometryFactory == null && layerGroup != null) {
-      return layerGroup.getGeometryFactory();
+    if (this.geometryFactory == null && this.layerGroup != null) {
+      return this.layerGroup.getGeometryFactory();
     } else {
-      return geometryFactory;
+      return this.geometryFactory;
     }
   }
 
   @Override
   public long getId() {
-    return id;
+    return this.id;
   }
 
   @Override
   public LayerGroup getLayerGroup() {
-    return layerGroup;
+    return this.layerGroup;
   }
 
   @Override
   public long getMaximumScale() {
-    return maximumScale;
+    return this.maximumScale;
   }
 
   @Override
   public long getMinimumScale() {
-    return minimumScale;
+    return this.minimumScale;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getPath() {
@@ -274,22 +275,22 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public Project getProject() {
-    if (layerGroup == null) {
+    if (this.layerGroup == null) {
       return null;
     } else {
-      return layerGroup.getProject();
+      return this.layerGroup.getProject();
     }
   }
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <L extends LayerRenderer<? extends Layer>> L getRenderer() {
-    return (L)renderer;
+    return (L)this.renderer;
   }
 
   @Override
@@ -300,12 +301,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public String getType() {
-    return type;
+    return this.type;
   }
 
   @Override
   public boolean isEditable() {
-    return editable;
+    return this.editable;
   }
 
   @Override
@@ -314,7 +315,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public boolean isEventsEnabled() {
-    return eventsEnabled;
+    return this.eventsEnabled;
   }
 
   @Override
@@ -329,22 +330,23 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isQueryable() {
-    return querySupported && queryable;
+    return this.querySupported && this.queryable;
   }
 
   @Override
   public boolean isQuerySupported() {
-    return querySupported;
+    return this.querySupported;
   }
 
   @Override
   public boolean isReadOnly() {
-    return readOnly;
+    return this.readOnly;
   }
 
   @Override
   public boolean isSelectable() {
-    return isVisible() && (isSelectSupported() && selectable || isEditable());
+    return isVisible()
+      && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -354,12 +356,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isSelectSupported() {
-    return selectSupported;
+    return this.selectSupported;
   }
 
   @Override
   public boolean isVisible() {
-    return visible;
+    return this.visible;
   }
 
   @Override
@@ -376,7 +378,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     if (isEventsEnabled()) {
-      propertyChangeSupport.firePropertyChange(event);
+      this.propertyChangeSupport.firePropertyChange(event);
     }
   }
 
@@ -386,16 +388,17 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.removePropertyChangeListener(listener);
+    if (this.propertyChangeSupport != null) {
+      this.propertyChangeSupport.removePropertyChangeListener(listener);
     }
   }
 
   @Override
   public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    if (this.propertyChangeSupport != null) {
+      this.propertyChangeSupport.removePropertyChangeListener(propertyName,
+        listener);
     }
   }
 
@@ -454,7 +457,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void setName(final String name) {
     if (!EqualsRegistry.equal(name, this.name)) {
-      propertyChangeSupport.firePropertyChange("name", this.name, name);
+      this.propertyChangeSupport.firePropertyChange("name", this.name, name);
       this.name = name;
     }
   }
@@ -462,7 +465,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties == null || !this.getProperties().equals(properties)) {
-      propertyChangeSupport.firePropertyChange("properties",
+      this.propertyChangeSupport.firePropertyChange("properties",
         this.getProperties(), properties);
       super.setProperties(properties);
     }
@@ -482,7 +485,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
           this, "property", oldValue, value, name);
-        propertyChangeSupport.firePropertyChange(event);
+        this.propertyChangeSupport.firePropertyChange(event);
 
         try {
           if (JavaBeanUtil.setProperty(this, name, value)) {
@@ -526,7 +529,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setSelectable(final boolean selectable) {
     final boolean oldValue = this.selectable;
     this.selectable = selectable;
-    propertyChangeSupport.firePropertyChange("selectable", oldValue, selectable);
+    this.propertyChangeSupport.firePropertyChange("selectable", oldValue,
+      selectable);
   }
 
   public void setSelectSupported(final boolean selectSupported) {
@@ -541,7 +545,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setVisible(final boolean visible) {
     final boolean oldVisible = this.visible;
     this.visible = visible;
-    propertyChangeSupport.firePropertyChange("visible", oldVisible, visible);
+    this.propertyChangeSupport.firePropertyChange("visible", oldVisible,
+      visible);
   }
 
   @Override
@@ -564,24 +569,25 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    MapSerializerUtil.add(map, "type", type);
-    MapSerializerUtil.add(map, "name", name);
-    MapSerializerUtil.add(map, "visible", visible, true);
-    MapSerializerUtil.add(map, "querySupported", querySupported, true);
-    if (querySupported) {
-      MapSerializerUtil.add(map, "queryable", queryable, true);
+    MapSerializerUtil.add(map, "type", this.type);
+    MapSerializerUtil.add(map, "name", this.name);
+    MapSerializerUtil.add(map, "visible", this.visible, true);
+    MapSerializerUtil.add(map, "querySupported", this.querySupported, true);
+    if (this.querySupported) {
+      MapSerializerUtil.add(map, "queryable", this.queryable, true);
     }
-    MapSerializerUtil.add(map, "readOnly", readOnly, false);
-    if (!readOnly) {
-      MapSerializerUtil.add(map, "editable", editable, false);
+    MapSerializerUtil.add(map, "readOnly", this.readOnly, false);
+    if (!this.readOnly) {
+      MapSerializerUtil.add(map, "editable", this.editable, false);
     }
-    if (selectSupported) {
-      MapSerializerUtil.add(map, "selectable", selectable, true);
+    if (this.selectSupported) {
+      MapSerializerUtil.add(map, "selectable", this.selectable, true);
     }
-    MapSerializerUtil.add(map, "selectSupported", selectSupported, true);
-    MapSerializerUtil.add(map, "maximumScale", maximumScale, 0L);
-    MapSerializerUtil.add(map, "minimumScale", minimumScale, Long.MAX_VALUE);
-    MapSerializerUtil.add(map, "style", renderer);
+    MapSerializerUtil.add(map, "selectSupported", this.selectSupported, true);
+    MapSerializerUtil.add(map, "maximumScale", this.maximumScale, 0L);
+    MapSerializerUtil.add(map, "minimumScale", this.minimumScale,
+      Long.MAX_VALUE);
+    MapSerializerUtil.add(map, "style", this.renderer);
     final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil.getValue(getProperties());
     if (properties != null) {
       map.putAll(properties);

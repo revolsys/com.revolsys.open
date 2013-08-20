@@ -103,9 +103,6 @@ public class Viewport2D {
 
   private int viewHeight;
 
-  /** Multiplier to convert a value to be 1 pixel size at 72DPI.*/
-  private double standardPixelScaleFactor;
-
   private double metresPerPixel;
 
   private double scale;
@@ -135,7 +132,7 @@ public class Viewport2D {
    * @param listener The listener.
    */
   public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(listener);
+    this.propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
   /**
@@ -146,7 +143,7 @@ public class Viewport2D {
    */
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   public AffineTransform createModelToScreenTransform(
@@ -154,23 +151,23 @@ public class Viewport2D {
     final double viewHeight) {
     final AffineTransform modelToScreenTransform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
-    pixelsPerXUnit = viewWidth / mapWidth;
+    this.pixelsPerXUnit = viewWidth / mapWidth;
 
     final double mapHeight = boundingBox.getHeight();
-    pixelsPerYUnit = -viewHeight / mapHeight;
+    this.pixelsPerYUnit = -viewHeight / mapHeight;
 
-    originX = boundingBox.getMinX();
-    originY = boundingBox.getMaxY();
+    this.originX = boundingBox.getMinX();
+    this.originY = boundingBox.getMaxY();
 
     modelToScreenTransform.concatenate(AffineTransform.getScaleInstance(
-      pixelsPerXUnit, pixelsPerYUnit));
+      this.pixelsPerXUnit, this.pixelsPerYUnit));
     modelToScreenTransform.concatenate(AffineTransform.getTranslateInstance(
-      -originX, -originY));
+      -this.originX, -this.originY));
     return modelToScreenTransform;
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
@@ -208,28 +205,28 @@ public class Viewport2D {
    * @return The coordinate system the project is displayed in.
    */
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public double getMetresPerPixel() {
-    return metresPerPixel;
+    return this.metresPerPixel;
   }
 
   public double getMetresPerPixel(final double scale) {
-    return (scale * 0.0254) / getScreenResolution();
+    return scale * 0.0254 / getScreenResolution();
   }
 
   public double getModelHeight() {
-    final double height = boundingBox.getHeight();
+    final double height = this.boundingBox.getHeight();
     return height;
   }
 
   public Measurable<Length> getModelHeightLength() {
-    return boundingBox.getHeightLength();
+    return this.boundingBox.getHeightLength();
   }
 
   public AffineTransform getModelToScreenTransform() {
-    return modelToScreenTransform;
+    return this.modelToScreenTransform;
   }
 
   public double getModelUnitsPerViewUnit() {
@@ -237,32 +234,32 @@ public class Viewport2D {
   }
 
   public double getModelWidth() {
-    final double width = boundingBox.getWidth();
+    final double width = this.boundingBox.getWidth();
     return width;
   }
 
   public Measurable<Length> getModelWidthLength() {
-    return boundingBox.getWidthLength();
+    return this.boundingBox.getWidthLength();
   }
 
   public double getOriginX() {
-    return originX;
+    return this.originX;
   }
 
   public double getOriginY() {
-    return originY;
+    return this.originY;
   }
 
   public double getPixelsPerXUnit() {
-    return pixelsPerXUnit;
+    return this.pixelsPerXUnit;
   }
 
   public double getPixelsPerYUnit() {
-    return pixelsPerYUnit;
+    return this.pixelsPerYUnit;
   }
 
   public LayerGroup getProject() {
-    return project;
+    return this.project;
   }
 
   /**
@@ -272,7 +269,7 @@ public class Viewport2D {
    * @return The property change support.
    */
   protected PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   public <V extends Geometry> V getRoundedGeometry(final V geometry) {
@@ -305,15 +302,15 @@ public class Viewport2D {
   }
 
   public double getScale() {
-    return scale;
+    return this.scale;
   }
 
   public double getScaleForMetresPerPixel(final double metresPerPixel) {
-    return (metresPerPixel * getScreenResolution()) / 0.0254;
+    return metresPerPixel * getScreenResolution() / 0.0254;
   }
 
   public List<Double> getScales() {
-    return scales;
+    return this.scales;
   }
 
   public int getScreenResolution() {
@@ -323,7 +320,7 @@ public class Viewport2D {
   }
 
   public AffineTransform getScreenToModelTransform() {
-    return screenToModelTransform;
+    return this.screenToModelTransform;
   }
 
   public Unit<Length> getScreenUnit() {
@@ -350,7 +347,7 @@ public class Viewport2D {
   }
 
   public int getViewHeightPixels() {
-    return viewHeight;
+    return this.viewHeight;
   }
 
   public <Q extends Quantity> Unit<Q> getViewToModelUnit(final Unit<Q> modelUnit) {
@@ -368,7 +365,7 @@ public class Viewport2D {
   }
 
   public int getViewWidthPixels() {
-    return viewWidth;
+    return this.viewWidth;
   }
 
   public double getZoomOutScale(final double scale) {
@@ -397,13 +394,11 @@ public class Viewport2D {
 
       if (Double.isInfinite(metresPerPixel) || Double.isNaN(metresPerPixel)) {
         this.metresPerPixel = 0;
-        this.standardPixelScaleFactor = 0;
         this.modelToScreenTransform = null;
         this.screenToModelTransform = null;
         this.scale = 0;
       } else {
         this.metresPerPixel = metresPerPixel;
-        this.standardPixelScaleFactor = screenResolution / 72.0;
         this.modelToScreenTransform = createModelToScreenTransform(boundingBox,
           viewWidthPixels, viewHeightPixels);
         this.screenToModelTransform = createScreenToModelTransform(boundingBox,
@@ -412,13 +407,13 @@ public class Viewport2D {
       }
       this.boundingBox = boundingBox;
     }
-    propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
-      boundingBox);
-    propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
+    this.propertyChangeSupport.firePropertyChange("boundingBox",
+      oldBoundingBox, boundingBox);
+    this.propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
   }
 
   public boolean isUseModelCoordinates() {
-    return savedTransform.get() != null;
+    return this.savedTransform.get() != null;
   }
 
   /**
@@ -427,7 +422,7 @@ public class Viewport2D {
    * @param listener The listener.
    */
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(listener);
+    this.propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
   /**
@@ -438,7 +433,8 @@ public class Viewport2D {
    */
   public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    this.propertyChangeSupport.removePropertyChangeListener(propertyName,
+      listener);
   }
 
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
@@ -474,9 +470,10 @@ public class Viewport2D {
         final double metresPerPixel = modelWidthLength.doubleValue(SI.METRE)
           / viewWidthPixels;
         double scale = getScale(viewWidthLength, modelWidthLength);
-        if (!scales.isEmpty() && viewWidthPixels > 0 && viewHeightPixels > 0) {
-          final double minScale = scales.get(scales.size() - 1);
-          final double maxScale = scales.get(0);
+        if (!this.scales.isEmpty() && viewWidthPixels > 0
+          && viewHeightPixels > 0) {
+          final double minScale = this.scales.get(this.scales.size() - 1);
+          final double maxScale = this.scales.get(0);
           if (scale < minScale) {
             scale = minScale;
             return setBoundingBox(newBoundingBox, scale);
@@ -542,15 +539,15 @@ public class Viewport2D {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
     this.geometryFactory = geometryFactory;
-    propertyChangeSupport.firePropertyChange("geometryFactory",
+    this.propertyChangeSupport.firePropertyChange("geometryFactory",
       oldGeometryFactory, geometryFactory);
   }
 
   public void setScale(final double scale) {
     final double oldValue = getScale();
     if (Math.abs(oldValue - scale) > 0.0001) {
-      setBoundingBox(boundingBox, scale);
-      propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
+      setBoundingBox(this.boundingBox, scale);
+      this.propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
     }
   }
 
@@ -561,16 +558,16 @@ public class Viewport2D {
   public boolean setUseModelCoordinates(final boolean useModelCoordinates,
     final Graphics2D graphics) {
     boolean savedUseModelCoordinates = false;
-    final AffineTransform previousTransform = savedTransform.get();
+    final AffineTransform previousTransform = this.savedTransform.get();
     if (previousTransform != null) {
       graphics.setTransform(previousTransform);
       savedUseModelCoordinates = true;
     }
-    if (useModelCoordinates && modelToScreenTransform != null) {
-      savedTransform.set(graphics.getTransform());
-      graphics.transform(modelToScreenTransform);
+    if (useModelCoordinates && this.modelToScreenTransform != null) {
+      this.savedTransform.set(graphics.getTransform());
+      graphics.transform(this.modelToScreenTransform);
     } else {
-      savedTransform.remove();
+      this.savedTransform.remove();
     }
     return savedUseModelCoordinates;
   }
@@ -594,7 +591,7 @@ public class Viewport2D {
       }
     } else {
       convertedValue = value.doubleValue(SI.METRE);
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getSpheroid().getSemiMajorAxis();
@@ -620,11 +617,11 @@ public class Viewport2D {
   }
 
   public Point toModelPoint(final double... viewCoordinates) {
-    if (geometryFactory == null) {
+    if (this.geometryFactory == null) {
       return GeometryFactory.getFactory().createPoint();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return geometryFactory.createPoint(coordinates);
+      return this.geometryFactory.createPoint(coordinates);
     }
   }
 
@@ -687,7 +684,7 @@ public class Viewport2D {
   }
 
   public Point2D toViewPoint(Point point) {
-    point = geometryFactory.project(point);
+    point = this.geometryFactory.project(point);
     final double x = point.getX();
     final double y = point.getY();
     return toViewPoint(x, y);

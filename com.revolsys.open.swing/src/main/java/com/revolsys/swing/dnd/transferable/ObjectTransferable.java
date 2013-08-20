@@ -27,11 +27,11 @@ public class ObjectTransferable<T> implements Transferable {
   }
 
   public T getObject() {
-    return object;
+    return this.object;
   }
 
   public Object getOwner() {
-    return owner;
+    return this.owner;
   }
 
   @Override

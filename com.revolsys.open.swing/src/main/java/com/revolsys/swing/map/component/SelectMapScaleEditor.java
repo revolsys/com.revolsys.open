@@ -14,8 +14,6 @@ public class SelectMapScaleEditor implements ComboBoxEditor {
 
   final ObjectToStringConverter stringConverter;
 
-  private Object oldItem;
-
   public SelectMapScaleEditor(final ComboBoxEditor editor,
     final ObjectToStringConverter stringConverter) {
     this.wrapped = editor;
@@ -24,36 +22,35 @@ public class SelectMapScaleEditor implements ComboBoxEditor {
 
   @Override
   public void addActionListener(final ActionListener l) {
-    wrapped.addActionListener(l);
+    this.wrapped.addActionListener(l);
   }
 
   @Override
   public Component getEditorComponent() {
-    return wrapped.getEditorComponent();
+    return this.wrapped.getEditorComponent();
   }
 
   @Override
   public Object getItem() {
-    final Object item = wrapped.getItem();
+    final Object item = this.wrapped.getItem();
     String string = StringConverterRegistry.toString(item);
     string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
     final double scale = Double.parseDouble(string);
-    return stringConverter.getPreferredStringForItem(scale);
+    return this.stringConverter.getPreferredStringForItem(scale);
   }
 
   @Override
   public void removeActionListener(final ActionListener l) {
-    wrapped.removeActionListener(l);
+    this.wrapped.removeActionListener(l);
   }
 
   @Override
   public void selectAll() {
-    wrapped.selectAll();
+    this.wrapped.selectAll();
   }
 
   @Override
   public void setItem(final Object object) {
-    this.oldItem = object;
-    wrapped.setItem(stringConverter.getPreferredStringForItem(object));
+    this.wrapped.setItem(this.stringConverter.getPreferredStringForItem(object));
   }
 }

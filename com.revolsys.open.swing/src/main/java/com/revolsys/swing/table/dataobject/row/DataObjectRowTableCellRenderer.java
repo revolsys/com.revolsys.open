@@ -17,6 +17,11 @@ import com.revolsys.util.CollectionUtil;
 @SuppressWarnings("serial")
 public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public DataObjectRowTableCellRenderer() {
     setBorder(new EmptyBorder(1, 2, 1, 2));
     setOpaque(true);

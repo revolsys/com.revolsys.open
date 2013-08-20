@@ -15,6 +15,11 @@ import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 
 @SuppressWarnings("serial")
 public class TreePathListTransferHandler extends TransferHandler {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public boolean canImport(final TransferSupport support) {
     if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {

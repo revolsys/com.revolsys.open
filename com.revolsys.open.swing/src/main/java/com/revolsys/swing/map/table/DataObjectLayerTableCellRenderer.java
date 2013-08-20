@@ -29,11 +29,11 @@ public class DataObjectLayerTableCellRenderer extends DefaultTableCellRenderer {
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int column) {
-    final DataObjectLayer layer = model.getLayer();
-    final LayerDataObject object = model.getObject(row);
+    final DataObjectLayer layer = this.model.getLayer();
+    final LayerDataObject object = this.model.getObject(row);
     final boolean selected = layer.isSelected(object);
-    final DataObjectMetaData metaData = model.getMetaData();
-    final String attributeName = model.getAttributeName(column);
+    final DataObjectMetaData metaData = this.model.getMetaData();
+    final String attributeName = this.model.getAttributeName(column);
     boolean hasValue;
     String text = "-";
     if (value == null) {

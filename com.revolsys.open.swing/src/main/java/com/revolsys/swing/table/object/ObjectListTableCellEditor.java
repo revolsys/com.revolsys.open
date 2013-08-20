@@ -13,11 +13,16 @@ import com.revolsys.converter.string.StringConverterRegistry;
 public class ObjectListTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final JTextField editorComponent = new JTextField();
 
   @Override
   public Object getCellEditorValue() {
-    return editorComponent.getText();
+    return this.editorComponent.getText();
   }
 
   @Override
@@ -25,10 +30,10 @@ public class ObjectListTableCellEditor extends AbstractCellEditor implements
     final Object value, final boolean isSelected, final int row,
     final int column) {
     if (value == null) {
-      editorComponent.setText(null);
+      this.editorComponent.setText(null);
     } else {
-      editorComponent.setText(StringConverterRegistry.toString(value));
+      this.editorComponent.setText(StringConverterRegistry.toString(value));
     }
-    return editorComponent;
+    return this.editorComponent;
   }
 }

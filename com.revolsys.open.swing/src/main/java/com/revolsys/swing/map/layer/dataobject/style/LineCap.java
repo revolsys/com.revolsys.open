@@ -13,6 +13,6 @@ public enum LineCap {
   }
 
   public int getAwtValue() {
-    return awtValue;
+    return this.awtValue;
   }
 }

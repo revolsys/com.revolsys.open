@@ -21,6 +21,11 @@ import com.revolsys.util.PreferencesUtil;
 @SuppressWarnings("serial")
 public class ZoomToMapSheet extends AbstractAction {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public ZoomToMapSheet() {
     putValue(NAME, "Zoom to Map Sheet");
     putValue(SMALL_ICON, SilkIconLoader.getIcon("zoom"));

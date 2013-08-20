@@ -32,13 +32,13 @@ public class TogglePanel extends ValueField implements ItemListener {
     final Dimension dimension, final Action... actions) {
     super(fieldName, value);
     setLayout(new SpringLayout());
-    group = new ButtonGroup();
+    this.group = new ButtonGroup();
     for (final Action action : actions) {
       final JToggleButton button = new JToggleButton(action);
       if (dimension != null) {
         button.setPreferredSize(dimension);
       }
-      group.add(button);
+      this.group.add(button);
       add(button);
       final Object actionCommand = action.getValue(Action.ACTION_COMMAND_KEY);
       if (value != null && value.equals(actionCommand)) {
@@ -50,7 +50,7 @@ public class TogglePanel extends ValueField implements ItemListener {
   }
 
   public String getActionCommand() {
-    return group.getSelection().getActionCommand();
+    return this.group.getSelection().getActionCommand();
   }
 
   @Override

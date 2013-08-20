@@ -35,18 +35,18 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     int width;
 
     private EmptyIcon() {
-      width = 0;
-      height = 0;
+      this.width = 0;
+      this.height = 0;
     }
 
     @Override
     public int getIconHeight() {
-      return height;
+      return this.height;
     }
 
     @Override
     public int getIconWidth() {
-      return width;
+      return this.width;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
   private Icon sortArrow;
 
   public SortableTableCellHeaderRenderer() {
-    emptyIcon = new EmptyIcon();
+    this.emptyIcon = new EmptyIcon();
     setHorizontalAlignment(0);
   }
 
@@ -99,11 +99,11 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     rectangle.y = insets.top;
     rectangle.width = getWidth() - (insets.left + insets.right);
     rectangle.height = getHeight() - (insets.top + insets.bottom);
-    SwingUtilities.layoutCompoundLabel(this, fontmetrics, getText(), sortArrow,
-      getVerticalAlignment(), getHorizontalAlignment(),
+    SwingUtilities.layoutCompoundLabel(this, fontmetrics, getText(),
+      this.sortArrow, getVerticalAlignment(), getHorizontalAlignment(),
       getVerticalTextPosition(), getHorizontalTextPosition(), rectangle,
       rectangle2, rectangle1, getIconTextGap());
-    final int i = getWidth() - insets.right - sortArrow.getIconWidth();
+    final int i = getWidth() - insets.right - this.sortArrow.getIconWidth();
     final int j = rectangle2.y;
     return new Point(i, j);
   }
@@ -135,7 +135,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
         isPrint = header.isPaintingForPrint();
       }
       if (!isPrint) {
-        if (!horizontalTextPositionSet) {
+        if (!this.horizontalTextPositionSet) {
           setHorizontalTextPosition(10);
         }
         final SortOrder sortorder = getColumnSortOrder(table, column);
@@ -160,7 +160,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     final String text = StringConverterRegistry.toString(value);
     setText(text);
     setIcon(icon);
-    sortArrow = icon;
+    this.sortArrow = icon;
     Border border = null;
     if (hasFocus) {
       border = (Border)UIManager.get("TableHeader.focusCellBorder");
@@ -175,13 +175,13 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
   @Override
   public void paintComponent(final Graphics g) {
     final boolean flag = UIManager.get("TableHeader.rightAlignSortArrow") == Boolean.TRUE;
-    if (flag && sortArrow != null) {
-      emptyIcon.width = sortArrow.getIconWidth();
-      emptyIcon.height = sortArrow.getIconHeight();
-      setIcon(emptyIcon);
+    if (flag && this.sortArrow != null) {
+      this.emptyIcon.width = this.sortArrow.getIconWidth();
+      this.emptyIcon.height = this.sortArrow.getIconHeight();
+      setIcon(this.emptyIcon);
       super.paintComponent(g);
       final Point point = computeIconPosition(g);
-      sortArrow.paintIcon(this, g, point.x, point.y);
+      this.sortArrow.paintIcon(this, g, point.x, point.y);
     } else {
       super.paintComponent(g);
     }
@@ -189,7 +189,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
 
   @Override
   public void setHorizontalTextPosition(final int i) {
-    horizontalTextPositionSet = true;
+    this.horizontalTextPositionSet = true;
     super.setHorizontalTextPosition(i);
   }
 }

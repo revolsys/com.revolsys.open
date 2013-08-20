@@ -6,6 +6,11 @@ import com.revolsys.util.JavaBeanUtil;
 @SuppressWarnings("serial")
 public class SetObjectProperty extends AbstractUndoableEdit {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final Object object;
 
   private final String propertyName;
@@ -25,8 +30,8 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Object value = JavaBeanUtil.getValue(object, propertyName);
-      if (EqualsRegistry.equal(value, oldValue)) {
+      final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+      if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -36,8 +41,8 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Object value = JavaBeanUtil.getValue(object, propertyName);
-      if (EqualsRegistry.equal(value, newValue)) {
+      final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+      if (EqualsRegistry.equal(value, this.newValue)) {
         return true;
       }
     }
@@ -46,16 +51,17 @@ public class SetObjectProperty extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    JavaBeanUtil.setValue(object, propertyName, newValue);
+    JavaBeanUtil.setValue(this.object, this.propertyName, this.newValue);
   }
 
   @Override
   protected void doUndo() {
-    JavaBeanUtil.setValue(object, propertyName, oldValue);
+    JavaBeanUtil.setValue(this.object, this.propertyName, this.oldValue);
   }
 
   @Override
   public String toString() {
-    return propertyName + " old=" + oldValue + ", new=" + newValue;
+    return this.propertyName + " old=" + this.oldValue + ", new="
+      + this.newValue;
   }
 }

@@ -25,6 +25,7 @@ import com.revolsys.util.CaseConverter;
 
 @SuppressWarnings("serial")
 public class ValueField extends JPanel implements Field {
+
   private final Color defaultBackground = getBackground();
 
   private final Color defaultForeground = getBackground();
@@ -68,7 +69,7 @@ public class ValueField extends JPanel implements Field {
   }
 
   public void cancel() {
-    saved = false;
+    this.saved = false;
   }
 
   public void cancel(final JDialog dialog) {
@@ -84,22 +85,22 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return errorMessage;
+    return this.errorMessage;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue() {
-    return (T)fieldValue;
+    return (T)this.fieldValue;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   @Override
@@ -108,7 +109,7 @@ public class ValueField extends JPanel implements Field {
   }
 
   public boolean isSaved() {
-    return saved;
+    return this.saved;
   }
 
   public void save() {
@@ -127,7 +128,7 @@ public class ValueField extends JPanel implements Field {
       }
 
     }
-    saved = true;
+    this.saved = true;
   }
 
   public void save(final JDialog dialog) {
@@ -138,7 +139,7 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = defaultBackground;
+      color = this.defaultBackground;
     }
     setBackground(color);
   }
@@ -146,7 +147,7 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = defaultForeground;
+      color = this.defaultForeground;
     }
     setForeground(color);
   }
@@ -156,7 +157,7 @@ public class ValueField extends JPanel implements Field {
     setForeground(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
-    super.setToolTipText(errorMessage);
+    super.setToolTipText(this.errorMessage);
   }
 
   public void setFieldName(final String fieldName) {
@@ -170,9 +171,9 @@ public class ValueField extends JPanel implements Field {
 
   @Override
   public void setFieldValid() {
-    setForeground(defaultForeground);
-    setBackground(defaultBackground);
-    super.setToolTipText(originalToolTip);
+    setForeground(this.defaultForeground);
+    setBackground(this.defaultBackground);
+    super.setToolTipText(this.originalToolTip);
   }
 
   @Override
@@ -180,8 +181,8 @@ public class ValueField extends JPanel implements Field {
     final Object oldValue = this.fieldValue;
     this.fieldValue = value;
     firePropertyChange("fieldValue", oldValue, value);
-    if (StringUtils.hasText(fieldName)) {
-      firePropertyChange(fieldName, oldValue, value);
+    if (StringUtils.hasText(this.fieldName)) {
+      firePropertyChange(this.fieldName, oldValue, value);
     }
   }
 
@@ -192,7 +193,7 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(errorMessage)) {
+    if (!StringUtils.hasText(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
@@ -216,7 +217,7 @@ public class ValueField extends JPanel implements Field {
     } else {
       window = SwingUtilities.windowForComponent(component);
     }
-    final JDialog dialog = new JDialog(window, title,
+    final JDialog dialog = new JDialog(window, this.title,
       ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
@@ -230,7 +231,7 @@ public class ValueField extends JPanel implements Field {
     dialog.add(buttons, BorderLayout.SOUTH);
 
     dialog.pack();
-    saved = false;
+    this.saved = false;
     dialog.setVisible(true);
 
     return (V)getFieldValue();

@@ -39,17 +39,17 @@ public abstract class AbstractComponentFactory<T extends Component> implements
 
   @Override
   public Icon getIcon() {
-    return icon;
+    return this.icon;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public String getToolTip() {
-    return toolTip;
+    return this.toolTip;
   }
 
   protected void setIcon(final Icon icon) {

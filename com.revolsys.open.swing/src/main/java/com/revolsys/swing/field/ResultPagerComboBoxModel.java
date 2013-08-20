@@ -14,6 +14,11 @@ import com.revolsys.swing.list.ResultPagerListCellRenderer;
 public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
   ComboBoxModel {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final Object NULL = new Object();
 
   public static <T> ComboBox create(final ResultPager<T> codeTable,
@@ -52,25 +57,25 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
 
   @Override
   public Object getElementAt(int index) {
-    if (allowNull) {
+    if (this.allowNull) {
       if (index == 0) {
         return NULL;
       }
       index--;
     }
     if (index < getSize()) {
-      synchronized (cache) {
+      synchronized (this.cache) {
         // TODO load in background
-        T value = cache.get(index);
+        T value = this.cache.get(index);
         if (value == null) {
-          pager.setPageNumber((int)Math.floor(index / 100.0) + 1);
-          final List<T> values = pager.getList();
+          this.pager.setPageNumber((int)Math.floor(index / 100.0) + 1);
+          final List<T> values = this.pager.getList();
           int i = index;
           for (final T result : values) {
-            cache.put(i, result);
+            this.cache.put(i, result);
             i++;
           }
-          value = cache.get(index);
+          value = this.cache.get(index);
         }
         return value;
       }
@@ -80,22 +85,22 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
 
   @Override
   public Object getSelectedItem() {
-    if (selectedItem == NULL) {
+    if (this.selectedItem == NULL) {
       return null;
     } else {
-      return selectedItem;
+      return this.selectedItem;
     }
   }
 
   @Override
   public int getSize() {
     int size;
-    if (pager == null) {
+    if (this.pager == null) {
       size = 0;
     } else {
-      size = pager.getNumResults();
+      size = this.pager.getNumResults();
     }
-    if (allowNull) {
+    if (this.allowNull) {
       size++;
     }
     return size;
@@ -106,7 +111,7 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
       if (this.pager != null) {
         this.pager.close();
       }
-      cache.clear();
+      this.cache.clear();
       this.pager = pager;
       if (pager != null) {
         pager.setPageSize(100);
@@ -117,9 +122,9 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
 
   @Override
   public void setSelectedItem(final Object item) {
-    if ((selectedItem != null && !selectedItem.equals(item))
-      || selectedItem == null && item != null) {
-      selectedItem = item;
+    if (this.selectedItem != null && !this.selectedItem.equals(item)
+      || this.selectedItem == null && item != null) {
+      this.selectedItem = item;
     }
   }
 

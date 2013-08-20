@@ -10,9 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+
+import com.revolsys.awt.SwingWorkerManager;
 
 public abstract class DynamicTreeNode extends DefaultMutableTreeNode implements
   Runnable {
@@ -40,22 +41,22 @@ public abstract class DynamicTreeNode extends DefaultMutableTreeNode implements
    * @return Returns the name.
    */
   protected final String getName() {
-    return name;
+    return this.name;
   }
 
   public void populateChildren(final JTree tree) {
     this.refreshTask = new DefaultMutableTreeModelChangedTask(tree, this);
-    SwingUtilities.invokeLater(this);
+    SwingWorkerManager.invokeLater(this);
   }
 
   @Override
   public void run() {
-    final List locations = childLoader.loadNodes(getUserObject());
+    final List locations = this.childLoader.loadNodes(getUserObject());
     for (final Iterator children = locations.iterator(); children.hasNext();) {
       final MutableTreeNode childNode = (MutableTreeNode)children.next();
       add(childNode);
     }
-    SwingUtilities.invokeLater(refreshTask);
+    SwingWorkerManager.invokeLater(this.refreshTask);
   }
 
   @Override

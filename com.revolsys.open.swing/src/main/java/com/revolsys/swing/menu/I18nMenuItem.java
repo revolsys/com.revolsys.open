@@ -6,7 +6,10 @@ import javax.swing.JMenuItem;
 
 @SuppressWarnings("serial")
 public class I18nMenuItem extends JMenuItem {
-  private CharSequence label;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   public I18nMenuItem() {
   }
@@ -17,7 +20,6 @@ public class I18nMenuItem extends JMenuItem {
 
   public I18nMenuItem(final CharSequence text) {
     super(text.toString());
-    this.label = text;
   }
 
   public I18nMenuItem(final CharSequence text, final Icon icon) {

@@ -22,7 +22,7 @@ public class DataObjectStoreTreeNodeModel extends
     setSupportedChildClasses(DataObjectStoreSchema.class);
     setObjectTreeNodeModels(new DataObjectStoreSchemaTreeNodeModel());
     final ImageIcon icon = SilkIconLoader.getIcon("database_link");
-    DefaultTreeCellRenderer renderer = getRenderer();
+    final DefaultTreeCellRenderer renderer = getRenderer();
     renderer.setLeafIcon(icon);
     renderer.setOpenIcon(icon);
     renderer.setClosedIcon(icon);

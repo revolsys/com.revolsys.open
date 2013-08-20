@@ -95,7 +95,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       final DataObjectLayerTableModel layerTableModel = (DataObjectLayerTableModel)getTableModel();
       if (layerTableModel.getAttributeFilterMode().equals(
         DataObjectLayerTableModel.MODE_SELECTED)) {
-        return defaultSeletionModel;
+        return this.defaultSeletionModel;
       }
     }
     return super.getSelectionModel();
@@ -170,8 +170,8 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       }
     }
     super.tableChanged(e);
-    if (tableHeader != null) {
-      tableHeader.resizeAndRepaint();
+    if (this.tableHeader != null) {
+      this.tableHeader.resizeAndRepaint();
     }
   }
 }

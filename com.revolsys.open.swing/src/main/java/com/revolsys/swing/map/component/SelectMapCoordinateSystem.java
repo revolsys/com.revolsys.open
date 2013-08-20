@@ -20,6 +20,11 @@ import com.revolsys.swing.map.MapPanel;
 public class SelectMapCoordinateSystem extends ComboBox implements
   ItemListener, PropertyChangeListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final MapPanel map;
 
   public SelectMapCoordinateSystem(final MapPanel map) {
@@ -67,7 +72,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
       final Object value = e.getItem();
       final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
       if (coordinateSystem != null) {
-        map.setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+        this.map.setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
       }
     }
   }
@@ -76,7 +81,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     if ("geometryFactory".equals(propertyName)) {
-      final GeometryFactory geometryFactory = map.getGeometryFactory();
+      final GeometryFactory geometryFactory = this.map.getGeometryFactory();
       setSelectedItem(geometryFactory.getSRID());
     }
   }

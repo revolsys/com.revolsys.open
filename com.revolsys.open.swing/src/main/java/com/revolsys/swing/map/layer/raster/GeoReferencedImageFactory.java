@@ -6,5 +6,5 @@ import com.revolsys.io.IoFactory;
 
 public interface GeoReferencedImageFactory extends IoFactory {
 
- GeoReferencedImage loadImage(Resource resource);
+  GeoReferencedImage loadImage(Resource resource);
 }

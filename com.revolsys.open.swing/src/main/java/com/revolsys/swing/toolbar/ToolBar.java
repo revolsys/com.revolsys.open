@@ -19,6 +19,11 @@ import com.revolsys.swing.component.ComponentGroup;
 
 @SuppressWarnings("serial")
 public class ToolBar extends JToolBar {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private final ComponentGroup groups = new ComponentGroup();
 
   public ToolBar() {
@@ -28,14 +33,14 @@ public class ToolBar extends JToolBar {
 
   public JButton addButton(final Action action) {
     final JButton button = createButton(action);
-    groups.addComponent(this, button);
+    this.groups.addComponent(this, button);
     return button;
   }
 
   public JButton addButton(final String groupName, final Action action) {
     final JButton button = createButton(action);
     button.setAction(action);
-    groups.addComponent(this, groupName, button);
+    this.groups.addComponent(this, groupName, button);
     return button;
   }
 
@@ -67,15 +72,15 @@ public class ToolBar extends JToolBar {
   }
 
   public void addComponent(final Component component) {
-    groups.addComponent(this, component);
+    this.groups.addComponent(this, component);
   }
 
   public void addComponent(final String groupName, final Component component) {
-    groups.addComponent(this, groupName, component);
+    this.groups.addComponent(this, groupName, component);
   }
 
   public void addGroup(final String groupName) {
-    groups.addGroup(groupName);
+    this.groups.addGroup(groupName);
   }
 
   public JToggleButton addToggleButton(final String groupName, final int index,
@@ -95,7 +100,7 @@ public class ToolBar extends JToolBar {
     action.setEnableCheck(enableCheck);
 
     final JToggleButton button = createToggleButton(action);
-    groups.addComponent(this, groupName, index, button);
+    this.groups.addComponent(this, groupName, index, button);
     final ButtonGroup buttonGroup = getButtonGroup(groupName);
     buttonGroup.add(button);
     return button;
@@ -136,24 +141,24 @@ public class ToolBar extends JToolBar {
   }
 
   public ButtonGroup getButtonGroup(final String groupName) {
-    return groups.getButtonGroup(groupName);
+    return this.groups.getButtonGroup(groupName);
   }
 
   public List<Component> getGroup(final String groupName) {
-    return groups.getGroup(groupName);
+    return this.groups.getGroup(groupName);
   }
 
   public void removeComponent(final String groupName, final int index) {
-    groups.removeComponent(this, groupName, index);
+    this.groups.removeComponent(this, groupName, index);
   }
 
   public void removeGroup(final String groupName) {
-    groups.removeGroup(this, groupName);
+    this.groups.removeGroup(this, groupName);
 
   }
 
   public void setGroupEnabled(final String groupName, final boolean enabled) {
-    groups.setGroupEnabled(groupName, enabled);
+    this.groups.setGroupEnabled(groupName, enabled);
   }
 
 }

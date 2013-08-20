@@ -20,7 +20,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return null;
     } else {
-      final List<Object> values = codeTable.getValues(value);
+      final List<Object> values = this.codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
         return null;
       } else {

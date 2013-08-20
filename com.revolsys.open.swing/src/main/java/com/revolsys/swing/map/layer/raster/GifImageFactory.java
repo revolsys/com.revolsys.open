@@ -7,10 +7,10 @@ public class GifImageFactory extends AbstractGeoReferencedImageFactory {
   public GifImageFactory() {
     super("GIF");
     addMediaTypeAndFileExtension("image/gif", "gif");
-   }
+  }
 
   @Override
-  public GeoReferencedImage loadImage(Resource resource) {
+  public GeoReferencedImage loadImage(final Resource resource) {
     return new GeoReferencedImage(resource);
   }
 

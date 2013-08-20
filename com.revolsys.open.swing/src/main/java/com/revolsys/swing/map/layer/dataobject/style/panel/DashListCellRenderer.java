@@ -28,7 +28,7 @@ public class DashListCellRenderer extends DefaultListCellRenderer {
     super.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);
     setText(null);
-    dash = (List<Measure<Length>>)value;
+    this.dash = (List<Measure<Length>>)value;
     setPreferredSize(new Dimension(100, 20));
     return this;
   }

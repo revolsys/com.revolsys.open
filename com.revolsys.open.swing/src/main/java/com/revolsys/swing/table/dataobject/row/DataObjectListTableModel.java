@@ -68,7 +68,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public void add(final int index, final LayerDataObject object) {
-    objects.add(index, object);
+    this.objects.add(index, object);
     fireTableRowsInserted(index, index + 1);
   }
 
@@ -98,37 +98,37 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @PreDestroy
   public void dispose() {
     super.dispose();
-    objects.clear();
+    this.objects.clear();
   }
 
   private void firePropertyChange(final DataObject object, final String name,
     final Object oldValue, final Object newValue) {
     final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
       oldValue, newValue);
-    for (final PropertyChangeListener listener : propertyChangeListeners) {
+    for (final PropertyChangeListener listener : this.propertyChangeListeners) {
       listener.propertyChange(event);
     }
   }
 
   @Override
   public LayerDataObject getObject(final int index) {
-    return objects.get(index);
+    return this.objects.get(index);
   }
 
   /**
    * @return the objects
    */
   public List<LayerDataObject> getObjects() {
-    return objects;
+    return this.objects;
   }
 
   public Set<PropertyChangeListener> getPropertyChangeListeners() {
-    return Collections.unmodifiableSet(propertyChangeListeners);
+    return Collections.unmodifiableSet(this.propertyChangeListeners);
   }
 
   @Override
   public int getRowCount() {
-    return objects.size();
+    return this.objects.size();
   }
 
   @Override
@@ -201,7 +201,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     final String attributeName = getAttributeName(column);
     final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
       sortOrder == SortOrder.ASCENDING, attributeName);
-    Collections.sort(objects, comparitor);
+    Collections.sort(this.objects, comparitor);
     fireTableDataChanged();
     return sortOrder;
   }

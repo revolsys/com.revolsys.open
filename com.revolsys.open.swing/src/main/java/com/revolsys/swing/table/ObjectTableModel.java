@@ -30,32 +30,32 @@ public class ObjectTableModel<T> extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return propertyNames.length;
+    return this.propertyNames.length;
   }
 
   @Override
   public String getColumnName(final int column) {
-    return lables[column];
+    return this.lables[column];
   }
 
   @Override
   public int getRowCount() {
-    return rows.size();
+    return this.rows.size();
   }
 
   public List<T> getRows() {
-    return rows;
+    return this.rows;
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final Object row = rows.get(rowIndex);
-    final String propertyName = propertyNames[columnIndex];
+    final Object row = this.rows.get(rowIndex);
+    final String propertyName = this.propertyNames[columnIndex];
     return JavaBeanUtil.getProperty(row, propertyName);
   }
 
   public void insertRow(final int rowIndex, final T row) {
-    rows.add(rowIndex, row);
+    this.rows.add(rowIndex, row);
     fireTableRowsInserted(rowIndex, rowIndex);
   }
 
@@ -65,7 +65,7 @@ public class ObjectTableModel<T> extends AbstractTableModel {
   }
 
   public void removeRow(final int rowIndex) {
-    rows.remove(rowIndex);
+    this.rows.remove(rowIndex);
     fireTableRowsDeleted(rowIndex, rowIndex);
   }
 
@@ -78,8 +78,8 @@ public class ObjectTableModel<T> extends AbstractTableModel {
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final Object row = rows.get(rowIndex);
-    final String propertyName = propertyNames[columnIndex];
+    final Object row = this.rows.get(rowIndex);
+    final String propertyName = this.propertyNames[columnIndex];
     JavaBeanUtil.setProperty(row, propertyName, value);
   }
 

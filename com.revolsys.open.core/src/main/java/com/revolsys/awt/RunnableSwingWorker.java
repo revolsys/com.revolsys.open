@@ -1,4 +1,4 @@
-package com.revolsys.swing;
+package com.revolsys.awt;
 
 import javax.swing.SwingWorker;
 

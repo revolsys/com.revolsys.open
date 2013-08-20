@@ -13,9 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -23,7 +25,6 @@ import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.log4j.Log4jTableModel;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -73,20 +74,20 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
 
   protected void initDialog() {
 
-    setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
     setLayout(new BorderLayout());
 
-    statusLabel.setBorder(BorderFactory.createTitledBorder("Status"));
-    add(statusLabel, BorderLayout.NORTH);
-    setStatus("Creating merged record for " + layer.getName());
+    this.statusLabel.setBorder(BorderFactory.createTitledBorder("Status"));
+    add(this.statusLabel, BorderLayout.NORTH);
+    setStatus("Creating merged record for " + this.layer.getName());
 
     final JTabbedPane tabs = new JTabbedPane();
     add(tabs, BorderLayout.CENTER);
 
-    tablePanel = DataObjectListTableModel.createPanel(layer);
+    this.tablePanel = DataObjectListTableModel.createPanel(this.layer);
 
-    tabs.addTab("Merged Object", tablePanel);
+    tabs.addTab("Merged Object", this.tablePanel);
 
     tabs.addTab("Errors", Log4jTableModel.createPanel());
 
@@ -97,24 +98,24 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
       this, "cancel");
     buttonsPanel.add(cancelButton);
 
-    okButton = InvokeMethodAction.createButton("OK", this, "finish");
-    okButton.setEnabled(false);
-    buttonsPanel.add(okButton);
+    this.okButton = InvokeMethodAction.createButton("OK", this, "finish");
+    this.okButton.setEnabled(false);
+    buttonsPanel.add(this.okButton);
 
     SwingUtil.setSize(this, 10, 50);
   }
 
   public void run() {
     try {
-      originalObjects = layer.getMergeableSelectedRecords();
-      final DataType geometryType = layer.getGeometryType();
-      if (originalObjects.size() < 2) {
+      this.originalObjects = this.layer.getMergeableSelectedRecords();
+      final DataType geometryType = this.layer.getGeometryType();
+      if (this.originalObjects.size() < 2) {
         setStatus("<p style=\"color:red;font-weight: bold\">At least 2 active records must be selected to merge.</p></body></html>");
       } else if (!DataTypes.LINE_STRING.equals(geometryType)) {
         setStatus("<p style=\"color:red;font-weight: bold\">Merging "
           + geometryType + " not currently supported</p></body></html>");
       } else {
-        final DataObjectGraph graph = new DataObjectGraph(originalObjects);
+        final DataObjectGraph graph = new DataObjectGraph(this.originalObjects);
         for (final Node<DataObject> node : graph.nodes()) {
           final List<Edge<DataObject>> edges = node.getEdges();
           if (edges.size() == 2) {
@@ -127,11 +128,11 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
           final List<Edge<DataObject>> edges = graph.getEdges();
           final Edge<DataObject> edge = edges.get(0);
           final LayerDataObject object = (LayerDataObject)edge.getObject();
-          mergedObject = object;
+          this.mergedObject = object;
         }
       }
-      if (mergedObject != null) {
-        setMergedObject(mergedObject, originalObjects);
+      if (this.mergedObject != null) {
+        setMergedObject(this.mergedObject, this.originalObjects);
       }
 
     } catch (final Throwable e) {
@@ -146,7 +147,7 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
       setStatus("<p><b>Merged "
         + objects.size()
         + " "
-        + layer.getName()
+        + this.layer.getName()
         + " records.</p>"
         + "<p>Verify the values shown in the merged record below (highlighted in green).</p>"
         + "<p style=\"color:green;font-weight: bold\">Click OK to save the merged record or click Cancel to abondon edits.</p>");
@@ -154,19 +155,20 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
         objects.add(0, mergedObject);
       }
 
-      final DataObjectRowTable table = tablePanel.getTable();
+      final DataObjectRowTable table = this.tablePanel.getTable();
       final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
       model.setObjects(objects);
       MergedObjectPredicate.add(table, mergedObject);
       MergedValuePredicate.add(table, mergedObject);
-      okButton.setEnabled(true);
+      this.okButton.setEnabled(true);
     } else {
-      SwingUtil.invokeLater(this, "setMergedObject", mergedObject, objects);
+      SwingWorkerManager.invokeLater(this, "setMergedObject", mergedObject,
+        objects);
     }
   }
 
   public void setStatus(final String message) {
-    statusLabel.setText("<html><body>" + message + "</body></html>");
+    this.statusLabel.setText("<html><body>" + message + "</body></html>");
   }
 
   private void showDialog() {

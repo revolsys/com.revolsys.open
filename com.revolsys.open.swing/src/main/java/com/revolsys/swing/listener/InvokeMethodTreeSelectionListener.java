@@ -1,9 +1,9 @@
 package com.revolsys.swing.listener;
 
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import com.revolsys.awt.SwingWorkerManager;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 /**
@@ -30,7 +30,7 @@ public class InvokeMethodTreeSelectionListener implements TreeSelectionListener 
   public InvokeMethodTreeSelectionListener(final Object object,
     final String methodName, final boolean invokeLater,
     final Object... parameters) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
@@ -41,10 +41,10 @@ public class InvokeMethodTreeSelectionListener implements TreeSelectionListener 
 
   @Override
   public void valueChanged(final TreeSelectionEvent e) {
-    if (invokeLater) {
-      SwingUtilities.invokeLater(runnable);
+    if (this.invokeLater) {
+      SwingWorkerManager.invokeLater(this.runnable);
     } else {
-      runnable.run();
+      this.runnable.run();
     }
   }
 

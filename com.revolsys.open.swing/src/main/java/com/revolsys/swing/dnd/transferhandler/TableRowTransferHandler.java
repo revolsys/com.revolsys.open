@@ -21,7 +21,7 @@ public class TableRowTransferHandler extends TransferHandler {
   private final DataFlavor localObjectFlavor = new DataFlavor(Integer.class,
     "Integer Row Index");
 
-  private final String mimeType = localObjectFlavor.getMimeType();
+  private final String mimeType = this.localObjectFlavor.getMimeType();
 
   private final JTable table;
 
@@ -31,25 +31,25 @@ public class TableRowTransferHandler extends TransferHandler {
 
   @Override
   public boolean canImport(final TransferHandler.TransferSupport info) {
-    if (info.getComponent() == table) {
+    if (info.getComponent() == this.table) {
       if (info.isDrop()) {
-        if (info.isDataFlavorSupported(localObjectFlavor)) {
-          table.setCursor(DragSource.DefaultMoveDrop);
+        if (info.isDataFlavorSupported(this.localObjectFlavor)) {
+          this.table.setCursor(DragSource.DefaultMoveDrop);
           return true;
         }
       }
     }
-    table.setCursor(DragSource.DefaultMoveNoDrop);
+    this.table.setCursor(DragSource.DefaultMoveNoDrop);
     return false;
   }
 
   @Override
   protected Transferable createTransferable(final JComponent c) {
-    assert (c == table);
-    final int selectedRow = table.getSelectedRow();
-    if (c == table) {
+    assert c == this.table;
+    final int selectedRow = this.table.getSelectedRow();
+    if (c == this.table) {
 
-      return new DataHandler(selectedRow, mimeType);
+      return new DataHandler(selectedRow, this.mimeType);
     } else {
       return null;
     }
@@ -59,7 +59,7 @@ public class TableRowTransferHandler extends TransferHandler {
   protected void exportDone(final JComponent c, final Transferable t,
     final int action) {
     if (action == TransferHandler.MOVE) {
-      table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+      this.table.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
   }
 
@@ -73,7 +73,7 @@ public class TableRowTransferHandler extends TransferHandler {
     final JTable target = (JTable)info.getComponent();
     final JTable.DropLocation dropLocation = (JTable.DropLocation)info.getDropLocation();
     int index = dropLocation.getRow();
-    final TableModel model = table.getModel();
+    final TableModel model = this.table.getModel();
     final int max = model.getRowCount();
     if (index < 0 || index > max) {
       index = max;
@@ -81,7 +81,7 @@ public class TableRowTransferHandler extends TransferHandler {
     target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     try {
       final Transferable transferable = info.getTransferable();
-      final Integer rowFrom = (Integer)transferable.getTransferData(localObjectFlavor);
+      final Integer rowFrom = (Integer)transferable.getTransferData(this.localObjectFlavor);
       if (rowFrom != -1 && rowFrom != index) {
         ((Reorderable)model).reorder(rowFrom, index);
         if (index > rowFrom) {

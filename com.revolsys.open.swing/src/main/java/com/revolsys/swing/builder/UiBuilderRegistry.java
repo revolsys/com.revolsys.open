@@ -16,7 +16,7 @@ public class UiBuilderRegistry {
   private final Map<Class<?>, UiBuilder> builders = new LinkedHashMap<Class<?>, UiBuilder>();
 
   public void addBuilder(final Class<?> clazz, final UiBuilder builder) {
-    builders.put(clazz, builder);
+    this.builders.put(clazz, builder);
     builder.setRegistry(this);
   }
 
@@ -31,7 +31,7 @@ public class UiBuilderRegistry {
 
   private UiBuilder getBuilderPrivate(final Class<?> clazz) {
     if (clazz != null) {
-      UiBuilder renderer = builders.get(clazz);
+      UiBuilder renderer = this.builders.get(clazz);
       if (renderer == null) {
         final Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
