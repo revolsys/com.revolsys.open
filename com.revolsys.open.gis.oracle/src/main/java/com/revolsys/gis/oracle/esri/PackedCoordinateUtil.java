@@ -466,7 +466,6 @@ public class PackedCoordinateUtil {
       if (hasM) {
         readPolygonOordinates(in, pointsList, 3, mOffset, mScale);
       }
-      System.out.println(pointsList);
       return pointsList;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);

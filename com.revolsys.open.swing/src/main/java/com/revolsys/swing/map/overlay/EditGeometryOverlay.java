@@ -77,11 +77,6 @@ import com.vividsolutions.jts.geom.Polygon;
 public class EditGeometryOverlay extends SelectRecordsOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {
 
     /**
@@ -139,6 +134,11 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       repaint();
     }
   }
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   private static final Color COLOR = WebColors.Aqua;
 
@@ -1249,8 +1249,6 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
                   numPoints - pointIndex, null);
 
               }
-              System.out.println(line1);
-              System.out.println(line2);
               final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
 
               final LayerDataObject object2 = layer.copyObject(object);
