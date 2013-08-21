@@ -2,9 +2,10 @@ package com.revolsys.beans;
 
 import java.lang.reflect.Method;
 
+import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.util.JavaBeanUtil;
 
-public class MethodInvoker implements Runnable {
+public class MethodInvoker extends AbstractRunnable {
 
   /** The object to invoke the method on. */
   private final Object object;
@@ -29,14 +30,14 @@ public class MethodInvoker implements Runnable {
     this.parameters = parameters;
   }
 
+  @Override
+  public void doRun() {
+    invoke();
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T invoke() {
     return (T)JavaBeanUtil.invokeMethod(method, object, parameters);
-  }
-
-  @Override
-  public void run() {
-    invoke();
   }
 
   @Override

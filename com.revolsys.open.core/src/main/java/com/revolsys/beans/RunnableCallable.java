@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import javax.swing.SwingUtilities;
 
+import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -14,7 +15,7 @@ import com.revolsys.util.ExceptionUtil;
  * 
  * @param <T> The type of the result.
  */
-public class RunnableCallable<T> implements Runnable {
+public class RunnableCallable<T> extends AbstractRunnable {
 
   public static <V> V invokeAndWait(final Callable<V> callable) {
     final RunnableCallable<V> runnable = new RunnableCallable<V>(callable);
@@ -36,6 +37,15 @@ public class RunnableCallable<T> implements Runnable {
     this.callable = callable;
   }
 
+  @Override
+  public void doRun() {
+    try {
+      result = callable.call();
+    } catch (final Exception e) {
+      ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   /**
    * Get the result value returned by the callable.
    * 
@@ -43,14 +53,5 @@ public class RunnableCallable<T> implements Runnable {
    */
   public T getResult() {
     return result;
-  }
-
-  @Override
-  public void run() {
-    try {
-      result = callable.call();
-    } catch (final Exception e) {
-      ExceptionUtil.throwUncheckedException(e);
-    }
   }
 }

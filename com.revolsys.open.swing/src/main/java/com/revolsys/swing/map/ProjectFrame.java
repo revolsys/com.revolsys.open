@@ -9,6 +9,7 @@ import java.io.File;
 import java.net.ResponseCache;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -41,6 +42,7 @@ import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -57,6 +59,7 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
@@ -250,8 +253,15 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addTasksPanel() {
     final JPanel panel = SwingWorkerTableModel.createPanel();
-    DockingFramesUtil.addDockable(this.project,
-      MapPanel.MAP_TABLE_WORKING_AREA, "tasks", "Background Tasks", panel);
+    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
+      this.project, MapPanel.MAP_TABLE_WORKING_AREA, "tasks",
+      "Background Tasks", panel);
+    final SwingWorkerProgressBar progressBar = mapPanel.getProgressBar();
+    final JButton viewTasksAction = InvokeMethodAction.createButton(null,
+      "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
+      "toFront");
+    viewTasksAction.setBorderPainted(false);
+    progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
   protected void addWorkingAreas() {

@@ -1,4 +1,4 @@
-package com.revolsys.parallel;
+package com.revolsys.logging;
 
 import org.slf4j.LoggerFactory;
 

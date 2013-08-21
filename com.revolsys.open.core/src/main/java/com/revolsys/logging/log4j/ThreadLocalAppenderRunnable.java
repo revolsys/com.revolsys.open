@@ -1,6 +1,8 @@
 package com.revolsys.logging.log4j;
 
-public class ThreadLocalAppenderRunnable implements Runnable {
+import com.revolsys.parallel.AbstractRunnable;
+
+public class ThreadLocalAppenderRunnable extends AbstractRunnable {
   private final ThreadLocalFileAppender appender;
 
   private String logFile;
@@ -16,7 +18,7 @@ public class ThreadLocalAppenderRunnable implements Runnable {
   }
 
   @Override
-  public void run() {
+  public void doRun() {
     try {
       if (appender != null) {
         try {

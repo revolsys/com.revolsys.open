@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -16,7 +17,7 @@ import com.revolsys.util.ExceptionUtil;
  * 
  * @author Paul Austin
  */
-public class InvokeMethodRunnable implements Runnable {
+public class InvokeMethodRunnable extends AbstractRunnable {
 
   public static void run(final Object object, final String methodName,
     final List<Object> parameters) {
@@ -94,15 +95,11 @@ public class InvokeMethodRunnable implements Runnable {
     this.parameters = parameters;
   }
 
-  public Object getObject() {
-    return object;
-  }
-
   /**
    * Execute the method.
    */
   @Override
-  public void run() {
+  public void doRun() {
     final Object object = getObject();
     if (object == null) {
       LoggerFactory.getLogger(getClass())
@@ -110,6 +107,10 @@ public class InvokeMethodRunnable implements Runnable {
     } else {
       run(object, methodName, parameters);
     }
+  }
+
+  public Object getObject() {
+    return object;
   }
 
   protected void setObject(final Object object) {

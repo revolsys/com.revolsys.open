@@ -3,6 +3,8 @@ package com.revolsys.parallel;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.revolsys.logging.LoggingRunnable;
+
 public class NamedThreadFactory implements ThreadFactory {
 
   private static final AtomicInteger poolNumber = new AtomicInteger(1);

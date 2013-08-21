@@ -46,11 +46,11 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
+import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.vividsolutions.jts.geom.Geometry;
 
-@SuppressWarnings("serial")
 public class MapPanel extends JPanel implements PropertyChangeListener {
 
   /**
@@ -118,6 +118,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private boolean updateZoomHistory = true;
 
   private ToolTipOverlay toolTipOverlay;
+
+  private SwingWorkerProgressBar progressBar;
 
   public MapPanel() {
     this(new Project());
@@ -254,6 +256,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     addPointerLocation(false);
     addPointerLocation(true);
+    this.progressBar = new SwingWorkerProgressBar();
+    this.statusBar.add(progressBar);
   }
 
   protected void addToolBar() {
@@ -405,6 +409,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public MouseOverlay getMouseOverlay() {
     return this.mouseOverlay;
+  }
+
+  public SwingWorkerProgressBar getProgressBar() {
+    return progressBar;
   }
 
   public LayerGroup getProject() {

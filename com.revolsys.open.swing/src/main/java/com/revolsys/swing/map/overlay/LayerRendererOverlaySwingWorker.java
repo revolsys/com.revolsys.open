@@ -3,8 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import javax.swing.SwingWorker;
-
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -13,8 +11,10 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
+public class LayerRendererOverlaySwingWorker extends
+  AbstractSwingWorker<Void, Void> {
 
   private final LayerRendererOverlay overlay;
 
@@ -59,12 +59,17 @@ public class LayerRendererOverlaySwingWorker extends SwingWorker<Void, Void> {
     }
   }
 
-  @Override
-  protected void done() {
-    this.overlay.setImage(this);
-  }
-
   public GeoReferencedImage getReferencedImage() {
     return this.referencedImage;
+  }
+
+  @Override
+  public String toString() {
+    return "Render layers";
+  }
+
+  @Override
+  protected void uiTask() {
+    this.overlay.setImage(this);
   }
 }

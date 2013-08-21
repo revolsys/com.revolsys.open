@@ -1,8 +1,7 @@
 package com.revolsys.swing.parallel;
 
-import javax.swing.SwingWorker;
 
-public class RunnableSwingWorker extends SwingWorker<Void, Void> {
+public class RunnableSwingWorker extends AbstractSwingWorker<Void, Void> {
   private final String description;
 
   private final Runnable backgroundTask;
@@ -25,11 +24,6 @@ public class RunnableSwingWorker extends SwingWorker<Void, Void> {
     return null;
   }
 
-  @Override
-  protected void done() {
-
-  }
-
   public String getDescription() {
     return description;
   }
@@ -37,5 +31,9 @@ public class RunnableSwingWorker extends SwingWorker<Void, Void> {
   @Override
   public String toString() {
     return description;
+  }
+
+  @Override
+  protected void uiTask() {
   }
 }

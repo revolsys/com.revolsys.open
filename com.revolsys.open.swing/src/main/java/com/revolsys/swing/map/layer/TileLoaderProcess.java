@@ -4,13 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javax.swing.SwingWorker;
-
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class TileLoaderProcess extends SwingWorker<Void, Void> {
+public class TileLoaderProcess extends AbstractSwingWorker<Void, Void> {
   private final TiledImageLayerRenderer renderer;
 
   private MapTile mapTile;
@@ -64,11 +63,6 @@ public class TileLoaderProcess extends SwingWorker<Void, Void> {
     return null;
   }
 
-  @Override
-  protected void done() {
-
-  }
-
   private synchronized MapTile getNextMapTile() {
     final MapTile mapTile = this.mapTiles.poll();
     if (mapTile == null) {
@@ -80,5 +74,10 @@ public class TileLoaderProcess extends SwingWorker<Void, Void> {
   @Override
   public String toString() {
     return "Loading map tiles for " + this.layer;
+  }
+
+  @Override
+  protected void uiTask() {
+
   }
 }

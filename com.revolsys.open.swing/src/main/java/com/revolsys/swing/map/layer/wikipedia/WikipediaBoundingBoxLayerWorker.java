@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.SwingWorker;
-
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
@@ -20,10 +18,11 @@ import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.geonames.GeoNamesService;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.vividsolutions.jts.geom.Point;
 
 public class WikipediaBoundingBoxLayerWorker extends
-  SwingWorker<DataObjectQuadTree, Void> {
+  AbstractSwingWorker<DataObjectQuadTree, Void> {
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
@@ -97,17 +96,17 @@ public class WikipediaBoundingBoxLayerWorker extends
   }
 
   @Override
-  protected void done() {
+  public String toString() {
+    return "Load Wikipedia Articles";
+  }
+
+  @Override
+  protected void uiTask() {
     try {
       final DataObjectQuadTree index = get();
       this.layer.setIndex(this.boundingBox, index);
     } catch (final Throwable e) {
       this.layer.setIndex(this.boundingBox, null);
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Load Wikipedia Articles";
   }
 }

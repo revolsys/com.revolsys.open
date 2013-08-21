@@ -38,7 +38,7 @@ import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.beans.MethodRunnable;
+import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -424,7 +424,7 @@ public class SwingUtil {
       try {
         final Method method = SwingUtil.class.getMethod("setFieldValue",
           JComponent.class, Object.class);
-        final MethodRunnable runnable = new MethodRunnable(method,
+        final MethodInvoker runnable = new MethodInvoker(method,
           SwingUtil.class, field, value);
         SwingWorkerManager.invokeLater(runnable);
       } catch (final Throwable t) {

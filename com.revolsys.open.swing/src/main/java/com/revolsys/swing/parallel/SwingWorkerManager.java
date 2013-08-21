@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -125,14 +124,6 @@ public class SwingWorkerManager {
     }
     worker.addPropertyChangeListener(PROPERTY_CHANGE_LISTENER);
     worker.execute();
-  }
-
-  public static void executeUi(final String description, final Object object,
-    final String doneMethodName, final Object... doneParameters) {
-    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, null, Collections.emptyList(), doneMethodName,
-      Arrays.asList(doneParameters));
-    execute(worker);
   }
 
   public static PropertyChangeSupport getPropertyChangeSupport() {

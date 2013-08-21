@@ -3,16 +3,16 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
-import javax.swing.SwingWorker;
-
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
+public class LoadingWorker extends
+  AbstractSwingWorker<DataObjectQuadTree, Void> {
   private final BoundingBox viewportBoundingBox;
 
   private final DataObjectStoreLayer layer;
@@ -39,8 +39,22 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
     return index;
   }
 
+  public AbstractDataObjectLayer getLayer() {
+    return this.layer;
+  }
+
+  public BoundingBox getViewportBoundingBox() {
+    return this.viewportBoundingBox;
+  }
+
   @Override
-  protected void done() {
+  public String toString() {
+    final String typePath = this.layer.getTypePath();
+    return "Loading: " + typePath;
+  }
+
+  @Override
+  protected void uiTask() {
     try {
       if (!isCancelled()) {
         final DataObjectQuadTree index = get();
@@ -55,19 +69,5 @@ public class LoadingWorker extends SwingWorker<DataObjectQuadTree, Void> {
         .error("Unable to load " + typePath, t);
       this.layer.clearLoading(this.viewportBoundingBox);
     }
-  }
-
-  public AbstractDataObjectLayer getLayer() {
-    return this.layer;
-  }
-
-  public BoundingBox getViewportBoundingBox() {
-    return this.viewportBoundingBox;
-  }
-
-  @Override
-  public String toString() {
-    final String typePath = this.layer.getTypePath();
-    return "Loading: " + typePath;
   }
 }

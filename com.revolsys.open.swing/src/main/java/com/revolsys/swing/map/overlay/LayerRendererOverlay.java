@@ -76,7 +76,7 @@ public class LayerRendererOverlay extends JComponent implements
     synchronized (this.loadSync) {
       image = this.image;
 
-      if (image == null) {
+      if (image == null && imageWorker == null) {
         final BoundingBox boundingBox = this.viewport.getBoundingBox();
         final int viewWidthPixels = this.viewport.getViewWidthPixels();
         final int viewHeightPixels = this.viewport.getViewHeightPixels();

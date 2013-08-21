@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.SwingWorker;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
@@ -16,7 +14,7 @@ import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
+public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
   private Callable<T> backgroundTask;
 
   private Object doneObject;
@@ -74,8 +72,17 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     }
   }
 
+  public String getDescription() {
+    return this.description;
+  }
+
   @Override
-  protected void done() {
+  public String toString() {
+    return this.description;
+  }
+
+  @Override
+  protected void uiTask() {
     T result = null;
     try {
       if (!isCancelled()) {
@@ -107,14 +114,5 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
               this.doneMethodName, parameters), e);
       }
     }
-  }
-
-  public String getDescription() {
-    return this.description;
-  }
-
-  @Override
-  public String toString() {
-    return this.description;
   }
 }

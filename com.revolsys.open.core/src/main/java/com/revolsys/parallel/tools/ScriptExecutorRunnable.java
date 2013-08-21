@@ -20,10 +20,11 @@ import org.springframework.context.support.GenericApplicationContext;
 import com.revolsys.beans.ResourceEditorRegistrar;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
+import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.spring.factory.Parameter;
 
-public class ScriptExecutorRunnable implements Runnable {
+public class ScriptExecutorRunnable extends AbstractRunnable {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
 
   private static Throwable getBeanExceptionCause(final BeanCreationException e) {
@@ -75,16 +76,8 @@ public class ScriptExecutorRunnable implements Runnable {
     this.beans.putAll(beans);
   }
 
-  public Map<String, Object> getBeans() {
-    return beans;
-  }
-
-  public boolean isLogScriptInfo() {
-    return logScriptInfo;
-  }
-
   @Override
-  public void run() {
+  public void doRun() {
     final long startTime = System.currentTimeMillis();
     try {
       String logPath = null;
@@ -166,6 +159,14 @@ public class ScriptExecutorRunnable implements Runnable {
       seconds = seconds % 60;
       LOG.info(minutes + " minutes " + seconds + " seconds");
     }
+  }
+
+  public Map<String, Object> getBeans() {
+    return beans;
+  }
+
+  public boolean isLogScriptInfo() {
+    return logScriptInfo;
   }
 
   public void setBeans(final Map<String, Object> beans) {

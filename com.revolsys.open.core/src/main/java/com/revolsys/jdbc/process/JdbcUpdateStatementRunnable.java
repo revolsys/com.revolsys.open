@@ -5,14 +5,20 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.parallel.AbstractRunnable;
 
-public class JdbcUpdateStatementRunnable implements Runnable {
+public class JdbcUpdateStatementRunnable extends AbstractRunnable {
 
   private DataSource dataSource;
 
   private List<Object> parameters;
 
   private String sql;
+
+  @Override
+  public void doRun() {
+    JdbcUtils.executeUpdate(dataSource, sql, parameters.toArray());
+  }
 
   public DataSource getDataSource() {
     return dataSource;
@@ -24,11 +30,6 @@ public class JdbcUpdateStatementRunnable implements Runnable {
 
   public String getSql() {
     return sql;
-  }
-
-  @Override
-  public void run() {
-    JdbcUtils.executeUpdate(dataSource, sql, parameters.toArray());
   }
 
   public void setDataSource(final DataSource dataSource) {

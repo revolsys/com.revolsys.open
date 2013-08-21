@@ -1,6 +1,8 @@
 package com.revolsys.parallel.process;
 
-public class ProcessRunnable implements Runnable {
+import com.revolsys.parallel.AbstractRunnable;
+
+public class ProcessRunnable extends AbstractRunnable {
   private final ProcessNetwork processManager;
 
   private final Process process;
@@ -12,7 +14,7 @@ public class ProcessRunnable implements Runnable {
   }
 
   @Override
-  public void run() {
+  public void doRun() {
     try {
       process.run();
     } finally {

@@ -6,27 +6,27 @@
  */
 package com.revolsys.swing.tree.dynamic;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.parallel.SwingWorkerManager;
 
-public abstract class DynamicTreeNode extends DefaultMutableTreeNode implements
-  Runnable {
+public abstract class DynamicTreeNode extends DefaultMutableTreeNode {
   /**
    * 
    */
   private static final long serialVersionUID = 1396159389429851162L;
 
-  private DefaultMutableTreeModelChangedTask refreshTask;
-
   private final DynamicNodeLoader childLoader;
 
   private final String name;
+
+  private DefaultTreeModel model;
 
   public DynamicTreeNode(final String name, final DynamicNodeLoader childLoader) {
     this.name = name;
@@ -44,19 +44,19 @@ public abstract class DynamicTreeNode extends DefaultMutableTreeNode implements
     return this.name;
   }
 
-  public void populateChildren(final JTree tree) {
-    this.refreshTask = new DefaultMutableTreeModelChangedTask(tree, this);
-    SwingWorkerManager.invokeLater(this);
-  }
-
-  @Override
-  public void run() {
-    final List locations = this.childLoader.loadNodes(getUserObject());
-    for (final Iterator children = locations.iterator(); children.hasNext();) {
-      final MutableTreeNode childNode = (MutableTreeNode)children.next();
+  public void loadNodes() {
+    @SuppressWarnings("unchecked")
+    final List<MutableTreeNode> nodes = this.childLoader.loadNodes(getUserObject());
+    for (final MutableTreeNode childNode : nodes) {
       add(childNode);
     }
-    SwingWorkerManager.invokeLater(this.refreshTask);
+    model.nodeStructureChanged(this);
+  }
+
+  public void populateChildren(final JTree tree) {
+    model = (DefaultTreeModel)tree.getModel();
+
+    SwingWorkerManager.invokeLater(new InvokeMethodRunnable(this, "loadNodes"));
   }
 
   @Override
