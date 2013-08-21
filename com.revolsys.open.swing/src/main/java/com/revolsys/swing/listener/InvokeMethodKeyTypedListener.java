@@ -30,7 +30,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * An ActionListener that invokes the method on the object when the action is
@@ -68,7 +68,7 @@ public class InvokeMethodKeyTypedListener extends KeyAdapter {
   @Override
   public void keyTyped(final KeyEvent e) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }

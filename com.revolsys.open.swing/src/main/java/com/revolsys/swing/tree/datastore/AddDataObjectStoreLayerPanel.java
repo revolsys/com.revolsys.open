@@ -20,7 +20,7 @@ import com.revolsys.i18n.I18n;
 import com.revolsys.swing.i18n.NamedJPanel;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.PasswordUtil;
 
 public class AddDataObjectStoreLayerPanel extends NamedJPanel {
@@ -59,7 +59,7 @@ public class AddDataObjectStoreLayerPanel extends NamedJPanel {
 
       @Override
       public void actionPerformed(final ActionEvent e) {
-        SwingWorkerManager.invokeLater(new Runnable() {
+        Invoke.later(new Runnable() {
           @Override
           public void run() {
             final Map<String, Object> connectionProperties = new LinkedHashMap<String, Object>();

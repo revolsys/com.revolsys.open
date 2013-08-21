@@ -257,7 +257,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
           final Color textBoxColor = style.getTextBoxColor();
           if (textBoxColor != null) {
-            final double pixel = viewport.getModelUnitsPerViewUnit();
+            final double pixel = 1 / viewport.getModelUnitsPerViewUnit();
             graphics.setColor(textBoxColor);
             graphics.fill(new Rectangle2D.Double(bounds.getX() - pixel,
               bounds.getY(), width + 2 * pixel, height));

@@ -4,7 +4,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * An ActionListener that invokes the method on the object when the action is
@@ -53,7 +53,7 @@ public class InvokeMethodChangeListener implements ChangeListener {
   @Override
   public void stateChanged(final ChangeEvent e) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }

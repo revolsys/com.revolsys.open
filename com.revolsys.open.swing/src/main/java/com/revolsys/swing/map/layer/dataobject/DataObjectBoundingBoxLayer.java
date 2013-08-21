@@ -15,7 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
@@ -63,7 +63,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
               DataObjectBoundingBoxLayer.class, BoundingBox.class);
             this.worker = (SwingWorker)constructor.newInstance(this,
               boundingBox);
-            SwingWorkerManager.execute(this.worker);
+            Invoke.worker(this.worker);
           } catch (final NoSuchMethodException e) {
             LOG.error("Worker Constructor not found", e);
           } catch (final InvocationTargetException e) {

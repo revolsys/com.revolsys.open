@@ -69,11 +69,7 @@ import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
 import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
-@SuppressWarnings("serial")
 public class ProjectFrame extends BaseFrame {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   static {

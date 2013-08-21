@@ -4,7 +4,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodSelectedItemListener implements ItemListener {
 
@@ -32,7 +32,7 @@ public class InvokeMethodSelectedItemListener implements ItemListener {
       final Runnable runnable = new InvokeMethodRunnable(this.object,
         this.methodName, e.getItem());
       if (this.invokeLater) {
-        SwingWorkerManager.invokeLater(runnable);
+        Invoke.later(runnable);
       } else {
         runnable.run();
       }

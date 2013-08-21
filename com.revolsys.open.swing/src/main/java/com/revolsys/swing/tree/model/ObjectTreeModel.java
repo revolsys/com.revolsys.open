@@ -21,7 +21,7 @@ import com.revolsys.beans.ClassRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.StringTreeNodeModel;
@@ -276,7 +276,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model != null) {
       model.initialize(node);
-      SwingWorkerManager.invokeLater(this, "setNodeInitialized", path, node);
+      Invoke.later(this, "setNodeInitialized", path, node);
     }
   }
 

@@ -82,7 +82,7 @@ import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.DataObjectLayerAttributesTableModel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
 import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
@@ -1077,7 +1077,7 @@ public class DataObjectLayerForm extends JPanel implements
         CollectionUtil.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
       } else {
-        SwingWorkerManager.invokeLater(this, "setFieldInvalid", fieldName,
+        Invoke.later(this, "setFieldInvalid", fieldName,
           message);
       }
     }
@@ -1117,7 +1117,7 @@ public class DataObjectLayerForm extends JPanel implements
         updateTabValid(tabIndex);
         return true;
       } else {
-        SwingWorkerManager.invokeLater(this, "setFieldValid", fieldName);
+        Invoke.later(this, "setFieldValid", fieldName);
         return false;
       }
     }
@@ -1213,7 +1213,7 @@ public class DataObjectLayerForm extends JPanel implements
       if (SwingUtilities.isEventDispatchThread()) {
         this.tabs.setBackgroundAt(index, null);
       } else {
-        SwingWorkerManager.invokeLater(this, "setTabColor", index);
+        Invoke.later(this, "setTabColor", index);
       }
     }
   }
@@ -1224,9 +1224,9 @@ public class DataObjectLayerForm extends JPanel implements
         this.tabs.setBackgroundAt(index, color);
       } else {
         if (color == null) {
-          SwingWorkerManager.invokeLater(this, "setTabColor", index);
+          Invoke.later(this, "setTabColor", index);
         } else {
-          SwingWorkerManager.invokeLater(this, "setTabColor", index, color);
+          Invoke.later(this, "setTabColor", index, color);
         }
       }
     }
@@ -1249,7 +1249,7 @@ public class DataObjectLayerForm extends JPanel implements
         }
         validateFields(fieldNames);
       } else {
-        SwingWorkerManager.invokeLater(this, "setValues", values);
+        Invoke.later(this, "setValues", values);
       }
     }
 
@@ -1312,7 +1312,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   public boolean validateField(final String fieldName) {
     if (SwingUtilities.isEventDispatchThread()) {
-      SwingWorkerManager.execute("Validate Field " + fieldName, this,
+      Invoke.background("Validate Field " + fieldName, this,
         "validateField", fieldName);
       return false;
     } else {

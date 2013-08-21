@@ -15,7 +15,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
@@ -66,7 +66,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     this.url = SpringUtil.getUrl(resource).toString();
     setType("geoReferencedImage");
     setName(FileUtil.getBaseName(this.url));
-    SwingWorkerManager.execute("Loading file: " + this.url, this, "revert");
+    Invoke.background("Loading file: " + this.url, this, "revert");
   }
 
   public BoundingBox fitToViewport() {

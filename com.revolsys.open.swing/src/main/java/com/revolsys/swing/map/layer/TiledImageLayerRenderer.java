@@ -14,7 +14,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
@@ -104,7 +104,7 @@ public class TiledImageLayerRenderer extends
         this.tileLoaderProcess = layer.createTileLoaderProcess();
         this.tileLoaderProcess.addMapTiles(resolution, geometryFactory,
           tilesToLoad);
-        SwingWorkerManager.execute(this.tileLoaderProcess);
+        Invoke.worker(this.tileLoaderProcess);
       }
     }
   }

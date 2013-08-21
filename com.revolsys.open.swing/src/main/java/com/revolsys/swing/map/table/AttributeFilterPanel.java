@@ -30,7 +30,7 @@ import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.JavaBeanUtil;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
@@ -169,7 +169,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       if (SwingUtilities.isEventDispatchThread()) {
         final Method method = JavaBeanUtil.getMethod(getClass(),
           "fireSearchChanged", String.class, Object.class, Object.class);
-        SwingWorkerManager.execute("Change search", this, method, propertyName,
+        Invoke.background("Change search", this, method, propertyName,
           oldValue, newValue);
       } else {
         firePropertyChange(propertyName, oldValue, newValue);

@@ -35,7 +35,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -234,7 +234,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           }
           this.loadingBoundingBox = loadBoundingBox;
           this.loadingWorker = createLoadingWorker(loadBoundingBox);
-          SwingWorkerManager.execute(this.loadingWorker);
+          Invoke.worker(this.loadingWorker);
         }
       }
       Polygon polygon = boundingBox.toPolygon();

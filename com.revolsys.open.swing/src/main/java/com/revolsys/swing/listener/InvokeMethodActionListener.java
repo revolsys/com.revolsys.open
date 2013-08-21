@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * An ActionListener that invokes the method on the object when the action is
@@ -42,7 +42,7 @@ public class InvokeMethodActionListener implements ActionListener {
   @Override
   public void actionPerformed(final ActionEvent event) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }

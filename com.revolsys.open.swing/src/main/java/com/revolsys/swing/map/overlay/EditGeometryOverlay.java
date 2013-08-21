@@ -1028,10 +1028,12 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     }
 
     final java.awt.Point mousePosition = getMap().getMapMousePosition();
-    final MouseEvent event = new MouseEvent((Component)e.getSource(),
-      MouseEvent.MOUSE_MOVED, e.getWhen(), modifiers, mousePosition.x,
-      mousePosition.y, 0, false);
-    mouseMoved(event);
+    if (mousePosition != null) {
+      final MouseEvent event = new MouseEvent((Component)e.getSource(),
+        MouseEvent.MOUSE_MOVED, e.getWhen(), modifiers, mousePosition.x,
+        mousePosition.y, 0, false);
+      mouseMoved(event);
+    }
   }
 
   @Override

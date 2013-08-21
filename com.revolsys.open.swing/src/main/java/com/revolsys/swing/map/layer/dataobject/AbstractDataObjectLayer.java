@@ -91,7 +91,7 @@ import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.table.DataObjectMetaDataTableModel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -893,7 +893,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
-      SwingWorkerManager.invokeLater(MergeObjectsDialog.class, "showDialog",
+      Invoke.later(MergeObjectsDialog.class, "showDialog",
         this);
     }
   }
@@ -1131,7 +1131,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void setEditable(final boolean editable) {
     if (SwingUtilities.isEventDispatchThread()) {
-      SwingWorkerManager.execute("Set editable", this, "setEditable", editable);
+      Invoke.background("Set editable", this, "setEditable", editable);
     } else {
       synchronized (this.editSync) {
         if (editable == false) {
@@ -1423,7 +1423,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (!StringUtils.hasText(attributeFilterMode)) {
         attributeFilterMode = DataObjectLayerTableModel.MODE_ALL;
       }
-      SwingWorkerManager.invokeLater(this, "showRecordsTable",
+      Invoke.later(this, "showRecordsTable",
         attributeFilterMode);
     }
   }

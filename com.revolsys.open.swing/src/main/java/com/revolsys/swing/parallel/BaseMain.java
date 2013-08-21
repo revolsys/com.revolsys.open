@@ -77,7 +77,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
       doPreRun();
       if (swing) {
-        SwingWorkerManager.invokeLater(this, "doRun");
+        Invoke.later(this, "doRun");
       } else {
         doRun();
       }

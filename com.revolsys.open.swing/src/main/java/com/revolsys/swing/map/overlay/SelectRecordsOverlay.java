@@ -33,7 +33,7 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
@@ -164,7 +164,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-      SwingWorkerManager.execute("Select records", this, "selectRecords",
+      Invoke.background("Select records", this, "selectRecords",
         boundingBox);
       event.consume();
     }
@@ -354,7 +354,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     } else {
       methodName = "selectRecords";
     }
-    SwingWorkerManager.execute("Select records", this, methodName, boundingBox);
+    Invoke.background("Select records", this, methodName, boundingBox);
     event.consume();
   }
 

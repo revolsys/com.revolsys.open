@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class FileDropTargetListener implements DropTargetListener,
   HierarchyListener {
@@ -113,7 +113,7 @@ public class FileDropTargetListener implements DropTargetListener,
         }
       }
       if (files != null && !files.isEmpty()) {
-        SwingWorkerManager.execute("Open Files", Project.get(), "openFiles",
+        Invoke.background("Open Files", Project.get(), "openFiles",
           files);
       }
       event.getDropTargetContext().dropComplete(true);

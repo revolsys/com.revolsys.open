@@ -15,7 +15,7 @@ import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
@@ -175,7 +175,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   @Override
   public void actionPerformed(final ActionEvent event) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }

@@ -9,7 +9,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class JTableUtil {
 
@@ -35,7 +35,7 @@ public class JTableUtil {
         column.setPreferredWidth(maxwidth + 5);
       }
     } else {
-      SwingWorkerManager.invokeLater(JTableUtil.class, "sizeColumnsToFit",
+      Invoke.later(JTableUtil.class, "sizeColumnsToFit",
         table);
     }
   }

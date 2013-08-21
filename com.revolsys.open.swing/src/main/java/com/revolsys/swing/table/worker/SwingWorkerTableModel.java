@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 
 @SuppressWarnings("serial")
@@ -60,7 +60,7 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   public SwingWorkerTableModel() {
     this.listener = new InvokeMethodPropertyChangeListener(this,
       "fireTableDataChanged");
-    final PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
+    final PropertyChangeSupport propertyChangeSupport = Invoke.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(this.listener);
   }
 
@@ -81,17 +81,17 @@ public class SwingWorkerTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return SwingWorkerManager.getWorkerCount();
+    return Invoke.getWorkerCount();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final SwingWorker<?, ?> worker = SwingWorkerManager.getWorker(rowIndex);
+    final SwingWorker<?, ?> worker = Invoke.getWorker(rowIndex);
     if (worker == null) {
       return "-";
     } else {
       if (columnIndex == 1) {
-        if (SwingWorkerManager.isWorkerRunning(worker)) {
+        if (Invoke.isWorkerRunning(worker)) {
           return "Running";
         } else {
           return "Waiting";

@@ -15,7 +15,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
@@ -83,7 +83,7 @@ public class LayerRendererOverlay extends JComponent implements
         final GeoReferencedImage loadImage = new GeoReferencedImage(
           boundingBox, viewWidthPixels, viewHeightPixels);
         this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
-        SwingWorkerManager.execute(this.imageWorker);
+        Invoke.worker(this.imageWorker);
       }
     }
     GeoReferencedImageLayerRenderer.render(this.viewport, (Graphics2D)g, image);

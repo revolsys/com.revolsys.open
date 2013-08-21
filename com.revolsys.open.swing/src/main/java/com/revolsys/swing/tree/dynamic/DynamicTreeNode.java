@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public abstract class DynamicTreeNode extends DefaultMutableTreeNode {
   /**
@@ -56,7 +56,7 @@ public abstract class DynamicTreeNode extends DefaultMutableTreeNode {
   public void populateChildren(final JTree tree) {
     model = (DefaultTreeModel)tree.getModel();
 
-    SwingWorkerManager.invokeLater(new InvokeMethodRunnable(this, "loadNodes"));
+    Invoke.later(new InvokeMethodRunnable(this, "loadNodes"));
   }
 
   @Override

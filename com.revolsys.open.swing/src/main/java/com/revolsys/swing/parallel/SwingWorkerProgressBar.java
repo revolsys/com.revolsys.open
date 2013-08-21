@@ -16,7 +16,7 @@ public class SwingWorkerProgressBar extends JPanel implements
 
   public SwingWorkerProgressBar() {
     super(new BorderLayout());
-    SwingWorkerManager.getPropertyChangeSupport().addPropertyChangeListener(
+    Invoke.getPropertyChangeSupport().addPropertyChangeListener(
       "workers", this);
     progressBar.setIndeterminate(true);
     add(progressBar, BorderLayout.WEST);
@@ -37,7 +37,7 @@ public class SwingWorkerProgressBar extends JPanel implements
   @Override
   public void removeNotify() {
     super.removeNotify();
-    SwingWorkerManager.getPropertyChangeSupport().removePropertyChangeListener(
+    Invoke.getPropertyChangeSupport().removePropertyChangeListener(
       "workers", this);
   }
 }

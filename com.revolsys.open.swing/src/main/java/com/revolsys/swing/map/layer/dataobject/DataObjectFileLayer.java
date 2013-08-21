@@ -21,7 +21,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.grid.GridLayer;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectFileLayer extends DataObjectListLayer {
@@ -51,7 +51,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     this.url = SpringUtil.getUrl(resource).toString();
     setType("dataObjectFile");
     setName(FileUtil.getBaseName(this.url));
-    SwingWorkerManager.execute("Loading file: " + this.url, this, "revert");
+    Invoke.background("Loading file: " + this.url, this, "revert");
   }
 
   public String getUrl() {

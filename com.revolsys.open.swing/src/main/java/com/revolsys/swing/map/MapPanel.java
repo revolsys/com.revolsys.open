@@ -380,8 +380,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public Point getMapMousePosition() {
     final Point mousePosition = this.layeredPane.getMousePosition();
-    mousePosition.x -= this.layeredPane.getInsets().left;
-    mousePosition.y -= this.layeredPane.getInsets().top;
+    if (mousePosition != null) {
+      mousePosition.x -= this.layeredPane.getInsets().left;
+      mousePosition.y -= this.layeredPane.getInsets().top;
+    }
     return mousePosition;
   }
 

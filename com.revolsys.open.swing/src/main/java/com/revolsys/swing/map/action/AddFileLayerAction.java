@@ -24,7 +24,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.util.CollectionUtil;
 
@@ -105,7 +105,7 @@ public class AddFileLayerAction extends AbstractAction {
     if (status == JFileChooser.APPROVE_OPTION) {
       final LayerGroup layerGroup = ObjectTree.getMouseClickItem();
       final File file = fileChooser.getSelectedFile();
-      SwingWorkerManager.execute(
+      Invoke.background(
         "Open File: " + FileUtil.getCanonicalPath(file), layerGroup,
         "openFile", file);
     }

@@ -28,7 +28,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectListTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -162,8 +162,7 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
       MergedValuePredicate.add(table, mergedObject);
       this.okButton.setEnabled(true);
     } else {
-      SwingWorkerManager.invokeLater(this, "setMergedObject", mergedObject,
-        objects);
+      Invoke.later(this, "setMergedObject", mergedObject, objects);
     }
   }
 
@@ -172,7 +171,7 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
   }
 
   private void showDialog() {
-    SwingWorkerManager.execute(toString(), this, "run");
+    Invoke.background(toString(), this, "run");
     setVisible(true);
   }
 

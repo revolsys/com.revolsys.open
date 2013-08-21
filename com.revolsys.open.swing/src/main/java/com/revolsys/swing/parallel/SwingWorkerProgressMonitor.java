@@ -98,7 +98,7 @@ public class SwingWorkerProgressMonitor {
   }
 
   public void execute() {
-    SwingWorkerManager.invokeLater(new Runnable() {
+    Invoke.later(new Runnable() {
       @Override
       public void run() {
         if (progress == null) {
@@ -108,7 +108,7 @@ public class SwingWorkerProgressMonitor {
           progress.setMillisToPopup(100);
           progress.setProgress(0);
           for (final SwingWorker<?, ?> task : tasks) {
-            SwingWorkerManager.execute(task);
+            Invoke.worker(task);
           }
         }
       }

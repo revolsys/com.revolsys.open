@@ -4,7 +4,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * An ActionListener that invokes the method on the object when the action is
@@ -42,7 +42,7 @@ public class InvokeMethodTreeSelectionListener implements TreeSelectionListener 
   @Override
   public void valueChanged(final TreeSelectionEvent e) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }

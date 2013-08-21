@@ -56,7 +56,7 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -426,7 +426,7 @@ public class SwingUtil {
           JComponent.class, Object.class);
         final MethodInvoker runnable = new MethodInvoker(method,
           SwingUtil.class, field, value);
-        SwingWorkerManager.invokeLater(runnable);
+        Invoke.later(runnable);
       } catch (final Throwable t) {
         ExceptionUtil.throwUncheckedException(t);
       }

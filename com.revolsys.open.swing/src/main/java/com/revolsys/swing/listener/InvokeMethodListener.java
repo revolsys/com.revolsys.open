@@ -15,7 +15,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodListener extends InvokeMethodRunnable implements
   ActionListener, DocumentListener, ListSelectionListener, ItemListener,
@@ -72,7 +72,7 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   protected void invokeMethod() {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this);
+      Invoke.later(this);
     } else {
       run();
     }

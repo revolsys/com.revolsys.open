@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
@@ -69,7 +69,7 @@ public class InvokeMethodPropertyChangeListener implements
       runnable = new InvokeMethodRunnable(this.object, this.methodName, evt);
     }
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(runnable);
+      Invoke.later(runnable);
     } else {
       runnable.run();
     }

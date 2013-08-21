@@ -38,7 +38,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.table.predicate.NewPredicate;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTableModel;
@@ -147,8 +147,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   protected int getCachedRowCount() {
     if (!this.countLoaded) {
       if (this.rowCountWorker == null) {
-        this.rowCountWorker = SwingWorkerManager.execute("Query row count "
-          + this.layer.getName(), this, "updateRowCount");
+        this.rowCountWorker = Invoke.background(
+          "Query row count " + this.layer.getName(), this, "updateRowCount");
       }
       return 0;
     } else {
@@ -229,8 +229,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (page == null) {
         this.loadingPageNumbers.add(pageNumber);
         if (this.loadObjectsWorker == null) {
-          this.loadObjectsWorker = SwingWorkerManager.execute(
-            "Loading records " + getTypeName(), this, "loadPages");
+          this.loadObjectsWorker = Invoke.background("Loading records "
+            + getTypeName(), this, "loadPages");
         }
         return null;
       } else {

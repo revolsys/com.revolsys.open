@@ -23,7 +23,7 @@ import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
-public class SwingWorkerManager {
+public class Invoke {
   private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
     @Override
     public synchronized void propertyChange(final PropertyChangeEvent event) {
@@ -62,32 +62,41 @@ public class SwingWorkerManager {
   };
 
   private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(
-    SwingWorkerManager.class);
+    Invoke.class);
 
   private static final List<WeakReference<SwingWorker<?, ?>>> WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
   private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
-  public static void execute(final Runnable backgroundTask) {
-    execute(new RunnableSwingWorker(backgroundTask));
+  public static void andWait(final Object object, final String methodName,
+    final Object... parameters) {
+    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
+      methodName, parameters);
+    if (SwingUtilities.isEventDispatchThread()) {
+      runnable.run();
+    } else {
+      try {
+        SwingUtilities.invokeAndWait(runnable);
+      } catch (final InterruptedException e) {
+        ExceptionUtil.throwUncheckedException(e);
+      } catch (final InvocationTargetException e) {
+        ExceptionUtil.throwCauseException(e);
+      }
+    }
   }
 
-  public static void execute(final String description, final Object object,
+  public static void background(final Runnable backgroundTask) {
+    worker(new RunnableSwingWorker(backgroundTask));
+  }
+
+  public static void background(final String description, final Object object,
     final Method method, final Object... parameters) {
     final MethodInvoker backgroundTask = new MethodInvoker(method, object,
       parameters);
-    execute(description, backgroundTask);
+    background(description, backgroundTask);
   }
 
-  public static SwingWorker<?, ?> execute(final String description,
-    final Object object, final String backgroundMethodName) {
-    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName);
-    execute(worker);
-    return worker;
-  }
-
-  public static SwingWorker<?, ?> execute(final String description,
+  public static SwingWorker<?, ?> worker(final String description,
     final Object object, final String backgroundMethodName,
     final Collection<? extends Object> backgrounMethodParameters,
     final String doneMethodName,
@@ -95,25 +104,25 @@ public class SwingWorkerManager {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
       description, object, backgroundMethodName, backgrounMethodParameters,
       doneMethodName, doneMethodParameters);
-    execute(worker);
+    worker(worker);
     return worker;
   }
 
-  public static SwingWorker<?, ?> execute(final String description,
+  public static SwingWorker<?, ?> background(final String description,
     final Object object, final String backgroundMethodName,
     final Object... parameters) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
       description, object, backgroundMethodName, Arrays.asList(parameters));
-    execute(worker);
+    worker(worker);
     return worker;
   }
 
-  public static void execute(final String description,
+  public static void background(final String description,
     final Runnable backgroundTask) {
-    execute(new RunnableSwingWorker(description, backgroundTask));
+    worker(new RunnableSwingWorker(description, backgroundTask));
   }
 
-  public static void execute(
+  public static void worker(
     final SwingWorker<? extends Object, ? extends Object> worker) {
     synchronized (WORKERS) {
       final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
@@ -151,31 +160,18 @@ public class SwingWorkerManager {
     return CollectionUtil.getReferences(WORKERS);
   }
 
-  public static void invokeAndWait(final Object object,
-    final String methodName, final Object... parameters) {
-    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
-      methodName, parameters);
-    if (SwingUtilities.isEventDispatchThread()) {
-      runnable.run();
-    } else {
-      try {
-        SwingUtilities.invokeAndWait(runnable);
-      } catch (final InterruptedException e) {
-        ExceptionUtil.throwUncheckedException(e);
-      } catch (final InvocationTargetException e) {
-        ExceptionUtil.throwCauseException(e);
-      }
-    }
+  public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {
+    return CollectionUtil.containsReference(RUNNING_WORKERS, worker);
   }
 
-  public static void invokeLater(final Object object, final String methodName,
+  public static void later(final Object object, final String methodName,
     final Object... parameters) {
     final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
       methodName, parameters);
-    SwingUtilities.invokeLater(runnable);
+    later(runnable);
   }
 
-  public static void invokeLater(final Runnable runnable) {
+  public static void later(final Runnable runnable) {
     if (SwingUtilities.isEventDispatchThread()) {
       runnable.run();
     } else {
@@ -183,17 +179,13 @@ public class SwingWorkerManager {
     }
   }
 
-  public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {
-    return CollectionUtil.containsReference(RUNNING_WORKERS, worker);
-  }
-
   public static void transactionExecute(
     final PlatformTransactionManager transactionManager,
     final int propagationBehavior, final Runnable runnable) {
-    execute(TransactionUtils.createRunnable(transactionManager,
+    background(TransactionUtils.createRunnable(transactionManager,
       propagationBehavior, runnable));
   }
 
-  private SwingWorkerManager() {
+  private Invoke() {
   }
 }

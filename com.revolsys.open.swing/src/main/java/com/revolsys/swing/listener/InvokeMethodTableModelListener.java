@@ -30,7 +30,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.parallel.SwingWorkerManager;
+import com.revolsys.swing.parallel.Invoke;
 
 /**
  * An TableModelListener that invokes the method on the object when the table
@@ -68,7 +68,7 @@ public class InvokeMethodTableModelListener implements TableModelListener {
   @Override
   public void tableChanged(final TableModelEvent e) {
     if (this.invokeLater) {
-      SwingWorkerManager.invokeLater(this.runnable);
+      Invoke.later(this.runnable);
     } else {
       this.runnable.run();
     }
