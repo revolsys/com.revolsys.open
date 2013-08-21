@@ -96,14 +96,11 @@ public class Invoke {
     background(description, backgroundTask);
   }
 
-  public static SwingWorker<?, ?> worker(final String description,
+  public static SwingWorker<?, ?> background(final String description,
     final Object object, final String backgroundMethodName,
-    final Collection<? extends Object> backgrounMethodParameters,
-    final String doneMethodName,
-    final Collection<? extends Object> doneMethodParameters) {
+    final List<Object> parameters) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, backgrounMethodParameters,
-      doneMethodName, doneMethodParameters);
+      description, object, backgroundMethodName, parameters);
     worker(worker);
     return worker;
   }
@@ -120,19 +117,6 @@ public class Invoke {
   public static void background(final String description,
     final Runnable backgroundTask) {
     worker(new RunnableSwingWorker(description, backgroundTask));
-  }
-
-  public static void worker(
-    final SwingWorker<? extends Object, ? extends Object> worker) {
-    synchronized (WORKERS) {
-      final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
-      if (!CollectionUtil.containsReference(WORKERS, worker)) {
-        WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
-      }
-      PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers, WORKERS);
-    }
-    worker.addPropertyChangeListener(PROPERTY_CHANGE_LISTENER);
-    worker.execute();
   }
 
   public static PropertyChangeSupport getPropertyChangeSupport() {
@@ -184,6 +168,31 @@ public class Invoke {
     final int propagationBehavior, final Runnable runnable) {
     background(TransactionUtils.createRunnable(transactionManager,
       propagationBehavior, runnable));
+  }
+
+  public static SwingWorker<?, ?> worker(final String description,
+    final Object object, final String backgroundMethodName,
+    final Collection<? extends Object> backgrounMethodParameters,
+    final String doneMethodName,
+    final Collection<? extends Object> doneMethodParameters) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, backgroundMethodName, backgrounMethodParameters,
+      doneMethodName, doneMethodParameters);
+    worker(worker);
+    return worker;
+  }
+
+  public static void worker(
+    final SwingWorker<? extends Object, ? extends Object> worker) {
+    synchronized (WORKERS) {
+      final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
+      if (!CollectionUtil.containsReference(WORKERS, worker)) {
+        WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
+      }
+      PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers, WORKERS);
+    }
+    worker.addPropertyChangeListener(PROPERTY_CHANGE_LISTENER);
+    worker.execute();
   }
 
   private Invoke() {

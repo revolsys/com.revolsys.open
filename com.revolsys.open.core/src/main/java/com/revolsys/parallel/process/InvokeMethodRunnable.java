@@ -8,7 +8,6 @@ import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.parallel.AbstractRunnable;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -44,14 +43,34 @@ public class InvokeMethodRunnable extends AbstractRunnable {
 
   public static String toString(final Object object, final String methodName,
     final List<Object> parameters) {
-    Class<?> clazz;
-    if (object instanceof Class) {
-      clazz = (Class<?>)object;
+    final StringBuffer string = new StringBuffer();
+
+    if (object == null) {
+    } else if (object instanceof Class<?>) {
+      string.append(object);
+      string.append('.');
     } else {
-      clazz = object.getClass();
+      string.append(object.getClass());
+      string.append('.');
     }
-    return clazz.getName() + "." + methodName + "("
-      + CollectionUtil.toString(parameters) + ")";
+    string.append(methodName);
+    string.append('(');
+    for (int i = 0; i < parameters.size(); i++) {
+      if (i > 0) {
+        string.append(',');
+      }
+      final Object parameter = parameters.get(i);
+      if (parameter == null) {
+        string.append("null");
+      } else {
+        string.append(parameter.getClass());
+      }
+    }
+    string.append(')');
+    string.append('\n');
+    string.append(parameters);
+
+    return string.toString();
   }
 
   public static String toString(final Object object, final String methodName,
@@ -119,14 +138,33 @@ public class InvokeMethodRunnable extends AbstractRunnable {
 
   @Override
   public String toString() {
+    final StringBuffer string = new StringBuffer();
+
     if (object == null) {
-      return methodName + parameters;
     } else if (object instanceof Class<?>) {
-      return object + "." + methodName + "(" + Arrays.toString(parameters)
-        + ")";
+      string.append(object);
+      string.append('.');
     } else {
-      return object.getClass() + "." + methodName + "("
-        + Arrays.toString(parameters) + ")";
+      string.append(object.getClass());
+      string.append('.');
     }
+    string.append(methodName);
+    string.append('(');
+    for (int i = 0; i < parameters.length; i++) {
+      if (i > 0) {
+        string.append(',');
+      }
+      final Object parameter = parameters[i];
+      if (parameter == null) {
+        string.append("null");
+      } else {
+        string.append(parameter.getClass());
+      }
+    }
+    string.append(')');
+    string.append('\n');
+    string.append(Arrays.toString(parameters));
+
+    return string.toString();
   }
 }

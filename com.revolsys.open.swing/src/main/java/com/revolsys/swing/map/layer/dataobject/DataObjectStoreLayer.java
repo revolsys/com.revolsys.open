@@ -662,6 +662,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final String id = object.getString(getMetaData().getIdAttributeName());
       if (this.deletedObjectIds.contains(id) || super.isDeleted(object)) {
         removeDeletedObject(object);
+        deletedObjectIds.remove(id);
         this.index.remove(object);
         object.setState(DataObjectState.Deleted);
         writer.write(object);

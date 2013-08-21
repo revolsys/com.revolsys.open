@@ -150,31 +150,32 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       if (rows != null) {
         try {
           final Row row = dataStore.nextRow(rows);
-
-          try {
-            final List<Object> esriValues = new ArrayList<Object>();
+          if (row != null) {
             try {
-              for (final Attribute attribute : metaData.getAttributes()) {
-                final String name = attribute.getName();
-                final Object value = object.getValue(name);
-                final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-                esriValues.add(esriAttribute.setUpdateValue(object, row, value));
+              final List<Object> esriValues = new ArrayList<Object>();
+              try {
+                for (final Attribute attribute : metaData.getAttributes()) {
+                  final String name = attribute.getName();
+                  final Object value = object.getValue(name);
+                  final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+                  esriValues.add(esriAttribute.setUpdateValue(object, row,
+                    value));
+                }
+                dataStore.updateRow(table, row);
+              } finally {
+                dataStore.addStatistic("Update", object);
               }
-              dataStore.updateRow(table, row);
-            } finally {
-              dataStore.addStatistic("Update", object);
-            }
-          } catch (final IllegalArgumentException e) {
-            LOG.error(
-              "Unable to insert row " + e.getMessage() + "\n"
+            } catch (final IllegalArgumentException e) {
+              LOG.error("Unable to insert row " + e.getMessage() + "\n"
                 + object.toString(), e);
-          } catch (final RuntimeException e) {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Unable to insert row \n:" + object.toString());
+            } catch (final RuntimeException e) {
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Unable to insert row \n:" + object.toString());
+              }
+              throw new RuntimeException("Unable to update row", e);
+            } finally {
+              dataStore.closeRow(row);
             }
-            throw new RuntimeException("Unable to update row", e);
-          } finally {
-            dataStore.closeRow(row);
           }
         } finally {
           dataStore.closeEnumRows(rows);

@@ -384,7 +384,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // }
 
   protected synchronized void closeRow(final Row row) {
-    row.delete();
+    if (row != null) {
+      row.delete();
+    }
   }
 
   protected synchronized void closeTable(final Table table) {

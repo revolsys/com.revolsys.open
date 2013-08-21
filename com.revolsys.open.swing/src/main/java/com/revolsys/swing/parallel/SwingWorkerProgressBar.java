@@ -11,13 +11,14 @@ import javax.swing.JProgressBar;
 
 public class SwingWorkerProgressBar extends JPanel implements
   PropertyChangeListener {
+  private static final long serialVersionUID = -5112492385171847107L;
 
   private final JProgressBar progressBar = new JProgressBar();
 
   public SwingWorkerProgressBar() {
     super(new BorderLayout());
-    Invoke.getPropertyChangeSupport().addPropertyChangeListener(
-      "workers", this);
+    Invoke.getPropertyChangeSupport()
+      .addPropertyChangeListener("workers", this);
     progressBar.setIndeterminate(true);
     add(progressBar, BorderLayout.WEST);
     progressBar.setPreferredSize(new Dimension(48, 16));
@@ -37,7 +38,7 @@ public class SwingWorkerProgressBar extends JPanel implements
   @Override
   public void removeNotify() {
     super.removeNotify();
-    Invoke.getPropertyChangeSupport().removePropertyChangeListener(
-      "workers", this);
+    Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers",
+      this);
   }
 }

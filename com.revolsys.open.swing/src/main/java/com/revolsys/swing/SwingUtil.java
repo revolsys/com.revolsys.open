@@ -346,6 +346,14 @@ public class SwingUtil {
     }
   }
 
+  public static Window getWindowAncestor(final Component component) {
+    if (component == null) {
+      return null;
+    } else {
+      return SwingUtilities.getWindowAncestor(component);
+    }
+  }
+
   public static int getX(final Component component) {
     final int x = component.getX();
     final Component parent = component.getParent();
