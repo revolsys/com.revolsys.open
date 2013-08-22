@@ -18,9 +18,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
-import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
@@ -156,15 +154,14 @@ public class Project extends LayerGroup {
     if (resource.exists()) {
       final Resource dataStoresDirectory = SpringUtil.getResource(resource,
         "Data Stores");
-      final DataObjectStoreConnectionManager dataObjectStoreConnectionManager = DataObjectStoreConnectionManager.get();
-      final DataObjectStoreConnectionRegistry dataStores = dataObjectStoreConnectionManager.addConnectionRegistry(
+      final DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
         "Project", dataStoresDirectory);
       setDataStores(dataStores);
 
       final Resource folderConnectionsDirectory = SpringUtil.getResource(
         resource, "Folder Connections");
-      this.folderConnections = FolderConnectionManager.get()
-        .addConnectionRegistry("Project", folderConnectionsDirectory);
+      this.folderConnections = new FolderConnectionRegistry("Project",
+        folderConnectionsDirectory);
 
       final Resource layersDir = SpringUtil.getResource(resource, "Layers");
       readLayers(layersDir);

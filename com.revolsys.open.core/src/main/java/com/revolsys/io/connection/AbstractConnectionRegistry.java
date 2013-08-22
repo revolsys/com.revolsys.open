@@ -38,13 +38,13 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   private final String fileExtension = "rgobject";
 
-  private final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager;
+  private ConnectionRegistryManager<ConnectionRegistry<T>> connectionManager;
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
     final String name) {
-    this.connectionManager = connectionManager;
     this.name = name;
+    setConnectionManager(connectionManager);
   }
 
   protected synchronized void addConnection(final String name,
@@ -125,7 +125,7 @@ public abstract class AbstractConnectionRegistry<T> implements
 
   @Override
   public ConnectionRegistryManager<ConnectionRegistry<T>> getConnectionManager() {
-    return (ConnectionRegistryManager)connectionManager;
+    return connectionManager;
   }
 
   @Override
@@ -202,6 +202,20 @@ public abstract class AbstractConnectionRegistry<T> implements
   }
 
   protected abstract boolean removeConnection(T connection);
+
+  @Override
+  public void setConnectionManager(
+    final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager) {
+    if (this.connectionManager != connectionManager) {
+      if (this.connectionManager != null) {
+        propertyChangeSupport.removePropertyChangeListener(connectionManager);
+      }
+      this.connectionManager = (ConnectionRegistryManager)connectionManager;
+      if (connectionManager != null) {
+        propertyChangeSupport.addPropertyChangeListener(connectionManager);
+      }
+    }
+  }
 
   protected void setDirectory(final Resource resource) {
     if (resource instanceof FileSystemResource) {

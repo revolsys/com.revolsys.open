@@ -16,13 +16,13 @@ import com.revolsys.util.CollectionUtil;
 public class FolderConnectionRegistry extends
   AbstractConnectionRegistry<FolderConnection> {
 
-  protected FolderConnectionRegistry(
+  public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name) {
     super(connectionManager, name);
     init();
   }
 
-  protected FolderConnectionRegistry(
+  public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
     final boolean visible, final FolderConnection... connections) {
     super(connectionManager, name);
@@ -34,12 +34,16 @@ public class FolderConnectionRegistry extends
     }
   }
 
-  protected FolderConnectionRegistry(
+  public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
     final Resource resource) {
     super(connectionManager, name);
     setDirectory(resource);
     init();
+  }
+
+  public FolderConnectionRegistry(final String name, final Resource resource) {
+    this(null, name, resource);
   }
 
   public void addConnection(final FolderConnection connection) {

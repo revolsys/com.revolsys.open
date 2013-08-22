@@ -154,7 +154,9 @@ public class ProjectFrame extends BaseFrame {
           if (newValue instanceof ConnectionRegistry) {
             final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
             final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
-            tree.expandPath(connectionManagers, connectionManager, registry);
+            if (connectionManager != null) {
+              tree.expandPath(connectionManagers, connectionManager, registry);
+            }
           }
         }
       });
@@ -344,6 +346,16 @@ public class ProjectFrame extends BaseFrame {
   public void loadProject(final File projectFile) {
     final FileSystemResource resource = new FileSystemResource(projectFile);
     this.project.readProject(resource);
+
+    final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
+    dataStoreConnectionManager.removeConnectionRegistry("Project");
+    dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
+    //
+    // final FolderConnectionManager folderConnectionManager =
+    // FolderConnectionManager.get();
+    // folderConnectionManager.removeConnectionRegistry("Project");
+    // folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
+
   }
 
 }

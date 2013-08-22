@@ -19,4 +19,7 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
   String getName();
 
   boolean isVisible();
+
+  void setConnectionManager(
+    ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager);
 }

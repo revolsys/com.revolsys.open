@@ -5,7 +5,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<?>>
+public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, V>
   implements ConnectionRegistryManager<T> {
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
@@ -26,13 +26,22 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<?>>
       if (!registries.contains(registry)) {
         index = registries.size();
         registries.add(registry);
-        registry.getPropertyChangeSupport().addPropertyChangeListener(this);
+        registry.setConnectionManager(this);
       }
     }
     if (index != -1) {
       propertyChangeSupport.fireIndexedPropertyChange("registries", index,
         null, registry);
     }
+  }
+
+  protected T findConnectionRegistry(final String name) {
+    for (final T registry : registries) {
+      if (registry.getName().equals(name)) {
+        return registry;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -42,12 +51,11 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<?>>
 
   @Override
   public T getConnectionRegistry(final String name) {
-    for (final T registry : registries) {
-      if (registry.getName().equals(name)) {
-        return registry;
-      }
+    final T connectionRegistry = findConnectionRegistry(name);
+    if (connectionRegistry == null) {
+      return registries.get(0);
     }
-    return registries.get(0);
+    return connectionRegistry;
   }
 
   @Override
@@ -76,19 +84,28 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<?>>
     propertyChangeSupport.firePropertyChange(event);
   }
 
+  public void removeConnectionRegistry(final String name) {
+    final T connectionRegistry = findConnectionRegistry(name);
+    removeConnectionRegistry(connectionRegistry);
+  }
+
   @Override
   public void removeConnectionRegistry(final T registry) {
-    int index;
-    synchronized (registries) {
-      index = registries.indexOf(registry);
-      if (index != -1) {
-        registries.remove(registry);
-        registry.getPropertyChangeSupport().removePropertyChangeListener(this);
+    if (registry != null) {
+      int index;
+      synchronized (registries) {
+        index = registries.indexOf(registry);
+        if (index != -1) {
+          registries.remove(registry);
+          registry.setConnectionManager(null);
+          registry.getPropertyChangeSupport()
+            .removePropertyChangeListener(this);
+        }
       }
-    }
-    if (index != -1) {
-      propertyChangeSupport.fireIndexedPropertyChange("registries", index,
-        registry, null);
+      if (index != -1) {
+        propertyChangeSupport.fireIndexedPropertyChange("registries", index,
+          registry, null);
+      }
     }
   }
 

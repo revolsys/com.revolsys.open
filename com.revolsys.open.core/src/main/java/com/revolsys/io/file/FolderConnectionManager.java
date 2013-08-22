@@ -11,7 +11,7 @@ import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OperatingSystemUtil;
 
 public class FolderConnectionManager extends
-  AbstractConnectionRegistryManager<FolderConnectionRegistry> {
+  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection> {
 
   private static final FolderConnectionManager INSTANCE;
 
@@ -42,8 +42,12 @@ public class FolderConnectionManager extends
     super("Folder Connections");
   }
 
-  public synchronized void addConnectionRegistry(final String name) {
-    addConnectionRegistry(new FolderConnectionRegistry(this, name));
+  public synchronized FolderConnectionRegistry addConnectionRegistry(
+    final String name) {
+    final FolderConnectionRegistry registry = new FolderConnectionRegistry(
+      this, name);
+    addConnectionRegistry(registry);
+    return registry;
   }
 
   public synchronized FolderConnectionRegistry addConnectionRegistry(

@@ -12,8 +12,9 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OperatingSystemUtil;
 
-public class DataObjectStoreConnectionManager extends
-  AbstractConnectionRegistryManager<DataObjectStoreConnectionRegistry> {
+public class DataObjectStoreConnectionManager
+  extends
+  AbstractConnectionRegistryManager<DataObjectStoreConnectionRegistry, DataObjectStoreConnection> {
 
   private static final DataObjectStoreConnectionManager INSTANCE;
 
@@ -61,4 +62,5 @@ public class DataObjectStoreConnectionManager extends
     addConnectionRegistry(registry);
     return registry;
   }
+
 }

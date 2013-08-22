@@ -33,6 +33,11 @@ public class DataObjectStoreConnectionRegistry extends
     init();
   }
 
+  public DataObjectStoreConnectionRegistry(final String name,
+    final Resource resource) {
+    this(null, name, resource);
+  }
+
   public void addConnection(final DataObjectStoreConnection connection) {
     addConnection(connection.getName(), connection);
   }

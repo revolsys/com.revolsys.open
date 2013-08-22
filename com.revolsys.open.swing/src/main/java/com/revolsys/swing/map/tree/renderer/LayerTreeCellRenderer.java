@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.tree.renderer;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -155,12 +154,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
 
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
-    if (icon != null) {
-      label.setIcon(icon);
-      final Dimension preferredSize = getPreferredSize();
-      setPreferredSize(new Dimension(preferredSize.width + 5,
-        preferredSize.height));
-    }
+    setIcon(icon);
 
     return label;
   }
