@@ -165,7 +165,10 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   @Override
   public void focusLost(final FocusEvent e) {
-    this.menu.setVisible(false);
+    Component oppositeComponent = e.getOppositeComponent();
+    if (oppositeComponent != list) {
+      this.menu.setVisible(false);
+    }
   }
 
   @Override
@@ -449,9 +452,6 @@ public class DataStoreSearchTextField extends JXSearchField implements
       this.menu.setVisible(true);
       this.menu.show(this, 0, this.getHeight());
       this.menu.pack();
-      if (objects.size() == 1) {
-        this.list.setSelectedIndex(0);
-      }
     }
   }
 
