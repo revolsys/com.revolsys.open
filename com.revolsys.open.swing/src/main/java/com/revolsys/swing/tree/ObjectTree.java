@@ -24,11 +24,11 @@ import javax.swing.tree.TreePath;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 
-@SuppressWarnings("serial")
 public class ObjectTree extends JTree implements PropertyChangeListener,
   MouseListener {
 
@@ -249,24 +249,28 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event instanceof IndexedPropertyChangeEvent) {
-      final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)event;
-      final Object source = event.getSource();
-      final int index = indexedEvent.getIndex();
-      final Object oldValue = event.getOldValue();
-      final Object newValue = event.getNewValue();
-      if (oldValue == null) {
-        final TreePath path = this.model.getPath(source);
-        if (path != null) {
-          this.model.fireTreeNodesInserted(path, index, newValue);
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (event instanceof IndexedPropertyChangeEvent) {
+        final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)event;
+        final Object source = event.getSource();
+        final int index = indexedEvent.getIndex();
+        final Object oldValue = event.getOldValue();
+        final Object newValue = event.getNewValue();
+        if (oldValue == null) {
+          final TreePath path = this.model.getPath(source);
+          if (path != null) {
+            this.model.fireTreeNodesInserted(path, index, newValue);
+          }
+        } else if (newValue == null) {
+          final TreePath path = this.model.getPath(source);
+          if (path != null) {
+            this.model.fireTreeNodesRemoved(path, index, oldValue);
+          }
         }
-      } else if (newValue == null) {
-        final TreePath path = this.model.getPath(source);
-        if (path != null) {
-          this.model.fireTreeNodesRemoved(path, index, oldValue);
-        }
-      }
 
+      }
+    } else {
+      Invoke.later(this, "propertyChange", event);
     }
   }
 
