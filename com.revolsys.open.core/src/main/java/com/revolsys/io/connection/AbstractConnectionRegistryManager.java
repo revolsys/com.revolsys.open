@@ -30,8 +30,11 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
       }
     }
     if (index != -1) {
-      propertyChangeSupport.fireIndexedPropertyChange("registries", index,
-        null, registry);
+      index = getVisibleConnectionRegistries().indexOf(registry);
+      if (index != -1) {
+        propertyChangeSupport.fireIndexedPropertyChange("registries", index,
+          null, registry);
+      }
     }
   }
 

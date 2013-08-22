@@ -51,7 +51,12 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
       if (StringUtils.hasText(name)) {
         return name;
       } else {
+        String path = file.getPath();
+        if (path.equals("/")) {
         return "/ (ROOT)";
+        } else {
+          return path.replaceAll("//", "");
+        }
       }
     }
   }
@@ -60,22 +65,26 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   public TreeCellRenderer getRenderer(final File file) {
     final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)super.getRenderer(file);
     if (!file.exists()) {
+      renderer.setLeafIcon(ICON_FOLDER_MISSING);
       renderer.setOpenIcon(ICON_FOLDER_MISSING);
       renderer.setClosedIcon(ICON_FOLDER_MISSING);
-    } else if (file.getParentFile() == null) {
-      renderer.setOpenIcon(ICON_FOLDER_DRIVE);
-      renderer.setClosedIcon(ICON_FOLDER_DRIVE);
-    } else if (file.isDirectory()) {
-      renderer.setOpenIcon(ICON_FOLDER);
-      renderer.setClosedIcon(ICON_FOLDER);
     } else {
+      String name = file.getName();
+      if (!StringUtils.hasText(name)) {
+        renderer.setOpenIcon(ICON_FOLDER_DRIVE);
+        renderer.setClosedIcon(ICON_FOLDER_DRIVE);
+      } else if (file.isDirectory()) {
+        renderer.setOpenIcon(ICON_FOLDER);
+        renderer.setClosedIcon(ICON_FOLDER);
+      } else {
+      }
     }
     return renderer;
   }
 
   @Override
   public boolean isLeaf(final File file) {
-    return !file.isDirectory();
+    return !file.isDirectory() && StringUtils.hasText(file.getName());
   }
 
 }

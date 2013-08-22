@@ -37,7 +37,7 @@ import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
-  private static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(PropertyChangeEvent.class);
+  public static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(PropertyChangeEvent.class);
 
   private Runnable runnable;
 

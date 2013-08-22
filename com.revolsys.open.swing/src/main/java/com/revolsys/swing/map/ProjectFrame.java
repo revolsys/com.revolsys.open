@@ -44,6 +44,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
+import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -96,6 +97,8 @@ public class ProjectFrame extends BaseFrame {
 
   private MapPanel mapPanel;
 
+  private ObjectTreePanel catalogPanel;
+
   public ProjectFrame(final String title) {
     this(title, new Project());
   }
@@ -126,14 +129,12 @@ public class ProjectFrame extends BaseFrame {
     connectionManagers.add(DataObjectStoreConnectionManager.get());
     connectionManagers.add(FileSystemConnectionManager.get());
     connectionManagers.add(FolderConnectionManager.get());
-    /* connectionManagers.add(WmsConnectionManager.get()); */
 
     final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
       new DataObjectStoreConnectionManagerModel(),
       new FileSystemConnectionManagerModel(),
       new FolderConnectionManagerModel());
-    final ObjectTreePanel catalogPanel = new ObjectTreePanel(
-      connectionManagers, listModel);
+    catalogPanel = new ObjectTreePanel(connectionManagers, listModel);
     final ObjectTree tree = catalogPanel.getTree();
     tree.setDragEnabled(false);
 
@@ -147,19 +148,9 @@ public class ProjectFrame extends BaseFrame {
       }
     }
     connectionManagers.getPropertyChangeSupport().addPropertyChangeListener(
-      "registries", new PropertyChangeListener() {
-        @Override
-        public void propertyChange(final PropertyChangeEvent event) {
-          final Object newValue = event.getNewValue();
-          if (newValue instanceof ConnectionRegistry) {
-            final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-            final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
-            if (connectionManager != null) {
-              tree.expandPath(connectionManagers, connectionManager, registry);
-            }
-          }
-        }
-      });
+      "registries",
+      new InvokeMethodPropertyChangeListener(true, this,
+        "expandConnectionManagers", PropertyChangeEvent.class));
     final LayerGroup project = getProject();
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
       "catalog", "Catalog", catalogPanel);
@@ -168,6 +159,35 @@ public class ProjectFrame extends BaseFrame {
 
   }
 
+  public void expandConnectionManagers(PropertyChangeEvent event) {
+    final Object newValue = event.getNewValue();
+    if (newValue instanceof ConnectionRegistry) {
+      final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+      final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
+      if (connectionManager != null) {
+        List<?> connectionRegistries = connectionManager.getConnectionRegistries();
+        if (connectionRegistries != null) {
+          final ObjectTree tree = catalogPanel.getTree();
+          tree.expandPath(connectionRegistries, connectionManager, registry);
+        }
+      }
+    }
+  }
+
+  public void expandLayers(PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof LayerGroup) {
+      LayerGroup layerGroup = (LayerGroup)source;
+      final Object newValue = event.getNewValue();
+      if (newValue instanceof LayerGroup) {
+        layerGroup = (LayerGroup)newValue;
+      }
+      final List<Layer> pathList = layerGroup.getPathList();
+      final TreePath treePath = ObjectTree.createTreePath(pathList);
+      ObjectTree tree = tocPanel.getTree();
+      tree.expandPath(treePath);
+    }
+  }
   protected void addControlWorkingArea() {
     final CLocation location = CLocation.base().normalWest(0.20);
     DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
@@ -217,26 +237,12 @@ public class ProjectFrame extends BaseFrame {
     this.tocPanel = new ObjectTreePanel(this.project, model);
     final ObjectTree tree = this.tocPanel.getTree();
     tree.setRootVisible(true);
-    this.project.addPropertyChangeListener("layers",
-      new PropertyChangeListener() {
-
-        @Override
-        public void propertyChange(final PropertyChangeEvent event) {
-          final Object source = event.getSource();
-          if (source instanceof LayerGroup) {
-            LayerGroup layerGroup = (LayerGroup)source;
-            final Object newValue = event.getNewValue();
-            if (newValue instanceof LayerGroup) {
-              layerGroup = (LayerGroup)newValue;
-            }
-            final List<Layer> pathList = layerGroup.getPathList();
-            final TreePath treePath = ObjectTree.createTreePath(pathList);
-            tree.expandPath(treePath);
-          }
-
-        }
-      });
-    panel.add(this.tocPanel, BorderLayout.CENTER);
+    
+    this.project.getPropertyChangeSupport().addPropertyChangeListener(
+      "layers",
+      new InvokeMethodPropertyChangeListener(true, this,
+        "expandLayers", PropertyChangeEvent.class));
+     panel.add(this.tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       this.project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
     tableOfContents.toFront();
@@ -350,11 +356,10 @@ public class ProjectFrame extends BaseFrame {
     final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
     dataStoreConnectionManager.removeConnectionRegistry("Project");
     dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
-    //
-    // final FolderConnectionManager folderConnectionManager =
-    // FolderConnectionManager.get();
-    // folderConnectionManager.removeConnectionRegistry("Project");
-    // folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
+
+    final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
+    folderConnectionManager.removeConnectionRegistry("Project");
+    folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
 
   }
 

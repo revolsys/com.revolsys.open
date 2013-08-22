@@ -270,7 +270,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
       }
     } else {
-      Invoke.later(this, "propertyChange", event);
+      Invoke.andWait(this, "propertyChange", event);
     }
   }
 

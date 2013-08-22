@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.util.OperatingSystemUtil;
 
 public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
   /**
@@ -141,6 +142,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
   public LayerTreeCellRenderer() {
   }
 
+  
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, Object value,
     final boolean selected, final boolean expanded, final boolean leaf,
@@ -155,6 +157,9 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     setIcon(icon);
+    if (OperatingSystemUtil.isWindows()) {
+      setText(value + "    ");
+    }
 
     return label;
   }
