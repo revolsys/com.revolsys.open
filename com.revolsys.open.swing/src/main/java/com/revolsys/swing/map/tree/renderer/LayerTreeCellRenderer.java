@@ -142,17 +142,23 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
   }
 
   @Override
-  public Component getTreeCellRendererComponent(final JTree tree,
-    final Object value, final boolean selected, final boolean expanded,
-    final boolean leaf, final int row, final boolean hasFocus) {
-    final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
-      value, selected, expanded, leaf, row, hasFocus);
+  public Component getTreeCellRendererComponent(final JTree tree, Object value,
+    final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    Icon icon = null;
     if (value instanceof Layer) {
       final Layer layer = (Layer)value;
-      label.setText(layer.getName());
-      final Icon icon = getIcon(this, layer);
-      setIcon(icon);
+      value = layer.getName();
+      icon = getIcon(this, layer);
     }
+
+    final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
+      value, selected, expanded, leaf, row, hasFocus);
+    if (icon != null) {
+      setIcon(icon);
+      setSize(getPreferredSize());
+    }
+
     return label;
   }
 }

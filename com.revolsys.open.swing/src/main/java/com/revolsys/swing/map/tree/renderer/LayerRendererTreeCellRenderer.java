@@ -109,6 +109,12 @@ public class LayerRendererTreeCellRenderer extends DefaultTreeCellRenderer {
   public Component getTreeCellRendererComponent(final JTree tree,
     final Object value, final boolean selected, final boolean expanded,
     final boolean leaf, final int row, final boolean hasFocus) {
+    if (value instanceof LayerRenderer) {
+      final LayerRenderer<?> renderer = (LayerRenderer<?>)value;
+      final Icon icon = getIcon(this, renderer);
+      setIcon(icon);
+      setText(renderer.getName());
+    }
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     if (value instanceof LayerRenderer) {
