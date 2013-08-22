@@ -73,15 +73,11 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-@SuppressWarnings("serial")
 public class EditGeometryOverlay extends SelectRecordsOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
 
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private final Geometry oldGeometry = EditGeometryOverlay.this.addGeometry;
@@ -201,6 +197,8 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   private java.awt.Point moveGeometryStart;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
+
+  private final Map<Coordinates, List<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -720,6 +718,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   }
 
   private boolean hasSnapPoint(final BoundingBox boundingBox) {
+    new TreeMap<Coordinates, List<CloseLocation>>();
     final GeometryFactory geometryFactory = Project.get().getGeometryFactory();
     final Point point = boundingBox.getCentrePoint();
     final Set<DataObjectLayer> layers = getSnapLayers();

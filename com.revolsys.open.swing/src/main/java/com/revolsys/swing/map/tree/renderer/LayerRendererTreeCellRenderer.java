@@ -113,9 +113,9 @@ public class LayerRendererTreeCellRenderer extends DefaultTreeCellRenderer {
       value, selected, expanded, leaf, row, hasFocus);
     if (value instanceof LayerRenderer) {
       final LayerRenderer<?> renderer = (LayerRenderer<?>)value;
-      label.setText(renderer.getName());
       final Icon icon = getIcon(this, renderer);
       setIcon(icon);
+      label.setText(renderer.getName());
     }
     return label;
   }
