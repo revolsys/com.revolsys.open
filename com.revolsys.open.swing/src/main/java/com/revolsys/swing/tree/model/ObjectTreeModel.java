@@ -293,6 +293,10 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     }
   }
 
+  public void fireTreeNodesChanged(final TreePath path) {
+    eventHandler.treeNodesChanged(new TreeModelEvent(this.root, path));
+  }
+
   private boolean isInitialized(final TreePath path,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model == null) {

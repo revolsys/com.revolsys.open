@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
@@ -111,4 +112,6 @@ public interface Layer extends PropertyChangeSupportProxy,
   void showProperties();
 
   void showProperties(String tabName);
+
+  List<Layer> getPathList();
 }

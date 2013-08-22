@@ -19,6 +19,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -170,6 +171,11 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
       }
     }
     return values;
+  }
+
+  @Override
+  public ObjectTreeModel getModel() {
+    return model;
   }
 
   public boolean isMenuEnabled() {

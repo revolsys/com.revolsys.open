@@ -68,6 +68,7 @@ import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionManagerModel;
 import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
 import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 
 public class ProjectFrame extends BaseFrame {
@@ -177,17 +178,29 @@ public class ProjectFrame extends BaseFrame {
   public void expandLayers(PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof LayerGroup) {
-      LayerGroup layerGroup = (LayerGroup)source;
       final Object newValue = event.getNewValue();
       if (newValue instanceof LayerGroup) {
-        layerGroup = (LayerGroup)newValue;
+        expandLayers((LayerGroup)newValue);
       }
-      final List<Layer> pathList = layerGroup.getPathList();
-      final TreePath treePath = ObjectTree.createTreePath(pathList);
-      ObjectTree tree = tocPanel.getTree();
-      tree.expandPath(treePath);
     }
   }
+
+  protected void expandLayers(Layer layer) {
+    final List<Layer> pathList = layer.getPathList();
+    ObjectTree tree = tocPanel.getTree();
+    final TreePath treePath = ObjectTree.createTreePath(pathList);
+    if (layer instanceof LayerGroup) {
+      LayerGroup layerGroup = (LayerGroup)layer;
+      tree.expandPath(treePath);
+      for (Layer childLayer : layerGroup) {
+        expandLayers(childLayer);
+      }
+    } else {
+      ObjectTreeModel model = tree.getModel();
+      model.fireTreeNodesChanged(treePath);
+    }
+  }
+
   protected void addControlWorkingArea() {
     final CLocation location = CLocation.base().normalWest(0.20);
     DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
@@ -237,12 +250,12 @@ public class ProjectFrame extends BaseFrame {
     this.tocPanel = new ObjectTreePanel(this.project, model);
     final ObjectTree tree = this.tocPanel.getTree();
     tree.setRootVisible(true);
-    
+
     this.project.getPropertyChangeSupport().addPropertyChangeListener(
       "layers",
-      new InvokeMethodPropertyChangeListener(true, this,
-        "expandLayers", PropertyChangeEvent.class));
-     panel.add(this.tocPanel, BorderLayout.CENTER);
+      new InvokeMethodPropertyChangeListener(true, this, "expandLayers",
+        PropertyChangeEvent.class));
+    panel.add(this.tocPanel, BorderLayout.CENTER);
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       this.project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
     tableOfContents.toFront();
