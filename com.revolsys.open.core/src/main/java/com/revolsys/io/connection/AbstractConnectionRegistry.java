@@ -173,6 +173,11 @@ public abstract class AbstractConnectionRegistry<T> implements
     propertyChangeSupport.firePropertyChange(event);
   }
 
+  public boolean removeConnection(final String name) {
+    final T connection = getConnection(name);
+    return removeConnection(connection);
+  }
+
   protected synchronized boolean removeConnection(final String name,
     final T connection) {
     if (connection != null && name != null) {

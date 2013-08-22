@@ -83,8 +83,8 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
     } catch (final Throwable e) {
       final Logger logger = Logger.getLogger(getClass());
-      final LoggingEvent event = new LoggingEvent(logger.getName(), logger,
-        Level.ERROR, "Unable to start application", e);
+      final LoggingEvent event = new LoggingEvent(logger.getClass().getName(),
+        logger, Level.ERROR, "Unable to start application", e);
 
       LoggingEventPanel.showDialog(null, event);
       ExceptionUtil.log(getClass(), "Unable to start application " + name, e);
@@ -93,7 +93,7 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {
-    Class<? extends BaseMain> logClass = getClass();
+    final Class<? extends BaseMain> logClass = getClass();
     ExceptionUtil.log(logClass, "Unable to start application " + name, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger()
@@ -105,8 +105,8 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
     }
     final Logger logger = Logger.getLogger(logClass);
-    final LoggingEvent event = new LoggingEvent(logger.getName(), logger,
-      Level.ERROR, "Unable to start application", e);
+    final LoggingEvent event = new LoggingEvent(logger.getClass().getName(),
+      logger, Level.ERROR, "Unable to start application", e);
 
     LoggingEventPanel.showDialog(null, event);
 

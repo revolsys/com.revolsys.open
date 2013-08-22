@@ -82,4 +82,5 @@ public class DataObjectStoreConnectionRegistry extends
       return removeConnection(connection.getName(), connection);
     }
   }
+
 }
