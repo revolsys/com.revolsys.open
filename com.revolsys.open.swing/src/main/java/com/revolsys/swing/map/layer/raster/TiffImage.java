@@ -115,7 +115,7 @@ public class TiffImage extends GeoReferencedImage {
         final double pixelHeight = geoTransform.getAsDouble(5);
         final double xRotation = geoTransform.getAsDouble(4);
         final double yRotation = geoTransform.getAsDouble(1);
-
+        setResolution(pixelWidth);
         // TODO rotation
         setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         return true;
@@ -146,7 +146,7 @@ public class TiffImage extends GeoReferencedImage {
         // modelYOffset));
         final double pixelWidth = pixelScale.getAsDouble(0);
         final double pixelHeight = pixelScale.getAsDouble(1);
-
+        setResolution(pixelWidth);
         setBoundingBox(x1, y1, pixelWidth, pixelHeight);
         return true;
       }

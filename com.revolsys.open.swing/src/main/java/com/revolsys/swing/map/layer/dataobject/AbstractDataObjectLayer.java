@@ -893,8 +893,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
-      Invoke.later(MergeObjectsDialog.class, "showDialog",
-        this);
+      Invoke.later(MergeObjectsDialog.class, "showDialog", this);
     }
   }
 
@@ -925,6 +924,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       for (final DataObject sourceRecord : reader) {
         final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
           sourceRecord);
+
+        // TODO ignore case
         newValues.keySet().retainAll(attributeNames);
         if (geometryDataType != null) {
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
@@ -1423,8 +1424,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (!StringUtils.hasText(attributeFilterMode)) {
         attributeFilterMode = DataObjectLayerTableModel.MODE_ALL;
       }
-      Invoke.later(this, "showRecordsTable",
-        attributeFilterMode);
+      Invoke.later(this, "showRecordsTable", attributeFilterMode);
     }
   }
 

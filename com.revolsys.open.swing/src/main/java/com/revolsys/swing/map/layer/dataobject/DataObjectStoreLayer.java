@@ -613,7 +613,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     synchronized (this.formObjectIds) {
       final String id = getId(object);
       if (id == null) {
-        return null;
+        return super.showForm(object);
       } else {
         this.formObjectIds.add(id);
         final LayerDataObject cachedObject = getCacheObject(id, object);

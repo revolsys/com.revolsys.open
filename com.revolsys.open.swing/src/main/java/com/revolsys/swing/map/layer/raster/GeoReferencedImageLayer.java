@@ -70,11 +70,11 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   public BoundingBox fitToViewport() {
-    final BoundingBox oldValue = this.image.getBoundingBox();
     final Project project = getProject();
-    if (project == null) {
+    if (project == null || this.image == null) {
       return new BoundingBox();
     } else {
+      final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
       if (viewBoundingBox.isNull()) {
         return viewBoundingBox;

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.vividsolutions.jts.geom.Point;
@@ -79,12 +80,22 @@ public class GeoReferencedImageLayerRenderer extends
     if (layer.isVisible(scale)) {
       if (!layer.isEditable()) {
         final GeoReferencedImage image = layer.getImage();
-        final BoundingBox boundingBox = layer.getBoundingBox();
-        if (boundingBox == null || boundingBox.isNull()) {
-          layer.fitToViewport();
+        if (image != null) {
+          BoundingBox boundingBox = layer.getBoundingBox();
+          if (boundingBox == null || boundingBox.isNull()) {
+            boundingBox = layer.fitToViewport();
+          }
+          if (viewport.getBoundingBox().intersects(boundingBox)) {
+            final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+            // final GeoReferencedImage convertedImage = image.getImage(
+            // viewGeometryFactory.getCoordinateSystem(),
+            // image.getResolution());
+            // TODO projection (it's slow and takes lots of memory
+            final BoundingBox convertedBoundingBox = boundingBox.convert(viewGeometryFactory);
+            render(viewport, graphics, image, convertedBoundingBox);
+          }
         }
 
-        render(viewport, graphics, image);
       }
     }
   }

@@ -35,6 +35,8 @@ public class GeoReferencedImage {
 
   private Resource imageResource;
 
+  private double resolution;
+
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
     this(boundingBox, image.getWidth(), image.getHeight());
@@ -137,6 +139,10 @@ public class GeoReferencedImage {
     return this.jaiImage;
   }
 
+  public double getResolution() {
+    return resolution;
+  }
+
   @Override
   public int hashCode() {
     return this.boundingBox.hashCode();
@@ -175,6 +181,7 @@ public class GeoReferencedImage {
           // Top left
           final double x1 = Double.parseDouble(reader.readLine());
           final double y1 = Double.parseDouble(reader.readLine());
+          setResolution(pixelWidth);
 
           // TODO rotation
           setBoundingBox(x1, y1, pixelWidth, pixelHeight);
@@ -235,5 +242,9 @@ public class GeoReferencedImage {
 
   public void setJaiImage(final RenderedOp jaiImage) {
     this.jaiImage = jaiImage;
+  }
+
+  protected void setResolution(final double resolution) {
+    this.resolution = resolution;
   }
 }
