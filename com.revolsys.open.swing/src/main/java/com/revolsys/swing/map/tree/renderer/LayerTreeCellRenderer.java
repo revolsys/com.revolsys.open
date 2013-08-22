@@ -156,7 +156,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     if (icon != null) {
-      setIcon(icon);
+      label.setIcon(icon);
       final Dimension preferredSize = getPreferredSize();
       setPreferredSize(new Dimension(preferredSize.width + 5,
         preferredSize.height));

@@ -12,10 +12,6 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
 public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = -4266326319932775964L;
 
   private final ObjectTreeModel model;
@@ -49,5 +45,4 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
     return super.getTreeCellRendererComponent(tree, label, selected, expanded,
       leaf, row, hasFocus);
   }
-
 }
