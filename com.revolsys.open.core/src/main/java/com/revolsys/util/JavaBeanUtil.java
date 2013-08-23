@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -443,6 +444,31 @@ public final class JavaBeanUtil {
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static boolean isAssignableFrom(final Collection<Class<?>> classes,
+    final Class<?> objectClass) {
+    for (final Class<?> allowedClass : classes) {
+      if (allowedClass != null) {
+        if (allowedClass.isAssignableFrom(objectClass)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public static boolean isAssignableFrom(final Collection<Class<?>> classes,
+    final Object object) {
+    Class<?> objectClass;
+    if (object == null) {
+      return false;
+    } else if (object instanceof Class<?>) {
+      objectClass = (Class<?>)object;
+    } else {
+      objectClass = object.getClass();
+    }
+    return isAssignableFrom(classes, objectClass);
   }
 
   public static boolean isDefinedInClassLoader(final ClassLoader classLoader,

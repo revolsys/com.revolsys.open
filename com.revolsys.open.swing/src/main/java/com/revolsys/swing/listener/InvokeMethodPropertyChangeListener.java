@@ -28,18 +28,12 @@ package com.revolsys.swing.listener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
-  public static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(PropertyChangeEvent.class);
-
-  private Runnable runnable;
 
   private final boolean invokeLater;
 
@@ -47,13 +41,13 @@ public class InvokeMethodPropertyChangeListener implements
 
   private final String methodName;
 
+  private final Object[] parameters;
+
   public InvokeMethodPropertyChangeListener(final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     this.object = object;
     this.methodName = methodName;
-    if (!Arrays.asList(parameters).equals(EVENT_PARAMETERS)) {
-      this.runnable = new InvokeMethodRunnable(object, methodName, parameters);
-    }
+    this.parameters = parameters;
     this.invokeLater = invokeLater;
   }
 
@@ -64,10 +58,19 @@ public class InvokeMethodPropertyChangeListener implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent evt) {
-    Runnable runnable = this.runnable;
-    if (runnable == null) {
-      runnable = new InvokeMethodRunnable(this.object, this.methodName, evt);
+    final Object[] parameters = new Object[this.parameters.length];
+    for (int i = 0; i < this.parameters.length; i++) {
+      Object parameter = this.parameters[i];
+      if (parameter instanceof Class<?>) {
+        final Class<?> parameterClass = (Class<?>)parameter;
+        if (PropertyChangeEvent.class.isAssignableFrom(parameterClass)) {
+          parameter = evt;
+        }
+      }
+      parameters[i] = parameter;
     }
+    final Runnable runnable = new InvokeMethodRunnable(this.object,
+      this.methodName, parameters);
     if (this.invokeLater) {
       Invoke.later(runnable);
     } else {
@@ -75,4 +78,8 @@ public class InvokeMethodPropertyChangeListener implements
     }
   }
 
+  @Override
+  public String toString() {
+    return InvokeMethodRunnable.toString(object, methodName, parameters);
+  }
 }

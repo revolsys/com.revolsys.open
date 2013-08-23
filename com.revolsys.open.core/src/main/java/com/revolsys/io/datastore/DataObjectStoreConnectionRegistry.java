@@ -33,6 +33,10 @@ public class DataObjectStoreConnectionRegistry extends
     init();
   }
 
+  public DataObjectStoreConnectionRegistry(final String name) {
+    this(null, name, true);
+  }
+
   public DataObjectStoreConnectionRegistry(final String name,
     final Resource resource) {
     this(null, name, resource);

@@ -417,7 +417,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return progressBar;
   }
 
-  public LayerGroup getProject() {
+  public Project getProject() {
     return this.project;
   }
 

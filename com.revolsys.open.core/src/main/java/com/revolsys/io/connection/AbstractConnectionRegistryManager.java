@@ -21,19 +21,21 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
 
   @Override
   public void addConnectionRegistry(final T registry) {
-    int index = -1;
-    synchronized (registries) {
-      if (!registries.contains(registry)) {
-        index = registries.size();
-        registries.add(registry);
-        registry.setConnectionManager(this);
+    if (registry != null) {
+      int index = -1;
+      synchronized (registries) {
+        if (!registries.contains(registry)) {
+          index = registries.size();
+          registries.add(registry);
+          registry.setConnectionManager(this);
+        }
       }
-    }
-    if (index != -1) {
-      index = getVisibleConnectionRegistries().indexOf(registry);
       if (index != -1) {
-        propertyChangeSupport.fireIndexedPropertyChange("registries", index,
-          null, registry);
+        index = getVisibleConnectionRegistries().indexOf(registry);
+        if (index != -1) {
+          propertyChangeSupport.fireIndexedPropertyChange("registries", index,
+            null, registry);
+        }
       }
     }
   }

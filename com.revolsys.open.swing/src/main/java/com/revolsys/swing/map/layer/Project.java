@@ -44,9 +44,11 @@ public class Project extends LayerGroup {
 
   private BoundingBox viewBoundingBox = new BoundingBox();
 
-  private DataObjectStoreConnectionRegistry dataStores;
+  private DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
+    "Project");
 
-  private FolderConnectionRegistry folderConnections;
+  private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
+    "Project");
 
   public Project() {
     this("Project");

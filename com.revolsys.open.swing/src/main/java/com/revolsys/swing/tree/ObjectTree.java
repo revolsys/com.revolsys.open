@@ -19,7 +19,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -29,13 +28,11 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
+import com.revolsys.util.JavaBeanUtil;
 
 public class ObjectTree extends JTree implements PropertyChangeListener,
   MouseListener {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private static Object mouseClickItem = null;
@@ -149,12 +146,85 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     expandPath(path);
   }
 
+  public void expandPath(final Object object) {
+    final TreePath path = model.getPath(object);
+    if (path != null) {
+      expandPath(path);
+    }
+  }
+
   @Override
   public void expandPath(final TreePath path) {
     if (path != null) {
       this.model.initializePath(path);
       super.expandPath(path);
     }
+  }
+
+  public void expandPaths(final Collection<Class<?>> expectedClasses,
+    final Object object) {
+    if (object instanceof PropertyChangeEvent) {
+      expandPaths(expectedClasses, (PropertyChangeEvent)object);
+    } else if (object != null) {
+      if (JavaBeanUtil.isAssignableFrom(expectedClasses, object)) {
+        final TreePath path = model.getPath(object);
+        if (path != null) {
+          expandPath(object);
+          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          if (nodeModel != null) {
+            if (nodeModel.isLeaf(object)) {
+              model.fireTreeNodesChanged(path);
+            } else {
+              for (int i = 0; i < model.getChildCount(object); i++) {
+                final Object child = model.getChild(object, i);
+                expandPaths(expectedClasses, child);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void expandPaths(final Collection<Class<?>> expectedClasses,
+    final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source != null) {
+      if (JavaBeanUtil.isAssignableFrom(expectedClasses, source)) {
+        expandPath(source);
+        final Object newValue = event.getNewValue();
+        expandPaths(expectedClasses, newValue);
+      }
+    }
+  }
+
+  public void expandPaths(final IndexedPropertyChangeEvent event) {
+    expandPath(event.getSource());
+    final Object newValue = event.getNewValue();
+    expandPaths(newValue);
+  }
+
+  public void expandPaths(final Object parent) {
+    final TreePath path = model.getPath(parent);
+    if (path != null) {
+      expandPath(parent);
+      final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+      if (nodeModel != null) {
+        if (nodeModel.isLeaf(parent)) {
+          model.fireTreeNodesChanged(path);
+        } else {
+          for (int i = 0; i < model.getChildCount(parent); i++) {
+            final Object child = model.getChild(parent, i);
+            expandPaths(child);
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public ObjectTreeModel getModel() {
+    return model;
   }
 
   @SuppressWarnings("unchecked")
@@ -171,11 +241,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
       }
     }
     return values;
-  }
-
-  @Override
-  public ObjectTreeModel getModel() {
-    return model;
   }
 
   public boolean isMenuEnabled() {

@@ -42,6 +42,10 @@ public class FolderConnectionRegistry extends
     init();
   }
 
+  public FolderConnectionRegistry(final String name) {
+    this(null, name, true);
+  }
+
   public FolderConnectionRegistry(final String name, final Resource resource) {
     this(null, name, resource);
   }
