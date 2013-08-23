@@ -18,6 +18,67 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class WktParser {
 
+  public static boolean hasText(final StringBuffer text, final String expected) {
+    skipWhitespace(text);
+    final int length = expected.length();
+    final CharSequence subText = text.subSequence(0, length);
+    if (subText.equals(expected)) {
+      text.delete(0, length);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public static Double parseDouble(final StringBuffer text) {
+    skipWhitespace(text);
+    int i = 0;
+    for (; i < text.length(); i++) {
+      final char c = text.charAt(i);
+      if (Character.isWhitespace(c) || c == ',' || c == ')') {
+        break;
+      }
+    }
+    final String numberText = text.substring(0, i);
+    text.delete(0, i);
+    if (numberText.length() == 0) {
+      return null;
+    } else {
+      return new Double(numberText);
+    }
+
+  }
+
+  public static Integer parseInteger(final StringBuffer text) {
+    skipWhitespace(text);
+    int i = 0;
+    while (i < text.length() && Character.isDigit(text.charAt(i))) {
+      i++;
+    }
+    if (!Character.isDigit(text.charAt(i))) {
+      i--;
+    }
+    if (i < 0) {
+      return null;
+    } else {
+      final String numberText = text.substring(0, i + 1);
+      text.delete(0, i + 1);
+      return Integer.valueOf(numberText);
+    }
+  }
+
+  public static void skipWhitespace(final StringBuffer text) {
+    for (int i = 0; i < text.length(); i++) {
+      final char c = text.charAt(i);
+      if (!Character.isWhitespace(c)) {
+        if (i > 0) {
+          text.delete(0, i);
+        }
+        return;
+      }
+    }
+  }
+
   private final GeometryFactory geometryFactory;
 
   public WktParser() {
@@ -49,18 +110,6 @@ public class WktParser {
       default:
         throw new IllegalArgumentException(
           "Expecting Z, M, ZM, (, or EMPTY not: " + text);
-    }
-  }
-
-  private boolean hasText(final StringBuffer text, final String expected) {
-    skipWhitespace(text);
-    final int length = expected.length();
-    final CharSequence subText = text.subSequence(0, length);
-    if (subText.equals(expected)) {
-      text.delete(0, length);
-      return true;
-    } else {
-      return false;
     }
   }
 
@@ -140,25 +189,6 @@ public class WktParser {
     }
   }
 
-  private Double parseDouble(final StringBuffer text) {
-    skipWhitespace(text);
-    int i = 0;
-    for (; i < text.length(); i++) {
-      final char c = text.charAt(i);
-      if (Character.isWhitespace(c) || c == ',' || c == ')') {
-        break;
-      }
-    }
-    final String numberText = text.substring(0, i);
-    text.delete(0, i);
-    if (numberText.length() == 0) {
-      return null;
-    } else {
-      return new Double(numberText);
-    }
-
-  }
-
   public <T extends Geometry> T parseGeometry(final String value) {
     return parseGeometry(value, true);
   }
@@ -217,24 +247,6 @@ public class WktParser {
       }
     } else {
       return null;
-    }
-  }
-
-  private Integer parseInteger(final StringBuffer text) {
-    skipWhitespace(text);
-    int i = 0;
-    while (i < text.length() && Character.isDigit(text.charAt(i))) {
-      i++;
-    }
-    if (!Character.isDigit(text.charAt(i))) {
-      i--;
-    }
-    if (i < 0) {
-      return null;
-    } else {
-      final String numberText = text.substring(0, i + 1);
-      text.delete(0, i + 1);
-      return Integer.valueOf(numberText);
     }
   }
 
@@ -430,18 +442,6 @@ public class WktParser {
       parts = parseParts(geometryFactory, text, numAxis);
     }
     return geometryFactory.createPolygon(parts);
-  }
-
-  private void skipWhitespace(final StringBuffer text) {
-    for (int i = 0; i < text.length(); i++) {
-      final char c = text.charAt(i);
-      if (!Character.isWhitespace(c)) {
-        if (i > 0) {
-          text.delete(0, i);
-        }
-        return;
-      }
-    }
   }
 
 }

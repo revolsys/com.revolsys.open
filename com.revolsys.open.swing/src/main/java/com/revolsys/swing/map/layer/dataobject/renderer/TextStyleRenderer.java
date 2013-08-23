@@ -41,7 +41,6 @@ import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
@@ -149,11 +148,13 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             point = CoordinatesUtil.get(geometry);
           } else if (geometry instanceof LineString) {
             point = CoordinatesUtil.get(geometry);
-          } else if (geometry instanceof Polygon) {
+          } else {
             point = CoordinatesUtil.get(geometry.getCentroid());
           }
-          point = ProjectionFactory.convert(point, geometryFactory,
-            viewportGeometryFactory);
+          if (point != null) {
+            point = ProjectionFactory.convert(point, geometryFactory,
+              viewportGeometryFactory);
+          }
         }
 
         if (point != null && viewport.getBoundingBox().contains(point)) {
@@ -172,7 +173,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final DataObject object,
     final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
-    if (StringUtils.hasText(label)) {
+    if (StringUtils.hasText(label) && geometry != null) {
       final CoordinatesWithOrientation point = getTextLocation(viewport,
         geometry, style);
       if (point != null) {

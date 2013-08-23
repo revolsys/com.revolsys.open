@@ -7,6 +7,8 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
@@ -18,6 +20,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.io.wkt.WktParser;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -34,6 +37,41 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
+
+  public static BoundingBox create(final String wkt) {
+    if (StringUtils.hasLength(wkt)) {
+      GeometryFactory geometryFactory = null;
+      final StringBuffer text = new StringBuffer(wkt);
+      if (WktParser.hasText(text, "SRID=")) {
+        final Integer srid = WktParser.parseInteger(text);
+        if (srid != null) {
+          geometryFactory = GeometryFactory.getFactory(srid, 2);
+        }
+        WktParser.hasText(text, ";");
+      }
+      if (WktParser.hasText(text, "BBOX(")) {
+        final Double x1 = WktParser.parseDouble(text);
+        if (WktParser.hasText(text, ",")) {
+          final Double y1 = WktParser.parseDouble(text);
+          WktParser.skipWhitespace(text);
+          final Double x2 = WktParser.parseDouble(text);
+          if (WktParser.hasText(text, ",")) {
+            final Double y2 = WktParser.parseDouble(text);
+            return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+          } else {
+            throw new IllegalArgumentException("Expecting a ',' not " + text);
+          }
+
+        } else {
+          throw new IllegalArgumentException("Expecting a ',' not " + text);
+        }
+      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
+        return new BoundingBox(geometryFactory);
+      }
+    }
+
+    return new BoundingBox();
+  }
 
   public static BoundingBox getBoundingBox(final DataObject object) {
     if (object == null) {
@@ -147,6 +185,14 @@ public class BoundingBox extends Envelope implements Cloneable {
           }
         }
       }
+    }
+  }
+
+  public static boolean isEmpty(final BoundingBox boundingBox) {
+    if (boundingBox == null) {
+      return false;
+    } else {
+      return boundingBox.isEmpty();
     }
   }
 
@@ -405,14 +451,24 @@ public class BoundingBox extends Envelope implements Cloneable {
   public boolean equals(final Object other) {
     if (other instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)other;
-      return geometryFactory.equals(boundingBox.getGeometryFactory())
-        && getMaxX() == boundingBox.getMaxX()
-        && getMaxY() == boundingBox.getMaxY()
-        && getMinX() == boundingBox.getMinX()
-        && getMinY() == boundingBox.getMinY();
-    } else {
-      return false;
+      if (isNull()) {
+        return boundingBox.isNull();
+      } else if (boundingBox.isNull()) {
+        return true;
+      } else if (getSrid() == boundingBox.getSrid()) {
+        if (getMaxX() == boundingBox.getMaxX()) {
+          if (getMaxY() == boundingBox.getMaxY()) {
+            if (getMinX() == boundingBox.getMinX()) {
+              if (getMinY() == boundingBox.getMinY()) {
+                return true;
+              }
+            }
+          }
+        }
+
+      }
     }
+    return false;
   }
 
   public BoundingBox expand(final double delta) {
@@ -698,6 +754,14 @@ public class BoundingBox extends Envelope implements Cloneable {
       getMaxX(), getMinY());
   }
 
+  public int getSrid() {
+    if (geometryFactory == null) {
+      return -1;
+    } else {
+      return geometryFactory.getSRID();
+    }
+  }
+
   public Point getTopLeftPoint() {
     return getGeometryFactory().createPoint(getMinX(), getMaxY());
   }
@@ -739,6 +803,10 @@ public class BoundingBox extends Envelope implements Cloneable {
   public boolean intersects(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     return intersects((Envelope)convertedBoundingBox);
+  }
+
+  public boolean isEmpty() {
+    return isNull();
   }
 
   /**
@@ -885,15 +953,20 @@ public class BoundingBox extends Envelope implements Cloneable {
       s.append(geometryFactory.getSRID());
       s.append(";");
     }
-    s.append("BBOX(");
-    s.append(StringConverterRegistry.toString(getMinX()));
-    s.append(',');
-    s.append(StringConverterRegistry.toString(getMinY()));
-    s.append(' ');
-    s.append(StringConverterRegistry.toString(getMaxX()));
-    s.append(',');
-    s.append(StringConverterRegistry.toString(getMaxY()));
-    s.append(')');
+    if (isNull()) {
+      s.append("BBOX EMPTY");
+    } else {
+      s.append("BBOX(");
+      s.append(StringConverterRegistry.toString(getMinX()));
+      s.append(',');
+      s.append(StringConverterRegistry.toString(getMinY()));
+      s.append(' ');
+      s.append(StringConverterRegistry.toString(getMaxX()));
+      s.append(',');
+      s.append(StringConverterRegistry.toString(getMaxY()));
+      s.append(')');
+    }
     return s.toString();
   }
+
 }

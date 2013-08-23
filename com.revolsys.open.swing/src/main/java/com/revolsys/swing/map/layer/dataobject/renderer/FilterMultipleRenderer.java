@@ -8,6 +8,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.util.ExceptionUtil;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -29,8 +30,15 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
         if (renderer.isFilterAccept(object)) {
           if (renderer.isVisible(object) && !layer.isHidden(object)) {
             if (renderer.isVisible(scale)) {
-              renderer.renderObject(viewport, graphics, visibleArea, layer,
-                object);
+              try {
+                renderer.renderObject(viewport, graphics, visibleArea, layer,
+                  object);
+              } catch (final Throwable e) {
+                ExceptionUtil.log(
+                  getClass(),
+                  "Unabled to render " + layer.getName() + " #"
+                    + object.getIdString(), e);
+              }
             }
           }
           // Only render using the first match

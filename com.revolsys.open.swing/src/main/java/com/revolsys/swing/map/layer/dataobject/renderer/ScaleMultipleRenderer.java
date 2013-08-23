@@ -9,6 +9,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.util.ExceptionUtil;
 
 /**
  * Use the first renderer which is visible at the current scale, ignore all
@@ -71,7 +72,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
-        renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+        try {
+          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
+            + " #" + object.getIdString(), e);
+        }
       }
     }
   }

@@ -20,6 +20,7 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractDataObjectLayerRenderer extends
   AbstractLayerRenderer<DataObjectLayer> {
@@ -136,8 +137,17 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final LayerDataObject object : objects) {
-      if (isVisible(object) && !layer.isHidden(object)) {
-        renderObject(viewport, graphics, visibleArea, layer, object);
+      if (object != null) {
+        if (isVisible(object) && !layer.isHidden(object)) {
+          try {
+            renderObject(viewport, graphics, visibleArea, layer, object);
+          } catch (final Throwable e) {
+            ExceptionUtil.log(
+              getClass(),
+              "Unabled to render " + layer.getName() + " #"
+                + object.getIdString(), e);
+          }
+        }
       }
     }
   }

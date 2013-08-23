@@ -15,12 +15,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
@@ -257,9 +259,23 @@ public class Project extends LayerGroup {
     super.setGeometryFactory(geometryFactory);
   }
 
-  public void setViewBoundingBox(BoundingBox viewBoundingBox) {
+  @Override
+  public void setProperty(final String name, final Object value) {
+    if ("viewBoundingBox".equals(name)) {
+      if (value != null) {
+        final BoundingBox viewBoundingBox = BoundingBox.create(value.toString());
+        setViewBoundingBox(viewBoundingBox);
+        if (!BoundingBox.isEmpty(viewBoundingBox)) {
+          firePropertyChange("srid", -2, viewBoundingBox.getSrid());
+        }
+      }
+    } else {
+      super.setProperty(name, value);
+    }
+  }
 
-    if (!viewBoundingBox.isNull()) {
+  public void setViewBoundingBox(BoundingBox viewBoundingBox) {
+    if (!BoundingBox.isEmpty(viewBoundingBox)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox oldValue = this.viewBoundingBox;
       if (viewBoundingBox.getWidth() == 0) {
@@ -279,6 +295,27 @@ public class Project extends LayerGroup {
       this.viewBoundingBox = viewBoundingBox;
       firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+
+    final BoundingBox boundingBox = getViewBoundingBox();
+    if (!BoundingBox.isEmpty(boundingBox)) {
+      BoundingBox defaultBoundingBox = null;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory != null) {
+        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem != null) {
+          defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
+        }
+      }
+      MapSerializerUtil.add(map, "viewBoundingBox", boundingBox,
+        defaultBoundingBox);
+    }
+
+    return map;
   }
 
 }

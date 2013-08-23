@@ -162,6 +162,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           setBoundingBox(boundingBox);
         }
       });
+    project.addPropertyChangeListener("srid", new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(final PropertyChangeEvent event) {
+        final Integer srid = (Integer)event.getNewValue();
+        setGeometryFactory(GeometryFactory.getFactory(srid));
+      }
+    });
     this.baseMapLayers.addPropertyChangeListener(this);
     project.addPropertyChangeListener(this);
 

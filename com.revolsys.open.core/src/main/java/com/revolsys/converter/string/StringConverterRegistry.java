@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.gis.converter.string.BoundingBoxStringConverter;
 import com.revolsys.gis.converter.string.GeometryStringConverter;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.util.CollectionUtil;
@@ -124,6 +125,7 @@ public class StringConverterRegistry {
     addConverter(new ListStringConverter());
     addConverter(new ColorStringConverter());
     addConverter(new MeasureStringConverter());
+    addConverter(new BoundingBoxStringConverter());
   }
 
   public void addConverter(final Class<?> clazz,

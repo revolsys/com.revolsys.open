@@ -50,9 +50,13 @@ public final class ProjectionFactory {
   public static Coordinates convert(final Coordinates point,
     final GeometryFactory sourceGeometryFactory,
     final GeometryFactory targetGeometryFactory) {
-    if (sourceGeometryFactory == targetGeometryFactory) {
+    if (point == null) {
+      return point;
+    } else if (sourceGeometryFactory == targetGeometryFactory) {
       return point;
     } else if (sourceGeometryFactory == null) {
+      return point;
+    } else if (targetGeometryFactory == null) {
       return point;
     } else {
       final CoordinatesOperation operation = getCoordinatesOperation(

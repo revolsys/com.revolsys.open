@@ -1,6 +1,7 @@
 package com.revolsys.io.esri.map.rest;
 
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,6 +17,7 @@ import com.revolsys.io.esri.map.rest.map.LevelOfDetail;
 import com.revolsys.io.esri.map.rest.map.TableDescription;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
 import com.revolsys.io.esri.map.rest.map.TimeInfo;
+import com.revolsys.util.WrappedException;
 
 public class MapServer extends Service {
 
@@ -72,6 +74,18 @@ public class MapServer extends Service {
     return getValue("mapName");
   }
 
+  public double getResolution(final int zoomLevel) {
+    final TileInfo tileInfo = getTileInfo();
+    final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
+    for (final LevelOfDetail levelOfDetail : levelOfDetails) {
+      final int level = levelOfDetail.getLevel();
+      if (level == zoomLevel) {
+        return levelOfDetail.getResolution();
+      }
+    }
+    return 0;
+  }
+
   public Boolean getSingleFusedMapCache() {
     return getValue("singleFusedMapCache");
   }
@@ -91,8 +105,10 @@ public class MapServer extends Service {
       final URLConnection connection = new URL(url).openConnection();
       final InputStream in = connection.getInputStream();
       return ImageIO.read(in);
+    } catch (final FileNotFoundException e) {
+      return null;
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to download image from: " + url, e);
+      throw new WrappedException(e);
     }
   }
 
@@ -149,8 +165,10 @@ public class MapServer extends Service {
           return levelOfDetail.getLevel();
         } else {
           final double previousLevelMetresPerPixel = previousLevel.getResolution();
-          double range = levelMetresPerPixel - previousLevelMetresPerPixel;
-          double ratio = (metresPerPixel - previousLevelMetresPerPixel) / range;
+          final double range = levelMetresPerPixel
+            - previousLevelMetresPerPixel;
+          final double ratio = (metresPerPixel - previousLevelMetresPerPixel)
+            / range;
           if (ratio < 0.8) {
             return previousLevel.getLevel();
           } else {
@@ -161,17 +179,5 @@ public class MapServer extends Service {
       previousLevel = levelOfDetail;
     }
     return previousLevel.getLevel();
-  }
-
-  public double getResolution(final int zoomLevel) {
-    final TileInfo tileInfo = getTileInfo();
-    final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
-    for (final LevelOfDetail levelOfDetail : levelOfDetails) {
-      int level = levelOfDetail.getLevel();
-      if (level == zoomLevel) {
-        return levelOfDetail.getResolution();
-      }
-    }
-    return 0;
   }
 }

@@ -600,6 +600,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
+
     final List<String> layerFiles = new ArrayList<String>();
     final List<Layer> layers = getLayers();
     for (final Layer layer : layers) {

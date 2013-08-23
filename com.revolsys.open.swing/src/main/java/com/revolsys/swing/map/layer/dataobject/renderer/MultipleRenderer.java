@@ -10,6 +10,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.util.ExceptionUtil;
 
 /**
  * Use all the specified renderers to render the layer. All features are
@@ -41,7 +42,15 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
-          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+          try {
+            renderer.renderObject(viewport, graphics, visibleArea, layer,
+              object);
+          } catch (final Throwable e) {
+            ExceptionUtil.log(
+              getClass(),
+              "Unabled to render " + layer.getName() + " #"
+                + object.getIdString(), e);
+          }
         }
       }
     }
@@ -57,8 +66,15 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
       if (renderer.isVisible(scale)) {
         for (final LayerDataObject object : objects) {
           if (renderer.isVisible(object)) {
-            renderer.renderObject(viewport, graphics, visibleArea, layer,
-              object);
+            try {
+              renderer.renderObject(viewport, graphics, visibleArea, layer,
+                object);
+            } catch (final Throwable e) {
+              ExceptionUtil.log(
+                getClass(),
+                "Unabled to render " + layer.getName() + " #"
+                  + object.getIdString(), e);
+            }
           }
         }
       }
