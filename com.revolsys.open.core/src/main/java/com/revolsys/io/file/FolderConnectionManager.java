@@ -1,6 +1,7 @@
 package com.revolsys.io.file;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +28,12 @@ public class FolderConnectionManager extends
 
   public static File getConnection(final String name) {
     final FolderConnectionManager connectionManager = get();
-    final List<FolderConnectionRegistry> registries = connectionManager.getConnectionRegistries();
+    final List<FolderConnectionRegistry> registries = new ArrayList<FolderConnectionRegistry>();
+    registries.addAll(connectionManager.getConnectionRegistries());
+    final FolderConnectionRegistry threadRegistry = FolderConnectionRegistry.getForThread();
+    if (threadRegistry != null) {
+      registries.add(threadRegistry);
+    }
     Collections.reverse(registries);
     for (final FolderConnectionRegistry registry : registries) {
       final FolderConnection connection = registry.getConnection(name);
@@ -53,7 +59,7 @@ public class FolderConnectionManager extends
   public synchronized FolderConnectionRegistry addConnectionRegistry(
     final String name, final Resource resource) {
     final FolderConnectionRegistry registry = new FolderConnectionRegistry(
-      this, name, resource);
+      this, name, resource, false);
     addConnectionRegistry(registry);
     return registry;
   }

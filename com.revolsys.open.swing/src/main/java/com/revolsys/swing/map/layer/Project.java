@@ -156,69 +156,102 @@ public class Project extends LayerGroup {
   public void readProject(final Resource resource) {
     this.resource = resource;
     if (resource.exists()) {
-      final Resource dataStoresDirectory = SpringUtil.getResource(resource,
-        "Data Stores");
-      final DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
-        "Project", dataStoresDirectory);
-      setDataStores(dataStores);
-
-      final Resource folderConnectionsDirectory = SpringUtil.getResource(
-        resource, "Folder Connections");
-      this.folderConnections = new FolderConnectionRegistry("Project",
-        folderConnectionsDirectory);
-
       final Resource layersDir = SpringUtil.getResource(resource, "Layers");
-      readLayers(layersDir);
+      readProperties(layersDir);
+      final DataObjectStoreConnectionRegistry oldDataStoreConnections = DataObjectStoreConnectionRegistry.getForThread();
+      try {
+        final Resource dataStoresDirectory = SpringUtil.getResource(resource,
+          "Data Stores");
 
-      readBaseMapsLayers(resource);
+        final boolean readOnly = isReadOnly();
+        final DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
+          "Project", dataStoresDirectory, readOnly);
+        setDataStores(dataStores);
+        DataObjectStoreConnectionRegistry.setForThread(dataStores);
+
+        final Resource folderConnectionsDirectory = SpringUtil.getResource(
+          resource, "Folder Connections");
+        this.folderConnections = new FolderConnectionRegistry("Project",
+          folderConnectionsDirectory, readOnly);
+
+        readLayers(layersDir);
+
+        readBaseMapsLayers(resource);
+      } finally {
+        DataObjectStoreConnectionRegistry.setForThread(oldDataStoreConnections);
+      }
+    }
+  }
+
+  protected void readProperties(final Resource resource) {
+    final Resource layerGroupResource = SpringUtil.getResource(resource,
+      "rgLayerGroup.rgobject");
+    if (!layerGroupResource.exists()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "File not found: " + layerGroupResource);
+    } else {
+      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      try {
+        final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
+        setProperties(properties);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to read: " + layerGroupResource, e);
+      } finally {
+        SpringUtil.setBaseResource(oldResource);
+      }
     }
   }
 
   public boolean saveChangesWithPrompt() {
-    final List<Layer> layersWithChanges = new ArrayList<Layer>();
-    addChangedLayers(this, layersWithChanges);
-
-    if (layersWithChanges.isEmpty()) {
+    if (isReadOnly()) {
       return true;
     } else {
-      final MapPanel mapPanel = MapPanel.get(this);
-      final JLabel message = new JLabel(
-        "<html><body><p><b>The following layers have un-saved changes.</b></p>"
-          + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-          + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-          + "</li></ul></body></html>");
+      final List<Layer> layersWithChanges = new ArrayList<Layer>();
+      addChangedLayers(this, layersWithChanges);
 
-      final int option = JOptionPane.showConfirmDialog(mapPanel, message,
-        "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
-        JOptionPane.WARNING_MESSAGE);
-      if (option == JOptionPane.CANCEL_OPTION) {
-        return false;
-      } else if (option == JOptionPane.NO_OPTION) {
+      if (layersWithChanges.isEmpty()) {
         return true;
       } else {
-        for (final Iterator<Layer> iterator = layersWithChanges.iterator(); iterator.hasNext();) {
-          final Layer layer = iterator.next();
-          if (layer.saveChanges()) {
-            iterator.remove();
-          }
-        }
-        saveProject();
-        if (layersWithChanges.isEmpty()) {
+        final MapPanel mapPanel = MapPanel.get(this);
+        final JLabel message = new JLabel(
+          "<html><body><p><b>The following layers have un-saved changes.</b></p>"
+            + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
+            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+            + "</li></ul></body></html>");
+
+        final int option = JOptionPane.showConfirmDialog(mapPanel, message,
+          "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
+          JOptionPane.WARNING_MESSAGE);
+        if (option == JOptionPane.CANCEL_OPTION) {
+          return false;
+        } else if (option == JOptionPane.NO_OPTION) {
           return true;
         } else {
-          final JLabel message2 = new JLabel(
-            "<html><body><p><b>The following layers could not be saved.</b></p>"
-              + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-              + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-              + "</li></ul></body></html>");
-
-          final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
-            "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-          if (option2 == JOptionPane.CANCEL_OPTION) {
-            return false;
-          } else {
+          for (final Iterator<Layer> iterator = layersWithChanges.iterator(); iterator.hasNext();) {
+            final Layer layer = iterator.next();
+            if (layer.saveChanges()) {
+              iterator.remove();
+            }
+          }
+          saveProject();
+          if (layersWithChanges.isEmpty()) {
             return true;
+          } else {
+            final JLabel message2 = new JLabel(
+              "<html><body><p><b>The following layers could not be saved.</b></p>"
+                + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
+                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+                + "</li></ul></body></html>");
+
+            final int option2 = JOptionPane.showConfirmDialog(mapPanel,
+              message2, "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+            if (option2 == JOptionPane.CANCEL_OPTION) {
+              return false;
+            } else {
+              return true;
+            }
           }
         }
       }

@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.ResponseCache;
 import java.util.List;
@@ -30,7 +29,6 @@ import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
@@ -44,6 +42,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
+import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -104,6 +103,12 @@ public class ProjectFrame extends BaseFrame {
     this(title, new Project());
   }
 
+  public ProjectFrame(final String title, final File projectDirectory) {
+    this(title);
+    ProgressMonitor.background(this, title, "Load project", false, this,
+      "loadProject", projectDirectory);
+  }
+
   public ProjectFrame(final String title, final Project project) {
     super(title);
     this.project = project;
@@ -160,58 +165,14 @@ public class ProjectFrame extends BaseFrame {
 
   }
 
-  public void expandConnectionManagers(PropertyChangeEvent event) {
-    final Object newValue = event.getNewValue();
-    if (newValue instanceof ConnectionRegistry) {
-      final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-      final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
-      if (connectionManager != null) {
-        List<?> connectionRegistries = connectionManager.getConnectionRegistries();
-        if (connectionRegistries != null) {
-          final ObjectTree tree = catalogPanel.getTree();
-          tree.expandPath(connectionRegistries, connectionManager, registry);
-        }
-      }
-    }
-  }
-
-  public void expandLayers(PropertyChangeEvent event) {
-    final Object source = event.getSource();
-    if (source instanceof LayerGroup) {
-      final Object newValue = event.getNewValue();
-      if (newValue instanceof LayerGroup) {
-        expandLayers((LayerGroup)newValue);
-      }
-    }
-  }
-
-  protected void expandLayers(Layer layer) {
-    final List<Layer> pathList = layer.getPathList();
-    ObjectTree tree = tocPanel.getTree();
-    final TreePath treePath = ObjectTree.createTreePath(pathList);
-    if (layer instanceof LayerGroup) {
-      LayerGroup layerGroup = (LayerGroup)layer;
-      tree.expandPath(treePath);
-      for (Layer childLayer : layerGroup) {
-        expandLayers(childLayer);
-      }
-    } else {
-      ObjectTreeModel model = tree.getModel();
-      model.fireTreeNodesChanged(treePath);
-    }
-  }
-
   protected void addControlWorkingArea() {
-    final CLocation location = CLocation.base().normalWest(0.20);
+    final CLocation location = CLocation.base().normalWest(getControlWidth());
     DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
       MapPanel.MAP_CONTROLS_WORKING_AREA, location);
   }
 
-  protected void addLayers() {
-    final File userHomeDirectory = FileUtil.getUserHomeDirectory();
-    final File projectFile = new File(userHomeDirectory,
-      "Documents/default.rgmap");
-    loadProject(projectFile);
+  public double getControlWidth() {
+    return 0.20;
   }
 
   protected void addLogPanel() {
@@ -329,6 +290,47 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  public void expandConnectionManagers(final PropertyChangeEvent event) {
+    final Object newValue = event.getNewValue();
+    if (newValue instanceof ConnectionRegistry) {
+      final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+      final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
+      if (connectionManager != null) {
+        final List<?> connectionRegistries = connectionManager.getConnectionRegistries();
+        if (connectionRegistries != null) {
+          final ObjectTree tree = catalogPanel.getTree();
+          tree.expandPath(connectionRegistries, connectionManager, registry);
+        }
+      }
+    }
+  }
+
+  protected void expandLayers(final Layer layer) {
+    final List<Layer> pathList = layer.getPathList();
+    final ObjectTree tree = tocPanel.getTree();
+    final TreePath treePath = ObjectTree.createTreePath(pathList);
+    if (layer instanceof LayerGroup) {
+      final LayerGroup layerGroup = (LayerGroup)layer;
+      tree.expandPath(treePath);
+      for (final Layer childLayer : layerGroup) {
+        expandLayers(childLayer);
+      }
+    } else {
+      final ObjectTreeModel model = tree.getModel();
+      model.fireTreeNodesChanged(treePath);
+    }
+  }
+
+  public void expandLayers(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof LayerGroup) {
+      final Object newValue = event.getNewValue();
+      if (newValue instanceof LayerGroup) {
+        expandLayers((LayerGroup)newValue);
+      }
+    }
+  }
+
   public CControl getDockControl() {
     return this.dockControl;
   }
@@ -357,8 +359,6 @@ public class ProjectFrame extends BaseFrame {
     addTasksPanel();
     addLogPanel();
 
-    addLayers();
-
     createMenuBar();
   }
 
@@ -374,6 +374,15 @@ public class ProjectFrame extends BaseFrame {
     folderConnectionManager.removeConnectionRegistry("Project");
     folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
 
+  }
+
+  public void loadProject(final ProgressMonitor progressMonitor,
+    final File projectFile) {
+    try {
+      loadProject(projectFile);
+    } finally {
+      progressMonitor.close();
+    }
   }
 
 }

@@ -226,13 +226,15 @@ public abstract class AbstractConnectionRegistry<T> implements
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       final File directory = fileResource.getFile();
-      boolean readOnly;
-      if (resource.exists()) {
-        readOnly = !directory.canWrite();
-      } else if (directory.mkdirs()) {
-        readOnly = false;
-      } else {
-        readOnly = true;
+      boolean readOnly = isReadOnly();
+      if (!readOnly) {
+        if (resource.exists()) {
+          readOnly = !directory.canWrite();
+        } else if (directory.mkdirs()) {
+          readOnly = false;
+        } else {
+          readOnly = true;
+        }
       }
       setReadOnly(readOnly);
       this.directory = directory;

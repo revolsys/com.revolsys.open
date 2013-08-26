@@ -2,6 +2,7 @@ package com.revolsys.swing.tree;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -98,6 +99,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     super(model);
     this.model = model;
     setToggleClickCount(0);
+    setRowHeight(0);
     final Object root = model.getRoot();
     if (root instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
@@ -227,6 +229,15 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     return model;
   }
 
+  @Override
+  public Rectangle getPathBounds(final TreePath path) {
+    if (model.isVisible(path.getLastPathComponent())) {
+      return super.getPathBounds(path);
+    } else {
+      return null;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <T> List<T> getSelectedItems(final Class<T> requiredClass) {
     final List<T> values = new ArrayList<T>();
@@ -335,17 +346,24 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
         } else if (newValue == null) {
           final TreePath path = this.model.getPath(source);
           if (path != null) {
-            this.model.fireTreeNodesRemoved(path, index, oldValue);
+            try {
+              this.model.fireTreeNodesRemoved(path, index, oldValue);
+            } catch (final ArrayIndexOutOfBoundsException e) {
+            }
           }
         }
 
       }
     } else {
-      Invoke.andWait(this, "propertyChange", event);
+      Invoke.later(this, "propertyChange", event);
     }
   }
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
+  }
+
+  public void setVisible(final Object object, final boolean visible) {
+    model.setVisible(object, visible);
   }
 }

@@ -17,6 +17,19 @@ import com.revolsys.util.CollectionUtil;
 public class DataObjectStoreConnectionRegistry extends
   AbstractConnectionRegistry<DataObjectStoreConnection> {
 
+  private static final ThreadLocal<DataObjectStoreConnectionRegistry> threadRegistry = new ThreadLocal<DataObjectStoreConnectionRegistry>();
+
+  public static DataObjectStoreConnectionRegistry getForThread() {
+    return DataObjectStoreConnectionRegistry.threadRegistry.get();
+  }
+
+  public static DataObjectStoreConnectionRegistry setForThread(
+    final DataObjectStoreConnectionRegistry registry) {
+    final DataObjectStoreConnectionRegistry oldValue = getForThread();
+    DataObjectStoreConnectionRegistry.threadRegistry.set(registry);
+    return oldValue;
+  }
+
   protected DataObjectStoreConnectionRegistry(
     final DataObjectStoreConnectionManager connectionManager,
     final String name, final boolean visible) {
@@ -38,8 +51,11 @@ public class DataObjectStoreConnectionRegistry extends
   }
 
   public DataObjectStoreConnectionRegistry(final String name,
-    final Resource resource) {
-    this(null, name, resource);
+    final Resource resource, final boolean readOnly) {
+    super(null, name);
+    setReadOnly(readOnly);
+    setDirectory(resource);
+    init();
   }
 
   public void addConnection(final DataObjectStoreConnection connection) {

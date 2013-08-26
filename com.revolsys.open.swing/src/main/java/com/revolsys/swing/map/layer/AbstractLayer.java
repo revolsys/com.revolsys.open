@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -40,7 +41,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener {
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
@@ -205,16 +206,17 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public BoundingBox getBoundingBox() {
-    return new BoundingBox();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return new BoundingBox(geometryFactory);
   }
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     if (this.visible || !visibleLayersOnly) {
+      return getBoundingBox();
+    } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return new BoundingBox(geometryFactory);
-    } else {
-      return getBoundingBox();
     }
   }
 
@@ -266,6 +268,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public List<Layer> getPathList() {
     final List<Layer> path = new ArrayList<Layer>();
     path.add(this);

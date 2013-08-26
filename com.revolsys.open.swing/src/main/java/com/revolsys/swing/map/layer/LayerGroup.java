@@ -222,15 +222,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public void delete() {
     synchronized (this.layers) {
-      int index = 0;
       for (final Iterator<Layer> iterator = this.layers.iterator(); iterator.hasNext();) {
         final Layer layer = iterator.next();
         iterator.remove();
         layer.setLayerGroup(null);
         layer.removePropertyChangeListener(this);
-        fireIndexedPropertyChange("layers", index, layer, null);
         layer.delete();
-        index++;
       }
       super.delete();
     }

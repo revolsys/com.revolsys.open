@@ -31,8 +31,12 @@ public class DataObjectStoreConnectionManager
 
   public static DataObjectStore getConnection(final String name) {
     final DataObjectStoreConnectionManager connectionManager = get();
-    final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>(
-      connectionManager.getConnectionRegistries());
+    final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>();
+    registries.addAll(connectionManager.getConnectionRegistries());
+    final DataObjectStoreConnectionRegistry threadRegistry = DataObjectStoreConnectionRegistry.getForThread();
+    if (threadRegistry != null) {
+      registries.add(threadRegistry);
+    }
     Collections.reverse(registries);
     for (final DataObjectStoreConnectionRegistry registry : registries) {
       final DataObjectStoreConnection dataStoreConnection = registry.getConnection(name);

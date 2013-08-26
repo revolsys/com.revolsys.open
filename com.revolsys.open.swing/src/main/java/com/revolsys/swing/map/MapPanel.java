@@ -514,6 +514,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final LayerGroup project = this.project;
     this.project = null;
     if (project != null) {
+      project.removePropertyChangeListener(this);
       project.delete();
     }
   }
@@ -719,7 +720,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomToSelected() {
-    final BoundingBox boundingBox = this.project.getSelectedBoundingBox();
+    zoomToSelected(project);
+  }
+
+  public void zoomToSelected(final Layer layer) {
+    final BoundingBox boundingBox = layer.getSelectedBoundingBox();
     if (!boundingBox.isNull()) {
       zoomTo(boundingBox);
     }

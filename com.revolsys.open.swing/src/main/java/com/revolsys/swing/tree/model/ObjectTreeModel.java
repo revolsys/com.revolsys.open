@@ -72,6 +72,8 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   private Object root;
 
+  public Map<Object, Boolean> hiddenObjects = new WeakHashMap<Object, Boolean>();
+
   public ObjectTreeModel() {
     addNodeModel(new StringTreeNodeModel());
     addNodeModel(new ListObjectTreeNodeModel());
@@ -112,6 +114,10 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     this.eventHandler.addTreeModelListener(listener);
   }
 
+  public void fireTreeNodesChanged(final TreePath path) {
+    eventHandler.treeNodesChanged(new TreeModelEvent(this.root, path));
+  }
+
   public void fireTreeNodesInserted(final TreePath path, final int index,
     final Object newValue) {
     try {
@@ -139,6 +145,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         });
         this.eventHandler.treeNodesRemoved(e);
       }
+    } catch (final ArrayIndexOutOfBoundsException t) {
     } catch (final Throwable t) {
       ExceptionUtil.log(getClass(), t);
     }
@@ -293,10 +300,6 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     }
   }
 
-  public void fireTreeNodesChanged(final TreePath path) {
-    eventHandler.treeNodesChanged(new TreeModelEvent(this.root, path));
-  }
-
   private boolean isInitialized(final TreePath path,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model == null) {
@@ -315,12 +318,24 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   @Override
   public boolean isLeaf(final Object node) {
-    final TreePath path = getPath(node);
-    final ObjectTreeNodeModel<Object, Object> nodeModel = getNodeModel(path);
-    if (!isInitialized(path, nodeModel, node)) {
+    if (isVisible(node)) {
+      final TreePath path = getPath(node);
+      final ObjectTreeNodeModel<Object, Object> nodeModel = getNodeModel(path);
+      if (!isInitialized(path, nodeModel, node)) {
+        return false;
+      } else {
+        return nodeModel.isLeaf(node);
+      }
+    } else {
+      return true;
+    }
+  }
+
+  public boolean isVisible(final Object object) {
+    if (hiddenObjects.get(object) == Boolean.TRUE) {
       return false;
     } else {
-      return nodeModel.isLeaf(node);
+      return true;
     }
   }
 
@@ -393,6 +408,21 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       this.root = root;
       final TreeModelEvent e = new TreeModelEvent(root, new TreePath(root));
       this.eventHandler.treeStructureChanged(e);
+    }
+  }
+
+  public void setVisible(final Object object, final boolean visible) {
+    final boolean oldVisible = !hiddenObjects.containsKey(object);
+    if (visible) {
+      hiddenObjects.remove(object);
+    } else {
+      hiddenObjects.put(object, true);
+    }
+    if (visible != oldVisible) {
+      final TreePath path = getPath(object);
+      if (path != null) {
+        fireTreeNodesChanged(path);
+      }
     }
   }
 

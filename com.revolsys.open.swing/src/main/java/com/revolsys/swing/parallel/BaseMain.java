@@ -48,9 +48,9 @@ public class BaseMain implements UncaughtExceptionHandler {
   private final boolean swing;
 
   public BaseMain(final String name, final boolean swing) {
-    Thread.setDefaultUncaughtExceptionHandler(this);
     this.name = name;
     this.swing = swing;
+    Thread.setDefaultUncaughtExceptionHandler(this);
   }
 
   public void doPreRun() throws Throwable {
@@ -58,9 +58,9 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   public void doRun() throws Throwable {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     ToolTipManager.sharedInstance().setInitialDelay(100);
   }
 
@@ -69,18 +69,8 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   public void run() {
     try {
-      if (swing) {
-        System.setProperty("awt.useSystemAAFontSettings", "lcd");
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-          name);
-      }
       doPreRun();
-      if (swing) {
-        Invoke.later(this, "doRun");
-      } else {
-        doRun();
-      }
+      Invoke.later(this, "doRun");
     } catch (final Throwable e) {
       final Logger logger = Logger.getLogger(getClass());
       final LoggingEvent event = new LoggingEvent(logger.getClass().getName(),

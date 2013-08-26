@@ -556,6 +556,14 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
+  public BoundingBox expandToInclude(final DataObject object) {
+    if (object != null) {
+      final Geometry geometry = object.getGeometryValue();
+      return expandToInclude(geometry);
+    }
+    return this;
+  }
+
   public BoundingBox expandToInclude(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return this;

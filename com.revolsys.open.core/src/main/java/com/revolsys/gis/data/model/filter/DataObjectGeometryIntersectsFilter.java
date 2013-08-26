@@ -31,6 +31,15 @@ import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static <D extends DataObject> List<D> filter(
+    final Collection<D> collection, final BoundingBox boundingBox) {
+    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+    return FilterUtil.filter(collection, filter);
+  }
+
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
 
@@ -53,7 +62,9 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   @Override
   public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
-    if (geometryFactory.copy(matchGeometry).intersects(geometry)) {
+    final Geometry convertedGeometry = geometryFactory.copy(matchGeometry);
+    if (convertedGeometry != null && geometry != null
+      && convertedGeometry.intersects(geometry)) {
       return true;
     } else {
       return false;
@@ -67,14 +78,5 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
    */
   public Geometry getGeometry() {
     return geometry;
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static <D extends DataObject> List<D> filter(
-    final Collection<D> collection, final BoundingBox boundingBox) {
-    Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
-    return FilterUtil.filter(collection, filter);
   }
 }

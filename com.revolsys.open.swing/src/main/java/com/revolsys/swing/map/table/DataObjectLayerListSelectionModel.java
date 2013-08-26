@@ -66,9 +66,9 @@ public class DataObjectLayerListSelectionModel extends
 
   @Override
   public void setSelectionInterval(final int index0, final int index1) {
-    super.setSelectionInterval(index0, index1);
     final List<LayerDataObject> objects = getObjects(index0, index1);
     final DataObjectLayer layer = this.model.getLayer();
     layer.setSelectedRecords(objects);
+    super.setSelectionInterval(index0, index1);
   }
 }

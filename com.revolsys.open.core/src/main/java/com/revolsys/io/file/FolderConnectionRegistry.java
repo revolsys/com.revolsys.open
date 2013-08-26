@@ -16,6 +16,19 @@ import com.revolsys.util.CollectionUtil;
 public class FolderConnectionRegistry extends
   AbstractConnectionRegistry<FolderConnection> {
 
+  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
+
+  public static FolderConnectionRegistry getForThread() {
+    return FolderConnectionRegistry.threadRegistry.get();
+  }
+
+  public static FolderConnectionRegistry setForThread(
+    final FolderConnectionRegistry registry) {
+    final FolderConnectionRegistry oldValue = getForThread();
+    FolderConnectionRegistry.threadRegistry.set(registry);
+    return oldValue;
+  }
+
   public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name) {
     super(connectionManager, name);
@@ -36,8 +49,9 @@ public class FolderConnectionRegistry extends
 
   public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name,
-    final Resource resource) {
+    final Resource resource, final boolean readOnly) {
     super(connectionManager, name);
+    setReadOnly(readOnly);
     setDirectory(resource);
     init();
   }
@@ -46,8 +60,9 @@ public class FolderConnectionRegistry extends
     this(null, name, true);
   }
 
-  public FolderConnectionRegistry(final String name, final Resource resource) {
-    this(null, name, resource);
+  public FolderConnectionRegistry(final String name, final Resource resource,
+    final boolean readOnly) {
+    this(null, name, resource, readOnly);
   }
 
   public void addConnection(final FolderConnection connection) {

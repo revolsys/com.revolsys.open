@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.swing.JTable;
 
@@ -73,13 +74,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public void add(final int index, final LayerDataObject element) {
-    // TODO events
+    final int oldRowCount = getRowCount();
     this.records.add(index, element);
+    fireIndexedPropertyChange("records", index, null, element);
+    firePropertyChange("rowCount", oldRowCount, getRowCount());
   }
 
   @Override
   public boolean add(final LayerDataObject object) {
-    addObject(object);
+    addRecord(object);
     return true;
   }
 
@@ -93,7 +96,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public boolean addAll(final int index,
     final Collection<? extends LayerDataObject> c) {
     // TODO events
-    return this.records.addAll(index, c);
+    final boolean added = this.records.addAll(index, c);
+    return added;
   }
 
   private void addAllInternal(
@@ -103,19 +107,13 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   public void addAllRecords(final Collection<? extends LayerDataObject> records) {
+    final int oldRowCount = getRowCount();
     final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
       this.records);
     addAllInternal(records);
     firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
       this.records));
-  }
-
-  public void addObject(final LayerDataObject object) {
-    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
-      this.records);
-    addObjectInternal(object);
-    firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
-      this.records));
+    firePropertyChange("rowCount", oldRowCount, getRowCount());
   }
 
   private void addObjectInternal(final LayerDataObject object) {
@@ -123,6 +121,17 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
       this.records.add(object);
       this.index.insert(object);
     }
+  }
+
+  public void addRecord(final LayerDataObject object) {
+    final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
+      this.records);
+    final int oldRowCount = getRowCount();
+    addObjectInternal(object);
+    firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
+      this.records));
+    firePropertyChange("rowCount", oldRowCount, getRowCount());
+
   }
 
   @Override
@@ -142,12 +151,18 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public LayerDataObject createRecord() {
-    final LayerDataObject object = super.createRecord();
-    if (object != null) {
-      this.records.add(object);
-      fireRecordsChanged();
+    final LayerDataObject record = super.createRecord();
+    if (record != null) {
+      addRecord(record);
     }
-    return object;
+    return record;
+  }
+
+  @Override
+  public LayerDataObject createRecord(final Map<String, Object> values) {
+    final LayerDataObject record = super.createRecord(values);
+    addRecord(record);
+    return record;
   }
 
   @Override
@@ -167,6 +182,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public void deleteRecords(final Collection<? extends LayerDataObject> records) {
     if (isCanDeleteRecords()) {
+      final int oldRowCount = getRowCount();
       super.deleteRecords(records);
       final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
         this.records);
@@ -174,6 +190,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
       this.index.remove(records);
       firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
         this.records));
+      firePropertyChange("rowCount", oldRowCount, getRowCount());
     }
   }
 
@@ -200,6 +217,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public LayerDataObject get(final int index) {
     return this.records.get(index);
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    BoundingBox boundingBox = new BoundingBox(getGeometryFactory());
+    for (final LayerDataObject record : getRecords()) {
+      boundingBox = boundingBox.expandToInclude(record);
+    }
+    return boundingBox;
   }
 
   @Override

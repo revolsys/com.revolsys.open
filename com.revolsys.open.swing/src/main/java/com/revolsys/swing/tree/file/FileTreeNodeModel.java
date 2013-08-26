@@ -51,9 +51,9 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
       if (StringUtils.hasText(name)) {
         return name;
       } else {
-        String path = file.getPath();
+        final String path = file.getPath();
         if (path.equals("/")) {
-          return "/ (ROOT)";
+          return "/";
         } else {
           return path.replaceAll("//", "");
         }
@@ -65,7 +65,7 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   public TreeCellRenderer getRenderer(final File file) {
     final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)super.getRenderer(file);
     if (file.exists()) {
-      String name = file.getName();
+      final String name = file.getName();
       if (file.isDirectory()) {
         renderer.setOpenIcon(ICON_FOLDER);
         renderer.setClosedIcon(ICON_FOLDER);

@@ -37,6 +37,7 @@ public class SpringExpresssionLanguageFilter implements Filter<DataObject>,
     this.query = query;
     this.expression = EXPRESSION_PARSER.parseExpression(query);
     context.addPropertyAccessor(new DataObjectAccessor());
+    context.setVariable("systemProperties", System.getProperties());
     context.setVariables((Map<String, Object>)variables);
   }
 

@@ -12,6 +12,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -45,10 +47,25 @@ public class ToolBar extends JToolBar {
   }
 
   public JButton addButton(final String groupName, final String title,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(title, object,
+      methodName, parameters);
+    return addButton(groupName, action);
+  }
+
+  public JButton addButton(final String groupName, String title,
     final String iconName, final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
-    final Icon icon = SilkIconLoader.getIcon(iconName);
-    final InvokeMethodAction action = new InvokeMethodAction(null, title, icon,
+    String name = null;
+    Icon icon = null;
+    if (StringUtils.hasText(iconName)) {
+      icon = SilkIconLoader.getIcon(iconName);
+    } else {
+      name = title;
+      title = null;
+    }
+
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
       enableCheck, object, methodName, parameters);
 
     return addButton(groupName, action);
