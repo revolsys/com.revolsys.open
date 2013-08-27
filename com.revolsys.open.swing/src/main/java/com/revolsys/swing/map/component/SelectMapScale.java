@@ -15,13 +15,8 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 
-@SuppressWarnings("serial")
 public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final MapPanel map;

@@ -14,15 +14,13 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.util.OperatingSystemUtil;
 
 public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
-   private static final long serialVersionUID = -7481451746832997079L;
+  private static final long serialVersionUID = -7481451746832997079L;
 
   private static final Icon EDIT_ICON = SilkIconLoader.getIcon("pencil");
 
@@ -140,7 +138,6 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
   public LayerTreeCellRenderer() {
   }
 
-  
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, Object value,
     final boolean selected, final boolean expanded, final boolean leaf,
@@ -155,7 +152,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     setIcon(icon);
-  
+
     return label;
   }
 }

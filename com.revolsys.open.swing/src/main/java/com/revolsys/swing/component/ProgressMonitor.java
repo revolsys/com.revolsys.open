@@ -3,6 +3,9 @@ package com.revolsys.swing.component;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.parallel.Invoke;
 
-public class ProgressMonitor extends JDialog {
+public class ProgressMonitor extends JDialog implements WindowListener {
   private static final long serialVersionUID = -5843323756390303783L;
 
   public static void background(final Component component, final String title,
@@ -118,6 +121,43 @@ public class ProgressMonitor extends JDialog {
 
   public void setProgress(final int newValue) {
     progressBar.setValue(newValue);
+  }
+
+  public void setVisible(final Window window) {
+    window.addWindowListener(this);
+    window.setVisible(true);
+  }
+
+  @Override
+  public void windowActivated(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowClosed(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowClosing(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowDeactivated(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowDeiconified(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowIconified(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowOpened(final WindowEvent e) {
+    final Window window = e.getWindow();
+    window.removeWindowListener(this);
+    close();
+    window.toFront();
   }
 
 }

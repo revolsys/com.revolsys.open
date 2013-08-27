@@ -16,13 +16,8 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 
-@SuppressWarnings("serial")
 public class SelectMapCoordinateSystem extends ComboBox implements
   ItemListener, PropertyChangeListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final MapPanel map;

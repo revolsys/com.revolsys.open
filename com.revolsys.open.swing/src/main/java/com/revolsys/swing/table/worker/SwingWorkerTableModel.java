@@ -17,11 +17,7 @@ import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 
-@SuppressWarnings("serial")
 public class SwingWorkerTableModel extends AbstractTableModel {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public static JPanel createPanel() {

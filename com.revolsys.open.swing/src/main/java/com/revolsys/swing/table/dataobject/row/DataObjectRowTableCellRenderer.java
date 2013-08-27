@@ -14,7 +14,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
-@SuppressWarnings("serial")
 public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
 
   /**

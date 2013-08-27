@@ -14,12 +14,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
-@SuppressWarnings("serial")
 public class GeometryCoordinatesPanel extends ValueField implements
   TableModelListener {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();

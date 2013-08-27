@@ -103,12 +103,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   private static final long serialVersionUID = 1L;
 
-  @SuppressWarnings("serial")
   private final UndoManager undoManager = new UndoManager() {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -1077,8 +1072,7 @@ public class DataObjectLayerForm extends JPanel implements
         CollectionUtil.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
       } else {
-        Invoke.later(this, "setFieldInvalid", fieldName,
-          message);
+        Invoke.later(this, "setFieldInvalid", fieldName, message);
       }
     }
   }
@@ -1312,8 +1306,8 @@ public class DataObjectLayerForm extends JPanel implements
 
   public boolean validateField(final String fieldName) {
     if (SwingUtilities.isEventDispatchThread()) {
-      Invoke.background("Validate Field " + fieldName, this,
-        "validateField", fieldName);
+      Invoke.background("Validate Field " + fieldName, this, "validateField",
+        fieldName);
       return false;
     } else {
       return validateFieldInternal(fieldName);

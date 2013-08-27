@@ -171,10 +171,6 @@ public class ProjectFrame extends BaseFrame {
       MapPanel.MAP_CONTROLS_WORKING_AREA, location);
   }
 
-  public double getControlWidth() {
-    return 0.20;
-  }
-
   protected void addLogPanel() {
     final JPanel panel = Log4jTableModel.createPanel();
     DockingFramesUtil.addDockable(this.project,
@@ -331,6 +327,10 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  public double getControlWidth() {
+    return 0.20;
+  }
+
   public CControl getDockControl() {
     return this.dockControl;
   }
@@ -382,6 +382,7 @@ public class ProjectFrame extends BaseFrame {
       loadProject(projectFile);
     } finally {
       progressMonitor.close();
+      toFront();
     }
   }
 

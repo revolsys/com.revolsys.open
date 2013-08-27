@@ -150,6 +150,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.layeredPane.setBorder(new MapRulerBorder(this.viewport));
 
     this.baseMapOverlay = new LayerRendererOverlay(this);
+    baseMapOverlay.setLayer(NullLayer.INSTANCE);
     this.layeredPane.add(this.baseMapOverlay, new Integer(0));
     this.baseMapOverlay.addPropertyChangeListener("layer", this);
 
@@ -193,7 +194,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       this.baseMapLayers.add(layer);
     }
     if (this.baseMapLayers.size() == 1) {
-      setBaseMapLayer(layer);
+      if (layer.isVisible()) {
+        setBaseMapLayer(layer);
+      }
     }
   }
 
@@ -500,9 +503,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && this.baseMapOverlay.getLayer() == null) {
+          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
-          if (layer != null) {
+          if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
           }
         }

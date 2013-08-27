@@ -825,18 +825,19 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       if (this.moveGeometryStart != null) {
         mouseMoved(e);
       }
-    } else if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
-      final int snapPointIndex = keyCode - KeyEvent.VK_1;
-      if (snapPointIndex < this.snapPointLocationMap.size()) {
-        this.snapPointIndex = snapPointIndex;
-        setSnapLocations(snapPointLocationMap);
-      }
     }
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
+    final char keyChar = e.getKeyChar();
     if (splitLineKeyPress(e)) {
+    } else if (keyChar >= '1' && keyChar <= '9') {
+      final int snapPointIndex = keyChar - '1';
+      if (snapPointIndex < this.snapPointLocationMap.size()) {
+        this.snapPointIndex = snapPointIndex;
+        setSnapLocations(snapPointLocationMap);
+      }
     } else {
       super.keyTyped(e);
     }
@@ -1014,6 +1015,9 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       if (!this.mouseOverLocations.isEmpty()) {
         setMapCursor(CURSOR_MOVE);
       }
+    }
+    if (!event.isConsumed()) {
+      super.mouseMoved(event);
     }
   }
 

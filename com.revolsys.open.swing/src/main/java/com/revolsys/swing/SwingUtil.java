@@ -467,9 +467,11 @@ public class SwingUtil {
     final double screenHeight = screenSize.getHeight();
     final Dimension size = new Dimension((int)(screenWidth - minusX),
       (int)(screenHeight - minusY));
+    frame.setLocation(minusX / 2, minusY / 2);
     frame.setSize(size);
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
+    frame.setState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
   }
 
 }

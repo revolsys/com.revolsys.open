@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.IsSimpleOp;
@@ -38,18 +39,16 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
-@SuppressWarnings("serial")
 public class SelectRecordsOverlay extends AbstractOverlay {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
     }, 0f);
+
+  private static final Cursor CURSOR_SELECT_BOX = SilkIconLoader.getCursor(
+    "cursor_select_box", 9, 9);
 
   protected static final Color COLOR_BOX = WebColors.Green;
 
@@ -137,16 +136,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+    final int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_ESCAPE) {
       clearMapCursor();
       this.selectBox = null;
       this.selectBoxFirstPoint = null;
       repaint();
+    } else if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_META) {
+      setMapCursor(CURSOR_SELECT_BOX);
+      e.consume();
     }
   }
 
   @Override
   public void keyReleased(final KeyEvent e) {
+    clearMapCursor();
   }
 
   @Override
@@ -164,8 +168,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-      Invoke.background("Select records", this, "selectRecords",
-        boundingBox);
+      Invoke.background("Select records", this, "selectRecords", boundingBox);
       event.consume();
     }
   }
@@ -175,6 +178,16 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     if (this.selectBoxFirstPoint != null) {
       selectBoxDrag(event);
       event.consume();
+    }
+  }
+
+  @Override
+  public void mouseMoved(final MouseEvent e) {
+    if (e.getButton() == 0) {
+      if (e.isControlDown() || e.isMetaDown()) {
+        setMapCursor(CURSOR_SELECT_BOX);
+        e.consume();
+      }
     }
   }
 
@@ -306,6 +319,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void selectBoxDrag(final MouseEvent event) {
+    setMapCursor(CURSOR_SELECT_BOX);
     final double width = Math.abs(event.getX()
       - this.selectBoxFirstPoint.getX());
     final double height = Math.abs(event.getY()
@@ -359,7 +373,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void selectBoxStart(final MouseEvent event) {
-    setMapCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    setMapCursor(CURSOR_SELECT_BOX);
     this.selectBoxFirstPoint = event.getPoint();
     this.selectBox = new Rectangle2D.Double();
     event.consume();

@@ -17,17 +17,13 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.vividsolutions.jts.geom.Point;
 
-@SuppressWarnings("serial")
 public class ZoomOverlay extends AbstractOverlay {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
@@ -42,13 +38,17 @@ public class ZoomOverlay extends AbstractOverlay {
 
   private BufferedImage panImage;
 
+  private static final Cursor CURSOR_ZOOM_BOX = SilkIconLoader.getCursor(
+    "cursor_zoom_box", 9, 9);
+
   public ZoomOverlay(final MapPanel map) {
     super(map);
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+    final int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_ESCAPE) {
       clearMapCursor();
       this.panning = false;
       this.panFirstPoint = null;
@@ -56,11 +56,14 @@ public class ZoomOverlay extends AbstractOverlay {
       this.zoomBox = null;
       this.zoomBoxFirstPoint = null;
       repaint();
+    } else if (keyCode == KeyEvent.VK_SHIFT) {
+      setMapCursor(CURSOR_ZOOM_BOX);
     }
   }
 
   @Override
   public void keyReleased(final KeyEvent e) {
+    clearMapCursor();
   }
 
   @Override
@@ -97,6 +100,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
+
   }
 
   @Override
@@ -104,7 +108,12 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void mouseMoved(final MouseEvent e) {
+  public void mouseMoved(final MouseEvent event) {
+    final boolean shiftDown = event.isShiftDown();
+    if (shiftDown) {
+      setMapCursor(CURSOR_ZOOM_BOX);
+      event.consume();
+    }
   }
 
   @Override
@@ -257,7 +266,7 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   public void zoomBoxStart(final MouseEvent event) {
-    setMapCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    setMapCursor(CURSOR_ZOOM_BOX);
     this.zoomBoxFirstPoint = event.getPoint();
     this.zoomBox = new Rectangle2D.Double();
     event.consume();

@@ -20,12 +20,8 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.vividsolutions.jts.geom.Point;
 
-@SuppressWarnings("serial")
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private static final NumberFormat FORMAT = new DecimalFormat(

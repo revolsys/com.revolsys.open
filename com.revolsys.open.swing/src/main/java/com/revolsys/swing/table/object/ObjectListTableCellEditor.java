@@ -9,7 +9,6 @@ import javax.swing.table.TableCellEditor;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 
-@SuppressWarnings("serial")
 public class ObjectListTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
 

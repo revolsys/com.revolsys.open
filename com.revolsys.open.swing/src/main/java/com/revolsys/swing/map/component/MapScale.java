@@ -14,11 +14,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.map.Viewport2D;
 
-@SuppressWarnings("serial")
 public class MapScale extends JLabel implements PropertyChangeListener {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public static final DecimalFormat FORMAT = new DecimalFormat("#,###");

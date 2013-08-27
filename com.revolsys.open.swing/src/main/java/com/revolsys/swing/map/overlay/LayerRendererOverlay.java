@@ -20,13 +20,8 @@ import com.revolsys.swing.parallel.Invoke;
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
-@SuppressWarnings("serial")
 public class LayerRendererOverlay extends JComponent implements
   PropertyChangeListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private Layer layer;
@@ -127,11 +122,13 @@ public class LayerRendererOverlay extends JComponent implements
     final Layer old = this.layer;
     if (old != layer) {
       if (old != null) {
-        layer.removePropertyChangeListener(this);
+        old.setVisible(false);
+        old.removePropertyChangeListener(this);
       }
       this.layer = layer;
       if (layer != null) {
         layer.addPropertyChangeListener(this);
+        layer.setVisible(true);
       }
       redraw();
       firePropertyChange("layer", old, layer);

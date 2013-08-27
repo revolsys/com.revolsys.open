@@ -15,13 +15,8 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 
-@SuppressWarnings("serial")
 public class MouseOverlay extends JComponent implements MouseListener,
   MouseMotionListener, MouseWheelListener, KeyListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public MouseOverlay(final JLayeredPane pane) {
@@ -116,6 +111,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseEntered(final MouseEvent e) {
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
