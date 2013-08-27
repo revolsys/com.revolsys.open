@@ -2,21 +2,15 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
-import org.jdesktop.swingx.color.ColorUtil;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 
-@SuppressWarnings("serial")
 public class ToolTipOverlay extends AbstractOverlay {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final JLabel label = new JLabel();
@@ -25,9 +19,8 @@ public class ToolTipOverlay extends AbstractOverlay {
     super(map);
     setLayout(null);
     this.label.setOpaque(true);
-    this.label.setBorder(BorderFactory.createLineBorder(ColorUtil.setAlpha(
-      WebColors.Black, 127)));
-    this.label.setBackground(ColorUtil.setAlpha(WebColors.Yellow, 127));
+    this.label.setBorder(BorderFactory.createLineBorder(WebColors.Black));
+    this.label.setBackground(WebColors.Yellow);
     add(this.label);
     clearText();
   }
@@ -38,10 +31,10 @@ public class ToolTipOverlay extends AbstractOverlay {
     repaint();
   }
 
-  public void setText(final Point point, final CharSequence text) {
-    this.label.setBackground(ColorUtil.setAlpha(WebColors.Yellow, 191));
+  public void setText(final Point2D point, final CharSequence text) {
+    this.label.setBackground(WebColors.Yellow);
     this.label.setText(text.toString());
-    this.label.setLocation(point);
+    this.label.setLocation(new Point((int)point.getX(), (int)point.getY()));
     this.label.setVisible(true);
     final Dimension preferredSize = this.label.getPreferredSize();
     this.label.setSize(preferredSize);

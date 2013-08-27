@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -50,6 +51,12 @@ public final class CollectionUtil {
   public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map,
     final K1 key1, final V value) {
     final Set<V> values = getSet(map, key1);
+    return values.add(value);
+  }
+
+  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map,
+    final K1 key1, final V value) {
+    final Set<V> values = getTreeSet(map, key1);
     return values.add(value);
   }
 
@@ -361,6 +368,15 @@ public final class CollectionUtil {
     } else {
       return StringConverterRegistry.toString(value);
     }
+  }
+
+  public static <K, V> Set<V> getTreeSet(final Map<K, Set<V>> map, final K key) {
+    Set<V> value = map.get(key);
+    if (value == null) {
+      value = new TreeSet<V>();
+      map.put(key, value);
+    }
+    return value;
   }
 
   public static boolean isNotNullAndNotZero(final Map<String, Object> object,

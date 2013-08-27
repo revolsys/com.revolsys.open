@@ -84,11 +84,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected void drawXorGeometry(final Graphics2D graphics) {
-    final Geometry geometry = this.xorGeometry;
-    drawXorGeometry(graphics, geometry);
-  }
-
-  protected void drawXorGeometry(final Graphics2D graphics, Geometry geometry) {
+    Geometry geometry = this.xorGeometry;
     if (geometry != null) {
       geometry = getViewport().getGeometryFactory().copy(geometry);
       final Paint paint = graphics.getPaint();
@@ -253,12 +249,6 @@ public class AbstractOverlay extends JComponent implements
 
   public void setXorGeometry(final Geometry xorGeometry) {
     this.xorGeometry = xorGeometry;
-  }
-
-  protected void setXorGeometry(final Graphics2D graphics,
-    final Geometry xorGeometry) {
-    drawXorGeometry(graphics);
-    this.xorGeometry = xorGeometry;
-    drawXorGeometry(graphics);
+    repaint();
   }
 }

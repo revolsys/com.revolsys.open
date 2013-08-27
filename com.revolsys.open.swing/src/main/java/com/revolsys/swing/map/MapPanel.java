@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.JXStatusBar;
@@ -46,6 +48,7 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
@@ -600,11 +603,18 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.toolTipOverlay.setText(location, text);
   }
 
-  public void setToolTipText(Point location, final int dx, final int dy,
-    final CharSequence text) {
-    location = new Point(location);
-    location.translate(dx, dy);
-    this.toolTipOverlay.setText(location, text);
+  public void setToolTipText(final Point2D location, final int dx,
+    final int dy, CharSequence text) {
+    if (text == null) {
+      text = "";
+    }
+    final Point point = new Point((int)location.getX(), (int)location.getY());
+    point.translate(dx, dy);
+    if (SwingUtilities.isEventDispatchThread()) {
+      this.toolTipOverlay.setText(point, text);
+    } else {
+      Invoke.later(toolTipOverlay, "setText", point, text);
+    }
   }
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {

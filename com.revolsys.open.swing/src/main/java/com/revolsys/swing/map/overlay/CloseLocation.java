@@ -3,11 +3,13 @@ package com.revolsys.swing.map.overlay;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class CloseLocation {
 
@@ -33,24 +35,6 @@ public class CloseLocation {
     this.vertexIndex = vertexIndex;
     this.segment = segment;
     this.point = point;
-  }
-
-  public void appendIdAndIndex(final StringBuffer string) {
-    final DataObjectMetaData metaData = getMetaData();
-    string.append(metaData.getIdAttributeName());
-    string.append("=");
-    final Object id = getId();
-    string.append(id);
-    string.append(", ");
-    int[] index = this.vertexIndex;
-    if (index != null) {
-      string.append("vertexIndex=");
-    } else {
-      string.append("segmentIndex=");
-      index = this.segment.getIndex();
-    }
-    final String indexString = CollectionUtil.toString(CollectionUtil.arrayToList(index));
-    string.append(indexString);
   }
 
   @SuppressWarnings("unchecked")
@@ -110,6 +94,21 @@ public class CloseLocation {
     return this.segment.getIndex();
   }
 
+  public String getType() {
+    if (geometry instanceof Point) {
+      return "Point";
+    } else if (segment != null) {
+      return "Edge";
+    } else {
+      if (GeometryEditUtil.isFromPoint(geometry, vertexIndex)
+        || GeometryEditUtil.isToPoint(geometry, vertexIndex)) {
+        return "End-Vertex";
+      } else {
+        return "Vertex";
+      }
+    }
+  }
+
   public String getTypePath() {
     final DataObjectMetaData metaData = getMetaData();
     return metaData.getPath();
@@ -124,7 +123,22 @@ public class CloseLocation {
     final StringBuffer string = new StringBuffer();
     string.append(getTypePath());
     string.append(", ");
-    appendIdAndIndex(string);
+    final DataObjectMetaData metaData = getMetaData();
+    string.append(metaData.getIdAttributeName());
+    string.append("=");
+    final Object id = getId();
+    string.append(id);
+    string.append(", ");
+    string.append(getType());
+    int[] index = this.vertexIndex;
+    if (index != null) {
+      string.append(", index=");
+    } else {
+      string.append(", index=");
+      index = this.segment.getIndex();
+    }
+    final String indexString = CollectionUtil.toString(CollectionUtil.arrayToList(index));
+    string.append(indexString);
     return string.toString();
   }
 

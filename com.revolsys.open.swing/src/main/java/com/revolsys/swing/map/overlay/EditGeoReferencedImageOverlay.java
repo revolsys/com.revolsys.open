@@ -100,7 +100,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       final LineString line = geometryFactory.createLineString(
         this.addTiePointFirstPoint, mousePoint);
       final Graphics2D graphics = getGraphics();
-      setXorGeometry(graphics, line);
+      setXorGeometry(line);
       // TODO make into an arrow
       return true;
     }

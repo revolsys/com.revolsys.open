@@ -47,6 +47,8 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
@@ -56,7 +58,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -192,13 +193,17 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   private Point snapPoint;
 
+  private int snapPointIndex;
+
   private boolean dragged = false;
 
   private java.awt.Point moveGeometryStart;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
-  private final Map<Coordinates, List<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
+  private Map<Coordinates, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
+
+  private java.awt.Point snapEventPoint;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -372,6 +377,9 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
   public void clearMouseOverGeometry() {
     clearMapCursor();
     this.mouseOverLocations = Collections.emptyList();
+    this.snapPointLocationMap = Collections.emptyMap();
+    this.snapPoint = null;
+    this.snapEventPoint = null;
   }
 
   protected void clearMouseOverLocations() {
@@ -455,8 +463,10 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       }
       if (closestSegment != null) {
         Coordinates pointOnLine = closestSegment.project(coordinates);
+        final GeometryFactory geometryFactory = layer.getGeometryFactory();
         pointOnLine = ProjectionFactory.convert(pointOnLine,
-          viewportGeometryFactory, layer.getGeometryFactory());
+          viewportGeometryFactory, geometryFactory);
+        geometryFactory.makePrecise(pointOnLine);
         return new CloseLocation(layer, object, geometry, null, closestSegment,
           pointOnLine);
       }
@@ -533,35 +543,6 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     } else {
       final Coordinates pointOnLine = segment.project(coordinates);
       return geometryFactory.createPoint(pointOnLine);
-    }
-  }
-
-  private IndexedLineSegment getClosetSegment(
-    final QuadTree<IndexedLineSegment> index, final BoundingBox boundingBox,
-    final double maxDistance, final double... previousDistance) {
-    final Point point = boundingBox.getCentrePoint();
-    final Coordinates coordinates = CoordinatesUtil.get(point);
-
-    double closestDistance = previousDistance[0];
-    if (index == null) {
-      return null;
-    } else {
-      final List<IndexedLineSegment> segments = index.query(boundingBox,
-        "isWithinDistance", point, maxDistance);
-      if (segments.isEmpty()) {
-        return null;
-      } else {
-        IndexedLineSegment closestSegment = null;
-        for (final IndexedLineSegment segment : segments) {
-          final double distance = segment.distance(coordinates);
-          if (distance < closestDistance) {
-            closestSegment = segment;
-            closestDistance = distance;
-            previousDistance[0] = distance;
-          }
-        }
-        return closestSegment;
-      }
     }
   }
 
@@ -717,55 +698,31 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     return null;
   }
 
-  private boolean hasSnapPoint(final BoundingBox boundingBox) {
+  private boolean hasSnapPoint(final java.awt.Point eventPoint,
+    final BoundingBox boundingBox) {
+    snapEventPoint = eventPoint;
     new TreeMap<Coordinates, List<CloseLocation>>();
-    final GeometryFactory geometryFactory = Project.get().getGeometryFactory();
     final Point point = boundingBox.getCentrePoint();
     final Set<DataObjectLayer> layers = getSnapLayers();
+    final TreeMap<Coordinates, Set<CloseLocation>> snapLocations = new TreeMap<Coordinates, Set<CloseLocation>>(
+      new CoordinatesDistanceComparator(point));
     this.snapPoint = null;
-    Boolean nodeSnap = null;
     for (final DataObjectLayer layer : layers) {
       final List<LayerDataObject> objects = layer.query(boundingBox);
-      final double maxDistance = getMaxDistance(boundingBox);
-      double closestDistance = Double.MAX_VALUE;
       for (final LayerDataObject object : objects) {
         if (layer.isVisible(object)) {
-          // if (object != this.mouseOverObject) {
-          final Geometry geometry = geometryFactory.copy(object.getGeometryValue());
-          if (geometry != null) {
-            final QuadTree<IndexedLineSegment> index = GeometryEditUtil.getLineSegmentQuadTree(geometry);
-            final IndexedLineSegment closeSegment = getClosetSegment(index,
-              boundingBox, maxDistance, Double.MAX_VALUE);
-            if (closeSegment != null) {
-              final Point closestPoint = getClosestPoint(geometryFactory,
-                closeSegment, point, maxDistance);
-              final double distance = point.distance(closestPoint);
-              if (JtsGeometryUtil.isFromPoint(geometry, this.snapPoint)
-                || JtsGeometryUtil.isToPoint(geometry, this.snapPoint)) {
-                if (distance < closestDistance || nodeSnap != Boolean.TRUE) {
-                  this.snapPoint = closestPoint;
-                  closestDistance = distance;
-                }
-                nodeSnap = true;
-              } else if (nodeSnap != Boolean.TRUE) {
-                if (distance < closestDistance) {
-                  this.snapPoint = closestPoint;
-                  nodeSnap = false;
-                  closestDistance = distance;
-                }
-              }
-            }
-            // }
+          final CloseLocation closeLocation = findCloseLocation(object,
+            boundingBox);
+          if (closeLocation != null) {
+            final Coordinates closePoint = new DoubleCoordinates(
+              closeLocation.getPoint(), 2);
+            CollectionUtil.addToSet(snapLocations, closePoint, closeLocation);
           }
         }
       }
     }
-    if (nodeSnap == Boolean.FALSE) {
-      setMapCursor(CURSOR_LINE_SNAP);
-    } else if (nodeSnap == Boolean.TRUE) {
-      setMapCursor(CURSOR_NODE_SNAP);
-    }
-    return this.snapPoint != null;
+    snapPointIndex = 0;
+    return setSnapLocations(snapLocations);
 
   }
 
@@ -868,6 +825,12 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       if (this.moveGeometryStart != null) {
         mouseMoved(e);
       }
+    } else if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
+      final int snapPointIndex = keyCode - KeyEvent.VK_1;
+      if (snapPointIndex < this.snapPointLocationMap.size()) {
+        this.snapPointIndex = snapPointIndex;
+        setSnapLocations(snapPointLocationMap);
+      }
     }
   }
 
@@ -932,7 +895,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
           setMapCursor(CURSOR_NODE_SNAP);
           this.snapPoint = fromPoint;
           point = fromPoint;
-        } else if (!hasSnapPoint(boundingBox)) {
+        } else if (!hasSnapPoint(event.getPoint(), boundingBox)) {
           setMapCursor(CURSOR_NODE_ADD);
         }
         final Coordinates firstPoint = GeometryEditUtil.getVertex(
@@ -964,8 +927,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
           }
         }
-        final Graphics2D graphics = getGraphics();
-        setXorGeometry(graphics, xorGeometry);
+        setXorGeometry(xorGeometry);
       }
       return true;
     } else {
@@ -1008,9 +970,9 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
           }
         }
       }
-      final Graphics2D graphics = getGraphics();
-      setXorGeometry(graphics, xorGeometry);
-      if (!hasSnapPoint(boundingBox)) {
+      setXorGeometry(xorGeometry);
+      final java.awt.Point point = event.getPoint();
+      if (!hasSnapPoint(point, boundingBox)) {
         setMapCursor(CURSOR_NODE_ADD);
       }
     } else {
@@ -1125,6 +1087,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
         STYLE_VERTEX);
     }
     paintSelectBox(graphics);
+    drawXorGeometry(graphics);
   }
 
   @Override
@@ -1193,8 +1156,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       return false;
     } else {
       this.snapPoint = null;
-      final Graphics2D graphics = getGraphics();
-      setXorGeometry(graphics, null);
+      setXorGeometry(null);
       final Map<String, Set<CloseLocation>> vertexLocations = new TreeMap<String, Set<CloseLocation>>();
       final Map<String, Set<CloseLocation>> segmentLocations = new TreeMap<String, Set<CloseLocation>>();
 
@@ -1216,6 +1178,66 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
         setMapCursor(CURSOR_LINE_ADD_NODE);
       } else {
         setMapCursor(CURSOR_NODE_EDIT);
+      }
+      return true;
+    }
+  }
+
+  private boolean setSnapLocations(
+    final Map<Coordinates, Set<CloseLocation>> snapLocations) {
+    this.snapPointLocationMap = snapLocations;
+    if (this.snapPointLocationMap.isEmpty()) {
+      this.snapPoint = null;
+      clearMapCursor();
+      return false;
+    } else {
+      this.snapPoint = getGeometryFactory().createPoint(
+        CollectionUtil.get(snapLocations.keySet(), snapPointIndex));
+
+      boolean nodeSnap = false;
+      final StringBuffer text = new StringBuffer(
+        "<html><ol style=\"margin: 2px 2px 2px 15px\">");
+      int i = 0;
+      for (final Entry<Coordinates, Set<CloseLocation>> entry : this.snapPointLocationMap.entrySet()) {
+        final Coordinates coordinates = entry.getKey();
+        if (this.snapPointIndex == i) {
+          text.append("<li style=\"border: 1px solid red; padding: 2px; background-color:#FFC0CB\">");
+        } else {
+          text.append("<li style=\"padding: 3px\">");
+        }
+        i++;
+        text.append("<b>Snap to (");
+        text.append(coordinates);
+        text.append(")</b><ul style=\"margin: 2px 2px 2px 15px\">");
+
+        final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
+        for (final CloseLocation snapLocation : entry.getValue()) {
+          final String typePath = snapLocation.getTypePath();
+          final String locationType = snapLocation.getType();
+          if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
+            nodeSnap = true;
+          }
+          CollectionUtil.addToSet(typeLocationsMap, typePath
+            + " (<b style=\"color:red\">" + locationType + "</b>)",
+            snapLocation);
+        }
+
+        for (final Entry<String, Set<CloseLocation>> typeLocations : typeLocationsMap.entrySet()) {
+          final String type = typeLocations.getKey();
+          text.append("<li>");
+          text.append(type);
+          text.append("</i><");
+        }
+
+        text.append("</ul></li>");
+      }
+      text.append("</ol></html>");
+      getMap().setToolTipText(snapEventPoint, 18, -12, text);
+
+      if (nodeSnap == Boolean.TRUE) {
+        setMapCursor(CURSOR_NODE_SNAP);
+      } else {
+        setMapCursor(CURSOR_LINE_SNAP);
       }
       return true;
     }

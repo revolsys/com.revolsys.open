@@ -691,6 +691,25 @@ public class GeometryEditUtil {
     return geometryFactory.createPolygon(rings);
   }
 
+  public static boolean isFromPoint(final Geometry geometry,
+    final int[] vertexId) {
+    final CoordinatesList points = getPoints(geometry, vertexId);
+    if (points != null && points.size() > 0 && vertexId.length > 0) {
+      final int index = vertexId[vertexId.length - 1];
+      return index == 0;
+    }
+    return false;
+  }
+
+  public static boolean isToPoint(final Geometry geometry, final int[] vertexId) {
+    final CoordinatesList points = getPoints(geometry, vertexId);
+    if (points != null && points.size() > 0 && vertexId.length > 0) {
+      final int index = vertexId[vertexId.length - 1];
+      return index == points.size() - 1;
+    }
+    return false;
+  }
+
   @SuppressWarnings("unchecked")
   public static <T extends Geometry> T moveGeometry(final Geometry geometry,
     final double deltaX, final double deltaY) {
