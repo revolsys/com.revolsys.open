@@ -3,13 +3,13 @@ package com.revolsys.swing.map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.ResponseCache;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -99,6 +99,8 @@ public class ProjectFrame extends BaseFrame {
 
   private ObjectTreePanel catalogPanel;
 
+  private boolean exitOnClose = true;
+
   public ProjectFrame(final String title) {
     this(title, new Project());
   }
@@ -112,7 +114,6 @@ public class ProjectFrame extends BaseFrame {
   public ProjectFrame(final String title, final Project project) {
     super(title);
     this.project = project;
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
@@ -278,11 +279,13 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void exit() {
-    if (getProject().saveChangesWithPrompt()) {
+    final Project project = getProject();
+    if (project != null && project.saveChangesWithPrompt()) {
       final Window[] windows = Window.getOwnerlessWindows();
       for (final Window window : windows) {
         window.dispose();
       }
+      System.exit(0);
     }
   }
 
@@ -383,6 +386,19 @@ public class ProjectFrame extends BaseFrame {
     } finally {
       progressMonitor.close();
       toFront();
+    }
+  }
+
+  public void setExitOnClose(final boolean exitOnClose) {
+    this.exitOnClose = exitOnClose;
+  }
+
+  @Override
+  public void windowClosing(final WindowEvent e) {
+    if (exitOnClose) {
+      exit();
+    } else {
+      dispose();
     }
   }
 

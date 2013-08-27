@@ -39,17 +39,22 @@ public class BaseMain implements UncaughtExceptionHandler {
       final Method appMethod = clazz.getMethod("getApplication");
       final Object application = appMethod.invoke(clazz);
       MethodUtils.invokeMethod(application, "setDockIconImage", image);
+
+      final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
+      final Object closeAllWindows = quitStrategyClass.getField(
+        "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
+      MethodUtils.invokeExactMethod(application, "setQuitStrategy",
+        closeAllWindows);
+
     } catch (final Throwable t) {
+      t.printStackTrace();
     }
   }
 
   private final String name;
 
-  private final boolean swing;
-
-  public BaseMain(final String name, final boolean swing) {
+  public BaseMain(final String name) {
     this.name = name;
-    this.swing = swing;
     Thread.setDefaultUncaughtExceptionHandler(this);
   }
 
