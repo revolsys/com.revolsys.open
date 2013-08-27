@@ -599,21 +599,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public void setToolTipText(final Point location, final CharSequence text) {
-    this.toolTipOverlay.setText(location, text);
-  }
-
-  public void setToolTipText(final Point2D location, final int dx,
-    final int dy, CharSequence text) {
+  public void setToolTipText(final Point2D location, CharSequence text) {
     if (text == null) {
       text = "";
     }
-    final Point point = new Point((int)location.getX(), (int)location.getY());
-    point.translate(dx, dy);
     if (SwingUtilities.isEventDispatchThread()) {
-      this.toolTipOverlay.setText(point, text);
+      this.toolTipOverlay.setText(location, text);
     } else {
-      Invoke.later(toolTipOverlay, "setText", point, text);
+      Invoke.later(toolTipOverlay, "setText", location, text);
     }
   }
 

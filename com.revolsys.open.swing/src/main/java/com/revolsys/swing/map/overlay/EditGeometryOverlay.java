@@ -1172,7 +1172,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       appendLocations(text, "Move Verticies", vertexLocations);
       appendLocations(text, "Insert Verticies", segmentLocations);
       text.append("</html>");
-      getMap().setToolTipText(eventPoint, 18, -12, text);
+      getMap().setToolTipText(eventPoint, text);
 
       if (vertexLocations.isEmpty()) {
         setMapCursor(CURSOR_LINE_ADD_NODE);
@@ -1232,7 +1232,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
         text.append("</ul></li>");
       }
       text.append("</ol></html>");
-      getMap().setToolTipText(snapEventPoint, 18, -12, text);
+      getMap().setToolTipText(snapEventPoint, text);
 
       if (nodeSnap == Boolean.TRUE) {
         setMapCursor(CURSOR_NODE_SNAP);

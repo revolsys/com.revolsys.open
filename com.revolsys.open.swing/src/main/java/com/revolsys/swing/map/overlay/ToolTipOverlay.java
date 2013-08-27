@@ -34,10 +34,33 @@ public class ToolTipOverlay extends AbstractOverlay {
   public void setText(final Point2D point, final CharSequence text) {
     this.label.setBackground(WebColors.Yellow);
     this.label.setText(text.toString());
-    this.label.setLocation(new Point((int)point.getX(), (int)point.getY()));
     this.label.setVisible(true);
     final Dimension preferredSize = this.label.getPreferredSize();
     this.label.setSize(preferredSize);
+
+    final int width = preferredSize.width;
+    final int height = preferredSize.height;
+    final int overlayWidth = getWidth() - 10;
+    final int overlayHeight = getHeight() - 10;
+    int x = (int)point.getX();
+    int y = (int)point.getY();
+    if (x > 20) {
+      x += 10;
+    }
+    if (x + width > overlayWidth) {
+      if (x > width + 10) {
+        x = x - 20 - width;
+      }
+    }
+
+    if (y > 20) {
+      y -= 10;
+    }
+    if (y + height > overlayHeight) {
+      y = Math.max(10, overlayHeight - height);
+    }
+    this.label.setLocation(new Point(x, y));
+
     repaint();
   }
 }
