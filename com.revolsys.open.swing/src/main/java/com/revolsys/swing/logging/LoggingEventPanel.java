@@ -26,7 +26,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class LoggingEventPanel extends JPanel {
 
@@ -61,7 +61,7 @@ public class LoggingEventPanel extends JPanel {
     for (final String fieldName : Arrays.asList("level", "loggerName",
       "message", "threadName")) {
 
-      final Object value = JavaBeanUtil.getValue(event, fieldName);
+      final Object value = Property.get(event, fieldName);
       addField(fieldName, value);
     }
 

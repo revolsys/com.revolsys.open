@@ -15,12 +15,8 @@
  */
 package com.revolsys.util;
 
-import java.beans.BeanInfo;
 import java.beans.IndexedPropertyDescriptor;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +30,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.Converter;
@@ -48,10 +43,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.beanutils.expression.Resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
-
-import com.revolsys.gis.data.model.DataObject;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get
@@ -64,7 +56,7 @@ public final class JavaBeanUtil {
 
   public static final ConvertUtilsBean CONVERT_UTILS_BEAN = new ConvertUtilsBean();
 
-  private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+  static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
   /**
    * Clone the value if it has a clone method.
@@ -132,7 +124,7 @@ public final class JavaBeanUtil {
     if (object == null) {
       return false;
     } else {
-      final Object value = getValue(object, attributeName);
+      final Object value = Property.get(object, attributeName);
       if (value == null) {
         return false;
       } else if (value instanceof Boolean) {
@@ -221,23 +213,6 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static PropertyDescriptor getPropertyDescriptor(
-    final Class<?> beanClass, final String name) {
-    try {
-      final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
-      final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-      for (int i = 0; i < props.length; i++) {
-        final PropertyDescriptor property = props[i];
-        if (name.equals(property.getName())) {
-          return property;
-        }
-      }
-    } catch (final IntrospectionException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
   public static String getPropertyName(final String methodName) {
     String propertyName;
     if (methodName.startsWith("is")) {
@@ -248,19 +223,6 @@ public final class JavaBeanUtil {
         + methodName.substring(4);
     }
     return propertyName;
-  }
-
-  public static Method getReadMethod(final Class<?> beanClass, final String name) {
-    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
-    if (descriptor != null) {
-      return descriptor.getReadMethod();
-    } else {
-      return null;
-    }
-  }
-
-  public static Method getReadMethod(final Object object, final String name) {
-    return getReadMethod(object.getClass(), name);
   }
 
   /**
@@ -335,36 +297,9 @@ public final class JavaBeanUtil {
       + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
-  public static Object getValue(final Object object, final String key) {
-    if (object == null) {
-      return null;
-    } else {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
-        return dataObject.getValueByPath(key);
-      } else if (object instanceof Map) {
-        @SuppressWarnings("unchecked")
-        final Map<String, ?> map = (Map<String, ?>)object;
-        return map.get(key);
-      } else if (object instanceof Annotation) {
-        final Annotation annotation = (Annotation)object;
-        return AnnotationUtils.getValue(annotation, key);
-      } else {
-        final String firstName = getFirstName(key);
-        final String subName = getSubName(key);
-        final Object value = getProperty(object, firstName);
-        if (value == null || !StringUtils.hasText(subName)) {
-          return value;
-        } else {
-          return getValue(value, subName);
-        }
-      }
-    }
-  }
-
   public static Method getWriteMethod(final Class<?> beanClass,
     final String name) {
-    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
+    final PropertyDescriptor descriptor = Property.descriptor(beanClass, name);
     if (descriptor != null) {
       return descriptor.getWriteMethod();
     } else {
@@ -484,22 +419,6 @@ public final class JavaBeanUtil {
       return false;
     } else {
       return true;
-    }
-  }
-
-  public static void setProperties(final Object object,
-    final Map<String, ? extends Object> properties) {
-    for (final Entry<String, ? extends Object> property : properties.entrySet()) {
-      final String propertyName = property.getKey();
-      final Object value = property.getValue();
-      try {
-        PropertyUtils.setProperty(object, propertyName, value);
-      } catch (final InvocationTargetException e) {
-        final Throwable t = e.getCause();
-        LOG.debug("Unable to set property " + propertyName, t);
-      } catch (final Throwable e) {
-        LOG.debug("Unable to set property " + propertyName, e);
-      }
     }
   }
 
@@ -648,22 +567,6 @@ public final class JavaBeanUtil {
           throw new RuntimeException("Unable to set property: " + propertyName,
             e);
         }
-      }
-    }
-  }
-
-  public static void setValue(final Object object, final String propertyName,
-    final Object value) {
-    if (object != null) {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
-        dataObject.setValueByPath(propertyName, value);
-      } else if (object instanceof Map) {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> map = (Map<String, Object>)object;
-        map.put(propertyName, value);
-      } else {
-        setProperty(object, propertyName, value);
       }
     }
   }

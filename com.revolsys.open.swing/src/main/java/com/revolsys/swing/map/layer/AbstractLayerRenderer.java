@@ -10,19 +10,27 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.Icon;
+
 import org.springframework.util.StringUtils;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.dataobject.style.panel.BaseStylePanel;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractLayerRenderer<T extends Layer> implements
-  LayerRenderer<T>, PropertyChangeListener {
+  LayerRenderer<T>, PropertyChangeListener, Cloneable {
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private static final Icon ICON = SilkIconLoader.getIcon("palette");
+
+  private Map<String, Object> defaults = new HashMap<String, Object>();
+
+  private Icon icon = ICON;
 
   private final T layer;
 
@@ -30,15 +38,16 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   private long minimumScale = Long.MAX_VALUE;
 
-  private boolean visible = true;
-
-  private final String type;
-
   private String name;
 
   private LayerRenderer<?> parent;
 
-  private Map<String, Object> defaults = new HashMap<String, Object>();
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
+
+  private final String type;
+
+  private boolean visible = true;
 
   public AbstractLayerRenderer(final String type, final T layer) {
     this.type = type;
@@ -75,9 +84,21 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     setName((String)style.remove("name"));
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  protected AbstractLayerRenderer<T> clone() {
+    try {
+      final AbstractLayerRenderer<T> clone = (AbstractLayerRenderer<T>)super.clone();
+      clone.defaults = JavaBeanUtil.clone(this.defaults);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
+
   @Override
   public ValueField createStylePanel() {
-    return null;
+    return new BaseStylePanel(this);
   }
 
   @Override
@@ -94,6 +115,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   public Map<String, Object> getDefaults() {
     return this.defaults;
+  }
+
+  @Override
+  public Icon getIcon() {
+    return this.icon;
   }
 
   public T getLayer() {
@@ -182,6 +208,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     } else {
       this.defaults = new LinkedHashMap<String, Object>(defaults);
     }
+  }
+
+  public void setIcon(final Icon icon) {
+    this.icon = icon;
   }
 
   public void setMaximumScale(final long maximumScale) {

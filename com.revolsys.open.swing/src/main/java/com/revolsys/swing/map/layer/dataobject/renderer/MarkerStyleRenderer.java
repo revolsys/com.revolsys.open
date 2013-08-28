@@ -16,6 +16,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
@@ -23,6 +24,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
+import com.revolsys.swing.map.layer.dataobject.style.panel.MarkerStylePanel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -275,6 +277,18 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     this(layer, null, style);
   }
 
+  @Override
+  public MarkerStyleRenderer clone() {
+    final MarkerStyleRenderer clone = (MarkerStyleRenderer)super.clone();
+    clone.style = style.clone();
+    return clone;
+  }
+
+  @Override
+  public ValueField createStylePanel() {
+    return new MarkerStylePanel(this);
+  }
+
   public MarkerStyle getStyle() {
     return this.style;
   }
@@ -289,7 +303,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
-  public void setStyle(final GeometryStyle style) {
+  public void setStyle(final MarkerStyle style) {
     this.style = style;
   }
 

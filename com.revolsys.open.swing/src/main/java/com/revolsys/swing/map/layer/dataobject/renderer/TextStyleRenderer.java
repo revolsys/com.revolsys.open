@@ -19,10 +19,12 @@ import java.util.regex.Pattern;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.swing.Icon;
 
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -33,11 +35,13 @@ import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
+import com.revolsys.swing.map.layer.dataobject.style.panel.TextStylePanel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -46,6 +50,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
     0, 0);
+
+  private static final Icon ICON = SilkIconLoader.getIcon("style");
 
   public static String getLabel(final DataObject object, final TextStyle style) {
     final StringBuffer label = new StringBuffer();
@@ -284,11 +290,19 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Map<String, Object> style = getAllDefaults();
     style.putAll(textStyle);
     this.style = new TextStyle(style);
+    setIcon(ICON);
   }
 
-  public TextStyleRenderer(final DataObjectLayer layer, final TextStyle style) {
-    super("textStyle", layer);
-    this.style = style;
+  @Override
+  public TextStyleRenderer clone() {
+    final TextStyleRenderer clone = (TextStyleRenderer)super.clone();
+    clone.style = style.clone();
+    return clone;
+  }
+
+  @Override
+  public ValueField createStylePanel() {
+    return new TextStylePanel(this);
   }
 
   public TextStyle getStyle() {

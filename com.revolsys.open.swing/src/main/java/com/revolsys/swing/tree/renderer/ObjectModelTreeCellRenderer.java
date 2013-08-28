@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -45,12 +44,12 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
       }
       Object label = value;
       if (nodeModel != null) {
-        final TreeCellRenderer renderer = nodeModel.getRenderer(value);
-        label = nodeModel.getLabel(value);
+        final Component renderer = nodeModel.getRenderer(value, tree, selected,
+          expanded, leaf, row, hasFocus);
         if (renderer != null) {
-          return renderer.getTreeCellRendererComponent(tree, label, selected,
-            expanded, leaf, row, hasFocus);
+          return renderer;
         }
+        label = nodeModel.getLabel(value);
       }
       return super.getTreeCellRendererComponent(tree, label, selected,
         expanded, leaf, row, hasFocus);

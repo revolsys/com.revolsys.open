@@ -4,6 +4,9 @@ import java.awt.Graphics2D;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -17,13 +20,16 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
-  private long lastScale = 0;
+  private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
 
-  private AbstractDataObjectLayerRenderer renderer;
+  private transient long lastScale = 0;
+
+  private transient AbstractDataObjectLayerRenderer renderer;
 
   public ScaleMultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("scaleStyle", layer, parent, style);
+    setIcon(ICON);
   }
 
   private AbstractDataObjectLayerRenderer getRenderer(final Viewport2D viewport) {

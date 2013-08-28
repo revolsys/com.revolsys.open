@@ -85,6 +85,7 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 @ResponseStatus(reason = "Access Denied", value = HttpStatus.FORBIDDEN)
@@ -678,7 +679,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     ServletException {
     final T object = createObject();
     HttpServletRequest request = HttpServletUtils.getRequest();
-    JavaBeanUtil.setProperties(object, defaultValues);
+    Property.set(object, defaultValues);
 
     // if (!canAddObject(request)) {
     // response.sendError(HttpServletResponse.SC_FORBIDDEN,
@@ -702,7 +703,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           object)) {
           insertObject(object);
           parameters.put("message", "Saved");
-          final Object id = JavaBeanUtil.getValue(object, getIdPropertyName());
+          final Object id = Property.get(object, getIdPropertyName());
           parameters.put(getIdParameterName(), id);
 
           postInsert(object);
@@ -755,7 +756,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           postUpdate(object);
 
           final Map<String, Object> parameters = new HashMap<String, Object>();
-          final Object id = JavaBeanUtil.getValue(object, getIdPropertyName());
+          final Object id = Property.get(object, getIdPropertyName());
           parameters.put(getIdParameterName(), id);
 
           final String url = getPageUrl(viewName, parameters);
@@ -1040,7 +1041,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Object getIdValue(final Object object) {
-    return JavaBeanUtil.getValue(object, idPropertyName);
+    return Property.get(object, idPropertyName);
   }
 
   /**
@@ -1281,7 +1282,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Object getProperty(final Object object, final String keyName) {
     try {
-      return JavaBeanUtil.getValue(object, keyName);
+      return Property.get(object, keyName);
     } catch (Throwable e) {
       log.error("Unable to get property " + keyName + " for:\n" + object, e);
       return "ERROR";

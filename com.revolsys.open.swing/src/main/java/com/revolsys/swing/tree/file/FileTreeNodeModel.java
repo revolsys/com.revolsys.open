@@ -1,5 +1,6 @@
 package com.revolsys.swing.tree.file;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,8 +8,8 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 
 import org.springframework.util.StringUtils;
 
@@ -62,21 +63,21 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   }
 
   @Override
-  public TreeCellRenderer getRenderer(final File file) {
-    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)super.getRenderer(file);
+  public Component getRenderer(final File file, final JTree tree,
+    final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    final JLabel renderer = (JLabel)super.getRenderer(file, tree, selected,
+      expanded, leaf, row, hasFocus);
     if (file.exists()) {
       final String name = file.getName();
       if (file.isDirectory()) {
-        renderer.setOpenIcon(ICON_FOLDER);
-        renderer.setClosedIcon(ICON_FOLDER);
+        renderer.setIcon(ICON_FOLDER);
       } else if (StringUtils.hasText(name)) {
       } else {
-        renderer.setOpenIcon(ICON_FOLDER_DRIVE);
-        renderer.setClosedIcon(ICON_FOLDER_DRIVE);
+        renderer.setIcon(ICON_FOLDER_DRIVE);
       }
     } else {
-      renderer.setOpenIcon(ICON_FOLDER_MISSING);
-      renderer.setClosedIcon(ICON_FOLDER_MISSING);
+      renderer.setIcon(ICON_FOLDER_MISSING);
     }
     return renderer;
   }

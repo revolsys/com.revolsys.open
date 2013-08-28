@@ -21,6 +21,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractDataObjectLayerRenderer extends
   AbstractLayerRenderer<DataObjectLayer> {
@@ -96,6 +97,13 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final Map<String, Object> style) {
     super(type, layer, parent, style);
     this.filter = getFilter(style);
+  }
+
+  @Override
+  protected AbstractDataObjectLayerRenderer clone() {
+    final AbstractDataObjectLayerRenderer clone = (AbstractDataObjectLayerRenderer)super.clone();
+    clone.filter = JavaBeanUtil.clone(filter);
+    return clone;
   }
 
   protected boolean isFilterAccept(final LayerDataObject object) {

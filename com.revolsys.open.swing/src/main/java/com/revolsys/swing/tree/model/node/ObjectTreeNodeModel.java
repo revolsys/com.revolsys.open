@@ -1,10 +1,11 @@
 package com.revolsys.swing.tree.model.node;
 
+import java.awt.Component;
 import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.JTree;
 
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -33,7 +34,8 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   List<ObjectTreeNodeModel<?, ?>> getObjectTreeNodeModels();
 
-  TreeCellRenderer getRenderer(final NODE node);
+  Component getRenderer(final NODE node, JTree tree, boolean selected,
+    boolean expanded, boolean leaf, int row, boolean hasFocus);
 
   Set<Class<?>> getSupportedChildClasses();
 

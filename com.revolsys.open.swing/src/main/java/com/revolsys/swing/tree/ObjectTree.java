@@ -262,7 +262,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   public void mouseClicked(final MouseEvent e) {
     final int x = e.getX();
     final int y = e.getY();
-    final TreePath path = ObjectTree.this.getPathForLocation(x, y);
+    final TreePath path = getPathForLocation(x, y);
     if (path != null) {
       final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
       if (nodeModel != null) {

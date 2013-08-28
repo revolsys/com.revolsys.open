@@ -13,7 +13,7 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.SetObject;
 import com.revolsys.ui.html.view.TableRow;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class UiBuilderObjectForm extends Form {
   private final HtmlUiBuilder<?> builder;
@@ -53,7 +53,7 @@ public class UiBuilderObjectForm extends Form {
       final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
         try {
-          return JavaBeanUtil.getValue(object, propertyName);
+          return Property.get(object, propertyName);
         } catch (final IllegalArgumentException e) {
           return null;
         }

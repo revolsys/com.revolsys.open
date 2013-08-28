@@ -12,7 +12,7 @@ import javax.swing.JList;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.ResultPagerComboBoxModel;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     } else {
       final List<String> values = new ArrayList<String>();
       for (final String attributeName : this.attributeNames) {
-        final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
+        final String text = StringConverterRegistry.toString(Property.get(
           value, attributeName));
         values.add(text);
       }

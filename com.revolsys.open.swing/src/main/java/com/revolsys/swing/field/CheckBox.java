@@ -1,32 +1,27 @@
 package com.revolsys.swing.field;
 
 import java.awt.Color;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.jdesktop.swingx.JXTextField;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
-@SuppressWarnings("serial")
-public class TextField extends JXTextField implements Field, FocusListener {
+public class CheckBox extends JCheckBox implements Field, ActionListener {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final String fieldName;
 
-  private String fieldValue;
+  private boolean fieldValue;
 
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
@@ -40,54 +35,31 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
-  public TextField(final int columns) {
-    this("text");
-    setColumns(columns);
-  }
-
-  public TextField(final String fieldName) {
+  public CheckBox(final String fieldName) {
     this(fieldName, "");
   }
 
-  public TextField(final String fieldName, final int columns) {
-    this(fieldName);
-    setColumns(columns);
-  }
-
-  public TextField(final String fieldName, final Object fieldValue) {
-    setDocument(new PropertyChangeDocument(this));
+  public CheckBox(final String fieldName, final Object fieldValue) {
     if (StringUtils.hasText(fieldName)) {
       this.fieldName = fieldName;
     } else {
       this.fieldName = "fieldValue";
     }
-    this.fieldValue = StringConverterRegistry.toString(fieldValue);
-    setText(this.fieldValue);
-    addFocusListener(this);
+    setFieldValue(BooleanStringConverter.getBoolean(fieldValue));
+    addActionListener(this);
     this.undoManager.addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
   }
 
-  public TextField(final String fieldName, final Object fieldValue,
-    final int columns) {
-    this(fieldName, fieldValue);
-    setColumns(columns);
+  @Override
+  public void actionPerformed(final ActionEvent e) {
+    setFieldValue(isSelected());
   }
 
   @Override
   public void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
-  }
-
-  @Override
-  public void focusGained(final FocusEvent e) {
-  }
-
-  @Override
-  public void focusLost(final FocusEvent e) {
-    final String text = getText();
-    setFieldValue(text);
   }
 
   @Override
@@ -103,7 +75,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)getText();
+    return (T)(Boolean)isSelected();
   }
 
   @Override
@@ -130,7 +102,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @Override
   public void setFieldInvalid(final String message, final Color color) {
     setForeground(color);
-    setSelectedTextColor(color);
     setBackground(ColorUtil.setAlpha(color, 50));
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
@@ -143,30 +114,23 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
+    setForeground(CheckBox.DEFAULT_FOREGROUND);
+    setBackground(CheckBox.DEFAULT_BACKGROUND);
     this.errorMessage = null;
     super.setToolTipText(this.originalToolTip);
   }
 
   @Override
   public void setFieldValue(final Object value) {
-    final String newValue = StringConverterRegistry.toString(value);
-    final String oldValue = this.fieldValue;
-    final String text = getText();
+    final boolean newValue = BooleanStringConverter.getBoolean(value);
+    final boolean oldValue = this.fieldValue;
+    final boolean selected = isSelected();
     this.undoManager.discardAllEdits();
-    if (!EqualsRegistry.equal(text, newValue)) {
-      if (newValue == null) {
-        if (StringUtils.hasText(text)) {
-          setText("");
-        }
-      } else {
-        setText(newValue);
-      }
+    if (newValue != selected) {
+      setSelected(newValue);
       this.undoManager.discardAllEdits();
     }
-    if (!EqualsRegistry.equal(oldValue, newValue)) {
+    if (oldValue != newValue) {
       this.fieldValue = newValue;
       firePropertyChange(this.fieldName, oldValue, newValue);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,

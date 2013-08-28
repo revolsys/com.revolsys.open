@@ -4,6 +4,9 @@ import java.awt.Graphics2D;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -18,13 +21,12 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class MultipleRenderer extends AbstractMultipleRenderer {
 
-  public MultipleRenderer(final DataObjectLayer layer) {
-    super("multipleStyle", layer);
-  }
+  private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
 
   public MultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> multipleStyle) {
     super("multipleStyle", layer, parent, multipleStyle);
+    setIcon(ICON);
   }
 
   public void addStyle(final GeometryStyle style) {

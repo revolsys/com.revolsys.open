@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
   private final String propertyName;
@@ -28,7 +28,7 @@ public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
       return disabled();
     } else {
       try {
-        final Object value = JavaBeanUtil.getValue(object, this.propertyName);
+        final Object value = Property.get(object, this.propertyName);
         if (EqualsRegistry.equal(value, this.value)) {
           return enabled();
         } else {

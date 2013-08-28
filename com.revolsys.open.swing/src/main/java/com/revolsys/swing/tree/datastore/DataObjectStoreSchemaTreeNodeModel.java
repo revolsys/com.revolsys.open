@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -19,17 +18,17 @@ public class DataObjectStoreSchemaTreeNodeModel extends
   AbstractObjectTreeNodeModel<DataObjectStoreSchema, DataObjectMetaData> {
   private final MenuFactory menu = new MenuFactory();
 
-  private final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-
   public DataObjectStoreSchemaTreeNodeModel() {
     setSupportedClasses(DataObjectStoreSchema.class);
     setSupportedChildClasses(DataObjectMetaData.class);
     setObjectTreeNodeModels(new DataObjectMetaDataTreeNodeModel());
     setLazyLoad(true);
+    final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+    setRenderer(renderer);
     final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
-    this.renderer.setLeafIcon(icon);
-    this.renderer.setOpenIcon(icon);
-    this.renderer.setClosedIcon(icon);
+    renderer.setLeafIcon(icon);
+    renderer.setOpenIcon(icon);
+    renderer.setClosedIcon(icon);
   }
 
   @Override
@@ -72,11 +71,6 @@ public class DataObjectStoreSchemaTreeNodeModel extends
   @Override
   public MouseListener getMouseListener(final DataObjectStoreSchema schema) {
     return null;
-  }
-
-  @Override
-  public TreeCellRenderer getRenderer(final DataObjectStoreSchema schema) {
-    return this.renderer;
   }
 
   @Override

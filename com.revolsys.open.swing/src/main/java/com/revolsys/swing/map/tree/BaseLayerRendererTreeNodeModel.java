@@ -1,11 +1,14 @@
 package com.revolsys.swing.map.tree;
 
+import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
@@ -14,7 +17,6 @@ import javax.swing.tree.TreePath;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.tree.renderer.LayerRendererTreeCellRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class BaseLayerRendererTreeNodeModel extends
@@ -26,8 +28,28 @@ public class BaseLayerRendererTreeNodeModel extends
   public BaseLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractLayerRenderer.class);
     setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
-    setRenderer(new LayerRendererTreeCellRenderer());
     setMouseListener(this);
+  }
+
+  @Override
+  public Component getRenderer(
+    final AbstractLayerRenderer<? extends Layer> node, final JTree tree,
+    final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    final Component renderer = super.getRenderer(node, tree, selected,
+      expanded, leaf, row, hasFocus);
+    if (renderer instanceof JLabel) {
+      final JLabel label = (JLabel)renderer;
+      final Icon icon = node.getIcon();
+      label.setIcon(icon);
+    }
+    renderer.setEnabled(node.isVisible());
+    return renderer;
+  }
+
+  @Override
+  public boolean isLeaf(final AbstractLayerRenderer<? extends Layer> node) {
+    return true;
   }
 
   @Override
@@ -75,5 +97,4 @@ public class BaseLayerRendererTreeNodeModel extends
   @Override
   public void mouseReleased(final MouseEvent e) {
   }
-
 }

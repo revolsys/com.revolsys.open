@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class DataObjectStoreFactoryBean extends
   AbstractFactoryBean<DataObjectStore> {
@@ -17,7 +17,7 @@ public class DataObjectStoreFactoryBean extends
   @Override
   protected DataObjectStore createInstance() throws Exception {
     final DataObjectStore dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
-    JavaBeanUtil.setProperties(dataObjectStore, properties);
+    Property.set(dataObjectStore, properties);
     dataObjectStore.initialize();
     return dataObjectStore;
   }

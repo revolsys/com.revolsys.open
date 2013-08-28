@@ -9,7 +9,7 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class DataObjectToStringConverter extends ObjectToStringConverter {
 
@@ -32,7 +32,7 @@ public class DataObjectToStringConverter extends ObjectToStringConverter {
       final DataObject object = (DataObject)value;
       final List<String> values = new ArrayList<String>();
       for (final String attributeName : this.attributeNames) {
-        final String text = StringConverterRegistry.toString(JavaBeanUtil.getValue(
+        final String text = StringConverterRegistry.toString(Property.get(
           object, attributeName));
         values.add(text);
       }

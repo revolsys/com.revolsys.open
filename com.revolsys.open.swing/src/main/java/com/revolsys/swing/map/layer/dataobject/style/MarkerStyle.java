@@ -30,6 +30,7 @@ import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class MarkerStyle implements Cloneable, MapSerializer {
 
@@ -529,7 +530,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
       if (geometryStyle || name.startsWith("marker")) {
-        final Object value = JavaBeanUtil.getValue(this, name);
+        final Object value = Property.get(this, name);
 
         boolean defaultEqual = false;
         if (DEFAULT_VALUES.containsKey(name)) {

@@ -3,9 +3,13 @@ package com.revolsys.swing.component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.JToggleButton;
 import javax.swing.SpringLayout;
 
@@ -30,8 +34,14 @@ public class TogglePanel extends ValueField implements ItemListener {
 
   public TogglePanel(final String fieldName, final String value,
     final Dimension dimension, final Action... actions) {
+    this(fieldName, value, dimension, Arrays.asList(actions));
+  }
+
+  public TogglePanel(final String fieldName, final String value,
+    final Dimension dimension, final List<Action> actions) {
     super(fieldName, value);
     setLayout(new SpringLayout());
+    setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 0));
     this.group = new ButtonGroup();
     for (final Action action : actions) {
       final JToggleButton button = new JToggleButton(action);
@@ -41,7 +51,9 @@ public class TogglePanel extends ValueField implements ItemListener {
       this.group.add(button);
       add(button);
       final Object actionCommand = action.getValue(Action.ACTION_COMMAND_KEY);
-      if (value != null && value.equals(actionCommand)) {
+
+      if (value != null && actionCommand != null
+        && value.equalsIgnoreCase(actionCommand.toString())) {
         button.setSelected(true);
       }
       button.addItemListener(this);
@@ -50,7 +62,13 @@ public class TogglePanel extends ValueField implements ItemListener {
   }
 
   public String getActionCommand() {
-    return this.group.getSelection().getActionCommand();
+    if (group != null) {
+      final ButtonModel selection = this.group.getSelection();
+      if (selection != null) {
+        return selection.getActionCommand();
+      }
+    }
+    return null;
   }
 
   @Override

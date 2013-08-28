@@ -27,7 +27,7 @@ import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.fields.HiddenField;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.SetObject;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class HtmlUiBuilderObjectForm extends Form {
   private static final Logger log = Logger.getLogger(HtmlUiBuilderObjectForm.class);
@@ -69,7 +69,7 @@ public class HtmlUiBuilderObjectForm extends Form {
       final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
         try {
-          return JavaBeanUtil.getValue(object, propertyName);
+          return Property.get(object, propertyName);
         } catch (final IllegalArgumentException e) {
           return null;
         }

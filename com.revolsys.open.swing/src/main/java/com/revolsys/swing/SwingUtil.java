@@ -15,8 +15,13 @@ import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -60,8 +65,9 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.OperatingSystemUtil;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class SwingUtil {
@@ -77,7 +83,7 @@ public class SwingUtil {
   public static JComponent addField(final Container panel, final Object object,
     final String fieldName, final String label) {
     addLabel(panel, label);
-    final Object fieldValue = JavaBeanUtil.getValue(object, fieldName);
+    final Object fieldValue = Property.get(object, fieldName);
     final JComponent field = SwingUtil.createField(fieldValue.getClass(),
       fieldName, fieldValue);
     panel.add(field);
@@ -378,6 +384,57 @@ public class SwingUtil {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
       && InputEvent.BUTTON1_MASK == modifiers;
+  }
+
+  public static boolean isScrollReversed() {
+    if (OperatingSystemUtil.isMac()) {
+      final String[] cmdAttribs = new String[] {
+        "/usr/bin/defaults",
+        "read",
+        System.getProperty("user.home")
+          + "/Library/Preferences/.GlobalPreferences.plist",
+        "com.apple.swipescrolldirection"
+      };
+      Process process = null;
+      InputStream in = null;
+      OutputStream out = null;
+      InputStream err = null;
+      BufferedReader inr = null;
+      final List<String> lines = new ArrayList<String>();
+      try {
+
+        process = Runtime.getRuntime().exec(cmdAttribs);
+        in = process.getInputStream();
+        out = process.getOutputStream();
+        err = process.getErrorStream();
+        inr = new BufferedReader(new InputStreamReader(in));
+        String line = inr.readLine();
+        while (line != null) {
+          line = line.toLowerCase().trim();
+          lines.add(line);
+          line = inr.readLine();
+        }
+
+        process.waitFor();
+        if (process.exitValue() == 0) {
+          if (lines.size() == 1) {
+            final String result = lines.get(0);
+            return "1".equals(result);
+          }
+        }
+      } catch (final Throwable e) {
+      } finally {
+        FileUtil.closeSilent(in);
+        FileUtil.closeSilent(out);
+        FileUtil.closeSilent(err);
+        FileUtil.closeSilent(inr);
+        if (process != null) {
+          process.destroy();
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   public static void saveFileChooserDirectory(final Class<?> preferencesClass,

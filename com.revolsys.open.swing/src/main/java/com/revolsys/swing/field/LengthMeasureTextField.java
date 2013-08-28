@@ -2,6 +2,8 @@ package com.revolsys.swing.field;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -15,10 +17,18 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodListener;
 
 public class LengthMeasureTextField extends ValueField implements ItemListener {
-  /**
-   * 
-   */
+
   private static final long serialVersionUID = 6402788548005557723L;
+
+  private static final Map<Unit<Length>, String> UNITS = new LinkedHashMap<Unit<Length>, String>();
+
+  static {
+    UNITS.put(NonSI.PIXEL, "Pixel");
+    UNITS.put(SI.METRE, "Metre");
+    UNITS.put(SI.KILOMETRE, "Kilometre");
+    UNITS.put(NonSI.FOOT, "Foot");
+    UNITS.put(NonSI.MILE, "Mile");
+  }
 
   private Number number;
 
@@ -60,10 +70,10 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     add(this.valueField);
     this.valueField.addActionListener(updateNumberListener);
 
-    this.unitField = new ComboBox(NonSI.PIXEL, SI.METRE, SI.KILOMETRE,
-      NonSI.FOOT, NonSI.MILE);
+    this.unitField = new ComboBox(
+      new InvokeMethodStringConverter(UNITS, "get"), true, UNITS.keySet());
     this.unitField.addItemListener(this);
-    this.unitField.setSelectedItem(unit);
+    this.unitField.setSelectedItem(this.unit);
     add(this.unitField);
     GroupLayoutUtil.makeColumns(this, 2);
   }
@@ -90,7 +100,10 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   public void itemStateChanged(final ItemEvent e) {
     if (e.getSource() == this.unitField
       && e.getStateChange() == ItemEvent.SELECTED) {
-      setUnit((Unit<Length>)this.unitField.getSelectedItem());
+      final Object selectedItem = this.unitField.getSelectedItem();
+      if (selectedItem instanceof Unit<?>) {
+        setUnit((Unit<Length>)selectedItem);
+      }
     }
   }
 

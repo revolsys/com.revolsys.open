@@ -4,7 +4,7 @@ import java.beans.PropertyChangeSupport;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
   private final Object object;
@@ -43,7 +43,7 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public boolean isEnabled() {
-    final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+    final Object value = Property.get(this.object, this.propertyName);
     boolean equal = EqualsRegistry.equal(value, this.value);
     if (equal == !this.inverse) {
       return enabled();

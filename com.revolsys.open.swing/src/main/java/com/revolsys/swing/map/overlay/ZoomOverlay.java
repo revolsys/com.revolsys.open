@@ -143,6 +143,7 @@ public class ZoomOverlay extends AbstractOverlay {
     if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
       numSteps *= 2;
     }
+    System.out.println(numSteps);
     final int x = event.getX();
     final int y = event.getY();
     final Point mapPoint = getViewport().toModelPoint(x, y);

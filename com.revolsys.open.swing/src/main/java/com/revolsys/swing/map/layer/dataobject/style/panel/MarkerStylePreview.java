@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
+import com.revolsys.util.ExceptionUtil;
 
 public class MarkerStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -31,6 +32,10 @@ public class MarkerStylePreview extends JPanel {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
     final Marker marker = this.markerStyle.getMarker();
-    marker.render(null, graphics, this.markerStyle, 49, 49, 0);
+    try {
+      marker.render(null, graphics, this.markerStyle, 49, 49, 0);
+    } catch (final Throwable e) {
+      ExceptionUtil.log(getClass(), e);
+    }
   }
 }

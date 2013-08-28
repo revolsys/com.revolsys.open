@@ -1,11 +1,12 @@
 package com.revolsys.swing.field;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 
+import javax.swing.BorderFactory;
 import javax.swing.JColorChooser;
 
 import org.jdesktop.swingx.JXColorSelectionButton;
+import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.component.ColorAlphaPanel;
 import com.revolsys.swing.component.ValueField;
@@ -21,8 +22,9 @@ public class ColorChooserField extends ValueField {
     this.colorButton.addPropertyChangeListener("background",
       new InvokeMethodListener(this, "updateFieldValue"));
     setFieldValue(color);
-    setLayout(new BorderLayout());
-    add(this.colorButton, BorderLayout.CENTER);
+    setLayout(new VerticalLayout());
+    setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 0));
+    add(this.colorButton);
     final JColorChooser chooser = this.colorButton.getChooser();
     chooser.addChooserPanel(new ColorAlphaPanel());
   }

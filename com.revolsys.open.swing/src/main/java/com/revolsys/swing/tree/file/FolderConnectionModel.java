@@ -1,13 +1,15 @@
 package com.revolsys.swing.tree.file;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
@@ -58,19 +60,18 @@ public class FolderConnectionModel extends
   }
 
   @Override
-  public TreeCellRenderer getRenderer(final FolderConnection connection) {
+  public Component getRenderer(final FolderConnection connection,
+    final JTree tree, final boolean selected, final boolean expanded,
+    final boolean leaf, final int row, final boolean hasFocus) {
     final File file = connection.getFile();
-    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)super.getRenderer(connection);
+    final JLabel renderer = (JLabel)super.getRenderer(connection, tree,
+      selected, expanded, leaf, row, hasFocus);
     if (file == null || !file.exists()) {
-      renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
-      renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
-
+      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
     } else if (file == null || !file.exists()) {
-      renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
-      renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
+      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
     } else {
-      renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
-      renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
+      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
     }
     return renderer;
   }

@@ -8,6 +8,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractMultipleRenderer extends
   AbstractDataObjectLayerRenderer {
@@ -52,6 +53,13 @@ public abstract class AbstractMultipleRenderer extends
     final AbstractDataObjectLayerRenderer renderer) {
     this.renderers.add(index, renderer);
     return index;
+  }
+
+  @Override
+  protected AbstractMultipleRenderer clone() {
+    final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
+    clone.renderers = JavaBeanUtil.clone(renderers);
+    return clone;
   }
 
   public List<AbstractDataObjectLayerRenderer> getRenderers() {

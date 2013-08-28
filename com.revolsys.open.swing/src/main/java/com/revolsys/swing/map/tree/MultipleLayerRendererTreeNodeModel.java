@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.tree;
 
+import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -7,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
@@ -15,7 +18,6 @@ import javax.swing.tree.TreePath;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractMultipleRenderer;
-import com.revolsys.swing.map.tree.renderer.LayerRendererTreeCellRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class MultipleLayerRendererTreeNodeModel
@@ -29,7 +31,6 @@ public class MultipleLayerRendererTreeNodeModel
     setSupportedClasses(AbstractMultipleRenderer.class);
 
     setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
-    setRenderer(new LayerRendererTreeCellRenderer());
     setObjectTreeNodeModels(this, new BaseLayerRendererTreeNodeModel());
     setMouseListener(this);
   }
@@ -50,6 +51,21 @@ public class MultipleLayerRendererTreeNodeModel
   protected List<AbstractDataObjectLayerRenderer> getChildren(
     final AbstractMultipleRenderer node) {
     return node.getRenderers();
+  }
+
+  @Override
+  public Component getRenderer(final AbstractMultipleRenderer node,
+    final JTree tree, final boolean selected, final boolean expanded,
+    final boolean leaf, final int row, final boolean hasFocus) {
+    final Component renderer = super.getRenderer(node, tree, selected,
+      expanded, leaf, row, hasFocus);
+    if (renderer instanceof JLabel) {
+      final JLabel label = (JLabel)renderer;
+      final Icon icon = node.getIcon();
+      label.setIcon(icon);
+    }
+    renderer.setEnabled(node.isVisible());
+    return renderer;
   }
 
   @Override

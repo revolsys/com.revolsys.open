@@ -14,6 +14,7 @@ import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class ObjectListTableModel<T> extends AbstractTableModel implements
@@ -165,7 +166,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
       return null;
     } else {
       final String name = getAttributeName(columnIndex);
-      return JavaBeanUtil.getValue(object, name);
+      return Property.get(object, name);
     }
   }
 
@@ -233,7 +234,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     final Object object = getObject(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);
-      final Object oldValue = JavaBeanUtil.getValue(object, name);
+      final Object oldValue = Property.get(object, name);
       JavaBeanUtil.setProperty(object, name, value);
       firePropertyChange(object, name, oldValue, value);
     }

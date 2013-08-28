@@ -8,16 +8,21 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.LayoutStyle;
 
 public class GroupLayoutUtil {
-  public static void makeColumns(final Container container, final int numColumns) {
+  public static GroupLayout getLayout(final Container container) {
     LayoutManager layout = container.getLayout();
     if (!(layout instanceof GroupLayout)) {
       layout = new GroupLayout(container);
       container.setLayout(layout);
     }
     final GroupLayout groupLayout = (GroupLayout)layout;
+    return groupLayout;
+  }
 
+  public static void makeColumns(final Container container,
+    final GroupLayout groupLayout, final int numColumns) {
     final int componentCount = container.getComponentCount();
     final int numRows = (int)Math.ceil(componentCount / (double)numColumns);
 
@@ -50,6 +55,21 @@ public class GroupLayoutUtil {
         }
       }
     }
+  }
+
+  public static void makeColumns(final Container container, final int numColumns) {
+    final GroupLayout groupLayout = getLayout(container);
+
+    makeColumns(container, groupLayout, numColumns);
+  }
+
+  public static void makeColumns(final LayoutStyle layoutStyle,
+    final Container container, final int numColumns) {
+    final GroupLayout groupLayout = getLayout(container);
+    groupLayout.setAutoCreateContainerGaps(false);
+    groupLayout.setAutoCreateGaps(false);
+    groupLayout.setLayoutStyle(layoutStyle);
+    makeColumns(container, groupLayout, numColumns);
   }
 
 }

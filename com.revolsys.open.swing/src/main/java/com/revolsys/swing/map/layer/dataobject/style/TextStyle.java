@@ -21,8 +21,9 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
-public class TextStyle implements MapSerializer {
+public class TextStyle implements MapSerializer, Cloneable {
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
 
@@ -133,6 +134,15 @@ public class TextStyle implements MapSerializer {
         final Object propertyValue = getValue(propertyName, value);
         JavaBeanUtil.setProperty(this, propertyName, propertyValue);
       }
+    }
+  }
+
+  @Override
+  public TextStyle clone() {
+    try {
+      return (TextStyle)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
     }
   }
 
@@ -338,7 +348,7 @@ public class TextStyle implements MapSerializer {
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
-      Object value = JavaBeanUtil.getValue(this, name);
+      Object value = Property.get(this, name);
       if (value instanceof Color) {
         final Color color = (Color)value;
         value = WebColors.getColorWithOpacity(color, 255);

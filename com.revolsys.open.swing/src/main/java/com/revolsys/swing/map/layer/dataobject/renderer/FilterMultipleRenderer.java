@@ -3,6 +3,9 @@ package com.revolsys.swing.map.layer.dataobject.renderer;
 import java.awt.Graphics2D;
 import java.util.Map;
 
+import javax.swing.Icon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -15,9 +18,13 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
+  private static final Icon ICON = SilkIconLoader.getIconWithBadge(
+    "style_multiple", "filter");
+
   public FilterMultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("filterStyle", layer, parent, style);
+    setIcon(ICON);
   }
 
   @Override

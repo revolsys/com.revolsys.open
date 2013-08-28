@@ -1,5 +1,6 @@
 package com.revolsys.swing.tree.model.node;
 
+import java.awt.Component;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,8 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 
 import org.springframework.util.CollectionUtils;
 
@@ -157,8 +158,13 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   }
 
   @Override
-  public TreeCellRenderer getRenderer(final NODE node) {
-    return this.renderer;
+  public Component getRenderer(final NODE node, final JTree tree,
+    final boolean selected, final boolean expanded, final boolean leaf,
+    final int row, final boolean hasFocus) {
+    final Object label = getLabel(node);
+
+    return this.renderer.getTreeCellRendererComponent(tree, label, selected,
+      expanded, leaf, row, hasFocus);
   }
 
   @Override

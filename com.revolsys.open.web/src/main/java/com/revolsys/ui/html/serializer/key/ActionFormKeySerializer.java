@@ -22,7 +22,7 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer implements
   HtmlUiBuilderAware<HtmlUiBuilder<?>> {
@@ -77,7 +77,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
     try {
       final Map<String, Object> parameters = new HashMap<String, Object>();
       for (final String name : parameterNames) {
-        final Object value = JavaBeanUtil.getValue(object, name);
+        final Object value = Property.get(object, name);
         parameters.put(name, value);
       }
       for (final Entry<String, String> entry : parameterNameMap.entrySet()) {

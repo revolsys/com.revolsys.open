@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class JdbcDataObjectStoreFactoryBean extends
   AbstractFactoryBean<JdbcDataObjectStore> implements ApplicationContextAware {
@@ -34,7 +34,7 @@ public class JdbcDataObjectStoreFactoryBean extends
       final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
       dataObjectStore = databaseFactory.createDataObjectStore(dataSource);
     }
-    JavaBeanUtil.setProperties(dataObjectStore, properties);
+    Property.set(dataObjectStore, properties);
     dataObjectStore.initialize();
     return dataObjectStore;
   }

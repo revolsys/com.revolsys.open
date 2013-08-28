@@ -154,6 +154,13 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   @Override
+  public GeometryStyleRenderer clone() {
+    final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
+    clone.style = style.clone();
+    return clone;
+  }
+
+  @Override
   public GeometryStylePanel createStylePanel() {
     return new GeometryStylePanel(this);
   }

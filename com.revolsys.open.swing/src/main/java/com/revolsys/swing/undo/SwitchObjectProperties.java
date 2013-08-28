@@ -1,7 +1,7 @@
 package com.revolsys.swing.undo;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 @SuppressWarnings("serial")
 public class SwitchObjectProperties extends AbstractUndoableEdit {
@@ -36,16 +36,16 @@ public class SwitchObjectProperties extends AbstractUndoableEdit {
     this.object = object;
     this.propertyName1 = propertyName1;
     this.propertyName2 = propertyName2;
-    this.value1 = JavaBeanUtil.getValue(object, propertyName1);
-    this.value2 = JavaBeanUtil.getValue(object, propertyName2);
+    this.value1 = Property.get(object, propertyName1);
+    this.value2 = Property.get(object, propertyName2);
   }
 
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Object value1 = JavaBeanUtil.getValue(this.object,
+      final Object value1 = Property.get(this.object,
         this.propertyName1);
-      final Object value2 = JavaBeanUtil.getValue(this.object,
+      final Object value2 = Property.get(this.object,
         this.propertyName2);
       if (!EqualsRegistry.equal(value1, value2)) {
         if (EqualsRegistry.equal(this.value1, value1)) {
@@ -61,9 +61,9 @@ public class SwitchObjectProperties extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Object value1 = JavaBeanUtil.getValue(this.object,
+      final Object value1 = Property.get(this.object,
         this.propertyName1);
-      final Object value2 = JavaBeanUtil.getValue(this.object,
+      final Object value2 = Property.get(this.object,
         this.propertyName2);
       if (EqualsRegistry.equal(this.value1, value2)) {
         if (EqualsRegistry.equal(this.value2, value1)) {
@@ -76,14 +76,14 @@ public class SwitchObjectProperties extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    JavaBeanUtil.setValue(this.object, this.propertyName1, this.value2);
-    JavaBeanUtil.setValue(this.object, this.propertyName2, this.value1);
+    Property.set(this.object, this.propertyName1, this.value2);
+    Property.set(this.object, this.propertyName2, this.value1);
   }
 
   @Override
   protected void doUndo() {
-    JavaBeanUtil.setValue(this.object, this.propertyName1, this.value1);
-    JavaBeanUtil.setValue(this.object, this.propertyName2, this.value2);
+    Property.set(this.object, this.propertyName1, this.value1);
+    Property.set(this.object, this.propertyName2, this.value2);
   }
 
   @Override

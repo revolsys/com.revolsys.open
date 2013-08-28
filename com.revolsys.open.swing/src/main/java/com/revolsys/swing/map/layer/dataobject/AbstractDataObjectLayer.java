@@ -71,19 +71,18 @@ import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.TabbedValuePanel;
-import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.component.MergeObjectsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
@@ -385,13 +384,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fieldPanel.add(fieldScroll, BorderLayout.CENTER);
     propertiesPanel.addTab("Fields", fieldPanel);
 
-    final LayerRenderer<? extends Layer> renderer = getRenderer();
-    if (renderer != null) {
-      final ValueField stylePanel = renderer.createStylePanel();
-      if (stylePanel != null) {
-        propertiesPanel.addTab(stylePanel);
-      }
-    }
+    final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
+      this);
+    propertiesPanel.addTab("Style", stylePanel);
     return propertiesPanel;
   }
 

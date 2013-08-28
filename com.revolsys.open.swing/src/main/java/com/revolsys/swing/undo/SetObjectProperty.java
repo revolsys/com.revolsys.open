@@ -1,7 +1,7 @@
 package com.revolsys.swing.undo;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 @SuppressWarnings("serial")
 public class SetObjectProperty extends AbstractUndoableEdit {
@@ -30,7 +30,7 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+      final Object value = Property.get(this.object, this.propertyName);
       if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
@@ -41,7 +41,7 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Object value = JavaBeanUtil.getValue(this.object, this.propertyName);
+      final Object value = Property.get(this.object, this.propertyName);
       if (EqualsRegistry.equal(value, this.newValue)) {
         return true;
       }
@@ -51,12 +51,12 @@ public class SetObjectProperty extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    JavaBeanUtil.setValue(this.object, this.propertyName, this.newValue);
+    Property.set(this.object, this.propertyName, this.newValue);
   }
 
   @Override
   protected void doUndo() {
-    JavaBeanUtil.setValue(this.object, this.propertyName, this.oldValue);
+    Property.set(this.object, this.propertyName, this.oldValue);
   }
 
   @Override
