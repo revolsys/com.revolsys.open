@@ -18,6 +18,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.ClassRegistry;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.menu.MenuFactory;
@@ -332,7 +333,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public boolean isVisible(final Object object) {
-    if (hiddenObjects.get(object) == Boolean.TRUE) {
+    if (BooleanStringConverter.getBoolean(hiddenObjects.get(object))) {
       return false;
     } else {
       return true;

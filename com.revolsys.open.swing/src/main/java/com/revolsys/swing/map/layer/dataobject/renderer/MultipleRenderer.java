@@ -67,7 +67,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
       final long scale = (long)viewport.getScale();
       if (renderer.isVisible(scale)) {
         for (final LayerDataObject object : objects) {
-          if (renderer.isVisible(object)) {
+          if (isVisible(object) && renderer.isVisible(object)) {
             try {
               renderer.renderObject(viewport, graphics, visibleArea, layer,
                 object);

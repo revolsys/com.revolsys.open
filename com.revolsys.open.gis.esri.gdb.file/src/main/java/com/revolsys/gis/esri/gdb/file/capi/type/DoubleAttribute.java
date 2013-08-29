@@ -2,6 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -10,7 +11,13 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 public class DoubleAttribute extends AbstractFileGdbAttribute {
   public DoubleAttribute(final Field field) {
     super(field.getName(), DataTypes.DOUBLE,
-      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
+  }
+
+  @Override
+  public int getMaxStringLength() {
+    return 19;
   }
 
   @Override
@@ -23,11 +30,6 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
         return row.getDouble(name);
       }
     }
-  }
-
-  @Override
-  public int getMaxStringLength() {
-    return 19;
   }
 
   @Override

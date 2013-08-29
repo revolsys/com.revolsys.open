@@ -2,6 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.WeakHashMap;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
@@ -34,7 +35,8 @@ public class GuidAttribute extends AbstractFileGdbAttribute {
 
   public GuidAttribute(final Field field) {
     this(field.getName(), field.getLength(),
-      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
   }
 
   public GuidAttribute(final String name, final int length,

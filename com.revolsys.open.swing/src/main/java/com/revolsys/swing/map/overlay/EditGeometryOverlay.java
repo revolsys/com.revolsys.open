@@ -32,6 +32,7 @@ import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.comparator.IntArrayComparator;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
@@ -1238,7 +1239,7 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
       text.append("</ol></html>");
       getMap().setToolTipText(snapEventPoint, text);
 
-      if (nodeSnap == Boolean.TRUE) {
+      if (BooleanStringConverter.getBoolean(nodeSnap)) {
         setMapCursor(CURSOR_NODE_SNAP);
       } else {
         setMapCursor(CURSOR_LINE_SNAP);

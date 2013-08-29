@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -9,7 +10,8 @@ public class BinaryAttribute extends AbstractFileGdbAttribute {
 
   public BinaryAttribute(final Field field) {
     super(field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
-      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
   }
 
   @Override

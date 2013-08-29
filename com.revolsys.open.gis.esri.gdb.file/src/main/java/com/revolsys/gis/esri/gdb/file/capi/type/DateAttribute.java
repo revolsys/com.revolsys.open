@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -23,8 +24,9 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   private static final Object LOCK = new Object();
 
   public DateAttribute(final Field field) {
-    super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.DATE,
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
   }
 
   @Override
@@ -35,7 +37,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getDataStore().isNull(row,name)) {
+    if (getDataStore().isNull(row, name)) {
       return null;
     } else {
       synchronized (getDataStore()) {

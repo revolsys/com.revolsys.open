@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -482,7 +483,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       final GeoReferencedImageLayer layer = (GeoReferencedImageLayer)source;
       final String propertyName = event.getPropertyName();
       if ("editable".equals(propertyName)) {
-        if (event.getNewValue() == Boolean.FALSE) {
+        if (!BooleanStringConverter.getBoolean(event.getNewValue())) {
           if (this.layer == layer) {
             setLayer(null);
           }

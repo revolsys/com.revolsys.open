@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -49,11 +50,6 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     addReadWriteMethods("Polyline");
     addReadWriteMethods("Multipoint");
     addReadWriteMethods("MultiPatch");
-  }
-
-  @Override
-  public int getMaxStringLength() {
-    return 40;
   }
 
   private static ShapefileGeometryUtil geometryUtil = new ShapefileGeometryUtil(
@@ -103,7 +99,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
 
   public GeometryAttribute(final Field field) {
     super(field.getName(), DataTypes.GEOMETRY,
-      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(
@@ -135,9 +132,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           numAxis = 4;
         }
         if (numAxis != geometryFactory.getNumAxis()) {
-          int srid = geometryFactory.getSRID();
-          double scaleXY = geometryFactory.getScaleXY();
-          double scaleZ = geometryFactory.getScaleZ();
+          final int srid = geometryFactory.getSRID();
+          final double scaleXY = geometryFactory.getScaleXY();
+          final double scaleZ = geometryFactory.getScaleZ();
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
             scaleZ);
         }
@@ -157,6 +154,11 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       }
 
     }
+  }
+
+  @Override
+  public int getMaxStringLength() {
+    return 40;
   }
 
   @Override

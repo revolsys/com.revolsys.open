@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -7,8 +8,9 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class ShortAttribute extends AbstractFileGdbAttribute {
   public ShortAttribute(final Field field) {
-    super(field.getName(), DataTypes.SHORT, field.getRequired() == Boolean.TRUE
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.SHORT,
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
   }
 
   @Override

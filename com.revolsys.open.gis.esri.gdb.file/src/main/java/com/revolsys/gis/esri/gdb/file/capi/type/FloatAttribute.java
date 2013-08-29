@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -7,8 +8,14 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class FloatAttribute extends AbstractFileGdbAttribute {
   public FloatAttribute(final Field field) {
-    super(field.getName(), DataTypes.FLOAT, field.getRequired() == Boolean.TRUE
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.FLOAT,
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
+  }
+
+  @Override
+  public int getMaxStringLength() {
+    return 19;
   }
 
   @Override
@@ -21,11 +28,6 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
         return row.getFloat(name);
       }
     }
-  }
-
-  @Override
-  public int getMaxStringLength() {
-    return 19;
   }
 
   @Override

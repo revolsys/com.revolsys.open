@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import com.revolsys.collection.ResultPager;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -61,7 +62,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
       try {
         this.connection = JdbcUtils.getConnection(dataSource);
         boolean autoCommit = false;
-        if (properties.get("autoCommit") == Boolean.TRUE) {
+        if (BooleanStringConverter.getBoolean(properties.get("autoCommit"))) {
           autoCommit = true;
         }
         this.connection.setAutoCommit(autoCommit);

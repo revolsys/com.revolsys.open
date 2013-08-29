@@ -28,6 +28,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -244,7 +245,8 @@ public abstract class AbstractJdbcDataObjectStore extends
         try {
           connection = JdbcUtils.getConnection(dataSource);
           boolean autoCommit = false;
-          if (getProperties().get("autoCommit") == Boolean.TRUE) {
+          if (BooleanStringConverter.getBoolean(getProperties().get(
+            "autoCommit"))) {
             autoCommit = true;
           }
           connection.setAutoCommit(autoCommit);
@@ -384,6 +386,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return tablePermissions.keySet();
   }
 
+  @Override
   public String getDatabaseTableName(final String typePath) {
     return tableNameMap.get(typePath);
   }

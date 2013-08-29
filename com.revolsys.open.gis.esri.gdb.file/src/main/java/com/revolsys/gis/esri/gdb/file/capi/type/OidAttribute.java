@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -7,8 +8,14 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class OidAttribute extends AbstractFileGdbAttribute {
   public OidAttribute(final Field field) {
-    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE
-      || !field.isIsNullable());
+    super(field.getName(), DataTypes.INT,
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
+  }
+
+  @Override
+  public int getMaxStringLength() {
+    return 10;
   }
 
   @Override
@@ -21,11 +28,6 @@ public class OidAttribute extends AbstractFileGdbAttribute {
         return row.getOid();
       }
     }
-  }
-
-  @Override
-  public int getMaxStringLength() {
-    return 10;
   }
 
   @Override

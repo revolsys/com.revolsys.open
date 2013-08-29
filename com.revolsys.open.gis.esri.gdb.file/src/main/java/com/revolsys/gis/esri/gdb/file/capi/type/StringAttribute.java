@@ -2,6 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -10,7 +11,8 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 public class StringAttribute extends AbstractFileGdbAttribute {
   public StringAttribute(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
-      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired())
+        || !field.isIsNullable());
   }
 
   @Override

@@ -808,18 +808,15 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final Map<String, Object> object) {
     final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
       object);
-    final String geometryAttributeName = getMetaData().getGeometryAttributeName();
-    if (geometryAttributeName != null) {
-      for (final Entry<String, String> pair : reverseAttributeNameMap.entrySet()) {
-        final String fromAttributeName = pair.getKey();
-        final String toAttributeName = pair.getValue();
-        final Object toValue = object.get(toAttributeName);
-        reverse.put(fromAttributeName, toValue);
-      }
-      for (final String attributeName : directionalAttributeValues.keySet()) {
-        final Object value = getDirectionalAttributeValue(object, attributeName);
-        reverse.put(attributeName, value);
-      }
+    for (final Entry<String, String> pair : reverseAttributeNameMap.entrySet()) {
+      final String fromAttributeName = pair.getKey();
+      final String toAttributeName = pair.getValue();
+      final Object toValue = object.get(toAttributeName);
+      reverse.put(fromAttributeName, toValue);
+    }
+    for (final String attributeName : directionalAttributeValues.keySet()) {
+      final Object value = getDirectionalAttributeValue(object, attributeName);
+      reverse.put(attributeName, value);
     }
     return reverse;
   }

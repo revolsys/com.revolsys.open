@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
@@ -71,7 +72,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       length = precision;
     }
     final Boolean required = !field.isIsNullable()
-      || field.getRequired() == Boolean.TRUE;
+      || BooleanStringConverter.getBoolean(field.getRequired());
     final Attribute attribute = new Attribute(fieldName, dataType, length,
       scale, required);
 
