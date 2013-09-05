@@ -15,6 +15,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.overlay.CloseLocation;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectLayer extends Layer {
@@ -28,7 +29,7 @@ public interface DataObjectLayer extends Layer {
 
   void clearSelectedRecords();
 
-  <V extends LayerDataObject> V copyObject(final V object);
+  <V extends LayerDataObject> V copyRecord(final V object);
 
   UndoableEdit createPropertyEdit(LayerDataObject object, String propertyName,
     Object oldValue, Object newValue);
@@ -132,6 +133,8 @@ public interface DataObjectLayer extends Layer {
   void showRecordsTable();
 
   void showRecordsTable(String attributeFilterMode);
+
+  void splitRecord(LayerDataObject object, CloseLocation mouseLocation);
 
   void unselectRecords(Collection<? extends LayerDataObject> records);
 

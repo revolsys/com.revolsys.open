@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
-import com.revolsys.util.OperatingSystemUtil;
+import com.revolsys.util.OS;
 
 public class DataObjectStoreConnectionManager
   extends
@@ -20,7 +20,7 @@ public class DataObjectStoreConnectionManager
 
   static {
     INSTANCE = new DataObjectStoreConnectionManager();
-    final File dataStoresDirectory = OperatingSystemUtil.getUserApplicationDataDirectory("com.revolsys.gis/Data Stores");
+    final File dataStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(
       dataStoresDirectory));
   }

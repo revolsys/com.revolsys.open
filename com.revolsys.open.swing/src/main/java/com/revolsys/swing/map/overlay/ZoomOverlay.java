@@ -7,7 +7,6 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -17,10 +16,14 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.util.OS;
 import com.vividsolutions.jts.geom.Point;
 
 public class ZoomOverlay extends AbstractOverlay {
@@ -38,11 +41,24 @@ public class ZoomOverlay extends AbstractOverlay {
 
   private BufferedImage panImage;
 
+  static {
+    PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis",
+      "/com/revolsys/gis/zoom", "wheelForwardsZoomIn", Boolean.class, true);
+  }
+
   private static final Cursor CURSOR_ZOOM_BOX = SilkIconLoader.getCursor(
     "cursor_zoom_box", 9, 9);
 
+  private int panModifiers;
+
   public ZoomOverlay(final MapPanel map) {
     super(map);
+  }
+
+  public boolean isWheelForwardsZoomIn() {
+    final Object wheelForwardsZoomIn = OS.getPreference("com.revolsys.gis",
+      "/com/revolsys/gis/zoom", "wheelForwardsZoomIn");
+    return !BooleanStringConverter.isFalse(wheelForwardsZoomIn);
   }
 
   @Override
@@ -118,11 +134,13 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void mousePressed(final MouseEvent event) {
-    final boolean shiftDown = event.isShiftDown();
     final int modifiers = event.getModifiers();
+    final boolean shiftDown = event.isShiftDown();
     if (shiftDown) {
       zoomBoxStart(event);
-    } else if (modifiers == InputEvent.BUTTON1_MASK) {
+    } else if (SwingUtilities.isLeftMouseButton(event)
+      || SwingUtilities.isMiddleMouseButton(event)) {
+      panModifiers = modifiers;
       panStart(event);
     }
   }
@@ -130,7 +148,9 @@ public class ZoomOverlay extends AbstractOverlay {
   @Override
   public void mouseReleased(final MouseEvent event) {
     if (this.panning) {
-      panFinish(event);
+      if (event.getModifiers() == panModifiers) {
+        panFinish(event);
+      }
     } else if (this.zoomBox != null) {
       zoomBoxFinish(event);
     }
@@ -139,6 +159,12 @@ public class ZoomOverlay extends AbstractOverlay {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent event) {
     int numSteps = event.getWheelRotation();
+    if (SwingUtil.isScrollReversed()) {
+      numSteps = -numSteps;
+    }
+    if (!isWheelForwardsZoomIn()) {
+      numSteps = -numSteps;
+    }
     final int scrollType = event.getScrollType();
     if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
       numSteps *= 2;

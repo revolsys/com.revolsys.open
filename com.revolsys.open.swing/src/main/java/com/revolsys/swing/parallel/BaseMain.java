@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.swing.listener.MacApplicationListenerHandler;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.ExceptionUtil;
@@ -46,7 +47,7 @@ public class BaseMain implements UncaughtExceptionHandler {
         "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
       MethodUtils.invokeExactMethod(application, "setQuitStrategy",
         closeAllWindows);
-
+      MacApplicationListenerHandler.init(application);
     } catch (final Throwable t) {
       t.printStackTrace();
     }

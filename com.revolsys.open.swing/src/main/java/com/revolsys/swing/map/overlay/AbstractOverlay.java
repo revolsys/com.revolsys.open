@@ -31,13 +31,9 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-@SuppressWarnings("serial")
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
   MouseWheelListener, KeyListener {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final LayerGroup project;

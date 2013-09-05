@@ -59,9 +59,12 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
+import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.ByteArrayResource;
@@ -85,6 +88,7 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
+import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.table.DataObjectLayerTableModel;
 import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
@@ -97,6 +101,7 @@ import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer, DataObjectFactory, AddGeometryCompleteAction {
@@ -322,7 +327,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V extends LayerDataObject> V copyObject(final V object) {
+  public <V extends LayerDataObject> V copyRecord(final V object) {
     final LayerDataObject copy = createRecord(object);
     return (V)copy;
   }
@@ -1428,6 +1433,46 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         attributeFilterMode = DataObjectLayerTableModel.MODE_ALL;
       }
       Invoke.later(this, "showRecordsTable", attributeFilterMode);
+    }
+  }
+
+  @Override
+  public void splitRecord(final LayerDataObject object,
+    final CloseLocation mouseLocation) {
+    final Geometry geometry = mouseLocation.getGeometry();
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      final int[] vertexIndex = mouseLocation.getVertexIndex();
+      final Coordinates coordinates = mouseLocation.getPoint();
+      final LineString line1;
+      final LineString line2;
+
+      final int numPoints = line.getNumPoints();
+      if (vertexIndex == null) {
+        final int pointIndex = mouseLocation.getSegmentIndex()[0];
+        line1 = LineStringUtil.subLineString(line, null, 0, pointIndex + 1,
+          coordinates);
+        line2 = LineStringUtil.subLineString(line, coordinates, pointIndex + 1,
+          numPoints - pointIndex - 1, null);
+      } else {
+        final int pointIndex = vertexIndex[0];
+        line1 = LineStringUtil.subLineString(line, pointIndex + 1);
+        line2 = LineStringUtil.subLineString(line, null, pointIndex, numPoints
+          - pointIndex, null);
+
+      }
+
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
+
+      final LayerDataObject object2 = copyRecord(object);
+      object.setGeometryValue(line1);
+      object2.setGeometryValue(line2);
+
+      property.setSplitAttributes(line, coordinates, object);
+      property.setSplitAttributes(line, coordinates, object2);
+
+      saveChanges(object);
+      saveChanges(object2);
     }
   }
 

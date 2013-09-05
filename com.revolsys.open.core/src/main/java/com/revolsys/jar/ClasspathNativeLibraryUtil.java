@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.OperatingSystemUtil;
+import com.revolsys.util.OS;
 
 public class ClasspathNativeLibraryUtil {
 
@@ -18,9 +18,9 @@ public class ClasspathNativeLibraryUtil {
   public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
 
   public static String getLibraryExtension() {
-    if (OperatingSystemUtil.IS_WINDOWS) {
+    if (OS.IS_WINDOWS) {
       return "dll";
-    } else if (OperatingSystemUtil.IS_MAC) {
+    } else if (OS.IS_MAC) {
       return "dylib";
     } else {
       return "so";
@@ -28,7 +28,7 @@ public class ClasspathNativeLibraryUtil {
   }
 
   public static String getLibraryPrefix() {
-    if (OperatingSystemUtil.IS_WINDOWS) {
+    if (OS.IS_WINDOWS) {
       return "";
     } else {
       return "lib";
@@ -36,16 +36,16 @@ public class ClasspathNativeLibraryUtil {
   }
 
   private static String getOperatingSystemName() {
-    if (OperatingSystemUtil.IS_WINDOWS) {
+    if (OS.IS_WINDOWS) {
       return "winnt";
-    } else if (OperatingSystemUtil.IS_MAC) {
+    } else if (OS.IS_MAC) {
       return "macosx";
-    } else if (OperatingSystemUtil.IS_LINUX) {
+    } else if (OS.IS_LINUX) {
       return "linux";
-    } else if (OperatingSystemUtil.IS_SOLARIS) {
+    } else if (OS.IS_SOLARIS) {
       return "solaris";
     } else {
-      return OperatingSystemUtil.OS_NAME;
+      return OS.OS_NAME;
     }
   }
 
@@ -55,7 +55,7 @@ public class ClasspathNativeLibraryUtil {
       if (loaded == null) {
         final String prefix = getLibraryPrefix();
         final String ext = getLibraryExtension();
-        final String arch = OperatingSystemUtil.getArch();
+        final String arch = OS.getArch();
         final String operatingSystemName = getOperatingSystemName();
         loadLibrary(prefix, name, arch, operatingSystemName, ext);
       } else if (!loaded) {

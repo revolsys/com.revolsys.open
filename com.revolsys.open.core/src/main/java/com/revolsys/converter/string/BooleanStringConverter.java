@@ -8,6 +8,24 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
     return bool != null && bool;
   }
 
+  public static boolean isFalse(final Object value) {
+    final Boolean bool = valueOf(value);
+    if (bool == null) {
+      return false;
+    } else {
+      return !bool;
+    }
+  }
+
+  public static boolean isTrue(final Object value) {
+    final Boolean bool = valueOf(value);
+    if (bool == null) {
+      return false;
+    } else {
+      return bool;
+    }
+  }
+
   public static Boolean valueOf(final Object value) {
     if (value instanceof Boolean) {
       final Boolean bool = (Boolean)value;

@@ -5,7 +5,7 @@ import java.util.Comparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class CompareUtil {
-  public static <T> int compare(final Comparable<T> object1, final T object2) {
+  public static <T> int compare(final Comparable<T> object1, T object2) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;
@@ -15,6 +15,9 @@ public class CompareUtil {
     } else if (object2 == null) {
       return 1;
     } else {
+      if (object1 instanceof Number) {
+        object2 = StringConverterRegistry.toObject(object1.getClass(), object2);
+      }
       return object1.compareTo(object2);
     }
   }

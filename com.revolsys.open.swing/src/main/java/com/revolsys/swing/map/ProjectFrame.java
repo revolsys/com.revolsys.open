@@ -60,6 +60,7 @@ import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
+import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
@@ -69,6 +70,7 @@ import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
 import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
+import com.revolsys.util.OS;
 
 public class ProjectFrame extends BaseFrame {
   private static final long serialVersionUID = 1L;
@@ -87,6 +89,7 @@ public class ProjectFrame extends BaseFrame {
     MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
+
   }
 
   private ObjectTreePanel tocPanel;
@@ -250,6 +253,12 @@ public class ProjectFrame extends BaseFrame {
 
     addMenu(menuBar, createMenuFile());
 
+    if (OS.isWindows()) {
+      final MenuFactory tools = new MenuFactory("Tools");
+      tools.addMenuItem("options", "Options...", "Options...", null, null,
+        PreferencesDialog.get(), "showPanel");
+      addMenu(menuBar, tools);
+    }
     WindowManager.addMenu(menuBar);
     return menuBar;
   }

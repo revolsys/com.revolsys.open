@@ -12,7 +12,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import com.revolsys.util.OperatingSystemUtil;
+import com.revolsys.util.OS;
 
 public class SilkIconLoader {
   private static final String RESOURCE_FOLDER = "/"
@@ -34,7 +34,7 @@ public class SilkIconLoader {
       return null;
     } else {
       final Toolkit toolkit = Toolkit.getDefaultToolkit();
-      if (OperatingSystemUtil.isWindows()) {
+      if (OS.isWindows()) {
         final BufferedImage newImage = new BufferedImage(32, 32,
           BufferedImage.TYPE_INT_ARGB);
         final Graphics graphics = newImage.getGraphics();

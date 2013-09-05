@@ -54,19 +54,18 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       6, 6
     }, 0f);
 
-  protected static final Color COLOR_BOX = WebColors.Green;
+  private static final Color COLOR_BOX = WebColors.Green;
 
-  protected static final Color COLOR_BOX_TRANSPARENT = ColorUtil.setAlpha(
+  private static final Color COLOR_BOX_TRANSPARENT = ColorUtil.setAlpha(
     COLOR_BOX, 127);
 
-  protected static final Color COLOR_OUTLINE = WebColors.Black;
+  private static final Color COLOR_OUTLINE = WebColors.Black;
 
-  protected static final Color COLOR_OUTLINE_TRANSPARENT = new Color(0, 0, 0,
-    127);
+  private static final Color COLOR_OUTLINE_TRANSPARENT = new Color(0, 0, 0, 127);
 
-  protected static final Color COLOR_SELECT = WebColors.Lime;
+  private static final Color COLOR_SELECT = WebColors.Lime;
 
-  protected static final Color COLOR_SELECT_TRANSPARENT = ColorUtil.setAlpha(
+  private static final Color COLOR_SELECT_TRANSPARENT = ColorUtil.setAlpha(
     COLOR_SELECT, 127);
 
   private static final Cursor CURSOR_SELECT_BOX = SilkIconLoader.getCursor(
@@ -74,21 +73,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private static final long serialVersionUID = 1L;
 
-  protected static final MarkerStyle STYLE_ERROR = MarkerStyle.marker(
-    "ellipse", 7, WebColors.Yellow, 1, WebColors.Red);
+  private static final MarkerStyle STYLE_ERROR = MarkerStyle.marker("ellipse",
+    7, WebColors.Yellow, 1, WebColors.Red);
 
-  protected static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
+  private static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
     COLOR_SELECT, 3, COLOR_SELECT_TRANSPARENT);
 
-  protected static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
+  private static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
 
-  protected static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker(
+  private static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker(
     vertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
-  protected static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle.marker(
+  private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle.marker(
     lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
-  protected static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker(
+  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker(
     firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   static {

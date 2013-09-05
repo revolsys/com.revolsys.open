@@ -51,6 +51,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
@@ -65,7 +66,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.OperatingSystemUtil;
+import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
@@ -177,6 +178,8 @@ public class SwingUtil {
       field = objectField;
     } else if (Color.class.isAssignableFrom(fieldClass)) {
       field = new ColorChooserField(fieldName, (Color)fieldValue);
+    } else if (Boolean.class.isAssignableFrom(fieldClass)) {
+      field = new CheckBox(fieldName, fieldValue);
     } else {
       final TextField textField = new TextField(fieldName, fieldValue);
       textField.setColumns(50);
@@ -387,7 +390,7 @@ public class SwingUtil {
   }
 
   public static boolean isScrollReversed() {
-    if (OperatingSystemUtil.isMac()) {
+    if (OS.isMac()) {
       final String[] cmdAttribs = new String[] {
         "/usr/bin/defaults",
         "read",

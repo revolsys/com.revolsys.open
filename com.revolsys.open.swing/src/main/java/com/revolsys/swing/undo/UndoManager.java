@@ -16,7 +16,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.util.OperatingSystemUtil;
+import com.revolsys.util.OS;
 
 @SuppressWarnings("serial")
 public class UndoManager extends javax.swing.undo.UndoManager implements
@@ -73,7 +73,7 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
       final ActionMap actionMap = jcomponent.getActionMap();
 
       int modifiers;
-      if (OperatingSystemUtil.isMac()) {
+      if (OS.isMac()) {
         modifiers = Event.META_MASK;
       } else {
         modifiers = Event.CTRL_MASK;

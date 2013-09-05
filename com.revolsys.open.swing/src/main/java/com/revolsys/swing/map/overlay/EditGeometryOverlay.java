@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.overlay;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
@@ -28,9 +27,6 @@ import java.util.TreeMap;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import org.jdesktop.swingx.color.ColorUtil;
-
-import com.revolsys.awt.WebColors;
 import com.revolsys.comparator.IntArrayComparator;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -41,11 +37,9 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -131,14 +125,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
-
-  private static final Color COLOR = WebColors.Aqua;
-
-  private static final Color COLOR_TRANSPARENT = ColorUtil.setAlpha(COLOR, 127);
 
   private static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
     "cursor_node_add", 8, 7);
@@ -188,6 +175,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   private Map<Coordinates, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
   private java.awt.Point snapEventPoint;
+
+  private int vertexDragModifiers;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -923,45 +912,43 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void mouseClicked(final MouseEvent event) {
     if (modeAddMouseClick(event)) {
-    } else {
-      super.mouseClicked(event);
     }
   }
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (this.moveGeometryStart != null) {
-      repaint();
-      return;
-    } else if (SwingUtilities.isLeftMouseButton(event)) {
-      this.dragged = true;
-      if (event.isAltDown() && !this.mouseOverLocations.isEmpty()) {
-        this.moveGeometryStart = event.getPoint();
+    if (!SwingUtilities.isMiddleMouseButton(event)) {
+      if (this.moveGeometryStart != null) {
+        repaint();
         return;
-      }
-    }
-
-    final BoundingBox boundingBox = getHotspotBoundingBox(event);
-
-    if (!this.mouseOverLocations.isEmpty()) {
-      Geometry xorGeometry = null;
-      for (final CloseLocation location : this.mouseOverLocations) {
-        final Geometry locationGeometry = getVertexGeometry(event, location);
-        if (locationGeometry != null) {
-          if (xorGeometry == null) {
-            xorGeometry = locationGeometry;
-          } else {
-            xorGeometry = xorGeometry.union(locationGeometry);
-          }
+      } else if (SwingUtilities.isLeftMouseButton(event)) {
+        this.dragged = true;
+        if (event.isAltDown() && !this.mouseOverLocations.isEmpty()) {
+          this.moveGeometryStart = event.getPoint();
+          return;
         }
       }
-      setXorGeometry(xorGeometry);
-      final java.awt.Point point = event.getPoint();
-      if (!hasSnapPoint(point, boundingBox)) {
-        setMapCursor(CURSOR_NODE_ADD);
+
+      final BoundingBox boundingBox = getHotspotBoundingBox(event);
+
+      if (!this.mouseOverLocations.isEmpty()) {
+        Geometry xorGeometry = null;
+        for (final CloseLocation location : this.mouseOverLocations) {
+          final Geometry locationGeometry = getVertexGeometry(event, location);
+          if (locationGeometry != null) {
+            if (xorGeometry == null) {
+              xorGeometry = locationGeometry;
+            } else {
+              xorGeometry = xorGeometry.union(locationGeometry);
+            }
+          }
+        }
+        setXorGeometry(xorGeometry);
+        final java.awt.Point point = event.getPoint();
+        if (!hasSnapPoint(point, boundingBox)) {
+          setMapCursor(CURSOR_NODE_ADD);
+        }
       }
-    } else {
-      super.mouseDragged(event);
     }
   }
 
@@ -984,24 +971,23 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   @Override
   public void mouseMoved(final MouseEvent event) {
-    final java.awt.Point point = event.getPoint();
-    if (modeAddMouseMoved(event)) {
-    } else {
-      final Graphics2D graphics = getGraphics();
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
-      if (updateMouseOverGeometry(point, graphics, boundingBox)) {
-
+    if (!SwingUtilities.isMiddleMouseButton(event)) {
+      final java.awt.Point point = event.getPoint();
+      if (modeAddMouseMoved(event)) {
       } else {
-        clearMapCursor();
+        final Graphics2D graphics = getGraphics();
+        final BoundingBox boundingBox = getHotspotBoundingBox(event);
+        if (updateMouseOverGeometry(point, graphics, boundingBox)) {
+
+        } else {
+          clearMapCursor();
+        }
       }
-    }
-    if (event.isAltDown()) {
-      if (!this.mouseOverLocations.isEmpty()) {
-        setMapCursor(CURSOR_MOVE);
+      if (event.isAltDown()) {
+        if (!this.mouseOverLocations.isEmpty()) {
+          setMapCursor(CURSOR_MOVE);
+        }
       }
-    }
-    if (!event.isConsumed()) {
-      super.mouseMoved(event);
     }
   }
 
@@ -1011,14 +997,17 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       this.dragged = false;
     }
     if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
+      if (!this.mouseOverLocations.isEmpty()) {
+        this.vertexDragModifiers = event.getModifiers();
+      }
       if (isModeAddGeometry()) {
       } else if (!this.mouseOverLocations.isEmpty()) {
+
         repaint();
         event.consume();
         return;
       }
     }
-    super.mousePressed(event);
   }
 
   @Override
@@ -1027,8 +1016,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       moveGeometryFinish(event);
     } else if (this.dragged && !this.mouseOverLocations.isEmpty()) {
       vertexDragFinish(event);
-    } else {
-      super.mouseReleased(event);
+      return;
     }
     if (SwingUtilities.isLeftMouseButton(event)) {
       this.dragged = false;
@@ -1238,39 +1226,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           for (final CloseLocation mouseLocation : this.mouseOverLocations) {
             final LayerDataObject object = mouseLocation.getObject();
             final DataObjectLayer layer = object.getLayer();
-            final Geometry geometry = mouseLocation.getGeometry();
-            if (geometry instanceof LineString) {
-              final LineString line = (LineString)geometry;
-              final int[] vertexIndex = mouseLocation.getVertexIndex();
-              final Coordinates coordinates = mouseLocation.getPoint();
-              final LineString line1;
-              final LineString line2;
-
-              final int numPoints = line.getNumPoints();
-              if (vertexIndex == null) {
-                final int pointIndex = mouseLocation.getSegmentIndex()[0];
-                line1 = LineStringUtil.subLineString(line, null, 0,
-                  pointIndex + 1, coordinates);
-                line2 = LineStringUtil.subLineString(line, coordinates,
-                  pointIndex + 1, numPoints - pointIndex - 1, null);
-              } else {
-                final int pointIndex = vertexIndex[0];
-                line1 = LineStringUtil.subLineString(line, pointIndex + 1);
-                line2 = LineStringUtil.subLineString(line, null, pointIndex,
-                  numPoints - pointIndex, null);
-
-              }
-              final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
-
-              final LayerDataObject object2 = layer.copyObject(object);
-              object.setGeometryValue(line1);
-              object2.setGeometryValue(line2);
-
-              property.setSplitAttributes(line, coordinates, object);
-              property.setSplitAttributes(line, coordinates, object2);
-
-              layer.saveChanges(object2);
-            }
+            layer.splitRecord(object, mouseLocation);
             e.consume();
             return true;
           }
@@ -1306,8 +1262,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected void vertexDragFinish(final MouseEvent event) {
-    try {
-      if (event != null) {
+    if (event == null) {
+      clearMouseOverLocations();
+    } else if (event.getModifiers() == vertexDragModifiers) {
+      try {
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : this.mouseOverLocations) {
           final Geometry geometry = location.getGeometry();
@@ -1337,10 +1295,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         if (!edit.isEmpty()) {
           addUndo(edit);
         }
+      } finally {
+        clearMouseOverLocations();
       }
-    } finally {
-      clearMouseOverLocations();
     }
-  }
 
+  }
 }

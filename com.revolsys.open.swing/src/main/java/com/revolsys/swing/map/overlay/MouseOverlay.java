@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -14,6 +15,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+
+import com.revolsys.swing.SwingUtil;
 
 public class MouseOverlay extends JComponent implements MouseListener,
   MouseMotionListener, MouseWheelListener, KeyListener {
@@ -83,7 +86,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    requestFocusInWindow(true);
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
@@ -97,7 +100,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    requestFocusInWindow(true);
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseMotionListener) {
         final MouseMotionListener listener = (MouseMotionListener)overlay;
@@ -138,6 +141,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseMoved(final MouseEvent e) {
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseMotionListener) {
         final MouseMotionListener listener = (MouseMotionListener)overlay;
@@ -151,7 +155,14 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    requestFocusInWindow(true);
+    final Window window = SwingUtil.getWindowAncestor(this);
+    window.setAlwaysOnTop(true);
+    window.toFront();
+    window.setFocusableWindowState(true);
+    window.requestFocus();
+    window.setAlwaysOnTop(false);
+
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
@@ -165,6 +176,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;

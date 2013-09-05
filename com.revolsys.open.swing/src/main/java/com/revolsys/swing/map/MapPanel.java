@@ -56,10 +56,6 @@ import com.revolsys.swing.undo.UndoManager;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public static final BoundingBox BC_ENVELOPE = new BoundingBox(
