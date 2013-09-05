@@ -102,6 +102,7 @@ public class MapServer extends Service {
     final int tileY) {
     final String url = getTileUrl(zoomLevel, tileX, tileY);
     try {
+
       final URLConnection connection = new URL(url).openConnection();
       final InputStream in = connection.getInputStream();
       return ImageIO.read(in);

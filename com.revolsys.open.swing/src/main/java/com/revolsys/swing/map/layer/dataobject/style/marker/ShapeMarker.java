@@ -31,6 +31,7 @@ public class ShapeMarker extends AbstractMarker {
     SHAPES.put("x", x(1));
     SHAPES.put("arrow", arrow(1));
     SHAPES.put("solidArrow", solidArrow(1));
+    SHAPES.put("ellipseArrow", ellipseArrow(1));
     SHAPES.put("diamond", diamond(1));
   }
 
@@ -75,6 +76,24 @@ public class ShapeMarker extends AbstractMarker {
     path.lineTo(size, size / 2);
     path.lineTo(size / 2, size);
     path.lineTo(0, size / 2);
+    path.closePath();
+    return path;
+  }
+
+  /**
+   * Get a ellipse arrow shape pointing right for the size of the graphic.
+   * 
+   * @return The shape.
+   */
+  public static Shape ellipseArrow(final double size) {
+    final double radius = size * .5;
+    final double kappaR = 0.5522847498 * radius;
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(radius, 0);
+    path.lineTo(size, radius);
+    path.lineTo(radius, size);
+    path.curveTo(radius - kappaR, size, 0, radius + kappaR, 0, radius);
+    path.curveTo(0, radius - kappaR, radius - kappaR, 0, radius, 0);
     path.closePath();
     return path;
   }

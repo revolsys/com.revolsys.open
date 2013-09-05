@@ -2,11 +2,15 @@
 # /usr/lib/libfgdbunixrtl.so
 #/usr/lib/libFileGDBAPI.so
 
-ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.2/
-ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.2/include
-ifndef OS
-	OS := $(shell uname)
+
+ifeq "$(shell uname)" "Darwin"
+  OS=macosx
+else 
+  OS=linux
 endif
+
+ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.3/macosx/x86_64
+ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.3/macosx/x86_64/include
 
 all: clean swig libs
 	
@@ -31,9 +35,9 @@ swig: init src/main/swig/EsriFileGdbAPI.i
 		src/main/swig/EsriFileGdbAPI.i
 
 libs:
-ifeq "$(OS)" "Darwin"
-	make -f os-arch.mk OS=macosx ARCH=x86_64
+ifeq "$(OS)" "macosx"
+	make -f os-arch.mk OS=${OS} ARCH=x86_64 EXT=dylib
 else 
-	make -f os-arch.mk OS=linux ARCH=x86
-	make -f os-arch.mk OS=linux ARCH=x86_64
+	make -f os-arch.mk OS=${OS} ARCH=x86 EXT=o
+	make -f os-arch.mk OS=${OS} ARCH=x86_64 EXT=o
 endif

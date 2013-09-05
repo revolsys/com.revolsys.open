@@ -336,6 +336,15 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   /**
+   * Get the data type class of the attribute value.
+   * 
+   * @return The data type of the attribute value.
+   */
+  public Class<?> getTypeClass() {
+    return type.getJavaClass();
+  }
+
+  /**
    * Get the data type of the attribute value.
    * 
    * @return The data type of the attribute value.

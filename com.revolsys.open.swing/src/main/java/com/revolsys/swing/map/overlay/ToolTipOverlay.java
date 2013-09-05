@@ -40,24 +40,25 @@ public class ToolTipOverlay extends AbstractOverlay {
 
     final int width = preferredSize.width;
     final int height = preferredSize.height;
-    final int overlayWidth = getWidth() - 10;
-    final int overlayHeight = getHeight() - 10;
+    final int offset = 20;
+    final int overlayWidth = getWidth() - offset;
+    final int overlayHeight = getHeight() - offset;
     int x = (int)point.getX();
     int y = (int)point.getY();
     if (x > 20) {
-      x += 10;
+      x += offset;
     }
     if (x + width > overlayWidth) {
-      if (x > width + 10) {
+      if (x > width + offset) {
         x = x - 20 - width;
       }
     }
 
     if (y > 20) {
-      y -= 10;
+      y -= offset;
     }
     if (y + height > overlayHeight) {
-      y = Math.max(10, overlayHeight - height);
+      y = Math.max(offset, overlayHeight - height);
     }
     this.label.setLocation(new Point(x, y));
 

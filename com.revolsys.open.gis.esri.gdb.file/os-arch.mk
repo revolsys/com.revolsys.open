@@ -2,14 +2,14 @@
 # /usr/lib/libfgdbunixrtl.so
 #/usr/lib/libFileGDBAPI.so
 
-ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.2/
-ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.2/include
+ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.3/${OS}/${ARCH}
+ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.3/${OS}/${ARCH}/include
 
 CFG=Release
 
 include ${ESRI_FILE_GBD_INCLUDE}/make.include
 TARGET_OBJ=target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
-TARGET_LIB=src/main/resources/native/libEsriFileGdbJni-${ARCH}-${OS}.${SLIBEXT}
+TARGET_LIB=src/main/resources/native/libEsriFileGdbJni-${ARCH}-${OS}.${EXT}
 
 all: clean ${TARGET_LIB}
 	
@@ -37,7 +37,7 @@ ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
 		-shared \
 		-lFileGDBAPI \
 		-lfgdbunixrtl \
-		-L${ESRI_FILE_GBD_HOME}/lib/${OS}/${ARCH} \
+		-L${ESRI_FILE_GBD_HOME}/lib/ \
 		${TARGET_OBJ} \
 		-o ${TARGET_LIB}
 	

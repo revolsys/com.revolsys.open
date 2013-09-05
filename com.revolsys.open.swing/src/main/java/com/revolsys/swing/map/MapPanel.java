@@ -46,6 +46,7 @@ import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
+import com.revolsys.swing.map.overlay.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.parallel.Invoke;
@@ -247,6 +248,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addMapOverlays() {
     new ZoomOverlay(this);
+    new SelectRecordsOverlay(this);
     new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(this.layeredPane);
     new EditGeoReferencedImageOverlay(this);

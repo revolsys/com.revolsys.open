@@ -61,8 +61,6 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
@@ -75,7 +73,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EditGeometryOverlay extends SelectRecordsOverlay implements
+public class EditGeometryOverlay extends AbstractOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
 
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {
@@ -161,21 +159,6 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
     "cursor_line_snap", 8, 4);
 
   private static final IntArrayComparator INT_ARRAY_COMPARATOR = new IntArrayComparator();
-
-  private static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
-    COLOR, 3, COLOR_TRANSPARENT);
-
-  private static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
-
-  private static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker("ellipse",
-    6, COLOR_OUTLINE, 1, COLOR);
-
-  static {
-    MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
-      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);
-    MarkerStyle.setMarker(STYLE_OUTLINE, "ellipse", 6,
-      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_TRANSPARENT);
-  }
 
   private int actionId = 0;
 
@@ -1071,8 +1054,9 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
 
   @Override
   public void paintComponent(final Graphics2D graphics) {
-    final LayerGroup layerGroup = getProject();
-    paint(graphics, layerGroup);
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+
     if (this.moveGeometryStart != null) {
       final AffineTransform transform = graphics.getTransform();
       try {
@@ -1081,17 +1065,16 @@ public class EditGeometryOverlay extends SelectRecordsOverlay implements
           final int deltaX = mousePoint.x - this.moveGeometryStart.x;
           final int deltaY = mousePoint.y - this.moveGeometryStart.y;
           graphics.translate(deltaX, deltaY);
-          paintSelected(graphics, this.addGeometry, STYLE_HIGHLIGHT,
-            STYLE_OUTLINE, STYLE_VERTEX);
+          SelectRecordsOverlay.paintSelected(viewport, viewportGeometryFactory,
+            graphics, this.addGeometry);
         }
       } finally {
         graphics.setTransform(transform);
       }
     } else {
-      paintSelected(graphics, this.addGeometry, STYLE_HIGHLIGHT, STYLE_OUTLINE,
-        STYLE_VERTEX);
+      SelectRecordsOverlay.paintSelected(viewport, viewportGeometryFactory,
+        graphics, this.addGeometry);
     }
-    paintSelectBox(graphics);
     drawXorGeometry(graphics);
   }
 

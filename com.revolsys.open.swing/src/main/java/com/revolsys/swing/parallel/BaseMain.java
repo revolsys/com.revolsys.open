@@ -15,6 +15,7 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
@@ -89,7 +90,15 @@ public class BaseMain implements UncaughtExceptionHandler {
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {
     final Class<? extends BaseMain> logClass = getClass();
-    ExceptionUtil.log(logClass, "Unable to start application " + name, e);
+    String message = e.getMessage();
+    if (!StringUtils.hasText(message)) {
+      if (e instanceof NullPointerException) {
+        message = "Null pointer";
+      } else {
+        message = "Unknow error";
+      }
+    }
+    ExceptionUtil.log(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger()
       .getAllAppenders();
@@ -101,7 +110,7 @@ public class BaseMain implements UncaughtExceptionHandler {
     }
     final Logger logger = Logger.getLogger(logClass);
     final LoggingEvent event = new LoggingEvent(logger.getClass().getName(),
-      logger, Level.ERROR, "Unable to start application", e);
+      logger, Level.ERROR, message, e);
 
     LoggingEventPanel.showDialog(null, event);
 

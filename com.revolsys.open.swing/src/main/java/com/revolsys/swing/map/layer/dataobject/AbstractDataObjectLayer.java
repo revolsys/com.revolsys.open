@@ -400,7 +400,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public LayerDataObject createRecord() {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final LayerDataObject object = createDataObject(getMetaData());
-      this.newRecords.add(object);
+      synchronized (newRecords) {
+        this.newRecords.add(object);
+      }
       return object;
     } else {
       return null;
@@ -458,12 +460,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final boolean trackDeletions) {
     if (isLayerObject(object)) {
       clearSelectedRecordsIndex();
-      if (!this.newRecords.remove(object)) {
-        this.modifiedRecords.remove(object);
-        if (trackDeletions) {
-          this.deletedRecords.add(object);
+      synchronized (newRecords) {
+        if (!this.newRecords.remove(object)) {
+          this.modifiedRecords.remove(object);
+          if (trackDeletions) {
+            this.deletedRecords.add(object);
+          }
+          this.selectedRecords.remove(object);
         }
-        this.selectedRecords.remove(object);
       }
       object.setState(DataObjectState.Deleted);
     }
@@ -555,7 +559,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public List<LayerDataObject> getChanges() {
     synchronized (this.editSync) {
       final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
-      objects.addAll(this.newRecords);
+      synchronized (newRecords) {
+        objects.addAll(this.newRecords);
+      }
       objects.addAll(this.modifiedRecords);
       objects.addAll(this.deletedRecords);
       return objects;
@@ -646,7 +652,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public List<LayerDataObject> getNewRecords() {
-    return new ArrayList<LayerDataObject>(this.newRecords);
+    synchronized (newRecords) {
+      return new ArrayList<LayerDataObject>(this.newRecords);
+    }
   }
 
   @Override

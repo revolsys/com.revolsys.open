@@ -25,6 +25,7 @@ import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.panel.MarkerStylePanel;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -219,10 +220,26 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Paint paint = graphics.getPaint();
     try {
       final Marker marker = style.getMarker();
-      for (int i = 0; i < points.size(); i++) {
+      final String orientationType = style.getMarkerOrientationType();
+      final boolean hasOrientationType = !"none".equals(orientationType);
+      final boolean isNext = "next".equals(orientationType);
+      final int pointCount = points.size();
+      for (int i = 0; i < pointCount; i++) {
         final double x = points.getX(i);
         final double y = points.getY(i);
-        marker.render(viewport, graphics, style, x, y, 0);
+        double orientation = 0;
+        if (hasOrientationType && pointCount > 1) {
+          if (i == 0 || isNext) {
+            final double x1 = points.getX(i + 1);
+            final double y1 = points.getY(i + 1);
+            orientation = MathUtil.angleDegrees(x, y, x1, y1);
+          } else {
+            final double x1 = points.getX(i - 1);
+            final double y1 = points.getY(i - 1);
+            orientation = MathUtil.angleDegrees(x1, y1, x, y);
+          }
+        }
+        marker.render(viewport, graphics, style, x, y, orientation);
       }
     } finally {
       graphics.setPaint(paint);
@@ -240,6 +257,28 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
           final Point point = (Point)part;
           renderMarker(viewport, graphics, point, style);
         } else if (part instanceof LineString) {
+          final LineString lineString = (LineString)part;
+          final CoordinatesList points = CoordinatesListUtil.get(lineString);
+          renderMarkers(viewport, graphics, points, style);
+        } else if (part instanceof Polygon) {
+          final Polygon polygon = (Polygon)part;
+          final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
+          for (final CoordinatesList points : pointsList) {
+            renderMarkers(viewport, graphics, points, style);
+          }
+        }
+      }
+    }
+  }
+
+  public static final void renderMarkerVerticesNoPoint(
+    final Viewport2D viewport, final Graphics2D graphics, Geometry geometry,
+    final MarkerStyle style) {
+    geometry = getGeometry(viewport, geometry);
+    if (!geometry.isEmpty()) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        final Geometry part = geometry.getGeometryN(i);
+        if (part instanceof LineString) {
           final LineString lineString = (LineString)part;
           final CoordinatesList points = CoordinatesListUtil.get(lineString);
           renderMarkers(viewport, graphics, points, style);
