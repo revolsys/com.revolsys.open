@@ -24,9 +24,9 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.UrlResource;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
@@ -232,6 +232,11 @@ public class SpringUtil {
     return new InputStreamReader(in);
   }
 
+  public static Resource getResource(final File directory, final String fileName) {
+    final File file = FileUtil.getFile(directory, fileName);
+    return new FileSystemResource(file);
+  }
+
   public static Resource getResource(final Resource resource,
     final CharSequence childPath) {
     try {
@@ -269,12 +274,6 @@ public class SpringUtil {
 
   }
 
-  public static Resource getResource(final File directory,
-    final String fileName) {
-    final File file = FileUtil.getFile(directory, fileName);
-    return new FileSystemResource(file);
-  }
-
   public static String getString(final Resource resource) {
     final Reader reader = getReader(resource);
     return FileUtil.getString(reader);
@@ -286,14 +285,6 @@ public class SpringUtil {
     } catch (final IOException e) {
       throw new IllegalArgumentException("Cannot get URL for resource "
         + resource, e);
-    }
-  }
-
-  public static Resource getUrlResource(final String url) {
-    try {
-      return new UrlResource(url);
-    } catch (final MalformedURLException e) {
-      throw new IllegalArgumentException("Not a valid URL " + url, e);
     }
   }
 

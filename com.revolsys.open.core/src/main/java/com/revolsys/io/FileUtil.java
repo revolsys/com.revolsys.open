@@ -31,6 +31,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -46,6 +48,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.io.file.FolderConnection;
+import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.util.ExceptionUtil;
@@ -794,6 +799,38 @@ public final class FileUtil {
       return out.toString();
     } finally {
       closeSilent(reader);
+    }
+  }
+
+  public static File getUrlFile(final String url) {
+    try {
+      final URI uri = new URI(url);
+      return getUrlFile(uri);
+    } catch (final URISyntaxException e) {
+      ExceptionUtil.throwUncheckedException(e);
+      return null;
+    }
+  }
+
+  public static File getUrlFile(final URI uri) {
+    if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
+      final String connectionName = uri.getAuthority();
+      final String path = uri.getPath();
+
+      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
+        .getConnectionRegistries()) {
+        final FolderConnection connection = registry.getConnection(connectionName);
+        if (connection != null) {
+          final File directory = connection.getFile();
+          final File file = new File(directory, path);
+          if (file.exists()) {
+            return getFile(file);
+          }
+        }
+      }
+      return getFile(path);
+    } else {
+      return getFile(new File(uri));
     }
   }
 

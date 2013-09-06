@@ -1,8 +1,6 @@
 package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,7 +14,8 @@ import com.revolsys.io.FileUtil;
 
 public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
-  private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?");
+  private static final List<String> URL_PATTERNS = Arrays.asList(
+    "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
 
   public static FileGdbDataObjectStore create(final File file) {
     FileGdbDataObjectStore dataObjectStore;
@@ -30,17 +29,12 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
       connectionProperties);
     final String url = (String)properties.remove("url");
-    try {
-      final URI uri = new URI(url);
-      final File file = FileUtil.getFile(new File(uri));
+    final File file = FileUtil.getUrlFile(url);
 
-      final FileGdbDataObjectStore dataObjectStore = create(file);
-      DataObjectStoreFactoryRegistry.setConnectionProperties(dataObjectStore,
-        properties);
-      return dataObjectStore;
-    } catch (final URISyntaxException e) {
-      throw new IllegalArgumentException("Url is not valid " + url, e);
-    }
+    final FileGdbDataObjectStore dataObjectStore = create(file);
+    DataObjectStoreFactoryRegistry.setConnectionProperties(dataObjectStore,
+      properties);
+    return dataObjectStore;
   }
 
   @Override

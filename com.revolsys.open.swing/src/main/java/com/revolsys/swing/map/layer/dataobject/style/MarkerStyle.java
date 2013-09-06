@@ -347,7 +347,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       url = markerFile;
     }
     if (url.toUpperCase().matches("[A-Z][A-Z0-9\\+\\.\\-]*:")) {
-      this.markerFileResource = SpringUtil.getUrlResource(url);
+      this.markerFileResource = SpringUtil.getResource(url);
     } else {
       this.markerFileResource = SpringUtil.getBaseResource(url);
     }
