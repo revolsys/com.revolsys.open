@@ -594,6 +594,16 @@ public class GeometryEditUtil {
     return index[lastIndex];
   }
 
+  public static Point getVertexPoint(final Geometry geometry,
+    final int[] vertexId) {
+    final Coordinates vertex = getVertex(geometry, vertexId);
+    if (vertex == null) {
+      return null;
+    } else {
+      return GeometryFactory.getFactory(geometry).createPoint(vertex);
+    }
+  }
+
   public static int[] incrementVertexIndex(final int[] index) {
     final int length = index.length;
     final int lastIndex = length - 1;

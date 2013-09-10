@@ -5,9 +5,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.SwingUtilities;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
+
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
@@ -16,12 +25,20 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
+import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
@@ -33,12 +50,29 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
+    menu.addGroup(1, "edit");
+
+    final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
+      false);
+    final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
+    final EnableCheck showOriginalImage = new TreeItemPropertyEnableCheck(
+      "showOriginalImage");
+
+    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
+      "pencil", readonly, "toggleEditable"), editable);
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("View Tie-Points",
+      "table_go", "showTiePointsTable"));
+
+    menu.addCheckboxMenuItem("edit",
+      TreeItemRunnable.createAction("Show Original Image", (String)null,
+        editable, "toggleShowOriginalImage"), showOriginalImage);
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
-      "arrow_out", "fitToViewport"));
-    menu.addMenuItem(
-      "edit",
-      TreeItemRunnable.createAction("Revert to Saved", "arrow_revert", "revert"));
+      "arrow_out", editable, "fitToViewport"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Revert to Saved",
+      "arrow_revert", editable, "revert"));
 
   }
 
@@ -63,6 +97,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   private final String url;
 
+  private boolean showOriginalImage = true;
+
   public GeoReferencedImageLayer(final Resource resource) {
     setType(getType());
     setRenderer(new GeoReferencedImageLayerRenderer(this));
@@ -73,6 +109,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setType("geoReferencedImage");
     setName(FileUtil.getBaseName(this.url));
     Invoke.background("Loading file: " + this.url, this, "revert");
+  }
+
+  @Override
+  public TabbedValuePanel createPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
+    final TiePointsPanel tiePointsPanel = new TiePointsPanel(this);
+    tiePointsPanel.setBorder(BorderFactory.createTitledBorder("Tie Points"));
+    propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
+    return propertiesPanel;
   }
 
   public BoundingBox fitToViewport() {
@@ -134,6 +179,19 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public GeoReferencedImage getImage() {
     return this.image;
+  }
+
+  public WarpFilter getWarpFilter() {
+    if (isShowOriginalImage()) {
+      return new WarpAffineFilter(getBoundingBox(), image.getImageWidth(),
+        image.getImageHeight());
+    } else {
+      return image.getWarpFilter();
+    }
+  }
+
+  public boolean isShowOriginalImage() {
+    return showOriginalImage;
   }
 
   public void revert() {
@@ -201,12 +259,74 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     super.setProperty(name, value);
   }
 
+  public void setShowOriginalImage(final boolean showOriginalImage) {
+    this.showOriginalImage = showOriginalImage;
+  }
+
+  public void showTiePointsTable() {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final Object tableView = getProperty("TableView");
+      DefaultSingleCDockable dockable = null;
+      if (tableView instanceof DefaultSingleCDockable) {
+        dockable = (DefaultSingleCDockable)tableView;
+      }
+      final TiePointsPanel tiePointsPanel;
+      if (dockable == null) {
+        final LayerGroup project = getProject();
+
+        tiePointsPanel = new TiePointsPanel(this);
+
+        if (tiePointsPanel != null) {
+          final String id = getClass().getName() + "." + getId();
+          dockable = DockingFramesUtil.addDockable(project,
+            MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), tiePointsPanel);
+
+          if (dockable != null) {
+            dockable.setCloseable(true);
+            setProperty("TableView", dockable);
+            dockable.addCDockableStateListener(new CDockableStateListener() {
+              @Override
+              public void extendedModeChanged(final CDockable dockable,
+                final ExtendedMode mode) {
+              }
+
+              @Override
+              public void visibilityChanged(final CDockable dockable) {
+                final boolean visible = dockable.isVisible();
+                if (!visible) {
+                  dockable.getControl()
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
+                  setProperty("TableView", null);
+                }
+              }
+            });
+            dockable.toFront();
+          }
+        }
+      } else {
+        dockable.toFront();
+      }
+
+    } else {
+      Invoke.later(this, "showTiePointsTable");
+    }
+  }
+
+  public void toggleShowOriginalImage() {
+    final boolean showOriginalImage = isShowOriginalImage();
+    setShowOriginalImage(!showOriginalImage);
+  }
+
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
+    map.remove("editable");
+    map.remove("TableView");
     MapSerializerUtil.add(map, "url", this.url);
+    MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage, false);
     final BoundingBox boundingBox = image.getBoundingBox();
     if (boundingBox != null) {
       MapSerializerUtil.add(map, "boundingBox", boundingBox.toString());

@@ -281,7 +281,8 @@ public class GeometryFactory extends
         } else if (object instanceof Coordinates) {
           point = (Coordinates)object;
         } else if (object instanceof Point) {
-          point = CoordinatesUtil.get((Point)object);
+          final Point projectedPoint = copy((Point)object);
+          point = CoordinatesUtil.get(projectedPoint);
         } else if (object instanceof double[]) {
           point = new DoubleCoordinates((double[])object);
         } else if (object instanceof Coordinate) {

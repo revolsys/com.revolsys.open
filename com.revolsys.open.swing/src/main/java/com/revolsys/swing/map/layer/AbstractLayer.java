@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.TextArea;
 import java.awt.Window;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.BorderFactory;
@@ -684,7 +686,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     MapSerializerUtil.add(map, "style", this.renderer);
     final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil.getValue(getProperties());
     if (properties != null) {
-      map.putAll(properties);
+      for (final Entry<String, Object> entry : properties.entrySet()) {
+        final String name = entry.getKey();
+        if (!map.containsKey(name)) {
+          final Object value = entry.getValue();
+          if (!(value instanceof Component)) {
+            map.put(name, value);
+          }
+        }
+      }
     }
     return map;
   }
@@ -702,5 +712,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
+  }
+
+  public void toggleEditable() {
+    final boolean editable = isEditable();
+    setEditable(!editable);
   }
 }

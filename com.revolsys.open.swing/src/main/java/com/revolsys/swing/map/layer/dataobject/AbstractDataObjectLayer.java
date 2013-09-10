@@ -65,6 +65,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.ByteArrayResource;
@@ -103,6 +104,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer, DataObjectFactory, AddGeometryCompleteAction {
@@ -1468,7 +1470,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       final int[] vertexIndex = mouseLocation.getVertexIndex();
-      final Coordinates coordinates = mouseLocation.getPoint();
+      final Point point = mouseLocation.getPoint();
+      final Point convertedPoint = getGeometryFactory().copy(point);
+      final Coordinates coordinates = CoordinatesUtil.get(convertedPoint);
       final LineString line1;
       final LineString line2;
 
@@ -1499,11 +1503,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       saveChanges(object);
       saveChanges(object2);
     }
-  }
-
-  public void toggleEditable() {
-    final boolean editable = isEditable();
-    setEditable(!editable);
   }
 
   @Override

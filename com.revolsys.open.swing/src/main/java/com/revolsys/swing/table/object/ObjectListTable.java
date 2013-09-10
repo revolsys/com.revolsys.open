@@ -18,6 +18,11 @@ public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
     this(new ObjectListTableModel<T>(columnNames, columnTitles));
   }
 
+  public ObjectListTable(final List<T> objects, final List<String> columnNames,
+    final List<String> titles) {
+    this(new ObjectListTableModel<T>(objects, columnNames, titles));
+  }
+
   public ObjectListTable(final ObjectListTableModel<T> model) {
     super(model);
 
@@ -52,9 +57,20 @@ public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public ObjectListTableModel<T> getTableModel() {
+    return (ObjectListTableModel<T>)getModel();
+  }
+
   @Override
   public Iterator<T> iterator() {
     return getObjects().iterator();
+  }
+
+  @Override
+  public void removeNotify() {
+    getTableModel().dispose();
+    super.removeNotify();
   }
 
   public void setObjects(final Collection<? extends T> objects) {
@@ -63,9 +79,12 @@ public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    super.tableChanged(e);
-    if (this.tableHeader != null) {
-      this.tableHeader.resizeAndRepaint();
+    try {
+      super.tableChanged(e);
+      if (this.tableHeader != null) {
+        this.tableHeader.resizeAndRepaint();
+      }
+    } catch (final Throwable t) {
     }
   }
 }

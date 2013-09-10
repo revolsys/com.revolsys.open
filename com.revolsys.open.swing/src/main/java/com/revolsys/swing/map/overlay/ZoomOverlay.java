@@ -130,6 +130,7 @@ public class ZoomOverlay extends AbstractOverlay {
       setMapCursor(CURSOR_ZOOM_BOX);
       event.consume();
     }
+    panning = false;
   }
 
   @Override

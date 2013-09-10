@@ -9,6 +9,7 @@ import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class LoadingWorker extends
@@ -39,7 +40,7 @@ public class LoadingWorker extends
     return index;
   }
 
-  public AbstractDataObjectLayer getLayer() {
+  public AbstractLayer getLayer() {
     return this.layer;
   }
 

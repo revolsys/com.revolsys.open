@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.SwingUtilities;
@@ -31,6 +32,7 @@ import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
+import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -83,11 +85,14 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private boolean addTiePointFinish(final MouseEvent event) {
     if (this.addTiePointFirstPoint != null) {
       if (event != null) {
-        final Point mapPoint = getViewportPoint(event);
+        Point mapPoint = getViewportPoint(event);
+        final Point snapPoint = getSnapPoint();
+        if (snapPoint != null) {
+          mapPoint = snapPoint;
+        }
         final Coordinates sourcePoint = CoordinatesUtil.get(this.addTiePointFirstPoint);
-        final Coordinates sourcePixel = image.getWarpFilter()
-          .targetPointToSourcePixel(sourcePoint);
-
+        final WarpFilter warpFilter = layer.getWarpFilter();
+        final Coordinates sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
         final MappedLocation mappedLocation = new MappedLocation(sourcePixel,
           mapPoint);
         addUndo(new ListAddUndo(image.getTiePoints(), mappedLocation));
@@ -348,13 +353,17 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
     }
-    return this.moveCornerPoint != null;
+    if (this.moveCornerPoint == null) {
+      return false;
+    } else {
+      event.consume();
+      return true;
+    }
   }
 
   private boolean moveCornerStart(final MouseEvent event) {
     if (this.layer != null) {
-      if (image.getTiePoints().size() == 0
-        && SwingUtil.isLeftButtonAndNoModifiers(event)) {
+      if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
         if (this.moveCornerPoint != null) {
           event.consume();
           return true;
@@ -434,8 +443,14 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         final Composite composite = AlphaComposite.getInstance(
           AlphaComposite.SRC_OVER, .6f);
         graphics.setComposite(composite);
-        GeoReferencedImageLayerRenderer.render(viewport, graphics, this.image,
-          boundingBox);
+        if (layer.isShowOriginalImage()) {
+          final BufferedImage originalImage = this.image.getOriginalImage();
+          GeoReferencedImageLayerRenderer.render(viewport, graphics,
+            this.image, originalImage, boundingBox);
+        } else {
+          GeoReferencedImageLayerRenderer.render(viewport, graphics,
+            this.image, boundingBox);
+        }
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to render image", e);
       } finally {
@@ -455,9 +470,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));
         final int tiePointCount = image.getTiePoints().size();
         if (this.image != null && tiePointCount > 0) {
+          final WarpFilter warpFilter = layer.getWarpFilter();
           for (int i = 0; i < tiePointCount; i++) {
             final MappedLocation mappedLocation = image.getTiePoints().get(i);
-            final LineString line = mappedLocation.getSourceToTargetLine(image.getWarpFilter());
+            final LineString line = mappedLocation.getSourceToTargetLine(warpFilter);
             GeometryStyleRenderer.renderLineString(viewport, graphics, line,
               STYLE_MAPPED_LINE);
             MarkerStyleRenderer.renderMarkers(viewport, graphics,
@@ -507,8 +523,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     if (boundingBox == null) {
       boundingBox = new BoundingBox(getGeometryFactory());
     }
-    image.setBoundingBox(boundingBox);
-    this.preMoveBoundingBox = getImageBoundingBox();
+    if (image != null) {
+      image.setBoundingBox(boundingBox);
+      this.preMoveBoundingBox = getImageBoundingBox();
+    }
   }
 
   public void setLayer(final GeoReferencedImageLayer layer) {

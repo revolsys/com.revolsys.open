@@ -16,7 +16,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -287,9 +286,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void clearMouseOverGeometry() {
     super.clearMouseOverGeometry();
-    this.snapPointLocationMap = Collections.emptyMap();
-    this.snapPoint = null;
-    this.snapEventPoint = null;
   }
 
   protected void clearMouseOverLocations() {
@@ -621,10 +617,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (isModeAddGeometry()) {
         if (getMouseOverLocations().isEmpty()) {
           final Point point;
-          if (this.snapPoint == null) {
+          if (getSnapPoint() == null) {
             point = getPoint(event);
           } else {
-            point = this.snapPoint;
+            point = getSnapPoint();
           }
           if (this.addGeometry.isEmpty()) {
             setAddGeometry(appendVertex(point));
@@ -667,7 +663,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         || !updateAddMouseOverGeometry(event.getPoint(), boundingBox)) {
         if (snapToFirst) {
           setMapCursor(CURSOR_NODE_SNAP);
-          this.snapPoint = fromPoint;
+          setSnapPoint(fromPoint);
           point = fromPoint;
         } else if (!hasSnapPoint(event.getPoint(), boundingBox)) {
           setMapCursor(CURSOR_NODE_ADD);
@@ -1008,10 +1004,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final Geometry geometry = location.getGeometry();
           final GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point point;
-          if (this.snapPoint == null) {
+          if (getSnapPoint() == null) {
             point = getPoint(geometryFactory, event);
           } else {
-            point = geometryFactory.copy(this.snapPoint);
+            point = geometryFactory.copy(getSnapPoint());
           }
           final int[] vertexIndex = location.getVertexIndex();
           Geometry newGeometry;

@@ -1,24 +1,24 @@
 package com.revolsys.swing.table.object;
 
+import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
+import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class ObjectListTableModel<T> extends AbstractTableModel implements
-  Reorderable {
+  Reorderable, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -28,18 +28,26 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
 
   private boolean editable;
 
-  private final List<T> objects = new ArrayList<T>();
-
-  private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
+  private PropertyChangeArrayList<T> objects;
 
   public ObjectListTableModel(final Collection<? extends T> objects,
     final List<String> columnNames) {
     this(objects, columnNames, columnNames);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public ObjectListTableModel(final Collection<? extends T> objects,
     final List<String> columnNames, final List<String> columnTitles) {
-    this.objects.addAll(objects);
+    if (objects == null) {
+      this.objects = new PropertyChangeArrayList<T>();
+    } else if (objects instanceof PropertyChangeArrayList) {
+      this.objects = (PropertyChangeArrayList)objects;
+    } else {
+      this.objects = new PropertyChangeArrayList<T>(objects);
+    }
+    this.objects.addPropertyChangeListener(this);
     this.columnNames.addAll(columnNames);
     this.columnTitles.addAll(columnTitles);
     setEditable(true);
@@ -58,51 +66,38 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
 
   public void add(final int index, final T object) {
     this.objects.add(index, object);
-    fireTableRowsInserted(index, index);
   }
 
   public void add(final T... objects) {
-    if (objects.length > 0) {
-      final int startIndex = this.objects.size();
-      for (final T object : objects) {
-        this.objects.add(object);
-      }
-      final int endIndex = this.objects.size() - 1;
-      fireTableRowsInserted(startIndex, endIndex);
-    }
+    addAll(Arrays.asList(objects));
   }
 
   public void addAll(final Collection<? extends T> objects) {
-    if (objects.size() > 0) {
-      final int startIndex = this.objects.size();
-      this.objects.addAll(objects);
-      final int endIndex = this.objects.size() - 1;
-      fireTableRowsInserted(startIndex, endIndex);
-    }
+    this.objects.addAll(objects);
   }
 
   public void addPropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.add(propertyChangeListener);
+    objects.addPropertyChangeListener(propertyChangeListener);
   }
 
   public void clear() {
     this.objects.clear();
-    fireTableDataChanged();
   }
 
   @PreDestroy
   public void dispose() {
-    this.objects.clear();
+    if (objects != null) {
+      this.objects.removePropertyChangeListener(this);
+    }
+    this.objects = null;
   }
 
   private void firePropertyChange(final Object object, final String name,
     final Object oldValue, final Object newValue) {
     final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
       oldValue, newValue);
-    for (final PropertyChangeListener listener : this.propertyChangeListeners) {
-      listener.propertyChange(event);
-    }
+    this.objects.getPropertyChangeSupport().firePropertyChange(event);
   }
 
   public String getAttributeName(final int columnIndex) {
@@ -150,10 +145,6 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     return objects;
   }
 
-  public Set<PropertyChangeListener> getPropertyChangeListeners() {
-    return Collections.unmodifiableSet(this.propertyChangeListeners);
-  }
-
   @Override
   public int getRowCount() {
     return this.objects.size();
@@ -179,19 +170,32 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     return this.editable;
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == objects) {
+      if (event instanceof IndexedPropertyChangeEvent) {
+        final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)event;
+        final int index = indexedEvent.getIndex();
+        if (indexedEvent.getNewValue() == null) {
+          fireTableRowsDeleted(index, index);
+        } else if (indexedEvent.getOldValue() == null) {
+          fireTableRowsInserted(index, index);
+        } else {
+          fireTableRowsUpdated(index, index);
+        }
+      } else {
+        fireTableDataChanged();
+      }
+    }
+  }
+
   public void remove(final int... rows) {
     final List<Object> rowsToRemove = getObjects(rows);
     removeAll(rowsToRemove);
   }
 
   public void removeAll(final Collection<Object> objects) {
-    for (final Object object : objects) {
-      final int row = this.objects.indexOf(object);
-      if (row != -1) {
-        this.objects.remove(row);
-        fireTableRowsDeleted(row, row + 1);
-      }
-    }
+    this.objects.removeAll(objects);
   }
 
   public void removeAll(final Object... removedFeatures) {
@@ -200,7 +204,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
 
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.remove(propertyChangeListener);
+    objects.removePropertyChangeListener(propertyChangeListener);
   }
 
   @Override

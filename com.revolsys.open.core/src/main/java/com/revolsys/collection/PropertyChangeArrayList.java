@@ -10,8 +10,17 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 
 public class PropertyChangeArrayList<T> extends ArrayList<T> implements
   PropertyChangeListener, PropertyChangeSupportProxy {
+  private static final long serialVersionUID = 1L;
+
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
+
+  public PropertyChangeArrayList() {
+  }
+
+  public PropertyChangeArrayList(final Collection<? extends T> objects) {
+    super(objects);
+  }
 
   @Override
   public void add(final int index, final T object) {
@@ -64,6 +73,10 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
     }
   }
 
+  public void addPropertyChangeListener(final PropertyChangeListener listener) {
+    getPropertyChangeSupport().addPropertyChangeListener(listener);
+  }
+
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
@@ -76,7 +89,7 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
 
   @Override
   public T remove(final int index) {
-    final T object = remove(index);
+    final T object = super.remove(index);
     removeListener(object);
     propertyChangeSupport.fireIndexedPropertyChange("objects", index, object,
       null);
@@ -113,6 +126,10 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
         propertyChangeSupport.removePropertyChangeListener(this);
       }
     }
+  }
+
+  public void removePropertyChangeListener(final PropertyChangeListener listener) {
+    getPropertyChangeSupport().removePropertyChangeListener(listener);
   }
 
   @Override

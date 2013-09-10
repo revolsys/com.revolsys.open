@@ -25,6 +25,7 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
 
@@ -68,12 +69,14 @@ public class GeoReferencedImage implements PropertyChangeListener {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.imageWidth = imageWidth;
     this.imageHeight = imageHeight;
+    tiePoints.addPropertyChangeListener(this);
   }
 
   public GeoReferencedImage(final Resource imageResource) {
     this.imageResource = imageResource;
     setImage(createBufferedImage());
     loadImageMetaData();
+    tiePoints.addPropertyChangeListener(this);
   }
 
   protected BufferedImage createBufferedImage() {
@@ -104,9 +107,12 @@ public class GeoReferencedImage implements PropertyChangeListener {
   }
 
   public BufferedImage getImage() {
-    if (warpedImage == null) {
+    if (warpFilter == null) {
       return this.image;
     } else {
+      if (warpedImage == null) {
+        updateWarpedImage();
+      }
       return warpedImage;
     }
   }
@@ -182,12 +188,25 @@ public class GeoReferencedImage implements PropertyChangeListener {
     return this.jaiImage;
   }
 
+  public BufferedImage getOriginalImage() {
+    return image;
+  }
+
+  public WarpFilter getOriginalWarpFilter() {
+    return new WarpAffineFilter(getBoundingBox(), getImageWidth(),
+      getImageHeight());
+  }
+
   public double getResolution() {
     return resolution;
   }
 
   public List<MappedLocation> getTiePoints() {
     return tiePoints;
+  }
+
+  public BufferedImage getWarpedImage() {
+    return warpedImage;
   }
 
   public WarpFilter getWarpFilter() {
@@ -258,6 +277,7 @@ public class GeoReferencedImage implements PropertyChangeListener {
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.boundingBox = boundingBox;
+    updateWarpedImage();
   }
 
   public void setBoundingBox(final double x1, final double y1,
@@ -314,12 +334,12 @@ public class GeoReferencedImage implements PropertyChangeListener {
     final int imageWidth = image.getWidth();
     final int imageHeight = image.getHeight();
     final BoundingBox boundingBox = getBoundingBox();
-    if (!this.tiePoints.isEmpty() && !boundingBox.isEmpty()) {
+    if (!boundingBox.isEmpty()) {
       this.warpFilter = WarpFilter.createWarpFilter(boundingBox,
         getTiePoints(), this.degree, imageWidth, imageHeight);
       this.warpedImage = this.warpFilter.filter(image);
     } else {
-      warpFilter = null;
+      warpFilter = new WarpAffineFilter(boundingBox, imageWidth, imageHeight);
       warpedImage = null;
     }
   }
