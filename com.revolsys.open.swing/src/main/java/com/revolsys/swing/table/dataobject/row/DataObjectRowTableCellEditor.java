@@ -12,12 +12,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 
-@SuppressWarnings("serial")
 public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
@@ -55,7 +51,7 @@ public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
       return this.uiBuilder.getEditorComponent(value);
     } else {
       final String fieldName = metaData.getAttributeName(column);
-      return SwingUtil.createField(metaData, fieldName, true);
+      return (Component)SwingUtil.createField(metaData, fieldName, true);
     }
   }
 }

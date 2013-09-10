@@ -387,6 +387,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void refresh() {
+    firePropertyChange("refresh", false, true);
   }
 
   @Override

@@ -79,6 +79,7 @@ import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -165,6 +166,29 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
       "palette", hasGeometry, "showProperties", "Style"));
+  }
+
+  public static void addVisibleLayers(final List<DataObjectLayer> layers,
+    final LayerGroup group) {
+    if (group.isVisible()) {
+      for (final Layer layer : group) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          addVisibleLayers(layers, layerGroup);
+        } else if (layer instanceof DataObjectLayer) {
+          if (layer.isVisible()) {
+            final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+            layers.add(dataObjectLayer);
+          }
+        }
+      }
+    }
+  }
+
+  public static List<DataObjectLayer> getVisibleLayers(final LayerGroup group) {
+    final List<DataObjectLayer> layers = new ArrayList<DataObjectLayer>();
+    addVisibleLayers(layers, group);
+    return layers;
   }
 
   private BoundingBox boundingBox = new BoundingBox();

@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -39,9 +38,7 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
-import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -98,6 +95,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
     STYLE_VERTEX.setMarkerOrientationType("auto");
 
+    STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
+    STYLE_VERTEX_FIRST_POINT.setMarkerPlacement("point(0)");
+    STYLE_VERTEX_FIRST_POINT.setMarkerHorizontalAlignment("center");
+
     STYLE_VERTEX_LAST_POINT.setMarkerOrientationType("auto");
     STYLE_VERTEX_LAST_POINT.setMarkerPlacement("point(n)");
     STYLE_VERTEX_LAST_POINT.setMarkerHorizontalAlignment("right");
@@ -140,12 +141,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           if (part instanceof LineString) {
             final LineString lineString = (LineString)part;
             final CoordinatesList points = CoordinatesListUtil.get(lineString);
-            renderMarkers(viewport, graphics, points);
+            MarkerStyleRenderer.renderMarkers(viewport, graphics, points, STYLE_VERTEX_FIRST_POINT,
+              STYLE_VERTEX_LAST_POINT, STYLE_VERTEX);
           } else if (part instanceof Polygon) {
             final Polygon polygon = (Polygon)part;
             final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
             for (final CoordinatesList points : pointsList) {
-              renderMarkers(viewport, graphics, points);
+              MarkerStyleRenderer.renderMarkers(viewport, graphics, points,
+                STYLE_VERTEX_FIRST_POINT, STYLE_VERTEX_LAST_POINT, STYLE_VERTEX);
             }
           }
         }
@@ -168,45 +171,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
             STYLE_ERROR);
         }
       }
-    }
-  }
-
-  private static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final CoordinatesList points) {
-    final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
-      graphics);
-    final Paint paint = graphics.getPaint();
-    try {
-      final int pointCount = points.size();
-      if (pointCount > 1) {
-        for (int i = 0; i < pointCount; i++) {
-          MarkerStyle style;
-          if (i == 0) {
-            style = STYLE_VERTEX_FIRST_POINT;
-          } else if (i == pointCount - 1) {
-            style = STYLE_VERTEX_LAST_POINT;
-          } else {
-            style = STYLE_VERTEX;
-          }
-          final double x = points.getX(i);
-          final double y = points.getY(i);
-          double orientation = 0;
-          if (i == 0) {
-            final double x1 = points.getX(i + 1);
-            final double y1 = points.getY(i + 1);
-            orientation = MathUtil.angleDegrees(x, y, x1, y1);
-          } else {
-            final double x1 = points.getX(i - 1);
-            final double y1 = points.getY(i - 1);
-            orientation = MathUtil.angleDegrees(x1, y1, x, y);
-          }
-          final Marker marker = style.getMarker();
-          marker.render(viewport, graphics, style, x, y, orientation);
-        }
-      }
-    } finally {
-      graphics.setPaint(paint);
-      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
     }
   }
 

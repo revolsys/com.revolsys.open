@@ -816,7 +816,7 @@ public class DataObjectLayerForm extends JPanel implements
   protected int getTabIndex(final String fieldName) {
     Integer index = this.fieldTabIndex.get(fieldName);
     if (index == null) {
-      final JComponent field = getField(fieldName);
+      final JComponent field = (JComponent)getField(fieldName);
       if (field == null) {
         return -1;
       } else {
@@ -1050,7 +1050,7 @@ public class DataObjectLayerForm extends JPanel implements
     if (tabIndex >= 0) {
       this.tabs.setSelectedIndex(tabIndex);
     }
-    final JComponent field = getField(fieldName);
+    final JComponent field = (JComponent)getField(fieldName);
     if (field != null) {
       field.requestFocusInWindow();
     }
@@ -1136,7 +1136,7 @@ public class DataObjectLayerForm extends JPanel implements
     boolean changed = false;
     final Object oldValue = getFieldValue(fieldName);
     this.fieldValues.put(fieldName, value);
-    final JComponent field = getField(fieldName);
+    final JComponent field = (JComponent)getField(fieldName);
     if (oldValue == null & value != null
       || !EqualsRegistry.equal(value, oldValue)) {
       changed = true;
@@ -1235,7 +1235,7 @@ public class DataObjectLayerForm extends JPanel implements
           this.fieldValues.putAll(values);
           for (final String fieldName : fieldNames) {
             final Object value = values.get(fieldName);
-            final JComponent field = getField(fieldName);
+            final JComponent field = (JComponent)getField(fieldName);
             SwingUtil.setFieldValue(field, value);
           }
         } finally {

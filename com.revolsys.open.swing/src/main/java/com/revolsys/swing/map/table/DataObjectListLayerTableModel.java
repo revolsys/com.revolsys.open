@@ -156,7 +156,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
    * TODO @Override public SortOrder setSortOrder(int column) { SortOrder
    * sortOrder = super.setSortOrder(column); final String attributeName =
    * getAttributeName(column); final Comparator<DataObject> comparitor = new
-   * DataObjectAttributeComparator( sortOrder == SortOrder.ASCENDING,
+   * ObjectPropertyComparator( sortOrder == SortOrder.ASCENDING,
    * attributeName); Collections.sort(objects, comparitor);
    * fireTableDataChanged(); return sortOrder; }
    */

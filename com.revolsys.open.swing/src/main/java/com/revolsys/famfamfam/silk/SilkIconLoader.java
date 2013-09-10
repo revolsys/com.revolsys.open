@@ -69,7 +69,11 @@ public class SilkIconLoader {
   protected static BufferedImage getImage(final InputStream in) {
     if (in != null) {
       try {
-        return ImageIO.read(in);
+        final BufferedImage image = ImageIO.read(in);
+        final BufferedImage convertedImg = new BufferedImage(image.getWidth(),
+          image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        convertedImg.getGraphics().drawImage(image, 0, 0, null);
+        return convertedImg;
       } catch (final IOException e) {
       }
     }

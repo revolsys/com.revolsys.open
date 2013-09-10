@@ -74,7 +74,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       if (this.uiBuilder != null) {
         return this.uiBuilder.getEditorComponent(value);
       } else {
-        this.editorComponent = SwingUtil.createField(metaData,
+        this.editorComponent = (JComponent)SwingUtil.createField(metaData,
           this.attributeName, true);
         if (this.editorComponent instanceof JTextField) {
           final JTextField textField = (JTextField)this.editorComponent;

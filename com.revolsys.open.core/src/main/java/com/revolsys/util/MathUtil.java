@@ -545,6 +545,66 @@ public final class MathUtil {
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
   }
 
+  public static byte sgn(final byte x) {
+    if (x > 0) {
+      return 1;
+    }
+    if (x < 0) {
+      return -1;
+    }
+    return 0;
+  }
+
+  public static int sgn(final double x) {
+    if (x > 0.0D) {
+      return 1;
+    }
+    if (x < 0.0D) {
+      return -1;
+    }
+    return 0;
+  }
+
+  public static int sgn(final float x) {
+    if (x > 0.0F) {
+      return 1;
+    }
+    if (x < 0.0F) {
+      return -1;
+    }
+    return 0;
+  }
+
+  public static int sgn(final int x) {
+    if (x > 0) {
+      return 1;
+    }
+    if (x < 0) {
+      return -1;
+    }
+    return 0;
+  }
+
+  public static int sgn(final long x) {
+    if (x > 0L) {
+      return 1;
+    }
+    if (x < 0L) {
+      return -1;
+    }
+    return 0;
+  }
+
+  public static short sgn(final short x) {
+    if (x > 0) {
+      return 1;
+    }
+    if (x < 0) {
+      return -1;
+    }
+    return 0;
+  }
+
   @SuppressWarnings("unchecked")
   public static <V extends Number> V subtract(final Number left,
     final Number right, final Class<V> resultClass) {

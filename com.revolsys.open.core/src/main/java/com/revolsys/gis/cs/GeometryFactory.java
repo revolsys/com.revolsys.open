@@ -687,6 +687,15 @@ public class GeometryFactory extends
 
   }
 
+  public List<Point> createPointList(final CoordinatesList sourcePoints) {
+    final List<Point> points = new ArrayList<Point>(sourcePoints.size());
+    for (final Coordinates coordinates : sourcePoints) {
+      final Point point = createPoint(coordinates);
+      points.add(point);
+    }
+    return points;
+  }
+
   public Polygon createPolygon() {
     final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
       getNumAxis());

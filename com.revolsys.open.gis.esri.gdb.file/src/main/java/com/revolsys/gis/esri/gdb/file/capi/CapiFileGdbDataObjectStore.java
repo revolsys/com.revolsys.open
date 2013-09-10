@@ -940,15 +940,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return createMissingTables;
   }
 
-  // @Override
-  // public synchronized Reader<DataObject> query(final String typePath) {
-  // final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-  // typePath);
-  // final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-  // iterator);
-  // return reader;
-  // }
-
   public synchronized boolean isNull(final Row row, final String name) {
     return row.isNull(name);
   }

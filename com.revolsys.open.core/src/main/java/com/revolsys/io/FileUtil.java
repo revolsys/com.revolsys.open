@@ -29,11 +29,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -47,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionManager;
@@ -814,7 +817,13 @@ public final class FileUtil {
 
   public static File getUrlFile(final URI uri) {
     if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
-      final String connectionName = uri.getAuthority();
+      String connectionName = uri.getAuthority();
+      if (StringUtils.hasText(connectionName)) {
+        try {
+          connectionName = URLDecoder.decode(connectionName, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+        }
+      }
       final String path = uri.getPath();
 
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
