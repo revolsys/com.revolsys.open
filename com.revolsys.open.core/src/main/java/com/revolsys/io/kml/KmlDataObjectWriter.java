@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
@@ -46,9 +47,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   @Override
   public void close() {
-    if (!opened) {
-      writeHeader();
-    }
+    open();
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
       writer.endTag(DOCUMENT);
     }
@@ -60,6 +59,13 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   @Override
   public void flush() {
     writer.flush();
+  }
+
+  @Override
+  public void open() {
+    if (!opened) {
+      writeHeader();
+    }
   }
 
   @Override
@@ -91,9 +97,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   @Override
   public void write(final DataObject object) {
-    if (!opened) {
-      writeHeader();
-    }
+    open();
     writer.startTag(PLACEMARK);
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
@@ -138,14 +142,15 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       if (i != geometryIndex) {
         final String attributeName = metaData.getAttributeName(i);
         final Object value = object.getValue(i);
-        if (value != null) {
+        if (value != null
+          || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY))) {
           if (!hasValues) {
             hasValues = true;
             writer.startTag(EXTENDED_DATA);
           }
           writer.startTag(DATA);
           writer.attribute(NAME, attributeName);
-          writer.nillableElement(VALUE, value);
+          writer.element(VALUE, value);
           writer.endTag(DATA);
         }
       }

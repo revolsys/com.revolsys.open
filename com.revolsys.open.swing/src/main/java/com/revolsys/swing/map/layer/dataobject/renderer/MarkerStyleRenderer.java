@@ -247,6 +247,51 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
+  public static void renderMarkers(final Viewport2D viewport,
+    final Graphics2D graphics, final CoordinatesList points,
+    final MarkerStyle styleFirst, final MarkerStyle styleLast,
+    final MarkerStyle styleVertex) {
+    if (points != null) {
+      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
+        graphics);
+      final Paint paint = graphics.getPaint();
+      try {
+        final int pointCount = points.size();
+        if (pointCount > 1) {
+          for (int i = 0; i < pointCount; i++) {
+            MarkerStyle style;
+            if (i == 0) {
+              style = styleFirst;
+            } else if (i == pointCount - 1) {
+              style = styleLast;
+            } else {
+              style = styleVertex;
+            }
+            if (style != null) {
+              final double x = points.getX(i);
+              final double y = points.getY(i);
+              double orientation = 0;
+              if (i == 0) {
+                final double x1 = points.getX(i + 1);
+                final double y1 = points.getY(i + 1);
+                orientation = MathUtil.angleDegrees(x, y, x1, y1);
+              } else {
+                final double x1 = points.getX(i - 1);
+                final double y1 = points.getY(i - 1);
+                orientation = MathUtil.angleDegrees(x1, y1, x, y);
+              }
+              final Marker marker = style.getMarker();
+              marker.render(viewport, graphics, style, x, y, orientation);
+            }
+          }
+        }
+      } finally {
+        graphics.setPaint(paint);
+        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+      }
+    }
+  }
+
   public static final void renderMarkerVertices(final Viewport2D viewport,
     final Graphics2D graphics, Geometry geometry, final MarkerStyle style) {
     geometry = getGeometry(viewport, geometry);
@@ -355,48 +400,5 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
       map.putAll(styleMap);
     }
     return map;
-  }
-
-  public static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final CoordinatesList points,
-    final MarkerStyle styleFirst, final MarkerStyle styleLast,
-    final MarkerStyle styleVertex) {
-    final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
-      graphics);
-    final Paint paint = graphics.getPaint();
-    try {
-      final int pointCount = points.size();
-      if (pointCount > 1) {
-        for (int i = 0; i < pointCount; i++) {
-          MarkerStyle style;
-          if (i == 0) {
-            style = styleFirst;
-          } else if (i == pointCount - 1) {
-            style = styleLast;
-          } else {
-            style = styleVertex;
-          }
-          if (style != null) {
-            final double x = points.getX(i);
-            final double y = points.getY(i);
-            double orientation = 0;
-            if (i == 0) {
-              final double x1 = points.getX(i + 1);
-              final double y1 = points.getY(i + 1);
-              orientation = MathUtil.angleDegrees(x, y, x1, y1);
-            } else {
-              final double x1 = points.getX(i - 1);
-              final double y1 = points.getY(i - 1);
-              orientation = MathUtil.angleDegrees(x1, y1, x, y);
-            }
-            final Marker marker = style.getMarker();
-            marker.render(viewport, graphics, style, x, y, orientation);
-          }
-        }
-      }
-    } finally {
-      graphics.setPaint(paint);
-      viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-    }
   }
 }

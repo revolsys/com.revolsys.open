@@ -26,17 +26,23 @@ public class MapSerializerUtil {
   public static void add(final Map<String, Object> map, final String name,
     final Object value) {
     final Object mapValue = getValue(value);
-    if (mapValue != null) {
+    if (mapValue == null) {
+      map.remove(mapValue);
+    } else {
       map.put(name, mapValue);
     }
   }
 
   public static void add(final Map<String, Object> map, final String name,
     final Object value, final Object defaultValue) {
-    if (!EqualsRegistry.equal(value, defaultValue)) {
+    if (EqualsRegistry.equal(value, defaultValue)) {
+      map.remove(name);
+    } else {
       final Object mapValue = getValue(value);
-      if (mapValue != null) {
+      if (mapValue != null || defaultValue == null) {
         map.put(name, mapValue);
+      } else {
+        map.remove(name);
       }
     }
   }
@@ -50,7 +56,7 @@ public class MapSerializerUtil {
       if (value instanceof MapSerializer) {
         final MapSerializer mapSerializer = (MapSerializer)value;
         final Map<String, Object> mapObject = mapSerializer.toMap();
-        if (mapObject.isEmpty()) {
+        if (mapObject == null || mapObject.isEmpty()) {
           return null;
         }
         return mapObject;

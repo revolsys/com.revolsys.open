@@ -18,6 +18,8 @@ public class GroupLayoutUtil {
       container.setLayout(layout);
     }
     final GroupLayout groupLayout = (GroupLayout)layout;
+    groupLayout.setAutoCreateContainerGaps(true);
+    groupLayout.setAutoCreateGaps(true);
     return groupLayout;
   }
 
@@ -67,7 +69,7 @@ public class GroupLayoutUtil {
     final Container container, final int numColumns) {
     final GroupLayout groupLayout = getLayout(container);
     groupLayout.setAutoCreateContainerGaps(false);
-    groupLayout.setAutoCreateGaps(false);
+    groupLayout.setAutoCreateGaps(true);
     groupLayout.setLayoutStyle(layoutStyle);
     makeColumns(container, groupLayout, numColumns);
   }

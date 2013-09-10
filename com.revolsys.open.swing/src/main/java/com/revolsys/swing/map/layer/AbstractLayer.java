@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Font;
+import java.awt.TextArea;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -10,10 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -21,7 +27,10 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -124,7 +133,89 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
-  public ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+  protected JPanel addPropertiesTabCoordinateSystem(
+    final TabbedValuePanel tabPanel) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      final JPanel panel = new JPanel(new VerticalLayout());
+      tabPanel.addTab("Spatial", panel);
+
+      final JPanel extentPanel = new JPanel();
+      extentPanel.setBorder(BorderFactory.createTitledBorder("Extent"));
+      final BoundingBox boundingBox = getBoundingBox();
+      if (boundingBox == null || boundingBox.isNull()) {
+        extentPanel.add(new JLabel("Unknown"));
+
+      } else {
+        extentPanel.add(new JLabel(
+          "<html><table cellspacing=\"3\" style=\"margin:0px\">"
+            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+            + boundingBox.getMaximumY()
+            + "</td><td>&nbsp;</td></tr><tr>"
+            + "<td><b>Left</b>: "
+            + boundingBox.getMinimumX()
+            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+            + "<td><b>Right</b>: "
+            + boundingBox.getMaximumX()
+            + "</td></tr>"
+            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+            + boundingBox.getMinimumY() + "</td><td>&nbsp;</td></tr><tr>"
+            + "</tr></table></html>"));
+
+      }
+      GroupLayoutUtil.makeColumns(extentPanel, 1);
+      panel.add(extentPanel);
+
+      final JPanel coordinateSystemPanel = new JPanel();
+      coordinateSystemPanel.setBorder(BorderFactory.createTitledBorder("Coordinate System"));
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem == null) {
+        coordinateSystemPanel.add(new JLabel("Unknown"));
+      } else {
+        final int numAxis = geometryFactory.getNumAxis();
+        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "ID",
+          coordinateSystem.getId(), 10);
+        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "numAxis",
+          numAxis, 10);
+
+        final double scaleXY = geometryFactory.getScaleXY();
+        if (scaleXY > 0) {
+          SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleXy",
+            scaleXY, 10);
+        } else {
+          SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleXy",
+            "Floating", 10);
+        }
+
+        if (numAxis > 2) {
+          final double scaleZ = geometryFactory.getScaleZ();
+          if (scaleZ > 0) {
+            SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleZ",
+              scaleZ, 10);
+          } else {
+            SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleZ",
+              "Floating", 10);
+          }
+        }
+
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
+        final TextArea wktTextArea = new TextArea(
+          EsriCsWktWriter.toString(esriCoordinateSystem), 30, 80);
+        wktTextArea.setEditable(false);
+        wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        coordinateSystemPanel.add(wktTextArea);
+
+        GroupLayoutUtil.makeColumns(coordinateSystemPanel, 2);
+      }
+      panel.add(coordinateSystemPanel);
+
+      return panel;
+    }
+    return null;
+  }
+
+  protected ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
     final ValueField panel = new ValueField(this);
     tabPanel.addTab("General", panel);
 
@@ -158,18 +249,19 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this
       + " Properties", this);
     addPropertiesTabGeneral(tabPanel);
+    addPropertiesTabCoordinateSystem(tabPanel);
     return tabPanel;
   }
 
   @Override
   public void delete() {
-    this.eventsEnabled = false;
     final DefaultSingleCDockable dockable = getProperty("TableView");
     if (dockable != null) {
       // TODO all this should be done by listeners
       dockable.setVisible(false);
     }
     firePropertyChange("deleted", false, true);
+    this.eventsEnabled = false;
     if (this.layerGroup != null) {
       this.layerGroup.remove(this);
     }
@@ -492,10 +584,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         this.propertyChangeSupport.firePropertyChange(event);
 
         try {
-          if (JavaBeanUtil.setProperty(this, name, value)) {
-          } else {
-            super.setProperty(name, value);
-          }
+          JavaBeanUtil.setProperty(this, name, value);
+          super.setProperty(name, value);
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
             "Unable to set property:" + name, e);

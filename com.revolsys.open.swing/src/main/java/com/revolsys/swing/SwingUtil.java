@@ -34,6 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -532,6 +533,15 @@ public class SwingUtil {
     frame.setPreferredSize(size);
     frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
     frame.setState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
+  }
+
+  public static void addReadOnlyTextField(final JPanel container, String fieldName,
+    Object value, int length) {
+    addLabel(container, fieldName);
+    final TextField crsField = new TextField(fieldName,
+    value, length);
+    crsField.setEditable(false);
+    container.add(crsField);
   }
 
 }

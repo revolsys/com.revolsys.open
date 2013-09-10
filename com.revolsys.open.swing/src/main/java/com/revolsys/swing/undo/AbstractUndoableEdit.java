@@ -7,13 +7,8 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
 
-@SuppressWarnings("serial")
 public abstract class AbstractUndoableEdit implements UndoableEdit,
   Serializable {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private boolean hasBeenDone = false;

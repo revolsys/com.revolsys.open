@@ -177,7 +177,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
             new OutputStreamWriter(out));
           final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
             "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(writer, esriCoordinateSystem);
+          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
           writer.close();
         }
       }

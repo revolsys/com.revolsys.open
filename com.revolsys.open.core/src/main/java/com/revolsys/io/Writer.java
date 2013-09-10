@@ -25,5 +25,7 @@ public interface Writer<T> extends ObjectWithProperties {
 
   void flush();
 
+  void open();
+
   void write(T object);
 }

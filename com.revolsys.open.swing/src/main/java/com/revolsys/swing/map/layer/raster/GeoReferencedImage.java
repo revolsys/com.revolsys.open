@@ -1,9 +1,14 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
@@ -12,14 +17,18 @@ import javax.media.jai.RenderedOp;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
+import com.revolsys.swing.map.overlay.MappedLocation;
 
-public class GeoReferencedImage {
+public class GeoReferencedImage implements PropertyChangeListener {
 
   private BoundingBox boundingBox;
 
@@ -36,6 +45,16 @@ public class GeoReferencedImage {
   private Resource imageResource;
 
   private double resolution;
+
+  private final Map<CoordinateSystem, GeoReferencedImage> projectedImages = new HashMap<CoordinateSystem, GeoReferencedImage>();
+
+  private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<MappedLocation>();
+
+  private WarpFilter warpFilter;
+
+  private BufferedImage warpedImage;
+
+  private final int degree = 1;
 
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
@@ -85,7 +104,26 @@ public class GeoReferencedImage {
   }
 
   public BufferedImage getImage() {
-    return this.image;
+    if (warpedImage == null) {
+      return this.image;
+    } else {
+      return warpedImage;
+    }
+  }
+
+  public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem) {
+    synchronized (this.projectedImages) {
+      if (coordinateSystem.equals(getCoordinateSystem())) {
+        return this;
+      } else {
+        GeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
+        if (projectedImage == null) {
+          projectedImage = getImage(coordinateSystem, this.resolution);
+          this.projectedImages.put(coordinateSystem, projectedImage);
+        }
+        return projectedImage;
+      }
+    }
   }
 
   public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
@@ -102,6 +140,11 @@ public class GeoReferencedImage {
       return new GeoReferencedImage(destBoundingBox, newImage);
     }
     return this;
+  }
+
+  public GeoReferencedImage getImage(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    return getImage(coordinateSystem);
   }
 
   public double getImageAspectRatio() {
@@ -143,13 +186,17 @@ public class GeoReferencedImage {
     return resolution;
   }
 
+  public List<MappedLocation> getTiePoints() {
+    return tiePoints;
+  }
+
+  public WarpFilter getWarpFilter() {
+    return warpFilter;
+  }
+
   @Override
   public int hashCode() {
     return this.boundingBox.hashCode();
-  }
-
-  public BufferedImage loadImage() {
-    return this.image;
   }
 
   protected void loadImageMetaData() {
@@ -195,13 +242,20 @@ public class GeoReferencedImage {
     }
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == tiePoints) {
+      updateWarpedImage();
+    }
+  }
+
   public void revert() {
     if (this.imageResource != null) {
       loadImageMetaData();
     }
   }
 
-  protected void setBoundingBox(final BoundingBox boundingBox) {
+  public void setBoundingBox(final BoundingBox boundingBox) {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.boundingBox = boundingBox;
   }
@@ -246,5 +300,27 @@ public class GeoReferencedImage {
 
   protected void setResolution(final double resolution) {
     this.resolution = resolution;
+  }
+
+  public void setTiePoints(final List<MappedLocation> tiePoints) {
+    if (!EqualsRegistry.equal(tiePoints, this.tiePoints)) {
+      this.tiePoints.clear();
+      this.tiePoints.addAll(tiePoints);
+      updateWarpedImage();
+    }
+  }
+
+  protected void updateWarpedImage() {
+    final int imageWidth = image.getWidth();
+    final int imageHeight = image.getHeight();
+    final BoundingBox boundingBox = getBoundingBox();
+    if (!this.tiePoints.isEmpty() && !boundingBox.isEmpty()) {
+      this.warpFilter = WarpFilter.createWarpFilter(boundingBox,
+        getTiePoints(), this.degree, imageWidth, imageHeight);
+      this.warpedImage = this.warpFilter.filter(image);
+    } else {
+      warpFilter = null;
+      warpedImage = null;
+    }
   }
 }

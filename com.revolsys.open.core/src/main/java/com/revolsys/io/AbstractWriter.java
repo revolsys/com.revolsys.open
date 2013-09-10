@@ -34,4 +34,8 @@ public abstract class AbstractWriter<T> extends AbstractObjectWithProperties
   @Override
   public void flush() {
   }
+
+  @Override
+  public void open() {
+  }
 }

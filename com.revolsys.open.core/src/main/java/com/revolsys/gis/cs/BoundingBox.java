@@ -7,6 +7,8 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -34,6 +36,25 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Paul Austin
  */
 public class BoundingBox extends Envelope implements Cloneable {
+
+  static {
+    ConvertUtils.register(new Converter() {
+
+      @Override
+      public Object convert(final Class paramClass, final Object paramObject) {
+        if (paramObject == null) {
+          return null;
+        } else if (BoundingBox.class.isAssignableFrom(BoundingBox.class)) {
+          if (paramObject instanceof BoundingBox) {
+            return paramObject;
+          } else {
+            return create(paramObject.toString());
+          }
+        }
+        return null;
+      }
+    }, BoundingBox.class);
+  }
 
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;

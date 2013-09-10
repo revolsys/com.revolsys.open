@@ -416,6 +416,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
       this);
     propertiesPanel.addTab("Style", stylePanel);
+
     return propertiesPanel;
   }
 

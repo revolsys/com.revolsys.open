@@ -165,38 +165,46 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
   public void expandPaths(final Collection<Class<?>> expectedClasses,
     final Object object) {
-    if (object instanceof PropertyChangeEvent) {
-      expandPaths(expectedClasses, (PropertyChangeEvent)object);
-    } else if (object != null) {
-      if (JavaBeanUtil.isAssignableFrom(expectedClasses, object)) {
-        final TreePath path = model.getPath(object);
-        if (path != null) {
-          expandPath(object);
-          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
-          if (nodeModel != null) {
-            if (nodeModel.isLeaf(object)) {
-              model.fireTreeNodesChanged(path);
-            } else {
-              for (int i = 0; i < model.getChildCount(object); i++) {
-                final Object child = model.getChild(object, i);
-                expandPaths(expectedClasses, child);
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (object instanceof PropertyChangeEvent) {
+        expandPaths(expectedClasses, (PropertyChangeEvent)object);
+      } else if (object != null) {
+        if (JavaBeanUtil.isAssignableFrom(expectedClasses, object)) {
+          final TreePath path = model.getPath(object);
+          if (path != null) {
+            expandPath(object);
+            final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+            if (nodeModel != null) {
+              if (nodeModel.isLeaf(object)) {
+                model.fireTreeNodesChanged(path);
+              } else {
+                for (int i = 0; i < model.getChildCount(object); i++) {
+                  final Object child = model.getChild(object, i);
+                  expandPaths(expectedClasses, child);
+                }
               }
             }
           }
         }
       }
+    } else {
+      Invoke.later(this, "expandPaths", expectedClasses, object);
     }
   }
 
   public void expandPaths(final Collection<Class<?>> expectedClasses,
     final PropertyChangeEvent event) {
-    final Object source = event.getSource();
-    if (source != null) {
-      if (JavaBeanUtil.isAssignableFrom(expectedClasses, source)) {
-        expandPath(source);
-        final Object newValue = event.getNewValue();
-        expandPaths(expectedClasses, newValue);
+    if (SwingUtilities.isEventDispatchThread()) {
+      final Object source = event.getSource();
+      if (source != null) {
+        if (JavaBeanUtil.isAssignableFrom(expectedClasses, source)) {
+          expandPath(source);
+          final Object newValue = event.getNewValue();
+          expandPaths(expectedClasses, newValue);
+        }
       }
+    } else {
+      Invoke.later(this, "expandPaths", expectedClasses, event);
     }
   }
 

@@ -108,6 +108,8 @@ public interface Kml22Constants {
 
   String PLACEMARK_DESCRIPTION_PROPERTY = "kmlPlacemarkDescription";
 
+  String WRITE_NULLS_PROPERTY = "kmlWriteNulls";
+
   String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "kmlPlaceMarkNameAttribute";
 
   QName POINT = new QName(KML_NS_URI, "Point");

@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
@@ -59,6 +60,7 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
@@ -313,19 +315,23 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  protected void expandLayers(final Layer layer) {
-    final List<Layer> pathList = layer.getPathList();
-    final ObjectTree tree = tocPanel.getTree();
-    final TreePath treePath = ObjectTree.createTreePath(pathList);
-    if (layer instanceof LayerGroup) {
-      final LayerGroup layerGroup = (LayerGroup)layer;
-      tree.expandPath(treePath);
-      for (final Layer childLayer : layerGroup) {
-        expandLayers(childLayer);
+  public void expandLayers(final Layer layer) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final List<Layer> pathList = layer.getPathList();
+      final ObjectTree tree = tocPanel.getTree();
+      final TreePath treePath = ObjectTree.createTreePath(pathList);
+      if (layer instanceof LayerGroup) {
+        final LayerGroup layerGroup = (LayerGroup)layer;
+        tree.expandPath(treePath);
+        for (final Layer childLayer : layerGroup) {
+          expandLayers(childLayer);
+        }
+      } else {
+        final ObjectTreeModel model = tree.getModel();
+        model.fireTreeNodesChanged(treePath);
       }
     } else {
-      final ObjectTreeModel model = tree.getModel();
-      model.fireTreeNodesChanged(treePath);
+      Invoke.later(this, "expandLayers", layer);
     }
   }
 
