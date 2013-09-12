@@ -35,20 +35,20 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   }
 
   public static long getLookAtRange(final BoundingBox boundingBox) {
-    if (boundingBox.isNull()) {
+    if (boundingBox.isEmpty()) {
       return 1000;
     } else {
-      double minX = boundingBox.getMinX();
-      double maxX = boundingBox.getMaxX();
-      double centreX = boundingBox.getCentreX();
+      final double minX = boundingBox.getMinX();
+      final double maxX = boundingBox.getMaxX();
+      final double centreX = boundingBox.getCentreX();
 
-      double minY = boundingBox.getMinY();
-      double maxY = boundingBox.getMaxY();
-      double centreY = boundingBox.getCentreY();
+      final double minY = boundingBox.getMinY();
+      final double maxY = boundingBox.getMaxY();
+      final double centreY = boundingBox.getCentreY();
 
       double maxMetres = 0;
 
-      for (double y : new double[] {
+      for (final double y : new double[] {
         minY, centreY, maxY
       }) {
         final double widthMetres = GeographicCoordinateSystem.distanceMetres(
@@ -57,7 +57,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
           maxMetres = widthMetres;
         }
       }
-      for (double x : new double[] {
+      for (final double x : new double[] {
         minX, centreX, maxX
       }) {
         final double heightMetres = GeographicCoordinateSystem.distanceMetres(
@@ -66,11 +66,14 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
           maxMetres = heightMetres;
         }
       }
-
-      double lookAtScale = 1.2;
-      double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
-        * lookAtScale;
-      return (long)Math.ceil(lookAtRange);
+      if (maxMetres == 0) {
+        return 1000;
+      } else {
+        final double lookAtScale = 1.2;
+        final double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
+          * lookAtScale;
+        return (long)Math.ceil(lookAtRange);
+      }
     }
   }
 

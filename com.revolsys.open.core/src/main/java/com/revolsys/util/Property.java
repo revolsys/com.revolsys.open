@@ -3,6 +3,8 @@ package com.revolsys.util;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -12,9 +14,30 @@ import java.util.Map.Entry;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.data.model.DataObject;
 
 public final class Property {
+  public static void addListener(final PropertyChangeSupportProxy proxy,
+    final PropertyChangeListener listener) {
+    if (proxy != null && listener != null) {
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      if (propertyChangeSupport != null) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+      }
+    }
+  }
+
+  public static void addListener(final PropertyChangeSupportProxy proxy,
+    final String propertyName, final PropertyChangeListener listener) {
+    if (proxy != null && listener != null) {
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      if (propertyChangeSupport != null) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+      }
+    }
+  }
+
   public static PropertyDescriptor descriptor(final Class<?> beanClass,
     final String name) {
     if (beanClass != null && StringUtils.hasText(name)) {
@@ -91,6 +114,27 @@ public final class Property {
 
   public static Method readMethod(final Object object, final String name) {
     return readMethod(object.getClass(), name);
+  }
+
+  public static void removeListener(final PropertyChangeSupportProxy proxy,
+    final PropertyChangeListener listener) {
+    if (proxy != null && listener != null) {
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      if (propertyChangeSupport != null) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+      }
+    }
+  }
+
+  public static void removeListener(final PropertyChangeSupportProxy proxy,
+    final String propertyName, final PropertyChangeListener listener) {
+    if (proxy != null && listener != null) {
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      if (propertyChangeSupport != null) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName,
+          listener);
+      }
+    }
   }
 
   public static void set(final Object object,

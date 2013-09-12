@@ -665,7 +665,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           setMapCursor(CURSOR_NODE_SNAP);
           setSnapPoint(fromPoint);
           point = fromPoint;
-        } else if (!hasSnapPoint(event.getPoint(), boundingBox)) {
+        } else if (!hasSnapPoint(event, boundingBox)) {
           setMapCursor(CURSOR_NODE_ADD);
         }
         final Coordinates firstPoint = GeometryEditUtil.getVertex(
@@ -740,8 +740,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           }
         }
         setXorGeometry(xorGeometry);
-        final java.awt.Point point = event.getPoint();
-        if (!hasSnapPoint(point, boundingBox)) {
+        if (!hasSnapPoint(event, boundingBox)) {
           setMapCursor(CURSOR_NODE_ADD);
         }
       }

@@ -32,7 +32,6 @@ public class ToolTipOverlay extends AbstractOverlay {
   }
 
   public void setText(final Point2D point, final CharSequence text) {
-    this.label.setBackground(WebColors.Yellow);
     this.label.setText(text.toString());
     this.label.setVisible(true);
     final Dimension preferredSize = this.label.getPreferredSize();
@@ -62,6 +61,7 @@ public class ToolTipOverlay extends AbstractOverlay {
     }
     this.label.setLocation(new Point(x, y));
 
+    getMap().moveToFront(this);
     repaint();
   }
 }

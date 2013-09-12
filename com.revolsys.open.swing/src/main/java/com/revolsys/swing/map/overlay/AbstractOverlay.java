@@ -79,7 +79,7 @@ public class AbstractOverlay extends JComponent implements
 
   private GeometryFactory geometryFactory;
 
-  private final int hotspotPixels = 3;
+  private final int hotspotPixels = 6;
 
   private final MapPanel map;
 
@@ -385,8 +385,10 @@ public class AbstractOverlay extends JComponent implements
     return this.xorGeometry;
   }
 
-  protected boolean hasSnapPoint(final java.awt.Point eventPoint,
+  protected boolean hasSnapPoint(final MouseEvent event,
     final BoundingBox boundingBox) {
+
+    final java.awt.Point eventPoint = event.getPoint();
     snapEventPoint = eventPoint;
     new TreeMap<Coordinates, List<CloseLocation>>();
     final Point point = boundingBox.getCentrePoint();

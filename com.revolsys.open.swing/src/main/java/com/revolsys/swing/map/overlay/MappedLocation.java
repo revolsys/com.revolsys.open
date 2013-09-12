@@ -17,9 +17,9 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class MappedLocation implements MapSerializer {
-  private final Coordinates sourcePixel;
+  private Coordinates sourcePixel;
 
-  private final Point targetPoint;
+  private Point targetPoint;
 
   public MappedLocation(final Coordinates sourcePixel, final Point targetPoint) {
     this.sourcePixel = sourcePixel;
@@ -34,21 +34,43 @@ public class MappedLocation implements MapSerializer {
       (String)map.get("target"));
   }
 
-  public double getAccuracy() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
   public Coordinates getSourcePixel() {
     return sourcePixel;
+  }
+
+  public Point getSourcePoint(final WarpFilter filter,
+    final BoundingBox boundingBox) {
+    if (filter == null) {
+      return null;
+    } else {
+      final Coordinates sourcePixel = getSourcePixel();
+      final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
+        boundingBox, sourcePixel);
+      final GeometryFactory geometryFactory = filter.getGeometryFactory();
+      return geometryFactory.createPoint(sourcePoint);
+    }
   }
 
   public LineString getSourceToTargetLine(final WarpFilter filter) {
     if (filter == null) {
       return null;
     } else {
+      final GeometryFactory geometryFactory = filter.getGeometryFactory();
       final Coordinates sourcePixel = getSourcePixel();
-      final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
+      final Point sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
+      final Point targetPoint = getTargetPoint();
+      return geometryFactory.createLineString(sourcePoint, targetPoint);
+    }
+  }
+
+  public LineString getSourceToTargetLine(final WarpFilter filter,
+    final BoundingBox boundingBox) {
+    if (filter == null) {
+      return null;
+    } else {
+      final Coordinates sourcePixel = getSourcePixel();
+      final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
+        boundingBox, sourcePixel);
       final GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.createLineString(sourcePoint, getTargetPoint());
     }
@@ -64,6 +86,14 @@ public class MappedLocation implements MapSerializer {
 
   public Point getTargetPoint() {
     return targetPoint;
+  }
+
+  public void setSourcePixel(final Coordinates sourcePixel) {
+    this.sourcePixel = sourcePixel;
+  }
+
+  public void setTargetPoint(final Point targetPoint) {
+    this.targetPoint = targetPoint;
   }
 
   @Override

@@ -11,6 +11,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.swing.map.overlay.MappedLocation;
+import com.vividsolutions.jts.geom.Point;
 
 public abstract class WarpFilter extends WholeImageFilter {
   private static final long serialVersionUID = 1L;
@@ -151,18 +152,38 @@ public abstract class WarpFilter extends WholeImageFilter {
   public abstract Coordinates sourcePixelToTargetPixel(final double sourceX,
     final double sourceY);
 
-  public Coordinates sourcePixelToTargetPoint(final Coordinates sourcePixel) {
+  public Coordinates sourcePixelToTargetPoint(final BoundingBox boundingBox,
+    final Coordinates sourcePixel) {
+    final Coordinates targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
+    final double targetPixelX = targetImagePoint.getX();
+    final double targetPixelY = targetImagePoint.getY();
+    final Coordinates targetPoint = toModelPoint(boundingBox, targetPixelX,
+      targetPixelY, this.imageWidth, this.imageHeight);
+    return targetPoint;
+  }
+
+  public Point sourcePixelToTargetPoint(final Coordinates sourcePixel) {
     final Coordinates targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
     final double targetPixelX = targetImagePoint.getX();
     final double targetPixelY = targetImagePoint.getY();
     return targetPixelToPoint(targetPixelX, targetPixelY);
   }
 
-  public Coordinates targetPixelToPoint(final double targetPixelX,
+  public Point sourcePixelToTargetPoint(final double x, final double y) {
+    final DoubleCoordinates sourcePixel = new DoubleCoordinates(x, y);
+    return sourcePixelToTargetPoint(sourcePixel);
+  }
+
+  public Point sourcePixelToTargetPoint(final MappedLocation tiePoint) {
+    final Coordinates sourcePixel = tiePoint.getSourcePixel();
+    return sourcePixelToTargetPoint(sourcePixel);
+  }
+
+  public Point targetPixelToPoint(final double targetPixelX,
     final double targetPixelY) {
     final Coordinates targetPoint = toModelPoint(this.boundingBox,
       targetPixelX, targetPixelY, this.imageWidth, this.imageHeight);
-    return targetPoint;
+    return getGeometryFactory().createPoint(targetPoint);
   }
 
   public Coordinates targetPixelToSourcePixel(final Coordinates point) {

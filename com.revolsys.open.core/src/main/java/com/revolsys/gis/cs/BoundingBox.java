@@ -447,7 +447,8 @@ public class BoundingBox extends Envelope implements Cloneable {
   public boolean contains(final Point point) {
     final Point projectedPoint = (Point)geometryFactory.createGeometry(point);
     final Coordinates coordinates = CoordinatesUtil.get(projectedPoint);
-    return contains(coordinates);
+    final boolean contains = contains(coordinates);
+    return contains;
   }
 
   public BoundingBox convert(final GeometryFactory geometryFactory) {
@@ -466,6 +467,16 @@ public class BoundingBox extends Envelope implements Cloneable {
         return this;
       }
     }
+  }
+
+  public double distance(final BoundingBox boundingBox) {
+    final Envelope envelope = boundingBox.convert(getGeometryFactory());
+    return distance(envelope);
+  }
+
+  public double distance(final Geometry geometry) {
+    final BoundingBox boundingBox = getBoundingBox(geometry);
+    return distance(boundingBox);
   }
 
   @Override
@@ -997,5 +1008,4 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
     return s.toString();
   }
-
 }

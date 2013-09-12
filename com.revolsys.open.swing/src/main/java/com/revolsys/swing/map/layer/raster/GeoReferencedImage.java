@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.raster;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import javax.media.jai.RenderedOp;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -28,8 +30,10 @@ import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
+import com.revolsys.util.Property;
 
-public class GeoReferencedImage implements PropertyChangeListener {
+public class GeoReferencedImage implements PropertyChangeListener,
+  PropertyChangeSupportProxy {
 
   private BoundingBox boundingBox;
 
@@ -57,6 +61,9 @@ public class GeoReferencedImage implements PropertyChangeListener {
 
   private final int degree = 1;
 
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
+
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
     this(boundingBox, image.getWidth(), image.getHeight());
@@ -69,14 +76,14 @@ public class GeoReferencedImage implements PropertyChangeListener {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.imageWidth = imageWidth;
     this.imageHeight = imageHeight;
-    tiePoints.addPropertyChangeListener(this);
+    Property.addListener(tiePoints, this);
   }
 
   public GeoReferencedImage(final Resource imageResource) {
     this.imageResource = imageResource;
     setImage(createBufferedImage());
     loadImageMetaData();
-    tiePoints.addPropertyChangeListener(this);
+    Property.addListener(tiePoints, this);
   }
 
   protected BufferedImage createBufferedImage() {
@@ -197,6 +204,11 @@ public class GeoReferencedImage implements PropertyChangeListener {
       getImageHeight());
   }
 
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
   public double getResolution() {
     return resolution;
   }
@@ -266,6 +278,7 @@ public class GeoReferencedImage implements PropertyChangeListener {
     if (event.getSource() == tiePoints) {
       updateWarpedImage();
     }
+    propertyChangeSupport.firePropertyChange(event);
   }
 
   public void revert() {
@@ -330,7 +343,7 @@ public class GeoReferencedImage implements PropertyChangeListener {
     }
   }
 
-  protected void updateWarpedImage() {
+  public void updateWarpedImage() {
     final int imageWidth = image.getWidth();
     final int imageHeight = image.getHeight();
     final BoundingBox boundingBox = getBoundingBox();

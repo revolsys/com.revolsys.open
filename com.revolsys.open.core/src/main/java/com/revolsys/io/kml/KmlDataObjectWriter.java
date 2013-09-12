@@ -227,8 +227,13 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       final Point centre = geometryFactory.createPoint(
         boundingBox.getCentreX(), boundingBox.getCentreY());
 
-      final long range = KmlXmlWriter.getLookAtRange(boundingBox);
-
+      final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
+      final long range;
+      if (configRange == null) {
+        range = KmlXmlWriter.getLookAtRange(boundingBox);
+      } else {
+        range = configRange.longValue();
+      }
       writeLookAt(centre, range);
     }
   }

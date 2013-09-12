@@ -73,10 +73,6 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
     }
   }
 
-  public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    getPropertyChangeSupport().addPropertyChangeListener(listener);
-  }
-
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
@@ -126,10 +122,6 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
         propertyChangeSupport.removePropertyChangeListener(this);
       }
     }
-  }
-
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    getPropertyChangeSupport().removePropertyChangeListener(listener);
   }
 
   @Override

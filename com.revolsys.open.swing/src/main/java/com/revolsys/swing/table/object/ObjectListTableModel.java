@@ -47,7 +47,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     } else {
       this.objects = new PropertyChangeArrayList<T>(objects);
     }
-    this.objects.addPropertyChangeListener(this);
+    Property.addListener(this.objects, this);
     this.columnNames.addAll(columnNames);
     this.columnTitles.addAll(columnTitles);
     setEditable(true);
@@ -76,20 +76,13 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     this.objects.addAll(objects);
   }
 
-  public void addPropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    objects.addPropertyChangeListener(propertyChangeListener);
-  }
-
   public void clear() {
     this.objects.clear();
   }
 
   @PreDestroy
   public void dispose() {
-    if (objects != null) {
-      this.objects.removePropertyChangeListener(this);
-    }
+    Property.removeListener(this.objects, this);
     this.objects = null;
   }
 
@@ -200,11 +193,6 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
 
   public void removeAll(final Object... removedFeatures) {
     removeAll(Arrays.asList(removedFeatures));
-  }
-
-  public void removePropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    objects.removePropertyChangeListener(propertyChangeListener);
   }
 
   @Override

@@ -238,7 +238,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void addMapOverlay(final JComponent overlay) {
-    final int zIndex = 1000 * this.overlayIndex++;
+    final int zIndex = 100 * this.overlayIndex++;
     addMapOverlay(zIndex, overlay);
   }
 
@@ -249,7 +249,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.mouseOverlay = new MouseOverlay(this.layeredPane);
     new EditGeoReferencedImageOverlay(this);
     this.toolTipOverlay = new ToolTipOverlay(this);
-    this.layeredPane.add(this.toolTipOverlay, new Integer(100000));
   }
 
   private void addPointerLocation(final boolean geographics) {
@@ -487,6 +486,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public boolean isZoomPreviousEnabled() {
     return this.zoomHistoryIndex > 0;
+  }
+
+  public void moveToFront(final JComponent overlay) {
+    this.layeredPane.moveToFront(overlay);
   }
 
   @Override
