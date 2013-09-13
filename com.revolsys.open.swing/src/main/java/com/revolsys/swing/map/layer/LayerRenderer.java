@@ -20,7 +20,11 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   Icon getIcon();
 
+  T getLayer();
+
   String getName();
+
+  LayerRenderer<?> getParent();
 
   PropertyChangeSupport getPropertyChangeSupport();
 

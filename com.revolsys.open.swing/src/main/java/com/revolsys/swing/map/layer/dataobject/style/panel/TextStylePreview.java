@@ -9,23 +9,23 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
-import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
+import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.revolsys.util.ExceptionUtil;
 
-public class MarkerStylePreview extends JPanel {
+public class TextStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
 
-  private final MarkerStyle markerStyle;
+  private final TextStyle textStyle;
 
-  public MarkerStylePreview(final MarkerStyle markerStyle) {
+  public TextStylePreview(final TextStyle textStyle) {
     final Dimension size = new Dimension(101, 101);
     setPreferredSize(size);
     setMinimumSize(size);
     setMaximumSize(size);
     setBackground(Color.WHITE);
     setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-    this.markerStyle = markerStyle;
+    this.textStyle = textStyle;
   }
 
   @Override
@@ -37,9 +37,8 @@ public class MarkerStylePreview extends JPanel {
     graphics.drawLine(50, 0, 50, 100);
     graphics.drawLine(0, 50, 100, 50);
     graphics.translate(50, 50);
-    final Marker marker = this.markerStyle.getMarker();
     try {
-      marker.render(null, graphics, this.markerStyle, 0, 0, 0);
+      TextStyleRenderer.renderText(null, graphics, null, null, textStyle);
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), e);
     }

@@ -38,6 +38,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   String getName();
 
+  List<Layer> getPathList();
+
   Project getProject();
 
   <L extends LayerRenderer<? extends Layer>> L getRenderer();
@@ -113,5 +115,5 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   void showProperties(String tabName);
 
-  List<Layer> getPathList();
+  void showRendererProperties(final LayerRenderer<?> renderer);
 }

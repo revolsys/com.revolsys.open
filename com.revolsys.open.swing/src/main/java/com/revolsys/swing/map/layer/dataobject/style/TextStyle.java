@@ -315,21 +315,27 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   public synchronized void setTextStyle(final Viewport2D viewport,
     final Graphics2D graphics) {
-    final long scale = (long)viewport.getScale();
-    if (this.font == null || this.lastScale != scale) {
-      this.lastScale = scale;
-      final int style = 0;
-      // if (textStyle.getFontWeight() == FontWeight.BOLD) {
-      // style += Font.BOLD;
-      // }
-      // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
-      // style += Font.ITALIC;
-      // }
-      final double fontSize = Viewport2D.toDisplayValue(viewport,
-        this.textSizeMeasure);
-      this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
+    if (viewport == null) {
+      final Font font = new Font(this.textFaceName, 0,
+        textSizeMeasure.getValue().intValue());
+      graphics.setFont(font);
+    } else {
+      final long scale = (long)viewport.getScale();
+      if (this.font == null || this.lastScale != scale) {
+        this.lastScale = scale;
+        final int style = 0;
+        // if (textStyle.getFontWeight() == FontWeight.BOLD) {
+        // style += Font.BOLD;
+        // }
+        // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
+        // style += Font.ITALIC;
+        // }
+        final double fontSize = Viewport2D.toDisplayValue(viewport,
+          this.textSizeMeasure);
+        this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
+      }
+      graphics.setFont(this.font);
     }
-    graphics.setFont(this.font);
   }
 
   public void setTextVerticalAlignment(final String textVerticalAlignment) {

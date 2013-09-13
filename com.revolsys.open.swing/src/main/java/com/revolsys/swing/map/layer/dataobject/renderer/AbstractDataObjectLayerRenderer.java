@@ -20,11 +20,21 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractDataObjectLayerRenderer extends
   AbstractLayerRenderer<DataObjectLayer> {
+
+  static {
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
+    menu.addMenuItem("layer",
+      TreeItemRunnable.createAction("View/Edit", "palette", "showProperties"));
+
+  }
 
   private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
 

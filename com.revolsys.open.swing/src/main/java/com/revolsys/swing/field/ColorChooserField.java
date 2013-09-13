@@ -21,12 +21,12 @@ public class ColorChooserField extends ValueField {
     super(fieldName, color);
     this.colorButton.addPropertyChangeListener("background",
       new InvokeMethodListener(this, "updateFieldValue"));
-    setFieldValue(color);
     setLayout(new VerticalLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 0));
     add(this.colorButton);
     final JColorChooser chooser = this.colorButton.getChooser();
     chooser.addChooserPanel(new ColorAlphaPanel());
+    setFieldValue(color);
   }
 
   @Override

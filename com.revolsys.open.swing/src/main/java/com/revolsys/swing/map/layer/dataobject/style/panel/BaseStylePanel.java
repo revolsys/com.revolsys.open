@@ -120,10 +120,10 @@ public class BaseStylePanel extends ValueField implements
       Field field;
       if (fieldName.equals("textFaceName")) {
         field = new FontChooserField(fieldName, (String)value);
-      } else if (fieldName.equals("textHorizontalAlignment")) {
-        field = createHorizontalAlignmentField((String)value);
-      } else if (fieldName.equals("textVerticalAlignment")) {
-        field = createVerticalAlignmentField((String)value);
+      } else if (fieldName.endsWith("HorizontalAlignment")) {
+        field = createHorizontalAlignmentField(fieldName, (String)value);
+      } else if (fieldName.endsWith("VerticalAlignment")) {
+        field = createVerticalAlignmentField(fieldName, (String)value);
       } else if (fieldName.equals("lineCap")) {
         field = createLineCapField((LineCap)value);
       } else if (fieldName.equals("lineJoin")) {
@@ -140,6 +140,7 @@ public class BaseStylePanel extends ValueField implements
         field = new TextField(fieldName, value, 30);
       }
       container.add((Component)field);
+      field.addPropertyChangeListener("fieldValue", this);
       return field;
     }
   }
@@ -183,7 +184,13 @@ public class BaseStylePanel extends ValueField implements
   protected void addMarkerStylePanel(final JPanel stylePanels,
     final MarkerStyle markerStyle) {
     addPanel(stylePanels, "Marker Style", markerStyle, "markerLineColor",
-      "markerLineWidth", "markerFill");
+      "markerLineWidth", "markerFill", "markerWidth", "markerHeight");
+
+    addPanel(stylePanels, "Marker Position", markerStyle,
+      "markerHorizontalAlignment", "markerVerticalAlignment", "markerDeltaX",
+      "markerDeltaY", "markerOrientationType", "markerOrientation",
+      "markerPlacement");
+
   }
 
   protected JPanel addPanel(final Container container, final String title,
@@ -210,13 +217,14 @@ public class BaseStylePanel extends ValueField implements
     container.add(field);
   }
 
-  protected TogglePanel createHorizontalAlignmentField(String aligment) {
+  protected TogglePanel createHorizontalAlignmentField(final String fieldName,
+    String aligment) {
     if (!"left".equalsIgnoreCase(aligment)
       && !"right".equalsIgnoreCase(aligment)) {
       aligment = "center";
     }
-    return new TogglePanel("textHorizontalAlignment", aligment, new Dimension(
-      28, 28), HORIZONTAL_ALIGNMENT_ACTIONS);
+    return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
+      HORIZONTAL_ALIGNMENT_ACTIONS);
   }
 
   protected TogglePanel createLineCapField(final LineCap lineCap) {
@@ -230,13 +238,14 @@ public class BaseStylePanel extends ValueField implements
       28), LINE_JOIN_ACTIONS);
   }
 
-  protected TogglePanel createVerticalAlignmentField(String aligment) {
+  protected TogglePanel createVerticalAlignmentField(final String fieldName,
+    String aligment) {
     if (!"top".equalsIgnoreCase(aligment)
       && !"bottom".equalsIgnoreCase(aligment)) {
       aligment = "middle";
     }
-    return new TogglePanel("textVerticalAlignment", aligment, new Dimension(28,
-      28), VERTICAL_ALIGNMENT_ACTIONS);
+    return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
+      VERTICAL_ALIGNMENT_ACTIONS);
   }
 
   @SuppressWarnings("unchecked")

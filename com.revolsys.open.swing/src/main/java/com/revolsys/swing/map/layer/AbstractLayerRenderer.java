@@ -122,6 +122,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     return this.icon;
   }
 
+  @Override
   public T getLayer() {
     return this.layer;
   }
@@ -139,6 +140,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     return this.name;
   }
 
+  @Override
   public LayerRenderer<?> getParent() {
     return this.parent;
   }
@@ -238,6 +240,13 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.visible = visible;
     this.propertyChangeSupport.firePropertyChange("visible", oldVisible,
       visible);
+  }
+
+  public void showProperties() {
+    final T layer = getLayer();
+    if (layer != null) {
+      layer.showRendererProperties(this);
+    }
   }
 
   @Override

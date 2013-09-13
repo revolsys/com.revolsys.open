@@ -32,6 +32,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -54,28 +55,35 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   private static final Icon ICON = SilkIconLoader.getIcon("style");
 
   public static String getLabel(final DataObject object, final TextStyle style) {
-    final StringBuffer label = new StringBuffer();
-    final String labelPattern = style.getTextName();
-    final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(
-      labelPattern);
-    while (matcher.find()) {
-      final String propertyName = matcher.group(1);
-      final Object value = object.getValueByPath(propertyName);
-      String text;
-      if (value == null) {
-        text = "";
-      } else {
-        text = StringConverterRegistry.toString(value);
+    if (object == null) {
+      return "Text";
+    } else {
+      final StringBuffer label = new StringBuffer();
+      final String labelPattern = style.getTextName();
+      final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(
+        labelPattern);
+      while (matcher.find()) {
+        final String propertyName = matcher.group(1);
+        final Object value = object.getValueByPath(propertyName);
+        String text;
+        if (value == null) {
+          text = "";
+        } else {
+          text = StringConverterRegistry.toString(value);
+        }
+        matcher.appendReplacement(label, text);
       }
-      matcher.appendReplacement(label, text);
-    }
-    matcher.appendTail(label);
+      matcher.appendTail(label);
 
-    return label.toString().trim();
+      return label.toString().trim();
+    }
   }
 
   public static CoordinatesWithOrientation getTextLocation(
     final Viewport2D viewport, final Geometry geometry, final TextStyle style) {
+    if (viewport == null) {
+      return new CoordinatesWithOrientation(new DoubleCoordinates(0.0, 0.0), 0);
+    }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
@@ -179,14 +187,16 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final DataObject object,
     final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
-    if (StringUtils.hasText(label) && geometry != null) {
+    if (StringUtils.hasText(label) && geometry != null || viewport == null) {
       final CoordinatesWithOrientation point = getTextLocation(viewport,
         geometry, style);
       if (point != null) {
         final double orientation = point.getOrientation();
 
-        final boolean savedUseModelUnits = viewport.setUseModelCoordinates(
-          false, graphics);
+        boolean savedUseModelUnits = false;
+        if (viewport != null) {
+          savedUseModelUnits = viewport.setUseModelCoordinates(false, graphics);
+        }
         final Paint paint = graphics.getPaint();
         try {
           graphics.setBackground(Color.BLACK);
@@ -196,7 +206,14 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
           final double x = point.getX();
           final double y = point.getY();
-          final double[] location = viewport.toViewCoordinates(x, y);
+          final double[] location;
+          if (viewport == null) {
+            location = new double[] {
+              x, y
+            };
+          } else {
+            location = viewport.toViewCoordinates(x, y);
+          }
 
           final AffineTransform savedTransform = graphics.getTransform();
           final double screenX = location[0];
@@ -212,6 +229,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           double dy = 0;
 
           final Measure<Length> textDx = style.getTextDx();
+
           dx += Viewport2D.toDisplayValue(viewport, textDx);
 
           final Measure<Length> textDy = style.getTextDy();
@@ -264,7 +282,12 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
           final Color textBoxColor = style.getTextBoxColor();
           if (textBoxColor != null) {
-            final double pixel = 1 / viewport.getModelUnitsPerViewUnit();
+            final double pixel;
+            if (viewport == null) {
+              pixel = 1;
+            } else {
+              pixel = 1 / viewport.getModelUnitsPerViewUnit();
+            }
             graphics.setColor(textBoxColor);
             graphics.fill(new Rectangle2D.Double(bounds.getX() - pixel,
               bounds.getY(), width + 2 * pixel, height));
@@ -276,7 +299,9 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
         } finally {
           graphics.setPaint(paint);
-          viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+          if (viewport != null) {
+            viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
+          }
         }
       }
     }

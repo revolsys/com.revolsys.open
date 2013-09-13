@@ -7,6 +7,8 @@ import javax.swing.JTabbedPane;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class TabbedValuePanel extends ValueField {
   private static final long serialVersionUID = 1L;
 
@@ -34,6 +36,17 @@ public class TabbedValuePanel extends ValueField {
   public void addTab(final ValueField panel) {
     final String title = panel.getTitle();
     this.tabs.addTab(title, panel);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Component> V getTab(final String tabName) {
+    for (int i = 0; i < tabs.getTabCount(); i++) {
+      final String title = tabs.getTitleAt(i);
+      if (EqualsRegistry.equal(tabName, title)) {
+        return (V)tabs.getComponentAt(i);
+      }
+    }
+    return null;
   }
 
   public JTabbedPane getTabs() {

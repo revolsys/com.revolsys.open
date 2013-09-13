@@ -1,9 +1,11 @@
 package com.revolsys.swing.map.layer.dataobject.style.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.LinkedList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +42,7 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
       new MultipleLayerRendererTreeNodeModel());
     tree = styleTree.getTree();
     tree.setRootVisible(true);
+    tree.setSelectionPath(new TreePath(renderer));
     tree.addMouseListener(this);
     setEditStylePanel(renderer);
     final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -87,7 +90,25 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
   }
 
   public void setEditStylePanel(final LayerRenderer<? extends Layer> renderer) {
+    final Component view = editStyleContainer.getViewport().getView();
+    if (view instanceof ValueField) {
+      final ValueField valueField = (ValueField)view;
+      valueField.save();
+    }
     final ValueField stylePanel = renderer.createStylePanel();
     editStyleContainer.setViewportView(stylePanel);
+  }
+
+  public void setSelectedRenderer(final LayerRenderer<?> renderer) {
+    final LinkedList<Object> path = new LinkedList<Object>();
+    LayerRenderer<?> parent = renderer;
+    while (parent != null) {
+      path.addFirst(parent);
+      parent = parent.getParent();
+    }
+    if (!path.isEmpty()) {
+      tree.setSelectionPath(ObjectTree.createTreePath(path));
+    }
+    setEditStylePanel(renderer);
   }
 }

@@ -56,7 +56,7 @@ public class TextStylePanel extends BaseStylePanel implements
         "textHorizontalAlignment", "textVerticalAlignment", "textDx", "textDy",
         "textOrientationType", "textOrientation", "textPlacementType");
 
-      // this.previews.add(new TextStylePreview(this.textStyle));
+      this.previews.add(new TextStylePreview(this.textStyle));
     }
   }
 

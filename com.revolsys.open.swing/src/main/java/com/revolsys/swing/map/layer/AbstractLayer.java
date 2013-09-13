@@ -44,6 +44,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
 import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -661,6 +662,24 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  @Override
+  public void showRendererProperties(final LayerRenderer<?> renderer) {
+    final MapPanel map = MapPanel.get(this);
+    if (map != null) {
+      final Window window = SwingUtilities.getWindowAncestor(map);
+      final TabbedValuePanel panel = createPropertiesPanel();
+      panel.setSelectdTab("Style");
+      final DataObjectLayerStylePanel stylePanel = panel.getTab("Style");
+      stylePanel.setSelectedRenderer(renderer);
+      panel.showDialog(window);
+    }
+  }
+
+  public void toggleEditable() {
+    final boolean editable = isEditable();
+    setEditable(!editable);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Map<String, Object> toMap() {
@@ -712,10 +731,5 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
-  }
-
-  public void toggleEditable() {
-    final boolean editable = isEditable();
-    setEditable(!editable);
   }
 }

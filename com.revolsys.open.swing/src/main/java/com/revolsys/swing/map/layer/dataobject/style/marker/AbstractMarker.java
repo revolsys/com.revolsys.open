@@ -15,32 +15,32 @@ public abstract class AbstractMarker implements Marker {
     final double y, final double width, final double height,
     final double orientation) {
     if (viewport != null) {
+
       final double[] viewCoordinates = viewport.toViewCoordinates(x, y);
       graphics.translate(viewCoordinates[0], viewCoordinates[1]);
-      if (orientation != 0) {
-        graphics.rotate(-Math.toRadians(orientation));
-      }
-
-      final Measure<Length> deltaX = style.getMarkerDeltaX();
-      final Measure<Length> deltaY = style.getMarkerDeltaY();
-      double dx = Viewport2D.toDisplayValue(viewport, deltaX);
-      double dy = Viewport2D.toDisplayValue(viewport, deltaY);
-
-      final String verticalAlignment = style.getMarkerVerticalAlignment();
-      if ("top".equals(verticalAlignment)) {
-        dy -= height;
-      } else if ("auto".equals(verticalAlignment)
-        || "middle".equals(verticalAlignment)) {
-        dy -= height / 2;
-      }
-      final String horizontalAlignment = style.getMarkerHorizontalAlignment();
-      if ("right".equals(horizontalAlignment)) {
-        dx -= width;
-      } else if ("auto".equals(horizontalAlignment)
-        || "center".equals(horizontalAlignment)) {
-        dx -= width / 2;
-      }
-      graphics.translate(dx, dy);
     }
+    if (orientation != 0) {
+      graphics.rotate(-Math.toRadians(orientation));
+    }
+
+    final Measure<Length> deltaX = style.getMarkerDeltaX();
+    final Measure<Length> deltaY = style.getMarkerDeltaY();
+    double dx = Viewport2D.toDisplayValue(viewport, deltaX);
+    double dy = Viewport2D.toDisplayValue(viewport, deltaY);
+    final String verticalAlignment = style.getMarkerVerticalAlignment();
+    if ("top".equals(verticalAlignment)) {
+      dy -= height;
+    } else if ("auto".equals(verticalAlignment)
+      || "middle".equals(verticalAlignment)) {
+      dy -= height / 2;
+    }
+    final String horizontalAlignment = style.getMarkerHorizontalAlignment();
+    if ("right".equals(horizontalAlignment)) {
+      dx -= width;
+    } else if ("auto".equals(horizontalAlignment)
+      || "center".equals(horizontalAlignment)) {
+      dx -= width / 2;
+    }
+    graphics.translate(dx, dy);
   }
 }

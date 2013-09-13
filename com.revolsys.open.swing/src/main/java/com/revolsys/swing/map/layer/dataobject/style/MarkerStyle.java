@@ -71,6 +71,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     addProperty("markerClip", Boolean.class, true);
     addProperty("markerSmooth", Double.class, 0.0);
     addProperty("markerCompOp", String.class, null);
+    addProperty("markerOrientation", Double.class, 0.0);
     addProperty("markerOrientationType", String.class, "none");
     addProperty("markerHorizontalAlignment", String.class, "auto");
     addProperty("markerVerticalAlignment", String.class, "auto");
@@ -157,6 +158,9 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   private Resource markerFileResource;
 
   private Color markerFill = new Color(0, 0, 255, 255);
+
+  /** The orientation of the text in a clockwise direction from the east axis. */
+  private double markerOrientation = 0;
 
   private int markerFillOpacity = 255;
 
@@ -266,6 +270,10 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   public int getMarkerOpacity() {
     return this.markerOpacity;
+  }
+
+  public double getMarkerOrientation() {
+    return markerOrientation;
   }
 
   public String getMarkerOrientationType() {
@@ -476,6 +484,10 @@ public class MarkerStyle implements Cloneable, MapSerializer {
       setMarkerLineOpacity(markerOpacity);
       setMarkerFillOpacity(markerOpacity);
     }
+  }
+
+  public void setMarkerOrientation(final double markerOrientation) {
+    this.markerOrientation = markerOrientation;
   }
 
   public void setMarkerOrientationType(final String markerOrientationType) {

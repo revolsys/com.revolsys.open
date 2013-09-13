@@ -12,24 +12,15 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.menu.ChangeStyle;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
-
-  static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(GeometryStyleRenderer.class);
-    menu.addMenuItem("style", new ChangeStyle());
-  }
-
   public static Shape getShape(final Viewport2D viewport,
     final GeometryStyle style, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();

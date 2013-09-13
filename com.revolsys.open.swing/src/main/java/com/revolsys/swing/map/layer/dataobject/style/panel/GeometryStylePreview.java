@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 
 import javax.swing.BorderFactory;
@@ -68,14 +70,21 @@ public class GeometryStylePreview extends JPanel {
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
     final Graphics2D graphics = (Graphics2D)g;
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-      RenderingHints.VALUE_ANTIALIAS_ON);
+    final Paint paint = graphics.getPaint();
+    final Stroke stroke = graphics.getStroke();
+    try {
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
 
-    if (DataTypes.POLYGON.equals(this.geometryDataType)) {
-      this.geometryStyle.setFillStyle(null, graphics);
-      graphics.fill(this.shape);
+      if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+        this.geometryStyle.setFillStyle(null, graphics);
+        graphics.fill(this.shape);
+      }
+      this.geometryStyle.setLineStyle(null, graphics);
+      graphics.draw(this.shape);
+    } finally {
+      graphics.setPaint(paint);
+      graphics.setStroke(stroke);
     }
-    this.geometryStyle.setLineStyle(null, graphics);
-    graphics.draw(this.shape);
   }
 }
