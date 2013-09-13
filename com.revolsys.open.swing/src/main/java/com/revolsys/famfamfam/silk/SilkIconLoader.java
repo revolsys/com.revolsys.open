@@ -39,6 +39,7 @@ public class SilkIconLoader {
           BufferedImage.TYPE_INT_ARGB);
         final Graphics graphics = newImage.getGraphics();
         graphics.drawImage(image, 0, 0, null);
+        graphics.dispose();
         image = newImage;
       }
       return toolkit.createCustomCursor(image, new Point(dx, dy), imageName);
@@ -72,7 +73,9 @@ public class SilkIconLoader {
         final BufferedImage image = ImageIO.read(in);
         final BufferedImage convertedImg = new BufferedImage(image.getWidth(),
           image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        convertedImg.getGraphics().drawImage(image, 0, 0, null);
+        final Graphics graphics = convertedImg.getGraphics();
+        graphics.drawImage(image, 0, 0, null);
+        graphics.dispose();
         return convertedImg;
       } catch (final IOException e) {
       }
@@ -101,6 +104,7 @@ public class SilkIconLoader {
         g.drawImage(smallImage, 0, 0, null);
       }
     }
+    g.dispose();
     return combined;
   }
 

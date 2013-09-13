@@ -192,9 +192,12 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         } else {
           final DataObjectMetaData metaData = this.tableModel.getMetaData();
           final Class<?> attributeClass = metaData.getAttributeClass(searchAttribute);
-          final Object value = StringConverterRegistry.toObject(attributeClass,
-            searchValue);
-          condition = Conditions.equal(searchAttribute, value);
+          try {
+            final Object value = StringConverterRegistry.toObject(
+              attributeClass, searchValue);
+            condition = Conditions.equal(searchAttribute, value);
+          } catch (final Throwable t) {
+          }
         }
       }
       this.tableModel.setSearchCondition(condition);

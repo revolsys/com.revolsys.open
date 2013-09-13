@@ -3,6 +3,7 @@ package com.revolsys.swing.map.overlay;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -16,7 +17,8 @@ import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public class MappedLocation implements MapSerializer {
+public class MappedLocation extends AbstractPropertyChangeObject implements
+  MapSerializer {
   private Coordinates sourcePixel;
 
   private Point targetPoint;
@@ -89,11 +91,15 @@ public class MappedLocation implements MapSerializer {
   }
 
   public void setSourcePixel(final Coordinates sourcePixel) {
+    final Object oldValue = this.sourcePixel;
     this.sourcePixel = sourcePixel;
+    firePropertyChange("sourcePixel", oldValue, sourcePixel);
   }
 
   public void setTargetPoint(final Point targetPoint) {
+    final Object oldValue = this.targetPoint;
     this.targetPoint = targetPoint;
+    firePropertyChange("targetPoint", oldValue, targetPoint);
   }
 
   @Override
@@ -109,4 +115,5 @@ public class MappedLocation implements MapSerializer {
   public String toString() {
     return sourcePixel + "->" + targetPoint;
   }
+
 }

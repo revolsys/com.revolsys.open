@@ -19,6 +19,14 @@ public class ImageViewport extends Viewport2D {
     this.graphics = (Graphics2D)this.image.getGraphics();
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    if (graphics != null) {
+      graphics.dispose();
+    }
+  }
+
   public Graphics2D getGraphics() {
     return this.graphics;
   }

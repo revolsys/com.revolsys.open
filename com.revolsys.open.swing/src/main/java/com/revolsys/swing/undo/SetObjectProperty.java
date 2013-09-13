@@ -3,12 +3,7 @@ package com.revolsys.swing.undo;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
 
-@SuppressWarnings("serial")
 public class SetObjectProperty extends AbstractUndoableEdit {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final Object object;

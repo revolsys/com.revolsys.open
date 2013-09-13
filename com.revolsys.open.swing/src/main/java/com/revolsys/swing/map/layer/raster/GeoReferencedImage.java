@@ -1,9 +1,9 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.image.BufferedImage;
+import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import javax.media.jai.RenderedOp;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -32,8 +32,8 @@ import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.Property;
 
-public class GeoReferencedImage implements PropertyChangeListener,
-  PropertyChangeSupportProxy {
+public class GeoReferencedImage extends AbstractPropertyChangeObject implements
+  PropertyChangeListener {
 
   private BoundingBox boundingBox;
 
@@ -61,9 +61,6 @@ public class GeoReferencedImage implements PropertyChangeListener,
 
   private final int degree = 1;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
-
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
     this(boundingBox, image.getWidth(), image.getHeight());
@@ -84,6 +81,11 @@ public class GeoReferencedImage implements PropertyChangeListener,
     setImage(createBufferedImage());
     loadImageMetaData();
     Property.addListener(tiePoints, this);
+  }
+
+  protected synchronized void clearWarp() {
+    this.warpedImage = null;
+    this.warpFilter = null;
   }
 
   protected BufferedImage createBufferedImage() {
@@ -114,13 +116,10 @@ public class GeoReferencedImage implements PropertyChangeListener,
   }
 
   public BufferedImage getImage() {
-    if (warpFilter == null) {
+    if (getWarpFilter() == null) {
       return this.image;
     } else {
-      if (warpedImage == null) {
-        updateWarpedImage();
-      }
-      return warpedImage;
+      return getWarpedImage();
     }
   }
 
@@ -204,11 +203,6 @@ public class GeoReferencedImage implements PropertyChangeListener,
       getImageHeight());
   }
 
-  @Override
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
-  }
-
   public double getResolution() {
     return resolution;
   }
@@ -217,11 +211,29 @@ public class GeoReferencedImage implements PropertyChangeListener,
     return tiePoints;
   }
 
-  public BufferedImage getWarpedImage() {
+  public synchronized BufferedImage getWarpedImage() {
+    if (image == null || boundingBox.isEmpty()) {
+      return this.image;
+    } else if (this.warpedImage == null) {
+      final WarpFilter warpFilter = getWarpFilter();
+      this.warpedImage = warpFilter.filter(image);
+    }
     return warpedImage;
   }
 
-  public WarpFilter getWarpFilter() {
+  public synchronized WarpFilter getWarpFilter() {
+    if (this.image != null && this.warpFilter == null) {
+      final int imageWidth = image.getWidth();
+      final int imageHeight = image.getHeight();
+      if (this.boundingBox.isEmpty()) {
+        this.warpFilter = new WarpAffineFilter(boundingBox, imageWidth,
+          imageHeight);
+      } else {
+        final List<MappedLocation> tiePoints = getTiePoints();
+        this.warpFilter = WarpFilter.createWarpFilter(boundingBox, tiePoints,
+          this.degree, imageWidth, imageHeight);
+      }
+    }
     return warpFilter;
   }
 
@@ -275,10 +287,23 @@ public class GeoReferencedImage implements PropertyChangeListener,
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event.getSource() == tiePoints) {
-      updateWarpedImage();
+    final Object source = event.getSource();
+    if (source == tiePoints) {
+      if (event instanceof IndexedPropertyChangeEvent) {
+        final Object oldValue = event.getOldValue();
+        if (oldValue instanceof MappedLocation) {
+          ((MappedLocation)oldValue).removeListener(this);
+        }
+        final Object newValue = event.getOldValue();
+        if (newValue instanceof MappedLocation) {
+          ((MappedLocation)newValue).addListener(this);
+        }
+      }
+      clearWarp();
+    } else if (source instanceof MappedLocation) {
+      clearWarp();
     }
-    propertyChangeSupport.firePropertyChange(event);
+    firePropertyChange(event);
   }
 
   public void revert() {
@@ -290,7 +315,7 @@ public class GeoReferencedImage implements PropertyChangeListener,
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.boundingBox = boundingBox;
-    updateWarpedImage();
+    clearWarp();
   }
 
   public void setBoundingBox(final double x1, final double y1,
@@ -337,23 +362,15 @@ public class GeoReferencedImage implements PropertyChangeListener,
 
   public void setTiePoints(final List<MappedLocation> tiePoints) {
     if (!EqualsRegistry.equal(tiePoints, this.tiePoints)) {
+      for (final MappedLocation mappedLocation : this.tiePoints) {
+        mappedLocation.removeListener(this);
+      }
       this.tiePoints.clear();
       this.tiePoints.addAll(tiePoints);
-      updateWarpedImage();
-    }
-  }
-
-  public void updateWarpedImage() {
-    final int imageWidth = image.getWidth();
-    final int imageHeight = image.getHeight();
-    final BoundingBox boundingBox = getBoundingBox();
-    if (!boundingBox.isEmpty()) {
-      this.warpFilter = WarpFilter.createWarpFilter(boundingBox,
-        getTiePoints(), this.degree, imageWidth, imageHeight);
-      this.warpedImage = this.warpFilter.filter(image);
-    } else {
-      warpFilter = new WarpAffineFilter(boundingBox, imageWidth, imageHeight);
-      warpedImage = null;
+      for (final MappedLocation mappedLocation : tiePoints) {
+        mappedLocation.addListener(this);
+      }
+      clearWarp();
     }
   }
 }

@@ -63,6 +63,7 @@ public class PdfImage extends GeoReferencedImage {
                 * scaleFactor);
             graphics.scale(1, 1);
             graphics.drawImage(image, 0, 0, null);
+            graphics.dispose();
             image = viewportImage;
           }
           final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(
