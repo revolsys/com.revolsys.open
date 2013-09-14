@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,11 @@ import com.revolsys.util.ExceptionUtil;
 public class MultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
+
+  public MultipleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, Collections.<String, Object> emptyMap());
+  }
 
   public MultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> multipleStyle) {

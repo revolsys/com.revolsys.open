@@ -107,6 +107,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   void setReadOnly(boolean readOnly);
 
+  void setRenderer(final LayerRenderer<? extends Layer> renderer);
+
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);

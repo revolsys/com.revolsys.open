@@ -38,7 +38,7 @@ public class FolderConnectionManager extends
     for (final FolderConnectionRegistry registry : registries) {
       final FolderConnection connection = registry.getConnection(name);
       if (connection != null) {
-        return connection.getFile();
+        return connection.getFile().getFile();
       }
     }
     return null;

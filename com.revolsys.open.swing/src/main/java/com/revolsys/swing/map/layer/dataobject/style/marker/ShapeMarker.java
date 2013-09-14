@@ -7,11 +7,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
@@ -190,9 +193,33 @@ public class ShapeMarker extends AbstractMarker {
   public ShapeMarker(final String name) {
     this(SHAPES.get(name));
     this.name = name;
-    if (this.shape == null) {
+    if (this.getShape() == null) {
       throw new IllegalArgumentException("Unknown shape " + name);
     }
+  }
+
+  @Override
+  public Icon getIcon(final MarkerStyle style) {
+    final Shape shape = getShape();
+    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16,
+      16);
+
+    final BufferedImage image = new BufferedImage(16, 16,
+      BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D graphics = image.createGraphics();
+    final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
+    if (style.setMarkerFillStyle(null, graphics)) {
+      graphics.fill(newShape);
+    }
+    if (style.setMarkerLineStyle(null, graphics)) {
+      graphics.draw(newShape);
+    }
+    graphics.dispose();
+    return new ImageIcon(image);
+  }
+
+  public Shape getShape() {
+    return shape;
   }
 
   @Override
@@ -215,7 +242,7 @@ public class ShapeMarker extends AbstractMarker {
 
     final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
       mapWidth, mapHeight);
-    final Shape newShape = new GeneralPath(this.shape).createTransformedShape(shapeTransform);
+    final Shape newShape = new GeneralPath(this.getShape()).createTransformedShape(shapeTransform);
     if (style.setMarkerFillStyle(viewport, graphics)) {
       graphics.fill(newShape);
     }

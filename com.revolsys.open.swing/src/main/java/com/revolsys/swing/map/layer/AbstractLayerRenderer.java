@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,6 +13,7 @@ import javax.swing.Icon;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -22,9 +22,11 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.panel.BaseStylePanel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
-public abstract class AbstractLayerRenderer<T extends Layer> implements
-  LayerRenderer<T>, PropertyChangeListener, Cloneable {
+public abstract class AbstractLayerRenderer<T extends Layer> extends
+  AbstractPropertyChangeObject implements LayerRenderer<T>,
+  PropertyChangeListener, Cloneable {
 
   private static final Icon ICON = SilkIconLoader.getIcon("palette");
 
@@ -32,7 +34,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   private Icon icon = ICON;
 
-  private final T layer;
+  private T layer;
 
   private long maximumScale = 0;
 
@@ -42,30 +44,14 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   private LayerRenderer<?> parent;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
-
   private final String type;
 
   private boolean visible = true;
 
-  public AbstractLayerRenderer(final String type, final T layer) {
-    this.type = type;
-    this.layer = layer;
-    this.propertyChangeSupport.addPropertyChangeListener(layer);
-    this.name = CaseConverter.toCapitalizedWords(type);
-  }
-
-  public AbstractLayerRenderer(final String type, final T layer,
-    final LayerRenderer<?> parent) {
-    this(type, layer, parent, Collections.<String, Object> emptyMap());
-  }
-
-  public AbstractLayerRenderer(final String type, final T layer,
+  public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
     this.parent = parent;
-    getPropertyChangeSupport().addPropertyChangeListener(parent);
     @SuppressWarnings("unchecked")
     final Map<String, Object> styleDefaults = (Map<String, Object>)style.remove("defaults");
     setDefaults(styleDefaults);
@@ -81,7 +67,17 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     if (visible != null) {
       this.visible = visible;
     }
-    setName((String)style.remove("name"));
+    final String styleName = (String)style.remove("name");
+    if (StringUtils.hasText(styleName)) {
+      name = styleName;
+    }
+    setName(name);
+  }
+
+  public AbstractLayerRenderer(final String type, final T layer) {
+    this.type = type;
+    this.layer = layer;
+    this.name = CaseConverter.toCapitalizedWords(type);
   }
 
   @SuppressWarnings("unchecked")
@@ -145,11 +141,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     return this.parent;
   }
 
-  @Override
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return this.propertyChangeSupport;
-  }
-
   public String getType() {
     return this.type;
   }
@@ -190,7 +181,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    this.propertyChangeSupport.firePropertyChange(event);
+    firePropertyChange(event);
   }
 
   @Override
@@ -216,6 +207,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     this.icon = icon;
   }
 
+  public void setLayer(final T layer) {
+    final Object oldValue = this.layer;
+    this.layer = layer;
+    firePropertyChange("layer", oldValue, layer);
+  }
+
   public void setMaximumScale(final long maximumScale) {
     this.maximumScale = maximumScale;
   }
@@ -231,15 +228,27 @@ public abstract class AbstractLayerRenderer<T extends Layer> implements
     } else {
       this.name = CaseConverter.toCapitalizedWords(this.type);
     }
-    this.propertyChangeSupport.firePropertyChange("name", oldName, this.name);
+    firePropertyChange("name", oldName, this.name);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setParent(final LayerRenderer<?> parent) {
+    final Object oldValue = this.parent;
+    Property.removeListener(oldValue, this);
+    this.parent = parent;
+    if (parent != null) {
+      setLayer((T)parent.getLayer());
+    }
+    Property.addListener(parent, this);
+    firePropertyChange("parent", oldValue, parent);
   }
 
   @Override
   public void setVisible(final boolean visible) {
     final boolean oldVisible = this.visible;
     this.visible = visible;
-    this.propertyChangeSupport.firePropertyChange("visible", oldVisible,
-      visible);
+    firePropertyChange("visible", oldVisible, visible);
   }
 
   public void showProperties() {

@@ -1,9 +1,6 @@
 package com.revolsys.swing.tree.file;
 
 import java.awt.Component;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -14,9 +11,11 @@ import javax.swing.JTree;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.io.file.FolderConnectionFile;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
-public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
+public class FolderConnectionFileModel extends
+  AbstractObjectTreeNodeModel<FolderConnectionFile, FolderConnectionFile> {
   public static final Icon ICON_FOLDER_DRIVE = SilkIconLoader.getIconWithBadge(
     "folder", "drive");
 
@@ -26,25 +25,21 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIconWithBadge(
     "folder", "link");
 
-  public FileTreeNodeModel() {
-    setSupportedClasses(File.class);
-    setSupportedChildClasses(File.class);
+  public FolderConnectionFileModel() {
+    setSupportedClasses(FolderConnectionFile.class);
+    setSupportedChildClasses(FolderConnectionFile.class);
     setObjectTreeNodeModels(this);
   }
 
   @Override
-  protected List<File> getChildren(final File file) {
-    if (file.isDirectory()) {
-      final File[] files = file.listFiles();
-      if (files != null) {
-        return Arrays.asList(files);
-      }
-    }
-    return Collections.emptyList();
+  protected List<FolderConnectionFile> getChildren(
+    final FolderConnectionFile file) {
+    final List<FolderConnectionFile> files = file.getFiles();
+    return files;
   }
 
   @Override
-  public Object getLabel(final File file) {
+  public Object getLabel(final FolderConnectionFile file) {
     if (file == null) {
       return file;
     } else {
@@ -63,9 +58,9 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   }
 
   @Override
-  public Component getRenderer(final File file, final JTree tree,
-    final boolean selected, final boolean expanded, final boolean leaf,
-    final int row, final boolean hasFocus) {
+  public Component getRenderer(final FolderConnectionFile file,
+    final JTree tree, final boolean selected, final boolean expanded,
+    final boolean leaf, final int row, final boolean hasFocus) {
     final JLabel renderer = (JLabel)super.getRenderer(file, tree, selected,
       expanded, leaf, row, hasFocus);
     if (file.exists()) {
@@ -83,7 +78,7 @@ public class FileTreeNodeModel extends AbstractObjectTreeNodeModel<File, File> {
   }
 
   @Override
-  public boolean isLeaf(final File file) {
+  public boolean isLeaf(final FolderConnectionFile file) {
     if (file.exists()) {
       return !file.isDirectory();
     } else {

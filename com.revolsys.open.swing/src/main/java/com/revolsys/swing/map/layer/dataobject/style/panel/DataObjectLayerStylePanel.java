@@ -49,7 +49,7 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
       styleTree, editStyleContainer);
 
     splitPane.setDividerLocation(300);
-    setPreferredSize(new Dimension(1000, 400));
+    setPreferredSize(new Dimension(1100, 700));
     add(splitPane, BorderLayout.CENTER);
   }
 

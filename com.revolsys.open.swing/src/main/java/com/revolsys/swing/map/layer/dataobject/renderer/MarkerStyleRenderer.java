@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.Icon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -21,7 +24,6 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.panel.MarkerStylePanel;
@@ -33,10 +35,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
-  private MarkerStyle style;
-
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
     .createEmptyGeometry();
+
+  private static final Icon ICON = SilkIconLoader.getIcon("style_marker");
 
   public static Geometry getGeometry(final Viewport2D viewport,
     final Geometry geometry) {
@@ -338,22 +340,27 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
-  public MarkerStyleRenderer(final DataObjectLayer layer) {
-    this(layer, new GeometryStyle());
+  private MarkerStyle style;
+
+  public MarkerStyleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, new MarkerStyle());
   }
 
   public MarkerStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
-    super("markerStyle", layer, parent, geometryStyle);
+    super("markerStyle", "Marker Style", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(geometryStyle);
-    this.style = new GeometryStyle(style);
+    this.style = new MarkerStyle(style);
+    setIcon(ICON);
   }
 
   public MarkerStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final MarkerStyle style) {
-    super("markerStyle", layer, parent);
+    super("markerStyle", "Marker Style", layer, parent);
     this.style = style;
+    setIcon(ICON);
   }
 
   public MarkerStyleRenderer(final DataObjectLayer layer,
@@ -371,6 +378,17 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   public ValueField createStylePanel() {
     return new MarkerStylePanel(this);
+  }
+
+  @Override
+  public Icon getIcon() {
+    final Marker marker = style.getMarker();
+    final Icon icon = marker.getIcon(style);
+    if (icon == null) {
+      return super.getIcon();
+    } else {
+      return icon;
+    }
   }
 
   public MarkerStyle getStyle() {

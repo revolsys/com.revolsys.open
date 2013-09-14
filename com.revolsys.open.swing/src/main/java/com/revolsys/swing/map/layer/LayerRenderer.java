@@ -7,12 +7,13 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 
 public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
-  MapSerializer {
+  PropertyChangeSupportProxy, MapSerializer {
 
   ValueField createStylePanel();
 
@@ -26,6 +27,7 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   LayerRenderer<?> getParent();
 
+  @Override
   PropertyChangeSupport getPropertyChangeSupport();
 
   <V> V getValue(String name);
@@ -33,6 +35,8 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
   boolean isVisible();
 
   void render(Viewport2D viewport, Graphics2D graphics);
+
+  void setParent(LayerRenderer<?> parent);
 
   void setVisible(boolean visible);
 }

@@ -51,6 +51,7 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
@@ -611,15 +612,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.readOnly = readOnly;
   }
 
+  @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
-    if (this.renderer != null) {
-      this.renderer.getPropertyChangeSupport().removePropertyChangeListener(
-        this);
-    }
+    Property.removeListener(this.renderer, this);
     this.renderer = renderer;
-    if (renderer != null) {
-      renderer.getPropertyChangeSupport().addPropertyChangeListener(this);
-    }
+    Property.addListener(this.renderer, this);
   }
 
   @Override

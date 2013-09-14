@@ -17,8 +17,8 @@ public class FolderConnectionManagerModel
     setSupportedChildClasses(FolderConnectionRegistry.class);
     setObjectTreeNodeModels(new FolderConnectionRegistryModel());
     final DefaultTreeCellRenderer renderer = getRenderer();
-    renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
-    renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
+    renderer.setOpenIcon(FileModel.ICON_FOLDER_LINK);
+    renderer.setClosedIcon(FileModel.ICON_FOLDER_LINK);
   }
 
   @Override

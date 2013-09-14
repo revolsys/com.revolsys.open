@@ -13,6 +13,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   private static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
     0, 0);
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style");
+  private static final Icon ICON = SilkIconLoader.getIcon("style_text");
 
   public static String getLabel(final DataObject object, final TextStyle style) {
     if (object == null) {
@@ -310,8 +311,13 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   private TextStyle style;
 
   public TextStyleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, Collections.<String, Object> emptyMap());
+  }
+
+  public TextStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
-    super("textStyle", layer, parent, textStyle);
+    super("textStyle", "Text Style", layer, parent, textStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(textStyle);
     this.style = new TextStyle(style);

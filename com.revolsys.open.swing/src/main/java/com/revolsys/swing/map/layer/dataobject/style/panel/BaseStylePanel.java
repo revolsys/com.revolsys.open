@@ -86,7 +86,7 @@ public class BaseStylePanel extends ValueField implements
     setLayout(new VerticalLayout());
 
     // TODO min/max scale
-    addPanel(this, "General", renderer, "name", "visible");
+    addPanel(this, "General", renderer, "name", "type", "visible");
   }
 
   protected void addCheckBoxField(final JPanel container, final Object object,

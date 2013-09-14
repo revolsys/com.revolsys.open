@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -18,8 +19,12 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
-  private static final Icon ICON = SilkIconLoader.getIconWithBadge(
-    "style_multiple", "filter");
+  private static final Icon ICON = SilkIconLoader.getIcon("style_filter");
+
+  public FilterMultipleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, Collections.<String, Object> emptyMap());
+  }
 
   public FilterMultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {

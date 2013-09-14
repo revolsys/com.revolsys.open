@@ -1,8 +1,5 @@
 package com.revolsys.swing.action.enablecheck;
 
-import java.beans.PropertyChangeSupport;
-
-import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
 
@@ -28,14 +25,7 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
   public ObjectPropertyEnableCheck(final Object object,
     final String propertyName, final Object value, final boolean inverse) {
     this.object = object;
-    if (object instanceof PropertyChangeSupportProxy) {
-      final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
-      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
-      // TODO how to make this a weak reference
-      if (propertyChangeSupport != null) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, this);
-      }
-    }
+    Property.addListener(object, propertyName, this);
     this.propertyName = propertyName;
     this.value = value;
     this.inverse = inverse;
@@ -44,7 +34,7 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
   @Override
   public boolean isEnabled() {
     final Object value = Property.get(this.object, this.propertyName);
-    boolean equal = EqualsRegistry.equal(value, this.value);
+    final boolean equal = EqualsRegistry.equal(value, this.value);
     if (equal == !this.inverse) {
       return enabled();
     } else {

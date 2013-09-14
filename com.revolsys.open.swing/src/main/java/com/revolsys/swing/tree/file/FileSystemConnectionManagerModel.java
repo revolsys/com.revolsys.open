@@ -14,10 +14,10 @@ public class FileSystemConnectionManagerModel extends
   public FileSystemConnectionManagerModel() {
     setSupportedClasses(FileSystemConnectionManager.class);
     setSupportedChildClasses(File.class);
-    setObjectTreeNodeModels(new FileTreeNodeModel());
+    setObjectTreeNodeModels(new FileModel());
     final DefaultTreeCellRenderer renderer = getRenderer();
-    renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_DRIVE);
-    renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_DRIVE);
+    renderer.setOpenIcon(FileModel.ICON_FOLDER_DRIVE);
+    renderer.setClosedIcon(FileModel.ICON_FOLDER_DRIVE);
   }
 
   @Override

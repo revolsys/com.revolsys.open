@@ -4,11 +4,17 @@ import java.awt.Graphics2D;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.swing.Icon;
 
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 
 public abstract class AbstractMarker implements Marker {
+
+  @Override
+  public Icon getIcon(MarkerStyle style) {
+    return null;
+  }
 
   protected void translateMarker(final Viewport2D viewport,
     final Graphics2D graphics, final MarkerStyle style, final double x,
@@ -43,4 +49,5 @@ public abstract class AbstractMarker implements Marker {
     }
     graphics.translate(dx, dy);
   }
+
 }

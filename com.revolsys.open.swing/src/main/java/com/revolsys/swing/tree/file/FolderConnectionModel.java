@@ -1,9 +1,6 @@
 package com.revolsys.swing.tree.file;
 
 import java.awt.Component;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -12,6 +9,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.io.file.FolderConnection;
+import com.revolsys.io.file.FolderConnectionFile;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.ObjectTree;
@@ -20,16 +18,16 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class FolderConnectionModel extends
-  AbstractObjectTreeNodeModel<FolderConnection, File> {
+  AbstractObjectTreeNodeModel<FolderConnection, FolderConnectionFile> {
 
   public FolderConnectionModel() {
     setSupportedClasses(FolderConnection.class);
-    setSupportedChildClasses(File.class);
-    setObjectTreeNodeModels(new FileTreeNodeModel());
+    setSupportedChildClasses(FolderConnectionFile.class);
+    setObjectTreeNodeModels(new FolderConnectionFileModel());
     setLazyLoad(true);
     final DefaultTreeCellRenderer renderer = getRenderer();
-    renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
-    renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
+    renderer.setOpenIcon(FileModel.ICON_FOLDER_LINK);
+    renderer.setClosedIcon(FileModel.ICON_FOLDER_LINK);
   }
 
   public void deleteConnection() {
@@ -48,30 +46,26 @@ public class FolderConnectionModel extends
   }
 
   @Override
-  protected List<File> getChildren(final FolderConnection connection) {
-    final File file = connection.getFile();
-    if (file.isDirectory()) {
-      final File[] files = file.listFiles();
-      if (files != null) {
-        return Arrays.asList(files);
-      }
-    }
-    return Collections.emptyList();
+  protected List<FolderConnectionFile> getChildren(
+    final FolderConnection connection) {
+    final FolderConnectionFile file = connection.getFile();
+    final List<FolderConnectionFile> files = file.getFiles();
+    return files;
   }
 
   @Override
   public Component getRenderer(final FolderConnection connection,
     final JTree tree, final boolean selected, final boolean expanded,
     final boolean leaf, final int row, final boolean hasFocus) {
-    final File file = connection.getFile();
+    final FolderConnectionFile file = connection.getFile();
     final JLabel renderer = (JLabel)super.getRenderer(connection, tree,
       selected, expanded, leaf, row, hasFocus);
     if (file == null || !file.exists()) {
-      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
+      renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
     } else if (file == null || !file.exists()) {
-      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_MISSING);
+      renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
     } else {
-      renderer.setIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
+      renderer.setIcon(FileModel.ICON_FOLDER_LINK);
     }
     return renderer;
   }

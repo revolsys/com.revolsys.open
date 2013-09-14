@@ -20,30 +20,30 @@ import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 public class GeometryStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
 
-  public static GeneralPath getLineShape() {
+  public static GeneralPath getLineShape(final int size) {
     final GeneralPath path = new GeneralPath();
-    path.moveTo(19, 19);
-    path.lineTo(79, 19);
-    path.lineTo(19, 79);
-    path.lineTo(79, 79);
+    path.moveTo(0.19 * size, 0.19 * size);
+    path.lineTo(0.79 * size, 0.19 * size);
+    path.lineTo(0.19 * size, 0.79 * size);
+    path.lineTo(0.79 * size, 0.79 * size);
     return path;
   }
 
-  public static GeneralPath getPolygonShape() {
+  public static GeneralPath getPolygonShape(final int size) {
     final GeneralPath path = new GeneralPath();
-    path.moveTo(19, 19);
-    path.lineTo(79, 19);
-    path.lineTo(35, 39);
-    path.lineTo(79, 59);
-    path.lineTo(59, 79);
-    path.lineTo(39, 79);
-    path.lineTo(19, 59);
-    path.lineTo(19, 39);
+    path.moveTo(0.19 * size, 0.19 * size);
+    path.lineTo(0.79 * size, 0.19 * size);
+    path.lineTo(0.35 * size, 0.39 * size);
+    path.lineTo(0.79 * size, 0.59 * size);
+    path.lineTo(0.59 * size, 0.79 * size);
+    path.lineTo(0.39 * size, 0.79 * size);
+    path.lineTo(0.19 * size, 0.59 * size);
+    path.lineTo(0.19 * size, 0.39 * size);
     path.closePath();
     return path;
   }
 
-  private Shape shape = getLineShape();
+  private Shape shape = getLineShape(100);
 
   private final GeometryStyle geometryStyle;
 
@@ -60,9 +60,9 @@ public class GeometryStylePreview extends JPanel {
     this.geometryStyle = geometryStyle;
     this.geometryDataType = geometryDataType;
     if (DataTypes.LINE_STRING.equals(geometryDataType)) {
-      this.shape = getLineShape();
+      this.shape = getLineShape(100);
     } else if (DataTypes.POLYGON.equals(geometryDataType)) {
-      this.shape = getPolygonShape();
+      this.shape = getPolygonShape(100);
     }
   }
 

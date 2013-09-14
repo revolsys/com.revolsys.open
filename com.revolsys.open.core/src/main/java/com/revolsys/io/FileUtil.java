@@ -830,7 +830,7 @@ public final class FileUtil {
         .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
-          final File directory = connection.getFile();
+          final File directory = connection.getFile().getFile();
           final File file = new File(directory, path);
           if (file.exists()) {
             return getFile(file);

@@ -24,11 +24,11 @@ public class FolderConnectionRegistryModel extends
 
   public FolderConnectionRegistryModel() {
     setSupportedClasses(FolderConnectionRegistry.class);
-    setSupportedChildClasses(File.class);
+    setSupportedChildClasses(FolderConnection.class);
     setObjectTreeNodeModels(new FolderConnectionModel());
     final DefaultTreeCellRenderer renderer = getRenderer();
-    renderer.setOpenIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
-    renderer.setClosedIcon(FileTreeNodeModel.ICON_FOLDER_LINK);
+    renderer.setOpenIcon(FileModel.ICON_FOLDER_LINK);
+    renderer.setClosedIcon(FileModel.ICON_FOLDER_LINK);
   }
 
   public void addConnection() {

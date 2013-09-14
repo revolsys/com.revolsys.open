@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.ExceptionUtil;
@@ -33,7 +35,12 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
     menu.addMenuItem("layer",
       TreeItemRunnable.createAction("View/Edit", "palette", "showProperties"));
-
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
+      new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
+    // TODO change to geometry/marker/text style
+    // TODO wrap with multiple/filter/scale style
+    // TODO delete if not parent
+    // TODO drag and drop to move/re-order
   }
 
   private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
@@ -92,20 +99,15 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   private Filter<DataObject> filter = DEFAULT_FILTER;
 
-  public AbstractDataObjectLayerRenderer(final String type,
-    final DataObjectLayer layer) {
-    super(type, layer);
-  }
-
-  public AbstractDataObjectLayerRenderer(final String type,
+  public AbstractDataObjectLayerRenderer(final String type, final String name,
     final DataObjectLayer layer, final LayerRenderer<?> parent) {
-    super(type, layer, parent);
+    this(type, name, layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public AbstractDataObjectLayerRenderer(final String type,
+  public AbstractDataObjectLayerRenderer(final String type, final String name,
     final DataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
-    super(type, layer, parent, style);
+    super(type, name, layer, parent, style);
     this.filter = getFilter(style);
   }
 
@@ -114,6 +116,14 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final AbstractDataObjectLayerRenderer clone = (AbstractDataObjectLayerRenderer)super.clone();
     clone.filter = JavaBeanUtil.clone(filter);
     return clone;
+  }
+
+  public void delete() {
+    final LayerRenderer<?> parent = getParent();
+    if (parent instanceof AbstractMultipleRenderer) {
+      final AbstractMultipleRenderer multiple = (AbstractMultipleRenderer)parent;
+      multiple.removeRenderer(this);
+    }
   }
 
   protected boolean isFilterAccept(final LayerDataObject object) {

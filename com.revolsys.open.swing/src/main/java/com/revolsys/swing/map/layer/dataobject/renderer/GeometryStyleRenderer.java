@@ -1,19 +1,29 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
+import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePreview;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -21,6 +31,31 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
+
+  private static final Icon ICON = SilkIconLoader.getIcon("style_geometry");
+
+  public static GeneralPath getLineShape() {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, 0);
+    path.lineTo(15, 0);
+    path.lineTo(0, 15);
+    path.lineTo(15, 15);
+    return path;
+  }
+
+  public static GeneralPath getPolygonShape() {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, 0);
+    path.lineTo(7, 0);
+    path.lineTo(15, 8);
+    path.lineTo(15, 15);
+    path.lineTo(8, 15);
+    path.lineTo(0, 7);
+    path.lineTo(0, 0);
+    path.closePath();
+    return path;
+  }
+
   public static Shape getShape(final Viewport2D viewport,
     final GeometryStyle style, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
@@ -131,17 +166,24 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   public GeometryStyleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, new GeometryStyle());
+  }
+
+  public GeometryStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final GeometryStyle style) {
-    super("geometryStyle", layer, parent);
+    super("geometryStyle", "Geometry Style", layer, parent);
     this.style = style;
+    setIcon(ICON);
   }
 
   public GeometryStyleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
-    super("geometryStyle", layer, parent, geometryStyle);
+    super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
     style.putAll(geometryStyle);
     this.style = new GeometryStyle(style);
+    setIcon(ICON);
   }
 
   @Override
@@ -154,6 +196,48 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   public GeometryStylePanel createStylePanel() {
     return new GeometryStylePanel(this);
+  }
+
+  @Override
+  public Icon getIcon() {
+    final DataObjectLayer layer = getLayer();
+    if (layer == null) {
+      return super.getIcon();
+    } else {
+      final GeometryStyle geometryStyle = getStyle();
+      Shape shape = null;
+      final DataType geometryDataType = layer.getGeometryType();
+      if (DataTypes.POINT.equals(geometryDataType)
+        || DataTypes.MULTI_POINT.equals(geometryDataType)) {
+        return style.getMarker().getIcon(geometryStyle);
+      } else if (DataTypes.LINE_STRING.equals(geometryDataType)
+        || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        shape = GeometryStylePreview.getLineShape(16);
+      } else if (DataTypes.POLYGON.equals(geometryDataType)
+        || DataTypes.POLYGON.equals(geometryDataType)) {
+        shape = getPolygonShape();
+      } else {
+        return super.getIcon();
+      }
+
+      final BufferedImage image = new BufferedImage(16, 16,
+        BufferedImage.TYPE_INT_ARGB);
+      final Graphics2D graphics = image.createGraphics();
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
+
+      if (DataTypes.POLYGON.equals(geometryDataType)) {
+        graphics.setPaint(geometryStyle.getPolygonFill());
+        graphics.fill(shape);
+      }
+      final Color color = geometryStyle.getLineColor();
+      graphics.setColor(color);
+
+      graphics.draw(shape);
+      graphics.dispose();
+      return new ImageIcon(image);
+
+    }
   }
 
   public GeometryStyle getStyle() {

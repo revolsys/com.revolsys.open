@@ -16,6 +16,12 @@ public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy 
     propertyChangeSupport.firePropertyChange(event);
   }
 
+  protected void firePropertyChange(final String propertyName, final int index,
+    final Object oldValue, final Object newValue) {
+    propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
+      oldValue, newValue);
+  }
+
   protected void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
     propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);

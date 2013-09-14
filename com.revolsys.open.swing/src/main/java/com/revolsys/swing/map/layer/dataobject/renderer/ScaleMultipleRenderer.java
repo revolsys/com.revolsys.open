@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +21,16 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
+  private static final Icon ICON = SilkIconLoader.getIcon("style_scale");
 
   private transient long lastScale = 0;
 
   private transient AbstractDataObjectLayerRenderer renderer;
+
+  public ScaleMultipleRenderer(final DataObjectLayer layer,
+    final LayerRenderer<?> parent) {
+    this(layer, parent, Collections.<String, Object> emptyMap());
+  }
 
   public ScaleMultipleRenderer(final DataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
