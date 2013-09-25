@@ -117,7 +117,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     if (geometryFactory == null || geometryFactory.getSRID() == 0) {
       return null;
     } else {
-      final String wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSRID());
+      final String wkt;
+      synchronized (EsriFileGdb.class) {
+        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSRID());
+      }
       final SpatialReference spatialReference = SpatialReference.get(
         geometryFactory, wkt);
       return spatialReference;
@@ -191,21 +194,25 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     this.fileName = fileName;
   }
 
-  public synchronized void addChildSchema(final String path) {
-    final VectorOfWString childDatasets = geodatabase.getChildDatasets(path,
-      "Feature Dataset");
-    for (int i = 0; i < childDatasets.size(); i++) {
-      final String childPath = childDatasets.get(i);
-      addFeatureDatasetSchema(childPath);
+  public void addChildSchema(final String path) {
+    synchronized (EsriFileGdb.class) {
+      final VectorOfWString childDatasets = geodatabase.getChildDatasets(path,
+        "Feature Dataset");
+      for (int i = 0; i < childDatasets.size(); i++) {
+        final String childPath = childDatasets.get(i);
+        addFeatureDatasetSchema(childPath);
+      }
     }
   }
 
   @Override
-  public synchronized void addCodeTable(final CodeTable codeTable) {
+  public void addCodeTable(final CodeTable codeTable) {
     super.addCodeTable(codeTable);
-    if (codeTable instanceof Domain) {
-      final Domain domain = (Domain)codeTable;
-      createDomain(domain);
+    synchronized (EsriFileGdb.class) {
+      if (codeTable instanceof Domain) {
+        final Domain domain = (Domain)codeTable;
+        createDomain(domain);
+      }
     }
   }
 
@@ -226,9 +233,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     addMetaData(metaData);
   }
 
-  public synchronized void alterDomain(final CodedValueDomain domain) {
+  public void alterDomain(final CodedValueDomain domain) {
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
-    geodatabase.alterDomain(domainDefinition);
+    synchronized (EsriFileGdb.class) {
+      geodatabase.alterDomain(domainDefinition);
+    }
   }
 
   private void appendCondition(final StringBuffer buffer,
@@ -343,31 +352,35 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   @PreDestroy
-  public synchronized void close() {
-    for (final EnumRows rows : new ArrayList<EnumRows>(enumRowsToClose)) {
-      closeEnumRows(rows);
-    }
-    for (final Table table : tablesToClose.values()) {
-      doCloseTable(table);
-    }
-    tablesToClose.clear();
-    if (geodatabase != null) {
-      EsriFileGdb.CloseGeodatabase(geodatabase);
-      geodatabase = null;
-      System.gc();
+  public void close() {
+    synchronized (EsriFileGdb.class) {
+      for (final EnumRows rows : new ArrayList<EnumRows>(enumRowsToClose)) {
+        closeEnumRows(rows);
+      }
+      for (final Table table : tablesToClose.values()) {
+        doCloseTable(table);
+      }
+      tablesToClose.clear();
+      if (geodatabase != null) {
+        EsriFileGdb.CloseGeodatabase(geodatabase);
+        geodatabase = null;
+        System.gc();
+      }
     }
     super.close();
   }
 
-  public synchronized void closeEnumRows(EnumRows rows) {
-    if (rows != null) {
-      if (enumRowsToClose.remove(rows)) {
-        try {
-          rows.Close();
-        } catch (final NullPointerException e) {
-        } finally {
-          rows.delete();
-          rows = null;
+  public void closeEnumRows(EnumRows rows) {
+    synchronized (EsriFileGdb.class) {
+      if (rows != null) {
+        if (enumRowsToClose.remove(rows)) {
+          try {
+            rows.Close();
+          } catch (final NullPointerException e) {
+          } finally {
+            rows.delete();
+            rows = null;
+          }
         }
       }
     }
@@ -384,9 +397,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // return new FileGdbReader(this);
   // }
 
-  protected synchronized void closeRow(final Row row) {
+  protected void closeRow(final Row row) {
     if (row != null) {
-      row.delete();
+      synchronized (EsriFileGdb.class) {
+        row.delete();
+      }
     }
   }
 
@@ -398,284 +413,309 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public synchronized void createDomain(final Domain domain) {
     final String domainName = domain.getDomainName();
     if (!domainColumNames.containsKey(domainName)) {
-      final String domainDef = EsriGdbXmlSerializer.toString(domain);
-      try {
-        geodatabase.createDomain(domainDef);
-      } catch (final Exception e) {
-        LOG.debug(domainDef);
-        LOG.error("Unable to create domain", e);
+      synchronized (EsriFileGdb.class) {
+        final String domainDef = EsriGdbXmlSerializer.toString(domain);
+        try {
+          geodatabase.createDomain(domainDef);
+        } catch (final Exception e) {
+          LOG.debug(domainDef);
+          LOG.error("Unable to create domain", e);
+        }
+        loadDomain(domain.getDomainName());
       }
-      loadDomain(domain.getDomainName());
     }
   }
 
   // TODO add bounding box
   @Override
-  public synchronized AbstractIterator<DataObject> createIterator(
-    final Query query, final Map<String, Object> properties) {
-    String typePath = query.getTypeName();
-    DataObjectMetaData metaData = query.getMetaData();
-    if (metaData == null) {
-      typePath = query.getTypeName();
-      metaData = getMetaData(typePath);
+  public AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    synchronized (EsriFileGdb.class) {
+      String typePath = query.getTypeName();
+      DataObjectMetaData metaData = query.getMetaData();
       if (metaData == null) {
-        throw new IllegalArgumentException("Type name does not exist "
-          + typePath);
+        typePath = query.getTypeName();
+        metaData = getMetaData(typePath);
+        if (metaData == null) {
+          throw new IllegalArgumentException("Type name does not exist "
+            + typePath);
+        }
+      } else {
+        typePath = metaData.getPath();
       }
-    } else {
-      typePath = metaData.getPath();
-    }
-    final BoundingBox boundingBox = query.getBoundingBox();
-    final Map<String, Boolean> orderBy = query.getOrderBy();
-    final StringBuffer whereClause = getWhereClause(query);
-    StringBuffer sql = new StringBuffer();
-    if (orderBy.isEmpty()) {
-      sql = whereClause;
-    } else {
-      sql.append("SELECT * FROM ");
-      sql.append(JdbcUtils.getTableName(typePath));
-      if (whereClause.length() > 0) {
-        sql.append(" WHERE ");
-        sql.append(whereClause);
-      }
-      if (!orderBy.isEmpty()) {
-        boolean first = true;
-        for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-          .iterator(); iterator.hasNext();) {
-          final Entry<String, Boolean> entry = iterator.next();
-          final String column = entry.getKey();
-          final DataType dataType = metaData.getAttributeType(column);
-          // TODO at the moment only numbers are supported
-          if (dataType != null
-            && Number.class.isAssignableFrom(dataType.getJavaClass())) {
-            if (first) {
-              sql.append(" ORDER BY ");
-              first = false;
-            } else {
-              sql.append(", ");
-            }
-            sql.append(column);
-            final Boolean ascending = entry.getValue();
-            if (!ascending) {
-              sql.append(" DESC");
-            }
+      final BoundingBox boundingBox = query.getBoundingBox();
+      final Map<String, Boolean> orderBy = query.getOrderBy();
+      final StringBuffer whereClause = getWhereClause(query);
+      StringBuffer sql = new StringBuffer();
+      if (orderBy.isEmpty()) {
+        sql = whereClause;
+      } else {
+        sql.append("SELECT * FROM ");
+        sql.append(JdbcUtils.getTableName(typePath));
+        if (whereClause.length() > 0) {
+          sql.append(" WHERE ");
+          sql.append(whereClause);
+        }
+        if (!orderBy.isEmpty()) {
+          boolean first = true;
+          for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+            .iterator(); iterator.hasNext();) {
+            final Entry<String, Boolean> entry = iterator.next();
+            final String column = entry.getKey();
+            final DataType dataType = metaData.getAttributeType(column);
+            // TODO at the moment only numbers are supported
+            if (dataType != null
+              && Number.class.isAssignableFrom(dataType.getJavaClass())) {
+              if (first) {
+                sql.append(" ORDER BY ");
+                first = false;
+              } else {
+                sql.append(", ");
+              }
+              sql.append(column);
+              final Boolean ascending = entry.getValue();
+              if (!ascending) {
+                sql.append(" DESC");
+              }
 
+            }
           }
         }
       }
-    }
 
-    final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, sql.toString(), boundingBox, query, query.getOffset(),
-      query.getLimit());
-    return iterator;
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+        typePath, sql.toString(), boundingBox, query, query.getOffset(),
+        query.getLimit());
+      return iterator;
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized <T> T createPrimaryIdValue(final String typePath) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      return null;
-    } else {
-      final String idAttributeName = metaData.getIdAttributeName();
-      if (idAttributeName == null) {
+  public <T> T createPrimaryIdValue(final String typePath) {
+    synchronized (EsriFileGdb.class) {
+      final DataObjectMetaData metaData = getMetaData(typePath);
+      if (metaData == null) {
         return null;
-      } else if (!idAttributeName.equals("OBJECTID")) {
-        AtomicLong idGenerator = idGenerators.get(typePath);
-        if (idGenerator == null) {
-          long maxId = 0;
-          for (final DataObject object : query(typePath)) {
-            final Object id = object.getIdValue();
-            if (id instanceof Number) {
-              final Number number = (Number)id;
-              if (number.longValue() > maxId) {
-                maxId = number.longValue();
+      } else {
+        final String idAttributeName = metaData.getIdAttributeName();
+        if (idAttributeName == null) {
+          return null;
+        } else if (!idAttributeName.equals("OBJECTID")) {
+          AtomicLong idGenerator = idGenerators.get(typePath);
+          if (idGenerator == null) {
+            long maxId = 0;
+            for (final DataObject object : query(typePath)) {
+              final Object id = object.getIdValue();
+              if (id instanceof Number) {
+                final Number number = (Number)id;
+                if (number.longValue() > maxId) {
+                  maxId = number.longValue();
+                }
               }
             }
+            idGenerator = new AtomicLong(maxId);
+            idGenerators.put(typePath, idGenerator);
           }
-          idGenerator = new AtomicLong(maxId);
-          idGenerators.put(typePath, idGenerator);
+          return (T)((Object)(idGenerator.incrementAndGet()));
+        } else {
+          return null;
         }
-        return (T)((Object)(idGenerator.incrementAndGet()));
-      } else {
-        return null;
       }
     }
   }
 
-  protected synchronized Row createRowObject(final Table table) {
-    return table.createRowObject();
+  protected Row createRowObject(final Table table) {
+    synchronized (EsriFileGdb.class) {
+      return table.createRowObject();
+    }
   }
 
   private DataObjectStoreSchema createSchema(final DETable table) {
-    final String catalogPath = table.getParentCatalogPath();
-    final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
-    for (final DEFeatureDataset dataset : datasets) {
-      final String path = dataset.getCatalogPath();
-      final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-      try {
-        geodatabase.createFeatureDataset(datasetDefinition);
-        addFeatureDatasetSchema(path);
-      } catch (final Throwable t) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(datasetDefinition);
+    synchronized (EsriFileGdb.class) {
+      final String catalogPath = table.getParentCatalogPath();
+      final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
+      for (final DEFeatureDataset dataset : datasets) {
+        final String path = dataset.getCatalogPath();
+        final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+        try {
+          geodatabase.createFeatureDataset(datasetDefinition);
+          addFeatureDatasetSchema(path);
+        } catch (final Throwable t) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(datasetDefinition);
+          }
+          throw new RuntimeException(
+            "Unable to create feature dataset " + path, t);
         }
-        throw new RuntimeException("Unable to create feature dataset " + path,
-          t);
       }
+      return getSchema(catalogPath.replaceAll("\\\\", "/"));
     }
-    return getSchema(catalogPath.replaceAll("\\\\", "/"));
   }
 
-  public synchronized void createSchema(final String schemaName,
+  public void createSchema(final String schemaName,
     final GeometryFactory geometryFactory) {
-    final SpatialReference spatialReference = getSpatialReference(geometryFactory);
-    final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
-      schemaName, spatialReference);
-    for (final DEFeatureDataset dataset : datasets) {
-      final String path = dataset.getCatalogPath();
-      final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-      try {
-        geodatabase.createFeatureDataset(datasetDefinition);
-        addFeatureDatasetSchema(path);
-      } catch (final Throwable t) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(datasetDefinition);
+    synchronized (EsriFileGdb.class) {
+      final SpatialReference spatialReference = getSpatialReference(geometryFactory);
+      final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
+        schemaName, spatialReference);
+      for (final DEFeatureDataset dataset : datasets) {
+        final String path = dataset.getCatalogPath();
+        final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+        try {
+          geodatabase.createFeatureDataset(datasetDefinition);
+          addFeatureDatasetSchema(path);
+        } catch (final Throwable t) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(datasetDefinition);
+          }
+          throw new RuntimeException(
+            "Unable to create feature dataset " + path, t);
         }
-        throw new RuntimeException("Unable to create feature dataset " + path,
-          t);
       }
     }
   }
 
   private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
+    synchronized (EsriFileGdb.class) {
+      final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
+      final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 
-    final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
-    final SpatialReference spatialReference = getSpatialReference(geometryFactory);
-
-    final DETable deTable = EsriXmlDataObjectMetaDataUtil.getDETable(
-      objectMetaData, spatialReference);
-    final DataObjectMetaDataImpl tableMetaData = createTable(deTable);
-    final String idAttributeName = objectMetaData.getIdAttributeName();
-    if (idAttributeName != null) {
-      tableMetaData.setIdAttributeName(idAttributeName);
+      final DETable deTable = EsriXmlDataObjectMetaDataUtil.getDETable(
+        objectMetaData, spatialReference);
+      final DataObjectMetaDataImpl tableMetaData = createTable(deTable);
+      final String idAttributeName = objectMetaData.getIdAttributeName();
+      if (idAttributeName != null) {
+        tableMetaData.setIdAttributeName(idAttributeName);
+      }
+      return tableMetaData;
     }
-    return tableMetaData;
   }
 
-  protected synchronized DataObjectMetaDataImpl createTable(
-    final DETable deTable) {
-    String schemaPath = deTable.getParentCatalogPath();
-    String schemaName = schemaPath.replaceAll("\\\\", "/");
-    DataObjectStoreSchema schema = getSchema(schemaName);
-    if (schema == null) {
-      if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-        schema = createSchema(deTable);
-      } else {
-        schema = new DataObjectStoreSchema(this, schemaName);
-        addSchema(schema);
+  protected DataObjectMetaDataImpl createTable(final DETable deTable) {
+    synchronized (EsriFileGdb.class) {
+      String schemaPath = deTable.getParentCatalogPath();
+      String schemaName = schemaPath.replaceAll("\\\\", "/");
+      DataObjectStoreSchema schema = getSchema(schemaName);
+      if (schema == null) {
+        if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
+          schema = createSchema(deTable);
+        } else {
+          schema = new DataObjectStoreSchema(this, schemaName);
+          addSchema(schema);
+        }
+      } else if (schema.getProperty(CATALOG_PATH_PROPERTY) == null) {
+        if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
+          createSchema(deTable);
+        }
       }
-    } else if (schema.getProperty(CATALOG_PATH_PROPERTY) == null) {
-      if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-        createSchema(deTable);
-      }
-    }
-    if (schemaName.equals(defaultSchema)) {
-      if (!(deTable instanceof DEFeatureClass)) {
-        schemaPath = "\\";
-        // @TODO clone
-        deTable.setCatalogPath("\\" + deTable.getName());
+      if (schemaName.equals(defaultSchema)) {
+        if (!(deTable instanceof DEFeatureClass)) {
+          schemaPath = "\\";
+          // @TODO clone
+          deTable.setCatalogPath("\\" + deTable.getName());
 
+        }
+      } else if (schemaName.equals("")) {
+        schemaName = defaultSchema;
       }
-    } else if (schemaName.equals("")) {
-      schemaName = defaultSchema;
-    }
-    for (final Field field : deTable.getFields()) {
-      final String fieldName = field.getName();
-      final CodeTable codeTable = getCodeTableByColumn(fieldName);
-      if (codeTable instanceof FileGdbDomainCodeTable) {
-        final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
-        field.setDomain(domainCodeTable.getDomain());
+      for (final Field field : deTable.getFields()) {
+        final String fieldName = field.getName();
+        final CodeTable codeTable = getCodeTableByColumn(fieldName);
+        if (codeTable instanceof FileGdbDomainCodeTable) {
+          final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
+          field.setDomain(domainCodeTable.getDomain());
+        }
       }
-    }
-    final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
-    try {
-      final Table table = geodatabase.createTable(tableDefinition, schemaPath);
-      final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
-        schemaPath, tableDefinition);
-      addMetaData(metaData);
-      tablesToClose.put(metaData.getPath(), table);
-      return metaData;
+      final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
+      try {
+        final Table table = geodatabase.createTable(tableDefinition, schemaPath);
+        final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
+          schemaPath, tableDefinition);
+        addMetaData(metaData);
+        tablesToClose.put(metaData.getPath(), table);
+        return metaData;
 
-    } catch (final Throwable t) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(tableDefinition);
+      } catch (final Throwable t) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(tableDefinition);
+        }
+        throw new RuntimeException("Unable to create table "
+          + deTable.getCatalogPath(), t);
       }
-      throw new RuntimeException("Unable to create table "
-        + deTable.getCatalogPath(), t);
+    }
+  }
+
+  @Override
+  public Writer<DataObject> createWriter() {
+    synchronized (EsriFileGdb.class) {
+      return new FileGdbWriter(this);
     }
   }
 
   @Override
-  public synchronized Writer<DataObject> createWriter() {
-    return new FileGdbWriter(this);
-  }
-
-  @Override
-  public synchronized void delete(final DataObject object) {
-    if (object.getState() == DataObjectState.Persisted
-      || object.getState() == DataObjectState.Modified) {
-      object.setState(DataObjectState.Deleted);
-      final Writer<DataObject> writer = getWriter();
-      writer.write(object);
+  public void delete(final DataObject object) {
+    synchronized (EsriFileGdb.class) {
+      if (object.getState() == DataObjectState.Persisted
+        || object.getState() == DataObjectState.Modified) {
+        object.setState(DataObjectState.Deleted);
+        final Writer<DataObject> writer = getWriter();
+        writer.write(object);
+      }
     }
   }
 
-  protected synchronized void deletedRow(final Table table, final Row row) {
-    table.deleteRow(row);
+  protected void deletedRow(final Table table, final Row row) {
+    synchronized (EsriFileGdb.class) {
+      table.deleteRow(row);
+    }
   }
 
   @Override
-  public synchronized void deleteGeodatabase() {
-    close();
-    if (new File(fileName).exists()) {
-      EsriFileGdb.DeleteGeodatabase(fileName);
+  public void deleteGeodatabase() {
+    synchronized (EsriFileGdb.class) {
+      close();
+      if (new File(fileName).exists()) {
+        EsriFileGdb.DeleteGeodatabase(fileName);
+      }
     }
   }
 
   private void doCloseTable(final Table table) {
-    try {
-      tablesToClose.remove(table);
-      if (geodatabase != null) {
-        geodatabase.closeTable(table);
-        table.delete();
+    synchronized (EsriFileGdb.class) {
+      try {
+        tablesToClose.remove(table);
+        if (geodatabase != null) {
+          geodatabase.closeTable(table);
+          table.delete();
+        }
+      } catch (final Throwable e) {
+        LOG.error("Unable to close table", e);
       }
-    } catch (final Throwable e) {
-      LOG.error("Unable to close table", e);
     }
   }
 
-  protected synchronized void freeWriteLock(final Table table) {
-    table.freeWriteLock();
+  protected void freeWriteLock(final Table table) {
+    synchronized (EsriFileGdb.class) {
+      table.freeWriteLock();
+    }
   }
 
-  public synchronized String getDefaultSchema() {
+  public String getDefaultSchema() {
     return defaultSchema;
   }
 
-  public synchronized Map<String, List<String>> getDomainColumNames() {
+  public Map<String, List<String>> getDomainColumNames() {
     return domainColumNames;
   }
 
-  public synchronized String getFileName() {
+  public String getFileName() {
     return fileName;
   }
 
   @Override
-  public synchronized DataObjectMetaData getMetaData(
-    final DataObjectMetaData objectMetaData) {
-    synchronized (geodatabase) {
+  public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
+    synchronized (EsriFileGdb.class) {
       DataObjectMetaData metaData = super.getMetaData(objectMetaData);
       if (createMissingTables && metaData == null) {
         metaData = createTable(objectMetaData);
@@ -684,113 +724,92 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public synchronized DataObjectMetaDataImpl getMetaData(
-    final String schemaName, final String path, final String tableDefinition) {
-    try {
-      final XmlProcessor parser = new EsriGdbXmlParser();
-      final DETable deTable = parser.process(tableDefinition);
-      final String tableName = deTable.getName();
-      final String typePath = PathUtil.toPath(schemaName, tableName);
-      final DataObjectStoreSchema schema = getSchema(schemaName);
-      final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
-        schema, typePath);
-      for (final Field field : deTable.getFields()) {
-        final String fieldName = field.getName();
-        final FieldType type = field.getType();
-        final Constructor<? extends AbstractFileGdbAttribute> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
-        if (attributeConstructor != null) {
-          try {
-            final AbstractFileGdbAttribute attribute = JavaBeanUtil.invokeConstructor(
-              attributeConstructor, field);
-            attribute.setDataStore(this);
-            metaData.addAttribute(attribute);
-            if (attribute instanceof GlobalIdAttribute) {
+  public DataObjectMetaDataImpl getMetaData(final String schemaName,
+    final String path, final String tableDefinition) {
+    synchronized (EsriFileGdb.class) {
+      try {
+        final XmlProcessor parser = new EsriGdbXmlParser();
+        final DETable deTable = parser.process(tableDefinition);
+        final String tableName = deTable.getName();
+        final String typePath = PathUtil.toPath(schemaName, tableName);
+        final DataObjectStoreSchema schema = getSchema(schemaName);
+        final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+          this, schema, typePath);
+        for (final Field field : deTable.getFields()) {
+          final String fieldName = field.getName();
+          final FieldType type = field.getType();
+          final Constructor<? extends AbstractFileGdbAttribute> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
+          if (attributeConstructor != null) {
+            try {
+              final AbstractFileGdbAttribute attribute = JavaBeanUtil.invokeConstructor(
+                attributeConstructor, field);
+              attribute.setDataStore(this);
+              metaData.addAttribute(attribute);
+              if (attribute instanceof GlobalIdAttribute) {
+                metaData.setIdAttributeName(fieldName);
+              }
+            } catch (final Throwable e) {
+              LOG.error(tableDefinition);
+              throw new RuntimeException("Error creating attribute for "
+                + typePath + "." + field.getName() + " : " + field.getType(), e);
+            }
+          } else {
+            LOG.error("Unsupported field type " + fieldName + ":" + type);
+          }
+        }
+        final String oidFieldName = deTable.getOIDFieldName();
+        metaData.setProperty(
+          EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME, oidFieldName);
+        if (deTable instanceof DEFeatureClass) {
+          final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+          final String shapeFieldName = featureClass.getShapeFieldName();
+          metaData.setGeometryAttributeName(shapeFieldName);
+        }
+        metaData.setProperty(CATALOG_PATH_PROPERTY, path);
+        for (final Index index : deTable.getIndexes()) {
+          if (index.getName().endsWith("_PK")) {
+            for (final Field field : index.getFields()) {
+              final String fieldName = field.getName();
               metaData.setIdAttributeName(fieldName);
             }
-          } catch (final Throwable e) {
-            LOG.error(tableDefinition);
-            throw new RuntimeException("Error creating attribute for "
-              + typePath + "." + field.getName() + " : " + field.getType(), e);
-          }
-        } else {
-          LOG.error("Unsupported field type " + fieldName + ":" + type);
-        }
-      }
-      final String oidFieldName = deTable.getOIDFieldName();
-      metaData.setProperty(
-        EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME, oidFieldName);
-      if (deTable instanceof DEFeatureClass) {
-        final DEFeatureClass featureClass = (DEFeatureClass)deTable;
-        final String shapeFieldName = featureClass.getShapeFieldName();
-        metaData.setGeometryAttributeName(shapeFieldName);
-      }
-      metaData.setProperty(CATALOG_PATH_PROPERTY, path);
-      for (final Index index : deTable.getIndexes()) {
-        if (index.getName().endsWith("_PK")) {
-          for (final Field field : index.getFields()) {
-            final String fieldName = field.getName();
-            metaData.setIdAttributeName(fieldName);
           }
         }
-      }
-      addMetaDataProperties(metaData);
-      if (metaData.getIdAttributeIndex() == -1) {
-        metaData.setIdAttributeName(deTable.getOIDFieldName());
-      }
+        addMetaDataProperties(metaData);
+        if (metaData.getIdAttributeIndex() == -1) {
+          metaData.setIdAttributeName(deTable.getOIDFieldName());
+        }
 
-      return metaData;
-    } catch (final RuntimeException e) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(tableDefinition);
+        return metaData;
+      } catch (final RuntimeException e) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(tableDefinition);
+        }
+        throw e;
       }
-      throw e;
     }
   }
 
   @Override
-  public synchronized int getRowCount(final Query query) {
-    String typePath = query.getTypeName();
-    DataObjectMetaData metaData = query.getMetaData();
-    if (metaData == null) {
-      typePath = query.getTypeName();
-      metaData = getMetaData(typePath);
+  public int getRowCount(final Query query) {
+    synchronized (EsriFileGdb.class) {
+      String typePath = query.getTypeName();
+      DataObjectMetaData metaData = query.getMetaData();
       if (metaData == null) {
-        throw new IllegalArgumentException("Type name does not exist "
-          + typePath);
-      }
-    } else {
-      typePath = metaData.getPath();
-    }
-    final StringBuffer whereClause = getWhereClause(query);
-    final BoundingBox boundingBox = query.getBoundingBox();
-
-    if (boundingBox == null) {
-      final StringBuffer sql = new StringBuffer();
-      sql.append("SELECT OBJECTID FROM ");
-      sql.append(JdbcUtils.getTableName(typePath));
-      if (whereClause.length() > 0) {
-        sql.append(" WHERE ");
-        sql.append(whereClause);
-      }
-
-      final EnumRows rows = query(sql.toString(), false);
-      try {
-        int count = 0;
-        for (Row row = rows.next(); row != null; row = rows.next()) {
-          count++;
-          row.delete();
+        typePath = query.getTypeName();
+        metaData = getMetaData(typePath);
+        if (metaData == null) {
+          throw new IllegalArgumentException("Type name does not exist "
+            + typePath);
         }
-        return count;
-      } finally {
-        rows.Close();
-      }
-    } else {
-      final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
-      if (geometryAttribute == null || boundingBox.isNull()) {
-        return 0;
       } else {
+        typePath = metaData.getPath();
+      }
+      final StringBuffer whereClause = getWhereClause(query);
+      final BoundingBox boundingBox = query.getBoundingBox();
+
+      if (boundingBox == null) {
         final StringBuffer sql = new StringBuffer();
-        sql.append("SELECT " + geometryAttribute.getName() + " FROM ");
+        sql.append("SELECT OBJECTID FROM ");
         sql.append(JdbcUtils.getTableName(typePath));
         if (whereClause.length() > 0) {
           sql.append(" WHERE ");
@@ -801,41 +820,68 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         try {
           int count = 0;
           for (Row row = rows.next(); row != null; row = rows.next()) {
-            final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
-            final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
-            if (geometryBoundingBox.intersects(boundingBox)) {
-              count++;
-            }
+            count++;
             row.delete();
           }
           return count;
         } finally {
           rows.Close();
         }
-      }
-    }
-  }
+      } else {
+        final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
+        if (geometryAttribute == null || boundingBox.isNull()) {
+          return 0;
+        } else {
+          final StringBuffer sql = new StringBuffer();
+          sql.append("SELECT " + geometryAttribute.getName() + " FROM ");
+          sql.append(JdbcUtils.getTableName(typePath));
+          if (whereClause.length() > 0) {
+            sql.append(" WHERE ");
+            sql.append(whereClause);
+          }
 
-  protected synchronized Table getTable(final String typePath) {
-    if (getMetaData(typePath) == null) {
-      return null;
-    } else {
-      final String path = typePath.replaceAll("/", "\\\\");
-      try {
-
-        Table table = tablesToClose.get(typePath);
-        if (table == null) {
-          table = geodatabase.openTable(path);
-          tablesToClose.put(typePath, table);
+          final EnumRows rows = query(sql.toString(), false);
+          try {
+            int count = 0;
+            for (Row row = rows.next(); row != null; row = rows.next()) {
+              final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
+              final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
+              if (geometryBoundingBox.intersects(boundingBox)) {
+                count++;
+              }
+              row.delete();
+            }
+            return count;
+          } finally {
+            rows.Close();
+          }
         }
-        return table;
-      } catch (final RuntimeException e) {
-        throw new RuntimeException("Unable to open table " + typePath, e);
       }
     }
   }
 
-  public synchronized Resource getTemplate() {
+  protected Table getTable(final String typePath) {
+    synchronized (EsriFileGdb.class) {
+      if (getMetaData(typePath) == null) {
+        return null;
+      } else {
+        final String path = typePath.replaceAll("/", "\\\\");
+        try {
+
+          Table table = tablesToClose.get(typePath);
+          if (table == null) {
+            table = geodatabase.openTable(path);
+            tablesToClose.put(typePath, table);
+          }
+          return table;
+        } catch (final RuntimeException e) {
+          throw new RuntimeException("Unable to open table " + typePath, e);
+        }
+      }
+    }
+  }
+
+  public Resource getTemplate() {
     return template;
   }
 
@@ -849,282 +895,316 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public synchronized Writer<DataObject> getWriter() {
-    Writer<DataObject> writer = getSharedAttribute("writer");
-    if (writer == null) {
-      writer = createWriter();
-      setSharedAttribute("writer", writer);
+  public Writer<DataObject> getWriter() {
+    synchronized (EsriFileGdb.class) {
+      Writer<DataObject> writer = getSharedAttribute("writer");
+      if (writer == null) {
+        writer = createWriter();
+        setSharedAttribute("writer", writer);
+      }
+      return writer;
     }
-    return writer;
   }
 
   @Override
   @PostConstruct
-  public synchronized void initialize() {
-    if (!initialized) {
-      initialized = true;
-      super.initialize();
-      final File file = new File(fileName);
-      if (file.exists()) {
-        if (file.isDirectory()) {
-          if (new File(fileName, "gdb").exists()) {
-            geodatabase = EsriFileGdb.openGeodatabase(fileName);
+  public void initialize() {
+    synchronized (EsriFileGdb.class) {
+      if (!initialized) {
+        initialized = true;
+        super.initialize();
+        final File file = new File(fileName);
+        if (file.exists()) {
+          if (file.isDirectory()) {
+            if (new File(fileName, "gdb").exists()) {
+              geodatabase = EsriFileGdb.openGeodatabase(fileName);
+            } else {
+              throw new IllegalArgumentException(
+                FileUtil.getCanonicalPath(file)
+                  + " is not a valid ESRI File Geodatabase");
+            }
           } else {
             throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
-              + " is not a valid ESRI File Geodatabase");
+              + " ESRI File Geodatabase must be a directory");
           }
-        } else {
-          throw new IllegalArgumentException(FileUtil.getCanonicalPath(file)
-            + " ESRI File Geodatabase must be a directory");
-        }
-      } else if (createMissingDataStore) {
-        if (template == null) {
-          geodatabase = EsriFileGdb.createGeodatabase(fileName);
-        } else if (template.exists()) {
-          if (template instanceof FileSystemResource) {
-            final FileSystemResource fileResource = (FileSystemResource)template;
-            final File templateFile = fileResource.getFile();
-            if (templateFile.isDirectory()) {
-              try {
-                FileUtil.copy(templateFile, file);
-              } catch (final Throwable e) {
-                throw new IllegalArgumentException(
-                  "Unable to copy template ESRI geodatabase " + template, e);
-              }
-              geodatabase = EsriFileGdb.openGeodatabase(fileName);
-            }
-          }
-          if (geodatabase == null) {
+        } else if (createMissingDataStore) {
+          if (template == null) {
             geodatabase = EsriFileGdb.createGeodatabase(fileName);
-            final Workspace workspace = EsriGdbXmlParser.parse(template);
-            final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
-            for (final Domain domain : workspaceDefinition.getDomains()) {
-              createDomain(domain);
-            }
-            for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
-              if (dataElement instanceof DETable) {
-                final DETable table = (DETable)dataElement;
-                createTable(table);
+          } else if (template.exists()) {
+            if (template instanceof FileSystemResource) {
+              final FileSystemResource fileResource = (FileSystemResource)template;
+              final File templateFile = fileResource.getFile();
+              if (templateFile.isDirectory()) {
+                try {
+                  FileUtil.copy(templateFile, file);
+                } catch (final Throwable e) {
+                  throw new IllegalArgumentException(
+                    "Unable to copy template ESRI geodatabase " + template, e);
+                }
+                geodatabase = EsriFileGdb.openGeodatabase(fileName);
               }
             }
+            if (geodatabase == null) {
+              geodatabase = EsriFileGdb.createGeodatabase(fileName);
+              final Workspace workspace = EsriGdbXmlParser.parse(template);
+              final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
+              for (final Domain domain : workspaceDefinition.getDomains()) {
+                createDomain(domain);
+              }
+              for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
+                if (dataElement instanceof DETable) {
+                  final DETable table = (DETable)dataElement;
+                  createTable(table);
+                }
+              }
+            }
+          } else {
+            throw new IllegalArgumentException("Template does not exist "
+              + template);
           }
         } else {
-          throw new IllegalArgumentException("Template does not exist "
-            + template);
+          throw new IllegalArgumentException("ESRI file geodatabase not found "
+            + fileName);
         }
-      } else {
-        throw new IllegalArgumentException("ESRI file geodatabase not found "
-          + fileName);
-      }
-      final VectorOfWString domainNames = geodatabase.getDomains();
-      for (int i = 0; i < domainNames.size(); i++) {
-        final String domainName = domainNames.get(i);
-        loadDomain(domainName);
+        final VectorOfWString domainNames = geodatabase.getDomains();
+        for (int i = 0; i < domainNames.size(); i++) {
+          final String domainName = domainNames.get(i);
+          loadDomain(domainName);
+        }
       }
     }
   }
 
   @Override
-  public synchronized void insert(final DataObject object) {
-    getWriter().write(object);
+  public void insert(final DataObject object) {
+    synchronized (EsriFileGdb.class) {
+      getWriter().write(object);
+    }
   }
 
-  protected synchronized void insertRow(final Table table, final Row row) {
-    table.insertRow(row);
+  protected void insertRow(final Table table, final Row row) {
+    synchronized (EsriFileGdb.class) {
+      table.insertRow(row);
+    }
   }
 
-  public synchronized boolean isCreateMissingDataStore() {
+  public boolean isCreateMissingDataStore() {
     return createMissingDataStore;
   }
 
-  public synchronized boolean isCreateMissingTables() {
+  public boolean isCreateMissingTables() {
     return createMissingTables;
   }
 
-  public synchronized boolean isNull(final Row row, final String name) {
-    return row.isNull(name);
-  }
-
-  @Override
-  public synchronized DataObject load(final String typePath, final Object id) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typePath);
-    } else {
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        typePath, metaData.getIdAttributeName() + " = " + id);
-      try {
-        if (iterator.hasNext()) {
-          return iterator.next();
-        } else {
-          return null;
-        }
-      } finally {
-        iterator.close();
-      }
+  public boolean isNull(final Row row, final String name) {
+    synchronized (EsriFileGdb.class) {
+      return row.isNull(name);
     }
   }
 
-  protected synchronized void loadDomain(final String domainName) {
-    final String domainDef = geodatabase.getDomainDefinition(domainName);
-    final Domain domain = EsriGdbXmlParser.parse(domainDef);
-    if (domain instanceof CodedValueDomain) {
-      final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-      final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(this,
-        codedValueDomain);
-      super.addCodeTable(codeTable);
-      final List<String> columnNames = domainColumNames.get(domainName);
-      if (columnNames != null) {
-        for (final String columnName : columnNames) {
-          addCodeTable(columnName, codeTable);
+  @Override
+  public DataObject load(final String typePath, final Object id) {
+    synchronized (EsriFileGdb.class) {
+      final DataObjectMetaData metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Unknown type " + typePath);
+      } else {
+        final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+          typePath, metaData.getIdAttributeName() + " = " + id);
+        try {
+          if (iterator.hasNext()) {
+            return iterator.next();
+          } else {
+            return null;
+          }
+        } finally {
+          iterator.close();
         }
       }
     }
   }
 
+  protected void loadDomain(final String domainName) {
+    synchronized (EsriFileGdb.class) {
+      final String domainDef = geodatabase.getDomainDefinition(domainName);
+      final Domain domain = EsriGdbXmlParser.parse(domainDef);
+      if (domain instanceof CodedValueDomain) {
+        final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
+        final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
+          this, codedValueDomain);
+        super.addCodeTable(codeTable);
+        final List<String> columnNames = domainColumNames.get(domainName);
+        if (columnNames != null) {
+          for (final String columnName : columnNames) {
+            addCodeTable(columnName, codeTable);
+          }
+        }
+      }
+    }
+  }
+
   @Override
-  protected synchronized void loadSchemaDataObjectMetaData(
+  protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
     final Map<String, DataObjectMetaData> metaDataMap) {
-    final String schemaName = schema.getPath();
-    if (schemaName.equals(defaultSchema)) {
-      loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\",
+    synchronized (EsriFileGdb.class) {
+      final String schemaName = schema.getPath();
+      if (schemaName.equals(defaultSchema)) {
+        loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\",
+          "Feature Class");
+        loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\", "Table");
+      }
+      final String path = schemaName.replaceAll("/", "\\\\");
+      loadSchemaDataObjectMetaData(metaDataMap, schemaName, path,
         "Feature Class");
-      loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\", "Table");
+      loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Table");
     }
-    final String path = schemaName.replaceAll("/", "\\\\");
-    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Feature Class");
-    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Table");
   }
 
-  public synchronized void loadSchemaDataObjectMetaData(
+  public void loadSchemaDataObjectMetaData(
     final Map<String, DataObjectMetaData> metaDataMap, final String schemaName,
     final String path, final String datasetType) {
-    try {
-      final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
-        path, datasetType);
-      for (int i = 0; i < childFeatureClasses.size(); i++) {
-        final String childPath = childFeatureClasses.get(i);
-        addTableMetaData(schemaName, childPath);
-      }
-    } catch (final RuntimeException e) {
-      final String message = e.getMessage();
-      if (message == null
-        || !message.equals("-2147211775\tThe item was not found.")) {
-        throw e;
+    synchronized (EsriFileGdb.class) {
+      try {
+        final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
+          path, datasetType);
+        for (int i = 0; i < childFeatureClasses.size(); i++) {
+          final String childPath = childFeatureClasses.get(i);
+          addTableMetaData(schemaName, childPath);
+        }
+      } catch (final RuntimeException e) {
+        final String message = e.getMessage();
+        if (message == null
+          || !message.equals("-2147211775\tThe item was not found.")) {
+          throw e;
+        }
       }
     }
   }
 
   @Override
-  protected synchronized void loadSchemas(
-    final Map<String, DataObjectStoreSchema> schemaMap) {
-    addSchema(new DataObjectStoreSchema(this, defaultSchema));
-    addChildSchema("\\");
+  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
+    synchronized (EsriFileGdb.class) {
+      addSchema(new DataObjectStoreSchema(this, defaultSchema));
+      addChildSchema("\\");
+    }
   }
 
-  protected synchronized Row nextRow(final EnumRows rows) {
+  protected Row nextRow(final EnumRows rows) {
     if (rows == null) {
       return null;
     } else {
-      return rows.next();
+      synchronized (EsriFileGdb.class) {
+        return rows.next();
+      }
     }
   }
 
   @Override
-  public synchronized Reader<DataObject> query(
-    final DataObjectFactory dataObjectFactory, final String typePath,
-    final BoundingBox boundingBox) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Cannot find table " + typePath);
-    } else {
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        dataObjectFactory, typePath, boundingBox);
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, final BoundingBox boundingBox) {
+    synchronized (EsriFileGdb.class) {
+      final DataObjectMetaData metaData = getMetaData(typePath);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Cannot find table " + typePath);
+      } else {
+        final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+          dataObjectFactory, typePath, boundingBox);
 
-      final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-        iterator);
-      return reader;
+        final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
+          iterator);
+        return reader;
+      }
     }
   }
 
-  public synchronized EnumRows query(final String sql, final boolean recycling) {
-    return geodatabase.query(sql, recycling);
+  public EnumRows query(final String sql, final boolean recycling) {
+    synchronized (EsriFileGdb.class) {
+      return geodatabase.query(sql, recycling);
+    }
   }
 
-  public synchronized EnumRows search(final Table table, final String fields,
+  public EnumRows search(final Table table, final String fields,
     final String whereClause, final boolean recycling) {
-    try {
-      final EnumRows rows = table.search(fields, whereClause, recycling);
-      enumRowsToClose.add(rows);
-      return rows;
-    } catch (final Throwable t) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to execute query " + fields + " WHERE " + whereClause, t);
-      return null;
+    synchronized (EsriFileGdb.class) {
+      try {
+        final EnumRows rows = table.search(fields, whereClause, recycling);
+        enumRowsToClose.add(rows);
+        return rows;
+      } catch (final Throwable t) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to execute query " + fields + " WHERE " + whereClause, t);
+        return null;
+      }
     }
   }
 
-  public synchronized EnumRows search(final Table table, final String fields,
+  public EnumRows search(final Table table, final String fields,
     final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
-    try {
-      final EnumRows rows = table.search(fields, whereClause, boundingBox,
-        recycling);
-      enumRowsToClose.add(rows);
-      return rows;
-    } catch (final Exception e) {
-      LOG.error("ERROR executing query SELECT " + fields + " WHERE "
-        + whereClause + " AND " + boundingBox, e);
-      return null;
+    synchronized (EsriFileGdb.class) {
+      try {
+        final EnumRows rows = table.search(fields, whereClause, boundingBox,
+          recycling);
+        enumRowsToClose.add(rows);
+        return rows;
+      } catch (final Exception e) {
+        LOG.error("ERROR executing query SELECT " + fields + " WHERE "
+          + whereClause + " AND " + boundingBox, e);
+        return null;
+      }
     }
   }
 
   @Override
-  public synchronized void setCreateMissingDataStore(
-    final boolean createMissingDataStore) {
+  public void setCreateMissingDataStore(final boolean createMissingDataStore) {
     this.createMissingDataStore = createMissingDataStore;
   }
 
   @Override
-  public synchronized void setCreateMissingTables(
-    final boolean createMissingTables) {
+  public void setCreateMissingTables(final boolean createMissingTables) {
     this.createMissingTables = createMissingTables;
   }
 
   @Override
-  public synchronized void setDefaultSchema(final String defaultSchema) {
-    if (StringUtils.hasText(defaultSchema)) {
-      if (!defaultSchema.startsWith("/")) {
-        this.defaultSchema = "/" + defaultSchema;
+  public void setDefaultSchema(final String defaultSchema) {
+    synchronized (EsriFileGdb.class) {
+      if (StringUtils.hasText(defaultSchema)) {
+        if (!defaultSchema.startsWith("/")) {
+          this.defaultSchema = "/" + defaultSchema;
+        } else {
+          this.defaultSchema = defaultSchema;
+        }
       } else {
-        this.defaultSchema = defaultSchema;
+        this.defaultSchema = "/";
       }
-    } else {
-      this.defaultSchema = "/";
+      refreshSchema();
     }
-    refreshSchema();
   }
 
-  public synchronized void setDomainColumNames(
+  public void setDomainColumNames(
     final Map<String, List<String>> domainColumNames) {
     this.domainColumNames = domainColumNames;
   }
 
-  public synchronized void setFileName(final String fileName) {
+  public void setFileName(final String fileName) {
     this.fileName = fileName;
   }
 
-  public synchronized void setNull(final Row row, final String name) {
-    row.setNull(name);
+  public void setNull(final Row row, final String name) {
+    synchronized (EsriFileGdb.class) {
+      row.setNull(name);
+    }
   }
 
-  public synchronized void setTemplate(final Resource template) {
+  public void setTemplate(final Resource template) {
     this.template = template;
   }
 
-  protected synchronized void setWriteLock(final Table table) {
-    table.setWriteLock();
+  protected void setWriteLock(final Table table) {
+    synchronized (EsriFileGdb.class) {
+      table.setWriteLock();
+    }
   }
 
   @Override
@@ -1133,11 +1213,15 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public synchronized void update(final DataObject object) {
-    getWriter().write(object);
+  public void update(final DataObject object) {
+    synchronized (EsriFileGdb.class) {
+      getWriter().write(object);
+    }
   }
 
-  protected synchronized void updateRow(final Table table, final Row row) {
-    table.updateRow(row);
+  protected void updateRow(final Table table, final Row row) {
+    synchronized (EsriFileGdb.class) {
+      table.updateRow(row);
+    }
   }
 }
