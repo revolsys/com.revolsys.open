@@ -12,6 +12,7 @@ import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.map.AbstractMapObjectFactory;
 import com.revolsys.swing.tree.datastore.AddDataStoreConnectionPanel;
+import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectStoreLayerFactory extends AbstractMapObjectFactory {
 
@@ -19,9 +20,9 @@ public class DataObjectStoreLayerFactory extends AbstractMapObjectFactory {
     super("dataStore", "Data Store");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <V> V toObject(final Map<String, ? extends Object> properties) {
-    @SuppressWarnings("unchecked")
     final Map<String, String> connectionProperties = (Map<String, String>)properties.get("connection");
     if (connectionProperties == null) {
       throw new IllegalArgumentException(
@@ -36,24 +37,34 @@ public class DataObjectStoreLayerFactory extends AbstractMapObjectFactory {
           final ConnectionRegistry<DataObjectStoreConnection> registry = connectionManager.getConnectionRegistry("User");
           dataStore = new AddDataStoreConnectionPanel(registry, name).showDialog();
         }
-        // TODO if null add
       } else {
         dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
       }
+      boolean exists = true;
+      final String layerName = (String)properties.get("name");
       if (dataStore == null) {
         LoggerFactory.getLogger(getClass()).error(
-          "Unable to create data store for layer: " + properties.get("name"));
+          "Unable to create data store for layer: " + layerName);
         return null;
-      } else {
-        dataStore.initialize();
-        final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore);
-        layer.setProperties(properties);
-        if (layer.getMetaData() == null) {
-          return null;
-        } else {
-          return (V)layer;
-        }
       }
+      try {
+        dataStore.initialize();
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(),
+          "Unable to iniaitlize data store for layer " + layerName, e);
+        exists = false;
+      }
+      final DataObjectStoreLayer layer = new DataObjectStoreLayer(dataStore,
+        exists);
+      layer.setProperties(properties);
+
+      if (exists && layer.getMetaData() == null) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Cannot find table for layer: " + layer);
+        layer.setExists(false);
+      }
+
+      return (V)layer;
     }
   }
 }

@@ -187,8 +187,8 @@ public class BaseStylePanel extends ValueField implements
       "markerLineWidth", "markerFill", "markerWidth", "markerHeight");
 
     addPanel(stylePanels, "Marker Position", markerStyle,
-      "markerHorizontalAlignment", "markerVerticalAlignment", "markerDeltaX",
-      "markerDeltaY", "markerOrientationType", "markerOrientation",
+      "markerHorizontalAlignment", "markerVerticalAlignment", "markerDx",
+      "markerDy", "markerOrientationType", "markerOrientation",
       "markerPlacement");
 
   }

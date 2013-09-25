@@ -29,6 +29,7 @@ import com.revolsys.swing.map.layer.dataobject.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -149,9 +150,9 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   private String markerCompOp;
 
-  private Measure<Length> markerDeltaX = ZERO_PIXEL;
+  private Measure<Length> markerDx = ZERO_PIXEL;
 
-  private Measure<Length> markerDeltaY = ZERO_PIXEL;
+  private final Measure<Length> markerDy = ZERO_PIXEL;
 
   private String markerFile;
 
@@ -216,20 +217,12 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     return this.markerCompOp;
   }
 
-  public Measure<Length> getMarkerDeltaX() {
-    return this.markerDeltaX;
-  }
-
-  public Measure<Length> getMarkerDeltaY() {
-    return this.markerDeltaY;
-  }
-
   public Measure<Length> getMarkerDx() {
-    return this.markerDeltaX;
+    return this.markerDx;
   }
 
   public Measure<Length> getMarkerDy() {
-    return this.markerDeltaY;
+    return this.markerDy;
   }
 
   public String getMarkerFile() {
@@ -328,20 +321,12 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     this.markerCompOp = markerCompOp;
   }
 
-  public void setMarkerDeltaX(final Measure<Length> markerDx) {
-    this.markerDeltaX = getWithDefault(markerDx, ZERO_PIXEL);
-  }
-
-  public void setMarkerDeltaY(final Measure<Length> markerDy) {
-    this.markerDeltaY = getWithDefault(markerDy, ZERO_PIXEL);
-  }
-
   public void setMarkerDx(final double markerDx) {
-    setMarkerDeltaX(Measure.valueOf(markerDx, NonSI.PIXEL));
+    setMarkerDx(Measure.valueOf(markerDx, NonSI.PIXEL));
   }
 
-  public void setMarkerDy(final double markerDy) {
-    setMarkerDeltaY(Measure.valueOf(markerDy, NonSI.PIXEL));
+  public void setMarkerDx(final Measure<Length> markerDx) {
+    this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
   }
 
   public void setMarkerFile(final String markerFile) {
@@ -527,7 +512,12 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         final Object value = entry.getValue();
 
         final Object propertyValue = getValue(propertyName, value);
-        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+        try {
+          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName
+            + "=" + propertyValue, e);
+        }
       }
     }
   }

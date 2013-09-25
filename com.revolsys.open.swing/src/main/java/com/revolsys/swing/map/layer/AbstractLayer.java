@@ -37,6 +37,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
@@ -60,23 +61,27 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
 
+    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
+
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
       "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
-      "magnifier", hasGeometry, "zoomToLayer"));
+      "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
     menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
     menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
 
     menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
-      "refresh"));
+      exists, "refresh"));
 
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete Layer",
       "delete", "deleteWithConfirm"));
 
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Layer Properties",
-      "information", "showProperties"));
+      "information", exists, "showProperties"));
   }
+
+  private boolean exists = true;
 
   protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
     this);
@@ -418,6 +423,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean isExists() {
+    return exists;
+  }
+
+  @Override
   public boolean isHasChanges() {
     return false;
   }
@@ -434,12 +444,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isQuerySupported() {
-    return this.querySupported;
+    return isExists() && this.querySupported;
   }
 
   @Override
   public boolean isReadOnly() {
-    return this.readOnly;
+    return !isExists() || this.readOnly;
   }
 
   @Override
@@ -460,7 +470,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isVisible() {
-    return this.visible;
+    return isExists() && this.visible;
   }
 
   @Override
@@ -521,6 +531,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final boolean oldValue = this.eventsEnabled;
     this.eventsEnabled = eventsEnabled;
     return oldValue;
+  }
+
+  public void setExists(final boolean exists) {
+    final boolean old = this.exists;
+    this.exists = exists;
+    firePropertyChange("exists", old, this.exists);
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -650,12 +666,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void showProperties(final String tabName) {
-    final MapPanel map = MapPanel.get(this);
-    if (map != null) {
-      final Window window = SwingUtilities.getWindowAncestor(map);
-      final TabbedValuePanel panel = createPropertiesPanel();
-      panel.setSelectdTab(tabName);
-      panel.showDialog(window);
+    if (exists) {
+      final MapPanel map = MapPanel.get(this);
+      if (map != null) {
+        final Window window = SwingUtilities.getWindowAncestor(map);
+        final TabbedValuePanel panel = createPropertiesPanel();
+        panel.setSelectdTab(tabName);
+        panel.showDialog(window);
+      }
     }
   }
 

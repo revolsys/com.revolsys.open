@@ -352,8 +352,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
     tablesToClose.clear();
     if (geodatabase != null) {
-      geodatabase.delete();
+      EsriFileGdb.CloseGeodatabase(geodatabase);
       geodatabase = null;
+      System.gc();
     }
     super.close();
   }
@@ -912,7 +913,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             + template);
         }
       } else {
-        throw new IllegalArgumentException("ESRI file geodatbase not found "
+        throw new IllegalArgumentException("ESRI file geodatabase not found "
           + fileName);
       }
       final VectorOfWString domainNames = geodatabase.getDomains();

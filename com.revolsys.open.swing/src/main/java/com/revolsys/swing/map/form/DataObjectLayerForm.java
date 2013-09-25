@@ -944,48 +944,50 @@ public class DataObjectLayerForm extends JPanel implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final Object source = event.getSource();
-    if (source instanceof Field) {
-      final Field field = (Field)source;
-      final String fieldName = field.getFieldName();
-      final Object fieldValue = field.getFieldValue();
-      final Object objectValue = this.object.getValue(fieldName);
-      if (!EqualsRegistry.equal(objectValue, fieldValue)) {
-        boolean equal = false;
-        if (fieldValue instanceof String) {
-          final String string = (String)fieldValue;
-          if (!StringUtils.hasText(string) && objectValue == null) {
-            equal = true;
+    if (this.object != null) {
+      final Object source = event.getSource();
+      if (source instanceof Field) {
+        final Field field = (Field)source;
+        final String fieldName = field.getFieldName();
+        final Object fieldValue = field.getFieldValue();
+        final Object objectValue = this.object.getValue(fieldName);
+        if (!EqualsRegistry.equal(objectValue, fieldValue)) {
+          boolean equal = false;
+          if (fieldValue instanceof String) {
+            final String string = (String)fieldValue;
+            if (!StringUtils.hasText(string) && objectValue == null) {
+              equal = true;
+            }
+          }
+          if (!equal) {
+            this.object.setValueByPath(fieldName, fieldValue);
           }
         }
-        if (!equal) {
-          this.object.setValueByPath(fieldName, fieldValue);
-        }
-      }
-    } else {
-      final LayerDataObject object = getObject();
-      if (source == object) {
-        if (object.isDeleted()) {
-          final Window window = SwingUtilities.getWindowAncestor(this);
-          if (window != null) {
-            window.setVisible(false);
+      } else {
+        final LayerDataObject object = getObject();
+        if (source == object) {
+          if (object.isDeleted()) {
+            final Window window = SwingUtilities.getWindowAncestor(this);
+            if (window != null) {
+              window.setVisible(false);
+            }
           }
+          final String propertyName = event.getPropertyName();
+          final Object value = event.getNewValue();
+          final DataObjectMetaData metaData = getMetaData();
+          if ("errorsUpdated".equals(propertyName)) {
+            updateErrors();
+          } else if (metaData.hasAttribute(propertyName)) {
+            setFieldValue(propertyName, value, isFieldValidationEnabled());
+          }
+          final boolean modifiedOrDeleted = isModifiedOrDeleted();
+          this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+            !modifiedOrDeleted, modifiedOrDeleted);
+          final boolean deletable = isDeletable();
+          this.propertyChangeSupport.firePropertyChange("deletable",
+            !deletable, deletable);
+          repaint();
         }
-        final String propertyName = event.getPropertyName();
-        final Object value = event.getNewValue();
-        final DataObjectMetaData metaData = getMetaData();
-        if ("errorsUpdated".equals(propertyName)) {
-          updateErrors();
-        } else if (metaData.hasAttribute(propertyName)) {
-          setFieldValue(propertyName, value, isFieldValidationEnabled());
-        }
-        final boolean modifiedOrDeleted = isModifiedOrDeleted();
-        this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-          !modifiedOrDeleted, modifiedOrDeleted);
-        final boolean deletable = isDeletable();
-        this.propertyChangeSupport.firePropertyChange("deletable", !deletable,
-          deletable);
-        repaint();
       }
     }
   }

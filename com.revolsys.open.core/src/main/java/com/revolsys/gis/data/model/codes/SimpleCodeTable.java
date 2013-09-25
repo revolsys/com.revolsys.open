@@ -58,4 +58,8 @@ public class SimpleCodeTable extends AbstractCodeTable {
     return index;
   }
 
+  @Override
+  public void refresh() {
+  }
+
 }

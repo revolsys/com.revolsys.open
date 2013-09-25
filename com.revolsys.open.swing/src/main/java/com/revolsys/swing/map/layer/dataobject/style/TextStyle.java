@@ -20,6 +20,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -132,7 +133,12 @@ public class TextStyle implements MapSerializer, Cloneable {
       if (PROPERTIES.containsKey(propertyName)) {
         final Object value = entry.getValue();
         final Object propertyValue = getValue(propertyName, value);
-        JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+        try {
+          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unable to set style " + propertyName
+            + "=" + propertyValue, e);
+        }
       }
     }
   }

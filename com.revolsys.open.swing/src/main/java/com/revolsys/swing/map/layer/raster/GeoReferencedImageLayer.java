@@ -109,6 +109,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     this.url = SpringUtil.getUrl(resource).toString();
     setType("geoReferencedImage");
     setName(FileUtil.getBaseName(this.url));
+    setExists(false);
     Invoke.background("Loading file: " + this.url, this, "revert");
   }
 
@@ -182,6 +183,23 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return this.image;
   }
 
+  protected List<MappedLocation> getTiePointsProperty() {
+    final List<?> tiePointsProperty = getProperty("tiePoints");
+    final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
+    if (tiePointsProperty != null) {
+      for (final Object tiePointValue : tiePointsProperty) {
+        if (tiePointValue instanceof MappedLocation) {
+          tiePoints.add((MappedLocation)tiePointValue);
+        } else if (tiePointValue instanceof Map) {
+          final Map<String, Object> map = (Map<String, Object>)tiePointValue;
+          tiePoints.add(new MappedLocation(map));
+        }
+      }
+
+    }
+    return tiePoints;
+  }
+
   public WarpFilter getWarpFilter() {
     if (isShowOriginalImage()) {
       return new WarpAffineFilter(getBoundingBox(), image.getImageWidth(),
@@ -197,11 +215,12 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public void revert() {
     if (this.image == null && this.resource != null) {
+      GeoReferencedImage image = null;
       final Resource imageResource = SpringUtil.getResource(this.url);
       if (imageResource.exists()) {
         try {
-          setImage(AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource));
-          if (this.image == null) {
+          image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+          if (image == null) {
             LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
               "Cannot load image:" + this.url);
           }
@@ -213,6 +232,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
         LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
           "Image does not exist:" + this.url);
       }
+      setImage(image);
     } else {
       this.image.revert();
     }
@@ -224,20 +244,9 @@ public class GeoReferencedImageLayer extends AbstractLayer {
         image.setBoundingBox(boundingBox);
       }
 
-      final List<?> tiePointsProperty = getProperty("tiePoints");
-      final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
-      if (tiePointsProperty != null) {
-        for (final Object tiePointValue : tiePointsProperty) {
-          if (tiePointValue instanceof MappedLocation) {
-            tiePoints.add((MappedLocation)tiePointValue);
-          } else if (tiePointValue instanceof Map) {
-            final Map<String, Object> map = (Map<String, Object>)tiePointValue;
-            tiePoints.add(new MappedLocation(map));
-          }
-        }
+      final List<MappedLocation> tiePoints = getTiePointsProperty();
+      image.setTiePoints(tiePoints);
 
-        image.setTiePoints(tiePoints);
-      }
     }
     firePropertyChange("revert", false, true);
   }
@@ -249,13 +258,18 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   public void setImage(final GeoReferencedImage image) {
+    final GeoReferencedImage old = this.image;
     if (this.image != null) {
       Property.removeListener(image, this);
     }
     this.image = image;
-    if (image != null) {
+    if (image == null) {
+      setExists(false);
+    } else {
+      setExists(true);
       Property.addListener(image, this);
     }
+    firePropertyChange("image", old, this.image);
   }
 
   @Override
@@ -336,12 +350,25 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     map.remove("TableView");
     MapSerializerUtil.add(map, "url", this.url);
     MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage, false);
-    final BoundingBox boundingBox = image.getBoundingBox();
+
+    final BoundingBox boundingBox;
+    if (image == null) {
+      final Object boundingBoxProperty = getProperty("boundingBox");
+      boundingBox = StringConverterRegistry.toObject(BoundingBox.class,
+        boundingBoxProperty);
+    } else {
+      boundingBox = image.getBoundingBox();
+    }
     if (boundingBox != null) {
       MapSerializerUtil.add(map, "boundingBox", boundingBox.toString());
     }
-    MapSerializerUtil.add(map, "tiePoints", image.getTiePoints(),
-      Collections.emptyList());
+    List<MappedLocation> tiePoints;
+    if (image == null) {
+      tiePoints = getTiePointsProperty();
+    } else {
+      tiePoints = image.getTiePoints();
+    }
+    MapSerializerUtil.add(map, "tiePoints", tiePoints, Collections.emptyList());
     return map;
   }
 }

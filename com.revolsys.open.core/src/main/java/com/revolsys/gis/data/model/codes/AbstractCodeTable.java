@@ -269,6 +269,13 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     }
   }
 
+  @Override
+  public synchronized void refresh() {
+    idValueCache.clear();
+    stringIdMap.clear();
+    valueIdCache.clear();
+  }
+
   public void setCapitalizeWords(final boolean capitalizedWords) {
     this.capitalizeWords = capitalizedWords;
   }

@@ -20,6 +20,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
   public static FileGdbDataObjectStore create(final File file) {
     FileGdbDataObjectStore dataObjectStore;
     dataObjectStore = new CapiFileGdbDataObjectStore(file);
+    dataObjectStore.setCreateMissingDataStore(false);
     return dataObjectStore;
   }
 

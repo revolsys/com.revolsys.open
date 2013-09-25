@@ -28,7 +28,8 @@ public class AddLayer extends I18nAction {
     for (final DataObjectMetaData metaData : types) {
       final String typePath = metaData.getPath();
       final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
-      final Layer layer = new DataObjectStoreLayer(dataObjectStore, typePath);
+      final Layer layer = new DataObjectStoreLayer(dataObjectStore, typePath,
+        true);
       final LayerGroup layerGroup = Project.get();
       if (layerGroup != null) {
         layerGroup.add(layer);

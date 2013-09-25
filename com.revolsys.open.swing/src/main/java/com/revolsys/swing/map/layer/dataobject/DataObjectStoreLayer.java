@@ -66,8 +66,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private final Set<String> formObjectIds = new LinkedHashSet<String>();
 
-  public DataObjectStoreLayer(final DataObjectStore dataStore) {
+  public DataObjectStoreLayer(final DataObjectStore dataStore,
+    final boolean exists) {
     this.dataStore = dataStore;
+    setExists(exists);
     setType("dataStore");
     this.saveChangesMethod = ReflectionUtils.findMethod(getClass(),
       "transactionSaveChanges");
@@ -79,8 +81,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   public DataObjectStoreLayer(final DataObjectStore dataStore,
-    final String typePath) {
-    this(dataStore);
+    final String typePath, final boolean exists) {
+    this(dataStore, exists);
     setMetaData(dataStore.getMetaData(typePath));
     setTypePath(typePath);
   }
@@ -370,7 +372,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public DataObjectMetaData getMetaData() {
-    return this.dataStore.getMetaData(this.typePath);
+    if (isExists()) {
+      return this.dataStore.getMetaData(this.typePath);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings({
@@ -596,12 +602,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       setName(PathUtil.getName(typePath));
     }
     if (StringUtils.hasText(typePath)) {
-      final DataObjectMetaData metaData = this.dataStore.getMetaData(typePath);
-      if (metaData != null) {
+      if (isExists()) {
+        final DataObjectMetaData metaData = this.dataStore.getMetaData(typePath);
+        if (metaData != null) {
 
-        setMetaData(metaData);
-        this.query = new Query(metaData);
-        return;
+          setMetaData(metaData);
+          this.query = new Query(metaData);
+          return;
+        }
       }
     }
     setMetaData(null);

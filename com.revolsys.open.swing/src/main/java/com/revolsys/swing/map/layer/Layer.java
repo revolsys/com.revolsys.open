@@ -52,6 +52,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   boolean isEditable(double scale);
 
+  boolean isExists();
+
   boolean isHasChanges();
 
   boolean isHasGeometry();

@@ -72,7 +72,8 @@ public class ZoomOverlay extends AbstractOverlay {
       this.zoomBox = null;
       this.zoomBoxFirstPoint = null;
       repaint();
-    } else if (keyCode == KeyEvent.VK_SHIFT) {
+    } else if (keyCode == KeyEvent.VK_SHIFT
+      && !(e.isControlDown() || e.isMetaDown())) {
       setMapCursor(CURSOR_ZOOM_BOX);
     }
   }
@@ -126,7 +127,7 @@ public class ZoomOverlay extends AbstractOverlay {
   @Override
   public void mouseMoved(final MouseEvent event) {
     final boolean shiftDown = event.isShiftDown();
-    if (shiftDown) {
+    if (shiftDown && !(event.isControlDown() || event.isMetaDown())) {
       setMapCursor(CURSOR_ZOOM_BOX);
       event.consume();
     }

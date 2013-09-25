@@ -162,6 +162,10 @@ public class CodedValueDomain extends Domain implements CodeTable {
     }
   }
 
+  @Override
+  public void refresh() {
+  }
+
   public synchronized void setCodedValues(final List<CodedValue> codedValues) {
     this.codedValues = new ArrayList<CodedValue>();
     for (final CodedValue codedValue : codedValues) {

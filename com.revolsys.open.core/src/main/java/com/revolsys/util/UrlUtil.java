@@ -79,7 +79,7 @@ public final class UrlUtil {
       final InputStream in = url.openStream();
       return FileUtil.getString(in);
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to read " + urlString);
+      throw new RuntimeException("Unable to read " + urlString, e);
     }
   }
 

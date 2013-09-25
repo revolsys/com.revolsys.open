@@ -117,15 +117,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addGroup(2, "edit");
     menu.addGroup(3, "dnd");
 
+    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
+
     menu.addMenuItem("table", TreeItemRunnable.createAction("View Records",
-      "table_go", "showRecordsTable"));
+      "table_go", exists, "showRecordsTable"));
 
     final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
       "hasSelectedRecords");
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
       "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
-      "magnifier_zoom_selected", new AndEnableCheck(hasGeometry,
+      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
         hasSelectedRecords), "zoomToSelected"));
 
     final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
@@ -167,7 +169,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
 
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
-      "palette", hasGeometry, "showProperties", "Style"));
+      "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
+      "Style"));
   }
 
   public static void addVisibleLayers(final List<DataObjectLayer> layers,
@@ -415,10 +418,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fieldPanel.add(fieldScroll, BorderLayout.CENTER);
     propertiesPanel.addTab("Fields", fieldPanel);
 
-    final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
-      this);
-    propertiesPanel.addTab("Style", stylePanel);
-
+    if (getRenderer() != null) {
+      final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
+        this);
+      propertiesPanel.addTab("Style", stylePanel);
+    }
     return propertiesPanel;
   }
 
@@ -1374,7 +1378,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.pack();
             window.setLocation(50, 50);
             // TODO smart location
-            window.setVisible(true);
             this.forms.put(object, window);
             window.addWindowListener(new WindowAdapter() {
               @Override
@@ -1382,10 +1385,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                 removeForm(object);
               }
             });
+            window.setVisible(true);
             window.requestFocus();
             return (V)form;
           }
         } else {
+          window.setVisible(true);
           window.requestFocus();
           final Component component = window.getComponent(0);
           if (component instanceof JScrollPane) {

@@ -110,6 +110,10 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
+  public void refresh() {
+  }
+
+  @Override
   public String toString() {
     return domain.toString();
   }

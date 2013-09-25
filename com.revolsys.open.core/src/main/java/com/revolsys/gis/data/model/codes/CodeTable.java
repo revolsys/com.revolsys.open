@@ -23,4 +23,6 @@ public interface CodeTable extends Cloneable {
   List<String> getValueAttributeNames();
 
   List<Object> getValues(final Object id);
+
+  void refresh();
 }

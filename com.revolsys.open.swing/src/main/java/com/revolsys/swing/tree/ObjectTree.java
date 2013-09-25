@@ -361,6 +361,12 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
           }
         }
 
+      } else {
+        final Object source = event.getSource();
+        final TreePath path = this.model.getPath(source);
+        if (path != null) {
+          this.model.fireTreeNodesChanged(path);
+        }
       }
     } else {
       Invoke.later(this, "propertyChange", event);

@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.map.layer.Layer;
 
@@ -36,13 +37,18 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
 
   private static final Icon VISIBLE_ICON = SilkIconLoader.getIcon("map");
 
+  private static final Icon NOT_EXISTS_ICON = SilkIconLoader.getIcon("error");
+
   private static final Icon VISIBLE_DISABLED_ICON = SilkIconLoader.getIcon("map_gray");
 
   private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
 
   private static Icon getIcon(final Component component, final Layer layer) {
     final List<Icon> icons = new ArrayList<Icon>();
-    if (layer.getRenderer() != null) {
+    if (!layer.isExists()) {
+
+      return NOT_EXISTS_ICON;
+    } else if (layer.getRenderer() != null) {
       if (layer.isVisible()) {
         icons.add(VISIBLE_ICON);
       } else {
@@ -143,15 +149,22 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final boolean selected, final boolean expanded, final boolean leaf,
     final int row, final boolean hasFocus) {
     Icon icon = null;
+    boolean exists = false;
     if (value instanceof Layer) {
       final Layer layer = (Layer)value;
       value = layer.getName();
       icon = getIcon(this, layer);
+      exists = layer.isExists();
+    } else {
+      icon = NOT_EXISTS_ICON;
     }
 
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     setIcon(icon);
+    if (!exists) {
+      label.setForeground(WebColors.Red);
+    }
 
     return label;
   }

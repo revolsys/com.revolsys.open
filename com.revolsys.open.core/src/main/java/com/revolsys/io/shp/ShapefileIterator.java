@@ -19,6 +19,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianMappedByteBuffer;
@@ -265,7 +266,40 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
       final DataObjectMetaDataImpl metaData = xbaseIterator.getMetaData();
       this.metaData = metaData;
       if (metaData.getGeometryAttributeIndex() == -1) {
-        metaData.addAttribute("geometry", DataTypes.GEOMETRY, true);
+        DataType geometryType = DataTypes.GEOMETRY;
+        switch (shapeType) {
+          case ShapefileConstants.POINT_SHAPE:
+          case ShapefileConstants.POINT_Z_SHAPE:
+          case ShapefileConstants.POINT_M_SHAPE:
+          case ShapefileConstants.POINT_ZM_SHAPE:
+            geometryType = DataTypes.POINT;
+          break;
+
+          case ShapefileConstants.POLYLINE_SHAPE:
+          case ShapefileConstants.POLYLINE_Z_SHAPE:
+          case ShapefileConstants.POLYLINE_M_SHAPE:
+          case ShapefileConstants.POLYLINE_ZM_SHAPE:
+            geometryType = DataTypes.MULTI_LINE_STRING;
+          break;
+
+          case ShapefileConstants.POLYGON_SHAPE:
+          case ShapefileConstants.POLYGON_Z_SHAPE:
+          case ShapefileConstants.POLYGON_M_SHAPE:
+          case ShapefileConstants.POLYGON_ZM_SHAPE:
+            geometryType = DataTypes.MULTI_POLYGON;
+          break;
+
+          case ShapefileConstants.MULTI_POINT_SHAPE:
+          case ShapefileConstants.MULTI_POINT_Z_SHAPE:
+          case ShapefileConstants.MULTI_POINT_M_SHAPE:
+          case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+            geometryType = DataTypes.MULTI_POINT;
+          break;
+
+          default:
+          break;
+        }
+        metaData.addAttribute("geometry", geometryType, true);
       }
     }
   }

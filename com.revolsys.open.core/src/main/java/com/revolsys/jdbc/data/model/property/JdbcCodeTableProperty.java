@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -16,7 +15,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 
 public class JdbcCodeTableProperty extends CodeTableProperty {
-  private static final Logger LOG = Logger.getLogger(JdbcCodeTableProperty.class);
 
   private DataSource dataSource;
 

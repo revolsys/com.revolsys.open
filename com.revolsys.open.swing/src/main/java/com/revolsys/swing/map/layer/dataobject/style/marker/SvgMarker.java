@@ -52,8 +52,8 @@ public class SvgMarker extends AbstractMarker {
       graphics.rotate(Math.toRadians(orientation));
     }
 
-    final Measure<Length> deltaX = style.getMarkerDeltaX();
-    final Measure<Length> deltaY = style.getMarkerDeltaY();
+    final Measure<Length> deltaX = style.getMarkerDx();
+    final Measure<Length> deltaY = style.getMarkerDy();
     double dx = Viewport2D.toDisplayValue(viewport, deltaX);
     double dy = Viewport2D.toDisplayValue(viewport, deltaY);
 

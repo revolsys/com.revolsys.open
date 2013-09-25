@@ -48,6 +48,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       MethodUtils.invokeExactMethod(application, "setQuitStrategy",
         closeAllWindows);
       MacApplicationListenerHandler.init(application);
+    } catch (final ClassNotFoundException t) {
     } catch (final Throwable t) {
       t.printStackTrace();
     }

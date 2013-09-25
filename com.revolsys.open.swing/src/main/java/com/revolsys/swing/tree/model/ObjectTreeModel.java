@@ -83,7 +83,9 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public ObjectTreeModel(final Object root) {
     this();
     this.root = root;
-    this.objectPathMap.put(root, new TreePath(root));
+    if (root != null) {
+      this.objectPathMap.put(root, new TreePath(root));
+    }
   }
 
   public void addMenuItem(final Class<?> clazz, final JMenuItem menuItem) {
