@@ -177,7 +177,7 @@ public class BaseStylePanel extends ValueField implements
     addLengthMeasureField(panel, geometryStyle, "lineWidth");
     addField(panel, geometryStyle, "lineJoin");
     addField(panel, geometryStyle, "lineCap");
-    GroupLayoutUtil.makeColumns(panel, 2);
+    GroupLayoutUtil.makeColumns(panel, 2, true);
     stylePanels.add(panel);
   }
 
@@ -198,7 +198,7 @@ public class BaseStylePanel extends ValueField implements
     final JPanel panel = new JPanel();
     panel.setBorder(BorderFactory.createTitledBorder(title));
     addFields(panel, object, fieldNames);
-    GroupLayoutUtil.makeColumns(panel, 2);
+    GroupLayoutUtil.makeColumns(panel, 2, true);
     container.add(panel);
     return panel;
   }

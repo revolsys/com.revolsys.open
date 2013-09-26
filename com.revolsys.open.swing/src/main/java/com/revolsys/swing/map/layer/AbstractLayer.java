@@ -172,7 +172,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             + "</tr></table></html>"));
 
       }
-      GroupLayoutUtil.makeColumns(extentPanel, 1);
+      GroupLayoutUtil.makeColumns(extentPanel, 1, true);
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = new JPanel();
@@ -215,7 +215,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
 
-        GroupLayoutUtil.makeColumns(coordinateSystemPanel, 2);
+        GroupLayoutUtil.makeColumns(coordinateSystemPanel, 2, true);
       }
       panel.add(coordinateSystemPanel);
 
@@ -233,7 +233,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       nameField.addPropertyChangeListener("name", this.beanPropertyListener);
     }
 
-    GroupLayoutUtil.makeColumns(panel, 2);
+    GroupLayoutUtil.makeColumns(panel, 2, true);
     return panel;
   }
 

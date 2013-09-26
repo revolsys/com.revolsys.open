@@ -11,14 +11,15 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.LayoutStyle;
 
 public class GroupLayoutUtil {
-  public static GroupLayout getLayout(final Container container) {
+  public static GroupLayout getLayout(final Container container,
+    final boolean containerGaps) {
     LayoutManager layout = container.getLayout();
     if (!(layout instanceof GroupLayout)) {
       layout = new GroupLayout(container);
       container.setLayout(layout);
     }
     final GroupLayout groupLayout = (GroupLayout)layout;
-    groupLayout.setAutoCreateContainerGaps(true);
+    groupLayout.setAutoCreateContainerGaps(containerGaps);
     groupLayout.setAutoCreateGaps(true);
     return groupLayout;
   }
@@ -59,15 +60,15 @@ public class GroupLayoutUtil {
     }
   }
 
-  public static void makeColumns(final Container container, final int numColumns) {
-    final GroupLayout groupLayout = getLayout(container);
+  public static void makeColumns(final Container container, final int numColumns, boolean containerGaps) {
+    final GroupLayout groupLayout = getLayout(container, containerGaps);
 
     makeColumns(container, groupLayout, numColumns);
   }
 
   public static void makeColumns(final LayoutStyle layoutStyle,
     final Container container, final int numColumns) {
-    final GroupLayout groupLayout = getLayout(container);
+    final GroupLayout groupLayout = getLayout(container, true);
     groupLayout.setAutoCreateContainerGaps(false);
     groupLayout.setAutoCreateGaps(true);
     groupLayout.setLayoutStyle(layoutStyle);

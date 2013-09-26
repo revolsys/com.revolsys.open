@@ -44,7 +44,7 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
     add(new JLabel("Alpha (Opacity)"));
 
     add(this.alphaSlider);
-    GroupLayoutUtil.makeColumns(this, 2);
+    GroupLayoutUtil.makeColumns(this, 2, true);
   }
 
   @Override

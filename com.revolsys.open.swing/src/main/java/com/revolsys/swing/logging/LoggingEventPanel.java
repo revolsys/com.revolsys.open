@@ -78,7 +78,7 @@ public class LoggingEventPanel extends JPanel {
       add(new JScrollPane(textArea));
       textArea.setCaretPosition(0);
     }
-    GroupLayoutUtil.makeColumns(this, 2);
+    GroupLayoutUtil.makeColumns(this, 2, true);
   }
 
   private void addField(final String fieldName, final Object value) {

@@ -310,20 +310,21 @@ public class Project extends LayerGroup {
   public void setViewBoundingBox(BoundingBox viewBoundingBox) {
     if (!BoundingBox.isEmpty(viewBoundingBox)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox oldValue = this.viewBoundingBox;
-      if (viewBoundingBox.getWidth() == 0) {
-        if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          viewBoundingBox = viewBoundingBox.expand(0.000009 * 20, 0);
-        } else {
-          viewBoundingBox = viewBoundingBox.expand(20, 0);
-        }
+      // TODO really should be min scale
+      double minDimension;
+      if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+        minDimension = 0.0000045;
+      } else {
+        minDimension = 0.5;
       }
-      if (viewBoundingBox.getHeight() == 0) {
-        if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-          viewBoundingBox = viewBoundingBox.expand(0, 0.000009 * 20);
-        } else {
-          viewBoundingBox = viewBoundingBox.expand(0, 20);
-        }
+      final BoundingBox oldValue = this.viewBoundingBox;
+      final double width = viewBoundingBox.getWidth();
+      if (width < minDimension) {
+        viewBoundingBox = viewBoundingBox.expand((minDimension - width) / 2, 0);
+      }
+      final double height = viewBoundingBox.getHeight();
+      if (height < minDimension) {
+        viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
       }
       this.viewBoundingBox = viewBoundingBox;
       firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);

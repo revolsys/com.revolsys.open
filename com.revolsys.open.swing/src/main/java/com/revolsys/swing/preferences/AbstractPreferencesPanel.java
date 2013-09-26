@@ -36,7 +36,7 @@ public abstract class AbstractPreferencesPanel extends JPanel implements
   public void addField(final String title, final Component component) {
     SwingUtil.addLabel(fieldPanel, title);
     fieldPanel.add(component);
-    GroupLayoutUtil.makeColumns(fieldPanel, 2);
+    GroupLayoutUtil.makeColumns(fieldPanel, 2, true);
   }
 
   @Override

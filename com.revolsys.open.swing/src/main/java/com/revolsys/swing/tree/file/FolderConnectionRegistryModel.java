@@ -46,7 +46,7 @@ public class FolderConnectionRegistryModel extends
       final DirectoryNameField folderField = new DirectoryNameField();
       panel.add(folderField);
 
-      GroupLayoutUtil.makeColumns(panel, 2);
+      GroupLayoutUtil.makeColumns(panel, 2, true);
       panel.showDialog();
       if (panel.isSaved()) {
         final File file = folderField.getDirectoryFile();

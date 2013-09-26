@@ -336,7 +336,7 @@ public class DataObjectLayerForm extends JPanel implements
       addLabelledField(panel, fieldName);
     }
 
-    GroupLayoutUtil.makeColumns(panel, 2);
+    GroupLayoutUtil.makeColumns(panel, 2, true);
   }
 
   public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {

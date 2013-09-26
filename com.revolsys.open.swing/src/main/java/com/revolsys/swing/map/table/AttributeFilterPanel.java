@@ -82,10 +82,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.searchTextField = new SearchField();
     this.searchField = this.searchTextField;
     this.searchTextField.addActionListener(this);
-    this.searchTextField.setPreferredSize(new Dimension(200,
-      this.searchTextField.getHeight()));
+    this.searchTextField.setPreferredSize(new Dimension(200, 25));
     add(this.searchFieldPanel);
-    GroupLayoutUtil.makeColumns(this, 3);
+    GroupLayoutUtil.makeColumns(this, 3, false);
 
     final String searchField = layer.getProperty("searchField");
     setSearchField(searchField);
@@ -134,21 +133,19 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
             dataStoreSearchTextField.addItemListener(this);
             dataStoreSearchTextField.setMaxResults(5);
             this.operatorField.setEnabled(false);
-            dataStoreSearchTextField.setPreferredSize(new Dimension(200,
-              this.searchTextField.getHeight()));
+            dataStoreSearchTextField.setPreferredSize(new Dimension(200, 25));
           } else if (this.searchField instanceof JXSearchField) {
             final JXSearchField searchTextField = (JXSearchField)this.searchField;
             searchTextField.addActionListener(this);
             this.operatorField.setEnabled(true);
-            searchTextField.setPreferredSize(new Dimension(200,
-              searchTextField.getHeight()));
+            searchTextField.setPreferredSize(new Dimension(200, 25));
           } else if (this.searchField instanceof JComboBox) {
             final JComboBox comboField = (JComboBox)this.searchField;
             comboField.addActionListener(this);
             this.operatorField.setEnabled(false);
           }
           this.searchFieldPanel.add(this.searchField);
-          GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1);
+          GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1, true);
 
           fireSearchChanged("searchAttribute", oldValue, searchAttribute);
         }

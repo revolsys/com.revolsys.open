@@ -59,7 +59,7 @@ public class AddDataStoreConnectionPanel extends ValueField {
     add(new JLabel("Password:"));
     this.passwordField = new JTextField("", 20);
     add(this.passwordField);
-    GroupLayoutUtil.makeColumns(this, 2);
+    GroupLayoutUtil.makeColumns(this, 2, true);
 
   }
 

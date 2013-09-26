@@ -75,7 +75,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.unitField.addItemListener(this);
     this.unitField.setSelectedItem(this.unit);
     add(this.unitField);
-    GroupLayoutUtil.makeColumns(this, 2);
+    GroupLayoutUtil.makeColumns(this, 2, true);
   }
 
   public Measure<Length> getLength() {
