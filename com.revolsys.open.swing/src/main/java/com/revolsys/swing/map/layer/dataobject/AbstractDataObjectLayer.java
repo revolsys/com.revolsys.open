@@ -77,6 +77,8 @@ import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
+import com.revolsys.swing.field.CheckBox;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -415,7 +417,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
+    createPropertiesPanelFields(propertiesPanel);
+    createPropertiesPanelStyle(propertiesPanel);
+    createPropertiesPanelSnapping(propertiesPanel);
+    return propertiesPanel;
+  }
 
+  protected void createPropertiesPanelFields(
+    final TabbedValuePanel propertiesPanel) {
     final DataObjectMetaData metaData = getMetaData();
     final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
 
@@ -423,13 +432,28 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final JScrollPane fieldScroll = new JScrollPane(fieldTable);
     fieldPanel.add(fieldScroll, BorderLayout.CENTER);
     propertiesPanel.addTab("Fields", fieldPanel);
+  }
 
+  protected void createPropertiesPanelSnapping(
+    final TabbedValuePanel propertiesPanel) {
+    final JPanel panel = new JPanel();
+    SwingUtil.setTitledBorder(panel, "Snapping");
+    final CheckBox snapToAllLayers = new CheckBox("snapToAllLayers",
+      isSnapToAllLayers());
+    // TODO on toggle change value and enable/disable list of layers selection
+    SwingUtil.addLabel(panel, "Snap To All Layers");
+    panel.add(snapToAllLayers);
+    GroupLayoutUtil.makeColumns(panel, 2, false);
+    propertiesPanel.addTab("Snapping", panel);
+  }
+
+  protected void createPropertiesPanelStyle(
+    final TabbedValuePanel propertiesPanel) {
     if (getRenderer() != null) {
       final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
         this);
       propertiesPanel.addTab("Style", stylePanel);
     }
-    return propertiesPanel;
   }
 
   @Override

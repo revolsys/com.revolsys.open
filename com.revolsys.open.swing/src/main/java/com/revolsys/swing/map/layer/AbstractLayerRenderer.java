@@ -51,7 +51,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
-    setParent(parent);
     @SuppressWarnings("unchecked")
     final Map<String, Object> styleDefaults = (Map<String, Object>)style.remove("defaults");
     setDefaults(styleDefaults);
@@ -72,6 +71,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
       name = styleName;
     }
     setName(name);
+    setParent(parent);
   }
 
   public AbstractLayerRenderer(final String type, final T layer) {

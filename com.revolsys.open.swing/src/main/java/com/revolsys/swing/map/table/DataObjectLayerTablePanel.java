@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 
@@ -20,6 +21,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
+import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -53,11 +55,14 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final JToggleButton selectedButton;
 
+  private final QueryWhereConditionField advancedFilter;
+
   public DataObjectLayerTablePanel(final DataObjectLayer layer,
     final JTable table) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
+    this.advancedFilter = new QueryWhereConditionField(layer);
     final MenuFactory menu = getMenu();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -99,6 +104,8 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       layer);
     attributeFilterPanel.addPropertyChangeListener(this);
     toolBar.addComponent("search", attributeFilterPanel);
+    toolBar.addButton("search", "Advanced Filter", "Advanced Filter",
+      (Icon)null, this, "showAdvancedFilter");
 
     toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
       attributeFilterPanel, "clear");
@@ -222,6 +229,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (DataObjectLayerTableModel.MODE_SELECTED.equals(mode)) {
       this.selectedButton.doClick();
     }
+  }
+
+  public void showAdvancedFilter() {
+    advancedFilter.setFieldValue(tableModel.getSearchCondition());
+    advancedFilter.showDialog(this);
   }
 
   public void zoomToRecord() {
