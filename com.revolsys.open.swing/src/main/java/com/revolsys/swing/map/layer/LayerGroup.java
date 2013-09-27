@@ -145,6 +145,14 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return added;
   }
 
+  protected <V extends Layer> void addDescendants(final List<V> layers,
+    final Class<V> layerClass) {
+    addLayers(layers, layerClass);
+    for (final LayerGroup layerGroup : getLayerGroups()) {
+      layerGroup.addDescendants(layers, layerClass);
+    }
+  }
+
   public LayerGroup addLayerGroup() {
     final String name = JOptionPane.showInputDialog(
       SwingUtil.getActiveWindow(), "Enter the name of the new Layer Group.",
@@ -188,12 +196,44 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  protected <V extends Layer> void addLayers(final List<V> layers,
+    final Class<V> layerClass) {
+    for (final Layer layer : this.layers) {
+      if (layerClass.isAssignableFrom(layer.getClass())) {
+        layers.add((V)layer);
+      }
+    }
+  }
+
   public void addPath(final List<Layer> path) {
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
       layerGroup.addPath(path);
     }
     path.add(this);
+  }
+
+  protected <V extends Layer> void addVisibleDescendants(final List<V> layers,
+    final Class<V> layerClass, final double scale) {
+    if (isVisible(scale)) {
+      addVisibleLayers(layers, layerClass, scale);
+      for (final LayerGroup layerGroup : getLayerGroups()) {
+        layerGroup.addVisibleDescendants(layers, layerClass, scale);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <V extends Layer> void addVisibleLayers(final List<V> layers,
+    final Class<V> layerClass, final double scale) {
+    for (final Layer layer : this.layers) {
+      if (layer.isVisible(scale)) {
+        if (layerClass.isAssignableFrom(layer.getClass())) {
+          layers.add((V)layer);
+        }
+      }
+    }
   }
 
   @Override
@@ -266,6 +306,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return boudingBox;
   }
 
+  public <V extends Layer> List<V> getDescenants(final Class<V> layerClass) {
+    final List<V> layers = new ArrayList<V>();
+    addDescendants(layers, layerClass);
+    return layers;
+  }
+
   @Override
   public long getId() {
     // TODO Auto-generated method stub
@@ -324,14 +370,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     return new ArrayList<Layer>(this);
   }
 
-  @SuppressWarnings("unchecked")
   public <V extends Layer> List<V> getLayers(final Class<V> layerClass) {
     final List<V> layers = new ArrayList<V>();
-    for (final Layer layer : this.layers) {
-      if (layerClass.isAssignableFrom(layer.getClass())) {
-        layers.add((V)layer);
-      }
-    }
+    addLayers(layers, layerClass);
     return layers;
   }
 
@@ -360,6 +401,13 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
     return boundingBox;
+  }
+
+  public <V extends Layer> List<V> getVisibleDescendants(
+    final Class<V> layerClass, final double scale) {
+    final List<V> layers = new ArrayList<V>();
+    addVisibleDescendants(layers, layerClass, scale);
+    return layers;
   }
 
   public int indexOf(final Layer layer) {

@@ -53,6 +53,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.undo.UndoableEdit;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
@@ -507,7 +508,7 @@ public class DataObjectLayerForm extends JPanel implements
       addField(geometryAttributeName, this.geometryCoordinatesPanel);
       final JPanel panel = new JPanel(new GridLayout(1, 1));
 
-      this.geometryCoordinatesPanel.setBorder(BorderFactory.createTitledBorder("Coordinates"));
+      SwingUtil.setTitledBorder(geometryCoordinatesPanel, "Coordinates");
       panel.add(this.geometryCoordinatesPanel);
 
       addTab("Geometry", panel);
@@ -606,8 +607,7 @@ public class DataObjectLayerForm extends JPanel implements
   protected JPanel createPanel(final JPanel container, final String title) {
     final JPanel panel = new JPanel();
     container.add(panel);
-
-    panel.setBorder(BorderFactory.createTitledBorder(title));
+    SwingUtil.setTitledBorder(panel, title);
     return panel;
   }
 
@@ -1370,5 +1370,12 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     return valid;
+  }
+
+  protected JPanel addTab(final int index, final String title) {
+    final JPanel panel = new JPanel(new VerticalLayout(5));
+    panel.setOpaque(false);
+    addTab(index, title, panel);
+    return panel;
   }
 }

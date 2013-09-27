@@ -491,19 +491,23 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   })
   @Override
   public List<LayerDataObject> query(final Query query) {
-    final boolean enabled = setEventsEnabled(false);
-    try {
-      query.setProperty("dataObjectFactory", this);
-      final Reader reader = this.dataStore.query(query);
+    if (dataStore == null) {
+      return Collections.emptyList();
+    } else {
+      final boolean enabled = setEventsEnabled(false);
       try {
-        final List<LayerDataObject> readObjects = reader.read();
-        final List<LayerDataObject> objects = getCachedObjects(readObjects);
-        return objects;
+        query.setProperty("dataObjectFactory", this);
+        final Reader reader = this.dataStore.query(query);
+        try {
+          final List<LayerDataObject> readObjects = reader.read();
+          final List<LayerDataObject> objects = getCachedObjects(readObjects);
+          return objects;
+        } finally {
+          reader.close();
+        }
       } finally {
-        reader.close();
+        setEventsEnabled(enabled);
       }
-    } finally {
-      setEventsEnabled(enabled);
     }
   }
 
@@ -607,13 +611,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         if (metaData != null) {
 
           setMetaData(metaData);
-          this.query = new Query(metaData);
+          setQuery(new Query(metaData));
           return;
         }
       }
     }
     setMetaData(null);
-    this.query = null;
+    setQuery(null);
   }
 
   @Override

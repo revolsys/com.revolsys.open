@@ -4,7 +4,6 @@ import java.awt.TextField;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.io.file.FolderConnection;
@@ -37,7 +36,7 @@ public class FolderConnectionRegistryModel extends
       final FolderConnectionRegistry registry = (FolderConnectionRegistry)object;
       final ValueField panel = new ValueField();
       panel.setTitle("Add Folder Connection");
-      panel.setBorder(BorderFactory.createTitledBorder("Folder Connection"));
+      SwingUtil.setTitledBorder(panel, "Folder Connection");
       SwingUtil.addLabel(panel, "Name");
       final TextField nameField = new TextField(20);
       panel.add(nameField);

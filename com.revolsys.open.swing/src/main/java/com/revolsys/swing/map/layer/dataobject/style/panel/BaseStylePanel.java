@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
@@ -100,7 +101,9 @@ public class BaseStylePanel extends ValueField implements
   public BaseStylePanel(final LayerRenderer<?> renderer) {
     super(renderer);
     setTitle("Style");
-    setLayout(new VerticalLayout());
+    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    setBackground(WebColors.White);
+    setLayout(new VerticalLayout(5));
     addReadOnlyFieldName("type");
 
     addPanel(this, "General", renderer, "name", "type", "visible");
@@ -206,7 +209,7 @@ public class BaseStylePanel extends ValueField implements
     final GeometryStyle geometryStyle) {
     final JPanel panel = new JPanel();
     panel.setMinimumSize(new Dimension(300, 0));
-    panel.setBorder(BorderFactory.createTitledBorder("Line Style"));
+    SwingUtil.setTitledBorder(panel, "Line Style");
     addField(panel, geometryStyle, "lineColor");
     addLengthMeasureField(panel, geometryStyle, "lineWidth");
     addField(panel, geometryStyle, "lineJoin");
@@ -230,7 +233,8 @@ public class BaseStylePanel extends ValueField implements
   protected JPanel addPanel(final Container container, final String title,
     final Object object, final String... fieldNames) {
     final JPanel panel = new JPanel();
-    panel.setBorder(BorderFactory.createTitledBorder(title));
+    SwingUtil.setTitledBorder(panel, title);
+
     addFields(panel, object, fieldNames);
     GroupLayoutUtil.makeColumns(panel, 2, true);
     container.add(panel);

@@ -43,6 +43,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
@@ -221,6 +222,29 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
+  protected boolean addSnapLayers(final Set<DataObjectLayer> layers,
+    final Project project, final DataObjectLayer layer, final double scale) {
+    if (layer != null) {
+      if (layer.isSnapToAllLayers()) {
+        return true;
+      } else {
+        layers.add(layer);
+        final List<String> layerNames = layer.getSnapLayerNames();
+        if (layerNames != null) {
+          for (final String layerName : layerNames) {
+            final Layer snapLayer = project.getLayer(layerName);
+            if (snapLayer instanceof DataObjectLayer) {
+              if (snapLayer.isVisible(scale)) {
+                layers.add((DataObjectLayer)snapLayer);
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   protected Geometry appendVertex(final Point newPoint) {
     final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
     Geometry geometry = this.addGeometry;
@@ -396,33 +420,23 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   protected List<DataObjectLayer> getSnapLayers() {
+    final Project project = Project.get();
+    final double scale = MapPanel.get(project).getScale();
     final Set<DataObjectLayer> layers = new LinkedHashSet<DataObjectLayer>();
+    boolean snapAll = false;
     if (isModeAddGeometry()) {
-      layers.add(this.addLayer);
+      snapAll = addSnapLayers(layers, project, this.addLayer, scale);
     } else {
       for (final CloseLocation location : getMouseOverLocations()) {
         final DataObjectLayer layer = location.getLayer();
-        if (layer != null) {
-          final List<String> layerNames = (List<String>)layer.getProperty("snapLayers");
-          if (layerNames == null) {
-            layers.add(layer);
-          } else {
-            final LayerGroup project = layer.getProject();
-            final MapPanel map = MapPanel.get(project);
-            final double scale = map.getScale();
-            for (final String layerName : layerNames) {
-              final Layer snapLayer = project.getLayer(layerName);
-              if (snapLayer instanceof DataObjectLayer) {
-                if (snapLayer.isVisible(scale)) {
-                  layers.add((DataObjectLayer)snapLayer);
-                }
-              }
-            }
-          }
-        }
+        snapAll |= addSnapLayers(layers, project, layer, scale);
       }
+    }
+    if (snapAll) {
+      final List<DataObjectLayer> visibleDescendants = project.getVisibleDescendants(
+        DataObjectLayer.class, scale);
+      return visibleDescendants;
     }
     return new ArrayList<DataObjectLayer>(layers);
   }
@@ -577,15 +591,13 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         clearMouseOverLocations();
       }
     } else if (keyCode == KeyEvent.VK_ESCAPE) {
-      if (!getMouseOverLocations().isEmpty()) {
-        clearMouseOverLocations();
-      } else if (clearMoveGeometry()) {
-      } else if (isModeAddGeometry()) {
-        if (this.addCompleteAction != null) {
-          this.addCompleteAction.addComplete(this, null);
-        }
-        clearAddGeometry();
+      clearMouseOverLocations();
+      clearMoveGeometry();
+      if (this.addCompleteAction != null) {
+        this.addCompleteAction.addComplete(this, null);
       }
+      clearAddGeometry();
+
     } else if (keyCode == KeyEvent.VK_CONTROL) {
       if (!isModeAddGeometry()) {
         clearMouseOverLocations();
@@ -616,12 +628,15 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (SwingUtilities.isLeftMouseButton(event)) {
       if (isModeAddGeometry()) {
         if (getMouseOverLocations().isEmpty()) {
-          final Point point;
+          Point point;
           if (getSnapPoint() == null) {
             point = getPoint(event);
           } else {
             point = getSnapPoint();
           }
+          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+
+          point = geometryFactory.copy(point);
           if (this.addGeometry.isEmpty()) {
             setAddGeometry(appendVertex(point));
           } else {
@@ -795,8 +810,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (!getMouseOverLocations().isEmpty()) {
         this.vertexDragModifiers = event.getModifiers();
       }
-      if (isModeAddGeometry()) {
-      } else if (!getMouseOverLocations().isEmpty()) {
+      if (!getMouseOverLocations().isEmpty()) {
 
         repaint();
         event.consume();
@@ -819,7 +833,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected void moveGeometryFinish(final MouseEvent event) {
-    // TODO move geometry
     for (final CloseLocation location : getMouseOverLocations()) {
       final GeometryFactory geometryFactory = location.getGeometryFactory();
       final Point startPoint = geometryFactory.copy(getViewportPoint(this.moveGeometryStart));

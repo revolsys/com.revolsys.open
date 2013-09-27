@@ -78,6 +78,8 @@ public interface DataObjectLayer extends Layer {
 
   int getSelectionCount();
 
+  List<String> getSnapLayerNames();
+
   boolean isCanAddRecords();
 
   boolean isCanDeleteRecords();
@@ -98,6 +100,8 @@ public interface DataObjectLayer extends Layer {
   boolean isNew(LayerDataObject record);
 
   boolean isSelected(LayerDataObject record);
+
+  boolean isSnapToAllLayers();
 
   boolean isVisible(LayerDataObject record);
 

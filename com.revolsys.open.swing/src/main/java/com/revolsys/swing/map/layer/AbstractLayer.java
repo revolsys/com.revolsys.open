@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,6 +27,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -39,6 +39,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
@@ -146,11 +147,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final TabbedValuePanel tabPanel) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
-      final JPanel panel = new JPanel(new VerticalLayout());
+      final JPanel panel = new JPanel(new VerticalLayout(5));
       tabPanel.addTab("Spatial", panel);
 
       final JPanel extentPanel = new JPanel();
-      extentPanel.setBorder(BorderFactory.createTitledBorder("Extent"));
+      SwingUtil.setTitledBorder(extentPanel, "Extent");
       final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox == null || boundingBox.isNull()) {
         extentPanel.add(new JLabel("Unknown"));
@@ -176,7 +177,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = new JPanel();
-      coordinateSystemPanel.setBorder(BorderFactory.createTitledBorder("Coordinate System"));
+      coordinateSystemPanel.setBorder(new TitledBorder("Coordinate System"));
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem == null) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
@@ -246,6 +247,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+  }
+
+  protected boolean checkShowProperties() {
+    boolean show = true;
+    synchronized (this) {
+      if (BooleanStringConverter.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
+        show = false;
+      } else {
+        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
+      }
+    }
+    return show;
   }
 
   @Override
@@ -669,13 +682,19 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void showProperties(final String tabName) {
-    if (exists) {
-      final MapPanel map = MapPanel.get(this);
-      if (map != null) {
-        final Window window = SwingUtilities.getWindowAncestor(map);
-        final TabbedValuePanel panel = createPropertiesPanel();
-        panel.setSelectdTab(tabName);
-        panel.showDialog(window);
+    final MapPanel map = MapPanel.get(this);
+    if (map != null) {
+      if (exists) {
+        if (checkShowProperties()) {
+          try {
+            final Window window = SwingUtilities.getWindowAncestor(map);
+            final TabbedValuePanel panel = createPropertiesPanel();
+            panel.setSelectdTab(tabName);
+            panel.showDialog(window);
+          } finally {
+            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+          }
+        }
       }
     }
   }
@@ -684,12 +703,20 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void showRendererProperties(final LayerRenderer<?> renderer) {
     final MapPanel map = MapPanel.get(this);
     if (map != null) {
-      final Window window = SwingUtilities.getWindowAncestor(map);
-      final TabbedValuePanel panel = createPropertiesPanel();
-      panel.setSelectdTab("Style");
-      final DataObjectLayerStylePanel stylePanel = panel.getTab("Style");
-      stylePanel.setSelectedRenderer(renderer);
-      panel.showDialog(window);
+      if (exists) {
+        if (checkShowProperties()) {
+          try {
+            final Window window = SwingUtilities.getWindowAncestor(map);
+            final TabbedValuePanel panel = createPropertiesPanel();
+            panel.setSelectdTab("Style");
+            final DataObjectLayerStylePanel stylePanel = panel.getTab("Style");
+            stylePanel.setSelectedRenderer(renderer);
+            panel.showDialog(window);
+          } finally {
+            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+          }
+        }
+      }
     }
   }
 
@@ -725,7 +752,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     if (properties != null) {
       for (final Entry<String, Object> entry : properties.entrySet()) {
         final String name = entry.getKey();
-        if (!map.containsKey(name)) {
+        if (!map.containsKey(name) && !name.startsWith("INTERNAL")) {
           final Object value = entry.getValue();
           if (!(value instanceof Component)) {
             map.put(name, value);

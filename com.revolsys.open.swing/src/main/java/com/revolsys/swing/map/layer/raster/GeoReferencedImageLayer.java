@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
@@ -117,7 +117,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
     final TiePointsPanel tiePointsPanel = new TiePointsPanel(this);
-    tiePointsPanel.setBorder(BorderFactory.createTitledBorder("Tie Points"));
+    SwingUtil.setTitledBorder(tiePointsPanel, "Tie Points");
+
     propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
     return propertiesPanel;
   }

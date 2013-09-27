@@ -111,6 +111,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
+  private boolean snapToAllLayers = false;
+
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
     menu.addGroup(0, "table");
@@ -216,7 +218,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final Set<LayerDataObject> newRecords = new LinkedHashSet<LayerDataObject>();
 
-  protected Query query;
+  private Query query;
 
   private final Set<LayerDataObject> selectedRecords = new LinkedHashSet<LayerDataObject>();
 
@@ -254,11 +256,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public LayerDataObject addComplete(final AbstractOverlay overlay,
     final Geometry geometry) {
-    final DataObjectMetaData metaData = getMetaData();
-    final String geometryAttributeName = metaData.getGeometryAttributeName();
-    final Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put(geometryAttributeName, geometry);
-    return showAddForm(parameters);
+    if (geometry == null) {
+      return null;
+    } else {
+      final DataObjectMetaData metaData = getMetaData();
+      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      final Map<String, Object> parameters = new HashMap<String, Object>();
+      parameters.put(geometryAttributeName, geometry);
+      return showAddForm(parameters);
+    }
   }
 
   protected void addModifiedObject(final LayerDataObject object) {
@@ -769,6 +775,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return this.selectedRecords.size();
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<String> getSnapLayerNames() {
+    return (List<String>)getProperty("snapLayers");
+  }
+
   protected boolean hasPermission(final String permission) {
     if (this.metaData == null) {
       return true;
@@ -917,6 +929,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       return this.selectedRecords.contains(object);
     }
+  }
+
+  @Override
+  public boolean isSnapToAllLayers() {
+    return snapToAllLayers;
   }
 
   @Override
@@ -1324,6 +1341,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return objects.size();
   }
 
+  public void setSnapToAllLayers(final boolean snapToAllLayers) {
+    this.snapToAllLayers = snapToAllLayers;
+  }
+
   @Override
   public LayerDataObject showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
@@ -1518,6 +1539,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       MapSerializerUtil.add(map, "canDeleteRecords", this.canDeleteRecords,
         true);
       MapSerializerUtil.add(map, "canEditRecords", this.canEditRecords, true);
+      MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers, false);
     }
     MapSerializerUtil.add(map, "columnNameOrder", this.columnNameOrder);
     map.remove("TableView");

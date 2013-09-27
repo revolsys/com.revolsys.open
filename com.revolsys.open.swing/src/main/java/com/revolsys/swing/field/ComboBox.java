@@ -23,12 +23,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
-@SuppressWarnings("serial")
 public class ComboBox extends JComboBox implements Field {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private String fieldName;

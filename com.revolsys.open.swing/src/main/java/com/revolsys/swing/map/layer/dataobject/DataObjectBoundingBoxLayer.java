@@ -15,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -106,7 +107,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   public void setIndex(final BoundingBox boundingBox,
     final DataObjectQuadTree index) {
     synchronized (this.sync) {
-      if (this.boundingBox.equals(boundingBox)) {
+      if (EqualsRegistry.equal(this.boundingBox, boundingBox)) {
         this.index = index;
         this.worker = null;
         this.loading = false;

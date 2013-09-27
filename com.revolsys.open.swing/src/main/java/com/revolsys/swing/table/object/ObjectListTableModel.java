@@ -113,11 +113,12 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
   }
 
   public T getObject(final int index) {
-    if (index < this.objects.size()) {
-      return this.objects.get(index);
-    } else {
-      return null;
+    if (objects != null) {
+      if (index < this.objects.size()) {
+        return this.objects.get(index);
+      }
     }
+    return null;
   }
 
   /**

@@ -29,7 +29,7 @@ public class GraphicPanel extends ValueField
   //
   // final Measure<Length> size = graphic.getSize();
   // sizeField = new LengthMeasurePanel(size, 0, 300, 50, true, unit);
-  // sizeField.setBorder(BorderFactory.createTitledBorder("Graphic Size"));
+  // sizeField.setBorder(new TitledBorder("Graphic Size"));
   // add(sizeField);
   //
   // final GraphicSymbol symbol = graphic.getSymbols().get(0);

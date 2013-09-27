@@ -20,7 +20,7 @@ public class WellKnownMarkGraphicSymbolPanel {
   // });
   // markField.setSelectedItem(symbol.getName().toString());
   // markPanel.add(markField);
-  // markPanel.setBorder(BorderFactory.createTitledBorder("Symbol"));
+  // markPanel.setBorder(new TitledBorder("Symbol"));
   // add(markPanel, 0);
   // SpringLayoutUtil.makeRows(this, 0, 0, 5, 5, 4, 3);
   // }

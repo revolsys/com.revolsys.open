@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -15,6 +14,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -78,8 +78,10 @@ public class MergeObjectsDialog extends JDialog implements WindowListener {
     addWindowListener(this);
     setLayout(new BorderLayout());
 
-    this.statusLabel.setBorder(BorderFactory.createTitledBorder("Status"));
-    add(this.statusLabel, BorderLayout.NORTH);
+    final JPanel statusPanel = new JPanel(new VerticalLayout());
+    statusPanel.add(statusLabel);
+    SwingUtil.setTitledBorder(statusPanel, "Status");
+    add(statusPanel, BorderLayout.NORTH);
     setStatus("Creating merged record for " + this.layer.getName());
 
     final JTabbedPane tabs = new JTabbedPane();

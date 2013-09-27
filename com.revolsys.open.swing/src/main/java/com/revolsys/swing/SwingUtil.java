@@ -52,6 +52,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
 import com.revolsys.swing.field.ColorChooserField;
@@ -97,6 +98,14 @@ public class SwingUtil {
     label.setFont(BOLD_FONT);
     container.add(label);
     return label;
+  }
+
+  public static void addReadOnlyTextField(final JPanel container,
+    final String fieldName, final Object value, final int length) {
+    addLabel(container, fieldName);
+    final TextField crsField = new TextField(fieldName, value, length);
+    crsField.setEditable(false);
+    container.add(crsField);
   }
 
   public static ComboBox createComboBox(final CodeTable codeTable,
@@ -535,13 +544,12 @@ public class SwingUtil {
     frame.setState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
   }
 
-  public static void addReadOnlyTextField(final JPanel container, String fieldName,
-    Object value, int length) {
-    addLabel(container, fieldName);
-    final TextField crsField = new TextField(fieldName,
-    value, length);
-    crsField.setEditable(false);
-    container.add(crsField);
+  public static void setTitledBorder(final JComponent component,
+    final String title) {
+    if (component != null) {
+      final TitledBorder border = new TitledBorder(title);
+      component.setBorder(border);
+    }
   }
 
 }

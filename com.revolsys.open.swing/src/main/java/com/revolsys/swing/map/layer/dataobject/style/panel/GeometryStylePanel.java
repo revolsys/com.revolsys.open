@@ -10,10 +10,12 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -57,13 +59,20 @@ public class GeometryStylePanel extends BaseStylePanel implements
       final boolean hasPolygonStyle = false;
 
       final JPanel panel = new JPanel(new BorderLayout());
+      panel.setBackground(WebColors.White);
       add(panel, 1);
-      final JPanel stylePanels = new JPanel(new VerticalLayout());
+      final JPanel stylePanels = new JPanel(new VerticalLayout(5));
+      stylePanels.setBackground(WebColors.White);
       panel.add(stylePanels, BorderLayout.CENTER);
 
-      this.previews = new JPanel(new VerticalLayout());
-      this.previews.setBorder(BorderFactory.createTitledBorder("Preview"));
-      panel.add(this.previews, BorderLayout.EAST);
+      this.previews = new JPanel(new VerticalLayout(5));
+      SwingUtil.setTitledBorder(previews, "Preview");
+
+      final JPanel previewContainer = new JPanel(new VerticalLayout());
+      previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+      previewContainer.setBackground(WebColors.White);
+      previewContainer.add(previews);
+      panel.add(previewContainer, BorderLayout.EAST);
 
       if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels, geometryStyle);

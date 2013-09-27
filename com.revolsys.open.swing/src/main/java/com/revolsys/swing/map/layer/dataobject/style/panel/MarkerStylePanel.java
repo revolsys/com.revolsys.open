@@ -10,8 +10,10 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
@@ -40,13 +42,20 @@ public class MarkerStylePanel extends BaseStylePanel implements
     if (geometryAttribute != null) {
 
       final JPanel panel = new JPanel(new BorderLayout());
+      panel.setBackground(WebColors.White);
       add(panel, 1);
-      final JPanel stylePanels = new JPanel(new VerticalLayout());
+      final JPanel stylePanels = new JPanel(new VerticalLayout(5));
+      stylePanels.setBackground(WebColors.White);
       panel.add(stylePanels, BorderLayout.CENTER);
 
-      this.previews = new JPanel(new VerticalLayout());
-      this.previews.setBorder(BorderFactory.createTitledBorder("Preview"));
-      panel.add(this.previews, BorderLayout.EAST);
+      this.previews = new JPanel(new VerticalLayout(5));
+      SwingUtil.setTitledBorder(previews, "Preview");
+
+      final JPanel previewContainer = new JPanel(new VerticalLayout());
+      previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+      previewContainer.setBackground(WebColors.White);
+      previewContainer.add(previews);
+      panel.add(previewContainer, BorderLayout.EAST);
 
       addMarkerStylePanel(stylePanels, markerStyle);
       this.previews.add(new MarkerStylePreview(this.markerStyle));

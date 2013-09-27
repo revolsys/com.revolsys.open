@@ -1,6 +1,8 @@
 package com.revolsys.swing.map.component;
 
 import java.awt.Component;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -16,13 +18,15 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
 
-public class MarkerField extends ValueField {
+public class MarkerField extends ValueField implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
   private final ComboBox comboBox = new ComboBox("marker",
     new DefaultComboBoxModel(new Vector<Marker>(ShapeMarker.getMarkers())),
     null, new DefaultListCellRenderer() {
+      private static final long serialVersionUID = 1L;
+
       @Override
       public Component getListCellRendererComponent(final JList list,
         final Object value, final int index, final boolean isSelected,
@@ -40,6 +44,7 @@ public class MarkerField extends ValueField {
     super(fieldName, fieldValue);
     setLayout(new VerticalLayout());
     add(comboBox);
+    comboBox.addPropertyChangeListener("marker", this);
     comboBox.setSelectedItem(fieldValue);
   }
 
@@ -47,4 +52,11 @@ public class MarkerField extends ValueField {
     return (Marker)getFieldValue();
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == comboBox) {
+      final Object selectedItem = comboBox.getSelectedItem();
+      setFieldValue(selectedItem);
+    }
+  }
 }
