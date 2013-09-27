@@ -359,6 +359,12 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
             } catch (final ArrayIndexOutOfBoundsException e) {
             }
           }
+        } else if (oldValue != newValue) {
+          final TreePath path = this.model.getPath(source);
+          if (path != null) {
+            this.model.fireTreeNodesRemoved(path, index, oldValue);
+            this.model.fireTreeNodesInserted(path, index, newValue);
+          }
         }
 
       } else {
@@ -375,6 +381,20 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
+  }
+
+  public void setRoot(final Object object) {
+    final Object oldRoot = model.getRoot();
+    if (oldRoot != null) {
+      collapsePath(new TreePath(oldRoot));
+    }
+    setSelectionPath(null);
+    model.setRoot(object);
+    if (object != null) {
+      final TreePath newPath = new TreePath(object);
+      setSelectionPath(newPath);
+      expandPath(newPath);
+    }
   }
 
   public void setVisible(final Object object, final boolean visible) {

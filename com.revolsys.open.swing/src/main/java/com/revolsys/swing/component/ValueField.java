@@ -234,7 +234,9 @@ public class ValueField extends JPanel implements Field {
     this.saved = false;
     dialog.setVisible(true);
 
-    return (V)getFieldValue();
+    final V value = (V)getFieldValue();
+    dialog.dispose();
+    return value;
   }
 
   @Override

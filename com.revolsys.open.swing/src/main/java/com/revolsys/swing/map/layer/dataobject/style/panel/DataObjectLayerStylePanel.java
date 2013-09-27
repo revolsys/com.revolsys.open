@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import javax.swing.JLabel;
@@ -23,14 +25,21 @@ import com.revolsys.swing.map.tree.MultipleLayerRendererTreeNodeModel;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
+import com.revolsys.util.Property;
 
-public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
+public class DataObjectLayerStylePanel extends JPanel implements MouseListener,
+  PropertyChangeListener {
+
+  private static final long serialVersionUID = 1L;
 
   private final JScrollPane editStyleContainer = new JScrollPane();
 
   private final ObjectTree tree;
 
+  private final DataObjectLayer layer;
+
   public DataObjectLayerStylePanel(final DataObjectLayer layer) {
+    this.layer = layer;
     setLayout(new BorderLayout());
     final JLabel instructions = new JLabel(
       "<html><p style=\"padding: 2px 3px 2px\">Click on the style from the left to show the edit panel on the right for that style.</p></html>");
@@ -51,6 +60,7 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
     splitPane.setDividerLocation(300);
     setPreferredSize(new Dimension(1100, 700));
     add(splitPane, BorderLayout.CENTER);
+    Property.addListener(layer, "renderer", this);
   }
 
   @Override
@@ -87,6 +97,21 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if ("renderer".equals(event.getPropertyName())) {
+      final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
+      tree.setRoot(renderer);
+      setSelectedRenderer(renderer);
+    }
+  }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    Property.removeListener(layer, "renderer", this);
   }
 
   public void setEditStylePanel(final LayerRenderer<? extends Layer> renderer) {

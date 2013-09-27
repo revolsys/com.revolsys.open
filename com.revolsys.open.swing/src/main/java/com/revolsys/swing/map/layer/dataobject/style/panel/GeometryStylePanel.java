@@ -57,7 +57,7 @@ public class GeometryStylePanel extends BaseStylePanel implements
       final boolean hasPolygonStyle = false;
 
       final JPanel panel = new JPanel(new BorderLayout());
-      add(panel);
+      add(panel, 1);
       final JPanel stylePanels = new JPanel(new VerticalLayout());
       panel.add(stylePanels, BorderLayout.CENTER);
 
@@ -98,7 +98,7 @@ public class GeometryStylePanel extends BaseStylePanel implements
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent event) {
+  public void doPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
       final Field field = (Field)source;

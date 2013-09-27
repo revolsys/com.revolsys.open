@@ -153,6 +153,11 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     return this.objectTreeNodeModels;
   }
 
+  @Override
+  public <T> T getParent(final NODE node) {
+    return null;
+  }
+
   protected DefaultTreeCellRenderer getRenderer() {
     return this.renderer;
   }

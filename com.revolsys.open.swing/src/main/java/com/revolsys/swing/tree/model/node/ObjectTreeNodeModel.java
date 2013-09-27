@@ -34,6 +34,8 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   List<ObjectTreeNodeModel<?, ?>> getObjectTreeNodeModels();
 
+  <T> T getParent(final NODE node);
+
   Component getRenderer(final NODE node, JTree tree, boolean selected,
     boolean expanded, boolean leaf, int row, boolean hasFocus);
 

@@ -15,11 +15,7 @@ import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
-@SuppressWarnings("serial")
 public class ObjectTreePanel extends JPanel {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final List<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
@@ -76,7 +72,7 @@ public class ObjectTreePanel extends JPanel {
   }
 
   public ObjectTreeModel getTreeModel() {
-    return (ObjectTreeModel)this.tree.getModel();
+    return this.tree.getModel();
   }
 
   public void setSelectionMode(final int mode) {

@@ -74,7 +74,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     if (!isHasError()) {
       try {
-        final double metresPerPixel = viewport.getMetresPerPixel();
+        final double metresPerPixel = viewport.getUnitsPerPixel();
         final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
         final double resolution = getResolution(viewport);
         if (resolution > 0) {
@@ -114,7 +114,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     if (mapServer == null) {
       return 0;
     } else {
-      final double metresPerPixel = viewport.getMetresPerPixel();
+      final double metresPerPixel = viewport.getUnitsPerPixel();
       final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
       return mapServer.getResolution(zoomLevel);
     }

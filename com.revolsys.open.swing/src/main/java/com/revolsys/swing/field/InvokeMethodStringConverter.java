@@ -3,6 +3,7 @@ package com.revolsys.swing.field;
 import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
@@ -18,6 +19,8 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
 
   private final String methodName;
 
+  private int horizontalAlignment = JLabel.LEFT;
+
   public InvokeMethodStringConverter(final Object object,
     final String methodName) {
     if (object == null) {
@@ -25,6 +28,10 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
     }
     this.object = object;
     this.methodName = methodName;
+  }
+
+  public int getHorizontalAlignment() {
+    return horizontalAlignment;
   }
 
   @Override
@@ -35,6 +42,7 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
       cellHasFocus);
     final String text = getPreferredStringForItem(value);
     this.renderer.setText(text);
+    this.renderer.setHorizontalAlignment(horizontalAlignment);
     return this.renderer;
   }
 
@@ -60,5 +68,9 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
         throw new RuntimeException("Unable to invoke " + this, e);
       }
     }
+  }
+
+  public void setHorizontalAlignment(final int horizontalAlignment) {
+    this.horizontalAlignment = horizontalAlignment;
   }
 }

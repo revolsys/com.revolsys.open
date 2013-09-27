@@ -59,6 +59,16 @@ public class BaseLayerTreeNodeModel extends
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getParent(final AbstractLayer node) {
+    if (node == null) {
+      return null;
+    } else {
+      return (T)node.getLayerGroup();
+    }
+  }
+
   @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();

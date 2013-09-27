@@ -46,7 +46,7 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
-import com.revolsys.swing.map.layer.menu.SetLayerScaleMenu;
+import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -68,8 +68,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
       "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
-    menu.addComponentFactory("scale", new SetLayerScaleMenu(true));
-    menu.addComponentFactory("scale", new SetLayerScaleMenu(false));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
 
     menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
       exists, "refresh"));
@@ -630,9 +630,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
+    final Object oldValue = this.renderer;
     Property.removeListener(this.renderer, this);
     this.renderer = renderer;
     Property.addListener(this.renderer, this);
+    firePropertyChange("renderer", oldValue, this.renderer);
+    fireIndexedPropertyChange("renderer", 0, oldValue, this.renderer);
   }
 
   @Override

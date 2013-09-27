@@ -48,7 +48,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
     try {
-      final double metresPerPixel = viewport.getMetresPerPixel();
+      final double metresPerPixel = viewport.getUnitsPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
@@ -82,7 +82,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getMetresPerPixel();
+    final double metresPerPixel = viewport.getUnitsPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
   }

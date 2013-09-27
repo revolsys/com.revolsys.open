@@ -62,6 +62,16 @@ public class FileModel extends AbstractObjectTreeNodeModel<File, File> {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getParent(final File node) {
+    if (node == null) {
+      return null;
+    } else {
+      return (T)node.getParentFile();
+    }
+  }
+
   @Override
   public Component getRenderer(final File file, final JTree tree,
     final boolean selected, final boolean expanded, final boolean leaf,

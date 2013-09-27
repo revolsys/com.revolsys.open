@@ -32,8 +32,9 @@ public class TableRowCount extends JLabel implements TableModelListener {
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    setPreferredSize(new Dimension(100, 25));
-    setMaximumSize(new Dimension(100, 25));
+    final Dimension size = new Dimension(100, 22);
+    setPreferredSize(size);
+    setMaximumSize(size);
     final NumberFormat FORMAT = new DecimalFormat("#,##0");
     final String text = FORMAT.format(this.model.getRowCount());
     setText(text);

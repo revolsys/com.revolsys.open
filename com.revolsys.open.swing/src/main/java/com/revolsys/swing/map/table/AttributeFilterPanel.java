@@ -82,7 +82,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.searchTextField = new SearchField();
     this.searchField = this.searchTextField;
     this.searchTextField.addActionListener(this);
-    this.searchTextField.setPreferredSize(new Dimension(200, 25));
+    this.searchTextField.setPreferredSize(new Dimension(200, 22));
     add(this.searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 3, false);
 
@@ -133,19 +133,19 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
             dataStoreSearchTextField.addItemListener(this);
             dataStoreSearchTextField.setMaxResults(5);
             this.operatorField.setEnabled(false);
-            dataStoreSearchTextField.setPreferredSize(new Dimension(200, 25));
+            dataStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
           } else if (this.searchField instanceof JXSearchField) {
             final JXSearchField searchTextField = (JXSearchField)this.searchField;
             searchTextField.addActionListener(this);
             this.operatorField.setEnabled(true);
-            searchTextField.setPreferredSize(new Dimension(200, 25));
+            searchTextField.setPreferredSize(new Dimension(200, 22));
           } else if (this.searchField instanceof JComboBox) {
             final JComboBox comboField = (JComboBox)this.searchField;
             comboField.addActionListener(this);
             this.operatorField.setEnabled(false);
           }
           this.searchFieldPanel.add(this.searchField);
-          GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1, true);
+          GroupLayoutUtil.makeColumns(this.searchFieldPanel, 1, false);
 
           fireSearchChanged("searchAttribute", oldValue, searchAttribute);
         }

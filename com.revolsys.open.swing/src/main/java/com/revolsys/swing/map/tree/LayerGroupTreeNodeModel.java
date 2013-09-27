@@ -36,6 +36,16 @@ public class LayerGroupTreeNodeModel extends
     return parent.getLayers();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getParent(final LayerGroup node) {
+    if (node == null) {
+      return null;
+    } else {
+      return (T)node.getLayerGroup();
+    }
+  }
+
   @Override
   public boolean isLeaf(final LayerGroup node) {
     return false;

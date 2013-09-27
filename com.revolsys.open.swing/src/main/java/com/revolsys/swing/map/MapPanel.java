@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.revolsys.swing.map.border.MapRulerBorder;
 import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
+import com.revolsys.swing.map.component.SelectMapUnitsPerPixel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
@@ -57,6 +59,11 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
+
+  public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L,
+    125000000L, 50000000L, 25000000L, 12500000L, 5000000L, 2500000L, 1250000L,
+    500000L, 250000L, 125000L, 50000L, 25000L, 12500L, 5000L, 2500L, 1250L,
+    500L, 250L, 125L, 50L, 25L, 10L, 5L);
 
   public static final BoundingBox BC_ENVELOPE = new BoundingBox(
     GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252, 6174862,
@@ -81,7 +88,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  final List<Double> scales = new ArrayList<Double>();
+  private List<Long> scales = new ArrayList<Long>();
 
   private final LayerGroup baseMapLayers;
 
@@ -98,8 +105,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private Project project;
 
   private double scale = 0;
-
-  private SelectMapScale selectMapScale;
 
   private final UndoManager undoManager = new UndoManager();
 
@@ -205,7 +210,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
       this.baseMapLayers, true);
     final ComboBox comboBox = new ComboBox(baseMapLayersModel);
-    comboBox.setMaximumSize(new Dimension(200, 20));
+    comboBox.setMaximumSize(new Dimension(200, 22));
     comboBox.addItemListener(new InvokeMethodSelectedItemListener(this,
       "setBaseMapLayer"));
     if (this.baseMapLayers.size() > 0) {
@@ -257,10 +262,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.statusBar.add(location);
   }
 
-  protected void addScale(final double metresPerPixel) {
-    final double scale = this.viewport.getScaleForMetresPerPixel(metresPerPixel);
-    this.scales.add(scale);
-  }
+  // protected void addScale(final double metresPerPixel) {
+  // final double scale =
+  // this.viewport.getScaleForUnitsPerPixel(metresPerPixel);
+  // this.scales.add(scale);
+  // }
 
   protected void addStatusBar() {
     add(this.statusBar, BorderLayout.SOUTH);
@@ -327,8 +333,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       "magnifier_zoom_selected", this, "zoomToSelected");
     // TODO disable if none selected
 
-    this.selectMapScale = new SelectMapScale(this);
-    this.toolBar.addComponent("zoom", this.selectMapScale);
+    this.toolBar.addComponent("zoom", new SelectMapScale(this));
+    this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
   }
 
   public void clearToolTipText() {
@@ -341,14 +347,15 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void createScales() {
-    double multiplier = 0.001;
-    for (int i = 0; i < 9; i++) {
-      addScale(1 * multiplier);
-      addScale(2 * multiplier);
-      addScale(5 * multiplier);
-      multiplier *= 10;
-    }
-    Collections.reverse(this.scales);
+    // double multiplier = 0.001;
+    // for (int i = 0; i < 9; i++) {
+    // addScale(1 * multiplier);
+    // addScale(2 * multiplier);
+    // addScale(5 * multiplier);
+    // multiplier *= 10;
+    // }
+    // Collections.reverse(this.scales);
+    this.scales = SCALES;
   }
 
   public void dispose() {
@@ -436,7 +443,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.scale;
   }
 
-  public List<Double> getScales() {
+  public List<Long> getScales() {
     return this.scales;
   }
 
@@ -450,6 +457,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public UndoManager getUndoManager() {
     return this.undoManager;
+  }
+
+  public double getUnitsPerPixel() {
+    return viewport.getUnitsPerPixel();
   }
 
   public Viewport2D getViewport() {
@@ -469,10 +480,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public double getZoomOutScale(final double scale) {
     final long scaleCeil = (long)Math.floor(scale);
-    final List<Double> scales = new ArrayList<Double>(this.scales);
+    final List<Long> scales = new ArrayList<Long>(this.scales);
     Collections.reverse(scales);
-    for (final double nextScale : scales) {
-      final long newScale = (long)Math.floor(nextScale);
+    for (final Long nextScale : scales) {
+      final long newScale = nextScale;
       if (newScale > scaleCeil) {
         return nextScale;
       }
@@ -536,6 +547,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     final BoundingBox oldBoundingBox = getBoundingBox();
+    final double oldUnitsPerPixel = getUnitsPerPixel();
 
     final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
     final boolean zoomNextEnabled = isZoomNextEnabled();
@@ -568,6 +580,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
         }
       }
     }
+    firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
     firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
     firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
       isZoomPreviousEnabled());
@@ -595,10 +608,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void setScale(final double scale) {
     final double oldValue = this.scale;
+    final double oldUnitsPerPixel = getUnitsPerPixel();
     if (scale != oldValue) {
       this.viewport.setScale(scale);
       this.scale = scale;
       firePropertyChange("scale", oldValue, scale);
+      firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
       repaint();
     }
   }
@@ -612,6 +627,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else {
       Invoke.later(toolTipOverlay, "setText", location, text);
     }
+  }
+
+  public void setUnitsPerPixel(final double unitsPerPixel) {
+    setScale(viewport.getScaleForUnitsPerPixel(unitsPerPixel));
   }
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {

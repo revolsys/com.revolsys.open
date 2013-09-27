@@ -51,7 +51,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
-    this.parent = parent;
+    setParent(parent);
     @SuppressWarnings("unchecked")
     final Map<String, Object> styleDefaults = (Map<String, Object>)style.remove("defaults");
     setDefaults(styleDefaults);
@@ -123,11 +123,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return this.layer;
   }
 
-  public double getMaximumScale() {
+  public long getMaximumScale() {
     return this.maximumScale;
   }
 
-  public double getMinimumScale() {
+  public long getMinimumScale() {
     return this.minimumScale;
   }
 
@@ -234,13 +234,13 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   @SuppressWarnings("unchecked")
   @Override
   public void setParent(final LayerRenderer<?> parent) {
-    final Object oldValue = this.parent;
-    Property.removeListener(oldValue, this);
+    final LayerRenderer<?> oldValue = this.parent;
+    Property.removeListener(this, oldValue);
     this.parent = parent;
     if (parent != null) {
       setLayer((T)parent.getLayer());
     }
-    Property.addListener(parent, this);
+    Property.addListener(this, parent);
     firePropertyChange("parent", oldValue, parent);
   }
 

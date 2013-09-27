@@ -10,6 +10,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
@@ -22,12 +23,13 @@ public class SelectMapScale extends JComboBox implements ItemListener,
   private final MapPanel map;
 
   public SelectMapScale(final MapPanel map) {
-    super(new Vector<Double>(map.getScales()));
+    super(new Vector<Long>(map.getScales()));
     this.map = map;
 
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       MapScale.class, "formatScale");
+    renderer.setHorizontalAlignment(JLabel.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(),
       renderer);
     setEditor(editor);
@@ -35,9 +37,10 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     addItemListener(this);
     addActionListener(this);
     map.addPropertyChangeListener("scale", this);
-    final Dimension size = new Dimension(140, 30);
+    final Dimension size = new Dimension(140, 22);
     setPreferredSize(size);
     setMaximumSize(size);
+    setToolTipText("Map Scale");
   }
 
   @Override

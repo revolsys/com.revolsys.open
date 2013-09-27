@@ -16,12 +16,7 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
-@SuppressWarnings("serial")
 public class TextField extends JXTextField implements Field, FocusListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final String fieldName;

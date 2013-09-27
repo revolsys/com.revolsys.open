@@ -1,14 +1,19 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
 import java.awt.Graphics2D;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
+import javax.swing.ImageIcon;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.filter.AcceptAllFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
@@ -16,11 +21,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
 import com.revolsys.gis.data.model.filter.SpringExpresssionLanguageFilter;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -33,14 +40,21 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
-    menu.addMenuItem("layer",
-      TreeItemRunnable.createAction("View/Edit", "palette", "showProperties"));
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
+      "palette", "showProperties"));
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
       new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
-    // TODO change to geometry/marker/text style
-    // TODO wrap with multiple/filter/scale style
-    // TODO delete if not parent
-    // TODO drag and drop to move/re-order
+
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
+
+    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
+      final ImageIcon icon = SilkIconLoader.getIconWithBadge(
+        "style_" + type.toLowerCase(), "arrow_branch");
+      final InvokeMethodAction action = TreeItemRunnable.createAction(
+        "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
+      menu.addMenuItem("wrap", action);
+    }
   }
 
   private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
@@ -112,7 +126,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   @Override
-  protected AbstractDataObjectLayerRenderer clone() {
+  public AbstractDataObjectLayerRenderer clone() {
     final AbstractDataObjectLayerRenderer clone = (AbstractDataObjectLayerRenderer)super.clone();
     clone.filter = JavaBeanUtil.clone(filter);
     return clone;
@@ -123,6 +137,15 @@ public abstract class AbstractDataObjectLayerRenderer extends
     if (parent instanceof AbstractMultipleRenderer) {
       final AbstractMultipleRenderer multiple = (AbstractMultipleRenderer)parent;
       multiple.removeRenderer(this);
+    }
+  }
+
+  public String getQueryFilter() {
+    if (filter instanceof SpringExpresssionLanguageFilter) {
+      final SpringExpresssionLanguageFilter expressionFilter = (SpringExpresssionLanguageFilter)filter;
+      return expressionFilter.toString();
+    } else {
+      return null;
     }
   }
 
@@ -180,6 +203,18 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
+  public void setQueryFilter(final String queryFilter) {
+    if (filter instanceof SpringExpresssionLanguageFilter
+      || filter instanceof AcceptAllFilter) {
+      if (StringUtils.hasText(queryFilter)) {
+        filter = new SpringExpresssionLanguageFilter(queryFilter,
+          FILTER_VARIABLES);
+      } else {
+        filter = new AcceptAllFilter<DataObject>();
+      }
+    }
+  }
+
   @Override
   public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = super.toMap(defaults);
@@ -187,5 +222,43 @@ public abstract class AbstractDataObjectLayerRenderer extends
       MapSerializerUtil.add(map, "filter", this.filter);
     }
     return map;
+  }
+
+  protected void wrap(final DataObjectLayer layer,
+    final AbstractMultipleRenderer parent,
+    final AbstractMultipleRenderer newRenderer) {
+    if (parent == null) {
+      layer.setRenderer(newRenderer);
+    } else {
+      parent.removeRenderer(this);
+      parent.addRenderer(newRenderer);
+    }
+    newRenderer.addRenderer(this);
+  }
+
+  public FilterMultipleRenderer wrapWithFilterStyle() {
+    final DataObjectLayer layer = getLayer();
+    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
+      layer, parent);
+    wrap(layer, parent, newRenderer);
+    return newRenderer;
+  }
+
+  public MultipleRenderer wrapWithMultipleStyle() {
+    final DataObjectLayer layer = getLayer();
+    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
+    wrap(layer, parent, newRenderer);
+    return newRenderer;
+  }
+
+  public ScaleMultipleRenderer wrapWithScaleStyle() {
+    final DataObjectLayer layer = getLayer();
+    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
+      parent);
+    wrap(layer, parent, newRenderer);
+    return newRenderer;
   }
 }

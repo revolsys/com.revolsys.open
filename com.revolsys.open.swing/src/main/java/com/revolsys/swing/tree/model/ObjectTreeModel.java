@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -99,6 +100,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     menu.addComponent(groupName, menuItem);
   }
 
+  @SuppressWarnings("unchecked")
   public void addNodeModel(final Class<?> clazz,
     final ObjectTreeNodeModel<?, ?> model) {
     model.setObjectTreeModel(this);
@@ -118,7 +120,12 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public void fireTreeNodesChanged(final TreePath path) {
-    eventHandler.treeNodesChanged(new TreeModelEvent(this.root, path));
+    final TreeModelEvent event = new TreeModelEvent(this.root, path);
+    if (SwingUtilities.isEventDispatchThread()) {
+      eventHandler.treeNodesChanged(event);
+    } else {
+      Invoke.later(eventHandler, "treeNodesChanged", event);
+    }
   }
 
   public void fireTreeNodesInserted(final TreePath path, final int index,
@@ -151,6 +158,14 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     } catch (final ArrayIndexOutOfBoundsException t) {
     } catch (final Throwable t) {
       ExceptionUtil.log(getClass(), t);
+    }
+  }
+
+  protected void fireTreeStructureChanged(final TreeModelEvent treeEvent) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      this.eventHandler.treeStructureChanged(treeEvent);
+    } else {
+      Invoke.later(eventHandler, "treeStructureChanged", treeEvent);
     }
   }
 
@@ -236,6 +251,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     return getNodeModel(nodeClass);
   }
 
+  @SuppressWarnings("unchecked")
   public ObjectTreeNodeModel<Object, Object> getNodeModel(final TreePath path) {
     if (path == null) {
       return null;
@@ -408,9 +424,19 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   public void setRoot(final Object root) {
     if (root != this.root) {
+      final Object oldRoot = this.root;
       this.root = root;
-      final TreeModelEvent e = new TreeModelEvent(root, new TreePath(root));
-      this.eventHandler.treeStructureChanged(e);
+      objectPathMap.clear();
+      initialized.clear();
+      TreeModelEvent treeEvent;
+      if (root == null && oldRoot != null) {
+        treeEvent = new TreeModelEvent(this, (TreePath)null);
+      } else {
+        final TreePath path = new TreePath(root);
+        objectPathMap.put(root, path);
+        treeEvent = new TreeModelEvent(root, path, null, null);
+      }
+      fireTreeStructureChanged(treeEvent);
     }
   }
 

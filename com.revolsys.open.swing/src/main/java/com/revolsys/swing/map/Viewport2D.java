@@ -103,11 +103,11 @@ public class Viewport2D {
 
   private int viewHeight;
 
-  private double metresPerPixel;
+  private double unitsPerPixel;
 
   private double scale;
 
-  private List<Double> scales = new ArrayList<Double>();
+  private List<Long> scales = new ArrayList<Long>();
 
   public Viewport2D() {
   }
@@ -208,14 +208,6 @@ public class Viewport2D {
     return this.geometryFactory;
   }
 
-  public double getMetresPerPixel() {
-    return this.metresPerPixel;
-  }
-
-  public double getMetresPerPixel(final double scale) {
-    return scale * 0.0254 / getScreenResolution();
-  }
-
   public double getModelHeight() {
     final double height = this.boundingBox.getHeight();
     return height;
@@ -291,7 +283,7 @@ public class Viewport2D {
     GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final double resolution = getMetresPerPixel();
+      final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
         final int srid = geometryFactory.getSRID();
         final int numAxis = geometryFactory.getNumAxis();
@@ -305,11 +297,11 @@ public class Viewport2D {
     return this.scale;
   }
 
-  public double getScaleForMetresPerPixel(final double metresPerPixel) {
-    return metresPerPixel * getScreenResolution() / 0.0254;
+  public double getScaleForUnitsPerPixel(final double unitsPerPixel) {
+    return unitsPerPixel * getScreenResolution() / 0.0254;
   }
 
-  public List<Double> getScales() {
+  public List<Long> getScales() {
     return this.scales;
   }
 
@@ -326,6 +318,14 @@ public class Viewport2D {
   public Unit<Length> getScreenUnit() {
     final int screenResolution = getScreenResolution();
     return NonSI.INCH.divide(screenResolution);
+  }
+
+  public double getUnitsPerPixel() {
+    return this.unitsPerPixel;
+  }
+
+  public double getUnitsPerPixel(final double scale) {
+    return scale * 0.0254 / getScreenResolution();
   }
 
   public double getViewAspectRatio() {
@@ -370,7 +370,7 @@ public class Viewport2D {
 
   public double getZoomOutScale(final double scale) {
     final long scaleCeil = (long)Math.floor(scale);
-    final List<Double> scales = new ArrayList<Double>(this.scales);
+    final List<Long> scales = new ArrayList<Long>(this.scales);
     Collections.reverse(scales);
     for (final double nextScale : scales) {
       final long newScale = (long)Math.floor(nextScale);
@@ -382,23 +382,22 @@ public class Viewport2D {
   }
 
   private void internalSetBoundingBox(final BoundingBox boundingBox,
-    final double metresPerPixel) {
+    final double unitsPerPixel) {
     final double oldScale = getScale();
     final BoundingBox oldBoundingBox = this.boundingBox;
     synchronized (this) {
-      final int screenResolution = getScreenResolution();
       final int viewWidthPixels = getViewWidthPixels();
       final int viewHeightPixels = getViewHeightPixels();
       final Measurable<Length> viewWidthLength = getViewWidthLength();
       final Measurable<Length> modelWidthLength = boundingBox.getWidthLength();
 
-      if (Double.isInfinite(metresPerPixel) || Double.isNaN(metresPerPixel)) {
-        this.metresPerPixel = 0;
+      if (Double.isInfinite(unitsPerPixel) || Double.isNaN(unitsPerPixel)) {
+        this.unitsPerPixel = 0;
         this.modelToScreenTransform = null;
         this.screenToModelTransform = null;
         this.scale = 0;
       } else {
-        this.metresPerPixel = metresPerPixel;
+        this.unitsPerPixel = unitsPerPixel;
         this.modelToScreenTransform = createModelToScreenTransform(boundingBox,
           viewWidthPixels, viewHeightPixels);
         this.screenToModelTransform = createScreenToModelTransform(boundingBox,
@@ -467,7 +466,7 @@ public class Viewport2D {
         }
         final Measurable<Length> viewWidthLength = getViewWidthLength();
         final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
-        final double metresPerPixel = modelWidthLength.doubleValue(SI.METRE)
+        final double unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
           / viewWidthPixels;
         double scale = getScale(viewWidthLength, modelWidthLength);
         if (!this.scales.isEmpty() && viewWidthPixels > 0
@@ -485,7 +484,7 @@ public class Viewport2D {
           }
 
         }
-        internalSetBoundingBox(newBoundingBox, metresPerPixel);
+        internalSetBoundingBox(newBoundingBox, unitsPerPixel);
       }
     }
     return this.boundingBox;
@@ -499,27 +498,27 @@ public class Viewport2D {
 
   private BoundingBox setBoundingBox(final Coordinates centre,
     final double scale) {
-    final double metresPerPixel = getMetresPerPixel(scale);
+    final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int viewWidthPixels = getViewWidthPixels();
-    final double viewWidth = viewWidthPixels * metresPerPixel;
+    final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
-    final double viewHeight = viewHeightPixels * metresPerPixel;
+    final double viewHeight = viewHeightPixels * unitsPerPixel;
     final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-      1 / metresPerPixel);
+      1 / unitsPerPixel);
     precisionModel.makePrecise(centre);
     final double centreX = centre.getX();
     final double centreY = centre.getY();
 
     double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
     if (viewWidthPixels % 2 == 1) {
-      leftOffset -= metresPerPixel;
+      leftOffset -= unitsPerPixel;
     }
     final double rightOffset = precisionModel.makeXyPrecise(viewWidth / 2);
     final double topOffset = precisionModel.makeXyPrecise(viewHeight / 2);
     double bottomOffset = precisionModel.makeXyPrecise(viewHeight / 2);
     if (viewHeightPixels % 2 == 1) {
-      bottomOffset -= metresPerPixel;
+      bottomOffset -= unitsPerPixel;
     }
     final double x1 = centreX - leftOffset;
     final double y1 = centreY - bottomOffset;
@@ -527,7 +526,7 @@ public class Viewport2D {
     final double y2 = centreY + topOffset;
     final BoundingBox newBoundingBox = new BoundingBox(geometryFactory, x1, y1,
       x2, y2);
-    internalSetBoundingBox(newBoundingBox, metresPerPixel);
+    internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }
 
@@ -551,7 +550,7 @@ public class Viewport2D {
     }
   }
 
-  public void setScales(final List<Double> scales) {
+  public void setScales(final List<Long> scales) {
     this.scales = scales;
   }
 

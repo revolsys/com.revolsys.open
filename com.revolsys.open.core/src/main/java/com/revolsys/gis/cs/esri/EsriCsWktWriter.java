@@ -17,6 +17,14 @@ import com.revolsys.gis.cs.Spheroid;
 
 public class EsriCsWktWriter {
 
+  protected static int incrementIndent(final int indentLevel) {
+    if (indentLevel < 0) {
+      return -1;
+    } else {
+      return indentLevel + 1;
+    }
+  }
+
   public static void indent(final PrintWriter out, final int indentLevel) {
     if (indentLevel >= 0) {
       out.println();
@@ -65,12 +73,12 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out, final Datum datum,
     final int indentLevel) {
     out.print("DATUM[");
-    write(out, datum.getName(), indentLevel + 1);
+    write(out, datum.getName(), incrementIndent(indentLevel));
     final Spheroid spheroid = datum.getSpheroid();
     if (spheroid != null) {
       out.print(",");
-      indent(out, indentLevel + 1);
-      write(out, spheroid, indentLevel + 1);
+      indent(out, incrementIndent(indentLevel));
+      write(out, spheroid, incrementIndent(indentLevel));
     }
     indent(out, indentLevel);
     out.write(']');
@@ -79,22 +87,22 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out,
     final GeographicCoordinateSystem coordinateSystem, final int indentLevel) {
     out.print("GEOGCS[");
-    write(out, coordinateSystem.getName(), indentLevel + 1);
+    write(out, coordinateSystem.getName(), incrementIndent(indentLevel));
     final Datum datum = coordinateSystem.getDatum();
     if (datum != null) {
       out.print(",");
-      indent(out, indentLevel + 1);
-      write(out, datum, indentLevel + 1);
+      indent(out, incrementIndent(indentLevel));
+      write(out, datum, incrementIndent(indentLevel));
     }
     final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
     if (primeMeridian != null) {
       out.print(",");
-      indent(out, indentLevel + 1);
-      write(out, primeMeridian, indentLevel + 1);
+      indent(out, incrementIndent(indentLevel));
+      write(out, primeMeridian, incrementIndent(indentLevel));
     }
     final AngularUnit unit = coordinateSystem.getAngularUnit();
     if (unit != null) {
-      write(out, unit, indentLevel + 1);
+      write(out, unit, incrementIndent(indentLevel));
     }
     indent(out, indentLevel);
     out.write(']');
@@ -121,10 +129,10 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out,
     final PrimeMeridian primeMeridian, final int indentLevel) {
     out.print("PRIMEM[");
-    write(out, primeMeridian.getName(), indentLevel + 1);
+    write(out, primeMeridian.getName(), incrementIndent(indentLevel));
     out.write(',');
     final double longitude = primeMeridian.getLongitude();
-    write(out, longitude, indentLevel + 1);
+    write(out, longitude, incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }
@@ -132,28 +140,28 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out,
     final ProjectedCoordinateSystem coordinateSystem, final int indentLevel) {
     out.print("PROJCS[");
-    write(out, coordinateSystem.getName(), indentLevel + 1);
+    write(out, coordinateSystem.getName(), incrementIndent(indentLevel));
     final GeographicCoordinateSystem geoCs = coordinateSystem.getGeographicCoordinateSystem();
     if (geoCs != null) {
       out.print(",");
-      indent(out, indentLevel + 1);
-      write(out, geoCs, indentLevel + 1);
+      indent(out, incrementIndent(indentLevel));
+      write(out, geoCs, incrementIndent(indentLevel));
     }
     final Projection projection = coordinateSystem.getProjection();
     if (projection != null) {
       out.print(",");
-      indent(out, indentLevel + 1);
-      write(out, projection, indentLevel + 1);
+      indent(out, incrementIndent(indentLevel));
+      write(out, projection, incrementIndent(indentLevel));
     }
     for (final Entry<String, Object> parameter : coordinateSystem.getParameters()
       .entrySet()) {
       final String name = parameter.getKey();
       final Object value = parameter.getValue();
-      write(out, name, value, indentLevel + 1);
+      write(out, name, value, incrementIndent(indentLevel));
     }
     final LinearUnit unit = coordinateSystem.getLinearUnit();
     if (unit != null) {
-      write(out, unit, indentLevel + 1);
+      write(out, unit, incrementIndent(indentLevel));
     }
     indent(out, indentLevel);
     out.write(']');
@@ -162,7 +170,7 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out, final Projection projection,
     final int indentLevel) {
     out.print("PROJECTION[");
-    write(out, projection.getName(), indentLevel + 1);
+    write(out, projection.getName(), incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }
@@ -170,13 +178,13 @@ public class EsriCsWktWriter {
   public static void write(final PrintWriter out, final Spheroid spheroid,
     final int indentLevel) {
     out.print("SPHEROID[");
-    write(out, spheroid.getName(), indentLevel + 1);
+    write(out, spheroid.getName(), incrementIndent(indentLevel));
     out.write(',');
     final double semiMajorAxis = spheroid.getSemiMajorAxis();
-    write(out, semiMajorAxis, indentLevel + 1);
+    write(out, semiMajorAxis, incrementIndent(indentLevel));
     out.print(',');
     final double inverseFlattening = spheroid.getInverseFlattening();
-    write(out, inverseFlattening, indentLevel + 1);
+    write(out, inverseFlattening, incrementIndent(indentLevel));
     indent(out, indentLevel);
     out.write(']');
   }

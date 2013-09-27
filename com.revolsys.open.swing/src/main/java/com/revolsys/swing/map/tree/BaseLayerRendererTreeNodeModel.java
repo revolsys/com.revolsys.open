@@ -31,6 +31,21 @@ public class BaseLayerRendererTreeNodeModel extends
     setMouseListener(this);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getParent(final AbstractLayerRenderer<? extends Layer> node) {
+    if (node == null) {
+      return null;
+    } else {
+      final LayerRenderer<?> parent = node.getParent();
+      if (parent == null) {
+        return (T)node.getLayer();
+      } else {
+        return (T)parent;
+      }
+    }
+  }
+
   @Override
   public Component getRenderer(
     final AbstractLayerRenderer<? extends Layer> node, final JTree tree,

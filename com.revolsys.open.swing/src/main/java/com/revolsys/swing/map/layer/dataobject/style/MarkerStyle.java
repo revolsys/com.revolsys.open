@@ -306,7 +306,16 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarker(final Marker marker) {
+    final Object oldValue = this.marker;
     this.marker = getWithDefault(marker, ELLIPSE);
+    if (marker instanceof ShapeMarker) {
+      if (marker != oldValue) {
+        final ShapeMarker shapeMarker = (ShapeMarker)marker;
+        this.markerType = shapeMarker.getName();
+      }
+    } else {
+      this.markerType = "ellipse";
+    }
   }
 
   public void setMarkerAllowOverlap(final boolean markerAllowOverlap) {

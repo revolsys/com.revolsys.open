@@ -31,26 +31,41 @@ public class MultipleLayerRendererTreeNodeModel
     setSupportedClasses(AbstractMultipleRenderer.class);
 
     setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
-    setObjectTreeNodeModels(this, new BaseLayerRendererTreeNodeModel());
+    setObjectTreeNodeModels(this, new BaseLayerRendererTreeNodeModel(), this);
     setMouseListener(this);
   }
 
   @Override
   public int addChild(final AbstractMultipleRenderer node,
     final AbstractDataObjectLayerRenderer renderer) {
-    return node.addRenderer(renderer);
+    return node.addRenderer(renderer.clone());
   }
 
   @Override
   public int addChild(final AbstractMultipleRenderer node, final int index,
     final AbstractDataObjectLayerRenderer renderer) {
-    return node.addRenderer(index, renderer);
+    return node.addRenderer(index, renderer.clone());
   }
 
   @Override
   protected List<AbstractDataObjectLayerRenderer> getChildren(
     final AbstractMultipleRenderer node) {
     return node.getRenderers();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getParent(final AbstractMultipleRenderer node) {
+    if (node == null) {
+      return null;
+    } else {
+      final LayerRenderer<?> parent = node.getParent();
+      if (parent == null) {
+        return (T)node.getLayer();
+      } else {
+        return (T)parent;
+      }
+    }
   }
 
   @Override

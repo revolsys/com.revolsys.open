@@ -8,20 +8,24 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 
 public class ShapeMarker extends AbstractMarker {
 
-  private static final Map<String, Shape> SHAPES = new HashMap<String, Shape>();
+  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
 
   static {
     SHAPES.put("square", square(1));
@@ -34,7 +38,6 @@ public class ShapeMarker extends AbstractMarker {
     SHAPES.put("x", x(1));
     SHAPES.put("arrow", arrow(1));
     SHAPES.put("solidArrow", solidArrow(1));
-    SHAPES.put("ellipseArrow", ellipseArrow(1));
     SHAPES.put("diamond", diamond(1));
   }
 
@@ -83,22 +86,13 @@ public class ShapeMarker extends AbstractMarker {
     return path;
   }
 
-  /**
-   * Get a ellipse arrow shape pointing right for the size of the graphic.
-   * 
-   * @return The shape.
-   */
-  public static Shape ellipseArrow(final double size) {
-    final double radius = size * .5;
-    final double kappaR = 0.5522847498 * radius;
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(radius, 0);
-    path.lineTo(size, radius);
-    path.lineTo(radius, size);
-    path.curveTo(radius - kappaR, size, 0, radius + kappaR, 0, radius);
-    path.curveTo(0, radius - kappaR, radius - kappaR, 0, radius, 0);
-    path.closePath();
-    return path;
+  public static List<Marker> getMarkers() {
+    final List<Marker> markers = new ArrayList<Marker>();
+    for (final String markerName : SHAPES.keySet()) {
+      final ShapeMarker marker = new ShapeMarker(markerName);
+      markers.add(marker);
+    }
+    return markers;
   }
 
   /**
@@ -199,6 +193,16 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   @Override
+  public boolean equals(final Object object) {
+    if (object instanceof ShapeMarker) {
+      final ShapeMarker marker = (ShapeMarker)object;
+      return getName().equals(marker.getName());
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public Icon getIcon(final MarkerStyle style) {
     final Shape shape = getShape();
     final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16,
@@ -218,8 +222,21 @@ public class ShapeMarker extends AbstractMarker {
     return new ImageIcon(image);
   }
 
+  public String getName() {
+    if (StringUtils.hasText(name)) {
+      return this.name;
+    } else {
+      return "unknown";
+    }
+  }
+
   public Shape getShape() {
     return shape;
+  }
+
+  @Override
+  public int hashCode() {
+    return getName().hashCode();
   }
 
   @Override
@@ -254,10 +271,6 @@ public class ShapeMarker extends AbstractMarker {
 
   @Override
   public String toString() {
-    if (this.name == null) {
-      return "unknown";
-    } else {
-      return this.name;
-    }
+    return getName();
   }
 }

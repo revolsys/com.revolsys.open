@@ -33,16 +33,22 @@ public abstract class AbstractMultipleRenderer extends
       menu.addMenuItem("add", action);
     }
 
-    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
-      final ImageIcon icon = SilkIconLoader.getIconWithBadge(
-        "style_" + type.toLowerCase(), "go");
-      final TreeItemPropertyEnableCheck enableCheck = new TreeItemPropertyEnableCheck(
-        "class", GeometryStyleRenderer.class, true);
-      final InvokeMethodAction action = TreeItemRunnable.createAction(
-        "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
-          + "Style");
-      menu.addMenuItem("convert", action);
-    }
+    addMenuItem(menu, "Multiple", MultipleRenderer.class);
+    addMenuItem(menu, "Filter", FilterMultipleRenderer.class);
+    addMenuItem(menu, "Scale", ScaleMultipleRenderer.class);
+  }
+
+  protected static void addMenuItem(final MenuFactory menu, final String type,
+    final Class<?> rendererClass) {
+    final ImageIcon icon = SilkIconLoader.getIconWithBadge(
+      "style_" + type.toLowerCase(), "go");
+
+    final TreeItemPropertyEnableCheck enableCheck = new TreeItemPropertyEnableCheck(
+      "class", rendererClass, true);
+    final InvokeMethodAction action = TreeItemRunnable.createAction(
+      "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
+        + "Style");
+    menu.addMenuItem("convert", action);
   }
 
   private List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
@@ -91,8 +97,6 @@ public abstract class AbstractMultipleRenderer extends
     return renderer;
   }
 
-  // TODO events so the tree is updated.
-
   public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {
     return addRenderer(this.renderers.size(), renderer);
   }
@@ -102,6 +106,7 @@ public abstract class AbstractMultipleRenderer extends
     if (renderer == null) {
       return -1;
     } else {
+      renderer.setParent(this);
       this.renderers.add(index, renderer);
       firePropertyChange("renderers", index, null, renderer);
       return index;
@@ -122,7 +127,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   @Override
-  protected AbstractMultipleRenderer clone() {
+  public AbstractMultipleRenderer clone() {
     final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(renderers);
     return clone;
@@ -137,6 +142,12 @@ public abstract class AbstractMultipleRenderer extends
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
       layer, parent, style);
     newRenderer.setRenderers(renderers);
+    final String name = getName();
+    if (name.equals("Multiple Style")) {
+      newRenderer.setName("Filter Style");
+    } else if (name.equals("Scale Style")) {
+      newRenderer.setName("Filter Style");
+    }
     if (parent == null) {
       layer.setRenderer(newRenderer);
     } else {
@@ -155,6 +166,12 @@ public abstract class AbstractMultipleRenderer extends
     final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent,
       style);
     newRenderer.setRenderers(renderers);
+    final String name = getName();
+    if (name.equals("Filter Style")) {
+      newRenderer.setName("Multiple Style");
+    } else if (name.equals("Scale Style")) {
+      newRenderer.setName("Multiple Style");
+    }
     if (parent == null) {
       layer.setRenderer(newRenderer);
     } else {
@@ -173,6 +190,12 @@ public abstract class AbstractMultipleRenderer extends
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
       parent, style);
     newRenderer.setRenderers(renderers);
+    final String name = getName();
+    if (name.equals("Filter Style")) {
+      newRenderer.setName("Scale Style");
+    } else if (name.equals("Multiple Style")) {
+      newRenderer.setName("Scale Style");
+    }
     if (parent == null) {
       layer.setRenderer(newRenderer);
     } else {
@@ -201,8 +224,12 @@ public abstract class AbstractMultipleRenderer extends
   public void removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
     final int index = renderers.indexOf(renderer);
     if (index != -1) {
-      this.renderers.remove(renderer);
-      firePropertyChange("renderers", index, renderer, null);
+      if (renderer.getParent() == this) {
+        renderer.setParent(null);
+      }
+      if (this.renderers.remove(renderer)) {
+        firePropertyChange("renderers", index, renderer, null);
+      }
     }
   }
 

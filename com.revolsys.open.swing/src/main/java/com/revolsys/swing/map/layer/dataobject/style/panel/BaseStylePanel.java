@@ -7,7 +7,10 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -15,7 +18,12 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -26,11 +34,17 @@ import com.revolsys.swing.component.TogglePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.ColorChooserField;
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FontChooserField;
+import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
+import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.component.MapScale;
+import com.revolsys.swing.map.component.MarkerField;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -38,6 +52,7 @@ import com.revolsys.swing.map.layer.dataobject.style.LineCap;
 import com.revolsys.swing.map.layer.dataobject.style.LineJoin;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseStylePanel extends ValueField implements
@@ -80,13 +95,17 @@ public class BaseStylePanel extends ValueField implements
     return actions;
   }
 
+  private final Set<String> readOnlyFieldNames = new HashSet<String>();
+
   public BaseStylePanel(final LayerRenderer<?> renderer) {
     super(renderer);
     setTitle("Style");
     setLayout(new VerticalLayout());
+    addReadOnlyFieldName("type");
 
-    // TODO min/max scale
     addPanel(this, "General", renderer, "name", "type", "visible");
+    addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
+    addPanel(this, "Filter", renderer, "queryFilter");
   }
 
   protected void addCheckBoxField(final JPanel container, final Object object,
@@ -128,6 +147,13 @@ public class BaseStylePanel extends ValueField implements
         field = createLineCapField((LineCap)value);
       } else if (fieldName.equals("lineJoin")) {
         field = createLineJoinField((LineJoin)value);
+      } else if (fieldName.equals("queryFilter")) {
+        field = new TextArea(fieldName, 5, 50);
+        field.setFieldValue(value);
+      } else if (fieldName.equals("marker")) {
+        field = new MarkerField(fieldName, value);
+      } else if (fieldName.endsWith("Scale")) {
+        field = createScaleField(fieldName, (Long)value);
       } else if (Color.class.equals(fieldClass)) {
         field = new ColorChooserField(fieldName, (Color)value);
       } else if (Boolean.TYPE.equals(fieldClass)
@@ -139,8 +165,16 @@ public class BaseStylePanel extends ValueField implements
       } else {
         field = new TextField(fieldName, value, 30);
       }
-      container.add((Component)field);
+      if (readOnlyFieldNames.contains(fieldName)) {
+        field.setEnabled(false);
+      }
+      if (field instanceof JTextArea) {
+        container.add(new JScrollPane((Component)field));
+      } else {
+        container.add((Component)field);
+      }
       field.addPropertyChangeListener("fieldValue", this);
+      field.addPropertyChangeListener(fieldName, this);
       return field;
     }
   }
@@ -184,7 +218,7 @@ public class BaseStylePanel extends ValueField implements
   protected void addMarkerStylePanel(final JPanel stylePanels,
     final MarkerStyle markerStyle) {
     addPanel(stylePanels, "Marker Style", markerStyle, "markerLineColor",
-      "markerLineWidth", "markerFill", "markerWidth", "markerHeight");
+      "markerLineWidth", "markerFill", "markerWidth", "markerHeight", "marker");
 
     addPanel(stylePanels, "Marker Position", markerStyle,
       "markerHorizontalAlignment", "markerVerticalAlignment", "markerDx",
@@ -206,6 +240,10 @@ public class BaseStylePanel extends ValueField implements
   protected void addPolygonStylePanel(final JPanel stylePanels,
     final GeometryStyle geometryStyle) {
     addPanel(stylePanels, "Polygon Style", geometryStyle, "polygonFill");
+  }
+
+  public void addReadOnlyFieldName(final String fieldName) {
+    readOnlyFieldNames.add(fieldName);
   }
 
   protected void addTextField(final JPanel container, final Object object,
@@ -238,6 +276,21 @@ public class BaseStylePanel extends ValueField implements
       28), LINE_JOIN_ACTIONS);
   }
 
+  private Field createScaleField(final String fieldName, final Long value) {
+    final Vector<Long> scales = new Vector<Long>();
+    scales.add(Long.MAX_VALUE);
+    scales.addAll(MapPanel.SCALES);
+    final InvokeMethodStringConverter converter = new InvokeMethodStringConverter(
+      MapScale.class, "formatScale");
+    converter.setHorizontalAlignment(JLabel.RIGHT);
+    final ComboBox field = new ComboBox(fieldName, new DefaultComboBoxModel(
+      scales), converter, converter);
+    ((JTextField)field.getEditor().getEditorComponent()).setHorizontalAlignment(JTextField.RIGHT);
+    field.setSelectedItem(value);
+    field.setPreferredSize(new Dimension(150, 22));
+    return field;
+  }
+
   protected TogglePanel createVerticalAlignmentField(final String fieldName,
     String aligment) {
     if (!"top".equalsIgnoreCase(aligment)
@@ -248,12 +301,47 @@ public class BaseStylePanel extends ValueField implements
       VERTICAL_ALIGNMENT_ACTIONS);
   }
 
+  protected void doPropertyChange(final PropertyChangeEvent event) {
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends LayerRenderer<Layer>> T getRenderer() {
     return (T)getFieldValue();
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent evt) {
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (!scalePropertyChange(event)) {
+      doPropertyChange(event);
+    }
+  }
+
+  public boolean scalePropertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof Field) {
+      final Field field = (Field)source;
+      final String fieldName = field.getFieldName();
+      if (fieldName.endsWith("Scale")) {
+
+        final Object fieldValue = field.getFieldValue();
+        long scale = 0;
+        if (fieldValue instanceof Number) {
+          final Number number = (Number)fieldValue;
+          scale = number.longValue();
+        }
+        if ("minimumScale".equals(fieldName)) {
+          if (scale <= 0) {
+            scale = Long.MAX_VALUE;
+          }
+        } else if ("maximumScale".equals(fieldName)) {
+          if (scale == Long.MAX_VALUE) {
+            scale = 0;
+          }
+        }
+        JavaBeanUtil.setProperty(getRenderer(), fieldName, scale);
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -34,7 +34,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     AutoCompleteDecorator.decorate(this, renderer);
     addItemListener(this);
     map.addPropertyChangeListener("geometryFactory", this);
-    final Dimension size = new Dimension(200, 30);
+    final Dimension size = new Dimension(200, 22);
     setMaximumSize(size);
   }
 

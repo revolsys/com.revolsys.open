@@ -1,0 +1,50 @@
+package com.revolsys.swing.map.component;
+
+import java.awt.Component;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+
+import org.jdesktop.swingx.VerticalLayout;
+
+import com.revolsys.swing.component.ShapeIcon;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
+import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
+
+public class MarkerField extends ValueField {
+
+  private static final long serialVersionUID = 1L;
+
+  private final ComboBox comboBox = new ComboBox("marker",
+    new DefaultComboBoxModel(new Vector<Marker>(ShapeMarker.getMarkers())),
+    null, new DefaultListCellRenderer() {
+      @Override
+      public Component getListCellRendererComponent(final JList list,
+        final Object value, final int index, final boolean isSelected,
+        final boolean cellHasFocus) {
+        final Component component = super.getListCellRendererComponent(list,
+          value, index, isSelected, cellHasFocus);
+        setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        final ShapeMarker marker = (ShapeMarker)value;
+        setIcon(new ShapeIcon(marker.getShape(), 16, 16));
+        return component;
+      }
+    });
+
+  public MarkerField(final String fieldName, final Object fieldValue) {
+    super(fieldName, fieldValue);
+    setLayout(new VerticalLayout());
+    add(comboBox);
+    comboBox.setSelectedItem(fieldValue);
+  }
+
+  public Marker getMarker() {
+    return (Marker)getFieldValue();
+  }
+
+}
