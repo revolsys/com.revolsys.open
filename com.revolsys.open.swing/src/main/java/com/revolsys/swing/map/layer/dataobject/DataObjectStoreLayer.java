@@ -290,7 +290,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } else {
       synchronized (this.sync) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-        if (!this.boundingBox.contains(boundingBox)
+        if (this.boundingBox == null || !this.boundingBox.contains(boundingBox)
           && !this.loadingBoundingBox.contains(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
@@ -304,8 +304,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      final List objects = this.index.queryIntersects(polygon);
-      return objects;
+      if (index == null) {
+        return Collections.emptyList();
+      } else {
+        final List objects = this.index.queryIntersects(polygon);
+        return objects;
+      }
     }
   }
 
