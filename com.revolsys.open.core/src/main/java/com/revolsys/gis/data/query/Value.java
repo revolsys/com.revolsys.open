@@ -1,17 +1,21 @@
 package com.revolsys.gis.data.query;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class Value extends AbstractCondition {
   private Object value;
 
-  private final JdbcAttribute jdbcAttribute;
+  private JdbcAttribute jdbcAttribute;
 
   public Value(final Attribute attribute, final Object value) {
     if (attribute instanceof JdbcAttribute) {
@@ -45,6 +49,26 @@ public class Value extends AbstractCondition {
     return new Value(jdbcAttribute, value);
   }
 
+  public void convert(final Attribute attribute) {
+    if (attribute instanceof JdbcAttribute) {
+      this.jdbcAttribute = (JdbcAttribute)attribute;
+    }
+    convert(attribute.getType());
+  }
+
+  public void convert(final DataType dataType) {
+    if (value != null) {
+      final Object newValue = StringConverterRegistry.toObject(dataType, value);
+      final Class<?> typeClass = dataType.getJavaClass();
+      if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
+        throw new IllegalArgumentException(value + " is not a valid "
+          + typeClass);
+      } else {
+        this.value = newValue;
+      }
+    }
+  }
+
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof Value) {
@@ -65,7 +89,21 @@ public class Value extends AbstractCondition {
 
   @Override
   public String toString() {
-    return StringConverterRegistry.toString(value);
+    if (value instanceof String) {
+      final String string = (String)value;
+      return "'" + string.replaceAll("'", "''") + "'";
+    } else if (value instanceof Date) {
+      final Date date = (Date)value;
+      return "{d '" + date + "'}";
+    } else if (value instanceof Time) {
+      final Time time = (Time)value;
+      return "{t '" + time + "'}";
+    } else if (value instanceof Timestamp) {
+      final Timestamp time = (Timestamp)value;
+      return "{ts '" + time + "'}";
+    } else {
+      return StringConverterRegistry.toString(value);
+    }
   }
 
 }

@@ -62,7 +62,7 @@ public class MultipleCondition extends AbstractMultiCondition {
 
   @Override
   public String toString() {
-    return "(" + CollectionUtil.toString(" " + operator + " ", getConditions())
-      + ")";
+    return "("
+      + CollectionUtil.toString(") " + operator + " (", getConditions()) + ")";
   }
 }

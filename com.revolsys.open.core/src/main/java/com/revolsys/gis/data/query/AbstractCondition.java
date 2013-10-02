@@ -30,6 +30,11 @@ public abstract class AbstractCondition implements Condition {
   }
 
   @Override
+  public String toFormattedString() {
+    return toString();
+  }
+
+  @Override
   public String toString() {
     final StringBuffer string = new StringBuffer();
     appendSql(string);

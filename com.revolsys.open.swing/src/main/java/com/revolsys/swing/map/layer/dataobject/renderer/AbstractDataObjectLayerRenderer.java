@@ -171,7 +171,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final boolean saved = viewport.setUseModelCoordinates(true, graphics);
     try {
       final BoundingBox boundingBox = viewport.getBoundingBox();
-      final List<LayerDataObject> dataObjects = layer.query(boundingBox);
+      final List<LayerDataObject> dataObjects = layer.queryBackground(boundingBox);
       renderObjects(viewport, graphics, layer, dataObjects);
     } finally {
       viewport.setUseModelCoordinates(saved, graphics);

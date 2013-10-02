@@ -2,6 +2,7 @@ package com.revolsys.swing.map.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,9 +17,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.ComparisonType;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
@@ -46,13 +49,10 @@ import com.revolsys.swing.table.filter.ContainsFilter;
 import com.revolsys.swing.table.filter.EqualFilter;
 import com.revolsys.util.CollectionUtil;
 
-@SuppressWarnings("serial")
 public class DataObjectLayerTableModel extends DataObjectRowTableModel
-  implements SortableTableModel, PropertyChangeListener {
+  implements SortableTableModel, PropertyChangeListener,
+  PropertyChangeSupportProxy {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public static final String MODE_ALL = "all";
@@ -94,6 +94,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       table.repaint();
     }
   }
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
 
   private ListSelectionModel defaultSelectionModel = new DefaultListSelectionModel();
 
@@ -249,6 +252,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
+  @Override
   public int getRowCount() {
     synchronized (getSync()) {
       if (this.attributeFilterMode.equals(MODE_SELECTED)) {
@@ -362,10 +370,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  protected void refresh() {
+  public void refresh() {
     synchronized (getSync()) {
-      if (this.loadObjectsWorker != null) {
-        this.loadObjectsWorker.cancel(true);
+      final SwingWorker<?, ?> worker = this.loadObjectsWorker;
+      if (worker != null) {
+        worker.cancel(true);
         this.loadObjectsWorker = null;
       }
       this.loadingPageNumbers.clear();
@@ -373,7 +382,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       this.pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
       this.countLoaded = false;
     }
-    fireTableDataChanged();
+    if (SwingUtilities.isEventDispatchThread()) {
+      fireTableDataChanged();
+    } else {
+      Invoke.later(this, "refresh");
+    }
   }
 
   protected void replaceCachedObject(final LayerDataObject oldObject,
@@ -477,12 +490,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     if (EqualsRegistry.equal(searchCondition, this.searchCondition)) {
       return false;
     } else {
+      final Object oldValue = this.searchCondition;
       this.searchCondition = searchCondition;
       if (MODE_SELECTED.equals(getAttributeFilterMode())) {
         setRowSorter(searchCondition);
       } else {
         refresh();
       }
+      propertyChangeSupport.firePropertyChange("searchCondition", oldValue,
+        this.searchCondition);
       return true;
     }
   }

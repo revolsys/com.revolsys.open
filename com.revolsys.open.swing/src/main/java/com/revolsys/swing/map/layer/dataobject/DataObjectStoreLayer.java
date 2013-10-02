@@ -220,31 +220,30 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @SuppressWarnings({
-    "rawtypes", "unchecked"
+    "unchecked", "rawtypes"
   })
   @Override
   protected List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
-    if (boundingBox.isNull()) {
-      return Collections.emptyList();
-    } else {
-      synchronized (this.sync) {
-        final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-        if (!this.boundingBox.contains(boundingBox)
-          && !this.loadingBoundingBox.contains(boundingBox)) {
-          if (this.loadingWorker != null) {
-            this.loadingWorker.cancel(true);
-          }
-          this.loadingBoundingBox = loadBoundingBox;
-          this.loadingWorker = createLoadingWorker(loadBoundingBox);
-          Invoke.worker(this.loadingWorker);
+    final boolean enabled = setEventsEnabled(false);
+    try {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
+      if (this.boundingBox.contains(queryBoundingBox)) {
+        return (List)this.index.queryIntersects(queryBoundingBox);
+      } else {
+        final String typePath = getTypePath();
+        final DataObjectStore dataStore = getDataStore();
+        final Reader reader = dataStore.query(this, typePath, queryBoundingBox);
+        try {
+          final List<LayerDataObject> readObjects = reader.read();
+          final List<LayerDataObject> objects = getCachedObjects(readObjects);
+          return objects;
+        } finally {
+          reader.close();
         }
       }
-      Polygon polygon = boundingBox.toPolygon();
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      polygon = geometryFactory.project(polygon);
-
-      final List objects = this.index.queryIntersects(polygon);
-      return objects;
+    } finally {
+      setEventsEnabled(enabled);
     }
   }
 
@@ -277,6 +276,36 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     } finally {
       setEventsEnabled(enabled);
+    }
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  @Override
+  protected List<LayerDataObject> doQueryBackground(
+    final BoundingBox boundingBox) {
+    if (boundingBox.isNull()) {
+      return Collections.emptyList();
+    } else {
+      synchronized (this.sync) {
+        final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
+        if (!this.boundingBox.contains(boundingBox)
+          && !this.loadingBoundingBox.contains(boundingBox)) {
+          if (this.loadingWorker != null) {
+            this.loadingWorker.cancel(true);
+          }
+          this.loadingBoundingBox = loadBoundingBox;
+          this.loadingWorker = createLoadingWorker(loadBoundingBox);
+          Invoke.worker(this.loadingWorker);
+        }
+      }
+      Polygon polygon = boundingBox.toPolygon();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      polygon = geometryFactory.project(polygon);
+
+      final List objects = this.index.queryIntersects(polygon);
+      return objects;
     }
   }
 

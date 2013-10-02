@@ -571,6 +571,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return Collections.emptyList();
   }
 
+  protected List<LayerDataObject> doQueryBackground(
+    final BoundingBox boundingBox) {
+    return doQuery(boundingBox);
+  }
+
   @Override
   protected boolean doSaveChanges() {
     return true;
@@ -1085,6 +1090,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public List<LayerDataObject> query(final Query query) {
     throw new UnsupportedOperationException("Query not currently supported");
+  }
+
+  @Override
+  public final List<LayerDataObject> queryBackground(
+    final BoundingBox boundingBox) {
+    final List<LayerDataObject> results = doQueryBackground(boundingBox);
+    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
+      boundingBox);
+    filterUpdates(results, filter);
+    return results;
   }
 
   protected void removeDeletedObject(final LayerDataObject object) {

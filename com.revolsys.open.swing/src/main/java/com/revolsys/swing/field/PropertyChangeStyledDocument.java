@@ -3,17 +3,17 @@ package com.revolsys.swing.field;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.PlainDocument;
 
-public class PropertyChangeDocument extends PlainDocument {
+public class PropertyChangeStyledDocument extends DefaultStyledDocument {
   private static final long serialVersionUID = 1L;
 
   private boolean ignoreEvents = false;
 
   private final JTextComponent textComponent;
 
-  public PropertyChangeDocument(final JTextComponent textComponent) {
+  public PropertyChangeStyledDocument(final JTextComponent textComponent) {
     this.textComponent = textComponent;
   }
 
@@ -42,8 +42,10 @@ public class PropertyChangeDocument extends PlainDocument {
   }
 
   protected void fireTextChanged(final String oldValue) {
-    final String newValue = this.textComponent.getText();
-    ((Field)this.textComponent).firePropertyChange("text", null, newValue);
+    if (this.textComponent != null) {
+      final String newValue = this.textComponent.getText();
+      ((Field)this.textComponent).firePropertyChange("text", null, newValue);
+    }
   }
 
   @Override

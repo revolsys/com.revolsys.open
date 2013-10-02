@@ -4,24 +4,17 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 
-import org.springframework.util.StringUtils;
-
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
-import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -36,13 +29,8 @@ import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.vividsolutions.jts.geom.Geometry;
 
-@SuppressWarnings("serial")
 public class DataObjectLayerTablePanel extends TablePanel implements
   PropertyChangeListener {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -55,14 +43,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final JToggleButton selectedButton;
 
-  private final QueryWhereConditionField advancedFilter;
-
   public DataObjectLayerTablePanel(final DataObjectLayer layer,
     final JTable table) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
-    this.advancedFilter = new QueryWhereConditionField(layer);
     final MenuFactory menu = getMenu();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -101,11 +86,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
-      layer);
-    attributeFilterPanel.addPropertyChangeListener(this);
+      this);
     toolBar.addComponent("search", attributeFilterPanel);
-    toolBar.addButton("search", "Advanced Filter", "Advanced Filter",
-      (Icon)null, this, "showAdvancedFilter");
+
+    toolBar.addButtonTitleIcon("search", "Advanced Filter", "filter_edits",
+      attributeFilterPanel, "showAdvancedFilter");
 
     toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
       attributeFilterPanel, "clear");
@@ -183,32 +168,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
-    if (source instanceof AttributeFilterPanel) {
-      final AttributeFilterPanel filterPanel = (AttributeFilterPanel)source;
-      final String searchAttribute = filterPanel.getSearchAttribute();
-      final Object searchValue = filterPanel.getSearchValue();
-      Condition condition = null;
-      if (StringUtils.hasText(searchAttribute)
-        && StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
-        final String searchOperator = filterPanel.getSearchOperator();
-        if ("Like".equalsIgnoreCase(searchOperator)) {
-          final String searchText = (String)searchValue;
-          if (StringUtils.hasText(searchText)) {
-            condition = Conditions.likeUpper(searchAttribute, searchText);
-          }
-        } else {
-          final DataObjectMetaData metaData = this.tableModel.getMetaData();
-          final Class<?> attributeClass = metaData.getAttributeClass(searchAttribute);
-          try {
-            final Object value = StringConverterRegistry.toObject(
-              attributeClass, searchValue);
-            condition = Conditions.equal(searchAttribute, value);
-          } catch (final Throwable t) {
-          }
-        }
-      }
-      this.tableModel.setSearchCondition(condition);
-    } else if (source instanceof LayerDataObject) {
+    if (source instanceof LayerDataObject) {
       repaint();
     } else if (source == this.layer) {
       final String propertyName = event.getPropertyName();
@@ -229,11 +189,6 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (DataObjectLayerTableModel.MODE_SELECTED.equals(mode)) {
       this.selectedButton.doClick();
     }
-  }
-
-  public void showAdvancedFilter() {
-    advancedFilter.setFieldValue(tableModel.getSearchCondition());
-    advancedFilter.showDialog(this);
   }
 
   public void zoomToRecord() {

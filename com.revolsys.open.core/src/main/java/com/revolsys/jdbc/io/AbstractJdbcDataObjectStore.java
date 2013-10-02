@@ -824,6 +824,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final BoundingBox boundingBox) {
 
     final Query query = new Query(typePath);
+    query.setProperty("dataObjectFactory", dataObjectFactory);
     query.setBoundingBox(boundingBox);
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
@@ -843,6 +844,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     geometryAttribute.addSelectStatementPlaceHolder(qArg);
 
     final Query query = new Query(metaData);
+    query.setProperty("dataObjectFactory", dataObjectFactory);
     query.setWhereCondition(new SqlCondition(intersectsFunction.toSql(
       geometryAttribute.getName(), qArg), geometryAttribute, geometry));
     final DataObjectStoreQueryReader reader = createReader();

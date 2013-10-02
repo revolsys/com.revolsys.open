@@ -14,4 +14,6 @@ public interface Condition extends Cloneable {
   List<Condition> getConditions();
 
   boolean isEmpty();
+
+  String toFormattedString();
 }

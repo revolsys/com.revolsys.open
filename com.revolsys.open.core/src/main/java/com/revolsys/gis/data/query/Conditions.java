@@ -66,22 +66,37 @@ public class Conditions {
       new CollectionValue(attribute, values));
   }
 
+  public static BinaryCondition in(final Condition left,
+    final CollectionCondition conditions) {
+    return new BinaryCondition(left, "in", conditions);
+  }
+
   public static BinaryCondition in(final String name,
     final Collection<? extends Object> values) {
-    return new BinaryCondition(new Column(name), "in", new CollectionValue(
-      values));
+    final Column left = new Column(name);
+    return new BinaryCondition(left, "in", new CollectionValue(values));
   }
 
   public static Condition in(final String name, final Object... values) {
     return in(name, Arrays.asList(values));
   }
 
+  public static RightUnaryCondition isNotNull(final Condition condition) {
+    return new RightUnaryCondition(condition, "IS NOT NULL");
+  }
+
   public static RightUnaryCondition isNotNull(final String name) {
-    return new RightUnaryCondition(new Column(name), "IS NOT NULL");
+    final Column condition = new Column(name);
+    return isNotNull(condition);
+  }
+
+  public static RightUnaryCondition isNull(final Condition condition) {
+    return new RightUnaryCondition(condition, "IS NULL");
   }
 
   public static RightUnaryCondition isNull(final String name) {
-    return new RightUnaryCondition(new Column(name), "IS NULL");
+    final Column condition = new Column(name);
+    return isNull(condition);
   }
 
   public static Condition lessThan(final String left, final Condition right) {

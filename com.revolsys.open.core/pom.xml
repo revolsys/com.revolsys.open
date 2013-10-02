@@ -161,9 +161,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>net.sf.jsqlparser</groupId>
-      <artifactId>jsqlparser</artifactId>
-      <version>0.8.0</version>
+      <groupId>com.akiban</groupId>
+      <artifactId>akiban-sql-parser</artifactId>
+      <version>1.0.16</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

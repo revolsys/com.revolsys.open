@@ -40,6 +40,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
         final int pageNumber = getPageNumber();
         if (pageNumber != -1) {
           String sql = getSql();
+          System.out.println(sql);
 
           final int startRowNum = ((pageNumber - 1) * pageSize);
           sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;
@@ -96,8 +97,8 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   public int getNumResults() {
     if (numResults == null) {
-      JdbcDataObjectStore dataStore = getDataStore();
-      Query query = getQuery();
+      final JdbcDataObjectStore dataStore = getDataStore();
+      final Query query = getQuery();
       numResults = dataStore.getRowCount(query);
       updateNumPages();
     }

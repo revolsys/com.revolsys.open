@@ -111,6 +111,8 @@ public interface DataObjectLayer extends Layer {
 
   List<LayerDataObject> query(Query query);
 
+  List<LayerDataObject> queryBackground(BoundingBox boundingBox);
+
   void removeSelectedRecords(BoundingBox boundingBox);
 
   void revertChanges(LayerDataObject record);

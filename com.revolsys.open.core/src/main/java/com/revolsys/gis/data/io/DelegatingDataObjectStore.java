@@ -307,12 +307,12 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   @Override
   public Reader<DataObject> query(DataObjectFactory dataObjectFactory,
     final String typePath, final BoundingBox boundingBox) {
-    return dataStore.query(null, typePath, boundingBox);
+    return dataStore.query(dataObjectFactory, typePath, boundingBox);
   }
 
   @Override
   public Reader<DataObject> query(DataObjectFactory dataObjectFactory, final String typePath, final Geometry geometry) {
-    return dataStore.query(null, typePath, geometry);
+    return dataStore.query(dataObjectFactory, typePath, geometry);
   }
 
   @Override

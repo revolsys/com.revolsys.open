@@ -48,6 +48,12 @@ public final class CollectionUtil {
     return values.add(value);
   }
 
+  public static <K1, K2, V> void addToMap(final Map<K1, Map<K2, V>> map,
+    final K1 key1, final K2 key2, final V value) {
+    final Map<K2, V> mapValue = getMap(map, key1);
+    mapValue.put(key2, value);
+  }
+
   public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map,
     final K1 key1, final V value) {
     final Set<V> values = getSet(map, key1);

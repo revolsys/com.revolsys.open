@@ -19,7 +19,7 @@ public class Column extends AbstractCondition {
 
   @Override
   public void appendSql(final StringBuffer buffer) {
-    buffer.append(name);
+    buffer.append(toString());
   }
 
   @Override
@@ -43,6 +43,10 @@ public class Column extends AbstractCondition {
 
   @Override
   public String toString() {
-    return name;
+    if (name.matches("[A-Z][_A-Z1-9]*")) {
+      return name;
+    } else {
+      return "\"" + name + "\"";
+    }
   }
 }
