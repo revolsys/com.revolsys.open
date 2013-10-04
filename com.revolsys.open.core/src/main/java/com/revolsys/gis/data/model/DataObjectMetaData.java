@@ -100,6 +100,8 @@ public interface DataObjectMetaData extends ObjectWithProperties,
 
   String getAttributeTitle(String fieldName);
 
+  List<String> getAttributeTitles();
+
   DataType getAttributeType(CharSequence name);
 
   /**

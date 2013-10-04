@@ -96,13 +96,15 @@ public class LayerRendererOverlay extends JComponent implements
   }
 
   public void redraw() {
-    synchronized (this.loadSync) {
-      this.image = null;
-      if (this.imageWorker != null) {
-        this.imageWorker.cancel(true);
-        this.imageWorker = null;
+    if (isValid() && layer.isVisible()) {
+      synchronized (this.loadSync) {
+        this.image = null;
+        if (this.imageWorker != null) {
+          this.imageWorker.cancel(true);
+          this.imageWorker = null;
+        }
+        firePropertyChange("imageLoaded", true, false);
       }
-      firePropertyChange("imageLoaded", true, false);
     }
   }
 

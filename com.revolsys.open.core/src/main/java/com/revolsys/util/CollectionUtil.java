@@ -21,6 +21,14 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public final class CollectionUtil {
+  public static <V> void addAllIfNotNull(final Collection<V> collection,
+    final Collection<V> values) {
+    if (collection != null && values != null) {
+      collection.addAll(values);
+    }
+
+  }
+
   public static <T> Integer addCount(final Map<T, Integer> counts,
     final T object) {
     Integer count = counts.get(object);

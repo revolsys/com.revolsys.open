@@ -381,17 +381,21 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void loadProject(final File projectFile) {
-    final FileSystemResource resource = new FileSystemResource(projectFile);
-    this.project.readProject(resource);
+    final boolean eventsEnabled = project.setEventsEnabled(false);
+    try {
+      final FileSystemResource resource = new FileSystemResource(projectFile);
+      this.project.readProject(resource);
 
-    final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
-    dataStoreConnectionManager.removeConnectionRegistry("Project");
-    dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
+      final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
+      dataStoreConnectionManager.removeConnectionRegistry("Project");
+      dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
 
-    final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
-    folderConnectionManager.removeConnectionRegistry("Project");
-    folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
-
+      final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
+      folderConnectionManager.removeConnectionRegistry("Project");
+      folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
+    } finally {
+      project.setEventsEnabled(eventsEnabled);
+    }
   }
 
   public void loadProject(final ProgressMonitor progressMonitor,

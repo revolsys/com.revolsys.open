@@ -35,7 +35,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public static TablePanel createPanel(final DataObjectLayer layer,
-    final List<LayerDataObject> objects) {
+    final Collection<LayerDataObject> objects) {
     return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
   }
 

@@ -421,7 +421,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   @Override
   protected List<DataObjectLayer> getSnapLayers() {
-    final Project project = Project.get();
+    final Project project = getProject();
     final double scale = MapPanel.get(project).getScale();
     final Set<DataObjectLayer> layers = new LinkedHashSet<DataObjectLayer>();
     boolean snapAll = false;

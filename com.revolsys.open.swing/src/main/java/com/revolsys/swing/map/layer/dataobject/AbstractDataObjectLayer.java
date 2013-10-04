@@ -86,7 +86,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.component.MergeObjectsDialog;
+import com.revolsys.swing.map.layer.dataobject.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
@@ -978,7 +978,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
-      Invoke.later(MergeObjectsDialog.class, "showDialog", this);
+      Invoke.later(MergeRecordsDialog.class, "showDialog", this);
     }
   }
 

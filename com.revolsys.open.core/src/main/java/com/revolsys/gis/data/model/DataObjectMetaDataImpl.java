@@ -404,6 +404,15 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public List<String> getAttributeTitles() {
+    final List<String> titles = new ArrayList<String>();
+    for (final Attribute attribute : getAttributes()) {
+      titles.add(attribute.getTitle());
+    }
+    return titles;
+  }
+
+  @Override
   public DataType getAttributeType(final CharSequence name) {
     final int index = getAttributeIndex(name);
     if (index == -1) {

@@ -56,7 +56,6 @@ import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
-import com.akiban.sql.unparser.NodeToString;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
@@ -555,13 +554,6 @@ public class QueryWhereConditionField extends ValueField implements
                 setFieldValue(condition);
                 statusLabel.setForeground(WebColors.DarkGreen);
                 statusLabel.setText("Valid");
-                try {
-                  System.out.println(new NodeToString().toString(where));
-                } catch (final StandardException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-                }
-                System.out.println(condition);
               }
             }
           }

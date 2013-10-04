@@ -44,7 +44,7 @@ import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -85,7 +85,7 @@ public class AbstractOverlay extends JComponent implements
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
-  private final LayerGroup project;
+  private final Project project;
 
   protected java.awt.Point snapEventPoint;
 
@@ -347,7 +347,7 @@ public class AbstractOverlay extends JComponent implements
     return point;
   }
 
-  public LayerGroup getProject() {
+  public Project getProject() {
     return this.project;
   }
 
@@ -397,7 +397,7 @@ public class AbstractOverlay extends JComponent implements
       new GeometryDistanceComparator(point));
     this.snapPoint = null;
     for (final DataObjectLayer layer : layers) {
-      final List<LayerDataObject> objects = layer.query(boundingBox);
+      final List<LayerDataObject> objects = layer.queryBackground(boundingBox);
       for (final LayerDataObject object : objects) {
         if (layer.isVisible(object)) {
           final CloseLocation closeLocation = findCloseLocation(object,

@@ -229,7 +229,6 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public void setSearchCondition(final Condition condition) {
-    System.out.println(condition);
     final boolean eventsEnabled = this.eventsEnabled;
     try {
       this.eventsEnabled = false;
