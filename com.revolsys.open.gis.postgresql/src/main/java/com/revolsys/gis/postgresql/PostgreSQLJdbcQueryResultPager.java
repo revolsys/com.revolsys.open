@@ -40,7 +40,6 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
         final int pageNumber = getPageNumber();
         if (pageNumber != -1) {
           String sql = getSql();
-          System.out.println(sql);
 
           final int startRowNum = ((pageNumber - 1) * pageSize);
           sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;

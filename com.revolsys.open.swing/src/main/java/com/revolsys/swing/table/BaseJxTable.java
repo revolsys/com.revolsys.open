@@ -1,6 +1,5 @@
 package com.revolsys.swing.table;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JLabel;
@@ -15,6 +14,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
 
 public class BaseJxTable extends JXTable {
@@ -23,7 +23,7 @@ public class BaseJxTable extends JXTable {
   public BaseJxTable() {
     setAutoCreateRowSorter(false);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
+    setHighlighters(HighlighterFactory.createSimpleStriping(WebColors.LightSteelBlue));
 
     final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();

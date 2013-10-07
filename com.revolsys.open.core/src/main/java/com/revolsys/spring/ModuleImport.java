@@ -113,6 +113,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   public void destroy() {
     if (applicationContext != null) {
       applicationContext.close();
+      applicationContext = null;
     }
   }
 

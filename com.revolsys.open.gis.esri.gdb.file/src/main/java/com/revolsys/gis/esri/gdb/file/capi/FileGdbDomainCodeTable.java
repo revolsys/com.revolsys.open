@@ -3,6 +3,8 @@ package com.revolsys.gis.esri.gdb.file.capi;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JComponent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   private final String name;
 
   private final CapiFileGdbDataObjectStore dataStore;
+
+  private JComponent swingEditor;
 
   public FileGdbDomainCodeTable(final CapiFileGdbDataObjectStore dataStore,
     final CodedValueDomain domain) {
@@ -94,6 +98,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
+  public JComponent getSwingEditor() {
+    return swingEditor;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     return (V)domain.getValue(id);
@@ -111,6 +120,10 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public void refresh() {
+  }
+
+  public void setSwingEditor(final JComponent swingEditor) {
+    this.swingEditor = swingEditor;
   }
 
   @Override

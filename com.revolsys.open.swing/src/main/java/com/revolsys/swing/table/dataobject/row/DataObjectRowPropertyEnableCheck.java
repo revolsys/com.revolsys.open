@@ -9,6 +9,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.util.JavaBeanUtil;
 
 public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {

@@ -90,13 +90,13 @@ import com.revolsys.swing.map.layer.dataobject.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectMetaDataTableModel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
-import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
-import com.revolsys.swing.map.table.DataObjectMetaDataTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
@@ -114,6 +114,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
   private boolean snapToAllLayers = false;
+
+  private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
@@ -354,7 +356,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void clearSelectedRecords() {
     this.selectedRecords.clear();
-    ;
     fireSelected();
   }
 
@@ -369,16 +370,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return (V)copy;
   }
 
-  public void copySelectedRecords() {
-    final List<LayerDataObject> selectedRecords = getSelectedRecords();
-    if (!selectedRecords.isEmpty()) {
+  @Override
+  public void copyRecordsToClipboard(final List<LayerDataObject> records) {
+    if (!records.isEmpty()) {
       final DataObjectMetaData metaData = getMetaData();
       final DataObjectReader reader = new ListDataObjectReader(metaData,
-        selectedRecords);
+        records);
       final DataObjectReaderTransferable transferable = new DataObjectReaderTransferable(
         reader);
       ClipboardUtil.setContents(transferable);
     }
+  }
+
+  public void copySelectedRecords() {
+    final List<LayerDataObject> selectedRecords = getSelectedRecords();
+    copyRecordsToClipboard(selectedRecords);
   }
 
   @Override
@@ -808,6 +814,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @SuppressWarnings("unchecked")
   public List<String> getSnapLayerNames() {
     return (List<String>)getProperty("snapLayers");
+  }
+
+  @Override
+  public Collection<String> getUserReadOnlyFieldNames() {
+    return Collections.unmodifiableSet(userReadOnlyFieldNames);
   }
 
   protected boolean hasPermission(final String permission) {
@@ -1382,6 +1393,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void setSnapToAllLayers(final boolean snapToAllLayers) {
     this.snapToAllLayers = snapToAllLayers;
+  }
+
+  public void setUserReadOnlyFieldNames(
+    final Collection<String> userReadOnlyFieldNames) {
+    this.userReadOnlyFieldNames = new LinkedHashSet<String>(
+      userReadOnlyFieldNames);
   }
 
   @Override

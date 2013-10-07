@@ -72,7 +72,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
-import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.dnd.transferhandler.DataObjectLayerFormTransferHandler;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
@@ -81,14 +80,14 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.table.DataObjectLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.table.dataobject.AbstractDataObjectTableModel;
-import com.revolsys.swing.table.dataobject.DataObjectTableCellEditor;
-import com.revolsys.swing.table.dataobject.DataObjectTableCellRenderer;
-import com.revolsys.swing.table.dataobject.ExcludeGeometryRowFilter;
+import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
+import com.revolsys.swing.table.dataobject.filter.ExcludeGeometryRowFilter;
+import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
+import com.revolsys.swing.table.dataobject.renderer.SingleDataObjectTableCellRenderer;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -172,8 +171,6 @@ public class DataObjectLayerForm extends JPanel implements
 
   private ToolBar toolBar;
 
-  private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry = new DataObjectMetaDataUiBuilderRegistry();
-
   private boolean editable = true;
 
   private DataObjectLayer layer;
@@ -206,7 +203,7 @@ public class DataObjectLayerForm extends JPanel implements
     addTabAllFields();
     final boolean editable = layer.isEditable();
     setEditable(editable);
-    getAllAttributes().setEditable(editable);
+    getAllAttributes().setEditable(isEditable());
     if (metaData.getGeometryAttributeName() != null) {
       addTabGeometry();
     }
@@ -365,6 +362,13 @@ public class DataObjectLayerForm extends JPanel implements
     addRequiredFieldNames(Arrays.asList(requiredFieldNames));
   }
 
+  protected JPanel addTab(final int index, final String title) {
+    final JPanel panel = new JPanel(new VerticalLayout(5));
+    panel.setOpaque(false);
+    addTab(index, title, panel);
+    return panel;
+  }
+
   public JScrollPane addTab(final int index, final String name,
     final Component component) {
     boolean init = false;
@@ -389,11 +393,11 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected void addTabAllFields() {
     this.allAttributes = new DataObjectLayerAttributesTableModel(this);
-    final BaseJxTable table = AbstractDataObjectTableModel.create(this.allAttributes);
+    final BaseJxTable table = AbstractSingleDataObjectTableModel.createTable(this.allAttributes);
     table.setRowFilter(new ExcludeGeometryRowFilter());
     final TableColumnModel columnModel = table.getColumnModel();
     final DataObjectMetaData metaData = getMetaData();
-    final DataObjectTableCellRenderer cellRenderer = new DataObjectTableCellRenderer() {
+    final SingleDataObjectTableCellRenderer cellRenderer = new SingleDataObjectTableCellRenderer() {
       @Override
       public Component getTableCellRendererComponent(final JTable table,
         Object value, final boolean isSelected, final boolean hasFocus,
@@ -470,16 +474,11 @@ public class DataObjectLayerForm extends JPanel implements
         return component;
       }
     };
-    cellRenderer.setUiBuilderRegistry(this.uiBuilderRegistry);
     for (int i = 0; i < columnModel.getColumnCount(); i++) {
       final TableColumn column = columnModel.getColumn(i);
       column.setCellRenderer(cellRenderer);
       if (i == 2) {
         final TableCellEditor cellEditor = column.getCellEditor();
-        if (cellEditor instanceof DataObjectTableCellEditor) {
-          final DataObjectTableCellEditor dataObjectCellEditor = (DataObjectTableCellEditor)cellEditor;
-          dataObjectCellEditor.setUiBuilderRegistry(this.uiBuilderRegistry);
-        }
         cellEditor.addCellEditorListener(this);
       }
     }
@@ -842,10 +841,6 @@ public class DataObjectLayerForm extends JPanel implements
     return this.toolBar;
   }
 
-  public DataObjectMetaDataUiBuilderRegistry getUiBuilderRegistry() {
-    return this.uiBuilderRegistry;
-  }
-
   public UndoManager getUndoManager() {
     return this.undoManager;
   }
@@ -1134,7 +1129,6 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void setFieldValue(final String fieldName, final Object value,
     final boolean validate) {
-
     boolean changed = false;
     final Object oldValue = getFieldValue(fieldName);
     this.fieldValues.put(fieldName, value);
@@ -1292,7 +1286,7 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     if (this.allAttributes != null) {
-      this.allAttributes.setReadOnlyFieldNames(this.readOnlyFieldNames);
+      this.allAttributes.setReadOnlyAttributeNames(this.readOnlyFieldNames);
     }
   }
 
@@ -1370,12 +1364,5 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     return valid;
-  }
-
-  protected JPanel addTab(final int index, final String title) {
-    final JPanel panel = new JPanel(new VerticalLayout(5));
-    panel.setOpaque(false);
-    addTab(index, title, panel);
-    return panel;
   }
 }

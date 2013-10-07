@@ -564,8 +564,14 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean isAttributeRequired(final CharSequence name) {
+    final Attribute attribute = getAttribute(name);
+    return attribute.isRequired();
+  }
+
+  @Override
   public boolean isAttributeRequired(final int i) {
-    final Attribute attribute = attributes.get(i);
+    final Attribute attribute = getAttribute(i);
     return attribute.isRequired();
   }
 

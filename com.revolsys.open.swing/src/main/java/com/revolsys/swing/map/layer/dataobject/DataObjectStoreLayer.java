@@ -34,7 +34,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.InvokeMethodAfterCommit;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.TransactionUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -228,7 +228,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     try {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
-      if (this.boundingBox.contains(queryBoundingBox)) {
+      if (this.boundingBox.contains(queryBoundingBox) && this.index != null) {
         return (List)this.index.queryIntersects(queryBoundingBox);
       } else {
         final String typePath = getTypePath();

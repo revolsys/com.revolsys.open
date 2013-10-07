@@ -12,6 +12,7 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 
 public class DataObjectRowRunnable extends InvokeMethodRunnable {
 

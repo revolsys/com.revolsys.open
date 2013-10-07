@@ -20,11 +20,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
@@ -35,13 +35,12 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.dataobject.row.DataObjectListTableModel;
+import com.revolsys.swing.table.dataobject.model.DataObjectListTableModel;
 import com.revolsys.util.CollectionUtil;
 
 public class MergeRecordsDialog extends JDialog implements WindowListener {
@@ -54,8 +53,6 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   }
 
   private JButton okButton;
-
-  private final JLabel statusLabel = new JLabel();
 
   private final DataObjectLayer layer;
 
@@ -85,27 +82,20 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   }
 
   protected void initDialog() {
-
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    setMinimumSize(new Dimension(600, 400));
     addWindowListener(this);
-    setLayout(new BorderLayout());
 
-    final JPanel statusPanel = new JPanel(new VerticalLayout());
-    statusPanel.add(statusLabel);
-    SwingUtil.setTitledBorder(statusPanel, "Status");
-    add(statusPanel, BorderLayout.NORTH);
-    setStatus("Creating merged record for " + this.layer.getName());
-
-    final JTabbedPane tabs = new JTabbedPane();
-    add(tabs, BorderLayout.CENTER);
+    final JPanel panel = new JPanel(new BorderLayout());
+    panel.setOpaque(false);
+    panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    add(new JScrollPane(panel));
 
     mergedObjectsPanel = new JPanel(new VerticalLayout(10));
-    mergedObjectsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    mergedObjectsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
     mergedObjectsPanel.setOpaque(false);
 
-    tabs.addTab("Merged Object", new JScrollPane(mergedObjectsPanel));
-
-    tabs.addTab("Errors", Log4jTableModel.createPanel());
+    panel.add(mergedObjectsPanel, BorderLayout.CENTER);
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(buttonsPanel, BorderLayout.SOUTH);
@@ -125,19 +115,19 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     try {
       final List<LayerDataObject> originalObjects = this.layer.getMergeableSelectedRecords();
 
+      String errorMessage = "";
       final DataType geometryType = this.layer.getGeometryType();
+      final Map<DataObject, Set<LayerDataObject>> mergedObjects = new HashMap<DataObject, Set<LayerDataObject>>();
       if (originalObjects.size() < 2) {
-        setStatus("<p style=\"color:red;font-weight: bold\">At least 2 active records must be selected to merge.</p></body></html>");
+        errorMessage = " at least two records must be selected to merge.";
       } else if (!DataTypes.LINE_STRING.equals(geometryType)) {
-        setStatus("<p style=\"color:red;font-weight: bold\">Merging "
-          + geometryType + " not currently supported</p></body></html>");
+        errorMessage = "Merging " + geometryType + " not currently supported";
       } else {
         for (final LayerDataObject originalObject : originalObjects) {
           final DataObject mergeableObject = new ArrayDataObject(originalObject);
           originalObjectsToMergeableObjects.put(originalObject, mergeableObject);
           mergeableObjectsToOiginalObjects.put(mergeableObject, originalObject);
         }
-        final Map<DataObject, Set<LayerDataObject>> mergedObjects = new HashMap<DataObject, Set<LayerDataObject>>();
         final DataObjectGraph graph = new DataObjectGraph(
           this.originalObjectsToMergeableObjects.values());
         for (final Node<DataObject> node : graph.nodes()) {
@@ -164,8 +154,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
             mergedObjects.put(mergedObject, sourceObjects);
           }
         }
-        Invoke.later(this, "setMergedObjects", mergedObjects);
       }
+      Invoke.later(this, "setMergedObjects", errorMessage, mergedObjects);
 
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error("Error " + this, e);
@@ -175,36 +165,38 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   public void setMergedObject(final int i, final DataObject mergedObject,
     final Collection<LayerDataObject> objects) {
-    final TablePanel tablePanel = MergedRecordsTableModel.createPanel(layer);
+    final TablePanel tablePanel = MergedRecordsTableModel.createPanel(layer,
+      mergedObject, objects);
 
-    final BaseJxTable table = tablePanel.getTable();
-    final MergedRecordsTableModel model = (MergedRecordsTableModel)table.getModel();
-    model.setObjects(mergedObject, objects);
     this.okButton.setEnabled(true);
-    tablePanel.setPreferredSize(new Dimension(100, 45 + objects.size() * 20));
+    tablePanel.setPreferredSize(new Dimension(100, 50 + objects.size() * 22));
 
     final JPanel panel = new JPanel(new BorderLayout());
     panel.add(tablePanel, BorderLayout.SOUTH);
-    SwingUtil.setTitledBorder(panel, "Merged records #" + i);
+    SwingUtil.setTitledBorder(panel, "Merged " + objects.size()
+      + " Source Records");
 
     mergedObjectsPanel.add(panel);
 
   }
 
-  public void setMergedObjects(
+  public void setMergedObjects(String errorMessage,
     final Map<DataObject, Set<LayerDataObject>> mergedObjects) {
     final Set<LayerDataObject> unMergeableRecords = new HashSet<LayerDataObject>(
       originalObjectsToMergeableObjects.keySet());
     if (!mergedObjects.isEmpty()) {
-      setStatus("<p><b>Merged "
-        + mergedObjects.size()
-        + " "
-        + this.layer.getName()
-        + " records.</p>"
-        + "<p>Verify the values shown in the merged record below (highlighted in green).</p>"
-        + "<p style=\"color:green;font-weight: bold\">Click OK to save the merged record or click Cancel to abondon edits.</p>");
-
+      final JPanel instructions = new JPanel(new BorderLayout());
+      SwingUtil.setTitledBorder(instructions, "Instructions");
+      instructions.add(
+        new JLabel(
+          "<html><p>Clicking OK will replace the records below with the merged records highlighted in green, or click Cancel to abandon any changes.</p>"
+            + "<p>Verify the values in the merged green record and edit them if required before clicking OK.</p>"
+            + "<p>Values in the source records that differ from the merged records will be highlighted in red.</p>"
+            + "<p>Values in the source record that were null but not null in the merged record will be highlighted in yellow.</p></html>"),
+        BorderLayout.NORTH);
       int i = 0;
+      mergedObjectsPanel.add(instructions);
+
       for (final Entry<DataObject, Set<LayerDataObject>> mergedEntry : mergedObjects.entrySet()) {
         final DataObject mergedObject = mergedEntry.getKey();
         final Set<LayerDataObject> originalObjects = mergedEntry.getValue();
@@ -219,22 +211,26 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       final DataObjectListTableModel tableModel = tablePanel.getTableModel();
       tableModel.setEditable(false);
       tablePanel.setPreferredSize(new Dimension(100,
-        25 + unMergeableRecords.size() * 20));
+        25 + unMergeableRecords.size() * 22));
 
       final JPanel panel = new JPanel(new BorderLayout());
+      if (!StringUtils.hasText(errorMessage)) {
+        errorMessage = "The following records could not be merged and will not be modified by clicking OK.";
+      }
+      final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">"
+        + errorMessage + "</p></html>");
+      panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
-      SwingUtil.setTitledBorder(panel, "Records that could not be merged");
+      SwingUtil.setTitledBorder(panel, unMergeableRecords.size()
+        + " Un-Mergable Records");
 
       mergedObjectsPanel.add(panel);
     }
   }
 
-  public void setStatus(final String message) {
-    this.statusLabel.setText("<html><body>" + message + "</body></html>");
-  }
-
   private void showDialog() {
     Invoke.background(toString(), this, "run");
+    pack();
     setVisible(true);
   }
 

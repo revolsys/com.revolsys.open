@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JComponent;
+
 import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class CodedValueDomain extends Domain implements CodeTable {
@@ -19,6 +21,8 @@ public class CodedValueDomain extends Domain implements CodeTable {
   private Map<String, Object> valueIdMap = new HashMap<String, Object>();
 
   private int maxId = 0;
+
+  private JComponent swingEditor;
 
   public synchronized void addCodedValue(final Object code, final String name) {
     final CodedValue value = new CodedValue(code, name);
@@ -128,6 +132,11 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
+  public JComponent getSwingEditor() {
+    return swingEditor;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
@@ -174,5 +183,9 @@ public class CodedValueDomain extends Domain implements CodeTable {
       addCodedValue(code, name);
 
     }
+  }
+
+  public void setSwingEditor(final JComponent swingEditor) {
+    this.swingEditor = swingEditor;
   }
 }

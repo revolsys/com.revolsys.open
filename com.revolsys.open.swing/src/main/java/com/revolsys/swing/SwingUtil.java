@@ -115,6 +115,7 @@ public class SwingUtil {
 
   public static ComboBox createComboBox(final String fieldName,
     final CodeTable codeTable, final boolean required) {
+
     final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName,
       codeTable, !required);
     if (comboBox.getModel().getSize() > 0) {
@@ -232,7 +233,12 @@ public class SwingUtil {
         textField.setEditable(false);
         field = textField;
       } else if (codeTable != null) {
-        field = createComboBox(fieldName, codeTable, required);
+        final JComponent component = codeTable.getSwingEditor();
+        if (component == null) {
+          field = createComboBox(fieldName, codeTable, required);
+        } else {
+          field = (Field)component;
+        }
       } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
         final int scale = attribute.getScale();
         final Number minValue = attribute.getMinValue();

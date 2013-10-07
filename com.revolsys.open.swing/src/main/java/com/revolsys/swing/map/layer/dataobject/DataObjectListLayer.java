@@ -19,8 +19,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.swing.map.table.DataObjectLayerTablePanel;
-import com.revolsys.swing.map.table.DataObjectListLayerTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements

@@ -85,6 +85,10 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setFieldValue(text);
   }
 
+  protected String getDisplayText(final Object value) {
+    return StringConverterRegistry.toString(value);
+  }
+
   @Override
   public String getFieldName() {
     return this.fieldName;
@@ -147,25 +151,25 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setFieldValue(final Object value) {
-    final String newValue = StringConverterRegistry.toString(value);
+    final String newText = getDisplayText(value);
     final String oldValue = this.fieldValue;
     final String text = getText();
     this.undoManager.discardAllEdits();
-    if (!EqualsRegistry.equal(text, newValue)) {
-      if (newValue == null) {
+    if (!EqualsRegistry.equal(text, newText)) {
+      if (newText == null) {
         if (StringUtils.hasText(text)) {
           setText("");
         }
       } else {
-        setText(newValue);
+        setText(newText);
       }
       this.undoManager.discardAllEdits();
     }
-    if (!EqualsRegistry.equal(oldValue, newValue)) {
-      this.fieldValue = newValue;
-      firePropertyChange(this.fieldName, oldValue, newValue);
+    if (!EqualsRegistry.equal(oldValue, newText)) {
+      this.fieldValue = newText;
+      firePropertyChange(this.fieldName, oldValue, newText);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, newValue);
+        oldValue, newText);
     }
   }
 

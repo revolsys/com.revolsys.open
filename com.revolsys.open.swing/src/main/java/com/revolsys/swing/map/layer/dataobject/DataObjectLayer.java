@@ -31,6 +31,8 @@ public interface DataObjectLayer extends Layer {
 
   <V extends LayerDataObject> V copyRecord(final V object);
 
+  void copyRecordsToClipboard(final List<LayerDataObject> records);
+
   UndoableEdit createPropertyEdit(LayerDataObject object, String propertyName,
     Object oldValue, Object newValue);
 
@@ -79,6 +81,8 @@ public interface DataObjectLayer extends Layer {
   int getSelectionCount();
 
   List<String> getSnapLayerNames();
+
+  Collection<String> getUserReadOnlyFieldNames();
 
   boolean isCanAddRecords();
 

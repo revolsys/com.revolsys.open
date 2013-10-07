@@ -13,9 +13,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
@@ -27,8 +27,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXList;
-import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -36,6 +34,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
@@ -48,10 +47,8 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.undo.CascadingUndoManager;
-import com.revolsys.swing.undo.UndoManager;
 
-public class DataStoreSearchTextField extends JXSearchField implements
+public class DataStoreQueryTextField extends TextField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
   ListDataListener, ItemSelectable, Field, ListSelectionListener,
   HighlightPredicate {
@@ -67,22 +64,29 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   public DataObject selectedItem;
 
-  private String errorMessage;
+  private final String idAttributeName;
 
-  private String originalToolTip;
+  private final DataObjectMetaData metaData;
 
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final DataObjectStore dataStore;
 
-  public DataStoreSearchTextField(final DataObjectMetaData metaData,
+  private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
+    100);
+
+  public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
-    this(metaData.getDataObjectStore(), displayAttributeName, new Query(
-      metaData, Conditions.equal(Function.upper(displayAttributeName),
-        new Value(null))), new Query(metaData, Conditions.likeUpper(
-      displayAttributeName, "")));
+    this(metaData, displayAttributeName, new Query(metaData, Conditions.equal(
+      Function.upper(displayAttributeName), new Value(null))), new Query(
+      metaData, Conditions.likeUpper(displayAttributeName, "")));
+
   }
 
-  public DataStoreSearchTextField(final DataObjectStore dataStore,
+  public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName, final List<Query> queries) {
+    super(displayAttributeName);
+    this.metaData = metaData;
+    this.dataStore = metaData.getDataObjectStore();
+    this.idAttributeName = metaData.getIdAttributeName();
     this.displayAttributeName = displayAttributeName;
 
     final Document document = getDocument();
@@ -111,22 +115,21 @@ public class DataStoreSearchTextField extends JXSearchField implements
       BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
     setEditable(true);
-    setSearchMode(SearchMode.REGULAR);
     PopupMenu.getPopupMenuFactory(this);
-    this.undoManager.addKeyMap(this);
   }
 
-  public DataStoreSearchTextField(final DataObjectStore dataStore,
+  public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName, final Query... queries) {
-    this(dataStore, displayAttributeName, Arrays.asList(queries));
+    this(metaData, displayAttributeName, Arrays.asList(queries));
 
   }
 
-  public DataStoreSearchTextField(final DataObjectStore dataStore,
+  public DataStoreQueryTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore, displayAttributeName, new Query(typeName, Conditions.equal(
-      Function.upper(displayAttributeName), new Value(null))), new Query(
-      typeName, Conditions.likeUpper(displayAttributeName, "")));
+    this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
+      typeName, Conditions.equal(Function.upper(displayAttributeName),
+        new Value(null))), new Query(typeName, Conditions.likeUpper(
+      displayAttributeName, "")));
   }
 
   @Override
@@ -173,13 +176,19 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   @Override
-  public String getFieldName() {
-    return this.displayAttributeName;
-  }
-
-  @Override
-  public String getFieldValidationMessage() {
-    return this.errorMessage;
+  protected String getDisplayText(final Object value) {
+    final String stringValue = StringConverterRegistry.toString(value);
+    String displayText = valueToDisplayMap.get(stringValue);
+    if (!StringUtils.hasText(displayText)) {
+      final DataObject record = dataStore.queryFirst(Query.equal(metaData,
+        idAttributeName, stringValue));
+      if (record == null) {
+        displayText = stringValue;
+      } else {
+        displayText = record.getString(displayAttributeName);
+      }
+    }
+    return displayText;
   }
 
   @Override
@@ -294,9 +303,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
           }
         }
         if (this.listModel.getSelectedItem() != null) {
-          final JButton findButton = getFindButton();
-          findButton.doClick();
-          setText("");
+
+          // setText(listModel.getSelectedItem().getStrin);
+          // final JButton findButton = getFindButton();
+          // findButton.doClick();
+          // setText("");
         }
       break;
       default:
@@ -368,57 +379,19 @@ public class DataStoreSearchTextField extends JXSearchField implements
     }
     final String text = getText();
     this.listModel.setSearchText(text);
-    showMenu();
-
-    this.selectedItem = this.listModel.getSelectedItem();
-    if (this.selectedItem != null) {
-      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-        this.selectedItem, ItemEvent.SELECTED));
+    if (isShowing()) {
+      showMenu();
+      this.selectedItem = this.listModel.getSelectedItem();
+      if (this.selectedItem != null) {
+        fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
+          this.selectedItem, ItemEvent.SELECTED));
+      }
     }
-  }
-
-  @Override
-  public void setFieldBackgroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setBackground(color);
-  }
-
-  @Override
-  public void setFieldForegroundColor(Color color) {
-    if (color == null) {
-      color = TextField.DEFAULT_BACKGROUND;
-    }
-    setForeground(color);
-  }
-
-  @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    setForeground(color);
-    setSelectedTextColor(color);
-    setBackground(ColorUtil.setAlpha(color, 50));
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
   }
 
   @Override
   public void setFieldToolTip(final String toolTip) {
     setToolTipText(toolTip);
-  }
-
-  @Override
-  public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
-  }
-
-  @Override
-  public void setFieldValue(final Object value) {
-    setText(StringConverterRegistry.toString(value));
   }
 
   public void setMaxResults(final int maxResults) {
@@ -428,20 +401,9 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public void setText(final String text) {
     super.setText(text);
-    search();
-  }
-
-  @Override
-  public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
-      super.setToolTipText(text);
+    if (listModel != null) {
+      search();
     }
-  }
-
-  @Override
-  public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
   }
 
   private void showMenu() {
@@ -453,11 +415,6 @@ public class DataStoreSearchTextField extends JXSearchField implements
       this.menu.show(this, 0, this.getHeight());
       this.menu.pack();
     }
-  }
-
-  @Override
-  public String toString() {
-    return getFieldName() + "=" + getFieldValue();
   }
 
   @Override

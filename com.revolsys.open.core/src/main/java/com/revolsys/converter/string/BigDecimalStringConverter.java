@@ -6,6 +6,26 @@ import org.springframework.util.StringUtils;
 
 public class BigDecimalStringConverter extends
   AbstractNumberStringConverter<BigDecimal> {
+
+  public static boolean isNumber(final Object value) {
+    if (value instanceof Number) {
+      return true;
+    } else {
+      try {
+        final Object number = StringConverterRegistry.toObject(
+          BigDecimal.class, value);
+        if (number instanceof Number) {
+          return true;
+        } else {
+          return false;
+        }
+
+      } catch (final Throwable t) {
+        return false;
+      }
+    }
+  }
+
   public BigDecimalStringConverter() {
     super(DECIMAL_FORMAT);
   }

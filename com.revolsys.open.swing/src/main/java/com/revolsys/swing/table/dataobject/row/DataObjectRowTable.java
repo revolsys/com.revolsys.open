@@ -21,10 +21,13 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.map.table.DataObjectLayerTableModel;
-import com.revolsys.swing.map.table.predicate.ErrorPredicate;
-import com.revolsys.swing.map.table.predicate.ModifiedAttributePredicate;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.predicate.ErrorPredicate;
+import com.revolsys.swing.map.layer.dataobject.table.predicate.ModifiedAttributePredicate;
 import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
+import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
+import com.revolsys.swing.table.dataobject.renderer.DataObjectRowTableCellRenderer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectRowTable extends BaseJxTable implements MouseListener {
@@ -41,19 +44,21 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     super(model);
     setSortable(false);
 
-    final DataObjectMetaData metaData = model.getMetaData();
-
     final JTableHeader tableHeader = getTableHeader();
 
     final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
-    for (int i = 0; i < model.getColumnCount(); i++) {
-      final TableColumn column = columnModel.getColumn(i);
-      final Class<?> attributeClass = metaData.getAttributeClass(i);
+    final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
+      model);
+    for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
+      final TableColumn column = columnModel.getColumn(columnIndex);
+      if (columnIndex >= model.getAttributesOffset()) {
+        column.setCellEditor(cellEditor);
+      }
+      column.setCellRenderer(cellRenderer);
+      final Class<?> attributeClass = model.getColumnClass(columnIndex);
       if (Geometry.class.isAssignableFrom(attributeClass)) {
         removeColumns.add(column);
-      } else {
-        column.setCellRenderer(cellRenderer);
       }
     }
     for (final TableColumn column : removeColumns) {
@@ -101,32 +106,39 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     return super.getSelectionModel();
   }
 
-  public DataObjectRowTableModel getTableModel() {
-    return (DataObjectRowTableModel)getModel();
+  @SuppressWarnings("unchecked")
+  public <V extends DataObjectRowTableModel> V getTableModel() {
+    return (V)getModel();
   }
 
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
-    final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
+    final DataObjectRowTableModel model = getTableModel();
     final DataObjectMetaData metaData = model.getMetaData();
     final int viewIndex = column.getModelIndex();
-    final String attributeName = model.getAttributeName(viewIndex);
-    final Attribute attribute = metaData.getAttribute(attributeName);
-    Integer columnWidth = attribute.getProperty("tableColumnWidth");
-    final String columnName = attribute.getTitle();
-    if (columnWidth == null) {
-      columnWidth = attribute.getMaxStringLength() * 7;
-      columnWidth = Math.min(columnWidth, 200);
-      attribute.setProperty("tableColumnWidth", columnWidth);
+    final int attributesOffset = model.getAttributesOffset();
+    if (viewIndex < attributesOffset) {
+      final String attributeName = model.getAttributeName(viewIndex
+        - attributesOffset);
+      final Attribute attribute = metaData.getAttribute(attributeName);
+      if (attribute != null) {
+        Integer columnWidth = attribute.getProperty("tableColumnWidth");
+        final String columnName = attribute.getTitle();
+        if (columnWidth == null) {
+          columnWidth = attribute.getMaxStringLength() * 7;
+          columnWidth = Math.min(columnWidth, 200);
+          attribute.setProperty("tableColumnWidth", columnWidth);
+        }
+        column.setMinWidth(columnName.length() * 7 + 15);
+        column.setPreferredWidth(columnWidth);
+      }
     }
-    column.setMinWidth(columnName.length() * 7 + 15);
-    column.setPreferredWidth(columnWidth);
   }
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getSource() == getTableHeader()) {
+    if (isSortable() && e.getSource() == getTableHeader()) {
       final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());

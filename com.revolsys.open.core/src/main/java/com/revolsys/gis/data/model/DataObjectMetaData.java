@@ -192,6 +192,8 @@ public interface DataObjectMetaData extends ObjectWithProperties,
    */
   boolean hasAttribute(CharSequence name);
 
+  boolean isAttributeRequired(CharSequence name);
+
   /**
    * Return true if a value for the attribute is required.
    * 

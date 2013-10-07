@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JComponent;
+
 import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractCodeTable implements CodeTable, Cloneable {
@@ -21,6 +23,17 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
   private Map<List<Object>, Object> valueIdCache = new LinkedHashMap<List<Object>, Object>();
 
   private final Map<String, Object> stringIdMap = new HashMap<String, Object>();
+
+  private JComponent swingEditor;
+
+  @Override
+  public JComponent getSwingEditor() {
+    return swingEditor;
+  }
+
+  public void setSwingEditor(JComponent swingEditor) {
+    this.swingEditor = swingEditor;
+  }
 
   private long maxId;
 

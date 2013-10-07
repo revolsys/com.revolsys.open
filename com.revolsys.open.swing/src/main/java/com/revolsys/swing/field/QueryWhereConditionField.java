@@ -73,7 +73,7 @@ import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
-import com.revolsys.swing.map.table.AttributeFilterPanel;
+import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
 
