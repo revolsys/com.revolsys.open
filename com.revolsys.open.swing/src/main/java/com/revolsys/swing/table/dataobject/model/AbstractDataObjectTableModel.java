@@ -1,17 +1,14 @@
 package com.revolsys.swing.table.dataobject.model;
 
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collection;
-import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.springframework.util.StringUtils;
@@ -86,17 +83,6 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
 
   public Set<String> getReadOnlyAttributeNames() {
     return this.readOnlyAttributeNames;
-  }
-
-  public boolean isCellEditable(final EventObject event) {
-    if (event instanceof MouseEvent) {
-      final MouseEvent mouseEvent = (MouseEvent)event;
-      if (SwingUtilities.isLeftMouseButton(mouseEvent)
-        && mouseEvent.isAltDown()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public boolean isEditable() {

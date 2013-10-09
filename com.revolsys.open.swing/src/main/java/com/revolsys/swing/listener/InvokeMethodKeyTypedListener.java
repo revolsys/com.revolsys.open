@@ -54,7 +54,7 @@ public class InvokeMethodKeyTypedListener extends KeyAdapter {
   }
 
   public InvokeMethodKeyTypedListener(final Object object,
-    final String methodName, final Object[] parameters) {
+    final String methodName, final Object... parameters) {
     this(object, methodName, parameters, false);
   }
 

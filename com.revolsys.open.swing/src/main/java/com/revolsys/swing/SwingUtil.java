@@ -26,8 +26,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.swing.ActionMap;
 import javax.swing.ComboBoxEditor;
+import javax.swing.InputMap;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -37,8 +40,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
@@ -52,6 +57,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.CodeTableComboBoxModel;
@@ -77,6 +83,25 @@ public class SwingUtil {
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
 
   public static final Font BOLD_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
+
+  public static void addAction(final JComponent component,
+    final KeyStroke keyStroke, final String actionKey, final Object object,
+    final String methodName, final Object... parameters) {
+    final InputMap inputMap = component.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    inputMap.put(keyStroke, actionKey);
+
+    final ActionMap actionMap = component.getActionMap();
+    final InvokeMethodAction action = new InvokeMethodAction(actionKey, object,
+      methodName, parameters);
+    actionMap.put(actionKey, action);
+    if (component instanceof JComboBox) {
+      final JComboBox comboBox = (JComboBox)component;
+      final JComponent editorComponent = (JComponent)comboBox.getEditor()
+        .getEditorComponent();
+      addAction(editorComponent, keyStroke, actionKey, object, methodName,
+        parameters);
+    }
+  }
 
   public static JComponent addField(final Container container,
     final Object object, final String fieldName) {

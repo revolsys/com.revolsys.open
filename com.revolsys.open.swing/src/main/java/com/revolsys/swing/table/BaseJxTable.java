@@ -1,16 +1,19 @@
 package com.revolsys.swing.table;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -23,19 +26,33 @@ public class BaseJxTable extends JXTable {
   public BaseJxTable() {
     setAutoCreateRowSorter(false);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    setHighlighters(HighlighterFactory.createSimpleStriping(WebColors.LightSteelBlue));
+
+    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
+      WebColors.LightSteelBlue, null, WebColors.Navy, WebColors.White));
+    addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
+      WebColors.White, null, WebColors.Blue, WebColors.White));
 
     final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();
     tableHeader.setDefaultRenderer(headerRenderer);
     tableHeader.setReorderingAllowed(true);
     setFont(SwingUtil.FONT);
+
+    SwingUtil.addAction(this,
+      KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK),
+      "selectPreviousColumnCell", this, "selectRelativeCell", 0, -1);
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
+      "selectNextColumnCell", this, "selectRelativeCell", 0, 1);
+    SwingUtil.addAction(this,
+      KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK),
+      "selectPreviousRowCell", this, "selectRelativeCell", -1, 0);
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+      "enterPressed", this, "selectRelativeCell", 1, 0);
   }
 
   public BaseJxTable(final TableModel model) {
     this();
     setModel(model);
-
   }
 
   @Override
@@ -100,6 +117,21 @@ public class BaseJxTable extends JXTable {
       }
       column.setMinWidth(maxPreferedWidth + 5);
       column.setPreferredWidth(maxPreferedWidth + 5);
+    }
+  }
+
+  public void selectRelativeCell(final int row, final int column) {
+    final int selectedRow = getSelectedRow() + row;
+    final int selectedColumn = getSelectedColumn() + column;
+    if (selectedRow >= 0 && selectedRow < getRowCount() && selectedColumn >= 0
+      && selectedColumn < getColumnCount()) {
+      requestFocusInWindow();
+      changeSelection(selectedRow, selectedColumn, false, false);
+      editCellAt(selectedRow, selectedColumn);
+      final Component editor = getEditorComponent();
+      if (editor != null) {
+        editor.requestFocusInWindow();
+      }
     }
   }
 

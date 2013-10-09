@@ -1,10 +1,6 @@
 package com.revolsys.swing.table.dataobject.model;
 
-import java.awt.event.MouseEvent;
-import java.util.EventObject;
-
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -31,7 +27,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
 
     final SingleDataObjectTableCellRenderer cellRenderer = new SingleDataObjectTableCellRenderer();
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
-      model);
+      table);
 
     final DataObjectMetaData metaData = model.getMetaData();
 
@@ -118,18 +114,6 @@ public abstract class AbstractSingleDataObjectTableModel extends
       default:
         return null;
     }
-  }
-
-  @Override
-  public boolean isCellEditable(final EventObject event) {
-    if (event instanceof MouseEvent) {
-      final MouseEvent mouseEvent = (MouseEvent)event;
-      if (SwingUtilities.isLeftMouseButton(mouseEvent)
-        && mouseEvent.getClickCount() == 2) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override

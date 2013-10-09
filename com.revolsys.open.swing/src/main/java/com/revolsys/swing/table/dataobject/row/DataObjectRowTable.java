@@ -14,10 +14,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-
-import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -49,7 +45,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
-      model);
+      this);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
       if (columnIndex >= model.getAttributesOffset()) {
@@ -66,16 +62,9 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     }
     tableHeader.addMouseListener(this);
     model.setTable(this);
-    addHighlighter(new ColorHighlighter(WebColors.White, WebColors.Black,
-      WebColors.Blue, WebColors.White));
 
     ModifiedAttributePredicate.add(this);
     ErrorPredicate.add(this);
-
-    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
-      WebColors.LightGray, null, WebColors.Navy, null));
-    addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
-      WebColors.White, null, WebColors.Blue, null));
 
   }
 
