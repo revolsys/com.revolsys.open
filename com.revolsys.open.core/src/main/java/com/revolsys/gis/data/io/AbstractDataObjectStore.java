@@ -371,7 +371,7 @@ public abstract class AbstractDataObjectStore extends
     return value;
   }
 
-  protected synchronized Map<String, Object> getSharedAttributes() {
+  protected Map<String, Object> getSharedAttributes() {
     Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
     if (sharedAttributes == null) {
       sharedAttributes = new HashMap<String, Object>();

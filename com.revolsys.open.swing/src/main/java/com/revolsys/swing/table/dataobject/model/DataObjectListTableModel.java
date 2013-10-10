@@ -1,15 +1,12 @@
 package com.revolsys.swing.table.dataobject.model;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JTable;
@@ -56,8 +53,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
 
   private final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
 
-  private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
-
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final Collection<LayerDataObject> objects,
     final Collection<String> columnNames) {
@@ -85,12 +80,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     this.objects.addAll(objects);
   }
 
-  @Override
-  public void addPropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.add(propertyChangeListener);
-  }
-
   public void clear() {
     this.objects.clear();
     fireTableDataChanged();
@@ -103,15 +92,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     this.objects.clear();
   }
 
-  private void firePropertyChange(final DataObject object, final String name,
-    final Object oldValue, final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
-      oldValue, newValue);
-    for (final PropertyChangeListener listener : this.propertyChangeListeners) {
-      listener.propertyChange(event);
-    }
-  }
-
   @Override
   public <V extends DataObject> V getObject(final int index) {
     return (V)this.objects.get(index);
@@ -122,10 +102,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
    */
   public List<LayerDataObject> getObjects() {
     return this.objects;
-  }
-
-  public Set<PropertyChangeListener> getPropertyChangeListeners() {
-    return Collections.unmodifiableSet(this.propertyChangeListeners);
   }
 
   @Override
@@ -171,12 +147,6 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   @Override
-  public void removePropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.remove(propertyChangeListener);
-  }
-
-  @Override
   public void reorder(final int fromIndex, int toIndex) {
     if (fromIndex < toIndex) {
       toIndex--;
@@ -188,6 +158,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       add(toIndex, layerDataObject);
       clearSortedColumns();
     }
+    firePropertyChange("reorder", false, true);
   }
 
   /**
@@ -220,7 +191,9 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       final String name = getColumnName(columnIndex);
       final Object oldValue = object.getValueByPath(name);
       object.setValue(name, value);
-      firePropertyChange(object, name, oldValue, value);
+      final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
+        oldValue, value);
+      getPropertyChangeSupport().firePropertyChange(event);
     }
   }
 

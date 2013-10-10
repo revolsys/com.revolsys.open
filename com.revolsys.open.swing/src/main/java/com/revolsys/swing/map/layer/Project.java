@@ -327,7 +327,8 @@ public class Project extends LayerGroup {
         viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
       }
       this.viewBoundingBox = viewBoundingBox;
-      firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
+      getPropertyChangeSupport().firePropertyChange("viewBoundingBox",
+        oldValue, viewBoundingBox);
     }
   }
 

@@ -655,13 +655,13 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public void delete(final DataObject object) {
-    synchronized (EsriFileGdb.class) {
-      if (object.getState() == DataObjectState.Persisted
-        || object.getState() == DataObjectState.Modified) {
-        object.setState(DataObjectState.Deleted);
-        final Writer<DataObject> writer = getWriter();
-        writer.write(object);
-      }
+    // Don't synchronize to avoid deadlock as that is done lower down in the
+    // methods
+    if (object.getState() == DataObjectState.Persisted
+      || object.getState() == DataObjectState.Modified) {
+      object.setState(DataObjectState.Deleted);
+      final Writer<DataObject> writer = getWriter();
+      writer.write(object);
     }
   }
 
@@ -977,9 +977,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public void insert(final DataObject object) {
-    synchronized (EsriFileGdb.class) {
-      getWriter().write(object);
-    }
+    // Don't synchronize to avoid deadlock as that is done lower down in the
+    // methods
+    getWriter().write(object);
   }
 
   protected void insertRow(final Table table, final Row row) {
@@ -1214,9 +1214,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public void update(final DataObject object) {
-    synchronized (EsriFileGdb.class) {
-      getWriter().write(object);
-    }
+    // Don't synchronize to avoid deadlock as that is done lower down in the
+    // methods
+    getWriter().write(object);
   }
 
   protected void updateRow(final Table table, final Row row) {

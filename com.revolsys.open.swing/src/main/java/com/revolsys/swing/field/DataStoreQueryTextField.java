@@ -297,19 +297,12 @@ public class DataStoreQueryTextField extends TextField implements
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
               setText(text);
-              e.consume();
-              return;
             }
           }
         }
-        if (this.listModel.getSelectedItem() != null) {
-
-          // setText(listModel.getSelectedItem().getStrin);
-          // final JButton findButton = getFindButton();
-          // findButton.doClick();
-          // setText("");
-        }
-      break;
+        return;
+      case KeyEvent.VK_TAB:
+        return;
       default:
       break;
     }

@@ -43,7 +43,7 @@ public class Column extends AbstractCondition {
 
   @Override
   public String toString() {
-    if (name.matches("[A-Z][_A-Z1-9]*")) {
+    if (name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
       return name;
     } else {
       return "\"" + name + "\"";

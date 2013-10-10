@@ -37,19 +37,17 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   @Override
   @PreDestroy
   public void close() {
-    synchronized (dataStore) {
-      for (final Entry<String, Table> entry : tables.entrySet()) {
-        final Table table = entry.getValue();
-        try {
-          dataStore.freeWriteLock(table);
-        } catch (final Throwable e) {
-          LOG.error("Unable to close table", e);
-        }
-        dataStore.closeTable(table);
+    for (final Entry<String, Table> entry : tables.entrySet()) {
+      final Table table = entry.getValue();
+      try {
+        dataStore.freeWriteLock(table);
+      } catch (final Throwable e) {
+        LOG.error("Unable to close table", e);
       }
-      tables = null;
-      dataStore = null;
+      dataStore.closeTable(table);
     }
+    tables = null;
+    dataStore = null;
   }
 
   private void delete(final DataObject object) {
@@ -186,37 +184,35 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
 
   @Override
   public void write(final DataObject object) {
-    synchronized (dataStore) {
-      try {
-        final DataObjectMetaData metaData = object.getMetaData();
-        final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
-        if (dataObjectStore == this.dataStore) {
-          switch (object.getState()) {
-            case New:
-              insert(object);
-            break;
-            case Modified:
-              update(object);
-            break;
-            case Persisted:
-            // No action required
-            break;
-            case Deleted:
-              delete(object);
-            break;
-            default:
-              throw new IllegalStateException("State not known");
-          }
-        } else {
-          insert(object);
+    try {
+      final DataObjectMetaData metaData = object.getMetaData();
+      final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+      if (dataObjectStore == this.dataStore) {
+        switch (object.getState()) {
+          case New:
+            insert(object);
+          break;
+          case Modified:
+            update(object);
+          break;
+          case Persisted:
+          // No action required
+          break;
+          case Deleted:
+            delete(object);
+          break;
+          default:
+            throw new IllegalStateException("State not known");
         }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Error e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException("Unable to write", e);
+      } else {
+        insert(object);
       }
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException("Unable to write", e);
     }
   }
 }

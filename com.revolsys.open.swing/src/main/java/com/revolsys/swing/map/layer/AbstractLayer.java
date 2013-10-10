@@ -432,7 +432,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public boolean isEventsEnabled() {
-    return this.eventsEnabled;
+    if (this.eventsEnabled) {
+      if (layerGroup == null) {
+        return true;
+      } else {
+        return layerGroup.isEventsEnabled();
+      }
+    } else {
+      return false;
+    }
   }
 
   @Override

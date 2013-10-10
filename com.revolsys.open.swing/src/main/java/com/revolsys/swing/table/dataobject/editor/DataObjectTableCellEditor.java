@@ -36,6 +36,10 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   private final BaseJxTable table;
 
+  private int rowIndex;
+
+  private int columnIndex;
+
   public DataObjectTableCellEditor(final BaseJxTable table) {
     this.table = table;
   }
@@ -72,13 +76,14 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     editorComponent.setOpaque(false);
     SwingUtil.setFieldValue(this.editorComponent, value);
 
+    this.rowIndex = rowIndex;
+    this.columnIndex = columnIndex;
     editorComponent.addKeyListener(this);
     if (editorComponent instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
-
     }
     return this.editorComponent;
   }
@@ -103,16 +108,18 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_ENTER) {
       if (e.isShiftDown()) {
-        table.selectRelativeCell(-1, 0);
+        table.editCell(rowIndex - 1, columnIndex);
       } else {
-        table.selectRelativeCell(1, 0);
+        table.editCell(rowIndex + 1, columnIndex);
       }
+      e.consume();
     } else if (keyCode == KeyEvent.VK_TAB) {
       if (e.isShiftDown()) {
-        table.selectRelativeCell(0, -1);
+        table.editCell(rowIndex, columnIndex - 1);
       } else {
-        table.selectRelativeCell(0, 1);
+        table.editCell(rowIndex, columnIndex + 1);
       }
+      e.consume();
     }
   }
 
@@ -122,5 +129,19 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public void keyTyped(final KeyEvent e) {
+  }
+
+  @Override
+  public boolean stopCellEditing() {
+    if (editorComponent != null) {
+      editorComponent.removeKeyListener(this);
+      if (editorComponent instanceof JComboBox) {
+        final JComboBox comboBox = (JComboBox)editorComponent;
+        final ComboBoxEditor editor = comboBox.getEditor();
+        final Component comboEditorComponent = editor.getEditorComponent();
+        comboEditorComponent.removeKeyListener(this);
+      }
+    }
+    return super.stopCellEditing();
   }
 }
