@@ -6,8 +6,6 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.beans.PropertyChangeEvent;
@@ -23,27 +21,15 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.jts.IsSimpleOp;
-import com.revolsys.gis.jts.IsValidOp;
-import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
@@ -56,139 +42,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final Color COLOR_BOX_TRANSPARENT = ColorUtil.setAlpha(
     COLOR_BOX, 127);
 
-  private static final Color COLOR_OUTLINE = WebColors.Black;
-
-  private static final Color COLOR_OUTLINE_TRANSPARENT = new Color(0, 0, 0, 127);
-
-  private static final Color COLOR_SELECT = WebColors.Lime;
-
-  private static final Color COLOR_SELECT_TRANSPARENT = ColorUtil.setAlpha(
-    COLOR_SELECT, 127);
-
   private static final Cursor CURSOR_SELECT_BOX = SilkIconLoader.getCursor(
     "cursor_select_box", 9, 9);
 
+  public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
+    WebColors.Black, WebColors.Lime);
+
   private static final long serialVersionUID = 1L;
-
-  private static final MarkerStyle STYLE_ERROR = MarkerStyle.marker("ellipse",
-    7, WebColors.Yellow, 1, WebColors.Red);
-
-  private static final GeometryStyle STYLE_HIGHLIGHT = GeometryStyle.polygon(
-    COLOR_SELECT, 3, COLOR_SELECT_TRANSPARENT);
-
-  private static final GeometryStyle STYLE_OUTLINE = GeometryStyle.line(COLOR_OUTLINE);
-
-  private static final MarkerStyle STYLE_VERTEX = MarkerStyle.marker(
-    vertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
-
-  private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle.marker(
-    lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
-
-  private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker(
-    firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
-
-  static {
-    MarkerStyle.setMarker(STYLE_HIGHLIGHT, "ellipse", 6,
-      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
-    MarkerStyle.setMarker(STYLE_OUTLINE, "ellipse", 6,
-      COLOR_OUTLINE_TRANSPARENT, 1, COLOR_SELECT_TRANSPARENT);
-
-    STYLE_VERTEX.setMarkerOrientationType("auto");
-
-    STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
-    STYLE_VERTEX_FIRST_POINT.setMarkerPlacement("point(0)");
-    STYLE_VERTEX_FIRST_POINT.setMarkerHorizontalAlignment("center");
-
-    STYLE_VERTEX_LAST_POINT.setMarkerOrientationType("auto");
-    STYLE_VERTEX_LAST_POINT.setMarkerPlacement("point(n)");
-    STYLE_VERTEX_LAST_POINT.setMarkerHorizontalAlignment("right");
-  }
-
-  public static GeneralPath firstVertexShape() {
-    final GeneralPath path = new GeneralPath(new Ellipse2D.Double(0, 0, 11, 11));
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
-
-  public static GeneralPath lastVertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(0, 0);
-    path.lineTo(10, 5);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    return path;
-  }
-
-  public static void paintSelected(final Viewport2D viewport,
-    final GeometryFactory viewportGeometryFactory, final Graphics2D graphics,
-    Geometry geometry) {
-    if (geometry != null && !geometry.isEmpty()) {
-      geometry = viewport.getGeometry(geometry);
-
-      GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
-        STYLE_HIGHLIGHT);
-      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry,
-        STYLE_OUTLINE);
-
-      if (!geometry.isEmpty()) {
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final Geometry part = geometry.getGeometryN(i);
-          if (part instanceof LineString) {
-            final LineString lineString = (LineString)part;
-            final CoordinatesList points = CoordinatesListUtil.get(lineString);
-            MarkerStyleRenderer.renderMarkers(viewport, graphics, points, STYLE_VERTEX_FIRST_POINT,
-              STYLE_VERTEX_LAST_POINT, STYLE_VERTEX);
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
-            for (final CoordinatesList points : pointsList) {
-              MarkerStyleRenderer.renderMarkers(viewport, graphics, points,
-                STYLE_VERTEX_FIRST_POINT, STYLE_VERTEX_LAST_POINT, STYLE_VERTEX);
-            }
-          }
-        }
-      }
-
-      final IsValidOp validOp = new IsValidOp(geometry);
-      if (validOp.isValid()) {
-        final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
-        if (!simpleOp.isSimple()) {
-          for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
-            final Point point = viewportGeometryFactory.createPoint(coordinates);
-            MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-              STYLE_ERROR);
-          }
-        }
-      } else {
-        for (final TopologyValidationError error : validOp.getErrors()) {
-          final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
-          MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-            STYLE_ERROR);
-        }
-      }
-    }
-  }
-
-  public static GeneralPath vertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(5, 0);
-    path.lineTo(10, 5);
-    path.lineTo(5, 10);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
 
   private Double selectBox;
 
@@ -324,8 +184,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
           if (object != null && dataObjectLayer.isVisible(object)) {
             final Geometry geometry = object.getGeometryValue();
-            paintSelected(viewport, viewportGeometryFactory, graphics2d,
-              geometry);
+            SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
+              graphics2d, geometry);
           }
         }
       }

@@ -861,15 +861,15 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final int deltaX = mousePoint.x - this.moveGeometryStart.x;
           final int deltaY = mousePoint.y - this.moveGeometryStart.y;
           graphics.translate(deltaX, deltaY);
-          SelectRecordsOverlay.paintSelected(viewport, viewportGeometryFactory,
-            graphics, this.addGeometry);
+          SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
+            viewportGeometryFactory, graphics, this.addGeometry);
         }
       } finally {
         graphics.setTransform(transform);
       }
     } else {
-      SelectRecordsOverlay.paintSelected(viewport, viewportGeometryFactory,
-        graphics, this.addGeometry);
+      SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
+        viewportGeometryFactory, graphics, this.addGeometry);
     }
     drawXorGeometry(graphics);
   }

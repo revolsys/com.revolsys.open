@@ -55,10 +55,12 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     COLOR_SELECT, 1);
 
   private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle.marker(
-    SelectRecordsOverlay.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+    SelectedRecordsRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1,
+    COLOR_SELECT);
 
   private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle.marker(
-    SelectRecordsOverlay.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+    SelectedRecordsRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1,
+    COLOR_SELECT);
 
   static {
     STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");

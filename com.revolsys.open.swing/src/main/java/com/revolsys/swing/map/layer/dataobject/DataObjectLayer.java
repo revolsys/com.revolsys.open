@@ -54,6 +54,8 @@ public interface DataObjectLayer extends Layer {
 
   DataType getGeometryType();
 
+  LayerDataObject getHighlightedObject();
+
   List<LayerDataObject> getMergeableSelectedRecords();
 
   DataObjectMetaData getMetaData();

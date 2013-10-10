@@ -113,9 +113,34 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
+  public static void addVisibleLayers(final List<DataObjectLayer> layers,
+    final LayerGroup group) {
+    if (group.isVisible()) {
+      for (final Layer layer : group) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          addVisibleLayers(layers, layerGroup);
+        } else if (layer instanceof DataObjectLayer) {
+          if (layer.isVisible()) {
+            final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+            layers.add(dataObjectLayer);
+          }
+        }
+      }
+    }
+  }
+
+  public static List<DataObjectLayer> getVisibleLayers(final LayerGroup group) {
+    final List<DataObjectLayer> layers = new ArrayList<DataObjectLayer>();
+    addVisibleLayers(layers, group);
+    return layers;
+  }
+
   private boolean snapToAllLayers = false;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
+
+  private LayerDataObject highlightedObject;
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
@@ -177,29 +202,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
       "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
       "Style"));
-  }
-
-  public static void addVisibleLayers(final List<DataObjectLayer> layers,
-    final LayerGroup group) {
-    if (group.isVisible()) {
-      for (final Layer layer : group) {
-        if (layer instanceof LayerGroup) {
-          final LayerGroup layerGroup = (LayerGroup)layer;
-          addVisibleLayers(layers, layerGroup);
-        } else if (layer instanceof DataObjectLayer) {
-          if (layer.isVisible()) {
-            final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
-            layers.add(dataObjectLayer);
-          }
-        }
-      }
-    }
-  }
-
-  public static List<DataObjectLayer> getVisibleLayers(final LayerGroup group) {
-    final List<DataObjectLayer> layers = new ArrayList<DataObjectLayer>();
-    addVisibleLayers(layers, group);
-    return layers;
   }
 
   private BoundingBox boundingBox = new BoundingBox();
@@ -695,6 +697,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         return geometryAttribute.getType();
       }
     }
+  }
+
+  public LayerDataObject getHighlightedObject() {
+    return highlightedObject;
   }
 
   @Override
@@ -1286,6 +1292,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       this.boundingBox = geometryFactory.getCoordinateSystem()
         .getAreaBoundingBox();
     }
+  }
+
+  public void setHighlightedObject(final LayerDataObject highlightedObject) {
+    final Object oldValue = this.highlightedObject;
+    this.highlightedObject = highlightedObject;
+    firePropertyChange("highlightedObject", oldValue, highlightedObject);
   }
 
   protected void setMetaData(final DataObjectMetaData metaData) {
