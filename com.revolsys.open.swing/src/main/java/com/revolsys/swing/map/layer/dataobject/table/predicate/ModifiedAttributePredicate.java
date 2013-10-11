@@ -5,11 +5,11 @@ import java.awt.Component;
 
 import javax.swing.JComponent;
 
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -23,15 +23,22 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 public class ModifiedAttributePredicate implements HighlightPredicate {
   public static void add(final DataObjectRowTable table) {
     final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
-    final Highlighter highlighter = getHighlighter(model);
-    table.addHighlighter(highlighter);
-  }
-
-  public static Highlighter getHighlighter(final DataObjectRowTableModel model) {
     final ModifiedAttributePredicate predicate = new ModifiedAttributePredicate(
       model);
-    return new ColorHighlighter(predicate, ColorUtil.setAlpha(WebColors.Green,
-      64), WebColors.Green, WebColors.Green, Color.WHITE);
+    addModifiedHighlighters(table, predicate);
+  }
+
+  public static void addModifiedHighlighters(final JXTable table,
+    final HighlightPredicate predicate) {
+
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
+      predicate, HighlightPredicate.EVEN), ColorUtil.setAlpha(
+      WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+      Color.WHITE));
+
+    table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
+      predicate, HighlightPredicate.ODD), WebColors.YellowGreen,
+      WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
   private final DataObjectRowTableModel model;

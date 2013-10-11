@@ -138,6 +138,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return layers;
   }
 
+  private DataObjectQuadTree index = new DataObjectQuadTree();
+
   private boolean snapToAllLayers = false;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
@@ -509,6 +511,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void delete() {
     clearChanges();
+    setIndex(null);
     super.delete();
     if (this.forms != null) {
       for (final Window window : this.forms.values()) {
@@ -689,6 +692,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public LayerDataObject getHighlightedObject() {
     return highlightedObject;
+  }
+
+  public DataObjectQuadTree getIndex() {
+    return index;
   }
 
   public List<LayerDataObject> getMergeableSelectedRecords() {
@@ -1316,6 +1323,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     firePropertyChange("highlightedObject", oldValue, highlightedObject);
   }
 
+  public void setIndex(final DataObjectQuadTree index) {
+    if (index == null) {
+      this.index = new DataObjectQuadTree();
+    } else {
+      this.index = index;
+    }
+  }
+
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     if (metaData != null) {
@@ -1565,8 +1580,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public void splitRecord(final LayerDataObject object,
+  public List<LayerDataObject> splitRecord(final LayerDataObject record,
     final CloseLocation mouseLocation) {
+
     final Geometry geometry = mouseLocation.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -1592,20 +1608,21 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
       }
 
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
 
-      final LayerDataObject object2 = copyRecord(object);
-      object.setGeometryValue(line1);
-      object2.setGeometryValue(line2);
+      final LayerDataObject record2 = copyRecord(record);
+      record.setGeometryValue(line1);
+      record2.setGeometryValue(line2);
 
-      property.setSplitAttributes(line, coordinates, object);
-      property.setSplitAttributes(line, coordinates, object2);
+      property.setSplitAttributes(line, coordinates, record);
+      property.setSplitAttributes(line, coordinates, record2);
 
-      saveChanges(object);
-      saveChanges(object2);
-      addSelectedRecords(object2);
-      // TODO UNDO
+      index.insert(record2);
+      removeSelectedRecord(record);
+      addSelectedRecords(record, record2);
+      return Arrays.asList(record, record2);
     }
+    return Arrays.asList(record);
   }
 
   @Override

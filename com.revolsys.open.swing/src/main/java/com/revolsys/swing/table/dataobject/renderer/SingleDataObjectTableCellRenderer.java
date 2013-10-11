@@ -3,6 +3,7 @@ package com.revolsys.swing.table.dataobject.renderer;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -43,7 +44,7 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
     final AbstractSingleDataObjectTableModel model = (AbstractSingleDataObjectTableModel)table.getModel();
     final DataObjectMetaData metaData = model.getMetaData();
 
-    Component component = null;
+    JComponent component = null;
     final String name = model.getAttributeName(rowIndex, columnIndex);
     final boolean required = metaData.isAttributeRequired(name);
     final String title = metaData.getAttributeTitle(name);
@@ -73,6 +74,7 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
     } else {
       setRowColor(table, component, rowIndex);
     }
+    component.setToolTipText(null);
     return component;
   }
 

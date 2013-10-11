@@ -41,6 +41,7 @@ public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
       setHorizontalAlignment(SwingConstants.LEFT);
       setHorizontalTextPosition(SwingConstants.LEFT);
     }
+    setToolTipText(null);
     return this;
   }
 }

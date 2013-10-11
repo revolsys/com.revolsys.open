@@ -33,57 +33,61 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final GridLayer layer) {
-    final double scale = viewport.getScale();
-    if (layer.isVisible(scale)) {
-      final BoundingBox boundingBox = viewport.getBoundingBox();
-      final RectangularMapGrid grid = layer.getGrid();
-      final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
-      final Font font = graphics.getFont();
-      for (final RectangularMapTile tile : tiles) {
-        final Polygon polygon = tile.getPolygon(50);
-        GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
-          GeometryStyle.line(Color.LIGHT_GRAY));
+    try {
+      final double scale = viewport.getScale();
+      if (layer.isVisible(scale)) {
+        final BoundingBox boundingBox = viewport.getBoundingBox();
+        final RectangularMapGrid grid = layer.getGrid();
+        final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
+        final Font font = graphics.getFont();
+        for (final RectangularMapTile tile : tiles) {
+          final Polygon polygon = tile.getPolygon(50);
+          GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
+            GeometryStyle.line(Color.LIGHT_GRAY));
 
-        final Point centroid = polygon.getCentroid();
-        final Coordinate coordinate = centroid.getCoordinate();
+          final Point centroid = polygon.getCentroid();
+          final Coordinate coordinate = centroid.getCoordinate();
 
-        final boolean saved = viewport.setUseModelCoordinates(false, graphics);
-        try {
-          final Font newFont = new Font(font.getName(), font.getStyle(), 12);
-          graphics.setFont(newFont);
+          final boolean saved = viewport.setUseModelCoordinates(false, graphics);
+          try {
+            final Font newFont = new Font(font.getName(), font.getStyle(), 12);
+            graphics.setFont(newFont);
 
-          final FontMetrics metrics = graphics.getFontMetrics();
-          final double[] coord = new double[2];
-          viewport.getModelToScreenTransform().transform(new double[] {
-            coordinate.x, coordinate.y
-          }, 0, coord, 0, 1);
-          final String tileName = tile.getName();
-          final int x = (int)(coord[0] + metrics.stringWidth(tileName) / 2);
-          final int y = (int)(coord[1] + metrics.getHeight() / 2);
+            final FontMetrics metrics = graphics.getFontMetrics();
+            final double[] coord = new double[2];
+            viewport.getModelToScreenTransform().transform(new double[] {
+              coordinate.x, coordinate.y
+            }, 0, coord, 0, 1);
+            final String tileName = tile.getName();
+            final int x = (int)(coord[0] + metrics.stringWidth(tileName) / 2);
+            final int y = (int)(coord[1] + metrics.getHeight() / 2);
 
-          final Stroke savedStroke = graphics.getStroke();
-          final Stroke outlineStroke = new BasicStroke(3, BasicStroke.CAP_BUTT,
-            BasicStroke.JOIN_BEVEL);
-          graphics.setColor(Color.WHITE);
-          graphics.setStroke(outlineStroke);
+            final Stroke savedStroke = graphics.getStroke();
+            final Stroke outlineStroke = new BasicStroke(3,
+              BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+            graphics.setColor(Color.WHITE);
+            graphics.setStroke(outlineStroke);
 
-          graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-          final TextLayout textLayout = new TextLayout(tileName, newFont,
-            graphics.getFontRenderContext());
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+              RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            final TextLayout textLayout = new TextLayout(tileName, newFont,
+              graphics.getFontRenderContext());
 
-          graphics.draw(textLayout.getOutline(AffineTransform.getTranslateInstance(
-            x, y)));
+            graphics.draw(textLayout.getOutline(AffineTransform.getTranslateInstance(
+              x, y)));
 
-          graphics.setStroke(savedStroke);
+            graphics.setStroke(savedStroke);
 
-          graphics.setColor(Color.BLACK);
-          graphics.drawString(tileName, x, y);
-        } finally {
-          viewport.setUseModelCoordinates(saved, graphics);
+            graphics.setColor(Color.BLACK);
+            graphics.drawString(tileName, x, y);
+          } finally {
+            viewport.setUseModelCoordinates(saved, graphics);
+          }
         }
+        graphics.setFont(font);
       }
-      graphics.setFont(font);
+    } catch (final IllegalArgumentException e) {
+
     }
   }
 

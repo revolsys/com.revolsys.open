@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.swing.JTable;
 
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
@@ -33,8 +32,6 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     metaData.setGeometryFactory(geometryFactory);
     return metaData;
   }
-
-  private DataObjectQuadTree index = new DataObjectQuadTree();
 
   private List<LayerDataObject> records = new ArrayList<LayerDataObject>();
 
@@ -103,7 +100,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   private void addAllInternal(
     final Collection<? extends LayerDataObject> records) {
     this.records.addAll(records);
-    this.index.insert(records);
+    getIndex().insert(records);
   }
 
   public void addAllRecords(final Collection<? extends LayerDataObject> records) {
@@ -119,7 +116,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   private void addObjectInternal(final LayerDataObject object) {
     if (!this.records.contains(object)) {
       this.records.add(object);
-      this.index.insert(object);
+      getIndex().insert(object);
     }
   }
 
@@ -175,7 +172,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     final List<LayerDataObject> oldRecords = new ArrayList<LayerDataObject>(
       this.records);
     this.records = new ArrayList<LayerDataObject>();
-    this.index = new DataObjectQuadTree();
+    setIndex(null);
     firePropertyChange("records", oldRecords, this.records);
   }
 
@@ -187,7 +184,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
       final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
         this.records);
       this.records.removeAll(records);
-      this.index.remove(records);
+      getIndex().remove(records);
       firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
         this.records));
       firePropertyChange("rowCount", oldRowCount, getRowCount());
@@ -203,7 +200,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerDataObject> records = (List)this.index.queryIntersects(convertedBoundingBox);
+      final List<LayerDataObject> records = (List)getIndex().queryIntersects(
+        convertedBoundingBox);
       return records;
     }
   }
@@ -211,7 +209,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   @Override
   public List<LayerDataObject> doQuery(Geometry geometry, final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
-    return (List)this.index.queryDistance(geometry, distance);
+    return (List)getIndex().queryDistance(geometry, distance);
   }
 
   @Override
@@ -323,7 +321,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public void setRecords(final Collection<LayerDataObject> records) {
     final List<LayerDataObject> oldRecords = this.records;
     this.records = new ArrayList<LayerDataObject>();
-    this.index = new DataObjectQuadTree();
+    setIndex(null);
     addAllRecords(records);
     firePropertyChange("records", oldRecords, this.records);
   }

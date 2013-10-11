@@ -46,6 +46,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.undo.SplitRecordUndo;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
@@ -223,7 +224,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected boolean addSnapLayers(final Set<AbstractDataObjectLayer> layers,
-    final Project project, final AbstractDataObjectLayer layer, final double scale) {
+    final Project project, final AbstractDataObjectLayer layer,
+    final double scale) {
     if (layer != null) {
       if (layer.isSnapToAllLayers()) {
         return true;
@@ -970,11 +972,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerDataObject record = mouseLocation.getObject();
-          final AbstractDataObjectLayer layer = record.getLayer();
-          layer.splitRecord(record, mouseLocation);
-          e.consume();
-          return true;
+          addUndo(new SplitRecordUndo(record, mouseLocation));
+          // final AbstractDataObjectLayer layer = record.getLayer();
+          // layer.splitRecord(record, mouseLocation);
         }
+        e.consume();
+        return true;
       }
     }
     return false;

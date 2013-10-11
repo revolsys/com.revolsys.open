@@ -104,6 +104,11 @@ public class BaseJxTable extends JXTable {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public <V extends TableModel> V getTableModel() {
+    return (V)getModel();
+  }
+
   @Override
   public Component prepareRenderer(final TableCellRenderer renderer,
     final int row, final int column) {

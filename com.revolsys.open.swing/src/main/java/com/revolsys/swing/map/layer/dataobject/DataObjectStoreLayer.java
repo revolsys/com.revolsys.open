@@ -48,8 +48,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private DataObjectStore dataStore;
 
-  private DataObjectQuadTree index = new DataObjectQuadTree();
-
   private BoundingBox loadingBoundingBox = new BoundingBox();
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
@@ -104,7 +102,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected void addToIndex(final LayerDataObject object) {
-    this.index.insert(object);
+    getIndex().insert(object);
   }
 
   protected void cacheObjects(final Collection<? extends DataObject> objects) {
@@ -136,12 +134,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           ids.add(id);
         }
       }
-      if (this.index != null) {
-        for (final DataObject object : this.index.queryAll()) {
-          final String id = getId((LayerDataObject)object);
-          if (id != null) {
-            ids.add(id);
-          }
+      for (final DataObject object : getIndex().queryAll()) {
+        final String id = getId((LayerDataObject)object);
+        if (id != null) {
+          ids.add(id);
         }
       }
       this.cachedObjects.keySet().retainAll(ids);
@@ -190,7 +186,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.boundingBox = null;
     this.cachedObjects.clear();
     this.dataStore = null;
-    this.index = null;
     this.loadingBoundingBox = null;
     this.loadingWorker = null;
     this.saveChangesMethod = null;
@@ -228,8 +223,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     try {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
-      if (this.boundingBox.contains(queryBoundingBox) && this.index != null) {
-        return (List)this.index.queryIntersects(queryBoundingBox);
+      if (this.boundingBox.contains(queryBoundingBox)) {
+        return (List)getIndex().queryIntersects(queryBoundingBox);
       } else {
         final String typePath = getTypePath();
         final DataObjectStore dataStore = getDataStore();
@@ -260,7 +255,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
       boundingBox = boundingBox.expand(distance);
       if (this.boundingBox.contains(boundingBox)) {
-        return (List)this.index.queryDistance(queryGeometry, distance);
+        return (List)getIndex().queryDistance(queryGeometry, distance);
       } else {
         final String typePath = getTypePath();
         final DataObjectStore dataStore = getDataStore();
@@ -304,12 +299,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      if (index == null) {
-        return Collections.emptyList();
-      } else {
-        final List objects = this.index.queryIntersects(polygon);
-        return objects;
-      }
+      final List objects = getIndex().queryIntersects(polygon);
+      return objects;
     }
   }
 
@@ -421,7 +412,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     DataObjectQuadTree index;
     synchronized (this.sync) {
       loadedBoundingBox = this.boundingBox;
-      index = this.index;
+      index = getIndex();
     }
     List<LayerDataObject> queryObjects;
     if (loadedBoundingBox.contains(boundingBox)) {
@@ -553,7 +544,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       this.boundingBox = new BoundingBox();
       this.loadingBoundingBox = this.boundingBox;
-      this.index = new DataObjectQuadTree();
+      setIndex(null);
     }
     fireRecordsChanged();
   }
@@ -571,7 +562,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected void removeFromIndex(final LayerDataObject object) {
-    this.index.remove(object);
+    getIndex().remove(object);
   }
 
   @Override
@@ -599,7 +590,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (this.sync != null) {
       synchronized (this.sync) {
         if (loadedBoundingBox == this.loadingBoundingBox) {
-          this.index = index;
+          setIndex(index);
           cacheObjects(index.queryAll());
           final List<LayerDataObject> newObjects = getNewRecords();
           index.insert(newObjects);
@@ -708,16 +699,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (this.deletedObjectIds.contains(id) || super.isDeleted(object)) {
         removeDeletedObject(object);
         deletedObjectIds.remove(id);
-        this.index.remove(object);
+        getIndex().remove(object);
         object.setState(DataObjectState.Deleted);
         writer.write(object);
       } else if (super.isModified(object)) {
         removeModifiedObject(object);
         writer.write(object);
-        this.index.insert(object);
+        getIndex().insert(object);
       } else if (isNew(object)) {
         removeNewObject(object);
-        this.index.insert(object);
+        getIndex().insert(object);
         writer.write(object);
       }
     } finally {
@@ -739,7 +730,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Geometry oldGeometry) {
     if (oldGeometry != null) {
       final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
-      if (this.index.remove(oldBoundingBox, object)) {
+      if (getIndex().remove(oldBoundingBox, object)) {
         addToIndex(object);
       }
     }

@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.data.equals;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -33,6 +34,23 @@ public class DataObjectEquals implements Equals<DataObject> {
     return true;
   }
 
+  public static boolean equalAttributes(final DataObject object1,
+    final Map<String, Object> values2) {
+    if (object1 == null) {
+      return values2 == null;
+    } else if (values2 == null) {
+      return false;
+    } else {
+      for (final String attributeName : object1.getMetaData()
+        .getAttributeNames()) {
+        if (!equals(object1, values2, attributeName)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
   public static boolean equals(final Collection<String> excludedAttributes,
     final DataObject object1, final DataObject object2,
     final String attributeName) {
@@ -56,6 +74,13 @@ public class DataObjectEquals implements Equals<DataObject> {
     final DataObject object2, final String attributeName) {
     final Object value1 = object1.getValue(attributeName);
     final Object value2 = object2.getValue(attributeName);
+    return EqualsRegistry.INSTANCE.equals(value1, value2);
+  }
+
+  public static boolean equals(final DataObject object1,
+    final Map<String, Object> object2, final String attributeName) {
+    final Object value1 = object1.getValue(attributeName);
+    final Object value2 = object2.get(attributeName);
     return EqualsRegistry.INSTANCE.equals(value1, value2);
   }
 

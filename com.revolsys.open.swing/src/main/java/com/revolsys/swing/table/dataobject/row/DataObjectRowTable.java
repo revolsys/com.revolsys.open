@@ -95,11 +95,6 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     return super.getSelectionModel();
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends DataObjectRowTableModel> V getTableModel() {
-    return (V)getModel();
-  }
-
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);

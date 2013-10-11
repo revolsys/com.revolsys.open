@@ -41,7 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
@@ -81,13 +80,14 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsErrorPredicate;
+import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.filter.ExcludeGeometryRowFilter;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
-import com.revolsys.swing.table.dataobject.renderer.SingleDataObjectTableCellRenderer;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -403,87 +403,11 @@ public class DataObjectLayerForm extends JPanel implements
     final BaseJxTable table = AbstractSingleDataObjectTableModel.createTable(this.allAttributes);
     table.setRowFilter(new ExcludeGeometryRowFilter());
     final TableColumnModel columnModel = table.getColumnModel();
-    final DataObjectMetaData metaData = getMetaData();
-    final SingleDataObjectTableCellRenderer cellRenderer = new SingleDataObjectTableCellRenderer() {
-      @Override
-      public Component getTableCellRendererComponent(final JTable table,
-        Object value, final boolean isSelected, final boolean hasFocus,
-        final int row, final int column) {
-        final boolean even = row % 2 == 0;
+    FormAllFieldsModifiedPredicate.add(this, table);
+    FormAllFieldsErrorPredicate.add(this, table);
 
-        final String fieldName = DataObjectLayerForm.this.allAttributes.getAttributeName(row);
-        final boolean isIdField = fieldName.equals(metaData.getIdAttributeName());
-        if (isIdField) {
-          if (value == null) {
-            value = "NEW";
-          }
-        }
-        final JComponent component = (JComponent)super.getTableCellRendererComponent(
-          table, value, isSelected, hasFocus, row, column);
-        component.setToolTipText("");
-        if (isIdField) {
-          setRowColor(table, component, row);
-        } else if (isFieldValid(fieldName)) {
-          if (hasOriginalValue(fieldName)) {
-            final Object fieldValue = getFieldValue(fieldName);
-            final Object originalValue = getOriginalValue(fieldName);
-            boolean equal = EqualsRegistry.equal(originalValue, fieldValue);
-            if (!equal) {
-              if (originalValue == null) {
-                if (fieldValue instanceof String) {
-                  final String string = (String)fieldValue;
-                  if (!StringUtils.hasText(string)) {
-                    equal = true;
-                  }
-                }
-              }
-            }
-            if (!equal) {
-              CodeTable codeTable = null;
-              if (!isIdField) {
-                codeTable = metaData.getCodeTableByColumn(fieldName);
-              }
-              String text;
-              if (value == null) {
-                text = "-";
-              } else if (codeTable == null) {
-                text = StringConverterRegistry.toString(originalValue);
-              } else {
-                text = codeTable.getValue(originalValue);
-                if (text == null) {
-                  text = "-";
-                }
-              }
-              component.setToolTipText(text);
-              if (isSelected) {
-                component.setForeground(Color.GREEN);
-              } else {
-                component.setForeground(new Color(33, 99, 00));
-                if (even) {
-                  component.setBackground(new Color(33, 99, 0, 31));
-                } else {
-                  component.setBackground(new Color(33, 99, 0, 95));
-                }
-              }
-            }
-          }
-        } else {
-          component.setForeground(Color.RED);
-          if (!isSelected) {
-            if (even) {
-              component.setBackground(new Color(255, 175, 175, 127));
-            } else {
-              component.setBackground(Color.PINK);
-            }
-          }
-          setFieldInvalidToolTip(fieldName, component);
-        }
-        return component;
-      }
-    };
     for (int i = 0; i < columnModel.getColumnCount(); i++) {
       final TableColumn column = columnModel.getColumn(i);
-      column.setCellRenderer(cellRenderer);
       if (i == 2) {
         final TableCellEditor cellEditor = column.getCellEditor();
         cellEditor.addCellEditorListener(this);
@@ -1082,7 +1006,7 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  protected void setFieldInvalidToolTip(final String fieldName,
+  public void setFieldInvalidToolTip(final String fieldName,
     final JComponent field) {
     final String message = this.fieldInValidMessage.get(fieldName);
     if (StringUtils.hasText(message)) {

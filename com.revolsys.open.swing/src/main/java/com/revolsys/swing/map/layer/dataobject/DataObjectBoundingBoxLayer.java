@@ -22,8 +22,6 @@ import com.vividsolutions.jts.geom.Polygon;
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   private static final Logger LOG = Logger.getLogger(DataObjectBoundingBoxLayer.class);
 
-  private DataObjectQuadTree index;
-
   private boolean loading = false;
 
   private final Object sync = new Object();
@@ -75,22 +73,18 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           }
         }
       }
-      if (this.index != null) {
-        Polygon polygon = boundingBox.toPolygon();
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
-        if (geometryFactory != null
-          && !geometryFactory.equals(bboxGeometryFactory)) {
-          final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
-            bboxGeometryFactory, geometryFactory);
-          if (operation != null) {
-            polygon = operation.perform(polygon);
-          }
+      Polygon polygon = boundingBox.toPolygon();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
+      if (geometryFactory != null
+        && !geometryFactory.equals(bboxGeometryFactory)) {
+        final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
+          bboxGeometryFactory, geometryFactory);
+        if (operation != null) {
+          polygon = operation.perform(polygon);
         }
-        return (List)this.index.queryIntersects(polygon);
-      } else {
-        return Collections.emptyList();
       }
+      return (List)getIndex().queryIntersects(polygon);
     }
   }
 
@@ -108,7 +102,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
     final DataObjectQuadTree index) {
     synchronized (this.sync) {
       if (EqualsRegistry.equal(this.boundingBox, boundingBox)) {
-        this.index = index;
+        setIndex(index);
         this.worker = null;
         this.loading = false;
       }

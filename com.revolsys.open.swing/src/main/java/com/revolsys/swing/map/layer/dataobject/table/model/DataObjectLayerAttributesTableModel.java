@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -84,6 +85,13 @@ public class DataObjectLayerAttributesTableModel extends
     } else {
       return false;
     }
+  }
+
+  public boolean isModified(final int rowIndex) {
+    final String attributeName = getAttributeName(rowIndex);
+    final Object originalValue = this.object.getOriginalValue(attributeName);
+    final Object value = this.object.getValue(attributeName);
+    return !EqualsRegistry.equal(originalValue, value);
   }
 
   @Override
