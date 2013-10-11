@@ -49,6 +49,7 @@ import javax.swing.text.JTextComponent;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
@@ -131,6 +132,34 @@ public class SwingUtil {
     final TextField crsField = new TextField(fieldName, value, length);
     crsField.setEditable(false);
     container.add(crsField);
+  }
+
+  public static void autoAdjustPosition(final Window window) {
+    window.pack();
+    int x = window.getX();
+    int y = window.getY();
+    // TODO consider centering
+    if (x == 0) {
+      x = 10;
+    }
+    if (y == 0) {
+      y = 100;
+    }
+    window.setLocation(x, y);
+    int width = window.getWidth();
+    int height = window.getHeight();
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    if (width > 100) {
+      if (x + width > screenSize.width) {
+        width = screenSize.width - x - 10;
+      }
+    }
+    if (height > 100) {
+      if (y + height > screenSize.height - 100) {
+        height = screenSize.height - y - 100;
+      }
+    }
+    window.setSize(width, height);
   }
 
   public static ComboBox createComboBox(final CodeTable codeTable,
@@ -580,6 +609,7 @@ public class SwingUtil {
     if (component != null) {
       final TitledBorder border = new TitledBorder(title);
       component.setBorder(border);
+      component.setBackground(WebColors.White);
     }
   }
 

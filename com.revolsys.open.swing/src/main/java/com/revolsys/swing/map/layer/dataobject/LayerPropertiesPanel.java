@@ -6,9 +6,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 public class LayerPropertiesPanel extends JPanel {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final JTabbedPane tabs = new JTabbedPane();

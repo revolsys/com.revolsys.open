@@ -18,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -211,14 +212,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
         final TextArea wktTextArea = new TextArea(
-          EsriCsWktWriter.toString(esriCoordinateSystem), 30, 80);
+          EsriCsWktWriter.toString(esriCoordinateSystem), 10, 80);
         wktTextArea.setEditable(false);
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
 
         GroupLayoutUtil.makeColumns(coordinateSystemPanel, 2, true);
       }
-      panel.add(coordinateSystemPanel);
+      panel.add(new JScrollPane(coordinateSystemPanel));
 
       return panel;
     }

@@ -57,8 +57,8 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener,
     final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
       styleTree, editStyleContainer);
 
-    splitPane.setDividerLocation(300);
-    setPreferredSize(new Dimension(1100, 700));
+    splitPane.setDividerLocation(200);
+    setPreferredSize(new Dimension(810, 600));
     add(splitPane, BorderLayout.CENTER);
     Property.addListener(layer, "renderer", this);
   }

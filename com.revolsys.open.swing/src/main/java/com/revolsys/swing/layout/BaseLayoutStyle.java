@@ -7,6 +7,8 @@ import javax.swing.LayoutStyle;
 
 public class BaseLayoutStyle extends LayoutStyle {
 
+  public static final BaseLayoutStyle INSTANCE = new BaseLayoutStyle();
+
   private int containerGap;
 
   @Override
@@ -19,7 +21,7 @@ public class BaseLayoutStyle extends LayoutStyle {
   public int getPreferredGap(final JComponent component1,
     final JComponent component2, final ComponentPlacement type,
     final int position, final Container parent) {
-    return 5;
+    return 1;
   }
 
 }

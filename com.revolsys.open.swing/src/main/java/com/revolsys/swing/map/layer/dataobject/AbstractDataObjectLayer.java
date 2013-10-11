@@ -52,6 +52,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.ListDataObjectReader;
+import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -376,8 +377,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void copyRecordsToClipboard(final List<LayerDataObject> records) {
     if (!records.isEmpty()) {
       final DataObjectMetaData metaData = getMetaData();
-      final DataObjectReader reader = new ListDataObjectReader(metaData,
-        records);
+      final List<DataObject> copies = new ArrayList<DataObject>();
+      for (final LayerDataObject record : records) {
+        copies.add(new ArrayDataObject(record));
+      }
+      final DataObjectReader reader = new ListDataObjectReader(metaData, copies);
       final DataObjectReaderTransferable transferable = new DataObjectReaderTransferable(
         reader);
       ClipboardUtil.setContents(transferable);
@@ -699,6 +703,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
   public LayerDataObject getHighlightedObject() {
     return highlightedObject;
   }
@@ -999,6 +1004,66 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @Override
+  public void pasteRecordGeometry(final LayerDataObject record) {
+    DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+    if (reader == null) {
+      final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+      final Resource resource = new ByteArrayResource("t.csv", string);
+      reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+    }
+    if (reader != null) {
+      final MapPanel parentComponent = MapPanel.get(getProject());
+      final DataObjectMetaData metaData = getMetaData();
+      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      if (geometryAttribute != null) {
+        DataType geometryDataType = null;
+        Class<?> layerGeometryClass = null;
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        geometryDataType = geometryAttribute.getType();
+        layerGeometryClass = geometryDataType.getJavaClass();
+
+        Geometry geometry = null;
+        for (final DataObject sourceRecord : reader) {
+          if (geometry == null) {
+            final Geometry sourceGeometry = sourceRecord.getGeometryValue();
+            if (sourceGeometry == null) {
+              JOptionPane.showMessageDialog(parentComponent,
+                "Clipboard does not contain a record with a geometry.",
+                "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+              return;
+            }
+            geometry = geometryFactory.createGeometry(layerGeometryClass,
+              sourceGeometry);
+            if (geometry == null) {
+              JOptionPane.showMessageDialog(parentComponent,
+                "Clipboard should contain a record with a " + geometryDataType
+                  + " not a " + sourceGeometry.getGeometryType() + ".",
+                "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+              return;
+            }
+          } else {
+            JOptionPane.showMessageDialog(parentComponent,
+              "Clipboard contains more than one record. Copy a single record.",
+              "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+            return;
+          }
+        }
+        if (geometry == null) {
+          JOptionPane.showMessageDialog(parentComponent,
+            "Clipboard does not contain a record with a geometry.",
+            "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+        } else if (geometry.isEmpty()) {
+          JOptionPane.showMessageDialog(parentComponent,
+            "Clipboard contains an empty geometry.", "Paste Geometry",
+            JOptionPane.ERROR_MESSAGE);
+        } else {
+          record.setGeometryValue(geometry);
+        }
+      }
+    }
+  }
+
   public void pasteRecords() {
     DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
     if (reader == null) {
@@ -1058,6 +1123,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
       }
     }
+    addSelectedRecords(newRecords);
   }
 
   @Override
@@ -1466,7 +1532,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.add(form);
             window.pack();
             window.setLocation(50, 50);
-            // TODO smart location
+            SwingUtil.autoAdjustPosition(window);
             this.forms.put(object, window);
             window.addWindowListener(new WindowAdapter() {
               @Override
@@ -1596,6 +1662,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
       saveChanges(object);
       saveChanges(object2);
+      addSelectedRecords(object2);
+      // TODO UNDO
     }
   }
 

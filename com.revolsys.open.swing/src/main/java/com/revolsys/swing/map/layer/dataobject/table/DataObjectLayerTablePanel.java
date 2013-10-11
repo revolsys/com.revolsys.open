@@ -89,6 +89,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     menu.addMenuItemTitleIcon("dnd", "Copy Field Value", "page_copy", this,
       "copyFieldValue");
 
+    if (hasGeometry) {
+      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "page_copy", this,
+        "pasteGeometry");
+    }
+
     // Toolbar
     final ToolBar toolBar = getToolBar();
 
@@ -192,6 +197,12 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (SwingUtil.isLeftButtonAndNoModifiers(e) && e.getClickCount() == 2) {
       editRecord();
     }
+  }
+
+  public void pasteGeometry() {
+    final LayerDataObject record = getEventRowObject();
+    this.layer.pasteRecordGeometry(record);
+
   }
 
   @Override

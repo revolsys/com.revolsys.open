@@ -231,6 +231,7 @@ public class ValueField extends JPanel implements Field {
     dialog.add(buttons, BorderLayout.SOUTH);
 
     dialog.pack();
+    SwingUtil.autoAdjustPosition(dialog);
     this.saved = false;
     dialog.setVisible(true);
 

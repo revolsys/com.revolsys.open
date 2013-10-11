@@ -570,7 +570,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    super.keyReleased(e);
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (!getMouseOverLocations().isEmpty()) {
@@ -606,14 +605,14 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (this.moveGeometryStart != null) {
         mouseMoved(e);
       }
+    } else if (splitLineKeyPress(e)) {
     }
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
     final char keyChar = e.getKeyChar();
-    if (splitLineKeyPress(e)) {
-    } else if (keyChar >= '1' && keyChar <= '9') {
+    if (keyChar >= '1' && keyChar <= '9') {
       final int snapPointIndex = keyChar - '1';
       if (snapPointIndex < this.snapPointLocationMap.size()) {
         this.snapPointIndex = snapPointIndex;
@@ -964,17 +963,17 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
+  // K key to split a record
   protected boolean splitLineKeyPress(final KeyEvent e) {
-    if (e.isControlDown() || e.isMetaDown()) {
-      if (e.getKeyChar() == 11) {
-        if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
-          for (final CloseLocation mouseLocation : getMouseOverLocations()) {
-            final LayerDataObject object = mouseLocation.getObject();
-            final DataObjectLayer layer = object.getLayer();
-            layer.splitRecord(object, mouseLocation);
-            e.consume();
-            return true;
-          }
+    final int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_K) {
+      if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
+        for (final CloseLocation mouseLocation : getMouseOverLocations()) {
+          final LayerDataObject record = mouseLocation.getObject();
+          final DataObjectLayer layer = record.getLayer();
+          layer.splitRecord(record, mouseLocation);
+          e.consume();
+          return true;
         }
       }
     }

@@ -694,40 +694,42 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   }
 
   private boolean moveTiePointMove(final MouseEvent event) {
-    final List<MappedLocation> tiePoints = image.getTiePoints();
-    if (!tiePoints.isEmpty()) {
-      if (!closeSourcePixelIndexes.isEmpty()
-        && !closeTargetPointIndexes.isEmpty()) {
-        clearMapCursor();
-      }
-      closeSourcePixelIndexes.clear();
-      closeTargetPointIndexes.clear();
-      final WarpFilter filter = layer.getWarpFilter();
-      final BoundingBox hotSpot = getHotspotBoundingBox(event);
-      int i = 0;
+    if (image != null) {
+      final List<MappedLocation> tiePoints = image.getTiePoints();
+      if (!tiePoints.isEmpty()) {
+        if (!closeSourcePixelIndexes.isEmpty()
+          && !closeTargetPointIndexes.isEmpty()) {
+          clearMapCursor();
+        }
+        closeSourcePixelIndexes.clear();
+        closeTargetPointIndexes.clear();
+        final WarpFilter filter = layer.getWarpFilter();
+        final BoundingBox hotSpot = getHotspotBoundingBox(event);
+        int i = 0;
 
-      for (final MappedLocation tiePoint : tiePoints) {
-        final Point targetPoint = tiePoint.getTargetPoint();
-        final Point sourcePoint = filter.sourcePixelToTargetPoint(tiePoint);
-        if (hotSpot.contains(sourcePoint)) {
-          closeSourcePixelIndexes.add(i);
+        for (final MappedLocation tiePoint : tiePoints) {
+          final Point targetPoint = tiePoint.getTargetPoint();
+          final Point sourcePoint = filter.sourcePixelToTargetPoint(tiePoint);
+          if (hotSpot.contains(sourcePoint)) {
+            closeSourcePixelIndexes.add(i);
+          }
+          if (hotSpot.contains(targetPoint)) {
+            closeTargetPointIndexes.add(i);
+          }
+          i++;
         }
-        if (hotSpot.contains(targetPoint)) {
-          closeTargetPointIndexes.add(i);
+        moveTiePointIndex = 0;
+        moveTiePointEventPoint = event.getPoint();
+        if (setMoveTiePointToolTip()) {
+          setMapCursor(CURSOR_NODE_EDIT);
+          event.consume();
+          return true;
+        } else {
+          moveTiePointEventPoint = null;
+          moveTiePointIndex = -1;
+          getMap().clearToolTipText();
+          return false;
         }
-        i++;
-      }
-      moveTiePointIndex = 0;
-      moveTiePointEventPoint = event.getPoint();
-      if (setMoveTiePointToolTip()) {
-        setMapCursor(CURSOR_NODE_EDIT);
-        event.consume();
-        return true;
-      } else {
-        moveTiePointEventPoint = null;
-        moveTiePointIndex = -1;
-        getMap().clearToolTipText();
-        return false;
       }
     }
     return false;

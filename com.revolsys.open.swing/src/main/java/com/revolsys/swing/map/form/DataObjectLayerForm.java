@@ -363,7 +363,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected JPanel addTab(final int index, final String title) {
-    final JPanel panel = new JPanel(new VerticalLayout(5));
+    final JPanel panel = new JPanel(new VerticalLayout());
     panel.setOpaque(false);
     addTab(index, title, panel);
     return panel;
@@ -385,6 +385,13 @@ public class DataObjectLayerForm extends JPanel implements
     final JLabel label = new JLabel(name);
     this.tabs.setTabComponentAt(index, label);
     return scrollPane;
+  }
+
+  protected JPanel addTab(final String title) {
+    final JPanel panel = new JPanel(new VerticalLayout());
+    panel.setOpaque(false);
+    addTab(title, panel);
+    return panel;
   }
 
   public JScrollPane addTab(final String name, final Component component) {
@@ -484,14 +491,14 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
     final JScrollPane scrollPane = addTab("All Fields", table);
-    int maxHeight = Integer.MAX_VALUE;
+    int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
       .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
+
       maxHeight = Math.min(bounds.height, maxHeight);
     }
-    maxHeight -= 300;
     final int preferredHeight = Math.min(maxHeight,
       (this.allAttributes.getRowCount() + 1) * 20);
     scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
@@ -605,6 +612,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected JPanel createPanel(final JPanel container, final String title) {
     final JPanel panel = new JPanel();
+    panel.setOpaque(false);
     container.add(panel);
     SwingUtil.setTitledBorder(panel, title);
     return panel;

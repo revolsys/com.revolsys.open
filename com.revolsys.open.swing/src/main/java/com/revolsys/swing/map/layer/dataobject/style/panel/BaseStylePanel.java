@@ -151,7 +151,7 @@ public class BaseStylePanel extends ValueField implements
       } else if (fieldName.equals("lineJoin")) {
         field = createLineJoinField((LineJoin)value);
       } else if (fieldName.equals("queryFilter")) {
-        field = new TextArea(fieldName, 5, 50);
+        field = new TextArea(fieldName, 5, 30);
         field.setFieldValue(value);
       } else if (fieldName.equals("marker")) {
         field = new MarkerField(fieldName, value);
@@ -166,7 +166,7 @@ public class BaseStylePanel extends ValueField implements
         field = new LengthMeasureTextField(fieldName, (Measure<Length>)value,
           NonSI.PIXEL);
       } else {
-        field = new TextField(fieldName, value, 30);
+        field = new TextField(fieldName, value, 20);
       }
       if (readOnlyFieldNames.contains(fieldName)) {
         field.setEnabled(false);

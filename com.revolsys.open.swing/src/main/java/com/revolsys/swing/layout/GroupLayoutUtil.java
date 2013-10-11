@@ -21,6 +21,7 @@ public class GroupLayoutUtil {
     final GroupLayout groupLayout = (GroupLayout)layout;
     groupLayout.setAutoCreateContainerGaps(containerGaps);
     groupLayout.setAutoCreateGaps(true);
+    groupLayout.setLayoutStyle(BaseLayoutStyle.INSTANCE);
     return groupLayout;
   }
 
@@ -60,7 +61,8 @@ public class GroupLayoutUtil {
     }
   }
 
-  public static void makeColumns(final Container container, final int numColumns, boolean containerGaps) {
+  public static void makeColumns(final Container container,
+    final int numColumns, final boolean containerGaps) {
     final GroupLayout groupLayout = getLayout(container, containerGaps);
 
     makeColumns(container, groupLayout, numColumns);

@@ -21,14 +21,14 @@ public class TitledBorder extends AbstractBorder {
 
   @Override
   public Insets getBorderInsets(final Component c) {
-    return new Insets(25, 5, 5, 5);
+    return new Insets(19, 5, 5, 5);
   }
 
   @Override
   public Insets getBorderInsets(final Component c, final Insets insets) {
     insets.left = 5;
     insets.right = 5;
-    insets.top = 25;
+    insets.top = 19;
     insets.bottom = 5;
     return insets;
   }
@@ -37,25 +37,31 @@ public class TitledBorder extends AbstractBorder {
   public void paintBorder(final Component c, final Graphics g, final int x,
     final int y, final int width, final int height) {
     final Graphics2D graphics = (Graphics2D)g;
+    final int boxX = x + 2;
+    final int boxY = y + 2;
+    final int boxWidth = width - 5;
+    final int boxHeight = height - 5;
+    final int topHeight = 14;
+
     graphics.setPaint(WebColors.White);
-    graphics.fillRoundRect(x, y, width - 1, height - 1, 10, 10);
+    graphics.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 10, 10);
 
     final Color titleBackground = new Color(222, 237, 247);
     graphics.setPaint(titleBackground);
-    graphics.fillRoundRect(x, y, width - 1, 21, 10, 10);
+    graphics.fillRoundRect(boxX, boxY, boxWidth, topHeight, 10, 10);
 
     graphics.setPaint(titleBackground);
-    graphics.fillRect(x, y + 11, width - 1, 10);
+    graphics.fillRect(boxX, boxY + topHeight - 5, boxWidth, 5);
 
     final Color borderColor = new Color(174, 208, 234);
     graphics.setColor(borderColor);
-    graphics.drawRoundRect(x, y, width - 1, height - 1, 10, 10);
+    graphics.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 10, 10);
 
-    graphics.drawLine(0, 21, width - 1, 21);
+    graphics.drawLine(boxX, boxY + topHeight, boxX + boxWidth, boxY + topHeight);
 
-    final Font font = new Font("Arial", Font.BOLD, 14);
+    final Font font = new Font("Arial", Font.BOLD, 12);
     graphics.setFont(font);
     graphics.setColor(new Color(0, 112, 163));
-    graphics.drawString(title, 10, 16);
+    graphics.drawString(title, 8, 14);
   }
 }

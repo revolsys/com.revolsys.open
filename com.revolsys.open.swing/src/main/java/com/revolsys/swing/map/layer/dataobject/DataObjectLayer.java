@@ -111,6 +111,8 @@ public interface DataObjectLayer extends Layer {
 
   boolean isVisible(LayerDataObject record);
 
+  void pasteRecordGeometry(final LayerDataObject record);
+
   List<LayerDataObject> query(BoundingBox boundingBox);
 
   List<LayerDataObject> query(Geometry geometry, double distance);

@@ -155,7 +155,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           }
         }
       }
-      Invoke.later(this, "setMergedObjects", errorMessage, mergedObjects);
+      Invoke.later(this, "setMergedRecords", errorMessage, mergedObjects);
 
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error("Error " + this, e);
@@ -163,13 +163,13 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     }
   }
 
-  public void setMergedObject(final int i, final DataObject mergedObject,
+  public void setMergedRecord(final int i, final DataObject mergedObject,
     final Collection<LayerDataObject> objects) {
     final TablePanel tablePanel = MergedRecordsTableModel.createPanel(layer,
       mergedObject, objects);
 
     this.okButton.setEnabled(true);
-    tablePanel.setPreferredSize(new Dimension(100, 50 + objects.size() * 22));
+    tablePanel.setPreferredSize(new Dimension(100, 75 + objects.size() * 22));
 
     final JPanel panel = new JPanel(new BorderLayout());
     panel.add(tablePanel, BorderLayout.SOUTH);
@@ -180,7 +180,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   }
 
-  public void setMergedObjects(String errorMessage,
+  public void setMergedRecords(String errorMessage,
     final Map<DataObject, Set<LayerDataObject>> mergedObjects) {
     final Set<LayerDataObject> unMergeableRecords = new HashSet<LayerDataObject>(
       originalObjectsToMergeableObjects.keySet());
@@ -201,7 +201,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
         final DataObject mergedObject = mergedEntry.getKey();
         final Set<LayerDataObject> originalObjects = mergedEntry.getValue();
         unMergeableRecords.removeAll(originalObjects);
-        setMergedObject(i, mergedObject, originalObjects);
+        setMergedRecord(i, mergedObject, originalObjects);
         i++;
       }
     }
@@ -211,7 +211,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       final DataObjectListTableModel tableModel = tablePanel.getTableModel();
       tableModel.setEditable(false);
       tablePanel.setPreferredSize(new Dimension(100,
-        25 + unMergeableRecords.size() * 22));
+        50 + unMergeableRecords.size() * 22));
 
       final JPanel panel = new JPanel(new BorderLayout());
       if (!StringUtils.hasText(errorMessage)) {
