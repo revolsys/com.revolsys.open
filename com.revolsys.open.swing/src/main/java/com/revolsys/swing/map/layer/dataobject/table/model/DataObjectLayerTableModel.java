@@ -36,7 +36,7 @@ import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.ModifiedPredicate;
@@ -61,7 +61,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static final String MODE_EDITS = "edits";
 
-  public static DataObjectRowTable createTable(final DataObjectLayer layer) {
+  public static DataObjectRowTable createTable(final AbstractDataObjectLayer layer) {
     final DataObjectMetaData metaData = layer.getMetaData();
     if (metaData == null) {
       return null;
@@ -118,7 +118,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private final int pageSize = 40;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private boolean countLoaded;
 
@@ -132,7 +132,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
-  public DataObjectLayerTableModel(final DataObjectLayer layer,
+  public DataObjectLayerTableModel(final AbstractDataObjectLayer layer,
     final List<String> attributeNames) {
     super(layer.getMetaData(), attributeNames);
     this.layer = layer;
@@ -174,7 +174,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 
@@ -207,7 +207,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
-      final DataObjectLayer layer = getLayer();
+      final AbstractDataObjectLayer layer = getLayer();
       final List<LayerDataObject> changes = layer.getChanges();
       if (row < changes.size()) {
         return (V)changes.get(row);
@@ -273,7 +273,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected List<LayerDataObject> getSelectedObjects() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final List<LayerDataObject> selectedObjects = layer.getSelectedRecords();
     return selectedObjects;
   }
@@ -307,7 +307,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected LayerDataObject loadLayerObjects(int row) {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final int newObjectCount = layer.getNewObjectCount();
     if (row < newObjectCount) {
       return layer.getNewRecords().get(row);
@@ -546,14 +546,14 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
-  public String toDisplayValue(final int attributeIndex,
-    final Object objectValue) {
+  public String toDisplayValueInternal(final int rowIndex,
+    final int attributeIndex, final Object objectValue) {
     if (objectValue == null) {
       if (getMetaData().getIdAttributeIndex() == attributeIndex) {
         return "NEW";
       }
     }
-    return super.toDisplayValue(attributeIndex, objectValue);
+    return super.toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
   }
 
   public void updateRowCount() {

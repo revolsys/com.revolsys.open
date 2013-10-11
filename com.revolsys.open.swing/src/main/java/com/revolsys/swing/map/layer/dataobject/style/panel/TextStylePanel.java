@@ -15,7 +15,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.revolsys.util.JavaBeanUtil;
@@ -35,7 +35,7 @@ public class TextStylePanel extends BaseStylePanel implements
 
     this.textStyleRenderer = textStyleRenderer;
     this.textStyle = textStyleRenderer.getStyle().clone();
-    final DataObjectLayer layer = textStyleRenderer.getLayer();
+    final AbstractDataObjectLayer layer = textStyleRenderer.getLayer();
     final DataObjectMetaData metaData = layer.getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
 

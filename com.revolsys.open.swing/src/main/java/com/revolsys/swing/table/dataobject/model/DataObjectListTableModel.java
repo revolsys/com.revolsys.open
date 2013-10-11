@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -27,12 +27,12 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel(final DataObjectLayer layer) {
+  public static TablePanel createPanel(final AbstractDataObjectLayer layer) {
     return createPanel(layer.getMetaData(), new ArrayList<LayerDataObject>(),
       layer.getColumnNames());
   }
 
-  public static TablePanel createPanel(final DataObjectLayer layer,
+  public static TablePanel createPanel(final AbstractDataObjectLayer layer,
     final Collection<LayerDataObject> objects) {
     return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
   }

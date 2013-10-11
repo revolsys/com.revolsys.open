@@ -72,7 +72,7 @@ import com.revolsys.gis.data.query.MultipleCondition;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
@@ -139,7 +139,7 @@ public class QueryWhereConditionField extends ValueField implements
   public QueryWhereConditionField(final AttributeFilterPanel filterPanel) {
     super(new BorderLayout());
     setTitle("Advanced Filter");
-    final DataObjectLayer layer = filterPanel.getLayer();
+    final AbstractDataObjectLayer layer = filterPanel.getLayer();
     this.filterPanel = filterPanel;
     metaData = layer.getMetaData();
     final List<String> attributeNames = metaData.getAttributeNames();

@@ -22,7 +22,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
@@ -342,12 +342,12 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private MarkerStyle style;
 
-  public MarkerStyleRenderer(final DataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, new MarkerStyle());
   }
 
-  public MarkerStyleRenderer(final DataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
     super("markerStyle", "Marker Style", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
@@ -356,14 +356,14 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final DataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final MarkerStyle style) {
     super("markerStyle", "Marker Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final DataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
     final MarkerStyle style) {
     this(layer, null, style);
   }
@@ -398,7 +398,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       final Geometry geometry = object.getGeometryValue();
       renderMarker(viewport, graphics, geometry, this.style);

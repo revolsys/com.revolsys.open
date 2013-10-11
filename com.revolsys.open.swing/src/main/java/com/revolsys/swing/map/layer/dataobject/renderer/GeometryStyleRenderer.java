@@ -19,7 +19,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
@@ -156,28 +156,28 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private GeometryStyle style;
 
-  public GeometryStyleRenderer(final DataObjectLayer layer) {
+  public GeometryStyleRenderer(final AbstractDataObjectLayer layer) {
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
     final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final DataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
     super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
     final Map<String, Object> style = getAllDefaults();
@@ -200,7 +200,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public Icon getIcon() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     if (layer == null) {
       return super.getIcon();
     } else {
@@ -247,7 +247,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);

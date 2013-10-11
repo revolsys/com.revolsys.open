@@ -56,7 +56,7 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
       this.labelComponent.setText(title);
       component = this.labelComponent;
     } else {
-      final String text = model.toDisplayValue(rowIndex, value);
+      final String text = model.toDisplayValue(rowIndex, rowIndex, value);
       this.valueComponent.setText(text);
       if (BigDecimalStringConverter.isNumber(text)) {
         valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);

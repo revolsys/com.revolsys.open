@@ -46,7 +46,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
@@ -193,7 +192,7 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
-  protected CloseLocation findCloseLocation(final DataObjectLayer layer,
+  protected CloseLocation findCloseLocation(final AbstractDataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
     final BoundingBox boundingBox) {
     CloseLocation closeLocation = findCloseVertexLocation(layer, object,
@@ -208,7 +207,7 @@ public class AbstractOverlay extends JComponent implements
   protected CloseLocation findCloseLocation(final LayerDataObject object,
     final BoundingBox boundingBox) {
     if (object.isGeometryEditable()) {
-      final DataObjectLayer layer = object.getLayer();
+      final AbstractDataObjectLayer layer = object.getLayer();
       final Geometry geometryValue = object.getGeometryValue();
       return findCloseLocation(layer, object, geometryValue, boundingBox);
 
@@ -216,7 +215,7 @@ public class AbstractOverlay extends JComponent implements
     return null;
   }
 
-  private CloseLocation findCloseSegmentLocation(final DataObjectLayer layer,
+  private CloseLocation findCloseSegmentLocation(final AbstractDataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
     final BoundingBox boundingBox) {
 
@@ -253,7 +252,7 @@ public class AbstractOverlay extends JComponent implements
     return null;
   }
 
-  protected CloseLocation findCloseVertexLocation(final DataObjectLayer layer,
+  protected CloseLocation findCloseVertexLocation(final AbstractDataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
     final BoundingBox boundingBox) {
     final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
@@ -351,7 +350,7 @@ public class AbstractOverlay extends JComponent implements
     return this.project;
   }
 
-  protected List<DataObjectLayer> getSnapLayers() {
+  protected List<AbstractDataObjectLayer> getSnapLayers() {
     return AbstractDataObjectLayer.getVisibleLayers(project);
   }
 
@@ -392,11 +391,11 @@ public class AbstractOverlay extends JComponent implements
     snapEventPoint = eventPoint;
     new TreeMap<Coordinates, List<CloseLocation>>();
     final Point point = boundingBox.getCentrePoint();
-    final List<DataObjectLayer> layers = getSnapLayers();
+    final List<AbstractDataObjectLayer> layers = getSnapLayers();
     final TreeMap<Point, Set<CloseLocation>> snapLocations = new TreeMap<Point, Set<CloseLocation>>(
       new GeometryDistanceComparator(point));
     this.snapPoint = null;
-    for (final DataObjectLayer layer : layers) {
+    for (final AbstractDataObjectLayer layer : layers) {
       final List<LayerDataObject> objects = layer.queryBackground(boundingBox);
       for (final LayerDataObject object : objects) {
         if (layer.isVisible(object)) {

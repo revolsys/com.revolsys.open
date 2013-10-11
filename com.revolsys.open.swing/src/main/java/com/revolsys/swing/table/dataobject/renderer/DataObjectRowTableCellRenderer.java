@@ -30,7 +30,7 @@ public class DataObjectRowTableCellRenderer extends DefaultTableCellRenderer {
     if (columnIndex < attributesOffset) {
       displayValue = value;
     } else {
-      displayValue = model.toDisplayValue(columnIndex, value);
+      displayValue = model.toDisplayValue(rowIndex, columnIndex, value);
     }
     super.getTableCellRendererComponent(table, displayValue, selected,
       hasFocus, rowIndex, columnIndex);

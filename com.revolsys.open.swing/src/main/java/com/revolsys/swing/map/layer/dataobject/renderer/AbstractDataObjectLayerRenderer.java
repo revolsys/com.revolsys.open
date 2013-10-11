@@ -25,7 +25,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
@@ -36,7 +36,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractDataObjectLayerRenderer extends
-  AbstractLayerRenderer<DataObjectLayer> {
+  AbstractLayerRenderer<AbstractDataObjectLayer> {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
@@ -85,7 +85,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public static AbstractDataObjectLayerRenderer getRenderer(
-    final DataObjectLayer layer, final LayerRenderer<?> parent,
+    final AbstractDataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     final String type = (String)style.remove("type");
     if ("geometryStyle".equals(type)) {
@@ -106,20 +106,20 @@ public abstract class AbstractDataObjectLayerRenderer extends
     return null;
   }
 
-  public static LayerRenderer<DataObjectLayer> getRenderer(
-    final DataObjectLayer layer, final Map<String, Object> style) {
+  public static LayerRenderer<AbstractDataObjectLayer> getRenderer(
+    final AbstractDataObjectLayer layer, final Map<String, Object> style) {
     return getRenderer(layer, null, style);
   }
 
   private Filter<DataObject> filter = DEFAULT_FILTER;
 
   public AbstractDataObjectLayerRenderer(final String type, final String name,
-    final DataObjectLayer layer, final LayerRenderer<?> parent) {
+    final AbstractDataObjectLayer layer, final LayerRenderer<?> parent) {
     this(type, name, layer, parent, Collections.<String, Object> emptyMap());
   }
 
   public AbstractDataObjectLayerRenderer(final String type, final String name,
-    final DataObjectLayer layer, final LayerRenderer<?> parent,
+    final AbstractDataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     super(type, name, layer, parent, style);
     this.filter = getFilter(style);
@@ -167,7 +167,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final DataObjectLayer layer) {
+    final AbstractDataObjectLayer layer) {
     final boolean saved = viewport.setUseModelCoordinates(true, graphics);
     try {
       final BoundingBox boundingBox = viewport.getBoundingBox();
@@ -180,11 +180,11 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
   }
 
   protected void renderObjects(final Viewport2D viewport,
-    final Graphics2D graphics, final DataObjectLayer layer,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
     final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final LayerDataObject object : objects) {
@@ -224,7 +224,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     return map;
   }
 
-  protected void wrap(final DataObjectLayer layer,
+  protected void wrap(final AbstractDataObjectLayer layer,
     final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
     if (parent == null) {
@@ -237,7 +237,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public FilterMultipleRenderer wrapWithFilterStyle() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
       layer, parent);
@@ -246,7 +246,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public MultipleRenderer wrapWithMultipleStyle() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
@@ -254,7 +254,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public ScaleMultipleRenderer wrapWithScaleStyle() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
       parent);

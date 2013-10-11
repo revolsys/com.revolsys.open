@@ -35,7 +35,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.parallel.Invoke;
@@ -47,14 +47,14 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private static final long serialVersionUID = 1L;
 
-  public static void showDialog(final DataObjectLayer layer) {
+  public static void showDialog(final AbstractDataObjectLayer layer) {
     final MergeRecordsDialog dialog = new MergeRecordsDialog(layer);
     dialog.showDialog();
   }
 
   private JButton okButton;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private final Map<LayerDataObject, DataObject> originalObjectsToMergeableObjects = new HashMap<LayerDataObject, DataObject>();
 
@@ -62,7 +62,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private JPanel mergedObjectsPanel;
 
-  public MergeRecordsDialog(final DataObjectLayer layer) {
+  public MergeRecordsDialog(final AbstractDataObjectLayer layer) {
     super(SwingUtil.getActiveWindow(), "Merge " + layer.getName(),
       ModalityType.APPLICATION_MODAL);
     this.layer = layer;

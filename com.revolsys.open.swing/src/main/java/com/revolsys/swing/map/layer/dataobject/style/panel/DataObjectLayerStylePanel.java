@@ -19,7 +19,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.tree.BaseLayerRendererTreeNodeModel;
 import com.revolsys.swing.map.tree.MultipleLayerRendererTreeNodeModel;
 import com.revolsys.swing.tree.ObjectTree;
@@ -36,9 +36,9 @@ public class DataObjectLayerStylePanel extends JPanel implements MouseListener,
 
   private final ObjectTree tree;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
-  public DataObjectLayerStylePanel(final DataObjectLayer layer) {
+  public DataObjectLayerStylePanel(final AbstractDataObjectLayer layer) {
     this.layer = layer;
     setLayout(new BorderLayout());
     final JLabel instructions = new JLabel(

@@ -11,7 +11,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.util.ExceptionUtil;
@@ -24,12 +24,12 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
 
-  public MultipleRenderer(final DataObjectLayer layer,
+  public MultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public MultipleRenderer(final DataObjectLayer layer,
+  public MultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> multipleStyle) {
     super("multipleStyle", layer, parent, multipleStyle);
     setIcon(ICON);
@@ -45,7 +45,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   // Needed for filter styles
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
@@ -66,7 +66,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   protected void renderObjects(final Viewport2D viewport,
-    final Graphics2D graphics, final DataObjectLayer layer,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
     final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {

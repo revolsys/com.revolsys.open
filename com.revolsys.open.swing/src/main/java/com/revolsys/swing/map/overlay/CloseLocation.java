@@ -4,7 +4,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -18,13 +18,13 @@ public class CloseLocation {
 
   private final IndexedLineSegment segment;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private final Geometry geometry;
 
   private final Point point;
 
-  public CloseLocation(final DataObjectLayer layer,
+  public CloseLocation(final AbstractDataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
     final int[] vertexIndex, final IndexedLineSegment segment, final Point point) {
     this.object = object;
@@ -68,7 +68,7 @@ public class CloseLocation {
     return CollectionUtil.toString(CollectionUtil.arrayToList(index));
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 

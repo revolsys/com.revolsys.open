@@ -10,7 +10,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.ExceptionUtil;
 
@@ -21,12 +21,12 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_filter");
 
-  public FilterMultipleRenderer(final DataObjectLayer layer,
+  public FilterMultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public FilterMultipleRenderer(final DataObjectLayer layer,
+  public FilterMultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("filterStyle", layer, parent, style);
     setIcon(ICON);
@@ -35,7 +35,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       final double scale = viewport.getScale();
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {

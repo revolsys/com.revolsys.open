@@ -19,7 +19,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
@@ -42,13 +42,13 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public static final String FILTER_ATTRIBUTE = "filter_attribute";
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private final DataObjectLayerTableModel tableModel;
 
   private final JToggleButton selectedButton;
 
-  public DataObjectLayerTablePanel(final DataObjectLayer layer,
+  public DataObjectLayerTablePanel(final AbstractDataObjectLayer layer,
     final JTable table) {
     super(table);
     this.layer = layer;
@@ -151,7 +151,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final int column = getEventColumn();
     final Object value = model.getValueAt(row, column);
 
-    final String displayValue = model.toDisplayValue(column, value);
+    final String displayValue = model.toDisplayValue(row, column, value);
     final StringSelection transferable = new StringSelection(displayValue);
     ClipboardUtil.setContents(transferable);
   }
@@ -180,7 +180,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     return object;
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 

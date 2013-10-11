@@ -121,8 +121,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     }
   }
 
-  public String toDisplayValue(final int attributeIndex,
-    final Object objectValue) {
+  public String toDisplayValue(int rowIndex,
+    final int attributeIndex, final Object objectValue) {
     String text;
     final DataObjectMetaData metaData = getMetaData();
     final String idAttributeName = metaData.getIdAttributeName();

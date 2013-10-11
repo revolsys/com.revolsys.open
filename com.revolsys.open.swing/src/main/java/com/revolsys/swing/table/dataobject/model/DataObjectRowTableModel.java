@@ -262,4 +262,19 @@ public abstract class DataObjectRowTableModel extends
     }
 
   }
+
+  @Override
+  public final String toDisplayValue(final int rowIndex,
+    final int attributeIndex, final Object objectValue) {
+    if (getObject(rowIndex) == null) {
+      return "\u2026";
+    } else {
+      return toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
+    }
+  }
+
+  protected String toDisplayValueInternal(final int rowIndex,
+    final int attributeIndex, final Object objectValue) {
+    return super.toDisplayValue(rowIndex, attributeIndex, objectValue);
+  }
 }

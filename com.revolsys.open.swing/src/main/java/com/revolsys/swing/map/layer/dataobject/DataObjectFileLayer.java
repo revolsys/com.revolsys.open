@@ -15,7 +15,6 @@ import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
@@ -57,7 +56,8 @@ public class DataObjectFileLayer extends DataObjectListLayer {
       setName("Unknown");
     } else {
       this.url = SpringUtil.getUrl(resource).toString();
-      setName(FileUtil.getBaseName(this.url));
+
+      setName(resource.getFilename());
       Invoke.background("Loading file: " + this.url, this, "revert");
     }
   }

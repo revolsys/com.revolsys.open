@@ -15,11 +15,11 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 public class LayerDataObject extends ArrayDataObject {
   private static final long serialVersionUID = 1L;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private Map<String, Object> originalValues;
 
-  public LayerDataObject(final DataObjectLayer layer) {
+  public LayerDataObject(final AbstractDataObjectLayer layer) {
     super(layer.getMetaData());
     this.layer = layer;
   }
@@ -33,7 +33,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   public void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
         attributeName, oldValue, newValue);
@@ -41,7 +41,7 @@ public class LayerDataObject extends ArrayDataObject {
     }
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 
@@ -117,7 +117,7 @@ public class LayerDataObject extends ArrayDataObject {
       setState(DataObjectState.Persisted);
       clearOriginalValues();
       setState(DataObjectState.Persisted);
-      final DataObjectLayer layer = getLayer();
+      final AbstractDataObjectLayer layer = getLayer();
       layer.revertChanges(this);
       firePropertyChange("state", DataObjectState.Modified,
         DataObjectState.Persisted);
@@ -131,7 +131,7 @@ public class LayerDataObject extends ArrayDataObject {
 
     final Object oldValue = getValue(index);
     if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
-      final DataObjectLayer layer = getLayer();
+      final AbstractDataObjectLayer layer = getLayer();
       final DataObjectState state = getState();
       if (DataObjectState.Initalizing.equals(state)) {
         // Allow modification on initialization

@@ -11,7 +11,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -44,7 +44,7 @@ public class ModifiedPredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final LayerDataObject object = this.model.getObject(rowIndex);
-      final DataObjectLayer layer = this.model.getLayer();
+      final AbstractDataObjectLayer layer = this.model.getLayer();
       return layer.isModified(object);
     } catch (final IndexOutOfBoundsException e) {
       return false;

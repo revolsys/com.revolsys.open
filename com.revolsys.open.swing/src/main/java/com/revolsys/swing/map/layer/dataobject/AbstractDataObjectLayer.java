@@ -110,20 +110,20 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
-  DataObjectLayer, DataObjectFactory, AddGeometryCompleteAction {
+  DataObjectFactory, AddGeometryCompleteAction {
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
-  public static void addVisibleLayers(final List<DataObjectLayer> layers,
-    final LayerGroup group) {
+  public static void addVisibleLayers(
+    final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
     if (group.isVisible()) {
       for (final Layer layer : group) {
         if (layer instanceof LayerGroup) {
           final LayerGroup layerGroup = (LayerGroup)layer;
           addVisibleLayers(layers, layerGroup);
-        } else if (layer instanceof DataObjectLayer) {
+        } else if (layer instanceof AbstractDataObjectLayer) {
           if (layer.isVisible()) {
-            final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+            final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
             layers.add(dataObjectLayer);
           }
         }
@@ -131,8 +131,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public static List<DataObjectLayer> getVisibleLayers(final LayerGroup group) {
-    final List<DataObjectLayer> layers = new ArrayList<DataObjectLayer>();
+  public static List<AbstractDataObjectLayer> getVisibleLayers(
+    final LayerGroup group) {
+    final List<AbstractDataObjectLayer> layers = new ArrayList<AbstractDataObjectLayer>();
     addVisibleLayers(layers, group);
     return layers;
   }
@@ -280,7 +281,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void addNewRecord() {
     final DataObjectMetaData metaData = getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
@@ -306,7 +306,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerDataObject> objects = query(boundingBox);
@@ -324,7 +323,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void addSelectedRecords(
     final Collection<? extends LayerDataObject> objects) {
     for (final LayerDataObject object : objects) {
@@ -333,7 +331,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireSelected();
   }
 
-  @Override
   public void addSelectedRecords(final LayerDataObject... objects) {
     addSelectedRecords(Arrays.asList(objects));
   }
@@ -356,7 +353,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireRecordsChanged();
   }
 
-  @Override
   public void clearSelectedRecords() {
     this.selectedRecords.clear();
     fireSelected();
@@ -366,14 +362,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     this.selectedRecordsIndex = null;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public <V extends LayerDataObject> V copyRecord(final V object) {
     final LayerDataObject copy = createRecord(object);
     return (V)copy;
   }
 
-  @Override
   public void copyRecordsToClipboard(final List<LayerDataObject> records) {
     if (!records.isEmpty()) {
       final DataObjectMetaData metaData = getMetaData();
@@ -468,13 +462,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public UndoableEdit createPropertyEdit(final LayerDataObject object,
     final String propertyName, final Object oldValue, final Object newValue) {
     return new SetObjectProperty(object, propertyName, oldValue, newValue);
   }
 
-  @Override
   public LayerDataObject createRecord() {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final LayerDataObject object = createDataObject(getMetaData());
@@ -505,7 +497,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public Component createTablePanel() {
     final JTable table = DataObjectLayerTableModel.createTable(this);
     if (table == null) {
@@ -551,7 +542,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void deleteRecords(final Collection<? extends LayerDataObject> objects) {
     if (isCanDeleteRecords()) {
       synchronized (this.editSync) {
@@ -564,7 +554,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void deleteRecords(final LayerDataObject... objects) {
     deleteRecords(Arrays.asList(objects));
   }
@@ -629,7 +618,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return this.boundingBox;
   }
 
-  @Override
   public int getChangeCount() {
     int changeCount = 0;
     changeCount += this.newRecords.size();
@@ -638,7 +626,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return changeCount;
   }
 
-  @Override
   public List<LayerDataObject> getChanges() {
     synchronized (this.editSync) {
       final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
@@ -651,7 +638,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public List<String> getColumnNames() {
     synchronized (this) {
       if (this.columnNames == null) {
@@ -671,7 +657,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getGeometryFactory().getCoordinateSystem();
   }
 
-  @Override
   public DataObjectStore getDataStore() {
     return getMetaData().getDataObjectStore();
   }
@@ -688,7 +673,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public DataType getGeometryType() {
     final DataObjectMetaData metaData = getMetaData();
     if (metaData == null) {
@@ -703,12 +687,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public LayerDataObject getHighlightedObject() {
     return highlightedObject;
   }
 
-  @Override
   public List<LayerDataObject> getMergeableSelectedRecords() {
     final List<LayerDataObject> selectedRecords = getSelectedRecords();
     for (final Iterator<LayerDataObject> iterator = selectedRecords.iterator(); iterator.hasNext();) {
@@ -720,7 +702,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return selectedRecords;
   }
 
-  @Override
   public DataObjectMetaData getMetaData() {
     return this.metaData;
   }
@@ -729,7 +710,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new LinkedHashSet<LayerDataObject>(this.modifiedRecords);
   }
 
-  @Override
   public int getNewObjectCount() {
     if (this.newRecords == null) {
       return 0;
@@ -738,14 +718,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public List<LayerDataObject> getNewRecords() {
     synchronized (newRecords) {
       return new ArrayList<LayerDataObject>(this.newRecords);
     }
   }
 
-  @Override
   public Query getQuery() {
     if (this.query == null) {
       return null;
@@ -754,29 +732,24 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public LayerDataObject getRecord(final int row) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public LayerDataObject getRecordById(final Object id) {
     return null;
   }
 
-  @Override
   public List<LayerDataObject> getRecords() {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public int getRowCount() {
     final DataObjectMetaData metaData = getMetaData();
     final Query query = new Query(metaData);
     return getRowCount(query);
   }
 
-  @Override
   public int getRowCount(final Query query) {
     LoggerFactory.getLogger(getClass()).error("Get row count not implemented");
     return 0;
@@ -792,12 +765,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return boundingBox;
   }
 
-  @Override
   public List<LayerDataObject> getSelectedRecords() {
     return new ArrayList<LayerDataObject>(this.selectedRecords);
   }
 
-  @Override
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
@@ -816,18 +787,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return this.selectedRecordsIndex;
   }
 
-  @Override
   public int getSelectionCount() {
     return this.selectedRecords.size();
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public List<String> getSnapLayerNames() {
     return (List<String>)getProperty("snapLayers");
   }
 
-  @Override
   public Collection<String> getUserReadOnlyFieldNames() {
     return Collections.unmodifiableSet(userReadOnlyFieldNames);
   }
@@ -850,19 +818,16 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     clearChanges();
   }
 
-  @Override
   public boolean isCanAddRecords() {
     return !super.isReadOnly() && isEditable() && this.canAddRecords
       && hasPermission("INSERT");
   }
 
-  @Override
   public boolean isCanDeleteRecords() {
     return !super.isReadOnly() && isEditable() && this.canDeleteRecords
       && hasPermission("DELETE");
   }
 
-  @Override
   public boolean isCanEditRecords() {
     return !super.isReadOnly() && isEditable() && this.canEditRecords
       && hasPermission("UPDATE");
@@ -889,7 +854,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
-  @Override
   public boolean isDeleted(final LayerDataObject object) {
     return this.deletedRecords != null && this.deletedRecords.contains(object);
   }
@@ -927,7 +891,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getSelectionCount() > 0;
   }
 
-  @Override
   public boolean isHidden(final LayerDataObject object) {
     if (isCanDeleteRecords() && isDeleted(object)) {
       return true;
@@ -946,12 +909,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public boolean isModified(final LayerDataObject object) {
     return this.modifiedRecords.contains(object);
   }
 
-  @Override
   public boolean isNew(final LayerDataObject object) {
     return this.newRecords.contains(object);
   }
@@ -973,7 +934,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public boolean isSelected(final LayerDataObject object) {
     if (object == null) {
       return false;
@@ -982,12 +942,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public boolean isSnapToAllLayers() {
     return snapToAllLayers;
   }
 
-  @Override
   public boolean isVisible(final LayerDataObject object) {
     if (isVisible()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer();
@@ -1004,7 +962,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void pasteRecordGeometry(final LayerDataObject record) {
     DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
     if (reader == null) {
@@ -1151,7 +1108,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public final List<LayerDataObject> query(final BoundingBox boundingBox) {
     final List<LayerDataObject> results = doQuery(boundingBox);
     final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
@@ -1160,7 +1116,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return results;
   }
 
-  @Override
   public List<LayerDataObject> query(final Geometry geometry,
     final double maxDistance) {
     final List<LayerDataObject> results = doQuery(geometry, maxDistance);
@@ -1170,12 +1125,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return results;
   }
 
-  @Override
   public List<LayerDataObject> query(final Query query) {
     throw new UnsupportedOperationException("Query not currently supported");
   }
 
-  @Override
   public final List<LayerDataObject> queryBackground(
     final BoundingBox boundingBox) {
     final List<LayerDataObject> results = doQueryBackground(boundingBox);
@@ -1224,7 +1177,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     clearSelectedRecordsIndex();
   }
 
-  @Override
   public void removeSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerDataObject> objects = query(boundingBox);
@@ -1250,7 +1202,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireSelected();
   }
 
-  @Override
   public void revertChanges(final LayerDataObject object) {
     synchronized (this.modifiedRecords) {
       if (isLayerObject(object)) {
@@ -1272,7 +1223,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public boolean saveChanges(final LayerDataObject object) {
     return false;
   }
@@ -1385,7 +1335,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<DataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
+        final LayerRenderer<AbstractDataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
           this, style);
         if (renderer != null) {
           setRenderer(renderer);
@@ -1396,14 +1346,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
     this.query = query;
     firePropertyChange("query", oldValue, query);
   }
 
-  @Override
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerDataObject> objects = query(boundingBox);
@@ -1421,7 +1369,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void setSelectedRecords(
     final Collection<LayerDataObject> selectedRecords) {
     synchronized (selectedRecords) {
@@ -1432,12 +1379,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireSelected();
   }
 
-  @Override
   public void setSelectedRecords(final LayerDataObject... selectedRecords) {
     setSelectedRecords(Arrays.asList(selectedRecords));
   }
 
-  @Override
   public void setSelectedRecordsById(final Object id) {
     final DataObjectMetaData metaData = getMetaData();
     final String idAttributeName = metaData.getIdAttributeName();
@@ -1450,7 +1395,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
     clearSelectedRecordsIndex();
@@ -1479,7 +1423,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       userReadOnlyFieldNames);
   }
 
-  @Override
   public LayerDataObject showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
       final LayerDataObject newObject = createRecord(parameters);
@@ -1502,7 +1445,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @SuppressWarnings("unchecked")
-  @Override
   public <V extends JComponent> V showForm(final LayerDataObject object) {
     if (object == null) {
       return null;
@@ -1535,6 +1477,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             SwingUtil.autoAdjustPosition(window);
             this.forms.put(object, window);
             window.addWindowListener(new WindowAdapter() {
+
               @Override
               public void windowClosing(final WindowEvent e) {
                 removeForm(object);
@@ -1559,12 +1502,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   }
 
-  @Override
   public void showRecordsTable() {
     showRecordsTable(DataObjectLayerTableModel.MODE_ALL);
   }
 
-  @Override
   public void showRecordsTable(String attributeFilterMode) {
     if (SwingUtilities.isEventDispatchThread()) {
       final Object tableView = getProperty("TableView");
@@ -1587,6 +1528,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             dockable.setCloseable(true);
             setProperty("TableView", dockable);
             dockable.addCDockableStateListener(new CDockableStateListener() {
+
               @Override
               public void extendedModeChanged(final CDockable dockable,
                 final ExtendedMode mode) {
@@ -1623,7 +1565,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void splitRecord(final LayerDataObject object,
     final CloseLocation mouseLocation) {
     final Geometry geometry = mouseLocation.getGeometry();
@@ -1682,7 +1623,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return map;
   }
 
-  @Override
   public void unselectRecords(
     final Collection<? extends LayerDataObject> objects) {
     clearSelectedRecordsIndex();
@@ -1690,7 +1630,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireSelected();
   }
 
-  @Override
   public void unselectRecords(final LayerDataObject... objects) {
     unselectRecords(Arrays.asList(objects));
   }
@@ -1706,7 +1645,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Geometry oldGeometry) {
   }
 
-  @Override
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Project project = getProject();
@@ -1720,7 +1658,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  @Override
   public void zoomToObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
 

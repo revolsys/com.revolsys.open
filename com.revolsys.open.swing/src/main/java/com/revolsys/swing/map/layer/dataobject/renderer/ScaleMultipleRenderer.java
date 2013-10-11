@@ -11,7 +11,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.ExceptionUtil;
 
@@ -27,12 +27,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   private transient AbstractDataObjectLayerRenderer renderer;
 
-  public ScaleMultipleRenderer(final DataObjectLayer layer,
+  public ScaleMultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public ScaleMultipleRenderer(final DataObjectLayer layer,
+  public ScaleMultipleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("scaleStyle", layer, parent, style);
     setIcon(ICON);
@@ -69,7 +69,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final DataObjectLayer layer) {
+    final AbstractDataObjectLayer layer) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       renderer.render(viewport, graphics, layer);
@@ -80,7 +80,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   // NOTE: Needed for filter styles
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
@@ -97,7 +97,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   // NOTE: Needed for multiple styles
   protected void renderObjects(final Viewport2D viewport,
-    final Graphics2D graphics, final DataObjectLayer layer,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
     final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);

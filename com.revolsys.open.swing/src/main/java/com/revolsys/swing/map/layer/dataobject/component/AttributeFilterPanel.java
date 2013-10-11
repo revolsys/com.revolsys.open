@@ -37,7 +37,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
@@ -62,7 +62,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private final DataObjectMetaData metaData;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private final ComboBox operatorField;
 
@@ -191,7 +191,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     return this.attributeNames;
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 

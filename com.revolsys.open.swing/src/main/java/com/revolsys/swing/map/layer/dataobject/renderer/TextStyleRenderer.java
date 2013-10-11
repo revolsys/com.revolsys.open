@@ -40,7 +40,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.TextStylePanel;
@@ -310,12 +310,12 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private TextStyle style;
 
-  public TextStyleRenderer(final DataObjectLayer layer,
+  public TextStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public TextStyleRenderer(final DataObjectLayer layer,
+  public TextStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
     super("textStyle", "Text Style", layer, parent, textStyle);
     final Map<String, Object> style = getAllDefaults();
@@ -343,7 +343,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   @Override
   protected void renderObject(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final DataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
     renderText(viewport, graphics, object, geometry, this.style);
   }

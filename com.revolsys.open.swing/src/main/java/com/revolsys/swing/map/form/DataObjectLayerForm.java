@@ -78,7 +78,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -173,7 +173,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   private boolean editable = true;
 
-  private DataObjectLayer layer;
+  private AbstractDataObjectLayer layer;
 
   private JButton addOkButton;
 
@@ -183,7 +183,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   private final Map<String, Object> fieldValues = new HashMap<String, Object>();
 
-  public DataObjectLayerForm(final DataObjectLayer layer) {
+  public DataObjectLayerForm(final AbstractDataObjectLayer layer) {
     setLayout(new BorderLayout());
     setName(layer.getName());
     this.layer = layer;
@@ -212,14 +212,14 @@ public class DataObjectLayerForm extends JPanel implements
     this.undoManager.addKeyMap(this);
   }
 
-  public DataObjectLayerForm(final DataObjectLayer layer,
+  public DataObjectLayerForm(final AbstractDataObjectLayer layer,
     final LayerDataObject object) {
     this(layer);
     setObject(object);
   }
 
   public void actionAddCancel() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final LayerDataObject object = getObject();
     layer.deleteRecords(object);
     this.object = null;
@@ -227,7 +227,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void actionAddOk() {
-    final DataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     final LayerDataObject object = getObject();
     layer.saveChanges(object);
     layer.addSelectedRecords(object);
@@ -790,7 +790,7 @@ public class DataObjectLayerForm extends JPanel implements
     return this.lastFocussedFieldName;
   }
 
-  public DataObjectLayer getLayer() {
+  public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 

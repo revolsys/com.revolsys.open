@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
 
@@ -16,7 +16,7 @@ public class DataObjectLayerAttributesTableModel extends
 
   private LayerDataObject object;
 
-  private final DataObjectLayer layer;
+  private final AbstractDataObjectLayer layer;
 
   private final DataObjectLayerForm form;
 

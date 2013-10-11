@@ -44,7 +44,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.DataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
@@ -137,7 +137,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   /** Index to the part of the addGeometry that new points should be added too. */
   private int[] addGeometryPartIndex = {};
 
-  private DataObjectLayer addLayer;
+  private AbstractDataObjectLayer addLayer;
 
   private boolean dragged = false;
 
@@ -172,7 +172,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
    * 
    * @param addLayer 
    */
-  public void addObject(final DataObjectLayer layer,
+  public void addObject(final AbstractDataObjectLayer layer,
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
       final DataObjectMetaData metaData = layer.getMetaData();
@@ -212,8 +212,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         addSelectedObjects(objects, childGroup, boundingBox);
-      } else if (layer instanceof DataObjectLayer) {
-        final DataObjectLayer dataObjectLayer = (DataObjectLayer)layer;
+      } else if (layer instanceof AbstractDataObjectLayer) {
+        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         if (dataObjectLayer.isEditable(scale)) {
           final List<LayerDataObject> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
           objects.addAll(selectedObjects);
@@ -222,8 +222,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  protected boolean addSnapLayers(final Set<DataObjectLayer> layers,
-    final Project project, final DataObjectLayer layer, final double scale) {
+  protected boolean addSnapLayers(final Set<AbstractDataObjectLayer> layers,
+    final Project project, final AbstractDataObjectLayer layer, final double scale) {
     if (layer != null) {
       if (layer.isSnapToAllLayers()) {
         return true;
@@ -233,9 +233,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         if (layerNames != null) {
           for (final String layerName : layerNames) {
             final Layer snapLayer = project.getLayer(layerName);
-            if (snapLayer instanceof DataObjectLayer) {
+            if (snapLayer instanceof AbstractDataObjectLayer) {
               if (snapLayer.isVisible(scale)) {
-                layers.add((DataObjectLayer)snapLayer);
+                layers.add((AbstractDataObjectLayer)snapLayer);
               }
             }
           }
@@ -357,7 +357,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return this.addGeometryPartDataType;
   }
 
-  public DataObjectLayer getAddLayer() {
+  public AbstractDataObjectLayer getAddLayer() {
     return this.addLayer;
   }
 
@@ -420,25 +420,25 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   @Override
-  protected List<DataObjectLayer> getSnapLayers() {
+  protected List<AbstractDataObjectLayer> getSnapLayers() {
     final Project project = getProject();
     final double scale = MapPanel.get(project).getScale();
-    final Set<DataObjectLayer> layers = new LinkedHashSet<DataObjectLayer>();
+    final Set<AbstractDataObjectLayer> layers = new LinkedHashSet<AbstractDataObjectLayer>();
     boolean snapAll = false;
     if (isModeAddGeometry()) {
       snapAll = addSnapLayers(layers, project, this.addLayer, scale);
     } else {
       for (final CloseLocation location : getMouseOverLocations()) {
-        final DataObjectLayer layer = location.getLayer();
+        final AbstractDataObjectLayer layer = location.getLayer();
         snapAll |= addSnapLayers(layers, project, layer, scale);
       }
     }
     if (snapAll) {
-      final List<DataObjectLayer> visibleDescendants = project.getVisibleDescendants(
-        DataObjectLayer.class, scale);
+      final List<AbstractDataObjectLayer> visibleDescendants = project.getVisibleDescendants(
+        AbstractDataObjectLayer.class, scale);
       return visibleDescendants;
     }
-    return new ArrayList<DataObjectLayer>(layers);
+    return new ArrayList<AbstractDataObjectLayer>(layers);
   }
 
   protected Geometry getVertexGeometry(final MouseEvent event,
@@ -509,7 +509,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return null;
   }
 
-  protected boolean isEditable(final DataObjectLayer dataObjectLayer) {
+  protected boolean isEditable(final AbstractDataObjectLayer dataObjectLayer) {
     return dataObjectLayer.isVisible() && dataObjectLayer.isCanEditRecords();
   }
 
@@ -924,7 +924,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (JtsGeometryUtil.equalsExact3D(newGeometry, oldValue)) {
         return null;
       } else {
-        final DataObjectLayer layer = location.getLayer();
+        final AbstractDataObjectLayer layer = location.getLayer();
         return layer.createPropertyEdit(object, geometryAttributeName,
           oldValue, newGeometry);
       }
@@ -970,7 +970,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerDataObject record = mouseLocation.getObject();
-          final DataObjectLayer layer = record.getLayer();
+          final AbstractDataObjectLayer layer = record.getLayer();
           layer.splitRecord(record, mouseLocation);
           e.consume();
           return true;
