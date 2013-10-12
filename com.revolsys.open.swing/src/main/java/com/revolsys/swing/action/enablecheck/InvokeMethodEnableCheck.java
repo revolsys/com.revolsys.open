@@ -14,19 +14,19 @@ public class InvokeMethodEnableCheck extends AbstractEnableCheck {
   private boolean inverse = false;
 
   public InvokeMethodEnableCheck(final boolean inverse, final Object object,
-    final String mthodName, final Object value) {
-    this.callable = new InvokeMethodCallable<Object>(object, mthodName, inverse);
+    final String methodName, final Object value) {
+    this.callable = new InvokeMethodCallable<Object>(object, methodName);
     this.value = value;
     this.inverse = inverse;
   }
 
-  public InvokeMethodEnableCheck(final Object object, final String mthodName) {
-    this(object, mthodName, true);
+  public InvokeMethodEnableCheck(final Object object, final String methodName) {
+    this(object, methodName, true);
   }
 
-  public InvokeMethodEnableCheck(final Object object, final String mthodName,
+  public InvokeMethodEnableCheck(final Object object, final String methodName,
     final Object value) {
-    this(false, object, mthodName, value);
+    this(false, object, methodName, value);
   }
 
   @Override

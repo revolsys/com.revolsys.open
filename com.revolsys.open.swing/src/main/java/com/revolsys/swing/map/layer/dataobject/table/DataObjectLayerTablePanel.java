@@ -14,7 +14,9 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -67,6 +69,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
       modifiedEnableCheck, deletedEnableCheck);
 
+    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
+      layer, "editable");
+
     // Right click Menu
     final MenuFactory menu = getMenu();
 
@@ -86,12 +91,15 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
       "copyRecord");
+
     menu.addMenuItemTitleIcon("dnd", "Copy Field Value", "page_copy", this,
       "copyFieldValue");
 
     if (hasGeometry) {
-      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "page_copy", this,
-        "pasteGeometry");
+      // TODO enablecheck
+      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
+        new AndEnableCheck(editableEnableCheck, new InvokeMethodEnableCheck(
+          this, "canPasteRecordGeometry")), this, "pasteGeometry");
     }
 
     // Toolbar
@@ -122,8 +130,6 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       DataObjectLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
-    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "editable");
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
       "change_table_filter", editableEnableCheck, this.tableModel,
       "setAttributeFilterMode", DataObjectLayerTableModel.MODE_EDITS);
@@ -143,6 +149,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         "setFilterByBoundingBox", true);
     }
     layer.addPropertyChangeListener(this);
+  }
+
+  public boolean canPasteRecordGeometry() {
+    final LayerDataObject record = getEventRowObject();
+    return this.layer.canPasteRecordGeometry(record);
   }
 
   public void copyFieldValue() {

@@ -54,7 +54,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   private void doMenu(final MouseEvent e) {
     setEventRow(e);
-    if (e.isPopupTrigger()) {
+    if (eventRow > -1 && e.isPopupTrigger()) {
       popupMouseEvent = new WeakReference<MouseEvent>(e);
       final int x = e.getX();
       final int y = e.getY();
