@@ -2,7 +2,6 @@ package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ListSelectionModel;
@@ -31,6 +30,8 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
   private final ListSelectionModel defaultSeletionModel = getSelectionModel();
 
+  private final DataObjectTableCellEditor tableCellEditor;
+
   public DataObjectRowTable(final DataObjectRowTableModel model) {
     this(model, new DataObjectRowTableCellRenderer());
   }
@@ -42,23 +43,14 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
     final JTableHeader tableHeader = getTableHeader();
 
-    final List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
-    final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
-      this);
+    tableCellEditor = new DataObjectTableCellEditor(this);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
       if (columnIndex >= model.getAttributesOffset()) {
-        column.setCellEditor(cellEditor);
+        column.setCellEditor(tableCellEditor);
       }
       column.setCellRenderer(cellRenderer);
-      final Class<?> attributeClass = model.getColumnClass(columnIndex);
-      if (Geometry.class.isAssignableFrom(attributeClass)) {
-        removeColumns.add(column);
-      }
-    }
-    for (final TableColumn column : removeColumns) {
-      removeColumn(column);
     }
     tableHeader.addMouseListener(this);
     model.setTable(this);
@@ -95,6 +87,10 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     return super.getSelectionModel();
   }
 
+  public DataObjectTableCellEditor getTableCellEditor() {
+    return tableCellEditor;
+  }
+
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
@@ -122,7 +118,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (isSortable() && e.getSource() == getTableHeader()) {
+    if (e.getSource() == getTableHeader()) {
       final DataObjectRowTableModel model = (DataObjectRowTableModel)getModel();
       final DataObjectMetaData metaData = model.getMetaData();
       final int column = columnAtPoint(e.getPoint());

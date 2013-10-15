@@ -86,7 +86,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
-import com.revolsys.swing.table.dataobject.filter.ExcludeGeometryRowFilter;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
@@ -401,7 +400,6 @@ public class DataObjectLayerForm extends JPanel implements
   protected void addTabAllFields() {
     this.allAttributes = new DataObjectLayerAttributesTableModel(this);
     final BaseJxTable table = AbstractSingleDataObjectTableModel.createTable(this.allAttributes);
-    table.setRowFilter(new ExcludeGeometryRowFilter());
     final TableColumnModel columnModel = table.getColumnModel();
     FormAllFieldsModifiedPredicate.add(this, table);
     FormAllFieldsErrorPredicate.add(this, table);
@@ -465,13 +463,18 @@ public class DataObjectLayerForm extends JPanel implements
       deletableEnableCheck, this, "deleteRecord");
 
     // Cut, Copy Paste
-    // TODO copy enable checks
 
-    this.toolBar.addButton("dnd", "Copy", "page_copy", (EnableCheck)null, this,
-      "dataTransferCopy");
-    this.toolBar.addButton("dnd", "Paste", "paste_plain", editable, this,
-      "dataTransferPaste");
+    this.toolBar.addButton("dnd", "Copy Record", "page_copy",
+      (EnableCheck)null, this, "dataTransferCopy");
 
+    this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable,
+      this, "dataTransferPaste");
+
+    if (hasGeometry) {
+      this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste",
+        editable, this, "pasteGeometry");
+
+    }
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
       "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
@@ -527,6 +530,11 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
+  public boolean canPasteRecordGeometry() {
+    final LayerDataObject record = getObject();
+    return this.layer.canPasteRecordGeometry(record);
+  }
+
   public void closeWindow() {
     final Window window = SwingUtilities.windowForComponent(this);
     if (window != null) {
@@ -544,10 +552,6 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void dataTransferCopy() {
     invokeAction("copy");
-  }
-
-  public void dataTransferCut() {
-
   }
 
   public void dataTransferPaste() {
@@ -850,6 +854,13 @@ public class DataObjectLayerForm extends JPanel implements
 
   protected boolean isTabValid(final int tabIndex) {
     return this.tabInvalidFieldMap.get(tabIndex) == null;
+  }
+
+  public void pasteGeometry() {
+    final LayerDataObject record = getObject();
+    if (record != null) {
+      this.layer.pasteRecordGeometry(record);
+    }
   }
 
   public void pasteValues(final Map<String, Object> map) {

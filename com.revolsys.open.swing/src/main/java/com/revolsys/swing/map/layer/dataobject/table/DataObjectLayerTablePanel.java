@@ -6,6 +6,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 
@@ -28,9 +29,11 @@ import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableM
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
+import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowPropertyEnableCheck;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowRunnable;
+import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -50,10 +53,14 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final JToggleButton selectedButton;
 
+  private final DataObjectTableCellEditor tableCellEditor;
+
   public DataObjectLayerTablePanel(final AbstractDataObjectLayer layer,
-    final JTable table) {
+    final DataObjectRowTable table) {
     super(table);
     this.layer = layer;
+    tableCellEditor = table.getTableCellEditor();
+    tableCellEditor.setPopupMenu(getMenu());
     this.tableModel = getTableModel();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -72,31 +79,36 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
 
+    final EnableCheck cellEditingEnableCheck = new ObjectPropertyEnableCheck(
+      this, "editingCurrentCell");
+
     // Right click Menu
     final MenuFactory menu = getMenu();
 
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
       notEnableCheck, this, "editRecord");
 
+    if (hasGeometry) {
+      menu.addMenuItemTitleIcon("record", "Zoom to Record",
+        "magnifier_zoom_selected", this, "zoomToRecord");
+    }
     menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
       deletableEnableCheck, this, "deleteRecord");
 
     menu.addMenuItem("record", DataObjectRowRunnable.createAction(
       "Revert Record", "arrow_revert", modifiedOrDeleted, "revertChanges"));
 
-    if (hasGeometry) {
-      menu.addMenuItemTitleIcon("zoom", "Zoom to Record",
-        "magnifier_zoom_selected", this, "zoomToRecord");
-    }
-
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
       "copyRecord");
 
-    menu.addMenuItemTitleIcon("dnd", "Copy Field Value", "page_copy", this,
-      "copyFieldValue");
+    menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
+      cellEditingEnableCheck, this, "cutFieldValue");
+    menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
+      this, "copyFieldValue");
+    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
+      "paste_plain", cellEditingEnableCheck, this, "pasteFieldValue");
 
     if (hasGeometry) {
-      // TODO enablecheck
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
         new AndEnableCheck(editableEnableCheck, new InvokeMethodEnableCheck(
           this, "canPasteRecordGeometry")), this, "pasteGeometry");
@@ -157,19 +169,31 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   }
 
   public void copyFieldValue() {
-    final DataObjectRowTableModel model = getTableModel();
-    final int row = getEventRow();
-    final int column = getEventColumn();
-    final Object value = model.getValueAt(row, column);
+    if (isEditingCurrentCell()) {
+      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      SwingUtil.dndCopy(editorComponent);
+    } else {
+      final DataObjectRowTableModel model = getTableModel();
+      final int row = getEventRow();
+      final int column = getEventColumn();
+      final Object value = model.getValueAt(row, column);
 
-    final String displayValue = model.toDisplayValue(row, column, value);
-    final StringSelection transferable = new StringSelection(displayValue);
-    ClipboardUtil.setContents(transferable);
+      final String displayValue = model.toDisplayValue(row, column, value);
+      final StringSelection transferable = new StringSelection(displayValue);
+      ClipboardUtil.setContents(transferable);
+    }
   }
 
   public void copyRecord() {
     final LayerDataObject record = getEventRowObject();
     this.layer.copyRecordsToClipboard(Collections.singletonList(record));
+  }
+
+  public void cutFieldValue() {
+    if (isEditingCurrentCell()) {
+      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      SwingUtil.dndCut(editorComponent);
+    }
   }
 
   public void deleteRecord() {
@@ -210,10 +234,16 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     }
   }
 
+  public void pasteFieldValue() {
+    if (isEditingCurrentCell()) {
+      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      SwingUtil.dndPaste(editorComponent);
+    }
+  }
+
   public void pasteGeometry() {
     final LayerDataObject record = getEventRowObject();
     this.layer.pasteRecordGeometry(record);
-
   }
 
   @Override

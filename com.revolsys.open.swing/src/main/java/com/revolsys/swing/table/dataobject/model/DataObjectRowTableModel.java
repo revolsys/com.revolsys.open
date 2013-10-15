@@ -17,6 +17,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class DataObjectRowTableModel extends
   AbstractDataObjectTableModel implements SortableTableModel {
@@ -176,7 +177,13 @@ public abstract class DataObjectRowTableModel extends
     if (isEditable()) {
       final String attributeName = getAttributeName(rowIndex, columnIndex);
       if (attributeName != null) {
-        return !isReadOnly(attributeName);
+        if (!isReadOnly(attributeName)) {
+          final Class<?> attributeClass = getMetaData().getAttributeClass(
+            attributeName);
+          if (!Geometry.class.isAssignableFrom(attributeClass)) {
+            return true;
+          }
+        }
       }
     }
     return false;

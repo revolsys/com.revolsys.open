@@ -25,7 +25,7 @@ public class DataObjectStoreSchemaTreeNodeModel extends
     setLazyLoad(true);
     final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
     setRenderer(renderer);
-    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
+    final ImageIcon icon = SilkIconLoader.getIcon("folder_database");
     renderer.setLeafIcon(icon);
     renderer.setOpenIcon(icon);
     renderer.setClosedIcon(icon);

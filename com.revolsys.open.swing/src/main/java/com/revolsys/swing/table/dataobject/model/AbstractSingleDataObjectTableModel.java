@@ -96,7 +96,8 @@ public abstract class AbstractSingleDataObjectTableModel extends
   @Override
   public int getRowCount() {
     final DataObjectMetaData metaData = getMetaData();
-    return metaData.getAttributeCount();
+    final int attributeCount = metaData.getAttributeCount();
+    return attributeCount;
   }
 
   @Override

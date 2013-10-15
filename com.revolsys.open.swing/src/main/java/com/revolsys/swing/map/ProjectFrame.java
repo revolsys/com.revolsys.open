@@ -269,8 +269,7 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItem("project", "Save Project", "Save Project",
-      SilkIconLoader.getIconWithBadge("layout", "save"), this.project,
-      "saveProject");
+      SilkIconLoader.getIcon("layout_save"), this.project, "saveProject");
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
   }

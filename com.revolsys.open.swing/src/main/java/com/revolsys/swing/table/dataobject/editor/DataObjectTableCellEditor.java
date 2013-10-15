@@ -22,6 +22,8 @@ import org.jdesktop.swingx.JXTable;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 
@@ -40,6 +42,8 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   private int columnIndex;
 
+  private PopupMenu popupMenu = null;
+
   public DataObjectTableCellEditor(final BaseJxTable table) {
     this.table = table;
   }
@@ -51,6 +55,10 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   @Override
   public Object getCellEditorValue() {
     return SwingUtil.getValue(this.editorComponent);
+  }
+
+  public JComponent getEditorComponent() {
+    return editorComponent;
   }
 
   @Override
@@ -84,6 +92,9 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
+    }
+    if (popupMenu != null) {
+      popupMenu.addToComponent(editorComponent);
     }
     return this.editorComponent;
   }
@@ -131,6 +142,15 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public void keyTyped(final KeyEvent e) {
   }
 
+  public void setPopupMenu(final MenuFactory menu) {
+    setPopupMenu(new PopupMenu(menu));
+  }
+
+  public void setPopupMenu(final PopupMenu popupMenu) {
+    this.popupMenu = popupMenu;
+    popupMenu.setAutoCreateDnd(false);
+  }
+
   @Override
   public boolean stopCellEditing() {
     if (editorComponent != null) {
@@ -140,6 +160,9 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
         final ComboBoxEditor editor = comboBox.getEditor();
         final Component comboEditorComponent = editor.getEditorComponent();
         comboEditorComponent.removeKeyListener(this);
+      }
+      if (popupMenu != null) {
+        PopupMenu.removeFromComponent(editorComponent);
       }
     }
     return super.stopCellEditing();

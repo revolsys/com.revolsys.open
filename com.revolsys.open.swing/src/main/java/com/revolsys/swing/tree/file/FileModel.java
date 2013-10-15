@@ -17,14 +17,11 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class FileModel extends AbstractObjectTreeNodeModel<File, File> {
-  public static final Icon ICON_FOLDER_DRIVE = SilkIconLoader.getIconWithBadge(
-    "folder", "drive");
+  public static final Icon ICON_FOLDER_DRIVE = SilkIconLoader.getIcon("folder_drive");
 
-  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIconWithBadge(
-    "folder", "error");
+  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIcon("folder_error");
 
-  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIconWithBadge(
-    "folder", "link");
+  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIcon("folder_link");
 
   public FileModel() {
     setSupportedClasses(File.class);

@@ -3,6 +3,7 @@ package com.revolsys.swing.table.dataobject.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
+import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   implements PropertyChangeSupportProxy {
@@ -34,6 +36,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     this);
 
   public AbstractDataObjectTableModel() {
+    this(null);
   }
 
   public AbstractDataObjectTableModel(final DataObjectMetaData metaData) {
@@ -43,6 +46,12 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   public void addPropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+  }
+
+  public void addReadOnlyAttributeNames(final String... readOnlyAttributeNames) {
+    if (readOnlyAttributeNames != null) {
+      this.readOnlyAttributeNames.addAll(Arrays.asList(readOnlyAttributeNames));
+    }
   }
 
   @PreDestroy
@@ -121,8 +130,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     }
   }
 
-  public String toDisplayValue(int rowIndex,
-    final int attributeIndex, final Object objectValue) {
+  public String toDisplayValue(final int rowIndex, final int attributeIndex,
+    final Object objectValue) {
     String text;
     final DataObjectMetaData metaData = getMetaData();
     final String idAttributeName = metaData.getIdAttributeName();
@@ -134,6 +143,10 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
         text = "-";
       }
     } else {
+      if (objectValue instanceof Geometry) {
+        final Geometry geometry = (Geometry)objectValue;
+        return geometry.getGeometryType();
+      }
       CodeTable codeTable = null;
       if (!name.equals(idAttributeName)) {
         codeTable = metaData.getCodeTableByColumn(name);

@@ -56,17 +56,6 @@ public class SilkIconLoader {
     }
   }
 
-  public static ImageIcon getIconWithBadge(final String imageName,
-    final String... smallImageName) {
-    final Image image = getImageWidthBadge(imageName, smallImageName);
-    if (image == null) {
-      return null;
-    } else {
-      final ImageIcon icon = new ImageIcon(image);
-      return icon;
-    }
-  }
-
   protected static BufferedImage getImage(final InputStream in) {
     if (in != null) {
       try {
@@ -85,33 +74,8 @@ public class SilkIconLoader {
   }
 
   public static BufferedImage getImage(final String imageName) {
-    return getImageWithPrefix("", imageName);
-  }
-
-  public static Image getImageWidthBadge(final String imageName,
-    final String... smallImageNames) {
-    final BufferedImage image = getImage(imageName);
-    final int w = image.getWidth();
-    final int h = image.getHeight();
-    final BufferedImage combined = new BufferedImage(w, h,
-      BufferedImage.TYPE_INT_ARGB);
-    final Graphics g = combined.getGraphics();
-    g.drawImage(image, 0, 0, null);
-
-    for (final String smallImageName : smallImageNames) {
-      final BufferedImage smallImage = getSmallImage(smallImageName);
-      if (image != null) {
-        g.drawImage(smallImage, 0, 0, null);
-      }
-    }
-    g.dispose();
-    return combined;
-  }
-
-  private static BufferedImage getImageWithPrefix(final String prefix,
-    final String imageName) {
     final Class<?> clazz = SilkIconLoader.class;
-    final String resourceName = RESOURCE_FOLDER + prefix + imageName + ".png";
+    final String resourceName = RESOURCE_FOLDER + imageName + ".png";
     InputStream in = clazz.getResourceAsStream(resourceName);
     if (in == null) {
       in = Thread.currentThread()
@@ -121,17 +85,4 @@ public class SilkIconLoader {
     return getImage(in);
   }
 
-  public static ImageIcon getSmallIcon(final String imageName) {
-    final Image image = getSmallImage(imageName);
-    if (image == null) {
-      return null;
-    } else {
-      final ImageIcon icon = new ImageIcon(image);
-      return icon;
-    }
-  }
-
-  public static BufferedImage getSmallImage(final String imageName) {
-    return getImageWithPrefix("../badges/", imageName);
-  }
 }

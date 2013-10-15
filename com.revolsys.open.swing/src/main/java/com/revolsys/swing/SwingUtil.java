@@ -356,6 +356,27 @@ public class SwingUtil {
     return textField;
   }
 
+  public static void dndCopy(final Component component) {
+    final JTextComponent textComponent = getTextComponent(component);
+    if (textComponent != null) {
+      textComponent.copy();
+    }
+  }
+
+  public static void dndCut(final Component component) {
+    final JTextComponent textComponent = getTextComponent(component);
+    if (textComponent != null) {
+      textComponent.cut();
+    }
+  }
+
+  public static void dndPaste(final Component component) {
+    final JTextComponent textComponent = getTextComponent(component);
+    if (textComponent != null) {
+      textComponent.paste();
+    }
+  }
+
   public static Window getActiveWindow() {
     final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
     final Window activeWindow = keyboardFocusManager.getActiveWindow();
@@ -397,6 +418,19 @@ public class SwingUtil {
 
     }
     return -1;
+  }
+
+  public static JTextComponent getTextComponent(final Component component) {
+    if (component instanceof JTextComponent) {
+      return (JTextComponent)component;
+    } else if (component instanceof JComboBox) {
+      final JComboBox comboBox = (JComboBox)component;
+      final ComboBoxEditor editor = comboBox.getEditor();
+      final Component editorComponent = editor.getEditorComponent();
+      return getTextComponent(editorComponent);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings({

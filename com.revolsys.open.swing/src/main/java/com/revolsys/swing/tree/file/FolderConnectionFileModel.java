@@ -3,27 +3,16 @@ package com.revolsys.swing.tree.file;
 import java.awt.Component;
 import java.util.List;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.file.FolderConnectionFile;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class FolderConnectionFileModel extends
   AbstractObjectTreeNodeModel<FolderConnectionFile, FolderConnectionFile> {
-  public static final Icon ICON_FOLDER_DRIVE = SilkIconLoader.getIconWithBadge(
-    "folder", "drive");
-
-  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIconWithBadge(
-    "folder", "error");
-
-  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIconWithBadge(
-    "folder", "link");
 
   public FolderConnectionFileModel() {
     setSupportedClasses(FolderConnectionFile.class);
@@ -69,10 +58,10 @@ public class FolderConnectionFileModel extends
         renderer.setIcon(ICON_FOLDER);
       } else if (StringUtils.hasText(name)) {
       } else {
-        renderer.setIcon(ICON_FOLDER_DRIVE);
+        renderer.setIcon(FileModel.ICON_FOLDER_DRIVE);
       }
     } else {
-      renderer.setIcon(ICON_FOLDER_MISSING);
+      renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
     }
     return renderer;
   }

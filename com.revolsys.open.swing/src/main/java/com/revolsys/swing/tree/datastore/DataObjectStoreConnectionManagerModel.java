@@ -18,7 +18,7 @@ public class DataObjectStoreConnectionManagerModel
     setSupportedClasses(DataObjectStoreConnectionManager.class);
     setSupportedChildClasses(DataObjectStoreConnectionRegistry.class);
     setObjectTreeNodeModels(new DataObjectStoreConnectionRegistryModel());
-    final ImageIcon icon = SilkIconLoader.getIconWithBadge("folder", "database");
+    final ImageIcon icon = SilkIconLoader.getIcon("folder_database");
     final DefaultTreeCellRenderer renderer = getRenderer();
     renderer.setOpenIcon(icon);
     renderer.setClosedIcon(icon);

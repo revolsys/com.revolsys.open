@@ -71,34 +71,9 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
     if (required && model.getObjectValue(rowIndex) == null) {
       component.setBackground(new Color(255, 0, 0, 100));
       component.setForeground(table.getForeground());
-    } else {
-      setRowColor(table, component, rowIndex);
     }
     component.setToolTipText(null);
     return component;
-  }
-
-  protected void setRowColor(final JTable table, final Component component,
-    final int row) {
-    if (component != null) {
-      final int[] selectedRows = table.getSelectedRows();
-      boolean selected = false;
-      for (final int selectedRow : selectedRows) {
-        if (row == selectedRow) {
-          selected = true;
-        }
-      }
-      if (selected) {
-        component.setBackground(table.getSelectionBackground());
-        component.setForeground(table.getSelectionForeground());
-      } else if (row % 2 == 0) {
-        component.setBackground(Color.WHITE);
-        component.setForeground(table.getForeground());
-      } else {
-        component.setBackground(Color.LIGHT_GRAY);
-        component.setForeground(table.getForeground());
-      }
-    }
   }
 
 }

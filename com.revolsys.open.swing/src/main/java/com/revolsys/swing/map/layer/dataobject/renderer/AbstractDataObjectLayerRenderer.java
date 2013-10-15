@@ -49,8 +49,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
 
     for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
-      final ImageIcon icon = SilkIconLoader.getIconWithBadge(
-        "style_" + type.toLowerCase(), "arrow_branch");
+      final ImageIcon icon = SilkIconLoader.getIcon("style_"
+        + type.toLowerCase() + "_wrap");
       final InvokeMethodAction action = TreeItemRunnable.createAction(
         "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);

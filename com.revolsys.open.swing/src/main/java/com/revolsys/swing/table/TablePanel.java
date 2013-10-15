@@ -17,11 +17,7 @@ import javax.swing.table.TableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
 
-@SuppressWarnings("serial")
 public class TablePanel extends JPanel implements MouseListener {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
@@ -55,6 +51,7 @@ public class TablePanel extends JPanel implements MouseListener {
   private void doMenu(final MouseEvent e) {
     setEventRow(e);
     if (eventRow > -1 && e.isPopupTrigger()) {
+      e.consume();
       popupMouseEvent = new WeakReference<MouseEvent>(e);
       final int x = e.getX();
       final int y = e.getY();
@@ -88,6 +85,17 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public ToolBar getToolBar() {
     return this.toolBar;
+  }
+
+  public boolean isEditingCurrentCell() {
+    if (table.isEditing()) {
+      if (eventRow > -1 && eventRow == table.getEditingRow()) {
+        if (eventColumn > -1 && eventColumn == table.getEditingColumn()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
