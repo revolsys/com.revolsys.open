@@ -108,7 +108,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private final UndoManager undoManager = new UndoManager();
 
-  private final JXStatusBar statusBar = new JXStatusBar();
+  private final JXStatusBar leftStatusBar = new JXStatusBar();
+
+  private final JXStatusBar rightStatusBar = new JXStatusBar();
 
   private final ToolBar toolBar = new ToolBar();
 
@@ -259,22 +261,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private void addPointerLocation(final boolean geographics) {
     final MapPointerLocation location = new MapPointerLocation(this,
       geographics);
-    this.statusBar.add(location);
+    this.leftStatusBar.add(location);
   }
 
-  // protected void addScale(final double metresPerPixel) {
-  // final double scale =
-  // this.viewport.getScaleForUnitsPerPixel(metresPerPixel);
-  // this.scales.add(scale);
-  // }
-
   protected void addStatusBar() {
-    add(this.statusBar, BorderLayout.SOUTH);
+    final JPanel panel = new JPanel(new BorderLayout());
+    add(panel, BorderLayout.SOUTH);
+    panel.add(this.leftStatusBar, BorderLayout.WEST);
+    panel.add(this.rightStatusBar, BorderLayout.EAST);
 
     addPointerLocation(false);
     addPointerLocation(true);
     this.progressBar = new SwingWorkerProgressBar();
-    this.statusBar.add(progressBar);
+    this.rightStatusBar.add(progressBar);
   }
 
   protected void addToolBar() {
@@ -396,6 +395,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.layerOverlay;
   }
 
+  public JXStatusBar getLeftStatusBar() {
+    return this.leftStatusBar;
+  }
+
   public Point getMapMousePosition() {
     final Point mousePosition = this.layeredPane.getMousePosition();
     if (mousePosition != null) {
@@ -439,16 +442,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.project;
   }
 
+  public JXStatusBar getRightStatusBar() {
+    return rightStatusBar;
+  }
+
   public double getScale() {
     return this.scale;
   }
 
   public List<Long> getScales() {
     return this.scales;
-  }
-
-  public JXStatusBar getStatusBar() {
-    return this.statusBar;
   }
 
   public ToolBar getToolBar() {

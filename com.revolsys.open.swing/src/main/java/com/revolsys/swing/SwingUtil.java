@@ -136,30 +136,16 @@ public class SwingUtil {
 
   public static void autoAdjustPosition(final Window window) {
     window.pack();
-    int x = window.getX();
-    int y = window.getY();
-    // TODO consider centering
-    if (x == 0) {
-      x = 10;
-    }
-    if (y == 0) {
-      y = 100;
-    }
-    window.setLocation(x, y);
-    int width = window.getWidth();
-    int height = window.getHeight();
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    if (width > 100) {
-      if (x + width > screenSize.width) {
-        width = screenSize.width - x - 10;
-      }
-    }
-    if (height > 100) {
-      if (y + height > screenSize.height - 100) {
-        height = screenSize.height - y - 100;
-      }
-    }
+
+    final int width = Math.min(window.getWidth(), screenSize.width - 100);
+    final int height = Math.min(window.getHeight(), screenSize.height - 100);
+
     window.setSize(width, height);
+
+    final int x = (screenSize.width - width) / 2;
+    final int y = (screenSize.height - height) / 2;
+    window.setLocation(x, y);
   }
 
   public static ComboBox createComboBox(final CodeTable codeTable,

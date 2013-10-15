@@ -764,8 +764,9 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
       final BufferedImage renderImage = getCachedImage(boundingBox);
       try {
+        final BoundingBox renderBoundingBox = boundingBox.convert(getViewportGeometryFactory());
         GeoReferencedImageLayerRenderer.render(viewport, graphics, this.image,
-          renderImage, boundingBox);
+          renderImage, renderBoundingBox);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to render image", e);
       }

@@ -970,12 +970,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_K) {
       if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
+        final MultipleUndo undo = new MultipleUndo();
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerDataObject record = mouseLocation.getObject();
-          addUndo(new SplitRecordUndo(record, mouseLocation));
-          // final AbstractDataObjectLayer layer = record.getLayer();
-          // layer.splitRecord(record, mouseLocation);
+          undo.addEdit(new SplitRecordUndo(record, mouseLocation));
         }
+        addUndo(undo);
         e.consume();
         return true;
       }

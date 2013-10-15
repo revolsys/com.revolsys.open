@@ -14,6 +14,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class SplitRecordUndo extends AbstractUndoableEdit {
 
+  private static final long serialVersionUID = 1L;
+
   private final LayerDataObject record1;
 
   private final CloseLocation splitLocation;
