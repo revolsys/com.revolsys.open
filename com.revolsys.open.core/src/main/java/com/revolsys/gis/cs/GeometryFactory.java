@@ -382,9 +382,13 @@ public class GeometryFactory extends
     if (geometry != null && !geometry.isEmpty()) {
       geometry = copy(geometry);
       if (geometry instanceof GeometryCollection) {
-        geometry = geometry.union();
-        // Union doesn't use this geometry factory
-        geometry = copy(geometry);
+        if (geometry.getNumGeometries() == 1) {
+          geometry = geometry.getGeometryN(0);
+        } else {
+          geometry = geometry.union();
+          // Union doesn't use this geometry factory
+          geometry = copy(geometry);
+        }
       }
       final Class<?> geometryClass = geometry.getClass();
       if (targetClass.isAssignableFrom(geometryClass)) {

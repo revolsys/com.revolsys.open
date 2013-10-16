@@ -97,6 +97,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Writer<DataObject> getWriter();
 
+  boolean hasSchema(String name);
+
   void initialize();
 
   void insert(DataObject object);
@@ -112,6 +114,9 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   ResultPager<DataObject> page(Query query);
 
   Reader<DataObject> query(DataObjectFactory dataObjectFactory,
+    String typePath, BoundingBox boundingBox);
+
+  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
     String typePath, Geometry geometry);
 
   Reader<DataObject> query(DataObjectFactory dataObjectFactory,
@@ -122,8 +127,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Reader<DataObject> query(Query... queries);
 
   Reader<DataObject> query(String typePath);
-
-  Reader<DataObject> query(DataObjectFactory dataObjectFactory, String typePath, BoundingBox boundingBox);
 
   DataObject queryFirst(Query query);
 

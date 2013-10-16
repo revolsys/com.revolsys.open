@@ -205,6 +205,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void addLayerControls() {
+    this.toolBar.addButtonTitleIcon("layers", "Refresh All Layers",
+      "arrow_refresh", this, "refresh");
+
     final SelectMapCoordinateSystem selectCoordinateSystem = new SelectMapCoordinateSystem(
       this);
     this.toolBar.addComponent("layers", selectCoordinateSystem);
@@ -231,6 +234,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           }
         }
       });
+    this.toolBar.addButtonTitleIcon("layers", "Refresh Base Map",
+      "map_refresh", baseMapOverlay, "refresh");
   }
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
@@ -527,6 +532,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
     repaint();
+  }
+
+  public void refresh() {
+    final Project project = getProject();
+    if (project != null) {
+      project.refresh();
+    }
   }
 
   @Override

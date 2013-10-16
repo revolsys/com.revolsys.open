@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.annotation.PreDestroy;
@@ -94,6 +95,12 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String primaryKeySql;
 
+  private final Set<ObjectProcessor<DataObjectStoreSchema>> schemaPostProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
+
+  private final Set<ObjectProcessor<DataObjectStoreSchema>> schemaPreProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
+
+  private final Set<String> allSchemaNames = new TreeSet<String>();
+
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -141,6 +148,16 @@ public abstract class AbstractJdbcDataObjectStore extends
   public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
     attributeAdders.put(sqlTypeName, adder);
+  }
+
+  public void addSchemaPostProcessor(
+    final ObjectProcessor<DataObjectStoreSchema> postProcessor) {
+    schemaPostProcessors.add(postProcessor);
+  }
+
+  public void addSchemaPreProcessor(
+    final ObjectProcessor<DataObjectStoreSchema> preProcessor) {
+    schemaPreProcessors.add(preProcessor);
   }
 
   @Override
@@ -291,6 +308,63 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  // protected Set<String> getDatabaseSchemaNames() {
+  // final Set<String> databaseSchemaNames = new TreeSet<String>();
+  // try {
+  // final Connection connection = getDbConnection();
+  // try {
+  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
+  // final ResultSet schemaRs = databaseMetaData.getSchemas();
+  //
+  // try {
+  // while (schemaRs.next()) {
+  // final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
+  // databaseSchemaNames.add(dbSchemaName);
+  // }
+  // } finally {
+  // JdbcUtils.close(schemaRs);
+  // }
+  // } finally {
+  // releaseConnection(connection);
+  // }
+  // } catch (final SQLException e) {
+  // throw new RuntimeException("Unable to get list of namespaces", e);
+  // }
+  // return databaseSchemaNames;
+  // }
+
+  public Set<String> getAllSchemaNames() {
+    return allSchemaNames;
+  }
+
+  // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
+  // throws SQLException {
+  // final Connection connection = getDbConnection();
+  // try {
+  // final Set<String> tableNames = new LinkedHashSet<String>();
+  //
+  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
+  // final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
+  // "%", null);
+  // try {
+  // while (tablesRs.next()) {
+  // final String dbTableName = tablesRs.getString("TABLE_NAME");
+  // final String tableName = dbTableName.toUpperCase();
+  // final String tableType = tablesRs.getString("TABLE_TYPE");
+  // final boolean excluded = !tableTypes.contains(tableType);
+  // if (!excluded && !isExcluded(dbSchemaName, dbTableName)) {
+  // tableNames.add(tableName);
+  // }
+  // }
+  // } finally {
+  // JdbcUtils.close(tablesRs);
+  // }
+  // return tableNames;
+  // } finally {
+  // releaseConnection(connection);
+  // }
+  // }
+
   public JdbcAttribute getAttribute(final String schemaName,
     final String tableName, final String columnName) {
     final String typePath = PathUtil.toPath(schemaName, tableName);
@@ -326,62 +400,9 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  // protected Set<String> getDatabaseSchemaNames() {
-  // final Set<String> databaseSchemaNames = new TreeSet<String>();
-  // try {
-  // final Connection connection = getDbConnection();
-  // try {
-  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
-  // final ResultSet schemaRs = databaseMetaData.getSchemas();
-  //
-  // try {
-  // while (schemaRs.next()) {
-  // final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
-  // databaseSchemaNames.add(dbSchemaName);
-  // }
-  // } finally {
-  // JdbcUtils.close(schemaRs);
-  // }
-  // } finally {
-  // releaseConnection(connection);
-  // }
-  // } catch (final SQLException e) {
-  // throw new RuntimeException("Unable to get list of namespaces", e);
-  // }
-  // return databaseSchemaNames;
-  // }
-
   public String getDatabaseSchemaName(final String schemaPath) {
     return schemaNameMap.get(schemaPath);
   }
-
-  // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
-  // throws SQLException {
-  // final Connection connection = getDbConnection();
-  // try {
-  // final Set<String> tableNames = new LinkedHashSet<String>();
-  //
-  // final DatabaseMetaData databaseMetaData = connection.getMetaData();
-  // final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
-  // "%", null);
-  // try {
-  // while (tablesRs.next()) {
-  // final String dbTableName = tablesRs.getString("TABLE_NAME");
-  // final String tableName = dbTableName.toUpperCase();
-  // final String tableType = tablesRs.getString("TABLE_TYPE");
-  // final boolean excluded = !tableTypes.contains(tableType);
-  // if (!excluded && !isExcluded(dbSchemaName, dbTableName)) {
-  // tableNames.add(tableName);
-  // }
-  // }
-  // } finally {
-  // JdbcUtils.close(tablesRs);
-  // }
-  // return tableNames;
-  // } finally {
-  // releaseConnection(connection);
-  // }
-  // }
 
   protected Set<String> getDatabaseSchemaNames() {
     final Map<String, Map<String, List<String>>> tablePermissions = getSchemaTablePermissions();
@@ -513,6 +534,7 @@ public abstract class AbstractJdbcDataObjectStore extends
               try {
                 while (resultSet.next()) {
                   final String owner = resultSet.getString("SCHEMA_NAME");
+                  allSchemaNames.add(owner.toUpperCase());
                   if (!isSchemaExcluded(owner)) {
                     final String dbTableName = resultSet.getString("TABLE_NAME");
                     if (!isExcluded(owner, dbTableName)) {
@@ -589,6 +611,15 @@ public abstract class AbstractJdbcDataObjectStore extends
       sequenceTypeSqlMap.put(typePath, sql);
     }
     return sql;
+  }
+
+  public Connection getSqlConnection() {
+    final DataSource dataSource = getDataSource();
+    if (dataSource == null) {
+      return getConnection();
+    } else {
+      return JdbcUtils.getConnection(dataSource);
+    }
   }
 
   public String getSqlPrefix() {
@@ -723,16 +754,18 @@ public abstract class AbstractJdbcDataObjectStore extends
     return idColumnNames;
   }
 
-  private Set<ObjectProcessor<DataObjectStoreSchema>> schemaPostProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
-  
-  public void addSchemaPostProcessor(ObjectProcessor<DataObjectStoreSchema> postProcessor) {
-	  schemaPostProcessors.add(postProcessor);
-  }
-  
   @Override
   protected synchronized void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
     final Map<String, DataObjectMetaData> metaDataMap) {
+    for (final ObjectProcessor<DataObjectStoreSchema> postProcessor : schemaPreProcessors) {
+      try {
+        postProcessor.process(schema);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to pre-process schema " + schema.getName(), e);
+      }
+    }
     final String schemaName = schema.getPath();
     final String dbSchemaName = getDatabaseSchemaName(schemaName);
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
@@ -803,6 +836,14 @@ public abstract class AbstractJdbcDataObjectStore extends
 
       postCreateDataObjectMetaData((DataObjectMetaDataImpl)metaData);
     }
+    for (final ObjectProcessor<DataObjectStoreSchema> postProcessor : schemaPostProcessors) {
+      try {
+        postProcessor.process(schema);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to post-process schema " + schema.getName(), e);
+      }
+    }
   }
 
   @Override
@@ -861,6 +902,11 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void releaseConnection(final Connection connection) {
+    JdbcUtils.release(connection, dataSource);
+  }
+
+  public void releaseSqlConnection(final Connection connection) {
+    final DataSource dataSource = getDataSource();
     JdbcUtils.release(connection, dataSource);
   }
 

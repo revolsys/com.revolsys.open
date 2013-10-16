@@ -427,6 +427,11 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
+  public boolean hasSchema(final String schemaName) {
+    return getSchema(schemaName) != null;
+  }
+
+  @Override
   @PostConstruct
   public void initialize() {
     statistics.connect();

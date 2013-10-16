@@ -1138,21 +1138,29 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         geometryDataType = geometryAttribute.getType();
         layerGeometryClass = geometryDataType.getJavaClass();
       }
-      final List<String> attributeNames = metaData.getAttributeNames();
-      final Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
-      if (ignorePasteFields != null) {
-        attributeNames.removeAll(ignorePasteFields);
+      Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
+      if (ignorePasteFields == null) {
+        ignorePasteFields = Collections.emptySet();
       }
       for (final DataObject sourceRecord : reader) {
         final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
           sourceRecord);
 
-        // TODO ignore case
-        newValues.keySet().retainAll(attributeNames);
+        Geometry sourceGeometry = sourceRecord.getGeometryValue();
+        for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
+          final String attributeName = iterator.next();
+          final Attribute attribute = metaData.getAttribute(attributeName);
+          if (attribute == null) {
+            iterator.remove();
+          } else if (ignorePasteFields != null) {
+            if (ignorePasteFields.contains(attribute.getName())) {
+              iterator.remove();
+            }
+          }
+        }
         if (geometryDataType != null) {
-          Geometry sourceGeometry = sourceRecord.getGeometryValue();
           if (sourceGeometry == null) {
-            final Object value = sourceRecord.get(geometryAttribute.getName());
+            final Object value = sourceRecord.getValue(geometryAttribute.getName());
             sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
               value);
           }

@@ -33,7 +33,9 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   public static final String DATA_TYPE = "dataType";
 
-public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
+  public static final String SPATIAL_REFERENCE = "spatialReference";
+
+  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
 
   private final int dimension;
 
@@ -95,8 +97,8 @@ public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
 
       final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
-        geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale, zOffset,
-        zScale, mOffset, mScale);
+        geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
+        zOffset, zScale, mOffset, mScale);
       object.setValue(getIndex(), geometry);
     }
     return columnIndex + 3;

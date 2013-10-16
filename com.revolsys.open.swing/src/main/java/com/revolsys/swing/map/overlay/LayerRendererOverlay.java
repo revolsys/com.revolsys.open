@@ -108,6 +108,12 @@ public class LayerRendererOverlay extends JComponent implements
     }
   }
 
+  public void refresh() {
+    if (layer != null) {
+      layer.refresh();
+    }
+  }
+
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {
     synchronized (this.loadSync) {
       if (this.imageWorker == imageWorker) {

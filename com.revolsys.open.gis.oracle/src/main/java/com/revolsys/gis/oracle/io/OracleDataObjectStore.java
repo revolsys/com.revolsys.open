@@ -28,6 +28,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
+import com.revolsys.gis.oracle.esri.ArcSdeSchemaPreProcessor;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
@@ -206,11 +207,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       addAttributeAdder("DATE", attributeAdder);
       addAttributeAdder("TIMESTAMP", attributeAdder);
 
-      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(
-        this, getDataSource(), getConnection());
-      addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-      addAttributeAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
-
       final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(
         this, getDataSource());
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
@@ -227,6 +223,14 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         + "where privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') AND ( "
         + "EXISTS (SELECT * FROM ALL_VIEWS V WHERE V.OWNER = P.OWNER AND V.VIEW_NAME = P.TABLE_NAME) OR "
         + "EXISTS (SELECT * FROM ALL_TABLES T WHERE T.OWNER = P.OWNER AND T.TABLE_NAME = P.TABLE_NAME)   ) ");
+
+      // TODO move to an extension
+      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(
+        this);
+      addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
+      addAttributeAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
+      addSchemaPreProcessor(new ArcSdeSchemaPreProcessor());
+
     }
   }
 
