@@ -112,7 +112,7 @@ public class LayerDataObject extends ArrayDataObject {
     return true;
   }
 
-  public void revertChanges() {
+  public LayerDataObject revertChanges() {
     if (this.originalValues != null || getState() == DataObjectState.Deleted) {
       setState(DataObjectState.Persisted);
       clearOriginalValues();
@@ -122,6 +122,7 @@ public class LayerDataObject extends ArrayDataObject {
       firePropertyChange("state", DataObjectState.Modified,
         DataObjectState.Persisted);
     }
+    return this;
   }
 
   @Override

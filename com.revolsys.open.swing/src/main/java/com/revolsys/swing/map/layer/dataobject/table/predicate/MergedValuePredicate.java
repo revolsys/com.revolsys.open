@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.map.layer.dataobject.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class MergedValuePredicate implements HighlightPredicate {
 
@@ -42,7 +43,13 @@ public class MergedValuePredicate implements HighlightPredicate {
         final String attributeName = this.model.getAttributeName(columnIndex);
         final Object value = object.getValue(attributeName);
         final Object mergedValue = mergedObject.getValue(attributeName);
-        return !EqualsRegistry.equal(value, mergedValue);
+        if (value instanceof Geometry) {
+          return false;
+        } else if (mergedValue instanceof Geometry) {
+          return false;
+        } else {
+          return !EqualsRegistry.equal(value, mergedValue);
+        }
       }
     } catch (final IndexOutOfBoundsException e) {
       return false;

@@ -1,8 +1,5 @@
 package com.revolsys.swing.table.dataobject.row;
 
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -28,18 +25,16 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
   }
 
   private DataObject getObject() {
-    final MouseEvent event = TablePanel.getPopupMouseEvent();
-    if (event == null) {
-      return null;
-    } else {
-      final DataObjectRowTable table = (DataObjectRowTable)event.getSource();
-      final Point point = event.getPoint();
-      final int eventRow = table.rowAtPoint(point);
-
-      final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
-      final DataObject object = model.getObject(eventRow);
-      return object;
+    final DataObjectRowTable table = TablePanel.getEventTable();
+    if (table != null) {
+      final int eventRow = TablePanel.getEventRow();
+      if (eventRow != -1) {
+        final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
+        final DataObject object = model.getObject(eventRow);
+        return object;
+      }
     }
+    return null;
   }
 
   @Override

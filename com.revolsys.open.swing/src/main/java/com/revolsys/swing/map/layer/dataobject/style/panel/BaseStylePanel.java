@@ -17,7 +17,6 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -101,9 +100,8 @@ public class BaseStylePanel extends ValueField implements
   public BaseStylePanel(final LayerRenderer<?> renderer) {
     super(renderer);
     setTitle("Style");
-    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     setBackground(WebColors.White);
-    setLayout(new VerticalLayout(5));
+    setLayout(new VerticalLayout());
     addReadOnlyFieldName("type");
 
     addPanel(this, "General", renderer, "name", "type", "visible");

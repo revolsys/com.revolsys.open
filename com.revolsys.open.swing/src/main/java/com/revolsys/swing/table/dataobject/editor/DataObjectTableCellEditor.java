@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
@@ -54,7 +53,8 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public Object getCellEditorValue() {
-    return SwingUtil.getValue(this.editorComponent);
+    final Object value = SwingUtil.getValue(this.editorComponent);
+    return value;
   }
 
   public JComponent getEditorComponent() {
@@ -76,7 +76,6 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       this.attributeName, true);
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
-      textField.setHorizontalAlignment(SwingConstants.LEFT);
       textField.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(WebColors.LightSteelBlue),
         BorderFactory.createEmptyBorder(1, 2, 1, 2)));

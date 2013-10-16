@@ -113,14 +113,18 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
       final String attributeName = getAttributeName(rowIndex, columnIndex);
-      final DataObjectMetaData metaData = getMetaData();
-      final DataType dataType = metaData.getAttributeType(attributeName);
-      if (dataType == null) {
-        return false;
-      } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+      if (isReadOnly(attributeName)) {
         return false;
       } else {
-        return true;
+        final DataObjectMetaData metaData = getMetaData();
+        final DataType dataType = metaData.getAttributeType(attributeName);
+        if (dataType == null) {
+          return false;
+        } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+          return false;
+        } else {
+          return true;
+        }
       }
     } else {
       return false;

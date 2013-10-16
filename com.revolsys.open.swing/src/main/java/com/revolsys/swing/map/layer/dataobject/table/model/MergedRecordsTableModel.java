@@ -23,7 +23,7 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     final MergedRecordsTableModel model = new MergedRecordsTableModel(layer,
       mergedObject, objects);
     final DataObjectRowTable table = new DataObjectRowTable(model);
-
+    table.setVisibleRowCount(objects.size() + 2);
     MergedValuePredicate.add(table);
     MergedObjectPredicate.add(table);
     MergedNullValuePredicate.add(table);
@@ -40,10 +40,11 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
 
   public MergedRecordsTableModel(final AbstractDataObjectLayer layer,
     final DataObject mergedObject, final Collection<LayerDataObject> objects) {
-    super(layer.getMetaData(), objects, layer.getMetaData().getAttributeNames());
+    super(layer.getMetaData(), objects, layer.getColumnNames());
     setAttributesOffset(1);
     this.mergedObject = mergedObject;
     setEditable(true);
+    setReadOnlyAttributeNames(layer.getUserReadOnlyFieldNames());
   }
 
   @Override
@@ -104,7 +105,6 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     final Map<String, Object> object = getObject(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);
-      final Object oldValue = object.get(name);
       object.put(name, value);
     }
   }

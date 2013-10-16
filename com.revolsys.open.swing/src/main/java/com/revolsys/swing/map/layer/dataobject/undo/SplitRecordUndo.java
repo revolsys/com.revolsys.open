@@ -45,12 +45,14 @@ public class SplitRecordUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canRedo() {
-    if (layer != null) {
-      if (record1 != null) {
-        if (splitLocation != null) {
-          if (geometry != null) {
-            if (EqualsRegistry.equal(record1.getGeometryValue(), geometry)) {
-              return true;
+    if (super.canRedo()) {
+      if (layer != null) {
+        if (record1 != null) {
+          if (splitLocation != null) {
+            if (geometry != null) {
+              if (EqualsRegistry.equal(record1.getGeometryValue(), geometry)) {
+                return true;
+              }
             }
           }
         }
@@ -61,11 +63,13 @@ public class SplitRecordUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canUndo() {
-    if (record1 != null) {
-      if (record2 != null) {
-        if (DataObjectEquals.equalAttributes(record1, values1)) {
-          if (DataObjectEquals.equalAttributes(record2, values2)) {
-            return true;
+    if (super.canUndo()) {
+      if (record1 != null) {
+        if (record2 != null) {
+          if (DataObjectEquals.equalAttributes(record1, values1)) {
+            if (DataObjectEquals.equalAttributes(record2, values2)) {
+              return true;
+            }
           }
         }
       }

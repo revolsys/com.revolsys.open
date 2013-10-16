@@ -16,7 +16,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -105,6 +107,7 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.util.CompareUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -529,25 +532,26 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     System.gc();
   }
 
-  protected void deleteObject(final LayerDataObject object) {
+  protected void deleteRecord(final LayerDataObject object) {
     final boolean trackDeletions = true;
-    deleteObject(object, trackDeletions);
+    deleteRecord(object, trackDeletions);
   }
 
-  protected void deleteObject(final LayerDataObject object,
+  protected void deleteRecord(final LayerDataObject record,
     final boolean trackDeletions) {
-    if (isLayerObject(object)) {
+    if (isLayerObject(record)) {
+      removeSelectedRecords(record);
       clearSelectedRecordsIndex();
       synchronized (newRecords) {
-        if (!this.newRecords.remove(object)) {
-          this.modifiedRecords.remove(object);
+        if (!this.newRecords.remove(record)) {
+          this.modifiedRecords.remove(record);
           if (trackDeletions) {
-            this.deletedRecords.add(object);
+            this.deletedRecords.add(record);
           }
-          this.selectedRecords.remove(object);
+          this.selectedRecords.remove(record);
         }
       }
-      object.setState(DataObjectState.Deleted);
+      record.setState(DataObjectState.Deleted);
     }
   }
 
@@ -556,7 +560,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       synchronized (this.editSync) {
         unselectRecords(objects);
         for (final LayerDataObject object : objects) {
-          deleteObject(object);
+          deleteRecord(object);
         }
       }
       fireRecordsChanged();
@@ -700,15 +704,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return highlightedObject;
   }
 
+  public String getIdAttributeName() {
+    return getMetaData().getIdAttributeName();
+  }
+
   public DataObjectQuadTree getIndex() {
     return index;
   }
 
   public List<LayerDataObject> getMergeableSelectedRecords() {
     final List<LayerDataObject> selectedRecords = getSelectedRecords();
-    for (final Iterator<LayerDataObject> iterator = selectedRecords.iterator(); iterator.hasNext();) {
-      final LayerDataObject mergedDataObject = iterator.next();
-      if (mergedDataObject.isDeleted()) {
+    for (final ListIterator<LayerDataObject> iterator = selectedRecords.listIterator(); iterator.hasNext();) {
+      final LayerDataObject record = iterator.next();
+      if (record.isDeleted()) {
         iterator.remove();
       }
     }
@@ -1048,6 +1056,56 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return false;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V extends DataObject> V mergeRecord(final Coordinates point,
+    final DataObject record1, final DataObject record2) {
+    if (record1 == record2) {
+      return (V)record1;
+    } else {
+      final String sourceIdAttributeName = getIdAttributeName();
+      final Object id1 = record1.getValue(sourceIdAttributeName);
+      final Object id2 = record2.getValue(sourceIdAttributeName);
+      int compare = 0;
+      if (id1 == null) {
+        if (id2 != null) {
+          compare = 1;
+        }
+      } else if (id2 == null) {
+        compare = -1;
+      } else {
+        compare = CompareUtil.compare(id1, id2);
+      }
+      if (compare == 0) {
+        final Geometry geometry1 = record1.getGeometryValue();
+        final Geometry geometry2 = record2.getGeometryValue();
+        final double length1 = geometry1.getLength();
+        final double length2 = geometry2.getLength();
+        if (length1 > length2) {
+          compare = -1;
+        } else {
+          compare = 1;
+        }
+      }
+      if (compare > 0) {
+        return (V)mergeRecord(point, record2, record1);
+      } else {
+        final DirectionalAttributes property = DirectionalAttributes.getProperty(getMetaData());
+        final Map<String, Object> newValues = property.getMergedMap(point,
+          record1, record2);
+
+        if (record2 instanceof LayerDataObject) {
+          deleteRecords((LayerDataObject)record2);
+        }
+        for (final Entry<String, Object> entry : newValues.entrySet()) {
+          final String name = entry.getKey();
+          final Object value = entry.getValue();
+          record1.setValue(name, value);
+        }
+        return (V)record1;
+      }
+    }
+  }
+
   public void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
       Invoke.later(MergeRecordsDialog.class, "showDialog", this);
@@ -1240,6 +1298,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       removeSelectedRecord(object);
     }
     fireSelected();
+  }
+
+  public void removeSelectedRecords(final LayerDataObject... objects) {
+    removeSelectedRecords(Arrays.asList(objects));
   }
 
   public void revertChanges(final LayerDataObject object) {

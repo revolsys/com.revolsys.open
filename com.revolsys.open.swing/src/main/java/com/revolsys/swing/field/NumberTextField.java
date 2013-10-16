@@ -235,6 +235,8 @@ public class NumberTextField extends JXTextField implements Field,
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
+    final String text = getText();
+    setFieldValue(text);
     return (T)this.fieldValue;
   }
 

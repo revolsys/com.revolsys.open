@@ -87,7 +87,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected void addModifiedObject(final LayerDataObject object) {
-    final LayerDataObject cacheObject = getCacheObject(object);
+    final LayerDataObject cacheObject = getCacheRecord(object);
     if (cacheObject != null) {
       super.addModifiedObject(cacheObject);
     }
@@ -95,9 +95,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected void addSelectedRecord(final LayerDataObject object) {
-    final DataObject cachedObject = getCacheObject(object);
+    final DataObject cachedObject = getCacheRecord(object);
     if (cachedObject != null) {
       super.addSelectedRecord(object);
+    }
+  }
+
+  @Override
+  public void addSelectedRecords(final BoundingBox boundingBox) {
+    if (isSelectable()) {
+      final List<LayerDataObject> objects = getObjects(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject) || super.isDeleted(layerDataObject)) {
+          iterator.remove();
+        }
+      }
+      if (!objects.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
+      addSelectedRecords(objects);
     }
   }
 
@@ -109,7 +126,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     for (final DataObject object : objects) {
       if (object instanceof LayerDataObject) {
         final LayerDataObject layerDataObject = (LayerDataObject)object;
-        getCacheObject(layerDataObject);
+        getCacheRecord(layerDataObject);
       }
     }
   }
@@ -198,18 +215,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void deleteObject(final LayerDataObject object) {
-    if (isLayerObject(object)) {
-      final LayerDataObject cacheObject = getCacheObject(object);
-      final String id = getId(cacheObject);
+  protected void deleteRecord(final LayerDataObject record) {
+    if (isLayerObject(record)) {
+      removeSelectedRecords(record);
+      final LayerDataObject cacheRecord = getCacheRecord(record);
+      final String id = getId(cacheRecord);
       if (StringUtils.hasText(id)) {
         this.deletedObjectIds.add(id);
-        deleteObject(cacheObject, true);
-        removeFromIndex(object);
-        removeFromIndex(cacheObject);
+        deleteRecord(cacheRecord, true);
+        removeFromIndex(record);
+        removeFromIndex(cacheRecord);
       } else {
-        removeFromIndex(object);
-        super.deleteObject(object);
+        removeFromIndex(record);
+        super.deleteRecord(record);
       }
     }
   }
@@ -331,15 +349,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return objects;
   }
 
-  protected LayerDataObject getCacheObject(final LayerDataObject object) {
-    if (object == null) {
-      return null;
-    } else {
-      final String id = getId(object);
-      return getCacheObject(id, object);
-    }
-  }
-
   protected LayerDataObject getCacheObject(final String id) {
     synchronized (this.cachedObjects) {
       if (id == null) {
@@ -374,6 +383,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     } else {
       return null;
+    }
+  }
+
+  protected LayerDataObject getCacheRecord(final LayerDataObject object) {
+    if (object == null) {
+      return null;
+    } else {
+      final String id = getId(object);
+      return getCacheObject(id, object);
     }
   }
 
@@ -567,9 +585,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected void removeSelectedRecord(final LayerDataObject object) {
-    final DataObject cachedObject = getCacheObject(object);
+    final DataObject cachedObject = getCacheRecord(object);
     if (cachedObject != null) {
       super.removeSelectedRecord(object);
+    }
+  }
+
+  @Override
+  public void removeSelectedRecords(final BoundingBox boundingBox) {
+    if (isSelectable()) {
+      final List<LayerDataObject> objects = getObjects(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject) || super.isDeleted(layerDataObject)) {
+          iterator.remove();
+        }
+      }
+      if (!objects.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
+      removeSelectedRecords(objects);
     }
   }
 

@@ -17,6 +17,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -102,8 +103,12 @@ public class ProgressMonitor extends JDialog implements WindowListener {
   }
 
   public void close() {
-    setVisible(false);
-    dispose();
+    if (SwingUtilities.isEventDispatchThread()) {
+      setVisible(false);
+      dispose();
+    } else {
+      Invoke.later(this, "close");
+    }
   }
 
   public PropertyChangeSupport getPropertyChangeSupport() {

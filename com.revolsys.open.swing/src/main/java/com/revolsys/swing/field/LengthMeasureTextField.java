@@ -51,6 +51,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   public LengthMeasureTextField(final String fieldName,
     final Measure<Length> value, final Unit<Length> unit) {
     super(fieldName, value);
+    setOpaque(false);
     this.valueField = new NumberTextField(fieldName, DataTypes.DOUBLE, 6, 2);
     if (value == null) {
       this.number = 0;

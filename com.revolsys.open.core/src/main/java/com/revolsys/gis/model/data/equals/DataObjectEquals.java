@@ -43,7 +43,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     } else {
       for (final String attributeName : object1.getMetaData()
         .getAttributeNames()) {
-        if (!equals(object1, values2, attributeName)) {
+        if (!MapEquals.equals(object1, values2, attributeName)) {
           return false;
         }
       }
@@ -74,13 +74,6 @@ public class DataObjectEquals implements Equals<DataObject> {
     final DataObject object2, final String attributeName) {
     final Object value1 = object1.getValue(attributeName);
     final Object value2 = object2.getValue(attributeName);
-    return EqualsRegistry.INSTANCE.equals(value1, value2);
-  }
-
-  public static boolean equals(final DataObject object1,
-    final Map<String, Object> object2, final String attributeName) {
-    final Object value1 = object1.getValue(attributeName);
-    final Object value2 = object2.get(attributeName);
     return EqualsRegistry.INSTANCE.equals(value1, value2);
   }
 

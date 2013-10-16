@@ -130,6 +130,7 @@ public class LayerRendererOverlay extends JComponent implements
       this.layer = layer;
       if (layer != null) {
         layer.addPropertyChangeListener(this);
+        layer.refresh();
         layer.setVisible(true);
       }
       redraw();
