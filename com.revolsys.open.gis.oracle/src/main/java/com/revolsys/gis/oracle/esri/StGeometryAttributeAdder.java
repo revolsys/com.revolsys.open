@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -62,10 +63,10 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
         LOG.error("Column not registered in SDE.ST_GEOMETRY table " + owner
           + "." + tableName + "." + name);
       }
-      final int dimension = getIntegerColumnProperty(schema, typePath,
+      final int numAxis = getIntegerColumnProperty(schema, typePath,
         columnName,
-        ArcSdeOracleStGeometryJdbcAttribute.COORDINATE_DIMENSION_PROPERTY);
-      if (dimension == -1) {
+        ArcSdeOracleStGeometryJdbcAttribute.NUM_AXIS);
+      if (numAxis == -1) {
         LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner
           + "." + tableName + "." + name);
       }
@@ -79,7 +80,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
       final SpatialReference spatialReference = spatialReferences.getSpatialReference(esriSrid);
 
       final Attribute attribute = new ArcSdeOracleStGeometryJdbcAttribute(name,
-        dataType, required, null, spatialReference, dimension);
+        dataType, required, null, spatialReference, numAxis);
 
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
@@ -102,7 +103,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private <T> T getColumnProperty(final DataObjectStoreSchema schema,
+  @SuppressWarnings("unchecked")
+private <T> T getColumnProperty(final DataObjectStoreSchema schema,
     final String typePath, final String columnName, final String propertyName) {
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
     final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typePath);
@@ -163,7 +165,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties)
     throws SQLException {
     final String schemaName = dataStore.getDatabaseSchemaName(schema);
-    final String sql = "select SG.TABLE_NAME, SG.COLUMN_NAME, SG.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION from SDE.ST_GEOMETRY_COLUMNS SG LEFT JOIN SDE.GEOMETRY_COLUMNS GC ON SG.OWNER = GC.F_TABLE_SCHEMA AND SG.TABLE_NAME = GC.F_TABLE_NAME where SG.OWNER = ?";
+    final String sql = "SELECT GC.F_TABLE_NAME, GC.F_GEOMETRY_COLUMN, GC.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION, SG.GEOMETRY_TYPE GEOMETRY_DATA_TYPE FROM SDE.GEOMETRY_COLUMNS GC LEFT OUTER JOIN SDE.ST_GEOMETRY_COLUMNS SG ON GC.F_TABLE_SCHEMA = SG.OWNER AND GC.F_TABLE_NAME = SG.TABLE_NAME WHERE GC.F_TABLE_SCHEMA = ?";
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       statement.setString(1, schemaName);
@@ -174,17 +176,28 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
           final String columnName = resultSet.getString(2);
           final int srid = resultSet.getInt(3);
           final int geometryType = resultSet.getInt(4);
-          final int numAxis = resultSet.getInt(5);
+         
           setColumnProperty(esriColumnProperties, schemaName, tableName,
             columnName, ArcSdeOracleStGeometryJdbcAttribute.ESRI_SRID_PROPERTY,
             srid);
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName,
-            ArcSdeOracleStGeometryJdbcAttribute.COORDINATE_DIMENSION_PROPERTY,
-            numAxis);
+          
           setColumnProperty(esriColumnProperties, schemaName, tableName,
             columnName, ArcSdeOracleStGeometryJdbcAttribute.DATA_TYPE,
             ArcSdeConstants.getGeometryDataType(geometryType));
+          
+          final int numAxis = resultSet.getInt(5);
+           setColumnProperty(esriColumnProperties, schemaName, tableName,
+            columnName,
+            ArcSdeOracleStGeometryJdbcAttribute.NUM_AXIS,
+            numAxis);
+        
+          String geometryColumnType = resultSet.getString(6);
+          if (!StringUtils.hasText(geometryColumnType)) {
+        	  geometryColumnType = "SDEBINARY";
+          }  setColumnProperty(esriColumnProperties, schemaName, tableName,
+                  columnName,
+                  ArcSdeOracleStGeometryJdbcAttribute.GEOMETRY_COLUMN_TYPE,
+                  geometryColumnType);
         }
       } finally {
         JdbcUtils.close(resultSet);

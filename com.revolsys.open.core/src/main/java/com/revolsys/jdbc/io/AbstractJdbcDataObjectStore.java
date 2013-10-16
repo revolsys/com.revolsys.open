@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.transaction.DataSourceTransactionManagerFactory;
+import com.revolsys.util.ObjectProcessor;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
@@ -721,6 +723,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     return idColumnNames;
   }
 
+  private Set<ObjectProcessor<DataObjectStoreSchema>> schemaPostProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
+  
+  public void addSchemaPostProcessor(ObjectProcessor<DataObjectStoreSchema> postProcessor) {
+	  schemaPostProcessors.add(postProcessor);
+  }
+  
   @Override
   protected synchronized void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,

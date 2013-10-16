@@ -25,13 +25,15 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
-  public static final String COORDINATE_DIMENSION_PROPERTY = "coordinateDimension";
+  public static final String NUM_AXIS = "numAxis";
 
   public static final String ESRI_SCHEMA_PROPERTY = ArcSdeOracleStGeometryJdbcAttribute.class.getName();
 
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
 
   public static final String DATA_TYPE = "dataType";
+
+public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
 
   private final int dimension;
 
