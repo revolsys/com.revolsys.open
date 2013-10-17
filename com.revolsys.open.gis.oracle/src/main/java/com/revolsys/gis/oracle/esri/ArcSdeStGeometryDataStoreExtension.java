@@ -30,14 +30,17 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final DataObjectStore dataStore) {
-    if (dataStore instanceof OracleDataObjectStore) {
+  public boolean initialize(final DataObjectStore dataStore) {
+    if (isEnabled(dataStore)) {
       final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
       final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
         oracleDataStore);
       oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
       oracleDataStore.addAttributeAdder("SDE.ST_GEOMETRY",
         stGeometryAttributeAdder);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -45,8 +48,6 @@ public class ArcSdeStGeometryDataStoreExtension implements
     final String schemaName, final Connection connection,
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties)
     throws SQLException {
-    final SpatialReferenceCache spatialReferences = new SpatialReferenceCache(
-      connection);
 
     final String sql = "SELECT GC.F_TABLE_NAME, GC.F_GEOMETRY_COLUMN, GC.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION, SG.GEOMETRY_TYPE GEOMETRY_DATA_TYPE FROM SDE.GEOMETRY_COLUMNS GC LEFT OUTER JOIN SDE.ST_GEOMETRY_COLUMNS SG ON GC.F_TABLE_SCHEMA = SG.OWNER AND GC.F_TABLE_NAME = SG.TABLE_NAME WHERE GC.F_TABLE_SCHEMA = ?";
     final PreparedStatement statement = connection.prepareStatement(sql);
@@ -60,13 +61,12 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
           final int esriSrid = resultSet.getInt(3);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.ESRI_SRID_PROPERTY,
-            esriSrid);
+            columnName, ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
 
-          final SpatialReference spatialReference = spatialReferences.getSpatialReference(esriSrid);
+          final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
+            schema, esriSrid);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.SPATIAL_REFERENCE,
-            spatialReference);
+            columnName, ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
           final int geometryType = resultSet.getInt(4);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
@@ -94,37 +94,36 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
+  public boolean isEnabled(final DataObjectStore dataStore) {
+    return ArcSdeConstants.isSdeAvailable(dataStore);
+  }
+
+  @Override
   public void postProcess(final DataObjectStoreSchema schema) {
   }
 
   @Override
   public void preProcess(final DataObjectStoreSchema schema) {
     final DataObjectStore dataStore = schema.getDataObjectStore();
-
-    if (dataStore instanceof OracleDataObjectStore) {
-      final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
-      if (oracleDataStore.getAllSchemaNames().contains("SDE")) {
-        Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY);
-        if (esriColumnProperties == null) {
-          esriColumnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
-          schema.setProperty(
-            ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
-            esriColumnProperties);
-        }
-        try {
-          final Connection connection = oracleDataStore.getSqlConnection();
-          try {
-            final String schemaName = oracleDataStore.getDatabaseSchemaName(schema);
-            initializeColumnProperties(schema, schemaName, connection,
-              esriColumnProperties);
-          } finally {
-            oracleDataStore.releaseSqlConnection(connection);
-          }
-        } catch (final SQLException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
-        }
+    final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
+    Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY);
+    if (esriColumnProperties == null) {
+      esriColumnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
+      schema.setProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
+        esriColumnProperties);
+    }
+    try {
+      final Connection connection = oracleDataStore.getSqlConnection();
+      try {
+        final String schemaName = oracleDataStore.getDatabaseSchemaName(schema);
+        initializeColumnProperties(schema, schemaName, connection,
+          esriColumnProperties);
+      } finally {
+        oracleDataStore.releaseSqlConnection(connection);
       }
+    } catch (final SQLException e) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
     }
   }
 

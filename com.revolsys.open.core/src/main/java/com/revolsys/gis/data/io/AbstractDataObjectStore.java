@@ -45,6 +45,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectStore extends
@@ -129,8 +130,13 @@ public abstract class AbstractDataObjectStore extends
 
   public void addDataStoreExtension(final DataObjectStoreExtension extension) {
     if (extension != null) {
-      extension.initialize(this);
-      dataStoreExtensions.add(extension);
+      try {
+        if (extension.initialize(this)) {
+          dataStoreExtensions.add(extension);
+        }
+      } catch (final Throwable e) {
+        ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
+      }
     }
   }
 

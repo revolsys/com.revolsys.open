@@ -27,14 +27,14 @@ public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
 
   private final int dimension;
 
-  private final SpatialReference spatialReference;
+  private final ArcSdeSpatialReference spatialReference;
 
   private final GeometryFactory geometryFactory;
 
   public ArcSdeStGeometryJdbcAttribute(final String name,
     final DataType type, final boolean required,
     final Map<String, Object> properties,
-    final SpatialReference spatialReference, final int dimension) {
+    final ArcSdeSpatialReference spatialReference, final int dimension) {
     super(name, type, -1, 0, 0, required, properties);
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();

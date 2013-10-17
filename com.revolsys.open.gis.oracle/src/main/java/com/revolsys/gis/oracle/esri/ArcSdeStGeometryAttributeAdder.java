@@ -53,7 +53,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
         + tableName + "." + name);
     }
 
-    final SpatialReference spatialReference = ArcSdeConstants.getColumnProperty(
+    final ArcSdeSpatialReference spatialReference = ArcSdeConstants.getColumnProperty(
       schema, typePath, columnName,
       ArcSdeConstants.SPATIAL_REFERENCE);
 

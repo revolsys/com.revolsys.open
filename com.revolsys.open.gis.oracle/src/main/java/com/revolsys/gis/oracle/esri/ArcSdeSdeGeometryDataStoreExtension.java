@@ -20,7 +20,13 @@ public class ArcSdeSdeGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final DataObjectStore dataStore) {
+  public boolean initialize(final DataObjectStore dataStore) {
+    return isEnabled(dataStore);
+  }
+
+  @Override
+  public boolean isEnabled(final DataObjectStore dataStore) {
+    return ArcSdeConstants.isSdeAvailable(dataStore);
   }
 
   @Override

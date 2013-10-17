@@ -75,6 +75,12 @@ public class GeometryFactory extends
     return getFactory(srid, 3, 0, 0);
   }
 
+  public static GeometryFactory getFactory(
+    final CoordinateSystem coordinateSystem, final int numAxis,
+    final double scaleXY, final double scaleZ) {
+    return new GeometryFactory(coordinateSystem, numAxis, scaleXY, scaleZ);
+  }
+
   /**
    * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y & floating z precision models.</p>
    * 
@@ -218,6 +224,16 @@ public class GeometryFactory extends
   private final CoordinateSystem coordinateSystem;
 
   private int numAxis = 2;
+
+  protected GeometryFactory(final CoordinateSystem coordinateSystem,
+    final int numAxis, final double scaleXY, final double scaleZ) {
+    super(PrecisionModelUtil.getPrecisionModel(scaleXY),
+      coordinateSystem.getId(), new DoubleCoordinatesListFactory());
+    this.coordinateSystem = coordinateSystem;
+    this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
+      scaleXY, scaleZ);
+    this.numAxis = numAxis;
+  }
 
   protected GeometryFactory(final int srid, final int numAxis,
     final double scaleXY, final double scaleZ) {

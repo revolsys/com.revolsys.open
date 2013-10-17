@@ -4,12 +4,15 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import oracle.sql.SQLName;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -85,6 +88,20 @@ public final class ArcSdeConstants {
     GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
   }
 
+  public static final String NUM_AXIS = "numAxis";
+
+  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
+
+  public static final String ESRI_SRID_PROPERTY = "esriSrid";
+
+  public static final String DATA_TYPE = "dataType";
+
+  public static final String SPATIAL_REFERENCE = "spatialReference";
+
+  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
+
+  public static final String SDEBINARY = "SDEBINARY";
+
   @SuppressWarnings("unchecked")
   public static <T> T getColumnProperty(final DataObjectStoreSchema schema,
     final String typePath, final String columnName, final String propertyName) {
@@ -146,17 +163,18 @@ public final class ArcSdeConstants {
     }
   }
 
-  public static final String NUM_AXIS = "numAxis";
+  public static boolean isSdeAvailable(final DataObjectStore dataStore) {
+    if (dataStore instanceof OracleDataObjectStore) {
+      final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
+      final Set<String> allSchemaNames = oracleDataStore.getAllSchemaNames();
+      return allSchemaNames.contains("SDE");
+    }
+    return false;
+  }
 
-  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
+  public static boolean isSdeAvailable(final DataObjectStoreSchema schema) {
+    final DataObjectStore dataStore = schema.getDataObjectStore();
 
-  public static final String ESRI_SRID_PROPERTY = "esriSrid";
-
-  public static final String DATA_TYPE = "dataType";
-
-  public static final String SPATIAL_REFERENCE = "spatialReference";
-
-  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
-
-  public static final String SDEBINARY = "SDEBINARY";
+    return isSdeAvailable(dataStore);
+  }
 }

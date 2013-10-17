@@ -3,7 +3,7 @@ package com.revolsys.gis.oracle.esri;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class SpatialReference {
+public class ArcSdeSpatialReference {
   private String csWkt;
 
   private int esriSrid;
@@ -32,7 +32,7 @@ public class SpatialReference {
 
   private Double zScale;
 
-  public SpatialReference(
+  public ArcSdeSpatialReference(
     GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }

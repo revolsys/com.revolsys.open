@@ -103,7 +103,9 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     final Collection<DataObjectStoreExtension> extensions = dataObjectStore.getDataStoreExtensions();
     for (final DataObjectStoreExtension extension : extensions) {
       try {
-        extension.preProcess(this);
+        if (extension.isEnabled(dataObjectStore)) {
+          extension.preProcess(this);
+        }
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(), "Unable to pre-process schema "
           + this, e);
@@ -112,7 +114,9 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
     for (final DataObjectStoreExtension extension : extensions) {
       try {
-        extension.postProcess(this);
+        if (extension.isEnabled(dataObjectStore)) {
+          extension.postProcess(this);
+        }
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(),
           "Unable to post-process schema " + this, e);
