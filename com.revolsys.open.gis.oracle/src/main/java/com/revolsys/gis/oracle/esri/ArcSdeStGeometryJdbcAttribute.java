@@ -25,18 +25,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
 
-  public static final String NUM_AXIS = "numAxis";
-
-  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
-
-  public static final String ESRI_SRID_PROPERTY = "esriSrid";
-
-  public static final String DATA_TYPE = "dataType";
-
-  public static final String SPATIAL_REFERENCE = "spatialReference";
-
-  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
-
   private final int dimension;
 
   private final SpatialReference spatialReference;

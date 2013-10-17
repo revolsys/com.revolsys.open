@@ -60,29 +60,29 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
           final int esriSrid = resultSet.getInt(3);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeStGeometryJdbcAttribute.ESRI_SRID_PROPERTY,
+            columnName, ArcSdeConstants.ESRI_SRID_PROPERTY,
             esriSrid);
 
           final SpatialReference spatialReference = spatialReferences.getSpatialReference(esriSrid);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeStGeometryJdbcAttribute.SPATIAL_REFERENCE,
+            columnName, ArcSdeConstants.SPATIAL_REFERENCE,
             spatialReference);
 
           final int geometryType = resultSet.getInt(4);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeStGeometryJdbcAttribute.DATA_TYPE,
+            columnName, ArcSdeConstants.DATA_TYPE,
             ArcSdeConstants.getGeometryDataType(geometryType));
 
           final int numAxis = resultSet.getInt(5);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeStGeometryJdbcAttribute.NUM_AXIS, numAxis);
+            columnName, ArcSdeConstants.NUM_AXIS, numAxis);
 
           String geometryColumnType = resultSet.getString(6);
           if (!StringUtils.hasText(geometryColumnType)) {
-            geometryColumnType = "SDEBINARY";
+            geometryColumnType = ArcSdeConstants.SDEBINARY;
           }
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeStGeometryJdbcAttribute.GEOMETRY_COLUMN_TYPE,
+            columnName, ArcSdeConstants.GEOMETRY_COLUMN_TYPE,
             geometryColumnType);
         }
       } finally {
@@ -104,11 +104,11 @@ public class ArcSdeStGeometryDataStoreExtension implements
     if (dataStore instanceof OracleDataObjectStore) {
       final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
       if (oracleDataStore.getAllSchemaNames().contains("SDE")) {
-        Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
+        Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY);
         if (esriColumnProperties == null) {
           esriColumnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
           schema.setProperty(
-            ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY,
+            ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
             esriColumnProperties);
         }
         try {

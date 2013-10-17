@@ -1,6 +1,7 @@
 package com.revolsys.gis.oracle.esri;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,10 +88,10 @@ public final class ArcSdeConstants {
   @SuppressWarnings("unchecked")
   public static <T> T getColumnProperty(final DataObjectStoreSchema schema,
     final String typePath, final String columnName, final String propertyName) {
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
-    final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typePath);
-    if (columnsProperties != null) {
-      final Map<String, Object> properties = columnsProperties.get(columnName);
+    final Map<String, Map<String, Object>> typeColumnProperties = getTypeColumnProperties(
+      schema, typePath);
+    if (typeColumnProperties != null) {
+      final Map<String, Object> properties = typeColumnProperties.get(columnName);
       if (properties != null) {
         final Object value = properties.get(propertyName);
         return (T)value;
@@ -131,4 +132,31 @@ public final class ArcSdeConstants {
       return type;
     }
   }
+
+  public static Map<String, Map<String, Object>> getTypeColumnProperties(
+    final DataObjectStoreSchema schema, final String typePath) {
+    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(
+      ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
+      Collections.<String, Map<String, Map<String, Object>>> emptyMap());
+    final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties.get(typePath);
+    if (typeColumnProperties == null) {
+      return Collections.emptyMap();
+    } else {
+      return typeColumnProperties;
+    }
+  }
+
+  public static final String NUM_AXIS = "numAxis";
+
+  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
+
+  public static final String ESRI_SRID_PROPERTY = "esriSrid";
+
+  public static final String DATA_TYPE = "dataType";
+
+  public static final String SPATIAL_REFERENCE = "spatialReference";
+
+  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
+
+  public static final String SDEBINARY = "SDEBINARY";
 }
