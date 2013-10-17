@@ -131,9 +131,8 @@ public abstract class AbstractDataObjectStore extends
   public void addDataStoreExtension(final DataObjectStoreExtension extension) {
     if (extension != null) {
       try {
-        if (extension.initialize(this)) {
-          dataStoreExtensions.add(extension);
-        }
+        extension.initialize(this);
+        dataStoreExtensions.add(extension);
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
       }

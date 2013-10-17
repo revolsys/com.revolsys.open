@@ -2,7 +2,7 @@ package com.revolsys.gis.data.io;
 
 public interface DataObjectStoreExtension {
 
-  public abstract boolean initialize(DataObjectStore dataStore);
+  public abstract void initialize(DataObjectStore dataStore);
 
   boolean isEnabled(DataObjectStore dataStore);
 

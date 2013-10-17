@@ -173,7 +173,7 @@ public final class ArcSdeConstants {
   }
 
   public static boolean isSdeAvailable(final DataObjectStoreSchema schema) {
-    final DataObjectStore dataStore = schema.getDataObjectStore();
+    final DataObjectStore dataStore = schema.getDataStore();
 
     return isSdeAvailable(dataStore);
   }

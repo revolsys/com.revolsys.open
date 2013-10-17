@@ -126,6 +126,17 @@ public final class Property {
     }
   }
 
+  public static boolean isEmpty(final Object value) {
+    if (value == null) {
+      return true;
+    } else if (value instanceof CharSequence) {
+      final CharSequence charSequence = (CharSequence)value;
+      return !StringUtils.hasText(charSequence);
+    } else {
+      return false;
+    }
+  }
+
   public static PropertyChangeSupport propertyChangeSupport(final Object object) {
     if (object instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;

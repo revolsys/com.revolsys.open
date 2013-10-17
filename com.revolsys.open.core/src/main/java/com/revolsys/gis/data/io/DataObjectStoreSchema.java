@@ -14,7 +14,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectStoreSchema extends AbstractObjectWithProperties {
-  private AbstractDataObjectStore dataObjectStore;
+  private AbstractDataObjectStore dataStore;
 
   private Map<String, DataObjectMetaData> metaDataCache = new TreeMap<String, DataObjectMetaData>();
 
@@ -22,7 +22,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
     final String path) {
-    this.dataObjectStore = dataObjectStore;
+    this.dataStore = dataObjectStore;
     this.path = path;
   }
 
@@ -44,7 +44,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
       }
       metaDataCache.clear();
     }
-    dataObjectStore = null;
+    dataStore = null;
     metaDataCache = null;
     path = null;
     super.close();
@@ -55,8 +55,8 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     return metaData;
   }
 
-  public DataObjectStore getDataObjectStore() {
-    return dataObjectStore;
+  public DataObjectStore getDataStore() {
+    return dataStore;
   }
 
   public synchronized DataObjectMetaData getMetaData(String typePath) {
@@ -100,10 +100,10 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   }
 
   public void refreshMetaData() {
-    final Collection<DataObjectStoreExtension> extensions = dataObjectStore.getDataStoreExtensions();
+    final Collection<DataObjectStoreExtension> extensions = dataStore.getDataStoreExtensions();
     for (final DataObjectStoreExtension extension : extensions) {
       try {
-        if (extension.isEnabled(dataObjectStore)) {
+        if (extension.isEnabled(dataStore)) {
           extension.preProcess(this);
         }
       } catch (final Throwable e) {
@@ -111,10 +111,10 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
           + this, e);
       }
     }
-    dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+    dataStore.loadSchemaDataObjectMetaData(this, metaDataCache);
     for (final DataObjectStoreExtension extension : extensions) {
       try {
-        if (extension.isEnabled(dataObjectStore)) {
+        if (extension.isEnabled(dataStore)) {
           extension.postProcess(this);
         }
       } catch (final Throwable e) {

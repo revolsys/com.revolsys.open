@@ -19,7 +19,7 @@ public class DataObjectStoreSchemaProxy extends DataObjectStoreSchema {
     if (metaData == null) {
       metaData = schema.findMetaData(typePath);
       if (metaData != null) {
-        metaData = new DataObjectMetaDataImpl(getDataObjectStore(), this,
+        metaData = new DataObjectMetaDataImpl(getDataStore(), this,
           metaData);
         addMetaData(typePath, metaData);
       }
@@ -33,7 +33,7 @@ public class DataObjectStoreSchemaProxy extends DataObjectStoreSchema {
     if (metaData == null) {
       metaData = schema.getMetaData(typePath);
       if (metaData != null) {
-        metaData = new DataObjectMetaDataImpl(getDataObjectStore(), this,
+        metaData = new DataObjectMetaDataImpl(getDataStore(), this,
           metaData);
         addMetaData(typePath, metaData);
       }

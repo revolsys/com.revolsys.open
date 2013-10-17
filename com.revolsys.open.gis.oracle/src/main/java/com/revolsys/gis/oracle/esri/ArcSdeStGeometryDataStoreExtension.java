@@ -30,18 +30,13 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
-  public boolean initialize(final DataObjectStore dataStore) {
-    if (isEnabled(dataStore)) {
-      final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
-      final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
-        oracleDataStore);
-      oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-      oracleDataStore.addAttributeAdder("SDE.ST_GEOMETRY",
-        stGeometryAttributeAdder);
-      return true;
-    } else {
-      return false;
-    }
+  public void initialize(final DataObjectStore dataStore) {
+    final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
+    final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
+      oracleDataStore);
+    oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
+    oracleDataStore.addAttributeAdder("SDE.ST_GEOMETRY",
+      stGeometryAttributeAdder);
   }
 
   private void initializeColumnProperties(final DataObjectStoreSchema schema,
@@ -104,7 +99,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
   @Override
   public void preProcess(final DataObjectStoreSchema schema) {
-    final DataObjectStore dataStore = schema.getDataObjectStore();
+    final DataObjectStore dataStore = schema.getDataStore();
     final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
     Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY);
     if (esriColumnProperties == null) {

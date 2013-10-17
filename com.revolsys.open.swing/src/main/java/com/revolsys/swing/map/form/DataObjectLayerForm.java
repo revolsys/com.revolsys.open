@@ -95,6 +95,7 @@ import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
 import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
@@ -852,6 +853,10 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
+  public boolean isReadOnly(final String fieldName) {
+    return getReadOnlyFieldNames().contains(fieldName);
+  }
+
   protected boolean isTabValid(final int tabIndex) {
     return this.tabInvalidFieldMap.get(tabIndex) == null;
   }
@@ -962,6 +967,23 @@ public class DataObjectLayerForm extends JPanel implements
     final LayerDataObject object = getObject();
     if (object != null) {
       object.revertChanges();
+    }
+  }
+
+  public void revertEmptyFields() {
+    final LayerDataObject record = getObject();
+    if (record != null) {
+      for (final String fieldName : getMetaData().getAttributeNames()) {
+        final Object value = record.getValue(fieldName);
+        if (Property.isEmpty(value)) {
+          if (!isReadOnly(fieldName)) {
+            final Object originalValue = record.getOriginalValue(fieldName);
+            if (!Property.isEmpty(originalValue)) {
+              object.setValue(fieldName, originalValue);
+            }
+          }
+        }
+      }
     }
   }
 
