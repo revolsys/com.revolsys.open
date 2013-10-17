@@ -62,8 +62,16 @@ public class DataObjectStoreConnectionRegistry extends
     addConnection(connection.getName(), connection);
   }
 
+  public void addConnection(final Map<String, Object> config) {
+    final DataObjectStoreConnection connection = new DataObjectStoreConnection(
+      this, null, config);
+    addConnection(connection);
+  }
+
   public void addConnection(final String name, final DataObjectStore dataStore) {
-    addConnection(new DataObjectStoreConnection(this, name, dataStore));
+    final DataObjectStoreConnection connection = new DataObjectStoreConnection(
+      this, name, dataStore);
+    addConnection(connection);
   }
 
   @Override

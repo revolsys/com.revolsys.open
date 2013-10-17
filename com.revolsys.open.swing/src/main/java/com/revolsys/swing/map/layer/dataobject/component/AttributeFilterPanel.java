@@ -24,9 +24,11 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.BinaryCondition;
+import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpelUtil;
@@ -238,8 +240,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       boolean simple = condition == null;
       if (condition instanceof BinaryCondition) {
         final BinaryCondition binaryCondition = (BinaryCondition)condition;
-        final Condition leftCondition = binaryCondition.getLeft();
+        Condition leftCondition = binaryCondition.getLeft();
         final Condition rightCondition = binaryCondition.getRight();
+        final Field field = (Field)searchField;
         if ("=".equals(binaryCondition.getOperator())) {
           if (leftCondition instanceof Column
             && rightCondition instanceof Value) {
@@ -247,7 +250,37 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
             final Value value = (Value)rightCondition;
             nameField.setFieldValue(column.getName());
             operatorField.setFieldValue("=");
-            ((Field)searchField).setFieldValue(StringConverterRegistry.toString(value.getValue()));
+            field.setFieldValue(StringConverterRegistry.toString(value.getValue()));
+            simple = true;
+          }
+        } else if ("LIKE".equalsIgnoreCase(binaryCondition.getOperator())) {
+          if (leftCondition instanceof Function) {
+            final Function function = (Function)leftCondition;
+            if ("UPPER".equals(function.getName())) {
+              final List<Condition> conditions = function.getConditions();
+              if (conditions.size() == 1) {
+                leftCondition = conditions.get(0);
+              }
+            }
+          }
+          if (leftCondition instanceof Cast) {
+            final Cast cast = (Cast)leftCondition;
+            leftCondition = cast.getCondition();
+          }
+          if (leftCondition instanceof Column
+            && rightCondition instanceof Value) {
+            final Column column = (Column)leftCondition;
+            final Value value = (Value)rightCondition;
+            nameField.setFieldValue(column.getName());
+            operatorField.setFieldValue("Like");
+            final String searchValue = StringConverterRegistry.toString(
+              value.getValue()).replaceAll("%", "");
+            final String fieldValue = StringConverterRegistry.toString(field.getFieldValue());
+
+            if (searchValue == null || fieldValue == null
+              || !searchValue.equalsIgnoreCase(fieldValue)) {
+              field.setFieldValue(searchValue);
+            }
             simple = true;
           }
         }

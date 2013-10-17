@@ -213,6 +213,19 @@ public final class StaxUtils {
   }
 
   /**
+   * Check that the parser is currently at the specified XML element.
+   * 
+   * @param parser The STAX XML parser.
+   * @param element The expected XML element.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static void requireLocalPart(final XMLStreamReader parser,
+    final QName element) {
+    require(parser, XMLStreamConstants.START_ELEMENT, null,
+      element.getLocalPart());
+  }
+
+  /**
    * Skip all elements and content until the end of the current element.
    * 
    * @param parser The STAX XML parser.

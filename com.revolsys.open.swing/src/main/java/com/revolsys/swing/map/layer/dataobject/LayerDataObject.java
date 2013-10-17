@@ -57,7 +57,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   public boolean isDeletable() {
     if (this.layer.isCanDeleteRecords()) {
-      return isDeleted();
+      return !isDeleted();
     }
     return false;
   }

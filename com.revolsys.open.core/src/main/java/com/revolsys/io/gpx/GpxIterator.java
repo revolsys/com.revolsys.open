@@ -12,7 +12,7 @@
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
+ * Unless requireLocalPartd by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -220,11 +220,12 @@ public class GpxIterator implements DataObjectIterator {
   // private SimpleAttribute processAttribute() throws XMLStreamException {
   // String propertySchemaName = in.getNamespaceURI();
   // String propertyName = in.getLocalName();
-  // in.require(XMLStreamReader.START_ELEMENT, null, null);
+  // in.requireLocalPart(XMLStreamReader.START_ELEMENT, null, null);
   // if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
   // || in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
   // StaxUtils.skipSubTree(in);
-  // in.require(XMLStreamReader.END_ELEMENT, propertySchemaName, propertyName);
+  // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
+  // propertyName);
   // return null;
   // }
   // Object value = null;
@@ -245,7 +246,8 @@ public class GpxIterator implements DataObjectIterator {
   // break;
   // }
   // SimpleAttribute attribute = new SimpleAttribute(propertyName, value);
-  // in.require(XMLStreamReader.END_ELEMENT, propertySchemaName, propertyName);
+  // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
+  // propertyName);
   // return attribute;
   // }
 
@@ -450,7 +452,7 @@ public class GpxIterator implements DataObjectIterator {
   }
 
   public void skipMetaData() throws XMLStreamException {
-    StaxUtils.require(in, GpxConstants.GPX_ELEMENT);
+    StaxUtils.requireLocalPart(in, GpxConstants.GPX_ELEMENT);
     StaxUtils.skipToStartElement(in);
     if (in.getName().equals(GpxConstants.METADATA_ELEMENT)) {
       StaxUtils.skipSubTree(in);

@@ -1705,9 +1705,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           numPoints - pointIndex - 1, null);
       } else {
         final int pointIndex = vertexIndex[0];
-        line1 = LineStringUtil.subLineString(line, pointIndex + 1);
-        line2 = LineStringUtil.subLineString(line, null, pointIndex, numPoints
-          - pointIndex, null);
+        if (numPoints - pointIndex < 2) {
+          return Collections.singletonList(record);
+        } else {
+          line1 = LineStringUtil.subLineString(line, pointIndex + 1);
+          line2 = LineStringUtil.subLineString(line, null, pointIndex,
+            numPoints - pointIndex, null);
+        }
 
       }
 

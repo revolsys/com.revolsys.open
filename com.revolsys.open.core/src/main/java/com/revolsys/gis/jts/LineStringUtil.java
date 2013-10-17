@@ -1216,10 +1216,14 @@ public final class LineStringUtil {
       fromPoint, fromIndex, length, toPoint);
 
     final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final LineString newLine = factory.createLineString(newPoints);
-    final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(line);
-    newLine.setUserData(userData);
-    return newLine;
+    if (newPoints.size() < 2) {
+      return null;
+    } else {
+      final LineString newLine = factory.createLineString(newPoints);
+      final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(line);
+      newLine.setUserData(userData);
+      return newLine;
+    }
 
   }
 
