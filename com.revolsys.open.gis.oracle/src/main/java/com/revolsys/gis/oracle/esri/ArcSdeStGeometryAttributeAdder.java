@@ -1,7 +1,5 @@
 package com.revolsys.gis.oracle.esri;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,14 +14,15 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcConstants;
 import com.revolsys.jdbc.io.SqlFunction;
 
-public class StGeometryAttributeAdder extends JdbcAttributeAdder {
-  private static final Logger LOG = LoggerFactory.getLogger(StGeometryAttributeAdder.class);
+public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
+  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
 
   private final boolean available = true;
 
   private final AbstractJdbcDataObjectStore dataStore;
 
-  public StGeometryAttributeAdder(final AbstractJdbcDataObjectStore dataStore) {
+  public ArcSdeStGeometryAttributeAdder(
+    final AbstractJdbcDataObjectStore dataStore) {
     this.dataStore = dataStore;
 
   }
@@ -38,30 +37,30 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
       final String owner = dataStore.getDatabaseSchemaName(schema);
       final String tableName = dataStore.getDatabaseTableName(typePath);
       final String columnName = name.toUpperCase();
-      final int esriSrid = getIntegerColumnProperty(schema, typePath,
-        columnName, ArcSdeOracleStGeometryJdbcAttribute.ESRI_SRID_PROPERTY);
+      final int esriSrid = ArcSdeConstants.getIntegerColumnProperty(schema,
+        typePath, columnName, ArcSdeStGeometryJdbcAttribute.ESRI_SRID_PROPERTY);
       if (esriSrid == -1) {
         LOG.error("Column not registered in SDE.ST_GEOMETRY table " + owner
           + "." + tableName + "." + name);
       }
-      final int numAxis = getIntegerColumnProperty(schema, typePath,
-        columnName, ArcSdeOracleStGeometryJdbcAttribute.NUM_AXIS);
+      final int numAxis = ArcSdeConstants.getIntegerColumnProperty(schema,
+        typePath, columnName, ArcSdeStGeometryJdbcAttribute.NUM_AXIS);
       if (numAxis == -1) {
         LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner
           + "." + tableName + "." + name);
       }
-      final DataType dataType = getColumnProperty(schema, typePath, columnName,
-        ArcSdeOracleStGeometryJdbcAttribute.DATA_TYPE);
+      final DataType dataType = ArcSdeConstants.getColumnProperty(schema,
+        typePath, columnName, ArcSdeStGeometryJdbcAttribute.DATA_TYPE);
       if (dataType == null) {
         LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner
           + "." + tableName + "." + name);
       }
 
-      final SpatialReference spatialReference = getColumnProperty(schema,
-        typePath, columnName,
-        ArcSdeOracleStGeometryJdbcAttribute.SPATIAL_REFERENCE);
+      final SpatialReference spatialReference = ArcSdeConstants.getColumnProperty(
+        schema, typePath, columnName,
+        ArcSdeStGeometryJdbcAttribute.SPATIAL_REFERENCE);
 
-      final Attribute attribute = new ArcSdeOracleStGeometryJdbcAttribute(name,
+      final Attribute attribute = new ArcSdeStGeometryJdbcAttribute(name,
         dataType, required, null, spatialReference, numAxis);
 
       metaData.addAttribute(attribute);
@@ -82,33 +81,6 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     } else {
       throw new IllegalStateException(
         "SDE is not installed or available from this user account");
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T getColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
-    final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typePath);
-    if (columnsProperties != null) {
-      final Map<String, Object> properties = columnsProperties.get(columnName);
-      if (properties != null) {
-        final Object value = properties.get(propertyName);
-        return (T)value;
-      }
-    }
-    return null;
-  }
-
-  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Object value = getColumnProperty(schema, typePath, columnName,
-      propertyName);
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      return -1;
     }
   }
 

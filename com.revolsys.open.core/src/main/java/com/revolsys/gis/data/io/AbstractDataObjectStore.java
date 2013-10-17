@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
@@ -42,6 +44,7 @@ import com.revolsys.io.FilterReader;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectStore extends
@@ -82,6 +85,10 @@ public abstract class AbstractDataObjectStore extends
 
   private GeometryFactory geometryFactory;
 
+  private DataStoreIteratorFactory iteratorFactory = new DataStoreIteratorFactory();
+
+  private final Set<DataObjectStoreExtension> dataStoreExtensions = new LinkedHashSet<DataObjectStoreExtension>();
+
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -117,6 +124,13 @@ public abstract class AbstractDataObjectStore extends
   public void addCodeTables(final Collection<CodeTable> codeTables) {
     for (final CodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
+    }
+  }
+
+  public void addDataStoreExtension(final DataObjectStoreExtension extension) {
+    if (extension != null) {
+      extension.initialize(this);
+      dataStoreExtensions.add(extension);
     }
   }
 
@@ -202,8 +216,26 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public AbstractIterator<DataObject> createIterator(final Query query,
-    final Map<String, Object> properties) {
-    throw new UnsupportedOperationException();
+    Map<String, Object> properties) {
+    if (properties == null) {
+      properties = Collections.emptyMap();
+    }
+    if (query == null) {
+      return null;
+    } else {
+      final DataObjectMetaData metaData = query.getMetaData();
+      if (metaData != null) {
+        final DataStoreIteratorFactory metaDataIteratorFactory = metaData.getProperty("dataStoreIteratorFactory");
+        if (metaDataIteratorFactory != null) {
+          final AbstractIterator<DataObject> iterator = metaDataIteratorFactory.createIterator(
+            this, query, properties);
+          if (iterator != null) {
+            return iterator;
+          }
+        }
+      }
+      return this.iteratorFactory.createIterator(this, query, properties);
+    }
   }
 
   @Override
@@ -306,8 +338,16 @@ public abstract class AbstractDataObjectStore extends
     return this.dataObjectFactory;
   }
 
+  public Collection<DataObjectStoreExtension> getDataStoreExtensions() {
+    return dataStoreExtensions;
+  }
+
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
+  }
+
+  public DataStoreIteratorFactory getIteratorFactory() {
+    return iteratorFactory;
   }
 
   @Override
@@ -601,6 +641,10 @@ public abstract class AbstractDataObjectStore extends
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  public void setIteratorFactory(final DataStoreIteratorFactory iteratorFactory) {
+    this.iteratorFactory = iteratorFactory;
   }
 
   @Override

@@ -7,10 +7,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.beanutils.MethodUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
@@ -103,6 +107,25 @@ public final class Property {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> V invoke(final Object object, final String methodName,
+    final Object... parameterArray) {
+    try {
+      if (object instanceof Class<?>) {
+        final Class<?> clazz = (Class<?>)object;
+        return (V)MethodUtils.invokeStaticMethod(clazz, methodName,
+          parameterArray);
+      } else {
+        return (V)MethodUtils.invokeMethod(object, methodName, parameterArray);
+      }
+    } catch (final InvocationTargetException e) {
+      return (V)ExceptionUtil.throwCauseException(e);
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unable to invoke "
+        + toString(object, methodName, parameterArray), e);
+    }
+  }
+
   public static PropertyChangeSupport propertyChangeSupport(final Object object) {
     if (object instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
@@ -174,6 +197,43 @@ public final class Property {
         JavaBeanUtil.setProperty(object, propertyName, value);
       }
     }
+  }
+
+  public static String toString(final Object object, final String methodName,
+    final List<Object> parameters) {
+    final StringBuffer string = new StringBuffer();
+
+    if (object == null) {
+    } else if (object instanceof Class<?>) {
+      string.append(object);
+      string.append('.');
+    } else {
+      string.append(object.getClass());
+      string.append('.');
+    }
+    string.append(methodName);
+    string.append('(');
+    for (int i = 0; i < parameters.size(); i++) {
+      if (i > 0) {
+        string.append(',');
+      }
+      final Object parameter = parameters.get(i);
+      if (parameter == null) {
+        string.append("null");
+      } else {
+        string.append(parameter.getClass());
+      }
+    }
+    string.append(')');
+    string.append('\n');
+    string.append(parameters);
+
+    return string.toString();
+  }
+
+  public static String toString(final Object object, final String methodName,
+    final Object... parameters) {
+    return toString(object, methodName, Arrays.asList(parameters));
   }
 
   private Property() {

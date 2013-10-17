@@ -15,7 +15,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
-  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeOracleStGeometryJdbcAttribute.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryJdbcAttribute.class);
 
   public static ArcSdeObjectIdJdbcAttribute getInstance(
     final JdbcAttribute attribute,

@@ -31,6 +31,7 @@ import java.beans.PropertyChangeListener;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
@@ -80,6 +81,6 @@ public class InvokeMethodPropertyChangeListener implements
 
   @Override
   public String toString() {
-    return InvokeMethodRunnable.toString(object, methodName, parameters);
+    return Property.toString(object, methodName, parameters);
   }
 }

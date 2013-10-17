@@ -11,14 +11,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.util.ObjectProcessor;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 
-public class ArcSdeSchemaPreProcessor implements
-  ObjectProcessor<DataObjectStoreSchema> {
+public class ArcSdeStGeometryDataStoreExtension implements
+  DataObjectStoreExtension {
+  private static final ArcSdeStGeometryDataStoreExtension INSTANCE = new ArcSdeStGeometryDataStoreExtension();
+
+  public static ArcSdeStGeometryDataStoreExtension get() {
+    return INSTANCE;
+  }
+
+  public ArcSdeStGeometryDataStoreExtension() {
+  }
+
+  @Override
+  public void initialize(final DataObjectStore dataStore) {
+    if (dataStore instanceof OracleDataObjectStore) {
+      final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
+      final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
+        oracleDataStore);
+      oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
+      oracleDataStore.addAttributeAdder("SDE.ST_GEOMETRY",
+        stGeometryAttributeAdder);
+    }
+  }
 
   private void initializeColumnProperties(final DataObjectStoreSchema schema,
     final String schemaName, final Connection connection,
@@ -39,30 +60,29 @@ public class ArcSdeSchemaPreProcessor implements
 
           final int esriSrid = resultSet.getInt(3);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeOracleStGeometryJdbcAttribute.ESRI_SRID_PROPERTY,
+            columnName, ArcSdeStGeometryJdbcAttribute.ESRI_SRID_PROPERTY,
             esriSrid);
 
           final SpatialReference spatialReference = spatialReferences.getSpatialReference(esriSrid);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeOracleStGeometryJdbcAttribute.SPATIAL_REFERENCE,
+            columnName, ArcSdeStGeometryJdbcAttribute.SPATIAL_REFERENCE,
             spatialReference);
 
           final int geometryType = resultSet.getInt(4);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeOracleStGeometryJdbcAttribute.DATA_TYPE,
+            columnName, ArcSdeStGeometryJdbcAttribute.DATA_TYPE,
             ArcSdeConstants.getGeometryDataType(geometryType));
 
           final int numAxis = resultSet.getInt(5);
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeOracleStGeometryJdbcAttribute.NUM_AXIS, numAxis);
+            columnName, ArcSdeStGeometryJdbcAttribute.NUM_AXIS, numAxis);
 
           String geometryColumnType = resultSet.getString(6);
           if (!StringUtils.hasText(geometryColumnType)) {
             geometryColumnType = "SDEBINARY";
           }
           setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName,
-            ArcSdeOracleStGeometryJdbcAttribute.GEOMETRY_COLUMN_TYPE,
+            columnName, ArcSdeStGeometryJdbcAttribute.GEOMETRY_COLUMN_TYPE,
             geometryColumnType);
         }
       } finally {
@@ -74,17 +94,21 @@ public class ArcSdeSchemaPreProcessor implements
   }
 
   @Override
-  public void process(final DataObjectStoreSchema schema) {
+  public void postProcess(final DataObjectStoreSchema schema) {
+  }
+
+  @Override
+  public void preProcess(final DataObjectStoreSchema schema) {
     final DataObjectStore dataStore = schema.getDataObjectStore();
 
     if (dataStore instanceof OracleDataObjectStore) {
       final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
       if (oracleDataStore.getAllSchemaNames().contains("SDE")) {
-        Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
+        Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
         if (esriColumnProperties == null) {
           esriColumnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
           schema.setProperty(
-            ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY,
+            ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY,
             esriColumnProperties);
         }
         try {
@@ -121,4 +145,5 @@ public class ArcSdeSchemaPreProcessor implements
     }
     columnProperties.put(propertyName, propertyValue);
   }
+
 }

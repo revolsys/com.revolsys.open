@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.transaction.DataSourceTransactionManagerFactory;
-import com.revolsys.util.ObjectProcessor;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
@@ -95,11 +93,16 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String primaryKeySql;
 
-  private final Set<ObjectProcessor<DataObjectStoreSchema>> schemaPostProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
-
-  private final Set<ObjectProcessor<DataObjectStoreSchema>> schemaPreProcessors = new LinkedHashSet<ObjectProcessor<DataObjectStoreSchema>>();
-
   private final Set<String> allSchemaNames = new TreeSet<String>();
+
+  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
+    AbstractJdbcDataObjectStore.class, "createJdbcIterator");
+
+  public static final AbstractIterator<DataObject> createJdbcIterator(
+    final AbstractJdbcDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    return new JdbcQueryIterator(dataStore, query, properties);
+  }
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -107,10 +110,12 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   public AbstractJdbcDataObjectStore(final DataSource dataSource) {
     setDataSource(dataSource);
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   public AbstractJdbcDataObjectStore(final JdbcDatabaseFactory databaseFactory) {
@@ -121,6 +126,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     this.databaseFactory = databaseFactory;
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   protected void addAttribute(final DataObjectMetaDataImpl metaData,
@@ -150,16 +156,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     attributeAdders.put(sqlTypeName, adder);
   }
 
-  public void addSchemaPostProcessor(
-    final ObjectProcessor<DataObjectStoreSchema> postProcessor) {
-    schemaPostProcessors.add(postProcessor);
-  }
-
-  public void addSchemaPreProcessor(
-    final ObjectProcessor<DataObjectStoreSchema> preProcessor) {
-    schemaPreProcessors.add(preProcessor);
-  }
-
   @Override
   @PreDestroy
   public synchronized void close() {
@@ -185,12 +181,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       sqlSuffix = null;
       tableNameMap = null;
     }
-  }
-
-  @Override
-  public AbstractIterator<DataObject> createIterator(final Query query,
-    final Map<String, Object> properties) {
-    return new JdbcQueryIterator(this, query, properties);
   }
 
   @SuppressWarnings("unchecked")
@@ -758,14 +748,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   protected synchronized void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
     final Map<String, DataObjectMetaData> metaDataMap) {
-    for (final ObjectProcessor<DataObjectStoreSchema> postProcessor : schemaPreProcessors) {
-      try {
-        postProcessor.process(schema);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to pre-process schema " + schema.getName(), e);
-      }
-    }
+
     final String schemaName = schema.getPath();
     final String dbSchemaName = getDatabaseSchemaName(schemaName);
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
@@ -835,14 +818,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       addMetaDataProperties((DataObjectMetaDataImpl)metaData);
 
       postCreateDataObjectMetaData((DataObjectMetaDataImpl)metaData);
-    }
-    for (final ObjectProcessor<DataObjectStoreSchema> postProcessor : schemaPostProcessors) {
-      try {
-        postProcessor.process(schema);
-      } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to post-process schema " + schema.getName(), e);
-      }
     }
   }
 

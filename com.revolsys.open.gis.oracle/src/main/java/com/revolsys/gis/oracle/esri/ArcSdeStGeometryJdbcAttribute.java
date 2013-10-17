@@ -23,11 +23,11 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
+public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
 
   public static final String NUM_AXIS = "numAxis";
 
-  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeOracleStGeometryJdbcAttribute.class.getName();
+  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
 
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
 
@@ -43,7 +43,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  public ArcSdeOracleStGeometryJdbcAttribute(final String name,
+  public ArcSdeStGeometryJdbcAttribute(final String name,
     final DataType type, final boolean required,
     final Map<String, Object> properties,
     final SpatialReference spatialReference, final int dimension) {
@@ -72,8 +72,8 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public ArcSdeOracleStGeometryJdbcAttribute clone() {
-    return new ArcSdeOracleStGeometryJdbcAttribute(getName(), getType(),
+  public ArcSdeStGeometryJdbcAttribute clone() {
+    return new ArcSdeStGeometryJdbcAttribute(getName(), getType(),
       isRequired(), getProperties(), spatialReference, dimension);
   }
 

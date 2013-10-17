@@ -5,8 +5,8 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.beanutils.MethodUtils;
 
-import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 /**
  * A runnable class which will invoke a method on an object with the specified
@@ -66,7 +66,7 @@ public class InvokeMethodCallable<T> implements Callable<T> {
 
   @Override
   public String toString() {
-    return InvokeMethodRunnable.toString(object, methodName,
+    return Property.toString(object, methodName,
       Arrays.asList(parameters));
   }
 }

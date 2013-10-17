@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
   private Callable<T> backgroundTask;
@@ -110,7 +111,7 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
           "Error running "
             + this.description
             + " using "
-            + InvokeMethodRunnable.toString(this.doneObject,
+            + Property.toString(this.doneObject,
               this.doneMethodName, parameters), e);
       }
     }

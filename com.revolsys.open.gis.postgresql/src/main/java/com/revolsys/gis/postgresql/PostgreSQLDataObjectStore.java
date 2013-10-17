@@ -28,11 +28,21 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
     "information_schema", "pg_catalog", "pg_toast_temp_1");
+
+  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
+    PostgreSQLDataObjectStore.class, "createPostgreSQLIterator");
+
+  public static final AbstractIterator<DataObject> createPostgreSQLIterator(
+    final PostgreSQLDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    return new PostgreSQLJdbcQueryIterator(dataStore, query, properties);
+  }
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -42,6 +52,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory,
@@ -52,6 +63,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public PostgreSQLDataObjectStore(final DataSource dataSource) {
     super(dataSource);
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   public PostgreSQLDataObjectStore(
@@ -60,13 +72,8 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     super(databaseFactory);
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
+    setIteratorFactory(ITERATOR_FACTORY);
 
-  }
-
-  @Override
-  public AbstractIterator<DataObject> createIterator(final Query query,
-    final Map<String, Object> properties) {
-    return new PostgreSQLJdbcQueryIterator(this, query, properties);
   }
 
   @Override

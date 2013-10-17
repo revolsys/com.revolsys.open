@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ArcSdeQueryIterator extends AbstractIterator<DataObject> {
+public class ArcSdeSdeGeometryQueryIterator extends AbstractIterator<DataObject> {
 
 	private static SeConnection sdeConnection;
 
@@ -260,7 +260,7 @@ public class ArcSdeQueryIterator extends AbstractIterator<DataObject> {
 
 	private Statistics statistics;
 
-	public ArcSdeQueryIterator(final JdbcDataObjectStore dataStore,
+	public ArcSdeSdeGeometryQueryIterator(final JdbcDataObjectStore dataStore,
 			final Query query, final Map<String, Object> properties) {
 		super();
 		// TODO sdeConnection
@@ -392,7 +392,7 @@ public class ArcSdeQueryIterator extends AbstractIterator<DataObject> {
 		try {
 			seQuery.close();
 		} catch (SeException e) {
-			LoggerFactory.getLogger(ArcSdeQueryIterator.class).error(
+			LoggerFactory.getLogger(ArcSdeSdeGeometryQueryIterator.class).error(
 					"Unable to close query", e);
 		}
 	}

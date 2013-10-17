@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,6 +11,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
+import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   private AbstractDataObjectStore dataObjectStore;
@@ -98,7 +100,24 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   }
 
   public void refreshMetaData() {
+    final Collection<DataObjectStoreExtension> extensions = dataObjectStore.getDataStoreExtensions();
+    for (final DataObjectStoreExtension extension : extensions) {
+      try {
+        extension.preProcess(this);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(extension.getClass(), "Unable to pre-process schema "
+          + this, e);
+      }
+    }
     dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+    for (final DataObjectStoreExtension extension : extensions) {
+      try {
+        extension.postProcess(this);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(extension.getClass(),
+          "Unable to post-process schema " + this, e);
+      }
+    }
   }
 
   @Override

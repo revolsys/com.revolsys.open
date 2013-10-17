@@ -6,6 +6,7 @@ import java.util.Map;
 
 import oracle.sql.SQLName;
 
+import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.vividsolutions.jts.geom.Geometry;
@@ -83,12 +84,40 @@ public final class ArcSdeConstants {
     GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T getColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
+    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
+    final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typePath);
+    if (columnsProperties != null) {
+      final Map<String, Object> properties = columnsProperties.get(columnName);
+      if (properties != null) {
+        final Object value = properties.get(propertyName);
+        return (T)value;
+      }
+    }
+    return null;
+  }
+
   public static DataType getGeometryDataType(final int geometryType) {
     final DataType dataType = DATA_TYPE_MAP.get(geometryType);
     if (dataType == null) {
       return DataTypes.GEOMETRY;
     } else {
       return dataType;
+    }
+  }
+
+  public static int getIntegerColumnProperty(
+    final DataObjectStoreSchema schema, final String typePath,
+    final String columnName, final String propertyName) {
+    final Object value = getColumnProperty(schema, typePath, columnName,
+      propertyName);
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.intValue();
+    } else {
+      return -1;
     }
   }
 

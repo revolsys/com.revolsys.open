@@ -27,17 +27,21 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
-import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
-import com.revolsys.gis.oracle.esri.ArcSdeSchemaPreProcessor;
-import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryJdbcAttribute;
+import com.revolsys.gis.oracle.esri.ArcSdeSdeGeometryDataStoreExtension;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryDataStoreExtension;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
+
+  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
+    OracleDataObjectStore.class, "createOracleIterator");
 
   public static final List<String> ORACLE_INTERNAL_SCHEMAS = Arrays.asList(
     "ANONYMOUS", "APEX_030200", "AURORA$JIS$UTILITY$",
@@ -45,6 +49,12 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "LBACSYS", "MDSYS", "OLAPSYS",
     "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN",
     "PERFSTAT", "SDE", "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
+
+  public static AbstractIterator<DataObject> createOracleIterator(
+    final OracleDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(dataStore, query, properties);
+  }
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -54,9 +64,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public OracleDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
-    setExcludeTablePatterns(".*\\$");
-    setSqlPrefix("BEGIN ");
-    setSqlSuffix(";END;");
+    initSettings();
   }
 
   public OracleDataObjectStore(final DataObjectFactory dataObjectFactory,
@@ -67,19 +75,16 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public OracleDataObjectStore(final DataSource dataSource) {
     super(dataSource);
-    setExcludeTablePatterns(".*\\$");
-    setSqlPrefix("BEGIN ");
-    setSqlSuffix(";END;");
+    initSettings();
   }
 
   public OracleDataObjectStore(final OracleDatabaseFactory databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
-    setExcludeTablePatterns(".*\\$");
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
-    setSqlPrefix("BEGIN ");
-    setSqlSuffix(";END;");
+    initSettings();
+
   }
 
   protected Query addBoundingBoxFilter(Query query) {
@@ -109,7 +114,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
             + "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
           query.and(new SqlCondition(where, geometryFactory.getSRID(), x1, y1,
             x2, y2));
-        } else if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
+        } else if (geometryAttribute instanceof ArcSdeStGeometryJdbcAttribute) {
           final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName
             + ", ?, ?, ?, ?) = 1";
           query.and(new SqlCondition(where, x1, y1, x2, y2));
@@ -120,12 +125,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       }
     }
     return query;
-  }
-
-  @Override
-  public AbstractIterator<DataObject> createIterator(final Query query,
-    final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(this, query, properties);
   }
 
   @Override
@@ -224,14 +223,17 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         + "EXISTS (SELECT * FROM ALL_VIEWS V WHERE V.OWNER = P.OWNER AND V.VIEW_NAME = P.TABLE_NAME) OR "
         + "EXISTS (SELECT * FROM ALL_TABLES T WHERE T.OWNER = P.OWNER AND T.TABLE_NAME = P.TABLE_NAME)   ) ");
 
-      // TODO move to an extension
-      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(
-        this);
-      addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-      addAttributeAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
-      addSchemaPreProcessor(new ArcSdeSchemaPreProcessor());
+      addDataStoreExtension(ArcSdeStGeometryDataStoreExtension.get());
+      addDataStoreExtension(ArcSdeSdeGeometryDataStoreExtension.get());
 
     }
+  }
+
+  private void initSettings() {
+    setExcludeTablePatterns(".*\\$");
+    setSqlPrefix("BEGIN ");
+    setSqlSuffix(";END;");
+    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   @Override
@@ -254,7 +256,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
     if (objectIdAttribute != null) {
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute instanceof ArcSdeOracleStGeometryJdbcAttribute) {
+      if (geometryAttribute instanceof ArcSdeStGeometryJdbcAttribute) {
         final Connection connection = getDbConnection();
         try {
           final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
