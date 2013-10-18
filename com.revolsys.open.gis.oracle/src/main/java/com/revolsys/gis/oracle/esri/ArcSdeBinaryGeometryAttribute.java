@@ -66,7 +66,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
           final SeObjectId featureId = new SeObjectId(objectId);
           final SeQuery query = new SeQuery(connection);
           try {
-            final DataObjectMetaData metaData = getMetaData();
+            final DataObjectMetaData metaData = object.getMetaData();
             final String tableName = extension.getTableName(metaData);
             final SeRow row = query.fetchRow(tableName, featureId,
               new String[] {

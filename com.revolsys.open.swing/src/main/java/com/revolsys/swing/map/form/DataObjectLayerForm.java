@@ -904,7 +904,7 @@ public class DataObjectLayerForm extends JPanel implements
               equal = true;
             }
           }
-          if (!equal) {
+          if (!equal && layer.isEditable()) {
             this.object.setValueByPath(fieldName, fieldValue);
           }
         }
