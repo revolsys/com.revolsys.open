@@ -18,18 +18,15 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttribute.class);
 
   public static ArcSdeObjectIdJdbcAttribute getInstance(
-    final JdbcAttribute attribute,
-    final Connection connection,
+    final JdbcAttribute attribute, final Connection connection,
     final String typePath) {
-    return getInstance(attribute, connection, JdbcUtils.getSchemaName(typePath),
-      PathUtil.getName(typePath));
+    return getInstance(attribute, connection,
+      JdbcUtils.getSchemaName(typePath), PathUtil.getName(typePath));
   }
 
   public static ArcSdeObjectIdJdbcAttribute getInstance(
-    final JdbcAttribute attribute,
-    final Connection connection,
-    final String schemaName,
-    final String tableName) {
+    final JdbcAttribute attribute, final Connection connection,
+    final String schemaName, final String tableName) {
     try {
       final long registrationId = JdbcUtils.selectLong(
         connection,
@@ -60,24 +57,13 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   /** The name of the database schema the table owned by. */
   private final String schemaName;
 
-  public ArcSdeObjectIdJdbcAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final int scale,
-    final boolean required,
-    final Map<String, Object> properties,
-    final String schemaName,
+  public ArcSdeObjectIdJdbcAttribute(final String name, final DataType type,
+    final int length, final int scale, final boolean required,
+    final Map<String, Object> properties, final String schemaName,
     final long registrationId) {
     super(name, type, -1, length, scale, required, properties);
     this.schemaName = schemaName;
     this.registrationId = registrationId;
-  }
-
-  @Override
-  public ArcSdeObjectIdJdbcAttribute clone() {
-    return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
-      getScale(), isRequired(), getProperties(), schemaName, registrationId);
   }
 
   /**
@@ -85,25 +71,28 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
    * function.
    */
   @Override
-  public void addInsertStatementPlaceHolder(
-    final StringBuffer sql,
+  public void addInsertStatementPlaceHolder(final StringBuffer sql,
     final boolean generateKeys) {
     sql.append(" sde.version_user_ddl.next_row_id('");
-    sql.append(schemaName);
+    sql.append(this.schemaName);
     sql.append("', ");
-    sql.append(registrationId);
+    sql.append(this.registrationId);
     sql.append(")");
+  }
+
+  @Override
+  public ArcSdeObjectIdJdbcAttribute clone() {
+    return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
+      getScale(), isRequired(), getProperties(), this.schemaName,
+      this.registrationId);
   }
 
   /**
    * Ignore any inserted value.
    */
   @Override
-  public int setInsertPreparedStatementValue(
-    PreparedStatement statement,
-    int parameterIndex,
-    DataObject object)
-    throws SQLException {
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final DataObject object) throws SQLException {
     return parameterIndex;
   }
 }

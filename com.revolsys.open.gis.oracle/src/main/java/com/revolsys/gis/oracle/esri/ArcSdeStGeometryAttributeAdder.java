@@ -31,8 +31,8 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final int length, final int scale, final boolean required) {
     final DataObjectStoreSchema schema = metaData.getSchema();
     final String typePath = metaData.getPath();
-    final String owner = dataStore.getDatabaseSchemaName(schema);
-    final String tableName = dataStore.getDatabaseTableName(typePath);
+    final String owner = this.dataStore.getDatabaseSchemaName(schema);
+    final String tableName = this.dataStore.getDatabaseTableName(typePath);
     final String columnName = name.toUpperCase();
     final int esriSrid = ArcSdeConstants.getIntegerColumnProperty(schema,
       typePath, columnName, ArcSdeConstants.ESRI_SRID_PROPERTY);
@@ -54,11 +54,10 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     }
 
     final ArcSdeSpatialReference spatialReference = ArcSdeConstants.getColumnProperty(
-      schema, typePath, columnName,
-      ArcSdeConstants.SPATIAL_REFERENCE);
+      schema, typePath, columnName, ArcSdeConstants.SPATIAL_REFERENCE);
 
-    final Attribute attribute = new ArcSdeStGeometryAttribute(name,
-      dataType, required, null, spatialReference, numAxis);
+    final Attribute attribute = new ArcSdeStGeometryAttribute(name, dataType,
+      required, null, spatialReference, numAxis);
 
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(

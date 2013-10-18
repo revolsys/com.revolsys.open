@@ -24,18 +24,18 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
     this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
       numAxis, factory.getScaleXY(), factory.getScaleZ());
     this.numAxis = numAxis;
-    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public int getNumAxis() {
-    return numAxis;
+    return this.numAxis;
   }
 
   public ArcSdeSpatialReference getSpatialReference() {
-    return spatialReference;
+    return this.spatialReference;
   }
 }

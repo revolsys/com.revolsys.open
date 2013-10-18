@@ -34,17 +34,18 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   public List<DataObject> getList() {
     synchronized (this) {
-      if (results == null) {
+      if (this.results == null) {
         final ArrayList<DataObject> results = new ArrayList<DataObject>();
         final int pageSize = getPageSize();
         final int pageNumber = getPageNumber();
         if (pageNumber != -1) {
           String sql = getSql();
 
-          final int startRowNum = ((pageNumber - 1) * pageSize) + 1;
+          final int startRowNum = (pageNumber - 1) * pageSize + 1;
           final int endRowNum = startRowNum + pageSize - 1;
-          sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql + ") T2 ) WHERE TROWNUM BETWEEN "
-            + startRowNum + " AND " + endRowNum;
+          sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql
+            + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND "
+            + endRowNum;
 
           final DataSource dataSource = getDataSource();
           Connection connection = getConnection();
@@ -89,19 +90,19 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
         }
         this.results = results;
       }
-      return results;
+      return this.results;
     }
   }
 
   @Override
   public int getNumResults() {
-    if (numResults == null) {
-      JdbcDataObjectStore dataStore = getDataStore();
-      Query query = getQuery();
-      numResults = dataStore.getRowCount(query);
+    if (this.numResults == null) {
+      final JdbcDataObjectStore dataStore = getDataStore();
+      final Query query = getQuery();
+      this.numResults = dataStore.getRowCount(query);
       updateNumPages();
     }
-    return numResults;
+    return this.numResults;
   }
 
   /**
@@ -109,6 +110,6 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
    */
   @Override
   protected void updateResults() {
-    results = null;
+    this.results = null;
   }
 }

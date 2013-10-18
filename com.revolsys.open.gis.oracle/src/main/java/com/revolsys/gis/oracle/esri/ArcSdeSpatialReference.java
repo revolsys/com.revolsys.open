@@ -37,63 +37,63 @@ public class ArcSdeSpatialReference {
   }
 
   public String getCsWkt() {
-    return csWkt;
+    return this.csWkt;
   }
 
   public int getEsriSrid() {
-    return esriSrid;
+    return this.esriSrid;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public Double getMOffset() {
-    return mOffset;
+    return this.mOffset;
   }
 
   public PrecisionModel getMPrecisionModel() {
-    return mPrecisionModel;
+    return this.mPrecisionModel;
   }
 
   public Double getMScale() {
-    return mScale;
+    return this.mScale;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public int getSrid() {
-    return srid;
+    return this.srid;
   }
 
   public Double getXOffset() {
-    return xOffset;
+    return this.xOffset;
   }
 
   public PrecisionModel getXyPrecisionModel() {
-    return geometryFactory.getPrecisionModel();
+    return this.geometryFactory.getPrecisionModel();
   }
 
   public Double getXyScale() {
-    return xyScale;
+    return this.xyScale;
   }
 
   public Double getYOffset() {
-    return yOffset;
+    return this.yOffset;
   }
 
   public Double getZOffset() {
-    return zOffset;
+    return this.zOffset;
   }
 
   public PrecisionModel getZPrecisionModel() {
-    return zPrecisionModel;
+    return this.zPrecisionModel;
   }
 
   public Double getZScale() {
-    return zScale;
+    return this.zScale;
   }
 
   public void setCsWkt(final String csWkt) {
@@ -119,14 +119,14 @@ public class ArcSdeSpatialReference {
   public void setMScale(final Double mScale) {
     this.mScale = mScale;
     if (mScale != null) {
-      mPrecisionModel = new PrecisionModel(mScale);
+      this.mPrecisionModel = new PrecisionModel(mScale);
     }
   }
 
   public void setMScale(final Number mScale) {
     if (mScale == null) {
       this.mScale = null;
-      mPrecisionModel = new PrecisionModel(mPrecisionModel);
+      this.mPrecisionModel = new PrecisionModel(this.mPrecisionModel);
     } else {
       setMScale(mScale.doubleValue());
     }
@@ -191,14 +191,14 @@ public class ArcSdeSpatialReference {
   public void setZScale(final Double zScale) {
     this.zScale = zScale;
     if (zScale != null) {
-      zPrecisionModel = new PrecisionModel(zScale);
+      this.zPrecisionModel = new PrecisionModel(zScale);
     }
   }
 
   public void setZScale(final Number zScale) {
     if (zScale == null) {
       this.zScale = null;
-      zPrecisionModel = null;
+      this.zPrecisionModel = null;
     } else {
       setZScale(zScale.doubleValue());
     }
@@ -206,7 +206,7 @@ public class ArcSdeSpatialReference {
 
   @Override
   public String toString() {
-    return esriSrid + "=" + srid;
+    return this.esriSrid + "=" + this.srid;
 
   }
 }

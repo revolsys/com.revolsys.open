@@ -139,20 +139,26 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final Set<String> ids = new HashSet<String>();
       ids.addAll(this.deletedObjectIds);
       ids.addAll(this.formObjectIds);
-      for (final LayerDataObject object : getSelectedRecords()) {
-        final String id = getId(object);
+      for (final LayerDataObject record : getSelectedRecords()) {
+        final String id = getId(record);
         if (id != null) {
           ids.add(id);
         }
       }
-      for (final LayerDataObject object : getModifiedRecords()) {
-        final String id = getId(object);
+      for (final LayerDataObject record : getHighlightedRecords()) {
+        final String id = getId(record);
         if (id != null) {
           ids.add(id);
         }
       }
-      for (final DataObject object : getIndex().queryAll()) {
-        final String id = getId((LayerDataObject)object);
+      for (final LayerDataObject record : getModifiedRecords()) {
+        final String id = getId(record);
+        if (id != null) {
+          ids.add(id);
+        }
+      }
+      for (final DataObject record : getIndex().queryAll()) {
+        final String id = getId((LayerDataObject)record);
         if (id != null) {
           ids.add(id);
         }

@@ -42,7 +42,7 @@ public class OracleJdbcClobAttribute extends JdbcAttribute {
       statement.setNull(parameterIndex, sqlType);
     } else {
       if (value instanceof CLOB) {
-        CLOB clob = (CLOB)value;
+        final CLOB clob = (CLOB)value;
         statement.setClob(parameterIndex, clob);
       } else {
         Reader in;
@@ -50,7 +50,7 @@ public class OracleJdbcClobAttribute extends JdbcAttribute {
           final Resource resource = (Resource)value;
           in = SpringUtil.getReader(resource);
         } else if (value instanceof Clob) {
-          Clob clob = (Clob)value;
+          final Clob clob = (Clob)value;
           in = clob.getCharacterStream();
         } else if (value instanceof String) {
           final String string = (String)value;

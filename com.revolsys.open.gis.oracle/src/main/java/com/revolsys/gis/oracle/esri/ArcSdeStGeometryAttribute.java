@@ -31,9 +31,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  public ArcSdeStGeometryAttribute(final String name,
-    final DataType type, final boolean required,
-    final Map<String, Object> properties,
+  public ArcSdeStGeometryAttribute(final String name, final DataType type,
+    final boolean required, final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int dimension) {
     super(name, type, -1, 0, 0, required, properties);
     this.spatialReference = spatialReference;
@@ -41,7 +40,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
       dimension, factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
-    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
   @Override
@@ -61,8 +60,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
   @Override
   public ArcSdeStGeometryAttribute clone() {
-    return new ArcSdeStGeometryAttribute(getName(), getType(),
-      isRequired(), getProperties(), spatialReference, dimension);
+    return new ArcSdeStGeometryAttribute(getName(), getType(), isRequired(),
+      getProperties(), this.spatialReference, this.dimension);
   }
 
   @Override
@@ -75,15 +74,15 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final InputStream pointsIn = new BufferedInputStream(
         blob.getBinaryStream(), 32000);
 
-      final Double xOffset = spatialReference.getXOffset();
-      final Double yOffset = spatialReference.getYOffset();
-      final Double xyScale = spatialReference.getXyScale();
-      final Double zScale = spatialReference.getZScale();
-      final Double zOffset = spatialReference.getZOffset();
-      final Double mScale = spatialReference.getMScale();
-      final Double mOffset = spatialReference.getMOffset();
+      final Double xOffset = this.spatialReference.getXOffset();
+      final Double yOffset = this.spatialReference.getYOffset();
+      final Double xyScale = this.spatialReference.getXyScale();
+      final Double zScale = this.spatialReference.getZScale();
+      final Double zOffset = this.spatialReference.getZOffset();
+      final Double mScale = this.spatialReference.getMScale();
+      final Double mOffset = this.spatialReference.getMOffset();
 
-      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
       final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
         geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
         zOffset, zScale, mOffset, mScale);
@@ -99,20 +98,21 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
     if (value instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)value;
-      value = geometryFactory.createPoint(coordinates);
+      value = this.geometryFactory.createPoint(coordinates);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
-      geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
+      geometry = GeometryProjectionUtil.performCopy(geometry,
+        this.geometryFactory);
 
-      final int sdeSrid = spatialReference.getEsriSrid();
-      final Double xOffset = spatialReference.getXOffset();
-      final Double yOffset = spatialReference.getYOffset();
-      final Double xyScale = spatialReference.getXyScale();
-      final Double zScale = spatialReference.getZScale();
-      final Double zOffset = spatialReference.getZOffset();
-      final Double mScale = spatialReference.getMScale();
-      final Double mOffset = spatialReference.getMOffset();
+      final int sdeSrid = this.spatialReference.getEsriSrid();
+      final Double xOffset = this.spatialReference.getXOffset();
+      final Double yOffset = this.spatialReference.getYOffset();
+      final Double xyScale = this.spatialReference.getXyScale();
+      final Double zScale = this.spatialReference.getZScale();
+      final Double zOffset = this.spatialReference.getZOffset();
+      final Double mScale = this.spatialReference.getMScale();
+      final Double mOffset = this.spatialReference.getMOffset();
 
       final BoundingBox envelope = BoundingBox.getBoundingBox(geometry);
       final double minX = envelope.getMinX();
@@ -122,8 +122,10 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final double area = geometry.getArea();
       final double length = geometry.getLength();
 
-      final boolean hasZ = dimension > 2 && zOffset != null && zScale != null;
-      final boolean hasM = dimension > 3 && mOffset != null && mScale != null;
+      final boolean hasZ = this.dimension > 2 && zOffset != null
+        && zScale != null;
+      final boolean hasM = this.dimension > 3 && mOffset != null
+        && mScale != null;
 
       int numPoints = 0;
       byte[] data;

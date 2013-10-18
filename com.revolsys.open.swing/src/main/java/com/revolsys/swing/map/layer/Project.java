@@ -60,7 +60,6 @@ public class Project extends LayerGroup {
   public Project(final String name) {
     super(name);
     this.baseMapLayers.setLayerGroup(this);
-    set(this);
   }
 
   private void addChangedLayers(final LayerGroup group,

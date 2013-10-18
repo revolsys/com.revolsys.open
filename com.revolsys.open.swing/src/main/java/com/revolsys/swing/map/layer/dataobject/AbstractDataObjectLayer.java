@@ -107,6 +107,7 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -147,7 +148,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
 
-  private LayerDataObject highlightedObject;
+  private Set<LayerDataObject> highlightedRecords = new LinkedHashSet<LayerDataObject>();
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
@@ -278,6 +279,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       parameters.put(geometryAttributeName, geometry);
       return showAddForm(parameters);
     }
+  }
+
+  protected void addHighlightedRecord(final LayerDataObject object) {
+    if (isLayerObject(object)) {
+      this.highlightedRecords.add(object);
+    }
+  }
+
+  public void addHighlightedRecords(
+    final Collection<? extends LayerDataObject> objects) {
+    for (final LayerDataObject object : objects) {
+      addHighlightedRecord(object);
+    }
+    fireHighlighted();
   }
 
   protected void addModifiedObject(final LayerDataObject object) {
@@ -615,6 +630,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     filter(results, this.newRecords, filter);
   }
 
+  protected void fireHighlighted() {
+    final int highlightedCount = getHighlightedCount();
+    final boolean highlighted = highlightedCount > 0;
+    firePropertyChange("hasHighlightedRecords", !highlighted, highlighted);
+    firePropertyChange("highlightedCount", -1, highlightedCount);
+  }
+
   protected void fireRecordsChanged() {
     firePropertyChange("recordsChanged", false, true);
   }
@@ -700,8 +722,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public LayerDataObject getHighlightedObject() {
-    return highlightedObject;
+  public int getHighlightedCount() {
+    return this.highlightedRecords.size();
+  }
+
+  public Collection<LayerDataObject> getHighlightedRecords() {
+    return highlightedRecords;
   }
 
   public String getIdAttributeName() {
@@ -1003,6 +1029,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } else {
       return false;
     }
+  }
+
+  public boolean isHighlighted(final LayerDataObject record) {
+    return highlightedRecords.contains(record);
   }
 
   public boolean isLayerObject(final DataObject object) {
@@ -1424,10 +1454,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public void setHighlightedObject(final LayerDataObject highlightedObject) {
-    final Object oldValue = this.highlightedObject;
-    this.highlightedObject = highlightedObject;
-    firePropertyChange("highlightedObject", oldValue, highlightedObject);
+  public void setHighlightedRecords(
+    final Collection<LayerDataObject> highlightedRecords) {
+    this.highlightedRecords = CollectionUtil.createLinkedHashSet(highlightedRecords);
+    fireHighlighted();
   }
 
   public void setIndex(final DataObjectQuadTree index) {
@@ -1749,6 +1779,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     MapSerializerUtil.add(map, "columnNameOrder", this.columnNameOrder);
     map.remove("TableView");
     return map;
+  }
+
+  public void unHighlightRecords(
+    final Collection<? extends LayerDataObject> records) {
+    this.highlightedRecords.removeAll(records);
+    fireHighlighted();
   }
 
   public void unselectRecords(

@@ -88,17 +88,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);
   }
 
-  private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
-
-  private AbstractJdbcDataObjectStore dataStore;
-
-  public OracleSdoGeometryAttributeAdder(AbstractJdbcDataObjectStore dataStore,
-    final DataSource dataSource) {
-    this.dataStore = dataStore;
-    this.dataSource = dataSource;
-  }
-
-  private static void addGeometryType(DataType dataType, String name, Integer id) {
+  private static void addGeometryType(final DataType dataType,
+    final String name, final Integer id) {
     ID_TO_GEOMETRY_TYPE.put(id, name);
     GEOMETRY_TYPE_TO_ID.put(name, id);
     ID_TO_DATA_TYPE.put(id, dataType);
@@ -107,8 +98,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  public static int getGeometryTypeId(DataType dataType, int numAxis) {
-    int id = DATA_TYPE_TO_2D_ID.get(dataType);
+  public static int getGeometryTypeId(final DataType dataType, final int numAxis) {
+    final int id = DATA_TYPE_TO_2D_ID.get(dataType);
     if (numAxis > 3) {
       return 3000 + id;
     } else if (numAxis > 2) {
@@ -118,9 +109,19 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
+  private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
+
+  private final AbstractJdbcDataObjectStore dataStore;
+
+  public OracleSdoGeometryAttributeAdder(
+    final AbstractJdbcDataObjectStore dataStore, final DataSource dataSource) {
+    this.dataStore = dataStore;
+    this.dataSource = dataSource;
+  }
+
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, String dataTypeName, final int sqlType,
+    final String name, final String dataTypeName, final int sqlType,
     final int length, final int scale, final boolean required) {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
@@ -144,16 +145,16 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     DataType dataType = DataTypes.GEOMETRY;
     final String schemaName = JdbcUtils.getSchemaName(typePath).toUpperCase();
     final String tableName = JdbcUtils.getTableName(typePath).toUpperCase();
-    String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+    final String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
     try {
-      int geometryType = JdbcUtils.selectInt(dataSource, sql, schemaName,
-        tableName, columnName);
+      final int geometryType = JdbcUtils.selectInt(this.dataSource, sql,
+        schemaName, tableName, columnName);
       dataType = ID_TO_DATA_TYPE.get(geometryType);
-    } catch (IllegalArgumentException e) {
-      LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typePath + "."
+    } catch (final IllegalArgumentException e) {
+      this.LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typePath + "."
         + columnName);
-    } catch (RuntimeException e) {
-      LOG.error("Unable to get geometry type for " + typePath + "."
+    } catch (final RuntimeException e) {
+      this.LOG.error("Unable to get geometry type for " + typePath + "."
         + columnName, e);
     }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
@@ -217,9 +218,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
         columnProperties);
 
       try {
-        final Connection connection = JdbcUtils.getConnection(dataSource);
+        final Connection connection = JdbcUtils.getConnection(this.dataSource);
         try {
-          final String schemaName = dataStore.getDatabaseSchemaName(schema);
+          final String schemaName = this.dataStore.getDatabaseSchemaName(schema);
           final String sridSql = "select TABLE_NAME, COLUMN_NAME, SRID, DIMINFO from ALL_SDO_GEOM_METADATA where OWNER = ?";
           final PreparedStatement statement = connection.prepareStatement(sridSql);
           try {
@@ -256,10 +257,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.release(connection, dataSource);
+          JdbcUtils.release(connection, this.dataSource);
         }
       } catch (final SQLException e) {
-        LOG.error("Unable to initialize", e);
+        this.LOG.error("Unable to initialize", e);
       }
     }
   }

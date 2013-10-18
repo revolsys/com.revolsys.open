@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,6 +47,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
 
+  public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(
+    WebColors.Black, WebColors.Yellow);
+
   private static final long serialVersionUID = 1L;
 
   private Double selectBox;
@@ -82,11 +84,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         }
       }
     }
-  }
-
-  protected Collection<LayerDataObject> getSelectedObjects(
-    final AbstractDataObjectLayer layer) {
-    return layer.getSelectedRecords();
   }
 
   protected boolean isSelectable(final AbstractDataObjectLayer dataObjectLayer) {
@@ -172,31 +169,33 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  protected void paint(final Graphics2D graphics2d, final LayerGroup layerGroup) {
+  @Override
+  public void paintComponent(final Graphics2D graphics) {
+    final LayerGroup layerGroup = getProject();
+    paintSelected(graphics, layerGroup);
+    paintHighlighted(graphics, layerGroup);
+    paintSelectBox(graphics);
+  }
+
+  protected void paintHighlighted(final Graphics2D graphics2d,
+    final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        paint(graphics2d, childGroup);
+        paintSelected(graphics2d, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-        for (final LayerDataObject object : getSelectedObjects(dataObjectLayer)) {
+        for (final LayerDataObject object : dataObjectLayer.getHighlightedRecords()) {
           if (object != null && dataObjectLayer.isVisible(object)) {
             final Geometry geometry = object.getGeometryValue();
-            SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
+            HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
               graphics2d, geometry);
           }
         }
       }
     }
-  }
-
-  @Override
-  public void paintComponent(final Graphics2D graphics) {
-    final LayerGroup layerGroup = getProject();
-    paint(graphics, layerGroup);
-    paintSelectBox(graphics);
   }
 
   protected void paintSelectBox(final Graphics2D graphics2d) {
@@ -206,6 +205,28 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       graphics2d.draw(this.selectBox);
       graphics2d.setPaint(COLOR_BOX_TRANSPARENT);
       graphics2d.fill(this.selectBox);
+    }
+  }
+
+  protected void paintSelected(final Graphics2D graphics2d,
+    final LayerGroup layerGroup) {
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    for (final Layer layer : layerGroup.getLayers()) {
+      if (layer instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)layer;
+        paintSelected(graphics2d, childGroup);
+      } else if (layer instanceof AbstractDataObjectLayer) {
+        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+        for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
+          if (record != null && dataObjectLayer.isVisible(record)
+            && !dataObjectLayer.isHighlighted(record)) {
+            final Geometry geometry = record.getGeometryValue();
+            SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
+              graphics2d, geometry);
+          }
+        }
+      }
     }
   }
 

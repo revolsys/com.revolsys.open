@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -155,6 +156,32 @@ public final class CollectionUtil {
     final Map<K, V> copy = new HashMap<K, V>();
     if (map != null) {
       copy.putAll(map);
+    }
+    return copy;
+  }
+
+  public static <V> Set<V> createHashSet(final Collection<? extends V> set) {
+    final Set<V> copy = new HashSet<V>();
+    if (set != null) {
+      copy.addAll(set);
+    }
+    return copy;
+
+  }
+
+  public static <K, V> Map<K, V> createLinkedHashMap(
+    final Map<K, ? extends V> map) {
+    final Map<K, V> copy = new LinkedHashMap<K, V>();
+    if (map != null) {
+      copy.putAll(map);
+    }
+    return copy;
+  }
+
+  public static <V> Set<V> createLinkedHashSet(final Collection<? extends V> set) {
+    final Set<V> copy = new LinkedHashSet<V>();
+    if (set != null) {
+      copy.addAll(set);
     }
     return copy;
 

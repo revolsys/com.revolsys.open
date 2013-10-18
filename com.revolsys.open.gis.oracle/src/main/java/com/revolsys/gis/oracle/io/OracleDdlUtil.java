@@ -10,26 +10,27 @@ import com.revolsys.jdbc.JdbcUtils;
 
 public class OracleDdlUtil {
 
-  public static void createTable(PrintWriter out, DataObjectMetaData metaData) {
-    String typePath = metaData.getPath();
+  public static void createTable(final PrintWriter out,
+    final DataObjectMetaData metaData) {
+    final String typePath = metaData.getPath();
     out.println();
     out.print("CREATE TABLE ");
-    String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     out.print(tableName);
     out.println(" (");
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 1) {
         out.println(",");
       }
-      Attribute attribute = metaData.getAttribute(i);
-      String name = attribute.getName();
+      final Attribute attribute = metaData.getAttribute(i);
+      final String name = attribute.getName();
       out.print("  ");
       out.print(name);
       for (int j = name.length(); j < 32; j++) {
         out.print(' ');
       }
       out.print(" : ");
-      DataType dataType = attribute.getType();
+      final DataType dataType = attribute.getType();
       if (dataType == DataTypes.BOOLEAN) {
         out.print("NUMBER(1)");
       } else if (dataType == DataTypes.BYTE) {

@@ -22,7 +22,8 @@ import com.revolsys.spring.SpringUtil;
 public class OracleJdbcBlobAttribute extends JdbcAttribute {
   public OracleJdbcBlobAttribute(final String name, final int sqlType,
     final int length, final boolean required) {
-    super(name, DataTypes.BLOB, sqlType, length, 0, required, Collections.<String,Object>emptyMap());
+    super(name, DataTypes.BLOB, sqlType, length, 0, required,
+      Collections.<String, Object> emptyMap());
   }
 
   @Override
@@ -41,7 +42,7 @@ public class OracleJdbcBlobAttribute extends JdbcAttribute {
       statement.setNull(parameterIndex, sqlType);
     } else {
       if (value instanceof BLOB) {
-        BLOB blob = (BLOB)value;
+        final BLOB blob = (BLOB)value;
         statement.setBlob(parameterIndex, blob);
       } else {
         InputStream in;
@@ -49,11 +50,11 @@ public class OracleJdbcBlobAttribute extends JdbcAttribute {
           final Resource resource = (Resource)value;
           in = SpringUtil.getInputStream(resource);
         } else if (value instanceof Blob) {
-          Blob blob = (Blob)value;
+          final Blob blob = (Blob)value;
           in = blob.getBinaryStream();
         } else if (value instanceof byte[]) {
           final byte[] bytes = (byte[])value;
-         in = new ByteArrayInputStream(bytes);
+          in = new ByteArrayInputStream(bytes);
         } else if (value instanceof File) {
           final File file = (File)value;
           final FileSystemResource resource = new FileSystemResource(file);

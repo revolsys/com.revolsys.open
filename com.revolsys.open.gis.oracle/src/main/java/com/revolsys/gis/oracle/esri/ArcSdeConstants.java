@@ -108,6 +108,25 @@ public final class ArcSdeConstants {
 
   public static final String SDEBINARY = "SDEBINARY";
 
+  public static void addObjectIdAttribute(
+    final AbstractJdbcDataObjectStore dataStore,
+    final DataObjectMetaData metaData) {
+    final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
+    if (objectIdAttribute != null) {
+      final Connection connection = dataStore.getSqlConnection();
+      try {
+        final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
+          objectIdAttribute, connection, metaData.getPath());
+        if (newObjectIdAttribute != null) {
+          ((DataObjectMetaDataImpl)metaData).replaceAttribute(
+            objectIdAttribute, newObjectIdAttribute);
+        }
+      } finally {
+        dataStore.releaseSqlConnection(connection);
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getColumnProperty(final DataObjectStoreSchema schema,
     final String typePath, final String columnName, final String propertyName) {
@@ -182,24 +201,5 @@ public final class ArcSdeConstants {
     final DataObjectStore dataStore = schema.getDataStore();
 
     return isSdeAvailable(dataStore);
-  }
-
-  public static void addObjectIdAttribute(
-    final AbstractJdbcDataObjectStore dataStore,
-    final DataObjectMetaData metaData) {
-    final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
-    if (objectIdAttribute != null) {
-      final Connection connection = dataStore.getSqlConnection();
-      try {
-        final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
-          objectIdAttribute, connection, metaData.getPath());
-        if (newObjectIdAttribute != null) {
-          ((DataObjectMetaDataImpl)metaData).replaceAttribute(
-            objectIdAttribute, newObjectIdAttribute);
-        }
-      } finally {
-        dataStore.releaseSqlConnection(connection);
-      }
-    }
   }
 }

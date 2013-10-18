@@ -28,7 +28,8 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final DataObjectStore dataStore, Map<String,Object> connectionProperties) {
+  public void initialize(final DataObjectStore dataStore,
+    final Map<String, Object> connectionProperties) {
     final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
     final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
       oracleDataStore);

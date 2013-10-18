@@ -53,7 +53,7 @@ public class ArcSdeSpatialReferenceCache {
 
   public synchronized ArcSdeSpatialReference getSpatialReference(
     final int esriSrid) {
-    ArcSdeSpatialReference spatialReference = spatialReferences.get(esriSrid);
+    ArcSdeSpatialReference spatialReference = this.spatialReferences.get(esriSrid);
     if (spatialReference == null) {
       spatialReference = getSpatialReference(
         "SELECT SRID, SR_NAME, X_OFFSET, Y_OFFSET, Z_OFFSET, M_OFFSET, XYUNITS, Z_SCALE, M_SCALE, CS_ID, DEFINITION FROM SDE.ST_SPATIAL_REFERENCES WHERE SRID = ?",
@@ -70,7 +70,7 @@ public class ArcSdeSpatialReferenceCache {
   protected ArcSdeSpatialReference getSpatialReference(final String sql,
     final int esriSrid) {
     try {
-      final Connection connection = dataStore.getSqlConnection();
+      final Connection connection = this.dataStore.getSqlConnection();
       try {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -120,14 +120,14 @@ public class ArcSdeSpatialReferenceCache {
             spatialReference.setMScale(mScale);
             spatialReference.setSrid(srid);
             spatialReference.setCsWkt(wkt);
-            spatialReferences.put(esriSrid, spatialReference);
+            this.spatialReferences.put(esriSrid, spatialReference);
             return spatialReference;
           }
         } finally {
           JdbcUtils.close(statement, resultSet);
         }
       } finally {
-        dataStore.releaseSqlConnection(connection);
+        this.dataStore.releaseSqlConnection(connection);
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to get srid " + esriSrid, e);

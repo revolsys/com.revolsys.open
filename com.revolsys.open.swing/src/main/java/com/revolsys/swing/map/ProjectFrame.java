@@ -119,6 +119,7 @@ public class ProjectFrame extends BaseFrame {
   public ProjectFrame(final String title, final Project project) {
     super(title);
     this.project = project;
+    Project.set(project);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
@@ -281,6 +282,9 @@ public class ProjectFrame extends BaseFrame {
       final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
       DataObjectStoreConnectionManager.get().removeConnectionRegistry(
         dataStores);
+      if (Project.get() == this.project) {
+        Project.set(null);
+      }
       this.tocPanel = null;
       this.project = null;
       this.dockControl = null;

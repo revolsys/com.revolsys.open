@@ -165,14 +165,14 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       final String shortName = ShortNameProperty.getShortName(metaData);
       final String sequenceName;
       if (StringUtils.hasText(shortName)) {
-        if (useSchemaSequencePrefix) {
+        if (this.useSchemaSequencePrefix) {
           sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
         } else {
           sequenceName = shortName.toLowerCase() + "_SEQ";
         }
       } else {
         final String tableName = getDatabaseTableName(typePath);
-        if (useSchemaSequencePrefix) {
+        if (this.useSchemaSequencePrefix) {
           sequenceName = schema + "." + tableName + "_SEQ";
         } else {
           sequenceName = tableName + "_SEQ";
@@ -186,8 +186,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   @PostConstruct
   public void initialize() {
     super.initialize();
-    if (!initialized) {
-      initialized = true;
+    if (!this.initialized) {
+      this.initialized = true;
       final JdbcAttributeAdder attributeAdder = new JdbcAttributeAdder();
       addAttributeAdder("NUMBER", attributeAdder);
 
@@ -239,7 +239,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public boolean isUseSchemaSequencePrefix() {
-    return useSchemaSequencePrefix;
+    return this.useSchemaSequencePrefix;
   }
 
   @Override

@@ -48,22 +48,22 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   public SeConnection createSeConnection() throws SeException {
-    final String server = (String)connectionProperties.get("sdeServer");
+    final String server = (String)this.connectionProperties.get("sdeServer");
 
     if (!StringUtils.hasText(server)) {
       throw new IllegalArgumentException(
         "The connection properties must include a sdeServer to support ESRI ArcSDE SDEBINARY columns");
     }
-    String instance = (String)connectionProperties.get("sdeInstance");
+    String instance = (String)this.connectionProperties.get("sdeInstance");
     if (!StringUtils.hasText(instance)) {
       instance = "5151";
     }
-    String database = (String)connectionProperties.get("sdeDatabase");
+    String database = (String)this.connectionProperties.get("sdeDatabase");
     if (!StringUtils.hasText(database)) {
       database = "none";
     }
-    final String username = (String)connectionProperties.get("username");
-    final String password = (String)connectionProperties.get("password");
+    final String username = (String)this.connectionProperties.get("username");
+    final String password = (String)this.connectionProperties.get("password");
     return new SeConnection(server, instance, database, username, password);
   }
 
@@ -111,7 +111,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
             attribute.getProperties(), spatialReference, numAxis);
           ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute,
             sdeAttribute);
-          metaData.setProperty("dataStoreIteratorFactory", iteratorFactory);
+          metaData.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
           ((DataObjectMetaDataImpl)metaData).setGeometryAttributeName(columnName);
           ArcSdeConstants.addObjectIdAttribute(dataStore, metaData);
         }

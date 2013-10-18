@@ -61,7 +61,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static final String MODE_EDITS = "edits";
 
-  public static DataObjectRowTable createTable(final AbstractDataObjectLayer layer) {
+  public static DataObjectRowTable createTable(
+    final AbstractDataObjectLayer layer) {
     final DataObjectMetaData metaData = layer.getMetaData();
     if (metaData == null) {
       return null;
@@ -98,6 +99,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private ListSelectionModel defaultSelectionModel = new DefaultListSelectionModel();
 
   private final DataObjectLayerListSelectionModel selectionModel = new DataObjectLayerListSelectionModel(
+    this);
+
+  private final DataObjectLayerHighlightedListSelectionModel highlightedModel = new DataObjectLayerHighlightedListSelectionModel(
     this);
 
   private Condition searchCondition;
@@ -419,7 +423,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public void setAttributeFilterMode(final String mode) {
     final DataObjectRowTable table = getTable();
     if (MODE_SELECTED.equals(mode)) {
-      table.setSelectionModel(this.defaultSelectionModel);
+      table.setSelectionModel(this.highlightedModel);
     } else {
       table.setSelectionModel(this.selectionModel);
     }
