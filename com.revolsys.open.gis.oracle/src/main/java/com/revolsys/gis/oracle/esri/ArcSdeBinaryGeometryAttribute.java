@@ -7,7 +7,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
-public class ArcSdeSdeGeometryAttribute extends JdbcAttribute {
+public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   private final ArcSdeSpatialReference spatialReference;
 
@@ -15,7 +15,7 @@ public class ArcSdeSdeGeometryAttribute extends JdbcAttribute {
 
   private final int numAxis;
 
-  public ArcSdeSdeGeometryAttribute(final String name, final DataType type,
+  public ArcSdeBinaryGeometryAttribute(final String name, final DataType type,
     final boolean required, final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int numAxis) {
     super(name, type, -1, 0, 0, required, properties);

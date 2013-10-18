@@ -151,6 +151,15 @@ public final class CollectionUtil {
     return false;
   }
 
+  public static <K, V> Map<K, V> createHashMap(final Map<K, ? extends V> map) {
+    final Map<K, V> copy = new HashMap<K, V>();
+    if (map != null) {
+      copy.putAll(map);
+    }
+    return copy;
+
+  }
+
   public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,
     final List<T2> targetValues) {
     final Map<T1, T2> map = new HashMap<T1, T2>();

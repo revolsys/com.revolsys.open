@@ -23,17 +23,12 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class ArcSdeStGeometryDataStoreExtension implements
   DataObjectStoreExtension {
-  private static final ArcSdeStGeometryDataStoreExtension INSTANCE = new ArcSdeStGeometryDataStoreExtension();
-
-  public static ArcSdeStGeometryDataStoreExtension get() {
-    return INSTANCE;
-  }
 
   public ArcSdeStGeometryDataStoreExtension() {
   }
 
   @Override
-  public void initialize(final DataObjectStore dataStore) {
+  public void initialize(final DataObjectStore dataStore, Map<String,Object> connectionProperties) {
     final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
     final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
       oracleDataStore);

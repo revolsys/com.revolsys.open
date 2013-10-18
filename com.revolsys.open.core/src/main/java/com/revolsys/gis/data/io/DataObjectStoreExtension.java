@@ -1,8 +1,11 @@
 package com.revolsys.gis.data.io;
 
+import java.util.Map;
+
 public interface DataObjectStoreExtension {
 
-  public abstract void initialize(DataObjectStore dataStore);
+  public abstract void initialize(DataObjectStore dataStore,
+    Map<String, Object> connectionProperties);
 
   boolean isEnabled(DataObjectStore dataStore);
 

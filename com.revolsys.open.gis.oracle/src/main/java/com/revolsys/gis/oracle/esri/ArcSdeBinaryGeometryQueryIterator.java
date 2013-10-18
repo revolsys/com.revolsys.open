@@ -35,12 +35,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ArcSdeSdeGeometryQueryIterator extends
+public class ArcSdeBinaryGeometryQueryIterator extends
   AbstractIterator<DataObject> {
 
   private static SeConnection sdeConnection;
@@ -59,10 +60,13 @@ public class ArcSdeSdeGeometryQueryIterator extends
 
   private Statistics statistics;
 
-  public ArcSdeSdeGeometryQueryIterator(final JdbcDataObjectStore dataStore,
-    final Query query, final Map<String, Object> properties) {
-    super();
-    // TODO sdeConnection
+  private final ArcSdeBinaryGeometryDataStoreExtension extension;
+
+  public ArcSdeBinaryGeometryQueryIterator(
+    final ArcSdeBinaryGeometryDataStoreExtension extension,
+    final JdbcDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    this.extension = extension;
     this.dataObjectFactory = query.getProperty("dataObjectFactory");
     if (this.dataObjectFactory == null) {
       this.dataObjectFactory = dataStore.getDataObjectFactory();
@@ -74,9 +78,11 @@ public class ArcSdeSdeGeometryQueryIterator extends
 
   private void closeSeQuery(final SeQuery seQuery) {
     try {
-      seQuery.close();
+      if (seQuery != null) {
+        seQuery.close();
+      }
     } catch (final SeException e) {
-      LoggerFactory.getLogger(ArcSdeSdeGeometryQueryIterator.class).error(
+      LoggerFactory.getLogger(ArcSdeBinaryGeometryQueryIterator.class).error(
         "Unable to close query", e);
     }
   }
@@ -84,23 +90,28 @@ public class ArcSdeSdeGeometryQueryIterator extends
   @Override
   @PreDestroy
   public void doClose() {
-    closeSeQuery(seQuery);
-    attributes = null;
-    sdeConnection = null;
-    dataObjectFactory = null;
-    dataStore = null;
-    metaData = null;
-    query = null;
-    seQuery = null;
-    statistics = null;
+
+    try {
+      if (sdeConnection != null) {
+        sdeConnection.close();
+        sdeConnection = null;
+      }
+    } catch (final SeException e) {
+      ExceptionUtil.log(getClass(), e);
+    } finally {
+      closeSeQuery(seQuery);
+      attributes = null;
+      dataObjectFactory = null;
+      dataStore = null;
+      metaData = null;
+      query = null;
+      seQuery = null;
+      statistics = null;
+    }
   }
 
   @Override
   protected void doInit() {
-    this.seQuery = executeQuery();
-  }
-
-  protected SeQuery executeQuery() {
     String tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {
@@ -112,22 +123,6 @@ public class ArcSdeSdeGeometryQueryIterator extends
     }
     tableName = dataStore.getDatabaseTableName(metaData.getPath());
     try {
-
-      final SeSqlConstruct sqlConstruct = null;
-      seQuery = new SeQuery(sdeConnection, null, sqlConstruct);
-      BoundingBox boundingBox = query.getBoundingBox();
-      if (boundingBox != null) {
-        final GeometryFactory geometryFactory = metaData.getGeometryFactory();
-        boundingBox = boundingBox.convert(geometryFactory);
-        final SeEnvelope envelope = new SeEnvelope(boundingBox.getMinX(),
-          boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
-        final SeShape shape = new SeShape();
-        shape.generateRectangle(envelope);
-        new SeShapeFilter(tableName, metaData.getGeometryAttributeName(),
-          shape, SeFilter.METHOD_ENVP);
-      }
-      seQuery.prepareQuery();
-      seQuery.execute();
 
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());
@@ -146,6 +141,26 @@ public class ArcSdeSdeGeometryQueryIterator extends
         }
       }
 
+      sdeConnection = extension.createSeConnection();
+      final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
+      seQuery = new SeQuery(sdeConnection,
+        attributeNames.toArray(new String[0]), sqlConstruct);
+      BoundingBox boundingBox = query.getBoundingBox();
+      if (boundingBox != null) {
+        final GeometryFactory geometryFactory = metaData.getGeometryFactory();
+        boundingBox = boundingBox.convert(geometryFactory);
+        final SeEnvelope envelope = new SeEnvelope(boundingBox.getMinX(),
+          boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
+        final SeShape shape = new SeShape();
+        shape.generateRectangle(envelope);
+        new SeShapeFilter(tableName, metaData.getGeometryAttributeName(),
+          shape, SeFilter.METHOD_ENVP);
+      }
+      // TODO where clause
+      // TODO how to load geometry for non-spatial queries
+      seQuery.prepareQuery();
+      seQuery.execute();
+
       final String typePath = query.getTypeNameAlias();
       if (typePath != null) {
         final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
@@ -156,7 +171,6 @@ public class ArcSdeSdeGeometryQueryIterator extends
       closeSeQuery(seQuery);
       throw new RuntimeException("Error performing query", e);
     }
-    return seQuery;
   }
 
   private CoordinatesList getCoordinates(final SeShape shape,

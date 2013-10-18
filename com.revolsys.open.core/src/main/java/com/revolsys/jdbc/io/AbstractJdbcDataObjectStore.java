@@ -816,8 +816,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
     for (final DataObjectMetaData metaData : metaDataMap.values()) {
       addMetaDataProperties((DataObjectMetaDataImpl)metaData);
-
-      postCreateDataObjectMetaData((DataObjectMetaDataImpl)metaData);
     }
   }
 
@@ -836,10 +834,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public ResultPager<DataObject> page(final Query query) {
     return new JdbcQueryResultPager(this, getProperties(), query);
-  }
-
-  protected void postCreateDataObjectMetaData(
-    final DataObjectMetaDataImpl metaData) {
   }
 
   @Override

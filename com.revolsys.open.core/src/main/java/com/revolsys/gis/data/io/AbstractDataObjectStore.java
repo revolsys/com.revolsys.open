@@ -45,6 +45,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -67,6 +68,8 @@ public abstract class AbstractDataObjectStore extends
     }
     return null;
   }
+
+  private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
   private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();
 
@@ -131,7 +134,8 @@ public abstract class AbstractDataObjectStore extends
   public void addDataStoreExtension(final DataObjectStoreExtension extension) {
     if (extension != null) {
       try {
-        extension.initialize(this);
+        final Map<String, Object> connectionProperties = getConnectionProperties();
+        extension.initialize(this, connectionProperties);
         dataStoreExtensions.add(extension);
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
@@ -336,6 +340,10 @@ public abstract class AbstractDataObjectStore extends
 
   public Map<String, List<String>> getCodeTableColumNames() {
     return codeTableColumNames;
+  }
+
+  protected Map<String, Object> getConnectionProperties() {
+    return connectionProperties;
   }
 
   @Override
@@ -637,6 +645,11 @@ public abstract class AbstractDataObjectStore extends
   public void setCommonMetaDataProperties(
     final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
     this.commonMetaDataProperties = commonMetaDataProperties;
+  }
+
+  protected void setConnectionProperties(
+    final Map<String, ? extends Object> connectionProperties) {
+    this.connectionProperties = CollectionUtil.createHashMap(connectionProperties);
   }
 
   @Override
