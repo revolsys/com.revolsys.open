@@ -97,6 +97,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
     menu.addMenuItem("record", DataObjectRowRunnable.createAction(
       "Revert Record", "arrow_revert", modifiedOrDeleted, "revertChanges"));
+    menu.addMenuItem("record", DataObjectRowRunnable.createAction(
+      "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
+      "revertEmptyFields"));
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
       "copyRecord");

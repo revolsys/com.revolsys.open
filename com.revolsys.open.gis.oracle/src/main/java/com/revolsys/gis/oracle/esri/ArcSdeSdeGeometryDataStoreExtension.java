@@ -88,7 +88,7 @@ public class ArcSdeSdeGeometryDataStoreExtension implements
           ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute,
             sdeAttribute);
           metaData.setProperty("dataStoreIteratorFactory", ITERATOR_FACTORY);
-
+          ((DataObjectMetaDataImpl)metaData).setGeometryAttributeName(columnName);
           ArcSdeConstants.addObjectIdAttribute(dataStore, metaData);
         }
       }
