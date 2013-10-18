@@ -7,8 +7,6 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
-
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeEnvelope;
 import com.esri.sde.sdk.client.SeException;
@@ -31,12 +29,11 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.util.ExceptionUtil;
 
 public class ArcSdeBinaryGeometryQueryIterator extends
   AbstractIterator<DataObject> {
 
-  private static SeConnection sdeConnection;
+  private SeConnection connection;
 
   private DataObjectFactory dataObjectFactory;
 
@@ -52,13 +49,13 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   private Statistics statistics;
 
-  private final ArcSdeBinaryGeometryDataStoreExtension extension;
+  private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
   public ArcSdeBinaryGeometryQueryIterator(
-    final ArcSdeBinaryGeometryDataStoreExtension extension,
+    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil,
     final JdbcDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
-    this.extension = extension;
+    this.sdeUtil = sdeUtil;
     this.dataObjectFactory = query.getProperty("dataObjectFactory");
     if (this.dataObjectFactory == null) {
       this.dataObjectFactory = dataStore.getDataObjectFactory();
@@ -68,42 +65,18 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     this.statistics = (Statistics)properties.get(Statistics.class.getName());
   }
 
-  private void closeSeQuery() {
-    try {
-      if (this.seQuery != null) {
-        this.seQuery.close();
-        this.seQuery = null;
-      }
-    } catch (final SeException e) {
-      LoggerFactory.getLogger(ArcSdeBinaryGeometryQueryIterator.class).error(
-        "Unable to close query", e);
-    }
-  }
-
   @Override
   @PreDestroy
   public void doClose() {
-    try {
-      closeSeQuery();
-    } finally {
-      try {
-        if (sdeConnection != null) {
-          sdeConnection.close();
-          sdeConnection = null;
-        }
-      } catch (final SeException e) {
-        ExceptionUtil.log(getClass(), e);
-      } finally {
-
-        this.attributes = null;
-        this.dataObjectFactory = null;
-        this.dataStore = null;
-        this.metaData = null;
-        this.query = null;
-        this.seQuery = null;
-        this.statistics = null;
-      }
-    }
+    this.seQuery = sdeUtil.close(seQuery);
+    this.connection = sdeUtil.close(connection);
+    this.attributes = null;
+    this.dataObjectFactory = null;
+    this.dataStore = null;
+    this.metaData = null;
+    this.query = null;
+    this.seQuery = null;
+    this.statistics = null;
   }
 
   @Override
@@ -118,7 +91,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       }
     }
     if (this.metaData != null) {
-      tableName = extension.getTableName(this.metaData);
+      tableName = sdeUtil.getTableName(this.metaData);
     }
     try {
 
@@ -142,13 +115,13 @@ public class ArcSdeBinaryGeometryQueryIterator extends
         }
       }
 
-      sdeConnection = this.extension.createSeConnection();
+      connection = this.sdeUtil.createSeConnection();
       final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
       final String[] columnNames = attributeNames.toArray(new String[0]);
-      this.seQuery = new SeQuery(sdeConnection, columnNames, sqlConstruct);
+      this.seQuery = new SeQuery(connection, columnNames, sqlConstruct);
       BoundingBox boundingBox = this.query.getBoundingBox();
       if (boundingBox != null) {
-        final SeLayer layer = new SeLayer(sdeConnection, tableName,
+        final SeLayer layer = new SeLayer(connection, tableName,
           this.metaData.getGeometryAttributeName());
 
         final GeometryFactory geometryFactory = this.metaData.getGeometryFactory();
@@ -176,7 +149,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
         this.metaData = newMetaData;
       }
     } catch (final SeException e) {
-      closeSeQuery();
+      this.seQuery = sdeUtil.close(seQuery);
       throw new RuntimeException("Error performing query", e);
     }
   }
@@ -221,7 +194,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     if (object != null) {
       object.setState(DataObjectState.Initalizing);
       for (int columnIndex = 0; columnIndex < this.attributes.size(); columnIndex++) {
-        ArcSdeBinaryGeometryDataStoreExtension.setValueFromRow(object, row, columnIndex);
+        sdeUtil.setValueFromRow(object, row, columnIndex);
       }
       object.setState(DataObjectState.Persisted);
       this.dataStore.addStatistic("query", object);

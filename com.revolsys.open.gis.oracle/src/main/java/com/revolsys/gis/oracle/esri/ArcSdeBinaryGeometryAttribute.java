@@ -5,14 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeTable;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -29,7 +26,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   private final int numAxis;
 
-  private final ArcSdeBinaryGeometryDataStoreExtension extension;
+  private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
   private String tableName;
 
@@ -37,15 +34,13 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   private boolean valid;
 
-  private String objectIdColumn;
-
   public ArcSdeBinaryGeometryAttribute(
-    final ArcSdeBinaryGeometryDataStoreExtension extension, final String name,
+    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String name,
     final DataType type, final boolean required,
     final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int numAxis) {
     super(name, type, -1, 0, 0, required, properties);
-    this.extension = extension;
+    this.sdeUtil = sdeUtil;
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
     this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
@@ -73,7 +68,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
       final int geometryId = resultSet.getInt(columnIndex);
       if (!resultSet.wasNull()) {
         try {
-          final SeConnection connection = extension.createSeConnection();
+          final SeConnection connection = sdeUtil.createSeConnection();
           try {
             final String where = "\"" + getName() + "\" = " + geometryId;
             final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName,
@@ -83,14 +78,13 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
             try {
 
               final SeRow row = query.fetch();
-              ArcSdeBinaryGeometryDataStoreExtension.setValueFromRow(object,
-                row, 0);
+              sdeUtil.setValueFromRow(object, row, 0);
             } finally {
               query.close();
             }
 
           } finally {
-            ArcSdeBinaryGeometryDataStoreExtension.close(connection);
+            sdeUtil.close(connection);
           }
         } catch (final SeException e) {
           ExceptionUtil.log(getClass(), "Unable to read geometry", e);
@@ -103,27 +97,11 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   @Override
   protected void setMetaData(final DataObjectMetaData metaData) {
-    final SeConnection connection = extension.createSeConnection();
-
-    try {
-      tableName = extension.getTableName(metaData);
-      final SeTable table = new SeTable(connection, tableName);
-      for (final SeColumnDefinition column : table.describe()) {
-        final String columnName = column.getName();
-        final short rowIdType = column.getRowIdType();
-        if (rowIdType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE) {
-          objectIdColumn = columnName;
-        }
-      }
-      geometryColumns = new String[] {
-        getName()
-      };
-      valid = true;
-    } catch (final SeException e) {
-      ExceptionUtil.log(getClass(), "Unable to initialize SDE column", e);
-    } finally {
-      ArcSdeBinaryGeometryDataStoreExtension.close(connection);
-    }
+    tableName = sdeUtil.getTableName(metaData);
+    geometryColumns = new String[] {
+      getName()
+    };
+    valid = true;
   }
 
   @Override
