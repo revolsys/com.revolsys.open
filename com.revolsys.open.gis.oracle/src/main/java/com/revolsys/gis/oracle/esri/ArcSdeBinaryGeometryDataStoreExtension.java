@@ -43,22 +43,33 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ArcSdeBinaryGeometryDataStoreExtension implements
   DataObjectStoreExtension {
 
+  public static void close(final SeConnection connection) {
+    try {
+      connection.close();
+    } catch (final SeException e) {
+    }
+  }
+
   public static CoordinatesList getCoordinates(final SeShape shape,
     final double[][][] allCoordinates, final int partIndex,
-    final int ringIndex, final int numAxis) throws SeException {
-    final int numCoords = shape.getNumPoints(partIndex + 1, ringIndex + 1);
-    final CoordinatesList coordinates = new DoubleCoordinatesList(numCoords,
-      numAxis);
-    for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
+    final int ringIndex, final int numAxis) {
+    try {
+      final int numCoords = shape.getNumPoints(partIndex + 1, ringIndex + 1);
+      final CoordinatesList coordinates = new DoubleCoordinatesList(numCoords,
+        numAxis);
+      for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
 
-      final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
-        * numAxis];
-      final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
-        * numAxis + 1];
-      coordinates.setX(coordinateIndex, x);
-      coordinates.setY(coordinateIndex, y);
+        final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
+          * numAxis];
+        final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
+          * numAxis + 1];
+        coordinates.setX(coordinateIndex, x);
+        coordinates.setY(coordinateIndex, y);
+      }
+      return coordinates;
+    } catch (final SeException e) {
+      throw new RuntimeException("Unable to get coordinates", e);
     }
-    return coordinates;
   }
 
   public static void setValueFromRow(final DataObject object, final SeRow row,
@@ -144,7 +155,6 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   public static Geometry toGeometry(final SeShape shape) {
-
     try {
       final int type = shape.getType();
       final SeCoordinateReference coordRef = shape.getCoordRef();
