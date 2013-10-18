@@ -103,6 +103,10 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public int size() {
-    return coordinates.length / numAxis;
+    if (numAxis < 2) {
+      return 0;
+    } else {
+      return coordinates.length / numAxis;
+    }
   }
 }
