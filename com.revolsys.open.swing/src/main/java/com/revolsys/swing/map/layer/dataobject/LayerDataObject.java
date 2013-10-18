@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.util.Property;
 
 public class LayerDataObject extends ArrayDataObject {
   private static final long serialVersionUID = 1L;
@@ -123,6 +124,20 @@ public class LayerDataObject extends ArrayDataObject {
         DataObjectState.Persisted);
     }
     return this;
+  }
+
+  public void revertEmptyFields() {
+    for (final String fieldName : getMetaData().getAttributeNames()) {
+      final Object value = getValue(fieldName);
+      if (Property.isEmpty(value)) {
+        if (!layer.isFieldUserReadOnly(fieldName)) {
+          final Object originalValue = getOriginalValue(fieldName);
+          if (!Property.isEmpty(originalValue)) {
+            setValue(fieldName, originalValue);
+          }
+        }
+      }
+    }
   }
 
   @Override

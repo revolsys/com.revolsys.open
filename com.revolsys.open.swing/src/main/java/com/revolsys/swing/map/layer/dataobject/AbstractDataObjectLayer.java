@@ -963,6 +963,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return this.eventsEnabled.get() != Boolean.FALSE;
   }
 
+  public boolean isFieldUserReadOnly(final String fieldName) {
+    return getUserReadOnlyFieldNames().contains(fieldName);
+  }
+
   @Override
   public boolean isHasChanges() {
     if (isEditable()) {

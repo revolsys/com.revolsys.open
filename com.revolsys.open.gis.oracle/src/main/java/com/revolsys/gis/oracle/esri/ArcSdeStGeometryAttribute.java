@@ -23,7 +23,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
+public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
   private final int dimension;
 
@@ -31,7 +31,7 @@ public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  public ArcSdeStGeometryJdbcAttribute(final String name,
+  public ArcSdeStGeometryAttribute(final String name,
     final DataType type, final boolean required,
     final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int dimension) {
@@ -60,8 +60,8 @@ public class ArcSdeStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public ArcSdeStGeometryJdbcAttribute clone() {
-    return new ArcSdeStGeometryJdbcAttribute(getName(), getType(),
+  public ArcSdeStGeometryAttribute clone() {
+    return new ArcSdeStGeometryAttribute(getName(), getType(),
       isRequired(), getProperties(), spatialReference, dimension);
   }
 

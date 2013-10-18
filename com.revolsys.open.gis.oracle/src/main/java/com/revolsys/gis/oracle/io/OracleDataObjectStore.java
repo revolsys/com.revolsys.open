@@ -27,7 +27,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryJdbcAttribute;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeSdeGeometryDataStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryDataStoreExtension;
 import com.revolsys.io.PathUtil;
@@ -114,7 +114,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
             + "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
           query.and(new SqlCondition(where, geometryFactory.getSRID(), x1, y1,
             x2, y2));
-        } else if (geometryAttribute instanceof ArcSdeStGeometryJdbcAttribute) {
+        } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
           final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName
             + ", ?, ?, ?, ?) = 1";
           query.and(new SqlCondition(where, x1, y1, x2, y2));
@@ -256,7 +256,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
     if (objectIdAttribute != null) {
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute instanceof ArcSdeStGeometryJdbcAttribute) {
+      if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
         final Connection connection = getDbConnection();
         try {
           final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(

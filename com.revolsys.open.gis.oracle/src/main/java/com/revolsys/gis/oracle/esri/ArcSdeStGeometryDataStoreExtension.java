@@ -13,10 +13,13 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class ArcSdeStGeometryDataStoreExtension implements
   DataObjectStoreExtension {
@@ -95,6 +98,13 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
   @Override
   public void postProcess(final DataObjectStoreSchema schema) {
+    final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
+    for (final DataObjectMetaData metaData : schema.getTypes()) {
+      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+        ArcSdeConstants.addObjectIdAttribute(dataStore, metaData);
+      }
+    }
   }
 
   @Override

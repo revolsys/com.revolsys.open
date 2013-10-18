@@ -1,5 +1,6 @@
 package com.revolsys.gis.oracle.esri;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,9 +11,14 @@ import oracle.sql.SQLName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
+import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -90,7 +96,7 @@ public final class ArcSdeConstants {
 
   public static final String NUM_AXIS = "numAxis";
 
-  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryJdbcAttribute.class.getName();
+  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryAttribute.class.getName();
 
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
 
@@ -176,5 +182,24 @@ public final class ArcSdeConstants {
     final DataObjectStore dataStore = schema.getDataStore();
 
     return isSdeAvailable(dataStore);
+  }
+
+  public static void addObjectIdAttribute(
+    final AbstractJdbcDataObjectStore dataStore,
+    final DataObjectMetaData metaData) {
+    final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
+    if (objectIdAttribute != null) {
+      final Connection connection = dataStore.getSqlConnection();
+      try {
+        final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
+          objectIdAttribute, connection, metaData.getPath());
+        if (newObjectIdAttribute != null) {
+          ((DataObjectMetaDataImpl)metaData).replaceAttribute(
+            objectIdAttribute, newObjectIdAttribute);
+        }
+      } finally {
+        dataStore.releaseSqlConnection(connection);
+      }
+    }
   }
 }

@@ -57,7 +57,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
       schema, typePath, columnName,
       ArcSdeConstants.SPATIAL_REFERENCE);
 
-    final Attribute attribute = new ArcSdeStGeometryJdbcAttribute(name,
+    final Attribute attribute = new ArcSdeStGeometryAttribute(name,
       dataType, required, null, spatialReference, numAxis);
 
     metaData.addAttribute(attribute);

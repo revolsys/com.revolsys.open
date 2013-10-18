@@ -95,7 +95,6 @@ import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
 import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.Property;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
@@ -486,6 +485,9 @@ public class DataObjectLayerForm extends JPanel implements
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
+
+    this.toolBar.addButton("changes", "Revert Empty Fields",
+      "field_empty_revert", modifiedOrDeleted, this, "revertEmptyFields");
 
     this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -973,17 +975,7 @@ public class DataObjectLayerForm extends JPanel implements
   public void revertEmptyFields() {
     final LayerDataObject record = getObject();
     if (record != null) {
-      for (final String fieldName : getMetaData().getAttributeNames()) {
-        final Object value = record.getValue(fieldName);
-        if (Property.isEmpty(value)) {
-          if (!isReadOnly(fieldName)) {
-            final Object originalValue = record.getOriginalValue(fieldName);
-            if (!Property.isEmpty(originalValue)) {
-              object.setValue(fieldName, originalValue);
-            }
-          }
-        }
-      }
+      record.revertEmptyFields();
     }
   }
 
