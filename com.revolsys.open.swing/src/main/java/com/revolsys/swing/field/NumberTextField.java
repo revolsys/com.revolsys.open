@@ -312,7 +312,6 @@ public class NumberTextField extends JXTextField implements Field,
 
   @Override
   public void setFieldValue(final Object value) {
-    this.undoManager.discardAllEdits();
     Object newValue;
     if (value == null) {
       newValue = null;
@@ -321,15 +320,16 @@ public class NumberTextField extends JXTextField implements Field,
       final BigDecimal bigNumber = new BigDecimal(number.toString());
       final String numberString = bigNumber.toPlainString();
       if (!numberString.equals(bigNumber)) {
+        this.undoManager.discardAllEdits();
         setText(numberString);
       }
     } else {
       final String string = StringConverterRegistry.toString(value);
       if (!EqualsRegistry.equal(string, getText())) {
+        this.undoManager.discardAllEdits();
         setText(string);
       }
     }
-    this.undoManager.discardAllEdits();
 
     validateField();
     final String text = getText();
