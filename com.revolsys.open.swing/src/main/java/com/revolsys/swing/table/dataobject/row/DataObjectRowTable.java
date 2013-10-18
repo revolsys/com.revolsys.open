@@ -81,7 +81,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       final DataObjectLayerTableModel layerTableModel = (DataObjectLayerTableModel)getTableModel();
       if (layerTableModel.getAttributeFilterMode().equals(
         DataObjectLayerTableModel.MODE_SELECTED)) {
-        return this.defaultSeletionModel;
+        return layerTableModel.getHighlightedModel();
       }
     }
     return super.getSelectionModel();

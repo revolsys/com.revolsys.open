@@ -12,7 +12,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.ComparisonType;
@@ -96,8 +95,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  private ListSelectionModel defaultSelectionModel = new DefaultListSelectionModel();
-
   private final DataObjectLayerListSelectionModel selectionModel = new DataObjectLayerListSelectionModel(
     this);
 
@@ -176,6 +173,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
       return query;
     }
+  }
+
+  public final ListSelectionModel getHighlightedModel() {
+    return highlightedModel;
   }
 
   public AbstractDataObjectLayer getLayer() {
@@ -545,7 +546,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public void setTable(final DataObjectRowTable table) {
     super.setTable(table);
-    this.defaultSelectionModel = table.getSelectionModel();
     table.setSelectionModel(this.selectionModel);
   }
 

@@ -1529,6 +1529,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       this.selectedRecords.addAll(selectedRecords);
     }
     fireSelected();
+    highlightedRecords.retainAll(selectedRecords);
   }
 
   public void setSelectedRecords(final LayerDataObject... selectedRecords) {
@@ -1788,10 +1789,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void unselectRecords(
-    final Collection<? extends LayerDataObject> objects) {
+    final Collection<? extends LayerDataObject> records) {
     clearSelectedRecordsIndex();
-    this.selectedRecords.removeAll(objects);
+    this.selectedRecords.removeAll(records);
     fireSelected();
+    unHighlightRecords(records);
   }
 
   public void unselectRecords(final LayerDataObject... objects) {

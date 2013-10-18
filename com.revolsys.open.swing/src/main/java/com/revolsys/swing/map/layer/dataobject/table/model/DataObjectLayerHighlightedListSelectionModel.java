@@ -56,6 +56,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
   @Override
   public boolean isSelectionEmpty() {
     final AbstractDataObjectLayer layer = this.model.getLayer();
+
     return layer.getHighlightedCount() == 0;
   }
 

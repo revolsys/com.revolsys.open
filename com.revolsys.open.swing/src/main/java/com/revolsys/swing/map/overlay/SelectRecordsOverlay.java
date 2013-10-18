@@ -184,7 +184,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        paintSelected(graphics2d, childGroup);
+        paintHighlighted(graphics2d, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         for (final LayerDataObject object : dataObjectLayer.getHighlightedRecords()) {
