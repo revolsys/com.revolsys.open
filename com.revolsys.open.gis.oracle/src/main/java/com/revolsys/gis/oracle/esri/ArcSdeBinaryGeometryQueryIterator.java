@@ -1,6 +1,5 @@
 package com.revolsys.gis.oracle.esri;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +9,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeEnvelope;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeFilter;
@@ -33,15 +30,8 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.util.ExceptionUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class ArcSdeBinaryGeometryQueryIterator extends
   AbstractIterator<DataObject> {
@@ -128,7 +118,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       }
     }
     if (this.metaData != null) {
-      tableName = this.dataStore.getDatabaseQualifiedTableName(this.metaData.getPath());
+      tableName = extension.getTableName(this.metaData);
     }
     try {
 
@@ -191,24 +181,6 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  private CoordinatesList getCoordinates(final SeShape shape,
-    final double[][][] allCoordinates, final int partIndex,
-    final int ringIndex, final int numAxis) throws SeException {
-    final int numCoords = shape.getNumPoints(partIndex + 1, ringIndex + 1);
-    final CoordinatesList coordinates = new DoubleCoordinatesList(numCoords,
-      numAxis);
-    for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
-
-      final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
-        * numAxis];
-      final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
-        * numAxis + 1];
-      coordinates.setX(coordinateIndex, x);
-      coordinates.setY(coordinateIndex, y);
-    }
-    return coordinates;
-  }
-
   public DataObjectMetaData getMetaData() {
     if (this.metaData == null) {
       hasNext();
@@ -222,7 +194,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       if (this.seQuery != null) {
         final SeRow row = this.seQuery.fetch();
         if (row != null) {
-          final DataObject object = getNextRecord(row);
+          final DataObject object = getNextRecord(metaData, row);
           if (this.statistics != null) {
             this.statistics.add(object);
           }
@@ -243,185 +215,18 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  private DataObject getNextRecord(
-
-  final SeRow row) {
-    final DataObject object = this.dataObjectFactory.createDataObject(this.metaData);
+  private DataObject getNextRecord(final DataObjectMetaData metaData,
+    final SeRow row) {
+    final DataObject object = this.dataObjectFactory.createDataObject(metaData);
     if (object != null) {
       object.setState(DataObjectState.Initalizing);
       for (int columnIndex = 0; columnIndex < this.attributes.size(); columnIndex++) {
-        try {
-          final SeColumnDefinition columnDefinition = row.getColumnDef(columnIndex);
-          final int type = columnDefinition.getType();
-          if (row.getIndicator(columnIndex) != SeRow.SE_IS_NULL_VALUE) {
-
-            final String name = columnDefinition.getName();
-            Object value = null;
-            switch (type) {
-              case SeColumnDefinition.TYPE_INT16:
-                value = row.getShort(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_INT32:
-                value = row.getInteger(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_INT64:
-                value = row.getLong(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_FLOAT32:
-                value = row.getFloat(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_FLOAT64:
-                value = row.getDouble(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_STRING:
-                value = row.getString(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_NSTRING:
-                value = row.getNString(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_CLOB:
-                final ByteArrayInputStream clob = row.getClob(columnIndex);
-                value = FileUtil.getString(clob);
-              break;
-              case SeColumnDefinition.TYPE_NCLOB:
-                final ByteArrayInputStream nClob = row.getNClob(columnIndex);
-                value = FileUtil.getString(nClob);
-              break;
-
-              case SeColumnDefinition.TYPE_XML:
-                value = row.getXml(columnIndex).getText();
-              break;
-
-              case SeColumnDefinition.TYPE_UUID:
-                value = row.getUuid(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_DATE:
-                value = row.getTime(columnIndex);
-              break;
-
-              case SeColumnDefinition.TYPE_SHAPE:
-                final SeShape shape = row.getShape(columnIndex);
-                value = toGeometry(shape);
-              break;
-
-              default:
-                LoggerFactory.getLogger(getClass()).error(
-                  "Unsupported column type: " + metaData + "." + name);
-              break;
-            }
-            object.setValue(name, value);
-          }
-        } catch (final SeException e) {
-          throw new RuntimeException("Unable to get value " + columnIndex
-            + " from result set", e);
-        }
+        ArcSdeBinaryGeometryDataStoreExtension.setValueFromRow(object, row, columnIndex);
       }
       object.setState(DataObjectState.Persisted);
       this.dataStore.addStatistic("query", object);
     }
     return object;
-  }
-
-  private Geometry toGeometry(final SeShape shape) {
-
-    try {
-      final int type = shape.getType();
-      final SeCoordinateReference coordRef = shape.getCoordRef();
-      final int srid = (int)coordRef.getSrid().longValue();
-      final double scaleXy = coordRef.getXYUnits();
-      final double scaleZ = coordRef.getZUnits();
-      int numAxis = 2;
-      if (shape.is3D()) {
-        numAxis = 3;
-      }
-      if (shape.isMeasured()) {
-        numAxis = 4;
-      }
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
-        numAxis, scaleXy, scaleZ);
-
-      final int numParts = shape.getNumParts();
-      final double[][][] allCoordinates = shape.getAllCoords();
-      switch (type) {
-
-        case SeShape.TYPE_NIL:
-          return geometryFactory.createEmptyGeometry();
-        case SeShape.TYPE_POINT:
-        case SeShape.TYPE_MULTI_POINT:
-          final List<Point> points = new ArrayList<Point>();
-          for (int partIndex = 0; partIndex < numParts; partIndex++) {
-            final int numRings = shape.getNumSubParts(partIndex + 1);
-            for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
-              final Point point = geometryFactory.createPoint(coordinates);
-              if (!point.isEmpty()) {
-                points.add(point);
-              }
-            }
-          }
-          if (points.size() == 1) {
-            return points.get(0);
-          } else {
-            return geometryFactory.createMultiPoint(points);
-          }
-        case SeShape.TYPE_MULTI_LINE:
-        case SeShape.TYPE_LINE:
-          final List<LineString> lines = new ArrayList<LineString>();
-          for (int partIndex = 0; partIndex < numParts; partIndex++) {
-            final int numRings = shape.getNumSubParts(partIndex + 1);
-            for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
-              final LineString line = geometryFactory.createLineString(coordinates);
-              if (!line.isEmpty()) {
-                lines.add(line);
-              }
-            }
-          }
-          if (lines.size() == 1) {
-            return lines.get(0);
-          } else {
-            return geometryFactory.createMultiLineString(lines);
-          }
-        case SeShape.TYPE_POLYGON:
-        case SeShape.TYPE_MULTI_POLYGON:
-          final List<Polygon> polygons = new ArrayList<Polygon>();
-          for (int partIndex = 0; partIndex < numParts; partIndex++) {
-            final int numRings = shape.getNumSubParts(partIndex + 1);
-            final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
-            for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
-              rings.add(coordinates);
-            }
-            if (!rings.isEmpty()) {
-              final Polygon polygon = geometryFactory.createPolygon(rings);
-              polygons.add(polygon);
-            }
-          }
-          if (polygons.size() == 1) {
-            return polygons.get(0);
-          } else {
-            return geometryFactory.createMultiPolygon(polygons);
-          }
-
-        default:
-          throw new IllegalArgumentException("Shape not supported:"
-            + shape.asText(1000));
-      }
-
-    } catch (final SeException e) {
-      throw new RuntimeException("Unable to read shape", e);
-    }
   }
 
 }
