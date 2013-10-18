@@ -41,6 +41,12 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
       numAxis, factory.getScaleXY(), factory.getScaleZ());
     this.numAxis = numAxis;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
+    final SeConnection connection = extension.createSeConnection();
+    try {
+
+    } finally {
+
+    }
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -61,6 +67,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
     try {
       final SeConnection connection = extension.createSeConnection();
       try {
+        // TODO some records don't have an object id
         final Integer objectId = object.getInteger("OBJECTID");
         if (objectId != null) {
           final SeObjectId featureId = new SeObjectId(objectId);

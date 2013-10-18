@@ -259,7 +259,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
     }
   }
 
-  public SeConnection createSeConnection() throws SeException {
+  public SeConnection createSeConnection() {
     final String server = (String)this.connectionProperties.get("sdeServer");
 
     if (!StringUtils.hasText(server)) {
@@ -276,7 +276,11 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
     }
     final String username = (String)this.connectionProperties.get("username");
     final String password = (String)this.connectionProperties.get("password");
-    return new SeConnection(server, instance, database, username, password);
+    try {
+      return new SeConnection(server, instance, database, username, password);
+    } catch (final SeException e) {
+      throw new RuntimeException("Unabel to create connection", e);
+    }
   }
 
   public String getTableName(final DataObjectMetaData metaData) {
@@ -310,12 +314,14 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
           final ArcSdeSpatialReference spatialReference = (ArcSdeSpatialReference)columnProperties.get(ArcSdeConstants.SPATIAL_REFERENCE);
           final Attribute attribute = metaData.getAttribute(columnName);
 
-          final int numAxis = ArcSdeConstants.getIntegerColumnProperty(schema,
+          int numAxis = ArcSdeConstants.getIntegerColumnProperty(schema,
             typePath, columnName, ArcSdeConstants.NUM_AXIS);
           if (numAxis == -1) {
             LoggerFactory.getLogger(getClass()).error(
               "Column not found in SDE.GEOMETRY_COLUMNS table " + metaData
                 + "." + columnName);
+          } else {
+            numAxis = Math.min(Math.max(numAxis, 2), 3);
           }
           final DataType dataType = ArcSdeConstants.getColumnProperty(schema,
             typePath, columnName, ArcSdeConstants.DATA_TYPE);

@@ -58,7 +58,10 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.</p>
+   * <p>
+   * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
+   * a floating precision model.
+   * </p>
    * 
    * @return The geometry factory.
    */
@@ -82,10 +85,15 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y & floating z precision models.</p>
+   * <p>
+   * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
+   * a fixed x, y & floating z precision models.
+   * </p>
    * 
-   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final double scaleXY) {
@@ -114,9 +122,13 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z) and a floating precision models.</p>
+   * <p>
+   * Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z)
+   * and a floating precision models.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid) {
@@ -124,11 +136,17 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with the coordinate system, 2D axis (x &amp; y) and a fixed x, y precision model.</p>
+   * <p>
+   * Get a GeometryFactory with the coordinate system, 2D axis (x &amp; y) and a
+   * fixed x, y precision model.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid, final double scaleXY) {
@@ -136,13 +154,21 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a fixed x, y &amp; floating z precision models.</p>
+   * <p>
+   * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
+   * a fixed x, y &amp; floating z precision models.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
-   * @param scaleZ The scale factor used to round the z coordinates. The precision is 1 / scaleZ.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @param scaleZ The scale factor used to round the z coordinates. The
+   *          precision is 1 / scaleZ. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid,
@@ -151,10 +177,15 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with the coordinate system, number of axis and a floating precision model.</p>
+   * <p>
+   * Get a GeometryFactory with the coordinate system, number of axis and a
+   * floating precision model.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y coordinates. 3 for 3D x, y &amp; z coordinates.
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y
+   *          coordinates. 3 for 3D x, y &amp; z coordinates.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid, final int numAxis) {
@@ -162,14 +193,23 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with the coordinate system, number of axis and a fixed x, y &amp; fixed z precision models.</p>
+   * <p>
+   * Get a GeometryFactory with the coordinate system, number of axis and a
+   * fixed x, y &amp; fixed z precision models.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
-   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y coordinates. 3 for 3D x, y &amp; z coordinates.
-   * @param scaleXY The scale factor used to round the x, y coordinates. The precision is 1 / scaleXy.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
-   * @param scaleZ The scale factor used to round the z coordinates. The precision is 1 / scaleZ.
-   * A scale factor of 1000 will give a precision of 1 / 1000 = 1mm for projected coordinate systems using metres.
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y
+   *          coordinates. 3 for 3D x, y &amp; z coordinates.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @param scaleZ The scale factor used to round the z coordinates. The
+   *          precision is 1 / scaleZ. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid, final int numAxis,
@@ -186,9 +226,13 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z) and a floating precision models.</p>
+   * <p>
+   * Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z)
+   * and a floating precision models.
+   * </p>
    * 
-   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG coordinate system id</a>. 
+   * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final String wkt) {
@@ -232,7 +276,7 @@ public class GeometryFactory extends
     this.coordinateSystem = coordinateSystem;
     this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
       scaleXY, scaleZ);
-    this.numAxis = numAxis;
+    this.numAxis = Math.max(numAxis, 2);
   }
 
   protected GeometryFactory(final int srid, final int numAxis,
@@ -242,7 +286,7 @@ public class GeometryFactory extends
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
       scaleXY, scaleZ);
-    this.numAxis = numAxis;
+    this.numAxis = Math.max(numAxis, 2);
   }
 
   public void addGeometries(final List<Geometry> geometryList,
@@ -385,7 +429,10 @@ public class GeometryFactory extends
   }
 
   /**
-   * <p>Create a new geometry of the requested target geometry class.<p>
+   * <p>
+   * Create a new geometry of the requested target geometry class.
+   * <p>
+   * 
    * @param targetClass
    * @param geometry
    * @return
@@ -939,6 +986,7 @@ public class GeometryFactory extends
 
   /**
    * Project the geometry if it is in a different coordinate system
+   * 
    * @param geometry
    * @return
    */
