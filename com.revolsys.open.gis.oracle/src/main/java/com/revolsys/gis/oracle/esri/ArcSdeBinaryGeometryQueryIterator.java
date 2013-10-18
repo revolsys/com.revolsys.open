@@ -1,5 +1,6 @@
 package com.revolsys.gis.oracle.esri;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -208,10 +209,6 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     return coordinates;
   }
 
-  public JdbcDataObjectStore getDataStore() {
-    return this.dataStore;
-  }
-
   public DataObjectMetaData getMetaData() {
     if (this.metaData == null) {
       hasNext();
@@ -225,7 +222,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       if (this.seQuery != null) {
         final SeRow row = this.seQuery.fetch();
         if (row != null) {
-          final DataObject object = getNextObject(row);
+          final DataObject object = getNextRecord(row);
           if (this.statistics != null) {
             this.statistics.add(object);
           }
@@ -246,7 +243,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  private DataObject getNextObject(
+  private DataObject getNextRecord(
 
   final SeRow row) {
     final DataObject object = this.dataObjectFactory.createDataObject(this.metaData);
@@ -259,52 +256,78 @@ public class ArcSdeBinaryGeometryQueryIterator extends
           if (row.getIndicator(columnIndex) != SeRow.SE_IS_NULL_VALUE) {
 
             final String name = columnDefinition.getName();
+            Object value = null;
             switch (type) {
-
               case SeColumnDefinition.TYPE_INT16:
-                object.setValue(name, row.getShort(columnIndex));
-              break;
-
-              case SeColumnDefinition.TYPE_DATE:
-                object.setValue(name, row.getTime(columnIndex));
+                value = row.getShort(columnIndex);
               break;
 
               case SeColumnDefinition.TYPE_INT32:
-                object.setValue(name, row.getInteger(columnIndex));
+                value = row.getInteger(columnIndex);
+              break;
+
+              case SeColumnDefinition.TYPE_INT64:
+                value = row.getLong(columnIndex);
               break;
 
               case SeColumnDefinition.TYPE_FLOAT32:
-                object.setValue(name, row.getFloat(columnIndex));
+                value = row.getFloat(columnIndex);
               break;
 
               case SeColumnDefinition.TYPE_FLOAT64:
-                object.setValue(name, row.getDouble(columnIndex));
+                value = row.getDouble(columnIndex);
               break;
 
               case SeColumnDefinition.TYPE_STRING:
-                object.setValue(name, row.getString(columnIndex));
+                value = row.getString(columnIndex);
+              break;
+
+              case SeColumnDefinition.TYPE_NSTRING:
+                value = row.getNString(columnIndex);
+              break;
+
+              case SeColumnDefinition.TYPE_CLOB:
+                final ByteArrayInputStream clob = row.getClob(columnIndex);
+                value = FileUtil.getString(clob);
+              break;
+              case SeColumnDefinition.TYPE_NCLOB:
+                final ByteArrayInputStream nClob = row.getNClob(columnIndex);
+                value = FileUtil.getString(nClob);
+              break;
+
+              case SeColumnDefinition.TYPE_XML:
+                value = row.getXml(columnIndex).getText();
+              break;
+
+              case SeColumnDefinition.TYPE_UUID:
+                value = row.getUuid(columnIndex);
+              break;
+
+              case SeColumnDefinition.TYPE_DATE:
+                value = row.getTime(columnIndex);
               break;
 
               case SeColumnDefinition.TYPE_SHAPE:
                 final SeShape shape = row.getShape(columnIndex);
-                object.setValue(name, toGeometry(shape));
+                value = toGeometry(shape);
+              break;
+
+              default:
+                LoggerFactory.getLogger(getClass()).error(
+                  "Unsupported column type: " + metaData + "." + name);
               break;
             }
+            object.setValue(name, value);
           }
         } catch (final SeException e) {
           throw new RuntimeException("Unable to get value " + columnIndex
             + " from result set", e);
         }
-        columnIndex++;
       }
       object.setState(DataObjectState.Persisted);
       this.dataStore.addStatistic("query", object);
     }
     return object;
-  }
-
-  protected String getSql(final Query query) {
-    return JdbcUtils.getSelectSql(query);
   }
 
   private Geometry toGeometry(final SeShape shape) {
