@@ -268,6 +268,7 @@ public class SwingUtil {
       } else if (columns > 50) {
         columns = 50;
       }
+      final Class<?> javaClass = type.getJavaClass();
       if (!editable) {
         final TextField textField = createTextField(fieldName, columns);
         textField.setEditable(false);
@@ -279,27 +280,27 @@ public class SwingUtil {
         } else {
           field = (Field)component;
         }
-      } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
+      } else if (Number.class.isAssignableFrom(javaClass)) {
         final int scale = attribute.getScale();
         final Number minValue = attribute.getMinValue();
         final Number maxValue = attribute.getMaxValue();
         final NumberTextField numberTextField = new NumberTextField(fieldName,
           type, length, scale, minValue, maxValue);
         field = numberTextField;
-      } else if (type.equals(DataTypes.DATE)) {
+      } else if (Date.class.isAssignableFrom(javaClass)) {
         field = createDateField(fieldName);
-      } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
+      } else if (Geometry.class.isAssignableFrom(javaClass)) {
         field = new ObjectLabelField(fieldName);
       } else {
         field = createTextField(fieldName, columns);
       }
-      if (field instanceof JTextField) {
-        final JTextField textField = (JTextField)field;
-        final int preferedWidth = textField.getPreferredSize().width;
-        textField.setMinimumSize(new Dimension(preferedWidth, 0));
-        textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
+    }
+    if (field instanceof JTextField) {
+      final JTextField textField = (JTextField)field;
+      final int preferedWidth = textField.getPreferredSize().width;
+      textField.setMinimumSize(new Dimension(preferedWidth, 0));
+      textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
 
-      }
     }
 
     ((JComponent)field).setFont(FONT);
