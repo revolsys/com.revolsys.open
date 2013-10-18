@@ -28,7 +28,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   DataObjectStoreExtension {
 
   private final DataStoreIteratorFactory iteratorFactory = new DataStoreIteratorFactory(
-    ArcSdeBinaryGeometryDataStoreExtension.class, "createIterator");
+    this, "createIterator");
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 

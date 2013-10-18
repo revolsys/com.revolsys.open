@@ -20,6 +20,9 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   Connection getConnection();
 
   String getDatabaseTableName(final String typePath);
+  String getDatabaseQualifiedTableName(final String typePath);
+
+  String getDatabaseSchemaName(final String schemaName);
 
   DataSource getDataSource();
 
