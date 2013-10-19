@@ -634,4 +634,14 @@ public class SwingUtil {
     }
   }
 
+  public static void setVisible(final Component window, final boolean visible) {
+    if (window != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        window.setVisible(visible);
+      } else {
+        Invoke.later(window, "setVisible", visible);
+      }
+    }
+  }
+
 }

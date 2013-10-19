@@ -9,6 +9,8 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import com.revolsys.swing.SwingUtil;
+
 public class SwingWorkerProgressBar extends JPanel implements
   PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
@@ -27,11 +29,11 @@ public class SwingWorkerProgressBar extends JPanel implements
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final List<?> workers = (List<?>)event.getNewValue();
-    progressBar.setVisible(true);
+    SwingUtil.setVisible(progressBar, true);
     if (workers == null || workers.isEmpty()) {
-      setVisible(false);
+      SwingUtil.setVisible(this, false);
     } else {
-      setVisible(true);
+      SwingUtil.setVisible(this, true);
     }
   }
 
