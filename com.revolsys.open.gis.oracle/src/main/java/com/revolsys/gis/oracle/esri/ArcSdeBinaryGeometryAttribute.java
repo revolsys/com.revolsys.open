@@ -76,7 +76,8 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
             final SeQuery query = new SeQuery(connection, geometryColumns,
               sqlConstruct);
             try {
-
+              query.prepareQuery();
+              query.execute();
               final SeRow row = query.fetch();
               sdeUtil.setValueFromRow(object, row, 0);
             } finally {
