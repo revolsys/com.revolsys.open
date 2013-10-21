@@ -95,7 +95,9 @@ public class ObjectTreeTransferHandler extends TransferHandler {
           for (final TreePath treePath : pathList) {
             final TreePath parentPath = treePath.getParentPath();
             final Object parent = parentPath.getLastPathComponent();
-            if (!pathTransferable.isSameParent(treePath)) {
+            if (pathTransferable.isSameParent(treePath)) {
+              model.fireTreeNodesChanged(treePath);
+            } else {
               final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(parentPath);
               if (nodeModel != null) {
                 final Object child = treePath.getLastPathComponent();
@@ -107,7 +109,6 @@ public class ObjectTreeTransferHandler extends TransferHandler {
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Cannot export data", e);
       }
-      c.repaint();
     }
   }
 

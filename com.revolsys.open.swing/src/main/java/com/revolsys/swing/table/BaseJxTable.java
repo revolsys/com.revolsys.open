@@ -64,6 +64,11 @@ public class BaseJxTable extends JXTable {
 
   }
 
+  @Override
+  protected RowSorter<? extends TableModel> createDefaultRowSorter() {
+    return new BaseRowSorter(getModel());
+  }
+
   public void editCell(final int rowIndex, final int columnIndex) {
 
     if (rowIndex >= 0 && rowIndex < getRowCount() && columnIndex >= 0

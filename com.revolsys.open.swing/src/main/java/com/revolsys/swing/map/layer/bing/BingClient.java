@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import javax.imageio.ImageIO;
 
 import org.springframework.core.io.UrlResource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
@@ -40,11 +41,15 @@ public class BingClient {
   private final Map<ImagerySet, Map<String, Object>> metaDataCache = new HashMap<ImagerySet, Map<String, Object>>();
 
   public BingClient() {
-    this("Aot4lgzhMpHW2veWHlULTZEilxA69oF94eZQrA8B_C25uybJpEERRIFi7R2WI1C_");
+    this(null);
   }
 
   public BingClient(final String bingMapsKey) {
-    this.bingMapsKey = bingMapsKey;
+    if (StringUtils.hasText(bingMapsKey)) {
+      this.bingMapsKey = bingMapsKey;
+    } else {
+      this.bingMapsKey = "Aot4lgzhMpHW2veWHlULTZEilxA69oF94eZQrA8B_C25uybJpEERRIFi7R2WI1C_";
+    }
   }
 
   private Map<String, Object> createParameterMap() {

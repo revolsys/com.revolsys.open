@@ -209,12 +209,12 @@ public class Viewport2D {
   }
 
   public double getModelHeight() {
-    final double height = this.boundingBox.getHeight();
+    final double height = getBoundingBox().getHeight();
     return height;
   }
 
   public Measurable<Length> getModelHeightLength() {
-    return this.boundingBox.getHeightLength();
+    return getBoundingBox().getHeightLength();
   }
 
   public AffineTransform getModelToScreenTransform() {
@@ -226,12 +226,12 @@ public class Viewport2D {
   }
 
   public double getModelWidth() {
-    final double width = this.boundingBox.getWidth();
+    final double width = getBoundingBox().getWidth();
     return width;
   }
 
   public Measurable<Length> getModelWidthLength() {
-    return this.boundingBox.getWidthLength();
+    return getBoundingBox().getWidthLength();
   }
 
   public double getOriginX() {
@@ -437,7 +437,8 @@ public class Viewport2D {
   }
 
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
-    if (boundingBox != null) {
+    if (boundingBox != null && !boundingBox.isEmpty()) {
+      double unitsPerPixel = 0;
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
       if (!convertedBoundingBox.isNull()) {
@@ -463,31 +464,32 @@ public class Viewport2D {
               newBoundingBox = newBoundingBox.expand(0, expandY);
             }
           }
-        }
-        final Measurable<Length> viewWidthLength = getViewWidthLength();
-        final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
-        final double unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
-          / viewWidthPixels;
-        double scale = getScale(viewWidthLength, modelWidthLength);
-        if (!this.scales.isEmpty() && viewWidthPixels > 0
-          && viewHeightPixels > 0) {
-          final double minScale = this.scales.get(this.scales.size() - 1);
-          final double maxScale = this.scales.get(0);
-          if (scale < minScale) {
-            scale = minScale;
-            return setBoundingBox(newBoundingBox, scale);
-          } else if (scale > maxScale) {
-            scale = maxScale;
-            return setBoundingBox(newBoundingBox, scale);
-          } else {
-            // scale = getZoomOutScale(scale);
-          }
+          final Measurable<Length> viewWidthLength = getViewWidthLength();
+          final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
+          unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
+            / viewWidthPixels;
+          double scale = getScale(viewWidthLength, modelWidthLength);
+          if (!this.scales.isEmpty() && viewWidthPixels > 0
+            && viewHeightPixels > 0) {
+            final double minScale = this.scales.get(this.scales.size() - 1);
+            final double maxScale = this.scales.get(0);
+            if (scale < minScale) {
+              scale = minScale;
+              return setBoundingBox(newBoundingBox, scale);
+            } else if (scale > maxScale) {
+              scale = maxScale;
+              return setBoundingBox(newBoundingBox, scale);
+            } else {
+              // scale = getZoomOutScale(scale);
+            }
 
+          }
         }
+
         internalSetBoundingBox(newBoundingBox, unitsPerPixel);
       }
     }
-    return this.boundingBox;
+    return getBoundingBox();
   }
 
   private BoundingBox setBoundingBox(final BoundingBox boundingBox,
@@ -544,8 +546,8 @@ public class Viewport2D {
 
   public void setScale(final double scale) {
     final double oldValue = getScale();
-    if (Math.abs(oldValue - scale) > 0.0001) {
-      setBoundingBox(this.boundingBox, scale);
+    if (scale > 0 && Math.abs(oldValue - scale) > 0.0001) {
+      setBoundingBox(getBoundingBox(), scale);
       this.propertyChangeSupport.firePropertyChange("scale", oldValue, scale);
     }
   }

@@ -53,6 +53,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     addAllRecords(records);
   }
 
+  public DataObjectListLayer(final Map<String, ? extends Object> properties) {
+    super(properties);
+  }
+
   public DataObjectListLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 import com.revolsys.parallel.process.AbstractProcess;
 
@@ -37,7 +38,9 @@ public class DataStoreQueryTask extends AbstractProcess {
   @Override
   public void run() {
     objects = new ArrayList<DataObject>();
-    final Reader<DataObject> reader = dataStore.query(null, path, boundingBox);
+    final Query query = new Query(path);
+    query.setBoundingBox(boundingBox);
+    final Reader<DataObject> reader = dataStore.query(query);
     try {
       for (final DataObject object : reader) {
         try {

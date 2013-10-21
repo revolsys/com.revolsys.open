@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -95,6 +96,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     super(name);
     setType("layerGroup");
     setRenderer(new LayerGroupRenderer(this));
+    setInitialized(true);
   }
 
   @Override
@@ -103,6 +105,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       if (layer != null && !this.layers.contains(layer)) {
         this.layers.add(index, layer);
         layer.setLayerGroup(this);
+        LayerInitializer.initialize(layer);
         fireIndexedPropertyChange("layers", index, null, layer);
       }
     }
@@ -510,13 +513,17 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       loadLayer(file);
     } else {
       final FileSystemResource resource = new FileSystemResource(file);
+      final Map<String, Object> properties = new HashMap<String, Object>();
+      final String url = SpringUtil.getUrl(resource).toString();
+      properties.put("url", url);
+      properties.put("name", FileUtil.getBaseName(url));
       if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(resource)) {
         final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-          resource);
+          properties);
         add(layer);
         layer.setEditable(true);
       } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(resource)) {
-        final DataObjectFileLayer layer = new DataObjectFileLayer(resource);
+        final DataObjectFileLayer layer = new DataObjectFileLayer(properties);
         final GeometryStyleRenderer renderer = layer.getRenderer();
         renderer.setStyle(GeometryStyle.createStyle());
         add(layer);

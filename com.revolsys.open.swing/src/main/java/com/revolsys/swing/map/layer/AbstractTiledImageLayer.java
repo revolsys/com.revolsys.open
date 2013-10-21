@@ -16,6 +16,14 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
     this(null, true, false, false);
   }
 
+  public AbstractTiledImageLayer(final Map<String, ? extends Object> properties) {
+    super(properties);
+    setReadOnly(true);
+    setSelectSupported(false);
+    setQuerySupported(false);
+    setRenderer(new TiledImageLayerRenderer(this));
+  }
+
   public AbstractTiledImageLayer(final String name, final boolean readOnly,
     final boolean selectSupported, final boolean querySupported) {
     super(name);

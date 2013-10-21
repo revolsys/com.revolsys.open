@@ -41,7 +41,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
         final Font font = graphics.getFont();
         for (final RectangularMapTile tile : tiles) {
-          final Polygon polygon = tile.getPolygon(50);
+          final Polygon polygon = tile.getPolygon(
+            viewport.getGeometryFactory(), 50);
           GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
             GeometryStyle.line(Color.LIGHT_GRAY));
 
@@ -59,7 +60,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               coordinate.x, coordinate.y
             }, 0, coord, 0, 1);
             final String tileName = tile.getName();
-            final int x = (int)(coord[0] + metrics.stringWidth(tileName) / 2);
+            final int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
             final int y = (int)(coord[1] + metrics.getHeight() / 2);
 
             final Stroke savedStroke = graphics.getStroke();

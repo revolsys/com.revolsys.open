@@ -27,7 +27,7 @@ public class MethodTransactionCallback<T> extends MethodInvoker implements
   public T doInTransaction(final TransactionStatus transaction) {
     try {
       final T result = invoke();
-      if (rollback) {
+      if (rollback && transaction != null) {
         transaction.setRollbackOnly();
       }
       return result;

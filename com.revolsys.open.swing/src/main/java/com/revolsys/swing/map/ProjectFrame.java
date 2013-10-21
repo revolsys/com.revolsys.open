@@ -49,13 +49,13 @@ import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayerFactory;
-import com.revolsys.swing.map.layer.bing.BingLayerFactory;
+import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
+import com.revolsys.swing.map.layer.bing.BingLayer;
 import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayerFactory;
+import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
-import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayerFactory;
+import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
@@ -82,10 +82,10 @@ public class ProjectFrame extends BaseFrame {
 
     // TODO move to a file config
     MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
-    MapObjectFactoryRegistry.addFactory(new DataObjectStoreLayerFactory());
-    MapObjectFactoryRegistry.addFactory(new ArcGisServerRestLayerFactory());
-    MapObjectFactoryRegistry.addFactory(new BingLayerFactory());
-    MapObjectFactoryRegistry.addFactory(new OpenStreetMapLayerFactory());
+    MapObjectFactoryRegistry.addFactory(DataObjectStoreLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(ArcGisServerRestLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(BingLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(OpenStreetMapLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(DataObjectFileLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);

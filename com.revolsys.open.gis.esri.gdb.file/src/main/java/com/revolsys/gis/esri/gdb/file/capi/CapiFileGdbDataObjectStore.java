@@ -29,9 +29,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -70,7 +68,6 @@ import com.revolsys.gis.esri.gdb.file.capi.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlAttribute;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
@@ -1096,24 +1093,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       synchronized (EsriFileGdb.class) {
         return rows.next();
-      }
-    }
-  }
-
-  @Override
-  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
-    final String typePath, final BoundingBox boundingBox) {
-    synchronized (EsriFileGdb.class) {
-      final DataObjectMetaData metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Cannot find table " + typePath);
-      } else {
-        final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-          dataObjectFactory, typePath, boundingBox);
-
-        final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-          iterator);
-        return reader;
       }
     }
   }

@@ -77,7 +77,7 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
   public List<T> getVisibleConnectionRegistries() {
     final List<T> registries = new ArrayList<T>();
     for (final T registry : this.registries) {
-      if (registry.isVisible()) {
+      if (registry != null && registry.isVisible()) {
         registries.add(registry);
       }
     }

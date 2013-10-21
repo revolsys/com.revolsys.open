@@ -10,11 +10,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.comparator.NumericComparator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.graph.comparator.NumberComparator;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -22,7 +22,7 @@ public class NodeAttributes {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
       final Set<Double> angles = new TreeSet<Double>(
-        new NumberComparator<Double>());
+        new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -146,7 +146,7 @@ public class NodeAttributes {
       final Map<String, Set<Double>> anglesByType, final String typePath) {
       Set<Double> angles = anglesByType.get(typePath);
       if (angles == null) {
-        angles = new TreeSet<Double>(new NumberComparator<Double>());
+        angles = new TreeSet<Double>(new NumericComparator<Double>());
         anglesByType.put(typePath, angles);
       }
       return angles;

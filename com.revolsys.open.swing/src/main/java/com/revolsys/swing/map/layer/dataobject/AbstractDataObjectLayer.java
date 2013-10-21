@@ -222,7 +222,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final Set<LayerDataObject> deletedRecords = new LinkedHashSet<LayerDataObject>();
 
-  private final Object editSync = new Object();
+  private Object editSync;
 
   private final Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
 
@@ -251,6 +251,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
+  }
+
+  public AbstractDataObjectLayer(final Map<String, ? extends Object> properties) {
+    setReadOnly(false);
+    setSelectSupported(true);
+    setQuerySupported(true);
+    setRenderer(new GeometryStyleRenderer(this));
+    setProperties(properties);
   }
 
   public AbstractDataObjectLayer(final String name) {
@@ -282,7 +290,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void addHighlightedRecord(final LayerDataObject object) {
-    if (isLayerObject(object)) {
+    if (isLayerRecord(object)) {
       this.highlightedRecords.add(object);
     }
   }
@@ -320,7 +328,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void addSelectedRecord(final LayerDataObject object) {
-    if (isLayerObject(object)) {
+    if (isLayerRecord(object)) {
       clearSelectedRecordsIndex();
       this.selectedRecords.add(object);
     }
@@ -356,7 +364,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void cancelChanges() {
-    synchronized (this.editSync) {
+    synchronized (this.getEditSync()) {
       internalCancelChanges();
       refresh();
     }
@@ -381,6 +389,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void clearSelectedRecords() {
     this.selectedRecords.clear();
+    this.highlightedRecords.clear();
     fireSelected();
   }
 
@@ -554,7 +563,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void deleteRecord(final LayerDataObject record,
     final boolean trackDeletions) {
-    if (isLayerObject(record)) {
+    if (isLayerRecord(record)) {
       removeSelectedRecords(record);
       clearSelectedRecordsIndex();
       synchronized (newRecords) {
@@ -572,7 +581,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void deleteRecords(final Collection<? extends LayerDataObject> objects) {
     if (isCanDeleteRecords()) {
-      synchronized (this.editSync) {
+      synchronized (this.getEditSync()) {
         unselectRecords(objects);
         for (final LayerDataObject object : objects) {
           deleteRecord(object);
@@ -662,7 +671,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public List<LayerDataObject> getChanges() {
-    synchronized (this.editSync) {
+    synchronized (this.getEditSync()) {
       final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
       synchronized (newRecords) {
         objects.addAll(this.newRecords);
@@ -698,6 +707,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public Set<LayerDataObject> getDeletedRecords() {
     return new LinkedHashSet<LayerDataObject>(this.deletedRecords);
+  }
+
+  public synchronized Object getEditSync() {
+    if (editSync == null) {
+      editSync = new Object();
+    }
+    return editSync;
   }
 
   public String getGeometryAttributeName() {
@@ -773,79 +789,87 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected Geometry getPasteRecordGeometry(final LayerDataObject record,
     final boolean alert) {
-    if (record == null) {
-      return null;
-    } else {
-      DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
-      if (reader == null) {
-        final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-        final Resource resource = new ByteArrayResource("t.csv", string);
-        reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
-      }
-      if (reader != null) {
-        final MapPanel parentComponent = MapPanel.get(getProject());
-        final DataObjectMetaData metaData = getMetaData();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
-        if (geometryAttribute != null) {
-          DataType geometryDataType = null;
-          Class<?> layerGeometryClass = null;
-          final GeometryFactory geometryFactory = getGeometryFactory();
-          geometryDataType = geometryAttribute.getType();
-          layerGeometryClass = geometryDataType.getJavaClass();
+    try {
+      if (record == null) {
+        return null;
+      } else {
+        DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+        if (reader == null) {
+          final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+          if (StringUtils.hasText(string)) {
+            final Resource resource = new ByteArrayResource("t.csv", string);
+            reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+          } else {
+            return null;
+          }
+        }
+        if (reader != null) {
+          final MapPanel parentComponent = MapPanel.get(getProject());
+          final DataObjectMetaData metaData = getMetaData();
+          final Attribute geometryAttribute = metaData.getGeometryAttribute();
+          if (geometryAttribute != null) {
+            DataType geometryDataType = null;
+            Class<?> layerGeometryClass = null;
+            final GeometryFactory geometryFactory = getGeometryFactory();
+            geometryDataType = geometryAttribute.getType();
+            layerGeometryClass = geometryDataType.getJavaClass();
 
-          Geometry geometry = null;
-          for (final DataObject sourceRecord : reader) {
-            if (geometry == null) {
-              final Geometry sourceGeometry = sourceRecord.getGeometryValue();
-              if (sourceGeometry == null) {
-                if (alert) {
-                  JOptionPane.showMessageDialog(parentComponent,
-                    "Clipboard does not contain a record with a geometry.",
-                    "Paste Geometry", JOptionPane.ERROR_MESSAGE);
-                }
-                return null;
-              }
-              geometry = geometryFactory.createGeometry(layerGeometryClass,
-                sourceGeometry);
+            Geometry geometry = null;
+            for (final DataObject sourceRecord : reader) {
               if (geometry == null) {
+                final Geometry sourceGeometry = sourceRecord.getGeometryValue();
+                if (sourceGeometry == null) {
+                  if (alert) {
+                    JOptionPane.showMessageDialog(parentComponent,
+                      "Clipboard does not contain a record with a geometry.",
+                      "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                  }
+                  return null;
+                }
+                geometry = geometryFactory.createGeometry(layerGeometryClass,
+                  sourceGeometry);
+                if (geometry == null) {
+                  if (alert) {
+                    JOptionPane.showMessageDialog(
+                      parentComponent,
+                      "Clipboard should contain a record with a "
+                        + geometryDataType + " not a "
+                        + sourceGeometry.getGeometryType() + ".",
+                      "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                  }
+                  return null;
+                }
+              } else {
                 if (alert) {
                   JOptionPane.showMessageDialog(
                     parentComponent,
-                    "Clipboard should contain a record with a "
-                      + geometryDataType + " not a "
-                      + sourceGeometry.getGeometryType() + ".",
+                    "Clipboard contains more than one record. Copy a single record.",
                     "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                 }
                 return null;
               }
-            } else {
+            }
+            if (geometry == null) {
               if (alert) {
-                JOptionPane.showMessageDialog(
-                  parentComponent,
-                  "Clipboard contains more than one record. Copy a single record.",
+                JOptionPane.showMessageDialog(parentComponent,
+                  "Clipboard does not contain a record with a geometry.",
                   "Paste Geometry", JOptionPane.ERROR_MESSAGE);
               }
+            } else if (geometry.isEmpty()) {
+              if (alert) {
+                JOptionPane.showMessageDialog(parentComponent,
+                  "Clipboard contains an empty geometry.", "Paste Geometry",
+                  JOptionPane.ERROR_MESSAGE);
+              }
               return null;
+            } else {
+              return geometry;
             }
-          }
-          if (geometry == null) {
-            if (alert) {
-              JOptionPane.showMessageDialog(parentComponent,
-                "Clipboard does not contain a record with a geometry.",
-                "Paste Geometry", JOptionPane.ERROR_MESSAGE);
-            }
-          } else if (geometry.isEmpty()) {
-            if (alert) {
-              JOptionPane.showMessageDialog(parentComponent,
-                "Clipboard contains an empty geometry.", "Paste Geometry",
-                JOptionPane.ERROR_MESSAGE);
-            }
-            return null;
-          } else {
-            return geometry;
           }
         }
+        return null;
       }
+    } catch (final Throwable t) {
       return null;
     }
   }
@@ -986,7 +1010,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean isEventsEnabled() {
-    return this.eventsEnabled.get() != Boolean.FALSE;
+    return eventsEnabled != null && this.eventsEnabled.get() != Boolean.FALSE;
   }
 
   public boolean isFieldUserReadOnly(final String fieldName) {
@@ -996,7 +1020,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public boolean isHasChanges() {
     if (isEditable()) {
-      synchronized (this.editSync) {
+      synchronized (this.getEditSync()) {
         if (!this.newRecords.isEmpty()) {
           return true;
         } else if (!this.modifiedRecords.isEmpty()) {
@@ -1035,7 +1059,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return highlightedRecords.contains(record);
   }
 
-  public boolean isLayerObject(final DataObject object) {
+  public boolean isLayerRecord(final DataObject object) {
     if (object.getMetaData() == getMetaData()) {
       return true;
     } else {
@@ -1157,8 +1181,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
     if (reader == null) {
       final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-      final Resource resource = new ByteArrayResource("t.csv", string);
-      reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+      if (StringUtils.hasText(string)) {
+        final Resource resource = new ByteArrayResource("t.csv", string);
+        reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+      }
     }
     final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();
     final List<DataObject> regectedRecords = new ArrayList<DataObject>();
@@ -1348,7 +1374,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void revertChanges(final LayerDataObject object) {
     synchronized (this.modifiedRecords) {
-      if (isLayerObject(object)) {
+      if (isLayerRecord(object)) {
         removeModifiedObject(object);
         this.deletedRecords.remove(object);
       }
@@ -1357,7 +1383,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public boolean saveChanges() {
-    synchronized (this.editSync) {
+    synchronized (this.getEditSync()) {
       final boolean saved = doSaveChanges();
       if (saved) {
         clearChanges();
@@ -1406,7 +1432,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (SwingUtilities.isEventDispatchThread()) {
       Invoke.background("Set editable", this, "setEditable", editable);
     } else {
-      synchronized (this.editSync) {
+      synchronized (this.getEditSync()) {
         if (editable == false) {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
@@ -1471,13 +1497,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     if (metaData != null) {
-
       setGeometryFactory(metaData.getGeometryFactory());
       if (metaData.getGeometryAttributeIndex() == -1) {
         setSelectSupported(false);
         setRenderer(null);
       }
       updateColumnNames();
+      if (query == null) {
+        setQuery(null);
+      }
     }
   }
 
@@ -1500,8 +1528,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
-    this.query = query;
-    firePropertyChange("query", oldValue, query);
+    if (query == null) {
+      final DataObjectMetaData metaData = getMetaData();
+      if (metaData == null) {
+        this.query = null;
+      } else {
+        this.query = new Query(metaData);
+      }
+    } else {
+      this.query = query;
+    }
+    firePropertyChange("query", oldValue, this.query);
   }
 
   public void setSelectedRecords(final BoundingBox boundingBox) {

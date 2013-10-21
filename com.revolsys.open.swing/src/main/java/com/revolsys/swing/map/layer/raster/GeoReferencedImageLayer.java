@@ -20,7 +20,6 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
@@ -79,38 +78,23 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public static GeoReferencedImageLayer create(
     final Map<String, Object> properties) {
-    final String url = (String)properties.get("url");
-    if (StringUtils.hasText(url)) {
-      final Resource resource = SpringUtil.getResource(url);
-      final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-        resource);
-      layer.setProperties(properties);
-      return layer;
-    } else {
-      throw new IllegalArgumentException(
-        "Layer definition does not contain a 'url' property");
-    }
+    return new GeoReferencedImageLayer(properties);
   }
 
   private GeoReferencedImage image;
 
-  private final Resource resource;
+  private Resource resource;
 
-  private final String url;
+  private String url;
 
   private boolean showOriginalImage = true;
 
-  public GeoReferencedImageLayer(final Resource resource) {
-    setType(getType());
-    setRenderer(new GeoReferencedImageLayerRenderer(this));
+  public GeoReferencedImageLayer(final Map<String, Object> properties) {
+    super(properties);
+    setType("geoReferencedImage");
     setSelectSupported(false);
     setQuerySupported(false);
-    this.resource = resource;
-    this.url = SpringUtil.getUrl(resource).toString();
-    setType("geoReferencedImage");
-    setName(FileUtil.getBaseName(this.url));
-    setExists(false);
-    Invoke.background("Loading file: " + this.url, this, "revert");
+    setRenderer(new GeoReferencedImageLayerRenderer(this));
   }
 
   @Override
@@ -121,6 +105,21 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
     propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
     return propertiesPanel;
+  }
+
+  @Override
+  protected boolean doInitialize() {
+    final String url = getProperty("url");
+    if (StringUtils.hasText(url)) {
+      this.url = url;
+      resource = SpringUtil.getResource(url);
+      revert();
+      return true;
+    } else {
+      LoggerFactory.getLogger(getClass()).error(
+        "Layer definition does not contain a 'url' property");
+      return false;
+    }
   }
 
   public BoundingBox fitToViewport() {

@@ -5,34 +5,48 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class OpenStreetMapLayer extends AbstractTiledImageLayer {
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "openStreetMap", "Open Street Map Tiles", OpenStreetMapLayer.class,
+    "create");
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
 
-  private final OpenStreetMapClient client;
-
-  public OpenStreetMapLayer() {
-    this(new OpenStreetMapClient());
+  public static OpenStreetMapLayer create(final Map<String, Object> properties) {
+    return new OpenStreetMapLayer(properties);
   }
 
-  public OpenStreetMapLayer(final OpenStreetMapClient client) {
-    this.client = client;
+  private OpenStreetMapClient client;
+
+  public OpenStreetMapLayer(final Map<String, Object> properties) {
+    super(properties);
     setType("openStreetMap");
   }
 
-  public OpenStreetMapLayer(final String serverUrl) {
-    this(new OpenStreetMapClient(serverUrl));
+  @Override
+  protected boolean doInitialize() {
+    final String serverUrl = getProperty("url");
+    if (StringUtils.hasText(serverUrl)) {
+      client = new OpenStreetMapClient(serverUrl);
+    } else {
+      client = new OpenStreetMapClient();
+    }
+    return true;
   }
 
   @Override
@@ -90,7 +104,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "url", this.client.getServerUrl());
+    MapSerializerUtil.add(map, "url", getProperty("url"));
     return map;
   }
 }

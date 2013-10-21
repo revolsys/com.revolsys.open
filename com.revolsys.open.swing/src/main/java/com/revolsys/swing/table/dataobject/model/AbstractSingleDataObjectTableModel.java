@@ -4,7 +4,7 @@ import javax.swing.JTable;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.comparator.StringNumericComparator;
+import com.revolsys.comparator.NumericComparator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.table.BaseJxTable;
@@ -55,7 +55,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
         column.setMinWidth(40);
         column.setPreferredWidth(40);
         column.setMaxWidth(40);
-        column.setComparator(new StringNumericComparator());
+        column.setComparator(new NumericComparator());
       } else if (i == 1) {
         column.setMinWidth(maxTitleWidth);
         column.setPreferredWidth(maxTitleWidth);

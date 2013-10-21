@@ -53,6 +53,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -123,7 +124,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private String type;
 
+  private boolean initialized;
+
   public AbstractLayer() {
+  }
+
+  public AbstractLayer(final Map<String, ? extends Object> properties) {
+    // Don't use super constructor as fields will not have been populated
+    setProperties(properties);
   }
 
   public AbstractLayer(final String name) {
@@ -299,6 +307,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  protected boolean doInitialize() {
+    return true;
+  }
+
   protected boolean doSaveChanges() {
     return true;
   }
@@ -423,6 +435,22 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public final synchronized void initialize() {
+    if (!isInitialized()) {
+      try {
+        final boolean exists = doInitialize();
+        setExists(exists);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to initialize layer: "
+          + getPath(), e);
+        setExists(false);
+      } finally {
+        setInitialized(true);
+      }
+    }
+  }
+
+  @Override
   public boolean isEditable() {
     return this.editable;
   }
@@ -446,7 +474,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isExists() {
-    return exists;
+    return isInitialized() && exists;
   }
 
   @Override
@@ -457,6 +485,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isHasGeometry() {
     return true;
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return initialized;
   }
 
   @Override
@@ -567,6 +600,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       this.geometryFactory = geometryFactory;
       firePropertyChange("geometryFactory", old, this.geometryFactory);
     }
+  }
+
+  protected void setInitialized(final boolean initialized) {
+    final boolean oldValue = this.initialized;
+    this.initialized = initialized;
+    firePropertyChange("initialized", oldValue, this.initialized);
   }
 
   @Override

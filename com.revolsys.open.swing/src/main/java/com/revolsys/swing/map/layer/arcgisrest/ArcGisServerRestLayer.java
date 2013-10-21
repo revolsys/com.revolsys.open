@@ -4,42 +4,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "arcgisServerRest", "Arc GIS Server REST", ArcGisServerRestLayer.class,
+    "create");
+
   public static ArcGisServerRestLayer create(
     final Map<String, Object> properties) {
-    final String url = (String)properties.get("url");
-    final ArcGisServerRestLayer layer = new ArcGisServerRestLayer(url);
-    layer.setProperties(properties);
-    return layer;
+    return new ArcGisServerRestLayer(properties);
   }
 
   private MapServer mapServer;
 
   private GeometryFactory geometryFactory;
 
-  private final String url;
+  private String url;
 
-  public ArcGisServerRestLayer(final String url) {
-    this(null, url);
+  public ArcGisServerRestLayer(final Map<String, Object> properties) {
+    super(properties);
+    setType("arcgisServerRest");
   }
 
-  public ArcGisServerRestLayer(final String name, final String url) {
-    this.url = url;
-    setType("arcgisServerRest");
-    if (StringUtils.hasText(name)) {
-      setName(name);
+  @Override
+  protected boolean doInitialize() {
+    this.url = getProperty("url");
+    try {
+      this.mapServer = ArcGisServerRestClient.getMapServer(url);
+      final TileInfo tileInfo = this.mapServer.getTileInfo();
+      this.geometryFactory = tileInfo.getSpatialReference();
+      return true;
+    } catch (final Throwable e) {
+      throw new RuntimeException("Error connecting to ArcGIS rest server "
+        + url, e);
     }
   }
 
@@ -54,17 +63,6 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   public synchronized MapServer getMapServer() {
-    if (this.mapServer == null) {
-      try {
-        // TODO initialize in background?
-        this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
-        final TileInfo tileInfo = this.mapServer.getTileInfo();
-        this.geometryFactory = tileInfo.getSpatialReference();
-      } catch (final Throwable e) {
-        setError(e);
-        return null;
-      }
-    }
     return this.mapServer;
   }
 

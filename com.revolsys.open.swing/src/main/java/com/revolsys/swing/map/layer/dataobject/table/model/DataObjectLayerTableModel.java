@@ -328,7 +328,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   protected int loadLayerRowCount() {
     final Query query = getFilterQuery();
     if (query == null) {
-      return 0;
+      return this.layer.getRowCount();
     } else {
       return this.layer.getRowCount(query);
     }
@@ -353,13 +353,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         synchronized (getSync()) {
           pageCache = this.pageCache;
         }
-        final List<LayerDataObject> objects;
+        final List<LayerDataObject> records;
         if (getFilterQuery() == null) {
-          objects = Collections.emptyList();
+          records = Collections.emptyList();
         } else {
-          objects = loadPage(pageNumber);
+          records = loadPage(pageNumber);
         }
-        pageCache.put(pageNumber, objects);
+        pageCache.put(pageNumber, records);
         synchronized (getSync()) {
           if (this.pageCache == pageCache) {
             this.loadingPageNumbers.remove(pageNumber);

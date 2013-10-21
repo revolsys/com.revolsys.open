@@ -48,6 +48,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   String getType();
 
+  void initialize();
+
   boolean isEditable();
 
   boolean isEditable(double scale);
@@ -57,6 +59,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   boolean isHasChanges();
 
   boolean isHasGeometry();
+
+  boolean isInitialized();
 
   boolean isQueryable();
 

@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectIoFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -186,13 +185,8 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public Reader<DataObject> query(DataObjectFactory dataObjectFactory,
-    final String typePath, final BoundingBox boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Reader<DataObject> query(DataObjectFactory dataObjectFactory, final String typePath, final Geometry geometry) {
+  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
+    final String typePath, final Geometry geometry) {
     throw new UnsupportedOperationException();
   }
 

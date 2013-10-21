@@ -19,8 +19,6 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
-import com.revolsys.swing.map.layer.grid.GridLayer;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -29,37 +27,31 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     "dataObjectFile", "File", DataObjectFileLayer.class, "create");
 
   public static DataObjectFileLayer create(final Map<String, Object> properties) {
-    final String url = (String)properties.remove("url");
-    Resource resource = null;
-    if (StringUtils.hasText(url)) {
-      resource = SpringUtil.getResource(url);
-    }
-    if (resource == null) {
-      LoggerFactory.getLogger(GridLayer.class).error(
-        "Layer definition does not contain a 'url' property");
-    }
-    final DataObjectFileLayer layer = new DataObjectFileLayer(resource);
-    layer.setProperties(properties);
-    return layer;
+    return new DataObjectFileLayer(properties);
   }
 
-  private final String url;
+  private String url;
 
-  private final Resource resource;
+  private Resource resource;
 
-  public DataObjectFileLayer(final Resource resource) {
-    this.resource = resource;
+  public DataObjectFileLayer(final Map<String, ? extends Object> properties) {
+    super(properties);
     setType("dataObjectFile");
-    setExists(false);
-    if (resource == null) {
-      this.url = null;
-      setName("Unknown");
-    } else {
-      this.url = SpringUtil.getUrl(resource).toString();
+  }
 
-      setName(resource.getFilename());
-      Invoke.background("Loading file: " + this.url, this, "revert");
+  @Override
+  protected boolean doInitialize() {
+    url = getProperty("url");
+    if (StringUtils.hasText(url)) {
+      resource = SpringUtil.getResource(url);
+      revert();
+      return true;
+    } else {
+      LoggerFactory.getLogger(getClass()).error(
+        "Layer definition does not contain a 'url' property: " + getName());
+      return false;
     }
+
   }
 
   public String getUrl() {

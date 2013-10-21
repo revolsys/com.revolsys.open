@@ -114,9 +114,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   ResultPager<DataObject> page(Query query);
 
   Reader<DataObject> query(DataObjectFactory dataObjectFactory,
-    String typePath, BoundingBox boundingBox);
-
-  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
     String typePath, Geometry geometry);
 
   Reader<DataObject> query(DataObjectFactory dataObjectFactory,

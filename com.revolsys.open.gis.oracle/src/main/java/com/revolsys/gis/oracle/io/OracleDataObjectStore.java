@@ -116,7 +116,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
             + ", ?, ?, ?, ?) = 1";
           query.and(new SqlCondition(where, x1, y1, x2, y2));
         } else {
-          throw new IllegalArgumentException("Unbown geometry attribute :"
+          throw new IllegalArgumentException("Unknown geometry attribute "
             + geometryAttribute);
         }
       }

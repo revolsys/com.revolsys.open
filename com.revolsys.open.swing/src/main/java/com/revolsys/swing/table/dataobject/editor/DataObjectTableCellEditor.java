@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -20,6 +21,7 @@ import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
@@ -42,6 +44,8 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   private int columnIndex;
 
   private PopupMenu popupMenu = null;
+
+  private DataType dataType;
 
   public DataObjectTableCellEditor(final BaseJxTable table) {
     this.table = table;
@@ -72,6 +76,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
     this.attributeName = model.getAttributeName(rowIndex, columnIndex);
     final DataObjectMetaData metaData = model.getMetaData();
+    dataType = metaData.getAttributeType(attributeName);
     this.editorComponent = (JComponent)SwingUtil.createField(metaData,
       this.attributeName, true);
     if (this.editorComponent instanceof JTextField) {
@@ -152,22 +157,38 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public boolean stopCellEditing() {
-    if (editorComponent != null) {
-      editorComponent.removeKeyListener(this);
-      if (editorComponent instanceof JComboBox) {
-        final JComboBox comboBox = (JComboBox)editorComponent;
-        final ComboBoxEditor editor = comboBox.getEditor();
-        final Component comboEditorComponent = editor.getEditorComponent();
-        comboEditorComponent.removeKeyListener(this);
-      }
-      if (popupMenu != null) {
-        PopupMenu.removeFromComponent(editorComponent);
-      }
-    }
+    boolean stopped = false;
     try {
-      return super.stopCellEditing();
+      stopped = super.stopCellEditing();
     } catch (final IndexOutOfBoundsException e) {
       return true;
+    } catch (final Throwable t) {
+      final int result = JOptionPane.showConfirmDialog(editorComponent,
+        "<html><p><b>'" + getCellEditorValue() + "' is not a valid " + dataType
+          + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
+        "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      if (result == JOptionPane.YES_OPTION) {
+        cancelCellEditing();
+        return true;
+      } else {
+        return false;
+      }
+    } finally {
+      if (stopped) {
+        if (editorComponent != null) {
+          editorComponent.removeKeyListener(this);
+          if (editorComponent instanceof JComboBox) {
+            final JComboBox comboBox = (JComboBox)editorComponent;
+            final ComboBoxEditor editor = comboBox.getEditor();
+            final Component comboEditorComponent = editor.getEditorComponent();
+            comboEditorComponent.removeKeyListener(this);
+          }
+          if (popupMenu != null) {
+            PopupMenu.removeFromComponent(editorComponent);
+          }
+        }
+      }
     }
+    return stopped;
   }
 }

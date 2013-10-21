@@ -61,9 +61,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L,
-    125000000L, 50000000L, 25000000L, 12500000L, 5000000L, 2500000L, 1250000L,
-    500000L, 250000L, 125000L, 50000L, 25000L, 12500L, 5000L, 2500L, 1250L,
-    500L, 250L, 125L, 50L, 25L, 10L, 5L);
+    100000000L, 50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L,
+    500000L, 250000L, 100000L, 50000L, 25000L, 10000L, 5000L, 2500L, 1000L,
+    500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
   public static final BoundingBox BC_ENVELOPE = new BoundingBox(
     GeometryFactory.getFactory(3857, 3, 1000, 1000), -15555252, 6174862,
@@ -567,41 +567,45 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
     final boolean zoomNextEnabled = isZoomNextEnabled();
     final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
-    this.project.setViewBoundingBox(resizedBoundingBox);
-    setScale(this.viewport.getScale());
-    synchronized (this.zoomHistory) {
-      if (this.updateZoomHistory) {
-        BoundingBox currentBoundingBox = null;
-        if (this.zoomHistoryIndex > -1) {
-          currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
-          if (!currentBoundingBox.equals(resizedBoundingBox)) {
-            while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
-              this.zoomHistory.removeLast();
-            }
-            for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
-              this.zoomHistory.remove(i);
-            }
-            this.zoomHistory.add(resizedBoundingBox);
-            this.zoomHistoryIndex = this.zoomHistory.size() - 1;
-            if (this.zoomHistory.size() > 50) {
-              this.zoomHistory.removeFirst();
+    if (this.project != null) {
+      this.project.setViewBoundingBox(resizedBoundingBox);
 
-              this.zoomHistoryIndex--;
+      setScale(this.viewport.getScale());
+      synchronized (this.zoomHistory) {
+        if (this.updateZoomHistory) {
+          BoundingBox currentBoundingBox = null;
+          if (this.zoomHistoryIndex > -1) {
+            currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
+            if (!currentBoundingBox.equals(resizedBoundingBox)) {
+              while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
+                this.zoomHistory.removeLast();
+              }
+              for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
+                this.zoomHistory.remove(i);
+              }
+              this.zoomHistory.add(resizedBoundingBox);
+              this.zoomHistoryIndex = this.zoomHistory.size() - 1;
+              if (this.zoomHistory.size() > 50) {
+                this.zoomHistory.removeFirst();
+
+                this.zoomHistoryIndex--;
+              }
             }
+          } else {
+            this.zoomHistory.add(resizedBoundingBox);
+            this.zoomHistoryIndex = 0;
           }
-        } else {
-          this.zoomHistory.add(resizedBoundingBox);
-          this.zoomHistoryIndex = 0;
         }
       }
-    }
-    firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
-    firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
-    firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
-      isZoomPreviousEnabled());
-    firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
+      firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
+      firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
+      firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
+        isZoomPreviousEnabled());
+      firePropertyChange("zoomNextEnabled", zoomNextEnabled,
+        isZoomNextEnabled());
 
-    repaint();
+      repaint();
+    }
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

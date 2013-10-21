@@ -27,10 +27,6 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
 
   private static final Icon EDIT_DISABLED_ICON = SilkIconLoader.getIcon("pencil_gray");
 
-  private static final Icon QUERY_ICON = SilkIconLoader.getIcon("information");
-
-  private static final Icon QUERY_DISABLED_ICON = SilkIconLoader.getIcon("information_gray");
-
   private static final Icon SELECT_ICON = SilkIconLoader.getIcon("map_select");
 
   private static final Icon SELECT_DISABLED_ICON = SilkIconLoader.getIcon("map_select_gray");
@@ -45,7 +41,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
 
   private static Icon getIcon(final Component component, final Layer layer) {
     final List<Icon> icons = new ArrayList<Icon>();
-    if (!layer.isExists()) {
+    if (!layer.isExists() && layer.isInitialized()) {
 
       return NOT_EXISTS_ICON;
     } else if (layer.getRenderer() != null) {
@@ -54,13 +50,6 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
       } else {
         icons.add(VISIBLE_DISABLED_ICON);
       }
-      // if (layer.isQuerySupported()) {
-      // if (layer.isQueryable()) {
-      // icons.add(QUERY_ICON);
-      // } else {
-      // icons.add(QUERY_DISABLED_ICON);
-      // }
-      // }
       if (layer.isSelectSupported()) {
         if (layer.isSelectable()) {
           icons.add(SELECT_ICON);
@@ -150,11 +139,13 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final int row, final boolean hasFocus) {
     Icon icon = null;
     boolean exists = false;
+    boolean initialized = false;
     if (value instanceof Layer) {
       final Layer layer = (Layer)value;
       value = layer.getName();
       icon = getIcon(this, layer);
       exists = layer.isExists();
+      initialized = layer.isInitialized();
     } else {
       icon = NOT_EXISTS_ICON;
     }
@@ -162,8 +153,12 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     final JLabel label = (JLabel)super.getTreeCellRendererComponent(tree,
       value, selected, expanded, leaf, row, hasFocus);
     setIcon(icon);
-    if (!exists) {
+    if (!initialized) {
+      label.setEnabled(false);
+    } else if (!exists) {
       label.setForeground(WebColors.Red);
+    } else {
+      label.setEnabled(true);
     }
 
     return label;

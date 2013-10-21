@@ -12,6 +12,14 @@ import javax.annotation.PreDestroy;
 public class AbstractObjectWithProperties implements ObjectWithProperties {
   private Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
+  public AbstractObjectWithProperties() {
+  }
+
+  public AbstractObjectWithProperties(
+    final Map<String, ? extends Object> properties) {
+    setProperties(properties);
+  }
+
   @Override
   public void clearProperties() {
     properties.clear();

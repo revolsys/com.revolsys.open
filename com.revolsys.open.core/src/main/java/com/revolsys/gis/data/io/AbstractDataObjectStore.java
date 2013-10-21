@@ -559,8 +559,10 @@ public abstract class AbstractDataObjectStore extends
   public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
     final String typePath, final Geometry geometry) {
     final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
-    final Reader<DataObject> reader = query(dataObjectFactory, typePath,
-      boundingBox);
+    final Query query = new Query(typePath);
+    query.setBoundingBox(boundingBox);
+    query.setProperty("dataObjectFactory", dataObjectFactory);
+    final Reader<DataObject> reader = query(query);
     final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
       geometry);
     return new FilterReader<DataObject>(filter, reader);

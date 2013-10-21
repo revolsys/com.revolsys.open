@@ -36,33 +36,35 @@ public class GridLayer extends AbstractLayer {
     "grid", "Grid", GridLayer.class, "create");
 
   public static GridLayer create(final Map<String, Object> properties) {
-    final String gridName = (String)properties.get("gridName");
-    if (StringUtils.hasText(gridName)) {
-      final RectangularMapGrid grid = RectangularMapGridFactory.getGrid(gridName);
-      if (grid == null) {
-        LoggerFactory.getLogger(GridLayer.class).error(
-          "Cannot find gridName=" + gridName);
-      } else {
-        final GridLayer layer = new GridLayer(grid);
-        layer.setProperties(properties);
-        return layer;
-      }
-    } else {
-      LoggerFactory.getLogger(GridLayer.class).error(
-        "Layer definition does not contain a 'gridName' property");
-    }
-    return null;
+    return new GridLayer(properties);
   }
 
-  private final RectangularMapGrid grid;
+  private RectangularMapGrid grid;
 
-  public GridLayer(final RectangularMapGrid grid) {
-    super(grid.getName());
-    this.grid = grid;
+  public GridLayer(final Map<String, Object> properties) {
+    super(properties);
     setType("grid");
     setReadOnly(true);
     setSelectSupported(false);
     setRenderer(new GridLayerRenderer(this));
+  }
+
+  @Override
+  protected boolean doInitialize() {
+    final String gridName = getProperty("gridName");
+    if (StringUtils.hasText(gridName)) {
+      grid = RectangularMapGridFactory.getGrid(gridName);
+      if (grid == null) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Cannot find gridName=" + gridName);
+      } else {
+        return true;
+      }
+    } else {
+      LoggerFactory.getLogger(getClass()).error(
+        "Layer definition does not contain a 'gridName' property");
+    }
+    return false;
   }
 
   @Override
