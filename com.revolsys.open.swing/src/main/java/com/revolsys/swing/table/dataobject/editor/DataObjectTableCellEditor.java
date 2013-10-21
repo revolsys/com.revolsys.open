@@ -164,6 +164,10 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
         PopupMenu.removeFromComponent(editorComponent);
       }
     }
-    return super.stopCellEditing();
+    try {
+      return super.stopCellEditing();
+    } catch (final IndexOutOfBoundsException e) {
+      return true;
+    }
   }
 }

@@ -1,5 +1,6 @@
 package com.revolsys.gis.jts;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -25,6 +27,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
+import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
@@ -182,11 +185,34 @@ public final class JtsGeometryUtil {
     return closestCoordinate;
   }
 
+  @SuppressWarnings("unchecked")
   public static void copyUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
-    final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(oldGeometry);
-    if (userData != null) {
-      newGeometry.setUserData(new TreeMap<String, Object>(userData));
+    if (oldGeometry != null && newGeometry != null
+      && oldGeometry != newGeometry) {
+      Object userData = oldGeometry.getUserData();
+      if (userData instanceof Map) {
+        final Map<String, Object> oldValues = (Map<String, Object>)userData;
+        final Map<String, Object> newValues = new TreeMap<String, Object>();
+        for (final Entry<String, Object> entry : oldValues.entrySet()) {
+          final String key = entry.getKey();
+          final Object value = entry.getValue();
+          if (value != null) {
+            if (!(value instanceof Reference)) {
+              final Object newValue = JavaBeanUtil.clone(value);
+              newValues.put(key, newValue);
+            }
+          }
+        }
+        if (newValues.isEmpty()) {
+          userData = null;
+        } else {
+          userData = newValues;
+        }
+      } else if (userData != null) {
+        userData = JavaBeanUtil.clone(userData);
+      }
+      newGeometry.setUserData(userData);
     }
   }
 
@@ -1013,7 +1039,7 @@ public final class JtsGeometryUtil {
         }
       }
     }
-    intersection.setUserData(line.getUserData());
+    JtsGeometryUtil.copyUserData(line, intersection);
     return intersection;
   }
 
@@ -1516,7 +1542,7 @@ public final class JtsGeometryUtil {
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final LinearRing newGeometry = factory.createLinearRing(newCoordinates);
-    newGeometry.setUserData(geometry.getUserData());
+    JtsGeometryUtil.copyUserData(geometry, newGeometry);
     return newGeometry;
   }
 
@@ -1525,7 +1551,7 @@ public final class JtsGeometryUtil {
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final LineString newGeometry = factory.createLineString(newCoordinates);
-    newGeometry.setUserData(geometry.getUserData());
+    JtsGeometryUtil.copyUserData(geometry, newGeometry);
     return newGeometry;
   }
 
@@ -1537,7 +1563,7 @@ public final class JtsGeometryUtil {
       points[i] = to2D(point);
     }
     final MultiPoint newGeometry = factory.createMultiPoint(points);
-    newGeometry.setUserData(geometry.getUserData());
+    JtsGeometryUtil.copyUserData(geometry, newGeometry);
     return newGeometry;
   }
 
@@ -1546,7 +1572,7 @@ public final class JtsGeometryUtil {
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final Point newGeometry = factory.createPoint(newCoordinates);
-    newGeometry.setUserData(geometry.getUserData());
+    JtsGeometryUtil.copyUserData(geometry, newGeometry);
     return newGeometry;
   }
 
@@ -1561,7 +1587,7 @@ public final class JtsGeometryUtil {
       holes[i] = to2D(hole);
     }
     final Polygon newGeometry = factory.createPolygon(shell, holes);
-    newGeometry.setUserData(geometry.getUserData());
+    JtsGeometryUtil.copyUserData(geometry, newGeometry);
     return newGeometry;
   }
 

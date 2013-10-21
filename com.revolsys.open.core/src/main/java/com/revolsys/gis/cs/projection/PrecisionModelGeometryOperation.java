@@ -3,9 +3,9 @@ package com.revolsys.gis.cs.projection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -25,14 +25,12 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
     this.geometryFactory = geometryFactory;
   }
 
-  @SuppressWarnings("unchecked")
   private void addUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     final Object userData = oldGeometry.getUserData();
     if (userData != null) {
       if (userData instanceof Map) {
-        final Map attrs = (Map)userData;
-        newGeometry.setUserData(new TreeMap(attrs));
+        JtsGeometryUtil.copyUserData(oldGeometry, newGeometry);
       } else {
         newGeometry.setUserData(userData);
       }

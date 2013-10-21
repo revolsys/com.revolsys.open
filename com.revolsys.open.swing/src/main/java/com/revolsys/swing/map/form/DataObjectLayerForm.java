@@ -540,9 +540,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void closeWindow() {
     final Window window = SwingUtilities.windowForComponent(this);
-    if (window != null) {
-      window.setVisible(false);
-    }
+    SwingUtil.setVisible(window, false);
   }
 
   protected JPanel createPanel(final JPanel container, final String title) {
@@ -913,9 +911,8 @@ public class DataObjectLayerForm extends JPanel implements
         if (source == object) {
           if (object.isDeleted()) {
             final Window window = SwingUtilities.getWindowAncestor(this);
-            if (window != null) {
-              window.setVisible(false);
-            }
+            SwingUtil.setVisible(window, false);
+
           }
           final String propertyName = event.getPropertyName();
           final Object value = event.getNewValue();

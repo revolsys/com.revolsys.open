@@ -22,7 +22,6 @@ package com.revolsys.gis.data.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,10 +65,7 @@ public final class DataObjectUtil {
     final Geometry oldGeometry = object.getGeometryValue();
     final T newObject = (T)object.clone();
     newObject.setGeometryValue(geometry);
-    final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(oldGeometry);
-    if (userData != null) {
-      geometry.setUserData(new HashMap<String, Object>(userData));
-    }
+    JtsGeometryUtil.copyUserData(oldGeometry, geometry);
     return newObject;
   }
 

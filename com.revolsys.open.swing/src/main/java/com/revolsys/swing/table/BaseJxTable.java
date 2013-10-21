@@ -110,6 +110,15 @@ public class BaseJxTable extends JXTable {
   }
 
   @Override
+  public boolean isCellEditable(final int row, final int column) {
+    try {
+      return super.isCellEditable(row, column);
+    } catch (final IndexOutOfBoundsException e) {
+      return false;
+    }
+  }
+
+  @Override
   public Component prepareRenderer(final TableCellRenderer renderer,
     final int row, final int column) {
     try {

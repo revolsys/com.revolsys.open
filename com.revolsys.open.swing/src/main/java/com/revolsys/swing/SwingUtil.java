@@ -634,12 +634,12 @@ public class SwingUtil {
     }
   }
 
-  public static void setVisible(final Component window, final boolean visible) {
-    if (window != null) {
+  public static void setVisible(final Component component, final boolean visible) {
+    if (component != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        window.setVisible(visible);
+        component.setVisible(visible);
       } else {
-        Invoke.later(window, "setVisible", visible);
+        Invoke.later(component, "setVisible", visible);
       }
     }
   }

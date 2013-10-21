@@ -1636,12 +1636,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                 removeForm(object);
               }
             });
-            window.setVisible(true);
+            SwingUtil.setVisible(window, true);
+
             window.requestFocus();
             return (V)form;
           }
         } else {
-          window.setVisible(true);
+          SwingUtil.setVisible(window, true);
+
           window.requestFocus();
           final Component component = window.getComponent(0);
           if (component instanceof JScrollPane) {
@@ -1807,8 +1809,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void updateSpatialIndex(final LayerDataObject object,
+  protected void updateSpatialIndex(final LayerDataObject record,
     final Geometry oldGeometry) {
+    index.remove(BoundingBox.getBoundingBox(oldGeometry), record);
   }
 
   public void zoomTo(final Geometry geometry) {

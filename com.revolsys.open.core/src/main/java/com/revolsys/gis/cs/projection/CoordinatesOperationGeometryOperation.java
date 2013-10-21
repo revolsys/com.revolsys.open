@@ -3,9 +3,9 @@ package com.revolsys.gis.cs.projection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -31,16 +31,12 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     this.geometryFactory = geometryFactory;
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   private void addUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     final Object userData = oldGeometry.getUserData();
     if (userData != null) {
       if (userData instanceof Map) {
-        final Map attrs = (Map)userData;
-        newGeometry.setUserData(new TreeMap(attrs));
+        JtsGeometryUtil.copyUserData(oldGeometry, newGeometry);
       } else {
         newGeometry.setUserData(userData);
       }

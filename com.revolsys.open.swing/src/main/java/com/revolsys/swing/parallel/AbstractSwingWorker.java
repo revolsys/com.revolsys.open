@@ -23,7 +23,7 @@ public abstract class AbstractSwingWorker<T, V> extends SwingWorker<T, V> {
       if (activeWindow instanceof RootPaneContainer) {
         final RootPaneContainer container = (RootPaneContainer)activeWindow;
         glassPane = container.getGlassPane();
-        glassPane.setVisible(true);
+        SwingUtil.setVisible(glassPane, true);
         component = glassPane;
       } else {
         component = activeWindow;
@@ -37,7 +37,7 @@ public abstract class AbstractSwingWorker<T, V> extends SwingWorker<T, V> {
         ExceptionUtil.log(getClass(), t);
       } finally {
         if (glassPane != null) {
-          glassPane.setVisible(false);
+          SwingUtil.setVisible(glassPane, false);
         }
         component.setCursor(cursor);
       }

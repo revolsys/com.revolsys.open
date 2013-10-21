@@ -130,7 +130,7 @@ public class ProgressMonitor extends JDialog implements WindowListener {
 
   public void setVisible(final Window window) {
     window.addWindowListener(this);
-    window.setVisible(true);
+    SwingUtil.setVisible(window, true);
   }
 
   @Override

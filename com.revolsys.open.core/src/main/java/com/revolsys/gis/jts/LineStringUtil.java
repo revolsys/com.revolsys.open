@@ -987,7 +987,7 @@ public final class LineStringUtil {
       coordinates1, coordinates2);
     final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
-    line.setUserData(line1.getUserData());
+    JtsGeometryUtil.copyUserData(line1, line);
     return line;
   }
 
@@ -1009,7 +1009,8 @@ public final class LineStringUtil {
       coordinates2);
     final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
-    line.setUserData(line1.getUserData());
+    JtsGeometryUtil.copyUserData(line1, line);
+
     return line;
   }
 
@@ -1220,8 +1221,7 @@ public final class LineStringUtil {
       return null;
     } else {
       final LineString newLine = factory.createLineString(newPoints);
-      final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(line);
-      newLine.setUserData(userData);
+      JtsGeometryUtil.copyUserData(line, newLine);
       return newLine;
     }
 

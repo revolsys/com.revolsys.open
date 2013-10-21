@@ -991,14 +991,16 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public void setSplitAttributes(final LineString line,
     final Coordinates point, final DataObject object) {
     final LineString newLine = object.getGeometryValue();
-    final boolean firstPoint = LineStringUtil.isFirstPoint(newLine, point);
-    final boolean toPoint = LineStringUtil.isToPoint(newLine, point);
-    if (firstPoint) {
-      if (!toPoint) {
-        clearStartAttributes(object);
+    if (newLine != null) {
+      final boolean firstPoint = LineStringUtil.isFirstPoint(newLine, point);
+      final boolean toPoint = LineStringUtil.isToPoint(newLine, point);
+      if (firstPoint) {
+        if (!toPoint) {
+          clearStartAttributes(object);
+        }
+      } else if (toPoint) {
+        clearEndAttributes(object);
       }
-    } else if (toPoint) {
-      clearEndAttributes(object);
     }
   }
 

@@ -40,7 +40,8 @@ public class ClipGeometryProcess extends
             JtsGeometryUtil.addElevation(cN, (LineString)geometry);
           }
         }
-        intersection.setUserData(geometry.getUserData());
+        JtsGeometryUtil.copyUserData(geometry, intersection);
+
         object.setGeometryValue(intersection);
         out.write(object);
       }

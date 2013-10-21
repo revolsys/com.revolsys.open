@@ -74,7 +74,7 @@ public class ValueField extends JPanel implements Field {
 
   public void cancel(final JDialog dialog) {
     cancel();
-    dialog.setVisible(false);
+    SwingUtil.setVisible(dialog, false);
   }
 
   @Override
