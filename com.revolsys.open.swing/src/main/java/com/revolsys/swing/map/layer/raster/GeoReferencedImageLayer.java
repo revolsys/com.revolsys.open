@@ -167,7 +167,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    if (isVisible() || !visibleLayersOnly) {
+    if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
       return new BoundingBox(getGeometryFactory());

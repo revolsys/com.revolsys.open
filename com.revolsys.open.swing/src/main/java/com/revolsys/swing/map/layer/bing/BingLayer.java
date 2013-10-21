@@ -149,15 +149,6 @@ public class BingLayer extends AbstractTiledImageLayer {
     return this.client.getResolution(zoomLevel);
   }
 
-  @Override
-  public boolean isVisible() {
-    if (!super.isVisible()) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   public void setClient(final BingClient client) {
     this.client = client;
     ExecutorServiceFactory.getExecutorService().execute(

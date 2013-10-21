@@ -135,7 +135,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public MapPanel(final Project project) {
     super(new BorderLayout());
     this.project = project;
-    this.baseMapLayers = project.addLayerGroup("Base Maps");
+    this.baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
     this.layeredPane = new JLayeredPane();
     this.layeredPane.setOpaque(true);
@@ -761,7 +761,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomTo(final Layer layer) {
-    if (layer != null && layer.isVisible()) {
+    if (layer != null && layer.isExists() && layer.isVisible()) {
       final BoundingBox boundingBox = layer.getBoundingBox(true);
       zoomTo(boundingBox);
     }

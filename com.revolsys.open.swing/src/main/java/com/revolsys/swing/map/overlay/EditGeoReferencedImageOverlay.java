@@ -750,7 +750,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   @Override
   protected void paintComponent(final Graphics2D graphics) {
-    if (this.layer != null && this.layer.isVisible() && this.image != null) {
+    if (this.layer != null && this.layer.isVisible() && layer.isExists()
+      && this.image != null) {
       final boolean showOriginalImage = layer.isShowOriginalImage();
       BoundingBox boundingBox = getImageBoundingBox();
       BoundingBox outlineBoundingBox = boundingBox;

@@ -512,7 +512,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected boolean isEditable(final AbstractDataObjectLayer dataObjectLayer) {
-    return dataObjectLayer.isVisible() && dataObjectLayer.isCanEditRecords();
+    return dataObjectLayer.isExists() && dataObjectLayer.isVisible()
+      && dataObjectLayer.isCanEditRecords();
   }
 
   protected boolean isGeometryValid(final Geometry geometry) {

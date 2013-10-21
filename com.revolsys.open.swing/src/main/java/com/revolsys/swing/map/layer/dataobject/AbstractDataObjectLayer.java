@@ -120,13 +120,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public static void addVisibleLayers(
     final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
-    if (group.isVisible()) {
+    if (group.isExists() && group.isVisible()) {
       for (final Layer layer : group) {
         if (layer instanceof LayerGroup) {
           final LayerGroup layerGroup = (LayerGroup)layer;
           addVisibleLayers(layers, layerGroup);
         } else if (layer instanceof AbstractDataObjectLayer) {
-          if (layer.isVisible()) {
+          if (layer.isExists() && layer.isVisible()) {
             final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
             layers.add(dataObjectLayer);
           }
@@ -1105,7 +1105,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public boolean isVisible(final LayerDataObject object) {
-    if (isVisible()) {
+    if (isExists() && isVisible()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer();
       if (renderer == null || renderer.isVisible(object)) {
         return true;

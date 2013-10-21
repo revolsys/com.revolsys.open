@@ -119,15 +119,6 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public boolean isVisible() {
-    if (!super.isVisible()) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
     MapSerializerUtil.add(map, "url", this.url);

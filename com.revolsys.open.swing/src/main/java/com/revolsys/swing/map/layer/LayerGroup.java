@@ -296,9 +296,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
-    if (!visibleLayersOnly || isVisible()) {
+    if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {
-        if (!visibleLayersOnly || layer.isVisible()) {
+        if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {
           final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
           if (!layerBoundingBox.isNull()) {
             boudingBox = boudingBox.expandToInclude(layerBoundingBox);
@@ -397,7 +397,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public BoundingBox getSelectedBoundingBox() {
     BoundingBox boundingBox = super.getSelectedBoundingBox();
-    if (isVisible()) {
+    if (isExists() && isVisible()) {
       for (final Layer layer : this) {
         final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
         boundingBox = boundingBox.expandToInclude(layerBoundingBox);

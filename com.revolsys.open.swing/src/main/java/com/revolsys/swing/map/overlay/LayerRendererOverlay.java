@@ -96,7 +96,7 @@ public class LayerRendererOverlay extends JComponent implements
   }
 
   public void redraw() {
-    if (isValid() && layer.isVisible()) {
+    if (isValid() && layer.isExists() && layer.isVisible()) {
       synchronized (this.loadSync) {
         this.image = null;
         if (this.imageWorker != null) {

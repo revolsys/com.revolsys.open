@@ -509,7 +509,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isSelectable() {
-    return isVisible()
+    return isExists() && isVisible()
       && (isSelectSupported() && this.selectable || isEditable());
   }
 
@@ -525,12 +525,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isVisible() {
-    return isExists() && this.visible;
+    return this.visible;
   }
 
   @Override
   public boolean isVisible(final double scale) {
-    if (isVisible()) {
+    if (isExists() && isVisible()) {
       final long longScale = (long)scale;
       if (getMinimumScale() >= longScale && longScale >= getMaximumScale()) {
         return true;

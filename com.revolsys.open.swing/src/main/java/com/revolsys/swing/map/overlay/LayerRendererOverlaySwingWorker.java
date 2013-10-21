@@ -41,7 +41,7 @@ public class LayerRendererOverlaySwingWorker extends
             imageHeight, boundingBox);
 
           final Graphics2D graphics = viewport.getGraphics();
-          if (layer != null && layer.isVisible()) {
+          if (layer != null && layer.isExists() && layer.isVisible()) {
             final LayerRenderer<Layer> renderer = layer.getRenderer();
             if (renderer != null) {
               renderer.render(viewport, graphics);
