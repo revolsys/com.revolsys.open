@@ -19,16 +19,18 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentGroup;
 
-@SuppressWarnings("serial")
 public class ToolBar extends JToolBar {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final ComponentGroup groups = new ComponentGroup();
 
   public ToolBar() {
+    this(HORIZONTAL);
+  }
+
+  public ToolBar(final int orientation) {
+    super(orientation);
+    setOpaque(false);
     setRollover(false);
     setFloatable(false);
   }

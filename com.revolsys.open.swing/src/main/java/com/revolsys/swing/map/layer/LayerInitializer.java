@@ -10,6 +10,8 @@ import com.revolsys.util.ExceptionUtil;
 
 public class LayerInitializer extends SwingWorker<Void, Void> {
 
+  private static final int MAX_WORKERS = 5;
+
   private static final LinkedList<Layer> INITIALIZING_LAYERS = new LinkedList<Layer>();
 
   private static int instanceCount;
@@ -18,7 +20,7 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
     synchronized (INITIALIZING_LAYERS) {
       if (!INITIALIZING_LAYERS.contains(layer) && !layer.isInitialized()) {
         INITIALIZING_LAYERS.add(layer);
-        if (instanceCount < 2) {
+        if (instanceCount < MAX_WORKERS) {
           instanceCount++;
           final LayerInitializer initializer = new LayerInitializer();
           Invoke.worker(initializer);

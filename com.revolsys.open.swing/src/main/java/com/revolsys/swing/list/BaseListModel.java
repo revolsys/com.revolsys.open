@@ -16,6 +16,13 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   protected EventListenerList listenerList = new EventListenerList();
 
+  public BaseListModel() {
+  }
+
+  public BaseListModel(final Collection<? extends T> values) {
+    addAll(values);
+  }
+
   @Override
   public void add(final int index, final T element) {
     super.add(index, element);
@@ -32,17 +39,23 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public boolean addAll(final Collection<? extends T> c) {
-    final int index = size();
-    final boolean result = super.addAll(c);
-    fireIntervalAdded(this, index, index + c.size());
-    return result;
+    if (c != null) {
+      final int index = size();
+      final boolean result = super.addAll(c);
+      fireIntervalAdded(this, index, index + c.size());
+      return result;
+    }
+    return false;
   }
 
   @Override
   public boolean addAll(final int index, final Collection<? extends T> c) {
-    final boolean result = super.addAll(index, c);
-    fireIntervalAdded(this, index, index + c.size());
-    return result;
+    if (c != null) {
+      final boolean result = super.addAll(index, c);
+      fireIntervalAdded(this, index, index + c.size());
+      return result;
+    }
+    return false;
   }
 
   @Override
@@ -145,6 +158,14 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public boolean removeAll(final Collection<?> c) {
+    boolean removed = false;
+    for (final Object object : c) {
+      removed |= remove(object);
+    }
+    return removed;
+  }
+
+  public boolean removeAll(final Object... c) {
     boolean removed = false;
     for (final Object object : c) {
       removed |= remove(object);

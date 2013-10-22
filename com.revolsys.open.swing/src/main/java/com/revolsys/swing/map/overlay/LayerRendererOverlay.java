@@ -13,6 +13,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
@@ -67,21 +68,25 @@ public class LayerRendererOverlay extends JComponent implements
 
   @Override
   public void paintComponent(final Graphics g) {
-    GeoReferencedImage image;
-    synchronized (this.loadSync) {
-      image = this.image;
+    if (!(layer instanceof NullLayer)) {
+      GeoReferencedImage image;
+      synchronized (this.loadSync) {
+        image = this.image;
 
-      if (image == null && imageWorker == null) {
-        final BoundingBox boundingBox = this.viewport.getBoundingBox();
-        final int viewWidthPixels = this.viewport.getViewWidthPixels();
-        final int viewHeightPixels = this.viewport.getViewHeightPixels();
-        final GeoReferencedImage loadImage = new GeoReferencedImage(
-          boundingBox, viewWidthPixels, viewHeightPixels);
-        this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
-        Invoke.worker(this.imageWorker);
+        if (image == null && imageWorker == null) {
+          final BoundingBox boundingBox = this.viewport.getBoundingBox();
+          final int viewWidthPixels = this.viewport.getViewWidthPixels();
+          final int viewHeightPixels = this.viewport.getViewHeightPixels();
+          final GeoReferencedImage loadImage = new GeoReferencedImage(
+            boundingBox, viewWidthPixels, viewHeightPixels);
+          this.imageWorker = new LayerRendererOverlaySwingWorker(this,
+            loadImage);
+          Invoke.worker(this.imageWorker);
+        }
       }
+      GeoReferencedImageLayerRenderer.render(this.viewport, (Graphics2D)g,
+        image);
     }
-    GeoReferencedImageLayerRenderer.render(this.viewport, (Graphics2D)g, image);
   }
 
   @Override

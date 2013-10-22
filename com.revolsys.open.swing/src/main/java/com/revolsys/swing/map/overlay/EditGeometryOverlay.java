@@ -16,6 +16,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -231,10 +232,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         return true;
       } else {
         layers.add(layer);
-        final List<String> layerNames = layer.getSnapLayerNames();
-        if (layerNames != null) {
-          for (final String layerName : layerNames) {
-            final Layer snapLayer = project.getLayer(layerName);
+        final Collection<String> layerPaths = layer.getSnapLayerPaths();
+        if (layerPaths != null) {
+          for (final String layerPath : layerPaths) {
+            final Layer snapLayer = project.getLayer(layerPath);
             if (snapLayer instanceof AbstractDataObjectLayer) {
               if (snapLayer.isVisible(scale)) {
                 layers.add((AbstractDataObjectLayer)snapLayer);

@@ -20,6 +20,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -79,10 +80,9 @@ import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
-import com.revolsys.swing.field.CheckBox;
-import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
+import com.revolsys.swing.map.form.SnapLayersPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -477,14 +477,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void createPropertiesPanelSnapping(
     final TabbedValuePanel propertiesPanel) {
-    final JPanel panel = new JPanel();
-    SwingUtil.setTitledBorder(panel, "Snapping");
-    final CheckBox snapToAllLayers = new CheckBox("snapToAllLayers",
-      isSnapToAllLayers());
-    // TODO on toggle change value and enable/disable list of layers selection
-    SwingUtil.addLabel(panel, "Snap To All Layers");
-    panel.add(snapToAllLayers);
-    GroupLayoutUtil.makeColumns(panel, 2, false);
+    final SnapLayersPanel panel = new SnapLayersPanel(this);
     propertiesPanel.addTab("Snapping", panel);
   }
 
@@ -941,9 +934,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return this.selectedRecords.size();
   }
 
-  @SuppressWarnings("unchecked")
-  public List<String> getSnapLayerNames() {
-    return (List<String>)getProperty("snapLayers");
+  public Collection<String> getSnapLayerPaths() {
+    return getProperty("snapLayers", Collections.<String> emptyList());
   }
 
   public Collection<String> getUserReadOnlyFieldNames() {
@@ -1601,6 +1593,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       this.selectedRecords.removeAll(objects);
     }
     return objects.size();
+  }
+
+  public void setSnapLayerPaths(final Collection<String> snapLayerPaths) {
+    if (snapLayerPaths == null || snapLayerPaths.isEmpty()) {
+      removeProperty("snapLayers");
+    } else {
+      setProperty("snapLayers", new TreeSet<String>(snapLayerPaths));
+    }
   }
 
   public void setSnapToAllLayers(final boolean snapToAllLayers) {

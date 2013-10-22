@@ -43,9 +43,13 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     this.url = getProperty("url");
     try {
       this.mapServer = ArcGisServerRestClient.getMapServer(url);
-      final TileInfo tileInfo = this.mapServer.getTileInfo();
-      this.geometryFactory = tileInfo.getSpatialReference();
-      return true;
+      if (mapServer == null) {
+        return false;
+      } else {
+        final TileInfo tileInfo = this.mapServer.getTileInfo();
+        this.geometryFactory = tileInfo.getSpatialReference();
+        return true;
+      }
     } catch (final Throwable e) {
       throw new RuntimeException("Error connecting to ArcGIS rest server "
         + url, e);

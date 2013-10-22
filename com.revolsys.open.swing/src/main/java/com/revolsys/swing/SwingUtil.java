@@ -538,6 +538,19 @@ public class SwingUtil {
     PreferencesUtil.setString(preferencesClass, preferenceName, path);
   }
 
+  public static void setDescendantsEnabled(final Component component,
+    final boolean enabled) {
+    if (component != null) {
+      component.setEnabled(enabled);
+      if (component instanceof Container) {
+        final Container container = (Container)component;
+        for (final Component child : container.getComponents()) {
+          setDescendantsEnabled(child, enabled);
+        }
+      }
+    }
+  }
+
   public static void setFieldValue(final JComponent field, final Object value) {
     if (SwingUtilities.isEventDispatchThread()) {
       if (field instanceof Field) {
