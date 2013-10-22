@@ -100,7 +100,68 @@ public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
   PropertyChangeSupportProxy {
 
+  public static final String FLIP_FIELDS_ICON = "flip_fields";
+
+  public static final String FLIP_FIELDS_NAME = "Flip Fields Orientation";
+
+  public static final String FLIP_LINE_ORIENTATION_ICON = "flip_line_orientation";
+
+  public static final String FLIP_LINE_ORIENTATION_NAME = "Flip Line Orientation (Visually Flips Fields)";
+
+  public static final String FLIP_RECORD_ICON = "flip_orientation";
+
+  public static final String FLIP_RECORD_NAME = "Flip Record Orientation";
+
   private static final long serialVersionUID = 1L;
+
+  private JButton addOkButton;
+
+  private DataObjectLayerAttributesTableModel allAttributes;
+
+  private DataObjectStore dataStore;
+
+  private boolean editable = true;
+
+  private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
+
+  private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
+
+  private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<Set<String>>();
+
+  private boolean fieldsValid;
+
+  private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
+
+  private final Map<Field, String> fieldToNameMap = new HashMap<Field, String>();
+
+  private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
+
+  private final Map<String, Boolean> fieldValidMap = new HashMap<String, Boolean>();
+
+  private final Map<String, Object> fieldValues = new HashMap<String, Object>();
+
+  private GeometryCoordinatesPanel geometryCoordinatesPanel;
+
+  private String lastFocussedFieldName;
+
+  private AbstractDataObjectLayer layer;
+
+  private DataObjectMetaData metaData;
+
+  private LayerDataObject object;
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
+
+  private Set<String> readOnlyFieldNames = new HashSet<String>();
+
+  private Set<String> requiredFieldNames = new HashSet<String>();
+
+  private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<Integer, Set<String>>();
+
+  private final JTabbedPane tabs = new JTabbedPane();
+
+  private ToolBar toolBar;
 
   private final UndoManager undoManager = new UndoManager() {
     private static final long serialVersionUID = 1L;
@@ -132,55 +193,6 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
   };
-
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
-
-  private DataObjectLayerAttributesTableModel allAttributes;
-
-  private String lastFocussedFieldName;
-
-  private DataObjectStore dataStore;
-
-  private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
-
-  private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
-
-  private boolean fieldsValid;
-
-  private final Map<Field, String> fieldToNameMap = new HashMap<Field, String>();
-
-  private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
-
-  private final Map<String, Boolean> fieldValidMap = new HashMap<String, Boolean>();
-
-  private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<Set<String>>();
-
-  private GeometryCoordinatesPanel geometryCoordinatesPanel;
-
-  private DataObjectMetaData metaData;
-
-  private LayerDataObject object;
-
-  private Set<String> readOnlyFieldNames = new HashSet<String>();
-
-  private Set<String> requiredFieldNames = new HashSet<String>();
-
-  private final JTabbedPane tabs = new JTabbedPane();
-
-  private ToolBar toolBar;
-
-  private boolean editable = true;
-
-  private AbstractDataObjectLayer layer;
-
-  private JButton addOkButton;
-
-  private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
-
-  private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<Integer, Set<String>>();
-
-  private final Map<String, Object> fieldValues = new HashMap<String, Object>();
 
   public DataObjectLayerForm(final AbstractDataObjectLayer layer) {
     setLayout(new BorderLayout());
@@ -506,15 +518,17 @@ public class DataObjectLayerForm extends JPanel implements
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        this.toolBar.addButton("geometry", "Reverse Geometry", "line_reverse",
-          editable, this, "reverseGeometry");
         if (DirectionalAttributes.getProperty(metaData)
           .hasDirectionalAttributes()) {
-          this.toolBar.addButton("geometry", "Reverse Fields",
-            "attributes_reverse", editable, this, "reverseAttributes");
-          this.toolBar.addButton("geometry", "Reverse Geometry & Fields",
-            "attributes_line_reverse", editable, this,
-            "reverseAttributesAndGeometry");
+          this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
+            FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
+          this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
+            FLIP_LINE_ORIENTATION_ICON, editable, this, "flipLineOrientation");
+          this.toolBar.addButton("geometry", FLIP_FIELDS_NAME,
+            FLIP_FIELDS_ICON, editable, this, "flipFields");
+        } else {
+          this.toolBar.addButton("geometry", "Flip Line Orientation",
+            "flip_line", editable, this, "flipLineOrientation");
         }
       }
     }
@@ -576,6 +590,18 @@ public class DataObjectLayerForm extends JPanel implements
     final String name = editor.getAttributeName();
     final Object value = editor.getCellEditorValue();
     setFieldValue(name, value, true);
+  }
+
+  public void flipFields() {
+    addUndo(new ReverseDataObjectAttributesUndo(this.object));
+  }
+
+  public void flipLineOrientation() {
+    addUndo(new ReverseDataObjectGeometryUndo(this.object));
+  }
+
+  public void flipRecordOrientation() {
+    addUndo(new ReverseDataObjectUndo(this.object));
   }
 
   @Override
@@ -948,18 +974,6 @@ public class DataObjectLayerForm extends JPanel implements
         this.layer = null;
       }
     }
-  }
-
-  public void reverseAttributes() {
-    addUndo(new ReverseDataObjectAttributesUndo(this.object));
-  }
-
-  public void reverseAttributesAndGeometry() {
-    addUndo(new ReverseDataObjectUndo(this.object));
-  }
-
-  public void reverseGeometry() {
-    addUndo(new ReverseDataObjectGeometryUndo(this.object));
   }
 
   public void revertChanges() {
