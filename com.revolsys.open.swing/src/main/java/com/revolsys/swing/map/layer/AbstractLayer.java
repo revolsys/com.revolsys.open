@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -86,7 +85,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean exists = true;
 
-  protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
+  private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
     this);
 
   private boolean editable = false;
@@ -114,7 +113,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean queryable = true;
 
-  private boolean eventsEnabled = true;
+  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<Boolean>();
 
   private boolean querySupported = true;
 
@@ -238,10 +237,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final ValueField panel = new ValueField(this);
     tabPanel.addTab("General", panel);
 
-    final JComponent nameField = SwingUtil.addField(panel, this, "name");
-    if (nameField instanceof Field) {
-      nameField.addPropertyChangeListener("name", this.beanPropertyListener);
-    }
+    final Field nameField = (Field)SwingUtil.addField(panel, this, "name");
+    nameField.addPropertyChangeListener("name", this.beanPropertyListener);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
     return panel;
@@ -286,13 +283,14 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
+    this.beanPropertyListener = null;
     final DefaultSingleCDockable dockable = getProperty("TableView");
     if (dockable != null) {
       // TODO all this should be done by listeners
       dockable.setVisible(false);
     }
     firePropertyChange("deleted", false, true);
-    this.eventsEnabled = false;
+    setEventsEnabled(false);
     if (this.layerGroup != null) {
       this.layerGroup.remove(this);
     }
@@ -461,7 +459,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public boolean isEventsEnabled() {
-    if (this.eventsEnabled) {
+    if (eventsEnabled.get() != Boolean.FALSE) {
       if (layerGroup == null) {
         return true;
       } else {
@@ -583,8 +581,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public boolean setEventsEnabled(final boolean eventsEnabled) {
-    final boolean oldValue = this.eventsEnabled;
-    this.eventsEnabled = eventsEnabled;
+    final boolean oldValue = this.eventsEnabled.get() != Boolean.FALSE;
+    if (eventsEnabled) {
+      this.eventsEnabled.set(null);
+    } else {
+      this.eventsEnabled.set(Boolean.FALSE);
+    }
     return oldValue;
   }
 
@@ -603,9 +605,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   protected void setInitialized(final boolean initialized) {
-    final boolean oldValue = this.initialized;
     this.initialized = initialized;
-    firePropertyChange("initialized", oldValue, this.initialized);
+    firePropertyChange("initialized", !initialized, this.initialized);
   }
 
   @Override

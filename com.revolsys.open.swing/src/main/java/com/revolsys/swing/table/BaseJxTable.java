@@ -57,6 +57,42 @@ public class BaseJxTable extends JXTable {
   }
 
   @Override
+  public int convertColumnIndexToModel(final int columnIndex) {
+    try {
+      return super.convertColumnIndexToModel(columnIndex);
+    } catch (final IndexOutOfBoundsException e) {
+      return columnIndex;
+    }
+  }
+
+  @Override
+  public int convertColumnIndexToView(final int columnIndex) {
+    try {
+      return super.convertColumnIndexToView(columnIndex);
+    } catch (final IndexOutOfBoundsException e) {
+      return columnIndex;
+    }
+  }
+
+  @Override
+  public int convertRowIndexToModel(final int rowIndex) {
+    try {
+      return super.convertRowIndexToModel(rowIndex);
+    } catch (final IndexOutOfBoundsException e) {
+      return rowIndex;
+    }
+  }
+
+  @Override
+  public int convertRowIndexToView(final int rowIndex) {
+    try {
+      return super.convertRowIndexToView(rowIndex);
+    } catch (final IndexOutOfBoundsException e) {
+      return rowIndex;
+    }
+  }
+
+  @Override
   protected void createDefaultRenderers() {
     super.createDefaultRenderers();
     setDefaultRenderer(Object.class, new DefaultTableRenderer(

@@ -54,12 +54,12 @@ public class Project extends LayerGroup {
 
   public Project() {
     this("Project");
-    setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
   }
 
   public Project(final String name) {
     super(name);
     this.baseMapLayers.setLayerGroup(this);
+    setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
   }
 
   private void addChangedLayers(final LayerGroup group,
@@ -296,8 +296,10 @@ public class Project extends LayerGroup {
     if ("viewBoundingBox".equals(name)) {
       if (value != null) {
         final BoundingBox viewBoundingBox = BoundingBox.create(value.toString());
-        setViewBoundingBox(viewBoundingBox);
         if (!BoundingBox.isEmpty(viewBoundingBox)) {
+          this.viewBoundingBox = viewBoundingBox;
+          setGeometryFactory(viewBoundingBox.getGeometryFactory());
+          setViewBoundingBox(viewBoundingBox);
           firePropertyChange("srid", -2, viewBoundingBox.getSrid());
         }
       }

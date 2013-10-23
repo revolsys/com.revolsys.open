@@ -105,7 +105,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       if (layer != null && !this.layers.contains(layer)) {
         this.layers.add(index, layer);
         layer.setLayerGroup(this);
-        LayerInitializer.initialize(layer);
+        initialize(layer);
         fireIndexedPropertyChange("layers", index, null, layer);
       }
     }
@@ -420,6 +420,18 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   @Override
   public int indexOf(final Object o) {
     return this.layers.indexOf(o);
+  }
+
+  public void initialize(final Layer layer) {
+    if (getProject() != null) {
+      LayerInitializer.initialize(layer);
+      if (layer instanceof LayerGroup) {
+        final LayerGroup layerGroup = (LayerGroup)layer;
+        for (final Layer child : layerGroup) {
+          initialize(child);
+        }
+      }
+    }
   }
 
   @Override

@@ -30,6 +30,7 @@ import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
@@ -43,7 +44,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
-import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -112,8 +112,7 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final File projectDirectory) {
     this(title);
-    ProgressMonitor.background(this, title, "Load project", false, this,
-      "loadProject", projectDirectory);
+    Invoke.background("Load project", this, "loadProject", projectDirectory);
   }
 
   public ProjectFrame(final String title, final Project project) {
@@ -277,18 +276,23 @@ public class ProjectFrame extends BaseFrame {
 
   @Override
   public void dispose() {
-    super.dispose();
-    if (this.project != null) {
-      final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
-      DataObjectStoreConnectionManager.get().removeConnectionRegistry(
-        dataStores);
-      if (Project.get() == this.project) {
-        Project.set(null);
+    if (SwingUtilities.isEventDispatchThread()) {
+      setVisible(false);
+      super.dispose();
+      if (this.project != null) {
+        final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
+        DataObjectStoreConnectionManager.get().removeConnectionRegistry(
+          dataStores);
+        if (Project.get() == this.project) {
+          Project.set(null);
+        }
+        this.tocPanel = null;
+        this.project = null;
+        this.dockControl = null;
+        this.mapPanel = null;
       }
-      this.tocPanel = null;
-      this.project = null;
-      this.dockControl = null;
-      this.mapPanel = null;
+    } else {
+      Invoke.later(this, "dispose");
     }
   }
 
@@ -384,30 +388,21 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void loadProject(final File projectFile) {
-    final boolean eventsEnabled = project.setEventsEnabled(false);
-    try {
-      final FileSystemResource resource = new FileSystemResource(projectFile);
-      this.project.readProject(resource);
+    final FileSystemResource resource = new FileSystemResource(projectFile);
+    this.project.readProject(resource);
 
-      final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
-      dataStoreConnectionManager.removeConnectionRegistry("Project");
-      dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
+    final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
+    dataStoreConnectionManager.removeConnectionRegistry("Project");
+    dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
 
-      final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
-      folderConnectionManager.removeConnectionRegistry("Project");
-      folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
-    } finally {
-      project.setEventsEnabled(eventsEnabled);
-    }
-  }
+    final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
+    folderConnectionManager.removeConnectionRegistry("Project");
+    folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
 
-  public void loadProject(final ProgressMonitor progressMonitor,
-    final File projectFile) {
-    try {
-      loadProject(projectFile);
-    } finally {
-      progressMonitor.close();
-      toFront();
+    final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+    if (!BoundingBox.isEmpty(viewBoundingBox)) {
+      getMapPanel().setGeometryFactory(viewBoundingBox.getGeometryFactory());
+      getMapPanel().setBoundingBox(viewBoundingBox);
     }
   }
 

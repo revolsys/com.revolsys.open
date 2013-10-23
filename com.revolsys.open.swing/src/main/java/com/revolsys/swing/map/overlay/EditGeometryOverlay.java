@@ -601,6 +601,13 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       }
       clearAddGeometry();
 
+    } else if (keyCode == KeyEvent.VK_F2 || keyCode == KeyEvent.VK_F) {
+      clearMouseOverLocations();
+      clearMoveGeometry();
+      if (this.addCompleteAction != null) {
+        this.addCompleteAction.addComplete(this, addGeometry);
+      }
+      clearAddGeometry();
     } else if (keyCode == KeyEvent.VK_CONTROL) {
       if (!isModeAddGeometry()) {
         clearMouseOverLocations();
@@ -706,9 +713,11 @@ public class EditGeometryOverlay extends AbstractOverlay implements
                 xorGeometry = createXorLine(geometryFactory, previousPoint,
                   point);
               } else {
+                final Point p1 = geometryFactory.createPoint(previousPoint);
+                final Point p3 = geometryFactory.createPoint(firstPoint);
                 final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
-                xorGeometry = viewportGeometryFactory.createLineString(
-                  previousPoint, point, firstPoint);
+                xorGeometry = viewportGeometryFactory.createLineString(p1,
+                  point, p3);
               }
             }
           } else {

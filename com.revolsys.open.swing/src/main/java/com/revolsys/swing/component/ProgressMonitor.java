@@ -53,7 +53,7 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     progressMonitor.setVisible(true);
   }
 
-  private final JProgressBar progressBar = new JProgressBar();;
+  private final JProgressBar progressBar = new JProgressBar();
 
   private final JLabel noteLabel;
 

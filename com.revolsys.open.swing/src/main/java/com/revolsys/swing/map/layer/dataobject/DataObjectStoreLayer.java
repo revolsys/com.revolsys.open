@@ -30,6 +30,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -101,6 +102,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.saveObjectChangesMethod = ReflectionUtils.findMethod(getClass(),
       "transactionSaveObjectChanges", LayerDataObject.class);
     this.saveObjectChangesMethod.setAccessible(true);
+  }
+
+  protected void addCachedRecords(final List<LayerDataObject> records,
+    final LayerDataObject record) {
+    final String id = getId(record);
+    synchronized (this.cachedRecords) {
+      final LayerDataObject cachedRecord = this.cachedRecords.get(id);
+      if (cachedRecord == null) {
+        records.add(record);
+      } else {
+        records.add(cachedRecord);
+      }
+    }
   }
 
   @Override
@@ -223,7 +237,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public void delete() {
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
-    this.beanPropertyListener = null;
     this.boundingBox = null;
     this.cachedRecords.clear();
     this.dataStore = null;
@@ -403,20 +416,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected List<LayerDataObject> getCachedRecords(
-    final List<LayerDataObject> readObjects) {
-    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
-    for (final LayerDataObject object : readObjects) {
-      final String id = getId(object);
-      synchronized (this.cachedRecords) {
-        final LayerDataObject cachedObject = this.cachedRecords.get(id);
-        if (cachedObject == null) {
-          objects.add(object);
-        } else {
-          objects.add(cachedObject);
-        }
-      }
+    final List<LayerDataObject> records) {
+    final List<LayerDataObject> cachedRecords = new ArrayList<LayerDataObject>();
+    for (final LayerDataObject record : records) {
+      addCachedRecords(cachedRecords, record);
     }
-    return objects;
+    return cachedRecords;
   }
 
   protected LayerDataObject getCacheRecord(final LayerDataObject object) {
@@ -612,12 +617,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (dataStore != null) {
         final boolean enabled = setEventsEnabled(false);
         try {
+          final Statistics statistics = query.getProperty("statistics");
           query.setProperty("dataObjectFactory", this);
-          final Reader reader = dataStore.query(query);
+          final Reader<LayerDataObject> reader = (Reader)dataStore.query(query);
           try {
-            final List<LayerDataObject> readObjects = reader.read();
-            final List<LayerDataObject> objects = getCachedRecords(readObjects);
-            return objects;
+            final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+            for (final LayerDataObject record : reader) {
+              addCachedRecords(records, record);
+              if (statistics != null) {
+                statistics.add(record);
+              }
+            }
+            return records;
+
           } finally {
             reader.close();
           }

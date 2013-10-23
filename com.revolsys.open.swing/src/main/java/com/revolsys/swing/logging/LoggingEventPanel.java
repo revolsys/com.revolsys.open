@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.JXTextArea;
 import org.springframework.util.StringUtils;
@@ -50,6 +52,13 @@ public class LoggingEventPanel extends JPanel {
     dialog.add(buttons, BorderLayout.SOUTH);
     dialog.pack();
     dialog.setVisible(true);
+  }
+
+  public static void showDialog(final Component component,
+    Class<?> category, final String message, final Throwable e) {
+    final LoggingEvent event = new LoggingEvent(Logger.class.getName(),
+      Logger.getLogger(component.getClass()), Level.ERROR, message, e);
+    showDialog(component, event);
   }
 
   public LoggingEventPanel(final LoggingEvent event) {
