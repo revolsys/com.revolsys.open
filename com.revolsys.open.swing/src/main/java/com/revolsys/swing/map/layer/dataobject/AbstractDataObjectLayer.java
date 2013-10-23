@@ -319,9 +319,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (map != null) {
         final EditGeometryOverlay addGeometryOverlay = map.getMapOverlay(EditGeometryOverlay.class);
         synchronized (addGeometryOverlay) {
-          // TODO what if there is another feature being edited?
-          addGeometryOverlay.addObject(this, this);
-          // TODO cancel action
+          clearSelectedRecords();
+          addGeometryOverlay.addRecord(this, this);
         }
       }
     }
@@ -1385,7 +1384,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public boolean saveChanges(final LayerDataObject object) {
+  public boolean saveChanges(final LayerDataObject record) {
     return false;
   }
 
@@ -1663,7 +1662,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
-            window.setLocation(50, 50);
             SwingUtil.autoAdjustPosition(window);
             this.forms.put(object, window);
             window.addWindowListener(new WindowAdapter() {

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
@@ -45,6 +46,8 @@ public class Project extends LayerGroup {
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 
   private BoundingBox viewBoundingBox = new BoundingBox();
+
+  private BoundingBox initialBoundingBox;
 
   private DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
     "Project");
@@ -92,6 +95,10 @@ public class Project extends LayerGroup {
 
   public FolderConnectionRegistry getFolderConnections() {
     return this.folderConnections;
+  }
+
+  public BoundingBox getInitialBoundingBox() {
+    return initialBoundingBox;
   }
 
   @Override
@@ -288,23 +295,38 @@ public class Project extends LayerGroup {
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
+    if (geometryFactory != null) {
+      super.setGeometryFactory(geometryFactory);
+      firePropertyChange("srid", -2, geometryFactory.getSRID());
+    }
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
-    if ("viewBoundingBox".equals(name)) {
+    if ("srid".equals(name)) {
+      try {
+        final Integer srid = StringConverterRegistry.toObject(Integer.class,
+          value);
+        setGeometryFactory(GeometryFactory.getFactory(srid));
+      } catch (final Throwable t) {
+      }
+    } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
         final BoundingBox viewBoundingBox = BoundingBox.create(value.toString());
         if (!BoundingBox.isEmpty(viewBoundingBox)) {
-          this.viewBoundingBox = viewBoundingBox;
+          this.initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
           setViewBoundingBox(viewBoundingBox);
-          firePropertyChange("srid", -2, viewBoundingBox.getSrid());
         }
       }
     } else {
       super.setProperty(name, value);
+    }
+  }
+
+  public void setSrid(final Number srid) {
+    if (srid != null) {
+      setGeometryFactory(GeometryFactory.getFactory(srid.intValue()));
     }
   }
 
@@ -337,7 +359,7 @@ public class Project extends LayerGroup {
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
 
-    final BoundingBox boundingBox = getViewBoundingBox();
+    BoundingBox boundingBox = getViewBoundingBox();
     if (!BoundingBox.isEmpty(boundingBox)) {
       BoundingBox defaultBoundingBox = null;
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -346,6 +368,7 @@ public class Project extends LayerGroup {
         if (coordinateSystem != null) {
           defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
         }
+        boundingBox = boundingBox.convert(geometryFactory);
       }
       MapSerializerUtil.add(map, "viewBoundingBox", boundingBox,
         defaultBoundingBox);

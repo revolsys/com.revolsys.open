@@ -828,27 +828,35 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   protected synchronized boolean transactionSaveObjectChanges(
-    final LayerDataObject object) {
+    final LayerDataObject record) {
     if (isExists()) {
       final DataObjectStore dataStore = getDataStore();
       if (dataStore != null) {
         final Writer<DataObject> writer = dataStore.createWriter();
         try {
-          final String id = object.getString(getMetaData().getIdAttributeName());
-          if (this.deletedObjectIds.contains(id) || super.isDeleted(object)) {
-            removeDeletedObject(object);
-            deletedObjectIds.remove(id);
-            getIndex().remove(object);
-            object.setState(DataObjectState.Deleted);
-            writer.write(object);
-          } else if (super.isModified(object)) {
-            removeModifiedObject(object);
-            writer.write(object);
-            getIndex().insert(object);
-          } else if (isNew(object)) {
-            removeNewObject(object);
-            getIndex().insert(object);
-            writer.write(object);
+          final String idAttributeName = getMetaData().getIdAttributeName();
+          Object id = record.getValue(idAttributeName);
+          final String idString = record.getString(idAttributeName);
+          if (this.deletedObjectIds.contains(idString)
+            || super.isDeleted(record)) {
+            removeDeletedObject(record);
+            deletedObjectIds.remove(idString);
+            getIndex().remove(record);
+            record.setState(DataObjectState.Deleted);
+            writer.write(record);
+          } else if (super.isModified(record)) {
+            removeModifiedObject(record);
+            writer.write(record);
+            getIndex().insert(record);
+          } else if (isNew(record)) {
+            if (id == null && StringUtils.hasText(idAttributeName)) {
+              id = dataStore.createPrimaryIdValue(typePath);
+              record.setValue(idAttributeName, id);
+            }
+
+            removeNewObject(record);
+            getIndex().insert(record);
+            writer.write(record);
           }
         } finally {
           writer.close();

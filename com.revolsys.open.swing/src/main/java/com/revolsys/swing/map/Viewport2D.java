@@ -408,7 +408,10 @@ public class Viewport2D {
     }
     this.propertyChangeSupport.firePropertyChange("boundingBox",
       oldBoundingBox, boundingBox);
-    this.propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
+    if (this.scale > 0) {
+      this.propertyChangeSupport.firePropertyChange("scale", oldScale,
+        this.scale);
+    }
   }
 
   public boolean isUseModelCoordinates() {

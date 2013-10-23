@@ -93,12 +93,13 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final MultipleUndo multipleUndo = new MultipleUndo();
     for (final DataObject mergedRecord : mergedRecords.keySet()) {
       final LayerDataObject originalRecord = mergeableToOiginalRecordMap.get(mergedRecord);
-      final SetRecordValuesUndo setValuesUndo = new SetRecordValuesUndo(originalRecord,
-        mergedRecord);
+      final SetRecordValuesUndo setValuesUndo = new SetRecordValuesUndo(
+        originalRecord, mergedRecord);
       multipleUndo.addEdit(setValuesUndo);
     }
     for (final LayerDataObject record : replacedOriginalRecords) {
-      final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(record);
+      final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(
+        record);
       multipleUndo.addEdit(deleteRecordUndo);
     }
     if (undoManager == null) {
@@ -137,6 +138,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     this.okButton.setEnabled(false);
     buttonsPanel.add(this.okButton);
 
+    pack();
     SwingUtil.autoAdjustPosition(this);
   }
 
@@ -268,6 +270,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
       mergedObjectsPanel.add(panel);
     }
+    pack();
     SwingUtil.autoAdjustPosition(this);
   }
 

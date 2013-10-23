@@ -135,7 +135,6 @@ public class SwingUtil {
   }
 
   public static void autoAdjustPosition(final Window window) {
-    window.pack();
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
     final int width = Math.min(window.getWidth(), screenSize.width - 100);

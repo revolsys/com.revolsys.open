@@ -104,7 +104,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private Project project;
 
-  private double scale = 0;
+  private double scale = 500000000;
 
   private final UndoManager undoManager = new UndoManager();
 
@@ -611,6 +611,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldValue = getGeometryFactory();
     if (geometryFactory != oldValue) {
+
       this.project.setGeometryFactory(geometryFactory);
       firePropertyChange("geometryFactory", oldValue, geometryFactory);
       repaint();

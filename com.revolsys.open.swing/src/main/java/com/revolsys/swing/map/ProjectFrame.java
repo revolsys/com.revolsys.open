@@ -399,10 +399,10 @@ public class ProjectFrame extends BaseFrame {
     folderConnectionManager.removeConnectionRegistry("Project");
     folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
 
-    final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-    if (!BoundingBox.isEmpty(viewBoundingBox)) {
-      getMapPanel().setGeometryFactory(viewBoundingBox.getGeometryFactory());
-      getMapPanel().setBoundingBox(viewBoundingBox);
+    final BoundingBox initialBoundingBox = project.getInitialBoundingBox();
+    if (!BoundingBox.isEmpty(initialBoundingBox)) {
+      project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
+      project.setViewBoundingBox(initialBoundingBox);
     }
   }
 

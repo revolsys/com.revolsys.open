@@ -174,7 +174,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
    * 
    * @param addLayer 
    */
-  public void addObject(final AbstractDataObjectLayer layer,
+  public void addRecord(final AbstractDataObjectLayer layer,
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
       final DataObjectMetaData metaData = layer.getMetaData();

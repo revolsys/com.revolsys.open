@@ -80,6 +80,7 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsErrorPredicate;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
@@ -239,9 +240,10 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void actionAddOk() {
     final AbstractDataObjectLayer layer = getLayer();
-    final LayerDataObject object = getObject();
-    layer.saveChanges(object);
-    layer.addSelectedRecords(object);
+    final LayerDataObject record = getObject();
+    layer.saveChanges(record);
+    layer.setSelectedRecords(record);
+    layer.showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
     closeWindow();
   }
 

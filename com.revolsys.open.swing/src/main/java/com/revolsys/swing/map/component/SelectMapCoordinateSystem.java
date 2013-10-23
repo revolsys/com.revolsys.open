@@ -27,6 +27,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     );
 
     this.map = map;
+    setSelectedItem(map.getGeometryFactory().getSRID());
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       this, "formatCoordinateSystem");
@@ -77,7 +78,8 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     final String propertyName = event.getPropertyName();
     if ("geometryFactory".equals(propertyName)) {
       final GeometryFactory geometryFactory = this.map.getGeometryFactory();
-      setSelectedItem(geometryFactory.getSRID());
+      final int srid = geometryFactory.getSRID();
+      setSelectedItem(srid);
     }
   }
 

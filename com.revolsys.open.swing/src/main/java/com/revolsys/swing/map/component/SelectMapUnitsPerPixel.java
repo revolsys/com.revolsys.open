@@ -43,7 +43,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
 
   private final MapPanel map;
 
-  private String unitString;
+  private String unitString = "m";
 
   public SelectMapUnitsPerPixel(final MapPanel map) {
     super(PROJECTED_MODEL);
@@ -112,7 +112,10 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
     final String propertyName = event.getPropertyName();
     if ("scale".equals(propertyName) || "unitsPerPixel".equals(propertyName)) {
       final double unitsPerPixel = this.map.getUnitsPerPixel();
-      setSelectedItem(unitsPerPixel);
+      if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
+        && !Double.isNaN(unitsPerPixel)) {
+        setSelectedItem(unitsPerPixel);
+      }
     } else if ("boundingBox".equals(propertyName)) {
       final BoundingBox boundingBox = this.map.getBoundingBox();
       ComboBoxModel model = PROJECTED_MODEL;

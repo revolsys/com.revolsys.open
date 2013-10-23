@@ -597,7 +597,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory != this.geometryFactory) {
+    if (geometryFactory != this.geometryFactory && geometryFactory != null) {
       final GeometryFactory old = this.geometryFactory;
       this.geometryFactory = geometryFactory;
       firePropertyChange("geometryFactory", old, this.geometryFactory);

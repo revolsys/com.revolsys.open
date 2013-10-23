@@ -211,7 +211,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public static boolean isEmpty(final BoundingBox boundingBox) {
     if (boundingBox == null) {
-      return false;
+      return true;
     } else {
       return boundingBox.isEmpty();
     }
