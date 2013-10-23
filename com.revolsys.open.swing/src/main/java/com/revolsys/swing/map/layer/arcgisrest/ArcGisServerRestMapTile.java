@@ -18,15 +18,14 @@ public class ArcGisServerRestMapTile extends MapTile {
   private final ArcGisServerRestLayer layer;
 
   public ArcGisServerRestMapTile(final ArcGisServerRestLayer layer,
-    final int zoomLevel, final double resolution, final int tileX,
-    final int tileY) {
+    final MapServer mapServer, final int zoomLevel, final double resolution,
+    final int tileX, final int tileY) {
 
-    super(layer.getMapServer().getBoundingBox(zoomLevel, tileX, tileY),
-      layer.getMapServer().getTileInfo().getWidth(), layer.getMapServer()
-        .getTileInfo()
-        .getHeight(), resolution);
+    super(mapServer.getBoundingBox(zoomLevel, tileX, tileY),
+      mapServer.getTileInfo().getWidth(), mapServer.getTileInfo().getHeight(),
+      resolution);
     this.layer = layer;
-    this.mapServer = layer.getMapServer();
+    this.mapServer = mapServer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
     this.tileY = tileY;
