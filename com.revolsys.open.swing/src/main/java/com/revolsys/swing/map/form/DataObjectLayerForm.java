@@ -77,6 +77,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
@@ -196,6 +197,7 @@ public class DataObjectLayerForm extends JPanel implements
   };
 
   public DataObjectLayerForm(final AbstractDataObjectLayer layer) {
+    ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
     setName(layer.getName());
     this.layer = layer;

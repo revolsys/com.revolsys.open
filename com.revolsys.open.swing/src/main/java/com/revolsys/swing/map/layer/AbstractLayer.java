@@ -7,6 +7,7 @@ import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -35,6 +37,8 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -255,6 +259,25 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
+  public boolean canSaveSettings(final File directory) {
+    if (directory != null) {
+      final Logger log = LoggerFactory.getLogger(getClass());
+      if (!directory.exists()) {
+        log.error("Unable to save layer " + getPath()
+          + " directory does not exist " + directory);
+      } else if (!directory.isDirectory()) {
+        log.error("Unable to save layer " + getPath()
+          + " file is not a directory " + directory);
+      } else if (!directory.canWrite()) {
+        log.error("Unable to save layer " + getPath()
+          + " directory is not writable " + directory);
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
   protected boolean checkShowProperties() {
     boolean show = true;
     synchronized (this) {
@@ -313,6 +336,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return true;
   }
 
+  protected boolean doSaveSettings(final File directory) {
+    final String settingsFileName = getSettingsFileName();
+    final File settingsFile = new File(directory, settingsFileName);
+    MapObjectFactoryRegistry.write(settingsFile, this);
+    return true;
+  }
+
   protected void fireIndexedPropertyChange(final String propertyName,
     final int index, final Object oldValue, final Object newValue) {
     if (this.propertyChangeSupport != null) {
@@ -342,6 +372,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return new BoundingBox(geometryFactory);
+    }
+  }
+
+  public File getDirectory() {
+    final LayerGroup layerGroup = getLayerGroup();
+    if (layerGroup == null) {
+      return null;
+    } else {
+      return layerGroup.getDirectory();
     }
   }
 
@@ -425,6 +464,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return new BoundingBox(geometryFactory);
+  }
+
+  protected String getSettingsFileName() {
+    final String name = getName();
+    return FileUtil.getSafeFileName(name) + ".rgobject";
   }
 
   @Override
@@ -567,10 +611,24 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean saveChanges() {
+    boolean saved = true;
     if (isHasChanges()) {
-      return doSaveChanges();
+      saved &= doSaveChanges();
     }
-    return true;
+    return saved;
+  }
+
+  public boolean saveSettings() {
+    final File directory = getDirectory();
+    return saveSettings(directory);
+  }
+
+  @Override
+  public boolean saveSettings(final File directory) {
+    if (canSaveSettings(directory)) {
+      return doSaveSettings(directory);
+    }
+    return false;
   }
 
   @Override

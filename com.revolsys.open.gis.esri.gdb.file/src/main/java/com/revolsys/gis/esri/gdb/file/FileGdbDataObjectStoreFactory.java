@@ -14,6 +14,8 @@ import com.revolsys.io.FileUtil;
 
 public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
+  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
+
   private static final List<String> URL_PATTERNS = Arrays.asList(
     "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
 
@@ -42,6 +44,16 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
+  }
+
+  @Override
+  public List<String> getFileExtensions() {
+    return FILE_NAME_EXTENSIONS;
+  }
+
+  @Override
+  public String getName() {
+    return "ESRI File Geodatabase";
   }
 
   @Override

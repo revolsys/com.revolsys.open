@@ -277,6 +277,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
   }
 
   @Override
+  protected boolean doSaveSettings(final File directory) {
+    final File groupDirectory = getGroupSettingsDirectory(directory);
+    return super.doSaveSettings(groupDirectory);
+  }
+
+  @Override
   public Layer get(final int index) {
     return this.layers.get(index);
   }
@@ -313,6 +319,27 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     final List<V> layers = new ArrayList<V>();
     addDescendants(layers, layerClass);
     return layers;
+  }
+
+  @Override
+  public File getDirectory() {
+    final LayerGroup layerGroup = getLayerGroup();
+    if (layerGroup != null) {
+      final File parentDirectory = layerGroup.getDirectory();
+      if (parentDirectory != null) {
+        final File layerDirectory = getGroupSettingsDirectory(parentDirectory);
+        return layerDirectory;
+      }
+    }
+    return null;
+  }
+
+  protected File getGroupSettingsDirectory(final File directory) {
+    final String name = getName();
+    final String groupDirectoryName = FileUtil.getSafeFileName(name);
+    final File groupDirectory = FileUtil.getDirectory(directory,
+      groupDirectoryName);
+    return groupDirectory;
   }
 
   @Override
@@ -404,6 +431,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
     return boundingBox;
+  }
+
+  @Override
+  protected String getSettingsFileName() {
+    return "rgLayerGroup.rgobject";
   }
 
   public <V extends Layer> List<V> getVisibleDescendants(
@@ -602,31 +634,32 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
     }
   }
 
-  @Override
-  public boolean saveChanges() {
+  protected boolean saveAllSettings(final File directory) {
     boolean saved = true;
-    for (final Layer layer : this) {
-      saved &= layer.saveChanges();
+    final File groupDirectory = getGroupSettingsDirectory(directory);
+    if (canSaveSettings(directory)) {
+      saved &= saveSettings(directory);
+      for (final Layer layer : this) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          saved &= layerGroup.saveAllSettings(groupDirectory);
+        } else {
+          saved &= layer.saveSettings(groupDirectory);
+        }
+      }
+    } else {
+      saved = false;
     }
     return saved;
   }
 
-  protected void saveLayerGroup(final File directory) {
-    final File file = new File(directory, "rgLayerGroup.rgobject");
-    MapObjectFactoryRegistry.write(file, this);
-    for (final Layer child : this) {
-      final String childName = child.getName();
-      final String childFileName = FileUtil.getSafeFileName(childName);
-      if (child instanceof LayerGroup) {
-        final LayerGroup childLayerGroup = (LayerGroup)child;
-        final File childDirectory = new File(directory, childFileName);
-        childDirectory.mkdirs();
-        childLayerGroup.saveLayerGroup(childDirectory);
-      } else {
-        final File childFile = new File(directory, childFileName + ".rgobject");
-        MapObjectFactoryRegistry.write(childFile, child);
-      }
+  @Override
+  public boolean saveChanges() {
+    boolean saved = super.saveChanges();
+    for (final Layer layer : this) {
+      saved &= layer.saveChanges();
     }
+    return saved;
   }
 
   @Override

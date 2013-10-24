@@ -1375,11 +1375,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public boolean saveChanges() {
     synchronized (this.getEditSync()) {
-      final boolean saved = doSaveChanges();
-      if (saved) {
-        clearChanges();
+      boolean saved = true;
+      if (isHasChanges()) {
+        saved &= doSaveChanges();
+        if (saved) {
+          clearChanges();
+        }
+        refresh();
       }
-      refresh();
       return saved;
     }
   }

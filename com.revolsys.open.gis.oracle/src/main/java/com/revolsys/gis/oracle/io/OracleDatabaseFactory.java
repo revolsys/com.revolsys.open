@@ -136,6 +136,16 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
+  public List<String> getFileExtensions() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getName() {
+    return "Oracle Database";
+  }
+
+  @Override
   public List<String> getProductNames() {
     return Collections.singletonList("Oracle");
   }

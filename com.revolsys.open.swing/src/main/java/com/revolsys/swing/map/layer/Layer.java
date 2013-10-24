@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer;
 
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -86,6 +87,8 @@ public interface Layer extends PropertyChangeSupportProxy,
     PropertyChangeListener listener);
 
   boolean saveChanges();
+
+  boolean saveSettings(File directory);
 
   void setEditable(boolean editable);
 

@@ -61,6 +61,12 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
       "pencil", readonly, "toggleEditable"), editable);
 
+    // final EnableCheck hasChanges = new
+    // TreeItemPropertyEnableCheck("hasChanges");
+
+    // menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
+    // "table_save", hasChanges, "saveChanges"));
+
     menu.addMenuItem("edit", TreeItemRunnable.createAction("View Tie-Points",
       "table_go", "showTiePointsTable"));
 
@@ -207,6 +213,11 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       return image.getWarpFilter();
     }
+  }
+
+  @Override
+  public boolean isHasChanges() {
+    return false;
   }
 
   public boolean isShowOriginalImage() {

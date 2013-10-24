@@ -10,5 +10,9 @@ public interface DataObjectStoreFactory {
   Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     Map<String, ? extends Object> connectionProperties);
 
+  List<String> getFileExtensions();
+
+  String getName();
+
   List<String> getUrlPatterns();
 }

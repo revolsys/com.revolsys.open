@@ -77,6 +77,16 @@ public class SpatiaLiteDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
+  public List<String> getFileExtensions() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getName() {
+    return "SQLite/SpatiaLite Database";
+  }
+
+  @Override
   public List<String> getProductNames() {
     return Collections.singletonList("SpatiaLite");
   }

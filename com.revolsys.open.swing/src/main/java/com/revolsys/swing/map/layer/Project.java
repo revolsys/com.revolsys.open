@@ -85,6 +85,24 @@ public class Project extends LayerGroup {
     this.viewBoundingBox = null;
   }
 
+  @Override
+  protected boolean doSaveSettings(final File directory) {
+    boolean saved = true;
+    FileUtil.deleteDirectory(directory, false);
+    directory.mkdir();
+
+    saved &= super.doSaveSettings(directory);
+
+    final File projectDirectory = getProjectDirectory();
+    final File baseMapsDirectory = new File(projectDirectory, "Base Maps");
+    FileUtil.deleteDirectory(baseMapsDirectory, false);
+    final LayerGroup baseMapLayers = getBaseMapLayers();
+    if (baseMapLayers != null) {
+      saved &= baseMapLayers.saveAllSettings(projectDirectory);
+    }
+    return saved;
+  }
+
   public LayerGroup getBaseMapLayers() {
     return this.baseMapLayers;
   }
@@ -93,8 +111,26 @@ public class Project extends LayerGroup {
     return this.dataStores;
   }
 
+  @Override
+  public File getDirectory() {
+    final File directory = getProjectDirectory();
+    if (directory != null) {
+      final File layersDirectory = new File(directory, "Layers");
+      layersDirectory.mkdirs();
+      if (layersDirectory.isDirectory()) {
+        return layersDirectory;
+      }
+    }
+    return null;
+  }
+
   public FolderConnectionRegistry getFolderConnections() {
     return this.folderConnections;
+  }
+
+  @Override
+  protected File getGroupSettingsDirectory(final File directory) {
+    return directory;
   }
 
   public BoundingBox getInitialBoundingBox() {
@@ -114,6 +150,20 @@ public class Project extends LayerGroup {
   @Override
   public Project getProject() {
     return this;
+  }
+
+  public File getProjectDirectory() {
+    if (this.resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)this.resource;
+      final File directory = fileResource.getFile();
+      if (!directory.exists()) {
+        directory.mkdirs();
+      }
+      if (directory.isDirectory()) {
+        return directory;
+      }
+    }
+    return null;
   }
 
   public BoundingBox getViewBoundingBox() {
@@ -209,6 +259,19 @@ public class Project extends LayerGroup {
     }
   }
 
+  public void save() {
+    System.out.println("Save");
+  }
+
+  public boolean saveAllSettings() {
+    if (isReadOnly()) {
+      return true;
+    } else {
+      final File directory = getDirectory();
+      return super.saveAllSettings(directory);
+    }
+  }
+
   public boolean saveChangesWithPrompt() {
     if (isReadOnly()) {
       return true;
@@ -240,7 +303,6 @@ public class Project extends LayerGroup {
               iterator.remove();
             }
           }
-          saveProject();
           if (layersWithChanges.isEmpty()) {
             return true;
           } else {
@@ -264,24 +326,48 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void saveProject() {
-    if (this.resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)this.resource;
-      final File directory = fileResource.getFile();
-      if (!directory.exists()) {
-        directory.mkdirs();
-      }
-      if (directory.isDirectory()) {
-        final File layersDirectory = new File(directory, "Layers");
-        FileUtil.deleteDirectory(layersDirectory, false);
-        layersDirectory.mkdir();
-        saveLayerGroup(layersDirectory);
-        final File baseMapsDirectory = new File(directory, "Base Maps");
-        FileUtil.deleteDirectory(baseMapsDirectory, false);
-        baseMapsDirectory.mkdir();
-        getBaseMapLayers().saveLayerGroup(baseMapsDirectory);
+  public boolean saveSettingsWithPrompt() {
+    if (isReadOnly()) {
+      return true;
+    } else {
+      final MapPanel mapPanel = MapPanel.get(this);
+      final JLabel message = new JLabel(
+        "<html><body><p><b>Save changes to project?</b></p></body></html>");
+
+      final int option = JOptionPane.showConfirmDialog(mapPanel, message,
+        "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+      if (option == JOptionPane.CANCEL_OPTION) {
+        return false;
+      } else if (option == JOptionPane.NO_OPTION) {
+        return true;
+      } else {
+        if (saveAllSettings()) {
+          return true;
+        } else {
+          final JLabel message2 = new JLabel(
+            "<html><body><p>Saving project failed.</b></p>"
+              + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
+
+          final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
+            "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          if (option2 == JOptionPane.CANCEL_OPTION) {
+            return false;
+          } else {
+            return true;
+          }
+        }
       }
     }
+  }
+
+  public boolean saveWithPrompt() {
+    boolean result = saveChangesWithPrompt();
+    if (result) {
+      result = saveSettingsWithPrompt();
+    }
+    return result;
   }
 
   public void setDataStores(final DataObjectStoreConnectionRegistry dataStores) {

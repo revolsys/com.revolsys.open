@@ -1,6 +1,7 @@
 package com.revolsys.jdbc.io;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,16 @@ public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
+  }
+
+  @Override
+  public List<String> getFileExtensions() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getName() {
+    return "JDBC";
   }
 
   @Override

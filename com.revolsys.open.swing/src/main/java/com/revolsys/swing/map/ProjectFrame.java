@@ -3,16 +3,23 @@ package com.revolsys.swing.map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.ResponseCache;
 import java.util.List;
 
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
@@ -75,6 +82,10 @@ import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.util.OS;
 
 public class ProjectFrame extends BaseFrame {
+  public static final String SAVE_PROJECT_KEY = "Save Project";
+
+  public static final String SAVE_CHANGES_KEY = "Save Changes";
+
   private static final long serialVersionUID = 1L;
 
   static {
@@ -92,6 +103,30 @@ public class ProjectFrame extends BaseFrame {
     MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
 
+  }
+
+  public static void addSaveActions(final JComponent component,
+    final Project project) {
+    final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    inputMap.put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+      SAVE_PROJECT_KEY);
+    inputMap.put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK),
+      SAVE_PROJECT_KEY);
+
+    inputMap.put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK
+        | InputEvent.ALT_DOWN_MASK), SAVE_CHANGES_KEY);
+    inputMap.put(
+      KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK
+        | InputEvent.ALT_DOWN_MASK), SAVE_CHANGES_KEY);
+
+    final ActionMap actionMap = component.getActionMap();
+    actionMap.put(SAVE_PROJECT_KEY, new InvokeMethodAction(SAVE_PROJECT_KEY,
+      project, "saveAllSettings"));
+    actionMap.put(SAVE_CHANGES_KEY, new InvokeMethodAction(SAVE_CHANGES_KEY,
+      project, "saveChanges"));
   }
 
   private ObjectTreePanel tocPanel;
@@ -117,6 +152,10 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final Project project) {
     super(title);
+    final JRootPane rootPane = getRootPane();
+
+    addSaveActions(rootPane, project);
+
     this.project = project;
     Project.set(project);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
@@ -269,7 +308,7 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItem("project", "Save Project", "Save Project",
-      SilkIconLoader.getIcon("layout_save"), this.project, "saveProject");
+      SilkIconLoader.getIcon("layout_save"), this.project, "saveAllSettings");
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
   }
@@ -298,7 +337,7 @@ public class ProjectFrame extends BaseFrame {
 
   public void exit() {
     final Project project = getProject();
-    if (project != null && project.saveChangesWithPrompt()) {
+    if (project != null && project.saveWithPrompt()) {
       final Window[] windows = Window.getOwnerlessWindows();
       for (final Window window : windows) {
         window.dispose();

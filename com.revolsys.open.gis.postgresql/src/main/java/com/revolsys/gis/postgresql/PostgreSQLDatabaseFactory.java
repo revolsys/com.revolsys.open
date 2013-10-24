@@ -104,6 +104,16 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
+  public List<String> getFileExtensions() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getName() {
+    return "PostgreSQL/PostGIS Database";
+  }
+
+  @Override
   public List<String> getProductNames() {
     return Collections.singletonList("PostgreSQL");
   }
