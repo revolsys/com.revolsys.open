@@ -5,9 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.channels.FileChannel.MapMode;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +25,7 @@ import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.DateUtil;
 
 public class XbaseIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
@@ -63,8 +61,6 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   private int currentDeletedCount = 0;
 
   private final DataObjectFactory dataObjectFactory;
-
-  private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
   private int deletedCount = 0;
 
@@ -170,12 +166,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      try {
-        return new java.sql.Date(dateFormat.parse(dateString).getTime());
-      } catch (final ParseException e) {
-        throw new IllegalStateException("'" + dateString
-          + "' is not a date in 'YYYYMMDD' format");
-      }
+      return new java.sql.Date(DateUtil.parse("yyyyMMdd", dateString).getTime());
     }
   }
 

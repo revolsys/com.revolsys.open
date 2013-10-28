@@ -2,7 +2,6 @@ package com.revolsys.io.esri.gdb.xml;
 
 import java.io.Writer;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlConstants;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
+import com.revolsys.util.DateUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -173,10 +173,10 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.text("}</MetaID>");
     out.text("<CreaDate>");
     final Timestamp date = new Timestamp(System.currentTimeMillis());
-    out.text(new SimpleDateFormat("yyyyMMdd").format(date));
+    out.text(DateUtil.format("yyyyMMdd", date));
     out.text("</CreaDate>");
     out.text("<CreaTime>");
-    out.text(new SimpleDateFormat("HHmmssSS").format(date));
+    out.text(DateUtil.format("HHmmssSS", date));
     out.text("</CreaTime>");
     out.text("<SyncOnce>TRUE</SyncOnce>");
     out.text("</Esri>");

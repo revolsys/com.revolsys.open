@@ -64,7 +64,7 @@ public class DataObjectLayerListSelectionModel extends
       convertRowIndexToModel(index1));
     final List<LayerDataObject> objects = getObjects(index0, index1);
     final AbstractDataObjectLayer layer = this.model.getLayer();
-    layer.unselectRecords(objects);
+    layer.unSelectRecords(objects);
   }
 
   @Override

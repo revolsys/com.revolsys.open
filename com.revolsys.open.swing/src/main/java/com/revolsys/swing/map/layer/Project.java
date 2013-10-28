@@ -4,8 +4,10 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,6 +29,9 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class Project extends LayerGroup {
 
@@ -41,13 +46,7 @@ public class Project extends LayerGroup {
     Project.project = new WeakReference<Project>(project);
   }
 
-  private Resource resource;
-
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
-
-  private BoundingBox viewBoundingBox = new BoundingBox();
-
-  private BoundingBox initialBoundingBox;
 
   private DataObjectStoreConnectionRegistry dataStores = new DataObjectStoreConnectionRegistry(
     "Project");
@@ -55,12 +54,21 @@ public class Project extends LayerGroup {
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
     "Project");
 
+  private BoundingBox initialBoundingBox;
+
+  private Resource resource;
+
+  private BoundingBox viewBoundingBox = new BoundingBox();
+
+  private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<String, BoundingBox>();
+
   public Project() {
     this("Project");
   }
 
   public Project(final String name) {
     super(name);
+    Property.addListener(zoomBookmarks, this);
     this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
   }
@@ -78,11 +86,26 @@ public class Project extends LayerGroup {
 
   }
 
+  public void addZoomBookmark(final String name, final BoundingBox boundingBox) {
+    if (name != null && boundingBox != null) {
+      final BoundingBox oldValue = zoomBookmarks.get(name);
+      int index;
+      if (oldValue == null) {
+        index = zoomBookmarks.size();
+      } else {
+        index = new ArrayList<String>(zoomBookmarks.keySet()).indexOf(name);
+      }
+      zoomBookmarks.put(name, boundingBox);
+      fireIndexedPropertyChange("zoomBookmarks", index, "", name);
+    }
+  }
+
   @Override
   public void delete() {
     super.delete();
     this.baseMapLayers = null;
     this.viewBoundingBox = null;
+    this.zoomBookmarks = null;
   }
 
   @Override
@@ -170,6 +193,10 @@ public class Project extends LayerGroup {
     return this.viewBoundingBox;
   }
 
+  public Map<String, BoundingBox> getZoomBookmarks() {
+    return zoomBookmarks;
+  }
+
   protected void readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = SpringUtil.getResource(resource,
       "Base Maps");
@@ -255,6 +282,19 @@ public class Project extends LayerGroup {
           "Unable to read: " + layerGroupResource, e);
       } finally {
         SpringUtil.setBaseResource(oldResource);
+      }
+    }
+  }
+
+  public void removeZoomBookmark(final String name) {
+    if (name != null) {
+      int index;
+      if (zoomBookmarks.containsKey(name)) {
+        index = new ArrayList<String>(zoomBookmarks.keySet()).indexOf(name);
+        zoomBookmarks.remove(name);
+        fireIndexedPropertyChange("zoomBookmarks", index, null, name);
+      } else {
+        index = zoomBookmarks.size();
       }
     }
   }
@@ -441,6 +481,38 @@ public class Project extends LayerGroup {
     }
   }
 
+  public void setZoomBookmarks(final Map<String, ?> zoomBookmarks) {
+    final Map<String, BoundingBox> bookmarks = new LinkedHashMap<String, BoundingBox>();
+    if (zoomBookmarks != null) {
+      for (final Entry<String, ?> entry : zoomBookmarks.entrySet()) {
+        final String name = entry.getKey();
+        final Object object = entry.getValue();
+        if (object != null && name != null) {
+          try {
+            BoundingBox boundingBox = null;
+            if (object instanceof BoundingBox) {
+              boundingBox = (BoundingBox)object;
+            } else if (object instanceof Geometry) {
+              final Geometry geometry = (Geometry)object;
+              boundingBox = BoundingBox.getBoundingBox(geometry);
+            } else if (object != null) {
+              final String wkt = object.toString();
+              boundingBox = BoundingBox.create(wkt);
+            }
+            if (boundingBox != null) {
+              bookmarks.put(name, boundingBox);
+            }
+          } catch (final Throwable e) {
+            ExceptionUtil.log(getClass(), "Not a valid bounding box " + name
+              + "=" + object, e);
+          }
+        }
+      }
+      this.zoomBookmarks = bookmarks;
+      firePropertyChange("zoomBookmarks", null, zoomBookmarks);
+    }
+  }
+
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
@@ -458,6 +530,8 @@ public class Project extends LayerGroup {
       }
       MapSerializerUtil.add(map, "viewBoundingBox", boundingBox,
         defaultBoundingBox);
+      final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();
+      MapSerializerUtil.add(map, "zoomBookmarks", zoomBookmarks);
     }
 
     return map;

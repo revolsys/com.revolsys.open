@@ -165,4 +165,9 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(getText());
+  }
 }

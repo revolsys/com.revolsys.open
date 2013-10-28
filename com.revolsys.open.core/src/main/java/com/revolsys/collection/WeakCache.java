@@ -1,7 +1,7 @@
 package com.revolsys.collection;
 
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +71,7 @@ public class WeakCache<K, V> implements Map<K, V> {
       if (value == null) {
         cache.remove(key);
       } else {
-        cache.put((K)key, new SoftReference<V>(value));
+        cache.put((K)key, new WeakReference<V>(value));
       }
     }
     return value;
@@ -109,7 +109,7 @@ public class WeakCache<K, V> implements Map<K, V> {
         oldValue = map.remove(key);
       }
     } else {
-      final Reference<V> oldReference = cache.put(key, new SoftReference<V>(
+      final Reference<V> oldReference = cache.put(key, new WeakReference<V>(
         value));
       if (map == null) {
         if (oldReference != null) {

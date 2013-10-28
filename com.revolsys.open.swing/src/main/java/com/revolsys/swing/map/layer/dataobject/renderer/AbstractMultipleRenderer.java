@@ -26,8 +26,8 @@ public abstract class AbstractMultipleRenderer extends
 
     for (final String type : Arrays.asList("Geometry", "Text", "Marker",
       "Multiple", "Filter", "Scale")) {
-      final ImageIcon icon = SilkIconLoader.getIcon("style_"
-        + type.toLowerCase() + "_add");
+      final String iconName = ("style_" + type + "_add").toLowerCase();
+      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
       final InvokeMethodAction action = TreeItemRunnable.createAction("Add "
         + type + " Style", icon, null, "add" + type + "Style");
       menu.addMenuItem("add", action);
@@ -40,8 +40,8 @@ public abstract class AbstractMultipleRenderer extends
 
   protected static void addMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass) {
-    final ImageIcon icon = SilkIconLoader.getIcon("style_" + type.toLowerCase()
-      + "_go");
+    final String iconName = ("style_" + type + "_go").toLowerCase();
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
 
     final TreeItemPropertyEnableCheck enableCheck = new TreeItemPropertyEnableCheck(
       "class", rendererClass, true);

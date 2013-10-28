@@ -192,4 +192,9 @@ public class DirectoryNameField extends JPanel implements Field {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(directoryName.getText());
+  }
 }

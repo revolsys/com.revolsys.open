@@ -10,13 +10,14 @@ public class IntegerField extends NumberField {
   }
 
   public IntegerField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 10, 10, defaultValue, required, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    final Object defaultValue) {
+    super(name, 12, 10, defaultValue, required, Integer.MIN_VALUE,
+      Integer.MAX_VALUE);
     setCssClass("int");
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Integer.valueOf(value);
   }
 

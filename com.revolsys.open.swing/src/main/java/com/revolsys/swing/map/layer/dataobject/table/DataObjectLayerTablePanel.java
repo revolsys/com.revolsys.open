@@ -33,7 +33,6 @@ import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowPropertyEnableCheck;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowRunnable;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -56,7 +55,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   private final DataObjectTableCellEditor tableCellEditor;
 
   public DataObjectLayerTablePanel(final AbstractDataObjectLayer layer,
-    final DataObjectRowTable table) {
+    final DataObjectLayerTable table) {
     super(table);
     this.layer = layer;
     tableCellEditor = table.getTableCellEditor();

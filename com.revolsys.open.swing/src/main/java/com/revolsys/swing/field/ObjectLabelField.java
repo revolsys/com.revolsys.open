@@ -151,4 +151,8 @@ public class ObjectLabelField extends JLabel implements Field {
     return getFieldName() + "=" + getFieldValue();
   }
 
+  @Override
+  public void updateFieldValue() {
+  }
+
 }

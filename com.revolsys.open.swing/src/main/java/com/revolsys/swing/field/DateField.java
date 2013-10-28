@@ -161,4 +161,9 @@ public class DateField extends JXDatePicker implements Field,
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    // TODO setFieldValue(getText());
+  }
 }

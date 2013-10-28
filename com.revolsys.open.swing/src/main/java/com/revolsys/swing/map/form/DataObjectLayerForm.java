@@ -1099,10 +1099,15 @@ public class DataObjectLayerForm extends JPanel implements
     return oldValue;
   }
 
-  public void setFieldValue(final String fieldName, final Object value,
+  public void setFieldValue(final String fieldName, Object value,
     final boolean validate) {
     boolean changed = false;
     final Object oldValue = getFieldValue(fieldName);
+    final DataObjectMetaData metaData = getMetaData();
+    if (metaData != null) {
+      final Class<?> attributeClass = metaData.getAttributeClass(fieldName);
+      value = StringConverterRegistry.toObject(attributeClass, value);
+    }
     this.fieldValues.put(fieldName, value);
     final JComponent field = (JComponent)getField(fieldName);
     if (oldValue == null & value != null
@@ -1282,7 +1287,7 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  private boolean validateFieldInternal(final String fieldName) {
+  protected boolean validateFieldInternal(final String fieldName) {
     final boolean oldValid = isFieldValid(fieldName);
     final Field field = getField(fieldName);
     boolean valid = true;

@@ -23,6 +23,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.field.Field;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.BaseJxTable;
@@ -159,6 +160,10 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public boolean stopCellEditing() {
     boolean stopped = false;
     try {
+      if (editorComponent instanceof Field) {
+        final Field field = (Field)editorComponent;
+        field.updateFieldValue();
+      }
       stopped = super.stopCellEditing();
     } catch (final IndexOutOfBoundsException e) {
       return true;

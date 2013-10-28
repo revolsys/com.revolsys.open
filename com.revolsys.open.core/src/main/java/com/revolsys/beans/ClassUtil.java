@@ -13,7 +13,6 @@ public class ClassUtil {
       final Class<?> superclass = clazz.getSuperclass();
       addSuperClasses(classes, superclass);
     }
-
   }
 
   public static void addSuperClassesAndInterfaces(

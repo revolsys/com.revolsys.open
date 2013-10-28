@@ -1,7 +1,5 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.revolsys.converter.string.BooleanStringConverter;
@@ -10,10 +8,9 @@ import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
+import com.revolsys.util.DateUtil;
 
 public class DateAttribute extends AbstractFileGdbAttribute {
-  private final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
   @SuppressWarnings("deprecation")
   public static final Date MIN_DATE = new Date(70, 0, 1);
 
@@ -64,7 +61,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
     } else {
       if (value instanceof String) {
         try {
-          value = DATE_FORMAT.parseObject(value.toString());
+          value = DateUtil.parse("yyyy-MM-dd", (String)value);
         } catch (final Exception e) {
           throw new IllegalArgumentException(
             "Data must be in the format YYYY-MM-DD " + value);

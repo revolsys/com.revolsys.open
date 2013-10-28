@@ -244,4 +244,8 @@ public class ValueField extends JPanel implements Field {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+  }
 }

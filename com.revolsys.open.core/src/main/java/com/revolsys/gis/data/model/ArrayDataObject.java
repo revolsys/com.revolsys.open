@@ -88,11 +88,6 @@ public class ArrayDataObject extends BaseDataObject {
     return Arrays.asList(attributes);
   }
 
-  @Override
-  public int hashCode() {
-    return attributes.hashCode();
-  }
-
   /**
    * Set the value of the attribute with the specified name.
    * 

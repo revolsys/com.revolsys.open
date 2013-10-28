@@ -129,14 +129,17 @@ public class PopupMenu implements MouseListener {
     this.autoCreateDnd = autoCreateDnd;
   }
 
+  public void show(final Component component, final int x, final int y) {
+    final JPopupMenu popupMenu = this.menu.createJPopupMenu();
+    popupMenu.show(component, x, y);
+  }
+
   protected void showMenu(final MouseEvent e) {
     if (e.isPopupTrigger()) {
-
-      final JPopupMenu popupMenu = this.menu.createJPopupMenu();
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
-      popupMenu.show(component, x, y);
+      show(component, x, y);
     }
   }
 

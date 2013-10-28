@@ -92,6 +92,7 @@ import com.revolsys.swing.map.layer.dataobject.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectMetaDataTableModel;
@@ -102,13 +103,13 @@ import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
+import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -230,7 +231,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final Set<LayerDataObject> modifiedRecords = new LinkedHashSet<LayerDataObject>();
 
-  private final Set<LayerDataObject> newRecords = new LinkedHashSet<LayerDataObject>();
+  private final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();
 
   private Query query;
 
@@ -289,23 +290,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void addHighlightedRecord(final LayerDataObject object) {
-    if (isLayerRecord(object)) {
-      this.highlightedRecords.add(object);
+  protected void addHighlightedRecord(final LayerDataObject record) {
+    if (isLayerRecord(record)) {
+      this.highlightedRecords.add(record);
     }
   }
 
   public void addHighlightedRecords(
-    final Collection<? extends LayerDataObject> objects) {
-    for (final LayerDataObject object : objects) {
-      addHighlightedRecord(object);
+    final Collection<? extends LayerDataObject> records) {
+    for (final LayerDataObject record : records) {
+      addHighlightedRecord(record);
     }
     fireHighlighted();
   }
 
-  protected void addModifiedObject(final LayerDataObject object) {
+  protected void addModifiedRecord(final LayerDataObject record) {
     synchronized (this.modifiedRecords) {
-      this.modifiedRecords.add(object);
+      this.modifiedRecords.add(record);
     }
   }
 
@@ -326,24 +327,24 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void addSelectedRecord(final LayerDataObject object) {
-    if (isLayerRecord(object)) {
+  protected void addSelectedRecord(final LayerDataObject record) {
+    if (isLayerRecord(record)) {
       clearSelectedRecordsIndex();
-      this.selectedRecords.add(object);
+      this.selectedRecords.add(record);
     }
   }
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerDataObject> objects = query(boundingBox);
-      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+      final List<LayerDataObject> records = query(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
         final LayerDataObject layerDataObject = iterator.next();
         if (!isVisible(layerDataObject)
           || this.deletedRecords.contains(layerDataObject)) {
           iterator.remove();
         }
       }
-      addSelectedRecords(objects);
+      addSelectedRecords(records);
       if (!this.selectedRecords.isEmpty()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
@@ -351,21 +352,37 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void addSelectedRecords(
-    final Collection<? extends LayerDataObject> objects) {
-    for (final LayerDataObject object : objects) {
-      addSelectedRecord(object);
+    final Collection<? extends LayerDataObject> records) {
+    for (final LayerDataObject record : records) {
+      addSelectedRecord(record);
     }
     fireSelected();
   }
 
-  public void addSelectedRecords(final LayerDataObject... objects) {
-    addSelectedRecords(Arrays.asList(objects));
+  public void addSelectedRecords(final LayerDataObject... records) {
+    addSelectedRecords(Arrays.asList(records));
   }
 
   public void cancelChanges() {
     synchronized (this.getEditSync()) {
-      internalCancelChanges();
-      refresh();
+      final boolean eventsEnabled = setEventsEnabled(false);
+      boolean cancelled = true;
+      try {
+        cancelled &= internalCancelChanges(newRecords);
+        cancelled &= internalCancelChanges(deletedRecords);
+        cancelled &= internalCancelChanges(modifiedRecords);
+      } finally {
+        setEventsEnabled(eventsEnabled);
+        fireRecordsChanged();
+      }
+      if (!cancelled) {
+        JOptionPane.showMessageDialog(MapPanel.get(this),
+          "<html><p>There was an error cancelling changes for one or more records.</p>"
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+      }
+
     }
   }
 
@@ -373,17 +390,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Geometry geometry = getPasteRecordGeometry(record, false);
 
     return geometry != null;
-  }
-
-  protected void clearChanges() {
-    clearSelectedRecords();
-    removeForm(this.newRecords);
-    removeForm(this.modifiedRecords);
-    removeForm(this.deletedRecords);
-    this.newRecords.clear();
-    this.modifiedRecords.clear();
-    this.deletedRecords.clear();
-    fireRecordsChanged();
   }
 
   public void clearSelectedRecords() {
@@ -397,8 +403,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends LayerDataObject> V copyRecord(final V object) {
-    final LayerDataObject copy = createRecord(object);
+  public <V extends LayerDataObject> V copyRecord(final V record) {
+    final LayerDataObject copy = createRecord(record);
     return (V)copy;
   }
 
@@ -426,23 +432,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (metaData.equals(getMetaData())) {
       return new LayerDataObject(this);
     } else {
-      throw new IllegalArgumentException("Cannot create objects for "
+      throw new IllegalArgumentException("Cannot create records for "
         + metaData);
     }
   }
 
-  protected DataObjectLayerForm createDefaultForm(final LayerDataObject object) {
-    return new DataObjectLayerForm(this, object);
+  protected DataObjectLayerForm createDefaultForm(final LayerDataObject record) {
+    return new DataObjectLayerForm(this, record);
   }
 
-  public DataObjectLayerForm createForm(final LayerDataObject object) {
+  public DataObjectLayerForm createForm(final LayerDataObject record) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (StringUtils.hasText(formFactoryExpression)) {
       try {
         final SpelExpressionParser parser = new SpelExpressionParser();
         final Expression expression = parser.parseExpression(formFactoryExpression);
         final EvaluationContext context = new StandardEvaluationContext(this);
-        context.setVariable("object", object);
+        context.setVariable("object", record);
         return expression.getValue(context, DataObjectLayerForm.class);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
@@ -450,7 +456,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         return null;
       }
     } else {
-      return createDefaultForm(object);
+      return createDefaultForm(record);
     }
   }
 
@@ -489,18 +495,18 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public UndoableEdit createPropertyEdit(final LayerDataObject object,
+  public UndoableEdit createPropertyEdit(final LayerDataObject record,
     final String propertyName, final Object oldValue, final Object newValue) {
-    return new SetObjectProperty(object, propertyName, oldValue, newValue);
+    return new SetObjectProperty(record, propertyName, oldValue, newValue);
   }
 
   public LayerDataObject createRecord() {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerDataObject object = createDataObject(getMetaData());
+      final LayerDataObject record = createDataObject(getMetaData());
       synchronized (newRecords) {
-        this.newRecords.add(object);
+        this.newRecords.add(record);
       }
-      return object;
+      return record;
     } else {
       return null;
     }
@@ -525,7 +531,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public Component createTablePanel() {
-    final DataObjectRowTable table = DataObjectLayerTableModel.createTable(this);
+    final DataObjectLayerTable table = DataObjectLayerTableModel.createTable(this);
     if (table == null) {
       return null;
     } else {
@@ -535,9 +541,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void delete() {
-    clearChanges();
-    setIndex(null);
     super.delete();
+    setIndex(null);
     if (this.forms != null) {
       for (final Window window : this.forms.values()) {
         if (window != null) {
@@ -545,18 +550,25 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
       }
     }
+    deletedRecords.clear();
+    forms.clear();
+    highlightedRecords.clear();
+    modifiedRecords.clear();
+    newRecords.clear();
+    selectedRecords.clear();
+    clearSelectedRecordsIndex();
     System.gc();
   }
 
-  protected void deleteRecord(final LayerDataObject object) {
+  protected void deleteRecord(final LayerDataObject record) {
     final boolean trackDeletions = true;
-    deleteRecord(object, trackDeletions);
+    deleteRecord(record, trackDeletions);
   }
 
   protected void deleteRecord(final LayerDataObject record,
     final boolean trackDeletions) {
     if (isLayerRecord(record)) {
-      removeSelectedRecords(record);
+      unSelectRecords(record);
       clearSelectedRecordsIndex();
       synchronized (newRecords) {
         if (!this.newRecords.remove(record)) {
@@ -571,20 +583,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public void deleteRecords(final Collection<? extends LayerDataObject> objects) {
+  public void deleteRecords(final Collection<? extends LayerDataObject> records) {
     if (isCanDeleteRecords()) {
       synchronized (this.getEditSync()) {
-        unselectRecords(objects);
-        for (final LayerDataObject object : objects) {
-          deleteRecord(object);
+        unSelectRecords(records);
+        for (final LayerDataObject record : records) {
+          deleteRecord(record);
         }
       }
       fireRecordsChanged();
     }
   }
 
-  public void deleteRecords(final LayerDataObject... objects) {
-    deleteRecords(Arrays.asList(objects));
+  public void deleteRecords(final LayerDataObject... records) {
+    deleteRecords(Arrays.asList(records));
   }
 
   public void deleteSelectedRecords() {
@@ -608,11 +620,37 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   protected boolean doSaveChanges() {
-    return true;
+    if (isExists()) {
+      boolean saved = true;
+      try {
+        saved &= doSaveChanges(deletedRecords);
+        saved &= doSaveChanges(modifiedRecords);
+        saved &= doSaveChanges(newRecords);
+      } finally {
+        fireRecordsChanged();
+      }
+      return saved;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean doSaveChanges(final Collection<LayerDataObject> records) {
+    boolean saved = true;
+    for (final LayerDataObject record : new ArrayList<LayerDataObject>(records)) {
+      if (!internalSaveChanges(record)) {
+        saved = false;
+      }
+    }
+    return saved;
+  }
+
+  protected boolean doSaveChanges(final LayerDataObject record) {
+    return false;
   }
 
   protected void filter(final List<LayerDataObject> results,
-    final Set<LayerDataObject> records, final Filter<DataObject> filter) {
+    final Collection<LayerDataObject> records, final Filter<DataObject> filter) {
     for (final LayerDataObject record : records) {
       if (filter.accept(record)) {
         if (!results.contains(record)) {
@@ -664,13 +702,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public List<LayerDataObject> getChanges() {
     synchronized (this.getEditSync()) {
-      final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+      final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
       synchronized (newRecords) {
-        objects.addAll(this.newRecords);
+        records.addAll(this.newRecords);
       }
-      objects.addAll(this.modifiedRecords);
-      objects.addAll(this.deletedRecords);
-      return objects;
+      records.addAll(this.modifiedRecords);
+      records.addAll(this.deletedRecords);
+      return records;
     }
   }
 
@@ -900,8 +938,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public BoundingBox getSelectedBoundingBox() {
     BoundingBox boundingBox = super.getSelectedBoundingBox();
-    for (final DataObject object : getSelectedRecords()) {
-      final Geometry geometry = object.getGeometryValue();
+    for (final DataObject record : getSelectedRecords()) {
+      final Geometry geometry = record.getGeometryValue();
       boundingBox = boundingBox.expandToInclude(geometry);
     }
     return boundingBox;
@@ -955,8 +993,81 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void internalCancelChanges() {
-    clearChanges();
+  /**
+   * Cancel changes for one of the lists of changes {@link #deletedRecords},
+   *  {@link #newRecords}, {@link #modifiedRecords}.
+   * @param records
+   */
+  private boolean internalCancelChanges(
+    final Collection<LayerDataObject> records) {
+    boolean cancelled = true;
+    for (final LayerDataObject record : new ArrayList<LayerDataObject>(records)) {
+      final boolean selected = isSelected(record);
+      removeForm(record);
+      index.remove(record);
+      try {
+        final LayerDataObject originalRecord = internalCancelChanges(record);
+        if (originalRecord == null) {
+          unSelectRecords(record);
+        } else {
+          index.insert(originalRecord);
+          if (selected) {
+            if (originalRecord != record) {
+              unSelectRecords(record);
+              addSelectedRecords(record);
+            }
+          }
+        }
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to cancel changes.\n" + record, e);
+        cancelled = false;
+      } finally {
+        records.remove(record);
+      }
+    }
+    return cancelled;
+  }
+
+  /**
+   * Revert the values of the record to the last values loaded from the database
+   * @param record
+   */
+  protected LayerDataObject internalCancelChanges(final LayerDataObject record) {
+    if (record != null) {
+      final boolean isNew = record.getState() == DataObjectState.New;
+      record.cancelChanges();
+      if (!isNew) {
+        return record;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Revert the values of the record to the last values loaded from the database
+   * @param record
+   */
+  protected LayerDataObject internalPostSaveChanges(final LayerDataObject record) {
+    if (record != null) {
+
+      return record;
+    }
+    return null;
+  }
+
+  protected boolean internalSaveChanges(final LayerDataObject record) {
+    try {
+      final DataObjectState originalState = record.getState();
+      final boolean saved = doSaveChanges(record);
+      if (saved) {
+        postSaveChanges(originalState, record);
+      }
+      return saved;
+    } catch (final Throwable e) {
+      ExceptionUtil.log(getClass(), "Unable to save changes for record:\n"
+        + record, e);
+      return false;
+    }
   }
 
   public boolean isCanAddRecords() {
@@ -995,8 +1106,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
-  public boolean isDeleted(final LayerDataObject object) {
-    return this.deletedRecords != null && this.deletedRecords.contains(object);
+  public boolean isDeleted(final LayerDataObject record) {
+    return this.deletedRecords != null && this.deletedRecords.contains(record);
   }
 
   @Override
@@ -1036,10 +1147,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getSelectionCount() > 0;
   }
 
-  public boolean isHidden(final LayerDataObject object) {
-    if (isCanDeleteRecords() && isDeleted(object)) {
+  public boolean isHidden(final LayerDataObject record) {
+    if (isCanDeleteRecords() && isDeleted(record)) {
       return true;
-    } else if (isSelected(object)) {
+    } else if (isSelected(record)) {
       return true;
     } else {
       return false;
@@ -1050,20 +1161,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return highlightedRecords.contains(record);
   }
 
-  public boolean isLayerRecord(final DataObject object) {
-    if (object.getMetaData() == getMetaData()) {
+  public boolean isLayerRecord(final DataObject record) {
+    if (record.getMetaData() == getMetaData()) {
       return true;
     } else {
       return false;
     }
   }
 
-  public boolean isModified(final LayerDataObject object) {
-    return this.modifiedRecords.contains(object);
+  public boolean isModified(final LayerDataObject record) {
+    return this.modifiedRecords.contains(record);
   }
 
-  public boolean isNew(final LayerDataObject object) {
-    return this.newRecords.contains(object);
+  public boolean isNew(final LayerDataObject record) {
+    return this.newRecords.contains(record);
   }
 
   @Override
@@ -1083,11 +1194,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public boolean isSelected(final LayerDataObject object) {
-    if (object == null) {
+  public boolean isSelected(final LayerDataObject record) {
+    if (record == null) {
       return false;
     } else {
-      return this.selectedRecords.contains(object);
+      return this.selectedRecords.contains(record);
     }
   }
 
@@ -1095,10 +1206,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return snapToAllLayers;
   }
 
-  public boolean isVisible(final LayerDataObject object) {
+  public boolean isVisible(final LayerDataObject record) {
     if (isExists() && isVisible()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer();
-      if (renderer == null || renderer.isVisible(object)) {
+      if (renderer == null || renderer.isVisible(record)) {
         return true;
       }
     }
@@ -1240,6 +1351,43 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     addSelectedRecords(newRecords);
   }
 
+  protected void postSaveChanges(final DataObjectState originalState,
+    final LayerDataObject record) {
+    postSaveDeletedRecord(record);
+    postSaveModifiedRecord(record);
+    postSaveNewRecord(record);
+  }
+
+  protected boolean postSaveDeletedRecord(final LayerDataObject record) {
+    if (this.deletedRecords.remove(record)) {
+      unSelectRecords(record);
+      index.remove(record);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected boolean postSaveModifiedRecord(final LayerDataObject record) {
+    synchronized (this.modifiedRecords) {
+      return this.modifiedRecords.remove(record);
+    }
+  }
+
+  protected boolean postSaveNewRecord(final LayerDataObject record) {
+    synchronized (this.newRecords) {
+      if (this.newRecords.remove(record)) {
+        index.insert(record);
+        if (isSelected(record)) {
+          unSelectRecords(record);
+          addSelectedRecords(record);
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);
@@ -1254,12 +1402,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             updateSpatialIndex(dataObject, oldGeometry);
           }
           clearSelectedRecordsIndex();
-          final DataObjectState state = dataObject.getState();
-          if (state == DataObjectState.Modified) {
-            addModifiedObject(dataObject);
-          } else if (state == DataObjectState.Persisted) {
-            removeModifiedObject(dataObject);
-          }
         }
       }
     }
@@ -1295,15 +1437,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return results;
   }
 
-  protected void removeDeletedObject(final LayerDataObject object) {
-    synchronized (this.deletedRecords) {
-      this.deletedRecords.remove(object);
-      unselectRecords(object);
-    }
-  }
-
-  protected void removeForm(final LayerDataObject object) {
-    final Window form = this.forms.remove(object);
+  protected void removeForm(final LayerDataObject record) {
+    final Window form = this.forms.remove(record);
     if (form != null) {
       form.dispose();
       form.removeNotify();
@@ -1312,62 +1447,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void removeForm(final Set<LayerDataObject> records) {
-    for (final LayerDataObject object : records) {
-      removeForm(object);
+    for (final LayerDataObject record : records) {
+      removeForm(record);
     }
   }
 
-  protected void removeModifiedObject(final LayerDataObject object) {
+  protected void removeSelectedRecord(final LayerDataObject record) {
+    this.selectedRecords.remove(record);
+  }
+
+  public void revertChanges(final LayerDataObject record) {
     synchronized (this.modifiedRecords) {
-      this.modifiedRecords.remove(object);
-    }
-  }
-
-  protected void removeNewObject(final LayerDataObject object) {
-    synchronized (this.newRecords) {
-      this.newRecords.remove(object);
-    }
-  }
-
-  protected void removeSelectedRecord(final LayerDataObject object) {
-    this.selectedRecords.remove(object);
-    clearSelectedRecordsIndex();
-  }
-
-  public void removeSelectedRecords(final BoundingBox boundingBox) {
-    if (isSelectable()) {
-      final List<LayerDataObject> objects = query(boundingBox);
-      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
-        final LayerDataObject layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject)
-          || this.deletedRecords.contains(layerDataObject)) {
-          iterator.remove();
-        }
-      }
-      removeSelectedRecords(objects);
-      if (!this.selectedRecords.isEmpty()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
-      }
-    }
-  }
-
-  public void removeSelectedRecords(
-    final Collection<? extends LayerDataObject> objects) {
-    for (final LayerDataObject object : objects) {
-      removeSelectedRecord(object);
-    }
-    fireSelected();
-  }
-
-  public void removeSelectedRecords(final LayerDataObject... objects) {
-    removeSelectedRecords(Arrays.asList(objects));
-  }
-
-  public void revertChanges(final LayerDataObject object) {
-    synchronized (this.modifiedRecords) {
-      if (isLayerRecord(object)) {
-        removeModifiedObject(object);
-        this.deletedRecords.remove(object);
+      if (isLayerRecord(record)) {
+        postSaveModifiedRecord(record);
+        this.deletedRecords.remove(record);
       }
     }
   }
@@ -1377,18 +1470,40 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     synchronized (this.getEditSync()) {
       boolean saved = true;
       if (isHasChanges()) {
-        saved &= doSaveChanges();
-        if (saved) {
-          clearChanges();
+        final boolean eventsEnabled = setEventsEnabled(false);
+        try {
+          saved &= doSaveChanges();
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unable to save changes for layer: "
+            + this, e);
+          saved = false;
+        } finally {
+          setEventsEnabled(eventsEnabled);
+          fireRecordsChanged();
         }
-        refresh();
+      }
+      if (!saved) {
+        JOptionPane.showMessageDialog(MapPanel.get(this),
+          "<html><p>There was an error saving changes for one or more records.</p>"
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
       }
       return saved;
     }
   }
 
-  public boolean saveChanges(final LayerDataObject record) {
-    return false;
+  public final boolean saveChanges(final LayerDataObject record) {
+    final boolean saved = internalSaveChanges(record);
+    fireRecordsChanged();
+    if (!saved) {
+      JOptionPane.showMessageDialog(MapPanel.get(this),
+        "<html><p>There was an error saving changes to the record.</p>" + "<p>"
+          + getPath() + "</p>"
+          + "<p>Check the logging panel for details.</html>",
+        "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+    }
+    return saved;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -1537,15 +1652,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerDataObject> objects = query(boundingBox);
-      for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+      final List<LayerDataObject> records = query(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
         final LayerDataObject layerDataObject = iterator.next();
         if (!isVisible(layerDataObject)
           || this.deletedRecords.contains(layerDataObject)) {
           iterator.remove();
         }
       }
-      setSelectedRecords(objects);
+      setSelectedRecords(records);
       if (!this.selectedRecords.isEmpty()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
@@ -1574,27 +1689,27 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       clearSelectedRecords();
     } else {
       final Query query = Query.equal(metaData, idAttributeName, id);
-      final List<LayerDataObject> objects = query(query);
-      setSelectedRecords(objects);
+      final List<LayerDataObject> records = query(query);
+      setSelectedRecords(records);
     }
   }
 
   public int setSelectedWithinDistance(final boolean selected,
     final Geometry geometry, final int distance) {
     clearSelectedRecordsIndex();
-    final List<LayerDataObject> objects = query(geometry, distance);
-    for (final Iterator<LayerDataObject> iterator = objects.iterator(); iterator.hasNext();) {
+    final List<LayerDataObject> records = query(geometry, distance);
+    for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
       final LayerDataObject layerDataObject = iterator.next();
       if (!isVisible(layerDataObject)) {
         iterator.remove();
       }
     }
     if (selected) {
-      this.selectedRecords.addAll(objects);
+      this.selectedRecords.addAll(records);
     } else {
-      this.selectedRecords.removeAll(objects);
+      this.selectedRecords.removeAll(records);
     }
-    return objects.size();
+    return records.size();
   }
 
   public void setSnapLayerPaths(final Collection<String> snapLayerPaths) {
@@ -1617,13 +1732,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public LayerDataObject showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
-      final LayerDataObject newObject = createRecord(parameters);
-      final DataObjectLayerForm form = createForm(newObject);
+      final LayerDataObject newRecord = createRecord(parameters);
+      // newRecord.setGeometryValue(getGeometryFactory().createEmptyGeometry());
+      final DataObjectLayerForm form = createForm(newRecord);
       if (form == null) {
         return null;
       } else {
-        final LayerDataObject object = form.showAddDialog();
-        return object;
+        final LayerDataObject addedRecord = form.showAddDialog();
+        return addedRecord;
       }
     } else {
       final Window window = SwingUtil.getActiveWindow();
@@ -1637,20 +1753,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends JComponent> V showForm(final LayerDataObject object) {
-    if (object == null) {
+  public <V extends JComponent> V showForm(final LayerDataObject record) {
+    if (record == null) {
       return null;
     } else {
       synchronized (this.forms) {
-        Window window = this.forms.get(object);
+        Window window = this.forms.get(record);
         if (window == null) {
-          final Object id = object.getIdValue();
-          final Component form = createForm(object);
+          final Object id = record.getIdValue();
+          final Component form = createForm(record);
           if (form == null) {
             return null;
           } else {
             String title;
-            if (object.getState() == DataObjectState.New) {
+            if (record.getState() == DataObjectState.New) {
               title = "Add NEW " + getName();
             } else if (isCanEditRecords()) {
               title = "Edit " + getName() + " #" + id;
@@ -1666,12 +1782,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.add(form);
             window.pack();
             SwingUtil.autoAdjustPosition(window);
-            this.forms.put(object, window);
+            this.forms.put(record, window);
             window.addWindowListener(new WindowAdapter() {
 
               @Override
               public void windowClosing(final WindowEvent e) {
-                removeForm(object);
+                removeForm(record);
               }
             });
             SwingUtil.setVisible(window, true);
@@ -1789,6 +1905,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
 
       }
+      if (line1 == null || line2 == null) {
+        return Collections.singletonList(record);
+      }
+      unSelectRecords(record);
 
       final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
 
@@ -1799,8 +1919,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       property.setSplitAttributes(line, coordinates, record);
       property.setSplitAttributes(line, coordinates, record2);
 
+      updateSpatialIndex(record2, line);
+
       index.insert(record2);
-      removeSelectedRecord(record);
       addSelectedRecords(record, record2);
       return Arrays.asList(record, record2);
     }
@@ -1828,22 +1949,50 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     fireHighlighted();
   }
 
-  public void unselectRecords(
+  public void unSelectRecords(final BoundingBox boundingBox) {
+    if (isSelectable()) {
+      final List<LayerDataObject> records = query(boundingBox);
+      for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
+        final LayerDataObject layerDataObject = iterator.next();
+        if (!isVisible(layerDataObject)
+          || this.deletedRecords.contains(layerDataObject)) {
+          iterator.remove();
+        }
+      }
+      unSelectRecords(records);
+      if (!this.selectedRecords.isEmpty()) {
+        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+      }
+    }
+  }
+
+  public void unSelectRecords(
     final Collection<? extends LayerDataObject> records) {
+    for (final LayerDataObject record : records) {
+      removeSelectedRecord(record);
+    }
     clearSelectedRecordsIndex();
-    this.selectedRecords.removeAll(records);
     fireSelected();
     unHighlightRecords(records);
   }
 
-  public void unselectRecords(final LayerDataObject... objects) {
-    unselectRecords(Arrays.asList(objects));
+  public void unSelectRecords(final LayerDataObject... records) {
+    unSelectRecords(Arrays.asList(records));
   }
 
   protected void updateColumnNames() {
     if (this.columnNames != null && this.metaData != null) {
       final List<String> attributeNames = this.metaData.getAttributeNames();
       this.columnNames.retainAll(attributeNames);
+    }
+  }
+
+  protected void updateRecordState(final LayerDataObject record) {
+    final DataObjectState state = record.getState();
+    if (state == DataObjectState.Modified) {
+      addModifiedRecord(record);
+    } else if (state == DataObjectState.Persisted) {
+      postSaveModifiedRecord(record);
     }
   }
 
@@ -1865,8 +2014,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public void zoomToObject(final DataObject object) {
-    final Geometry geometry = object.getGeometryValue();
+  public void zoomToObject(final DataObject record) {
+    final Geometry geometry = record.getGeometryValue();
 
     zoomTo(geometry);
   }

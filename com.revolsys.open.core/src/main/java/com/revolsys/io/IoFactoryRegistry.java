@@ -3,6 +3,7 @@ package com.revolsys.io;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
+import com.revolsys.util.CollectionUtil;
 
 public class IoFactoryRegistry {
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
@@ -30,6 +32,17 @@ public class IoFactoryRegistry {
     instance = null;
   }
 
+  public static String getFileExtension(final String resultFormat) {
+    final IoFactoryRegistry ioFactory = getInstance();
+    final DataObjectWriterFactory writerFactory = ioFactory.getFactoryByMediaType(
+      DataObjectWriterFactory.class, resultFormat);
+    if (writerFactory == null) {
+      return null;
+    } else {
+      return writerFactory.getFileExtension(resultFormat);
+    }
+  }
+
   public static IoFactoryRegistry getInstance() {
     synchronized (IoFactoryRegistry.class) {
       if (instance == null) {
@@ -38,6 +51,8 @@ public class IoFactoryRegistry {
       return instance;
     }
   }
+
+  private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<Class<? extends IoFactory>, Set<String>>();
 
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();
 
@@ -71,7 +86,7 @@ public class IoFactoryRegistry {
                   LOG.error(factoryClassName + " is not a subclass of "
                     + IoFactory.class);
                 }
-              } catch (Throwable e) {
+              } catch (final Throwable e) {
                 LOG.error("Unable to load: " + factoryClassName, e);
               }
             }
@@ -103,6 +118,8 @@ public class IoFactoryRegistry {
         final Set<IoFactory> factories = getFactories(ioInterface);
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
+            CollectionUtil.addToTreeSet(classFileExtensions, ioInterface,
+              fileExtension);
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
             for (final String mediaType : factory.getMediaTypes()) {
@@ -213,10 +230,10 @@ public class IoFactoryRegistry {
     return getFactoryByFileName(factoryClass, fileName);
   }
 
-  public <F extends IoFactory> Set<String> getFileExtensions(
-    final Class<F> factoryClass) {
-    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
-    return factoriesByFileExtension.keySet();
+  public Set<String> getFileExtensions(
+    final Class<? extends IoFactory> factoryClass) {
+    final Set<String> emptySet = Collections.<String> emptySet();
+    return CollectionUtil.get(classFileExtensions, factoryClass, emptySet);
   }
 
   public <F extends IoFactory> Set<String> getMediaTypes(
@@ -225,24 +242,24 @@ public class IoFactoryRegistry {
     return factoriesByMediaType.keySet();
   }
 
+  public boolean isFileExtensionSupported(
+    final Class<? extends IoFactory> factoryClass, final String fileExtension) {
+    if (factoryClass == null || fileExtension == null) {
+      return false;
+    } else {
+      return getFileExtensions(factoryClass).contains(
+        fileExtension.toLowerCase());
+    }
+  }
+
   public void setFactories(final Set<IoFactory> factories) {
     classFactoriesByFileExtension.clear();
     classFactoriesByMediaType.clear();
     classFactories.clear();
+
     this.factories.clear();
     for (final IoFactory factory : factories) {
       addFactory(factory);
-    }
-  }
-
-  public static String getFileExtension(String resultFormat) {
-    final IoFactoryRegistry ioFactory = getInstance();
-    final DataObjectWriterFactory writerFactory = ioFactory.getFactoryByMediaType(
-      DataObjectWriterFactory.class, resultFormat);
-    if (writerFactory == null) {
-      return null;
-    } else {
-      return writerFactory.getFileExtension(resultFormat);
     }
   }
 }

@@ -1,10 +1,8 @@
 package com.revolsys.io.moep;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Date;
-import java.text.ParseException;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -15,12 +13,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.Reader;
-import com.revolsys.io.filter.ExtensionFilenameFilter;
+import com.revolsys.util.DateUtil;
 
 public class MoepDirectoryReader extends DataObjectDirectoryReader implements
   DataObjectMetaDataFactory {
-  private static final FilenameFilter BIN_FILTER = new ExtensionFilenameFilter(
-    "bin");
 
   private Date integrationDate;
 
@@ -89,20 +85,12 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
         final String text = supData.getValue(MoepConstants.TEXT);
         final String[] versionFields = text.split(" ");
 
-        try {
-          final String dateString = versionFields[2];
-          submissionDate = new Date(MoepConstants.FULL_DATE_FORMAT.parse(
-            dateString).getTime());
-        } catch (final ParseException e) {
-          throw new IllegalArgumentException("Invalid KN submission date", e);
-        }
+        final String dateString = versionFields[2];
+        submissionDate = new Date(DateUtil.parse("yyyyMMdd", dateString)
+          .getTime());
         revisionKey = versionFields[3];
-        try {
-          integrationDate = new Date(MoepConstants.FULL_DATE_FORMAT.parse(
-            versionFields[4]).getTime());
-        } catch (final ParseException e) {
-          throw new IllegalArgumentException("Invalid KN integration date", e);
-        }
+        integrationDate = new Date(DateUtil.parse("yyyyMMdd", versionFields[4])
+          .getTime());
         specificationsRelease = versionFields[5];
       }
     }

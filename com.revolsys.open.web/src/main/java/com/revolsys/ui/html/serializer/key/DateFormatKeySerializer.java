@@ -1,10 +1,9 @@
 package com.revolsys.ui.html.serializer.key;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.util.DateUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 /**
@@ -43,13 +42,13 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object value = JavaBeanUtil.getProperty(object, getName());
-    final DateFormat format = new SimpleDateFormat(dateFormat);
     if (value == null) {
       out.text("-");
     } else if (value instanceof Date) {
-      out.text(format.format(value));
+      out.text(DateUtil.format(dateFormat, (Date)value));
     } else {
       out.text(value);
     }

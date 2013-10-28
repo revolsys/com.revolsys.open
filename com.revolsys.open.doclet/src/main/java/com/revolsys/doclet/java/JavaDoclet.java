@@ -195,7 +195,7 @@ public class JavaDoclet {
       parameters.add(parameter);
     }
     if (!parameters.isEmpty()) {
-      ClassDoc containingClass = method.containingClass();
+      final ClassDoc containingClass = method.containingClass();
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
       DocletUtil.title(writer, "Parameters");
@@ -315,18 +315,18 @@ public class JavaDoclet {
     writer.element(HtmlUtil.TITLE, docTitle);
     HtmlUtil.serializeCss(
       writer,
-      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/css/jquery.dataTables_themeroller.css");
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css");
     HtmlUtil.serializeCss(
       writer,
-      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css");
+      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/cupertino/jquery-ui.css");
     HtmlUtil.serializeCss(writer, "javadoc.css");
     HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js");
     HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js");
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js");
     HtmlUtil.serializeScriptLink(
       writer,
-      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/jquery.dataTables.min.js");
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js");
     HtmlUtil.serializeScriptLink(writer, "javadoc.js");
     writer.endTagLn(HtmlUtil.HEAD);
   }

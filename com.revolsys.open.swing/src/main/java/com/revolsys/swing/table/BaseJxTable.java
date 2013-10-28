@@ -24,7 +24,11 @@ public class BaseJxTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
   public BaseJxTable() {
-    setAutoCreateRowSorter(false);
+
+  }
+
+  public BaseJxTable(final TableModel model) {
+    super(model);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
@@ -49,11 +53,6 @@ public class BaseJxTable extends JXTable {
       "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
       "enterPressed", this, "editRelativeCell", 1, 0);
-  }
-
-  public BaseJxTable(final TableModel model) {
-    this();
-    setModel(model);
   }
 
   @Override

@@ -37,6 +37,7 @@ import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.NewPredicate;
@@ -60,7 +61,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static final String MODE_EDITS = "edits";
 
-  public static DataObjectRowTable createTable(
+  public static DataObjectLayerTable createTable(
     final AbstractDataObjectLayer layer) {
     final DataObjectMetaData metaData = layer.getMetaData();
     if (metaData == null) {
@@ -69,7 +70,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       final List<String> columnNames = layer.getColumnNames();
       final DataObjectLayerTableModel model = new DataObjectLayerTableModel(
         layer, columnNames);
-      final DataObjectRowTable table = new DataObjectRowTable(model);
+      final DataObjectLayerTable table = new DataObjectLayerTable(model);
 
       ModifiedPredicate.add(table);
       NewPredicate.add(table);
@@ -82,7 +83,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  public static final void selectionChanged(final DataObjectRowTable table,
+  public static final void selectionChanged(final DataObjectLayerTable table,
     final DataObjectLayerTableModel tableModel) {
     final String attributeFilterMode = tableModel.getAttributeFilterMode();
     if (MODE_SELECTED.equals(attributeFilterMode)) {
@@ -291,6 +292,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return this.sync;
   }
 
+  @Override
+  public DataObjectLayerTable getTable() {
+    return (DataObjectLayerTable)super.getTable();
+  }
+
   public String getTypeName() {
     return getMetaData().getPath();
   }
@@ -422,7 +428,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public void setAttributeFilterMode(final String mode) {
-    final DataObjectRowTable table = getTable();
+    final DataObjectLayerTable table = getTable();
     if (MODE_SELECTED.equals(mode)) {
       table.setSelectionModel(this.highlightedModel);
     } else {
@@ -448,7 +454,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected void setRowSorter(final Condition searchCondition) {
-    final DataObjectRowTable table = getTable();
+    final DataObjectLayerTable table = getTable();
     if (searchCondition == null) {
       table.setRowFilter(null);
     } else {

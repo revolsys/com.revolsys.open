@@ -2,18 +2,16 @@ package com.revolsys.swing.tree.renderer;
 
 import java.awt.Component;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -281281683669758372L;
+  private static final long serialVersionUID = 1L;
 
   private String labelPropertyName;
 
@@ -34,6 +32,13 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
       final String text = JavaBeanUtil.getProperty(value,
         this.labelPropertyName);
       label.setText(text);
+    }
+    if (value instanceof AbstractTreeNode) {
+      final AbstractTreeNode node = (AbstractTreeNode)value;
+      final Icon icon = node.getIcon();
+      if (icon != null) {
+        setIcon(icon);
+      }
     }
     return label;
   }

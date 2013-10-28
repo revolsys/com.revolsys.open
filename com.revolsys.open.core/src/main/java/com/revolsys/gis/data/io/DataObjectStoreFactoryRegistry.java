@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.DirectFieldAccessor;
@@ -16,6 +18,9 @@ public class DataObjectStoreFactoryRegistry {
   private static Map<Pattern, DataObjectStoreFactory> dataStoreFactoryUrlPatterns = new HashMap<Pattern, DataObjectStoreFactory>();
 
   private static List<DataObjectStoreFactory> fileDataStoreFactories = new ArrayList<DataObjectStoreFactory>();
+
+  private static Set<String> fileExtensions = new TreeSet<String>();
+
   static {
     new ClassPathXmlApplicationContext(
       "classpath*:META-INF/com.revolsys.gis.dataStore.sf.xml");
@@ -79,6 +84,10 @@ public class DataObjectStoreFactoryRegistry {
     return Collections.unmodifiableList(fileDataStoreFactories);
   }
 
+  public static Set<String> getFileExtensions() {
+    return fileExtensions;
+  }
+
   public static DataObjectStoreFactory register(
     final DataObjectStoreFactory factory) {
     final List<String> patterns = factory.getUrlPatterns();
@@ -86,8 +95,9 @@ public class DataObjectStoreFactoryRegistry {
       final Pattern pattern = Pattern.compile(regex);
       dataStoreFactoryUrlPatterns.put(pattern, factory);
     }
-    final List<String> fileNameExtensions = factory.getFileExtensions();
-    if (!fileNameExtensions.isEmpty()) {
+    final List<String> factoryFileExtensions = factory.getFileExtensions();
+    if (!factoryFileExtensions.isEmpty()) {
+      fileExtensions.addAll(factoryFileExtensions);
       fileDataStoreFactories.add(factory);
     }
     return factory;

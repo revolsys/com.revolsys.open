@@ -10,13 +10,13 @@ public class ShortField extends NumberField {
   }
 
   public ShortField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 10, 10, defaultValue, required, Short.MIN_VALUE, Short.MAX_VALUE);
+    final Object defaultValue) {
+    super(name, 6, 5, defaultValue, required, Short.MIN_VALUE, Short.MAX_VALUE);
     setCssClass("short");
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Short.valueOf(value);
   }
 

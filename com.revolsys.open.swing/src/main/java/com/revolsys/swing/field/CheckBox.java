@@ -49,6 +49,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
     addActionListener(this);
     this.undoManager.addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
+    setOpaque(false);
   }
 
   @Override
@@ -154,5 +155,10 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   @Override
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
+  }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(isSelected());
   }
 }

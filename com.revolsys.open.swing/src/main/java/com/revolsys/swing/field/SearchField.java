@@ -144,4 +144,9 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     return getFieldName() + "=" + getFieldValue();
   }
 
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(getText());
+  }
+
 }

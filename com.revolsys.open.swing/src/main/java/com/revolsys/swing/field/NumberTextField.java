@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -17,6 +19,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
@@ -140,8 +143,6 @@ public class NumberTextField extends JXTextField implements Field,
 
   private final String fieldName;
 
-  private Object fieldValue;
-
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
@@ -153,6 +154,8 @@ public class NumberTextField extends JXTextField implements Field,
   private String originalToolTip;
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
+
+  private Object fieldValue;
 
   public NumberTextField(final DataType dataType, final int length) {
     this(dataType, length, 0);
@@ -183,7 +186,6 @@ public class NumberTextField extends JXTextField implements Field,
     } else {
       this.fieldName = "fieldValue";
     }
-    setText(StringConverterRegistry.toString(this.fieldValue));
     addFocusListener(this);
 
     this.dataType = dataType;
@@ -217,9 +219,13 @@ public class NumberTextField extends JXTextField implements Field,
 
   @Override
   public void focusLost(final FocusEvent e) {
+    updateFieldValue();
+    this.undoManager.discardAllEdits();
+  }
+
+  public void updateFieldValue() {
     final String text = getText();
     setFieldValue(text);
-    this.undoManager.discardAllEdits();
   }
 
   @Override
@@ -234,10 +240,8 @@ public class NumberTextField extends JXTextField implements Field,
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T getFieldValue() {
-    final String text = getText();
-    setFieldValue(text);
-    return (T)this.fieldValue;
+  public <V> V getFieldValue() {
+    return (V)fieldValue;
   }
 
   public int getLength() {
@@ -254,6 +258,19 @@ public class NumberTextField extends JXTextField implements Field,
 
   public int getScale() {
     return this.scale;
+  }
+
+  private Object getTypedValue(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      try {
+        final BigDecimal bigNumber = new BigDecimal(value.toString());
+        return StringConverterRegistry.toObject(this.dataType, bigNumber);
+      } catch (final Throwable t) {
+        return value.toString();
+      }
+    }
   }
 
   @Override
@@ -311,47 +328,38 @@ public class NumberTextField extends JXTextField implements Field,
   }
 
   @Override
-  public void setFieldValue(final Object value) {
-    Object newValue;
+  public void setFieldValue(Object value) {
     if (value == null) {
-      newValue = null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      final BigDecimal bigNumber = new BigDecimal(number.toString());
-      final String numberString = bigNumber.toPlainString();
-      if (!numberString.equals(bigNumber)) {
+      value = "";
+    }
+    if (SwingUtilities.isEventDispatchThread()) {
+      final Object newValue = getTypedValue(value);
+      if (!EqualsRegistry.equal(this.fieldValue, newValue)) {
         this.undoManager.discardAllEdits();
-        setText(numberString);
+        String newText = StringConverterRegistry.toString(newValue);
+        if (newValue == null) {
+          newText = "";
+        } else if (newValue instanceof Number) {
+          BigDecimal decimal = new BigDecimal(newText);
+          if (decimal.scale() < scale) {
+            decimal = decimal.setScale(scale, RoundingMode.HALF_UP);
+          }
+          newText = decimal.toPlainString();
+        } else {
+          newText = StringConverterRegistry.toString(newValue);
+        }
+        if (!EqualsRegistry.equal(newText, getText())) {
+          setText(newText);
+        }
+        final Object oldValue = this.fieldValue;
+        this.fieldValue = newValue;
+        validateField();
+        firePropertyChange(this.fieldName, oldValue, this.fieldValue);
+        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+          oldValue, this.fieldValue);
       }
     } else {
-      final String string = StringConverterRegistry.toString(value);
-      if (!EqualsRegistry.equal(string, getText())) {
-        this.undoManager.discardAllEdits();
-        setText(string);
-      }
-    }
-
-    validateField();
-    final String text = getText();
-    if (StringUtils.hasText(text)) {
-      try {
-        final BigDecimal bigNumber = new BigDecimal(text);
-        final Number number = (Number)StringConverterRegistry.toObject(
-          this.dataType, bigNumber);
-        newValue = number;
-      } catch (final Throwable t) {
-        newValue = value;
-      }
-    } else {
-      newValue = null;
-    }
-
-    final Object oldValue = this.fieldValue;
-    if (!EqualsRegistry.equal(oldValue, newValue)) {
-      this.fieldValue = newValue;
-      firePropertyChange(this.fieldName, oldValue, newValue);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, newValue);
+      Invoke.later(this, "setFieldValue", value);
     }
   }
 

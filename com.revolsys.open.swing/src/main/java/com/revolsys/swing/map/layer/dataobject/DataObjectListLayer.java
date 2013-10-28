@@ -16,9 +16,9 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
@@ -167,7 +167,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
 
   @Override
   public Component createTablePanel() {
-    final DataObjectRowTable table = DataObjectListLayerTableModel.createTable(this);
+    final DataObjectLayerTable table = DataObjectListLayerTableModel.createTable(this);
     return new DataObjectLayerTablePanel(this, table);
   }
 

@@ -117,13 +117,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public static boolean isDataTableCallback(final HttpServletRequest request) {
-    return request.getParameter("_") != null;
-  }
-
   public static boolean isDataTableCallback() {
     return HttpServletUtils.getParameter("_") != null
       && HttpServletUtils.getParameter("callback") == null;
+  }
+
+  public static boolean isDataTableCallback(final HttpServletRequest request) {
+    return request.getParameter("_") != null;
   }
 
   public static boolean isHtmlPage(final HttpServletRequest request) {
@@ -224,8 +224,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (parameters.get("open") != Boolean.TRUE) {
         parameters.put("deferLoading", 0);
       }
-      HttpServletRequest request = getRequest();
-      Collection<Object> rows = Collections.emptyList();
+      final HttpServletRequest request = getRequest();
+      final Collection<Object> rows = Collections.emptyList();
       final ElementContainer element = builder.createDataTable(request,
         pageName, parameters, rows);
       if (element != null) {
@@ -303,7 +303,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void addObjectViewPage(final TabElementContainer tabs,
     final Object object, final String prefix) {
-    HttpServletRequest request = getRequest();
+    final HttpServletRequest request = getRequest();
     if (object == null) {
       throw new PageNotFoundException();
     } else {
@@ -323,8 +323,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
         final ElementContainer view = new ElementContainer(detailView);
         addMenuElement(view, actionMenu);
-        String tabId = getTypeName() + "_" + pageName;
-        String title = getPageTitle(pageName);
+        final String tabId = getTypeName() + "_" + pageName;
+        final String title = getPageTitle(pageName);
         tabs.add(tabId, title, view);
       }
     }
@@ -340,12 +340,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       parameters.put("tabbed", true);
       parameters.put("scrollYPercent", 1);
 
-      HttpServletRequest request = getRequest();
+      final HttpServletRequest request = getRequest();
       final ElementContainer element = builder.createDataTable(request,
         pageName, parameters);
       if (element != null) {
-        String tabId = builder.getTypeName() + "_" + pageName;
-        String title = builder.getPageTitle(pageName);
+        final String tabId = builder.getTypeName() + "_" + pageName;
+        final String title = builder.getPageTitle(pageName);
         container.add(tabId, title, element);
       }
     }
@@ -353,13 +353,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public ElementContainer createDataTable(final HttpServletRequest request,
     final String pageName, final Map<String, ? extends Object> parameters) {
-    String pageUrl = getPageUrl(pageName);
+    final String pageUrl = getPageUrl(pageName);
     if (StringUtils.hasText(pageUrl)) {
-      Map<String, Object> params = new HashMap<String, Object>();
+      final Map<String, Object> params = new HashMap<String, Object>();
       params.putAll(parameters);
       params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
-      List<T> rows = Collections.emptyList();
-      ElementContainer table = createDataTable(request, pageName, params, rows);
+      final List<T> rows = Collections.emptyList();
+      final ElementContainer table = createDataTable(request, pageName, params,
+        rows);
 
       return table;
     } else {
@@ -369,14 +370,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public ElementContainer createDataTable(final HttpServletRequest request,
     final String pageName, Map<String, ? extends Object> parameters,
-    Collection<? extends Object> rows) {
+    final Collection<? extends Object> rows) {
     parameters = new HashMap<String, Object>(parameters);
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final RowsTableSerializer model = new KeySerializerTableSerializer(
       serializers, rows);
     final String typeName = getTypeName();
     final TableView tableView = new TableView(model, typeName);
-    String tableId = typeName + "_" + pageName + "_table";
+    final String tableId = typeName + "_" + pageName + "_table";
     tableView.setId(tableId);
     tableView.setNoRecordsMessgae(null);
 
@@ -385,7 +386,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableParams.put("bAutoWidth", false);
     tableParams.put("bScrollInfinite", true);
     tableParams.put("bScrollCollapse", true);
-    String scrollY = (String)parameters.get("scrollY");
+    final String scrollY = (String)parameters.get("scrollY");
     if (scrollY == null) {
       tableParams.put("sScrollY", "200px");
     } else {
@@ -461,7 +462,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
     // }
     jsonMap += "}";
-    StringBuffer scriptBody = new StringBuffer();
+    final StringBuffer scriptBody = new StringBuffer();
     scriptBody.append("$(document).ready(function() {\n");
     scriptBody.append("  var tableDiv = $('#");
     scriptBody.append(tableId);
@@ -472,8 +473,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     scriptBody.append("  tableShowEvents(table,");
     scriptBody.append(scrollYPercent);
     scriptBody.append(");\n");
-    scriptBody.append("});");
     scriptBody.append("$(window).bind('resize', function () {table.fnAdjustColumnSizing();} );");
+    scriptBody.append("});");
     script.setContent(scriptBody.toString());
     final ElementContainer container = new ElementContainer(tableView, script);
 
@@ -486,68 +487,76 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Callable<Collection<? extends Object>> rowsCallable) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    final String pageName,
+    final Callable<Collection<? extends Object>> rowsCallable) {
+    final Map<String, Object> parameters = new HashMap<String, Object>();
     return createDataTableHandler(request, pageName, parameters, rowsCallable);
   }
 
-  public Object createDataTableHandler(String pageName,
-    Collection<? extends Object> rows) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableHandler(request, pageName, rows);
-  }
-
   public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Collection<? extends Object> rows) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    final String pageName, final Collection<? extends Object> rows) {
+    final Map<String, Object> parameters = new HashMap<String, Object>();
     return createDataTableHandler(request, pageName, parameters, rows);
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Map<String, Object> parameters,
-    Callable<Collection<? extends Object>> rowsCallable) {
+    final String pageName, final Map<String, Object> parameters,
+    final Callable<Collection<? extends Object>> rowsCallable) {
     parameters.put("serverSide", false);
     if (isDataTableCallback(request)) {
       try {
-        Collection<? extends Object> rows = rowsCallable.call();
+        final Collection<? extends Object> rows = rowsCallable.call();
         return createDataTableMap(request, rows, pageName);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Unable to get rows", e);
       }
     } else {
-      TabElementContainer tabs = new TabElementContainer();
+      final TabElementContainer tabs = new TabElementContainer();
       addTabDataTable(tabs, this, pageName, parameters);
       return tabs;
     }
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Map<String, Object> parameters,
-    Collection<? extends Object> rows) {
+    final String pageName, final Map<String, Object> parameters,
+    final Collection<? extends Object> rows) {
     if (isDataTableCallback(request)) {
       return createDataTableMap(request, rows, pageName);
     } else {
       parameters.put("serverSide", false);
-      TabElementContainer tabs = new TabElementContainer();
+      final TabElementContainer tabs = new TabElementContainer();
       addTabDataTable(tabs, this, pageName, parameters);
       return tabs;
     }
   }
 
+  public Object createDataTableHandler(final String pageName,
+    final Collection<? extends Object> rows) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableHandler(request, pageName, rows);
+  }
+
   public Object createDataTableHandlerOrRedirect(
     final HttpServletRequest request, final HttpServletResponse response,
-    String pageName, Callable<Collection<? extends Object>> rowsCallable,
-    Object parentBuilder, String parentPageName) {
+    final String pageName,
+    final Callable<Collection<? extends Object>> rowsCallable,
+    final Object parentBuilder, final String parentPageName) {
     if (isDataTableCallback(request)) {
       try {
-        Collection<? extends Object> rows = rowsCallable.call();
+        final Collection<? extends Object> rows = rowsCallable.call();
         return createDataTableMap(request, rows, pageName);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Unable to get rows", e);
       }
     } else {
       return redirectToTab(parentBuilder, parentPageName, pageName);
     }
+  }
+
+  public Map<String, Object> createDataTableMap(
+    final Collection<? extends Object> records, final String pageName) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, records, pageName);
   }
 
   public Map<String, Object> createDataTableMap(
@@ -572,18 +581,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Map<String, Object> createDataTableMap(
-    final ResultPager<? extends Object> pager, final String pageName) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, pager, pageName);
-  }
-
-  public Map<String, Object> createDataTableMap(
-    final Collection<? extends Object> records, final String pageName) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, records, pageName);
-  }
-
-  public Map<String, Object> createDataTableMap(
     final HttpServletRequest request,
     final ResultPager<? extends Object> pager, final String pageName) {
     try {
@@ -599,7 +596,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
       final int recordNumber = HttpServletUtils.getIntegerParameter(request,
         "iDisplayStart");
-      int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
+      final int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
       pager.setPageNumber(pageNumber);
 
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
@@ -624,6 +621,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       pager.close();
     }
 
+  }
+
+  public Map<String, Object> createDataTableMap(
+    final ResultPager<? extends Object> pager, final String pageName) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, pager, pageName);
   }
 
   public ElementContainer createDetailView(final Object object,
@@ -678,7 +681,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String prefix, final String preInsertMethod) throws IOException,
     ServletException {
     final T object = createObject();
-    HttpServletRequest request = HttpServletUtils.getRequest();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
     Property.set(object, defaultValues);
 
     // if (!canAddObject(request)) {
@@ -722,7 +725,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
     addMenuItem(actionMenu, prefix, "add", "Clear Fields");
-    String name = form.getName();
+    final String name = form.getName();
     actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name
       + "').submit()"));
 
@@ -738,7 +741,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (object == null) {
       throw new PageNotFoundException();
     } else {
-      HttpServletRequest request = HttpServletUtils.getRequest();
+      final HttpServletRequest request = HttpServletUtils.getRequest();
       final Set<String> parameterNamesToSave = new HashSet<String>();
       parameterNamesToSave.add(getIdParameterName());
 
@@ -777,7 +780,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Menu actionMenu = new Menu();
       addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
       addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top");
-      String name = form.getName();
+      final String name = form.getName();
       actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name
         + "').submit()"));
 
@@ -791,7 +794,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public ElementContainer createObjectViewPage(final Object object,
-    final String prefix, boolean collapsible)
+    final String prefix, final boolean collapsible)
     throws NoSuchRequestHandlingMethodException {
     if (object == null) {
       throw new PageNotFoundException();
@@ -806,7 +809,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       } else {
         final List<KeySerializer> serializers = getSerializers(pageName, "view");
         final Element detailView = createDetailView(object, serializers);
-        HttpServletRequest request = HttpServletUtils.getRequest();
+        final HttpServletRequest request = HttpServletUtils.getRequest();
         setPageTitle(request, pageName);
 
         final Menu actionMenu = new Menu();
@@ -825,7 +828,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   @SuppressWarnings("unchecked")
   public <F extends Form> F createTableForm(final Object object,
     final String keyListName) {
-    List<String> keyList = getKeyList(keyListName);
+    final List<String> keyList = getKeyList(keyListName);
     final UiBuilderObjectForm form = new UiBuilderObjectForm(object, this,
       getTypeName(), keyList);
     return (F)form;
@@ -893,7 +896,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (object instanceof HtmlUiBuilder) {
         return (H)object;
       } else if (object instanceof String) {
-        String typeName = (String)object;
+        final String typeName = (String)object;
         return (H)getBuilder(typeName);
       } else if (object instanceof Class) {
         final Class<H> class1 = (Class<H>)object;
@@ -1024,7 +1027,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public Decorator getFieldTableLabel(final String key) {
     final String label = getLabel(key);
     final String instructions = getFieldInstruction(key);
-    TableHeadingDecorator decorator = new TableHeadingDecorator(label,
+    final TableHeadingDecorator decorator = new TableHeadingDecorator(label,
       instructions);
     return decorator;
   }
@@ -1154,7 +1157,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public List<List<Object>> getListSortOrder(final String pageName) {
-    List<List<Object>> sortOrder = listSortOrder.get(pageName);
+    final List<List<Object>> sortOrder = listSortOrder.get(pageName);
     if (sortOrder == null) {
       if (pageName.equals("list")) {
         return Collections.emptyList();
@@ -1283,7 +1286,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public Object getProperty(final Object object, final String keyName) {
     try {
       return Property.get(object, keyName);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       log.error("Unable to get property " + keyName + " for:\n" + object, e);
       return "ERROR";
     }
@@ -1388,8 +1391,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return null;
   }
 
-  public Object redirectToTab(Object parentBuilder, String parentPageName,
-    String tabName) {
+  public Object redirectToTab(final Object parentBuilder,
+    final String parentPageName, final String tabName) {
     final HtmlUiBuilder<?> builder = getBuilder(parentBuilder);
     if (builder != null) {
       final Page parentPage = builder.getPage(parentPageName);
@@ -1790,7 +1793,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return true;
   }
 
-  public boolean validateForm(UiBuilderObjectForm uiBuilderObjectForm) {
+  public boolean validateForm(final UiBuilderObjectForm uiBuilderObjectForm) {
     return true;
   }
 

@@ -25,11 +25,21 @@ public class LayerDataObject extends ArrayDataObject {
     this.layer = layer;
   }
 
-  protected void clearOriginalValues() {
+  /**
+   * Internal method to revert the records values to the original 
+   */
+  protected synchronized void cancelChanges() {
+    DataObjectState newState = getState();
+    if (newState != DataObjectState.New) {
+      newState = DataObjectState.Persisted;
+    }
+    setState(DataObjectState.Initalizing);
+
     if (this.originalValues != null) {
       super.setValues(this.originalValues);
     }
     this.originalValues = null;
+    setState(newState);
   }
 
   public void firePropertyChange(final String attributeName,
@@ -115,9 +125,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   public LayerDataObject revertChanges() {
     if (this.originalValues != null || getState() == DataObjectState.Deleted) {
-      setState(DataObjectState.Persisted);
-      clearOriginalValues();
-      setState(DataObjectState.Persisted);
+      cancelChanges();
       final AbstractDataObjectLayer layer = getLayer();
       layer.revertChanges(this);
       firePropertyChange("state", DataObjectState.Modified,
@@ -184,6 +192,7 @@ public class LayerDataObject extends ArrayDataObject {
       super.setValue(index, value);
       if (!DataObjectState.Initalizing.equals(state)) {
         firePropertyChange(attributeName, oldValue, value);
+        layer.updateRecordState(this);
       }
     }
   }

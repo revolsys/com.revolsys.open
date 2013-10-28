@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +26,7 @@ import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.DateUtil;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
@@ -331,8 +330,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
         case FieldDefinition.DATE_TYPE:
           if (value instanceof Date) {
             final Date date = (Date)value;
-            final DateFormat format = new SimpleDateFormat("yyyyMMdd");
-            final String dateString = format.format(date);
+            final String dateString = DateUtil.format("yyyyMMdd", date);
             out.writeBytes(dateString);
 
           } else if (value == null) {

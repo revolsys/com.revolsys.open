@@ -10,12 +10,13 @@ public class DoubleField extends NumberField {
   }
 
   public DoubleField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 22, 22, defaultValue, required, Double.MIN_VALUE, Double.MAX_VALUE);
+    final Object defaultValue) {
+    super(name, 23, 19, defaultValue, required, Double.MIN_VALUE,
+      Double.MAX_VALUE);
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Double.valueOf(value);
   }
 

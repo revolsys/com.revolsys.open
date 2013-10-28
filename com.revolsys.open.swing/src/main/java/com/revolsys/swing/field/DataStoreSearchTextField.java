@@ -461,6 +461,11 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   @Override
+  public void updateFieldValue() {
+    setFieldValue(getText());
+  }
+
+  @Override
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
       final DataObject value = (DataObject)this.list.getSelectedValue();

@@ -204,4 +204,9 @@ public class ComboBox extends JComboBox implements Field {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(getSelectedItem());
+  }
 }

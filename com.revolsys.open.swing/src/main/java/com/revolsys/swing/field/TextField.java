@@ -190,4 +190,9 @@ public class TextField extends JXTextField implements Field, FocusListener {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(getText());
+  }
 }

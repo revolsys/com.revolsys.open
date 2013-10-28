@@ -13,15 +13,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.JXStatusBar;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -51,6 +54,8 @@ import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -127,6 +132,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private ToolTipOverlay toolTipOverlay;
 
   private SwingWorkerProgressBar progressBar;
+
+  private JButton zoomBookmarkButton;
 
   public MapPanel() {
     this(new Project());
@@ -308,6 +315,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       this.undoManager, "redo");
   }
 
+  public void addZoomBookmark() {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (!boundingBox.isEmpty()) {
+      final String name = JOptionPane.showInputDialog(this,
+        "Enter bookmark name", "Add Zoom Bookmark",
+        JOptionPane.QUESTION_MESSAGE);
+      if (StringUtils.hasText(name)) {
+        final Project project = getProject();
+        project.addZoomBookmark(name, boundingBox);
+      }
+    }
+  }
+
   private void addZoomButtons() {
     this.toolBar.addButtonTitleIcon("zoom", "Zoom to World",
       "magnifier_zoom_world", this, "zoomToWorld");
@@ -335,7 +355,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
       "magnifier_zoom_selected", this, "zoomToSelected");
-    // TODO disable if none selected
+
+    zoomBookmarkButton = this.toolBar.addButtonTitleIcon("zoom",
+      "Zoom Bookmarks", "zoom_bookmark", this, "showZoomBookmarkMenu");
 
     this.toolBar.addComponent("zoom", new SelectMapScale(this));
     this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
@@ -681,6 +703,23 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
         this.updateZoomHistory = true;
       }
     }
+  }
+
+  public void showZoomBookmarkMenu() {
+    final PopupMenu menu = new PopupMenu();
+    final MenuFactory factory = menu.getMenu();
+    factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
+      "addZoomBookmark");
+
+    final Project project = getProject();
+    for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
+      .entrySet()) {
+      final String name = entry.getKey();
+      final BoundingBox boundingBox = entry.getValue();
+      factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
+        this, "zoomTo", boundingBox);
+    }
+    menu.show(zoomBookmarkButton, 0, 20);
   }
 
   public void zoom(final com.vividsolutions.jts.geom.Point mapPoint,

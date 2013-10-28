@@ -1,15 +1,12 @@
 package com.revolsys.converter.string;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.util.StringUtils;
 
-public class DateTimeStringConverter implements StringConverter<Date> {
-  private final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+import com.revolsys.util.DateUtil;
 
+public class DateTimeStringConverter implements StringConverter<Date> {
   public DateTimeStringConverter() {
   }
 
@@ -38,12 +35,7 @@ public class DateTimeStringConverter implements StringConverter<Date> {
   @Override
   public Date toObject(final String string) {
     if (StringUtils.hasText(string)) {
-      try {
-        return new Date(FORMAT.parse(string).getTime());
-      } catch (final ParseException e) {
-        throw new IllegalArgumentException("Date must be YYYY-MM-DD HH:mm:ss "
-          + string, e);
-      }
+      return DateUtil.parse("yyyy-MM-dd HH:mm:ss", string);
     } else {
       return null;
     }
@@ -55,7 +47,7 @@ public class DateTimeStringConverter implements StringConverter<Date> {
       return null;
     } else if (value instanceof Date) {
       final Date date = (Date)value;
-      return FORMAT.format(date);
+      return DateUtil.format("yyyy-MM-dd HH:mm:ss", date);
     } else {
       return value.toString();
     }

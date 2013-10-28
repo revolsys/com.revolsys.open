@@ -306,6 +306,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void delete() {
+    setExists(false);
     this.beanPropertyListener = null;
     final DefaultSingleCDockable dockable = getProperty("TableView");
     if (dockable != null) {
@@ -416,6 +417,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public String getName() {
     return this.name;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends LayerGroup> V getParent() {
+    return (V)getLayerGroup();
   }
 
   public String getPath() {
@@ -681,13 +688,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setMaximumScale(final long maxScale) {
-    this.maximumScale = maxScale;
+  public void setMaximumScale(final long maximumScale) {
+    this.maximumScale = maximumScale;
   }
 
   @Override
-  public void setMinimumScale(final long minScale) {
-    this.minimumScale = minScale;
+  public void setMinimumScale(final long minimumScale) {
+    this.minimumScale = minimumScale;
   }
 
   @Override

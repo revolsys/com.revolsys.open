@@ -116,6 +116,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
     fieldsPanel.add(layerPathsScrollPane);
 
     final ToolBar toolBar = new ToolBar(ToolBar.VERTICAL);
+    toolBar.setOpaque(false);
     toolBar.setMinimumSize(new Dimension(25, 25));
     fieldsPanel.add(toolBar);
 

@@ -16,17 +16,17 @@ import com.revolsys.gis.data.query.Condition;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  public static DataObjectRowTable createTable(final DataObjectListLayer layer) {
+  public static DataObjectLayerTable createTable(final DataObjectListLayer layer) {
     final DataObjectLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
-    final DataObjectRowTable table = new DataObjectRowTable(model);
+    final DataObjectLayerTable table = new DataObjectLayerTable(model);
 
     layer.addPropertyChangeListener("hasSelectedRecords",
       new InvokeMethodPropertyChangeListener(DataObjectLayerTableModel.class,

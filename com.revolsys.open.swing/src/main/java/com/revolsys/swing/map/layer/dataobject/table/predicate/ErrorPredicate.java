@@ -16,7 +16,7 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 public class ErrorPredicate implements HighlightPredicate {
 
   public static void add(final DataObjectRowTable table) {
-    final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
+    final DataObjectRowTableModel model = table.getTableModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }

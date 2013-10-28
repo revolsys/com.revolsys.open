@@ -744,6 +744,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (this.moveGeometryStart != null) {
         repaint();
         return;
+      } else if (event.isShiftDown() || event.isControlDown()
+        || event.isMetaDown()) {
+        return;
       } else if (SwingUtilities.isLeftMouseButton(event)) {
         this.dragged = true;
         if (event.isAltDown() && !getMouseOverLocations().isEmpty()) {
@@ -796,7 +799,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (!SwingUtilities.isMiddleMouseButton(event)) {
       final java.awt.Point point = event.getPoint();
       if (modeAddMouseMoved(event)) {
-      } else {
+      } else if (!(event.isMetaDown() || event.isShiftDown() || event.isControlDown())) {
         final Graphics2D graphics = getGraphics();
         final BoundingBox boundingBox = getHotspotBoundingBox(event);
         if (updateMouseOverGeometry(point, graphics, boundingBox)) {
@@ -911,7 +914,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   private void setAddGeometry(final Geometry geometry) {
     if (!JtsGeometryUtil.equalsExact3D(geometry, this.addGeometry)) {
-      addUndo(new AddGeometryUndoEdit(geometry));
+      final AddGeometryUndoEdit undo = new AddGeometryUndoEdit(geometry);
+      addUndo(undo);
       repaint();
     }
   }

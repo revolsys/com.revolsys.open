@@ -18,6 +18,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.Parent;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
@@ -38,7 +39,8 @@ import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.CollectionUtil;
 
-public class LayerGroup extends AbstractLayer implements List<Layer> {
+public class LayerGroup extends AbstractLayer implements List<Layer>,
+  Parent<Layer> {
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "layerGroup", "Layer Group", LayerGroup.class, "create");
@@ -313,6 +315,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer> {
       }
     }
     return boudingBox;
+  }
+
+  @Override
+  public List<Layer> getChildren() {
+    return this;
   }
 
   public <V extends Layer> List<V> getDescenants(final Class<V> layerClass) {

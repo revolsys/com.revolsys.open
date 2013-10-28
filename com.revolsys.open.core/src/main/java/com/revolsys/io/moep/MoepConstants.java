@@ -1,8 +1,5 @@
 package com.revolsys.io.moep;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -20,8 +17,6 @@ public final class MoepConstants {
 
   public static final String ANGLE = "ANGLE";
 
-  public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyMMdd");
-
   public static final String DISPLAY_TYPE = "DISP_TYPE";
 
   public static final String ELEVATION = "ELEVATION";
@@ -31,9 +26,6 @@ public final class MoepConstants {
   public static final String FONT_SIZE = "FONT_SIZE";
 
   public static final String FONT_NAME = "FONT_NAME";
-
-  public static final DateFormat FULL_DATE_FORMAT = new SimpleDateFormat(
-    "yyyyMMdd");
 
   public static final String GEOMETRY = "geometry";
 

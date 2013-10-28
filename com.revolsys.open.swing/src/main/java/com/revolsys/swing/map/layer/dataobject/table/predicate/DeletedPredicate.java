@@ -12,15 +12,15 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
 public class DeletedPredicate implements HighlightPredicate {
 
   private static final Border BORDER = BorderFactory.createLineBorder(
     WebColors.Red, 2);
 
-  public static void add(final DataObjectRowTable table) {
+  public static void add(final DataObjectLayerTable table) {
     final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);

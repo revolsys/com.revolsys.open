@@ -25,9 +25,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +55,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
+import com.revolsys.util.DateUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -69,9 +67,6 @@ public class GpxIterator implements DataObjectIterator {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   private static final Logger log = Logger.getLogger(GpxIterator.class);
-
-  private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(
-    "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
   private static XMLStreamReader createXmlReader(final Reader in) {
     try {
@@ -202,11 +197,7 @@ public class GpxIterator implements DataObjectIterator {
     if (stringValue == null) {
       value = null;
     } else if (attributeName.equals("time")) {
-      try {
-        value = TIMESTAMP_FORMAT.parse(stringValue);
-      } catch (final ParseException e) {
-        throw new IllegalArgumentException("Invalid date " + stringValue);
-      }
+      value = DateUtil.parse("yyyy-MM-dd'T'HH:mm:ss'Z'", stringValue);
     } else {
       value = stringValue;
     }

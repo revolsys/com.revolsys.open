@@ -190,4 +190,9 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
+
+  @Override
+  public void updateFieldValue() {
+    setFieldValue(getText());
+  }
 }

@@ -18,6 +18,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -75,10 +76,12 @@ public class BaseStylePanel extends ValueField implements
     final String... alignmentTypes) {
     final List<Action> actions = new ArrayList<Action>();
     for (final String alignmentType : alignmentTypes) {
-      final I18nAction action = new I18nAction(alignmentType, null,
-        CaseConverter.toCapitalizedWords(alignmentType + " " + type),
-        SilkIconLoader.getIcon("line_" + type.toLowerCase() + "_"
-          + alignmentType));
+      final String iconName = ("line_" + type + "_" + alignmentType).toLowerCase();
+      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final String toolTip = CaseConverter.toCapitalizedWords(alignmentType
+        + " " + type);
+      final I18nAction action = new I18nAction(alignmentType, null, toolTip,
+        icon);
       actions.add(action);
     }
     return actions;

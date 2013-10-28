@@ -248,14 +248,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  public void removeSelectedRecords(final BoundingBox boundingBox) {
+  public void unSelectRecords(final BoundingBox boundingBox) {
     final LayerGroup project = getProject();
-    removeSelectedRecords(project, boundingBox);
+    unSelectRecords(project, boundingBox);
     final LayerRendererOverlay overlay = getMap().getLayerOverlay();
     overlay.redraw();
   }
 
-  private void removeSelectedRecords(final LayerGroup group,
+  private void unSelectRecords(final LayerGroup group,
     final BoundingBox boundingBox) {
 
     final double scale = getViewport().getScale();
@@ -264,11 +264,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     for (final Layer layer : layers) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        removeSelectedRecords(childGroup, boundingBox);
+        unSelectRecords(childGroup, boundingBox);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.removeSelectedRecords(boundingBox);
+          dataObjectLayer.unSelectRecords(boundingBox);
         }
       }
     }
@@ -318,7 +318,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     repaint();
     String methodName;
     if (event.isAltDown()) {
-      methodName = "removeSelectedRecords";
+      methodName = "unSelectRecords";
     } else if (event.isShiftDown()) {
       methodName = "addSelectedRecords";
     } else {

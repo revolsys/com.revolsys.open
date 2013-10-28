@@ -640,8 +640,12 @@ public final class FileUtil {
   }
 
   public static File getFile(final String path) {
-    final File file = new File(path);
-    return getFile(file);
+    if (path == null) {
+      return null;
+    } else {
+      final File file = new File(path);
+      return getFile(file);
+    }
   }
 
   public static String getFileAsString(final String fileName) {
@@ -664,6 +668,18 @@ public final class FileUtil {
       names.add(baseName);
     }
     return names;
+  }
+
+  public static String getFileName(final File file) {
+    if (file == null) {
+      return null;
+    } else {
+      String string = file.getName();
+      if (!StringUtils.hasText(string)) {
+        string = "/";
+      }
+      return string;
+    }
   }
 
   public static String getFileName(final String fileName) {
@@ -830,7 +846,7 @@ public final class FileUtil {
         .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
-          final File directory = connection.getFile().getFile();
+          final File directory = connection.getFileConnection().getFile();
           final File file = new File(directory, path);
           if (file.exists()) {
             return getFile(file);
@@ -856,6 +872,22 @@ public final class FileUtil {
     }
   }
 
+  public static List<File> listVisibleFiles(final File file) {
+    if (file != null && file.isDirectory()) {
+      final List<File> visibleFiles = new ArrayList<File>();
+      final File[] files = file.listFiles();
+      if (files != null) {
+        for (final File childFile : files) {
+          if (!childFile.exists() || !childFile.isHidden()) {
+            visibleFiles.add(childFile);
+          }
+        }
+      }
+      return visibleFiles;
+    }
+    return Collections.emptyList();
+  }
+
   public static URL toUrl(final File file) {
     try {
       return file.toURI().toURL();
@@ -869,4 +901,5 @@ public final class FileUtil {
    */
   private FileUtil() {
   }
+
 }

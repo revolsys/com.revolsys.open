@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
@@ -22,14 +23,6 @@ public class TextField extends Field {
   private String cssClass;
 
   public TextField() {
-  }
-
-  public void setCssClass(String cssClass) {
-    this.cssClass = cssClass;
-  }
-
-  public String getCssClass() {
-    return cssClass;
   }
 
   public TextField(final String name, final boolean required) {
@@ -66,22 +59,15 @@ public class TextField extends Field {
   }
 
   public TextField(final String name, final int size, final int maxLength,
-    final String defaultValue, final boolean required) {
-    this(name, size, defaultValue, required);
-    this.maxLength = maxLength;
-  }
-
-  public TextField(final String name, final int size, final int maxLength,
     final Object defaultValue, final boolean required) {
     this(name, size, defaultValue, required);
     this.maxLength = maxLength;
   }
 
-  public TextField(final String name, final int size,
+  public TextField(final String name, final int size, final int maxLength,
     final String defaultValue, final boolean required) {
-    super(name, required);
-    this.size = size;
-    setInitialValue(defaultValue);
+    this(name, size, defaultValue, required);
+    this.maxLength = maxLength;
   }
 
   public TextField(final String name, final int size,
@@ -89,8 +75,21 @@ public class TextField extends Field {
     super(name, required);
     this.size = size;
     if (defaultValue != null) {
+      setValue(defaultValue);
       setInitialValue(defaultValue.toString());
     }
+  }
+
+  public TextField(final String name, final int size,
+    final String defaultValue, final boolean required) {
+    super(name, required);
+    this.size = size;
+    setValue(defaultValue);
+    setInitialValue(defaultValue);
+  }
+
+  public String getCssClass() {
+    return cssClass;
   }
 
   public String getInputValue() {
@@ -199,6 +198,10 @@ public class TextField extends Field {
     out.endTag(HtmlUtil.INPUT);
   }
 
+  public void setCssClass(final String cssClass) {
+    this.cssClass = cssClass;
+  }
+
   protected void setInputValue(final String inputValue) {
     this.inputValue = inputValue;
   }
@@ -232,7 +235,7 @@ public class TextField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      inputValue = value.toString();
+      inputValue = StringConverterRegistry.toString(value);
     } else {
       inputValue = null;
     }

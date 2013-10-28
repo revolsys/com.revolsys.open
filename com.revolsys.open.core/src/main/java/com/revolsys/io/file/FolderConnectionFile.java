@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.FileUtil;
 
 public class FolderConnectionFile {
   private final FolderConnection folderConnection;
@@ -37,15 +38,11 @@ public class FolderConnectionFile {
 
   public List<FolderConnectionFile> getFiles() {
     final List<FolderConnectionFile> fileConnections = new ArrayList<FolderConnectionFile>();
-    if (isDirectory()) {
-      final File[] fileArray = this.file.listFiles();
-      if (fileArray != null) {
-        for (final File childFile : fileArray) {
-          final FolderConnectionFile fileConnection = new FolderConnectionFile(
-            folderConnection, childFile);
-          fileConnections.add(fileConnection);
-        }
-      }
+    final List<File> files = FileUtil.listVisibleFiles(file);
+    for (final File childFile : files) {
+      final FolderConnectionFile fileConnection = new FolderConnectionFile(
+        folderConnection, childFile);
+      fileConnections.add(fileConnection);
     }
     return fileConnections;
   }

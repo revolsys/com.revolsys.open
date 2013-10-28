@@ -10,13 +10,13 @@ public class LongField extends NumberField {
   }
 
   public LongField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 19, 19, defaultValue, required, Long.MIN_VALUE, Long.MAX_VALUE);
+    final Object defaultValue) {
+    super(name, 23, 19, defaultValue, required, Long.MIN_VALUE, Long.MAX_VALUE);
     setCssClass("digits");
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Long.valueOf(value);
   }
 

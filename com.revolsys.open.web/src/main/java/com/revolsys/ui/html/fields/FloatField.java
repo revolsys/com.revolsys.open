@@ -10,13 +10,13 @@ public class FloatField extends NumberField {
   }
 
   public FloatField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 18, 18, defaultValue, required, Float.MIN_VALUE,
+    final Object defaultValue) {
+    super(name, 22, 18, defaultValue, required, Float.MIN_VALUE,
       Float.MAX_VALUE);
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Float.valueOf(value);
   }
 

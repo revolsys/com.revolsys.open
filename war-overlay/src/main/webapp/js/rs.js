@@ -164,6 +164,7 @@ function tableShowEvents(table, heightPercent) {
   }
 }
 
+
 $(document).ready(
   function() {
     addConfirmButton({

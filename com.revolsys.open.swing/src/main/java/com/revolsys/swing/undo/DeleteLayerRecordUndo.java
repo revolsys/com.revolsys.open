@@ -53,7 +53,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
       final AbstractDataObjectLayer layer = record.getLayer();
       if (layer != null) {
         layer.deleteRecords(record);
-        layer.removeSelectedRecords(record);
+        layer.unSelectRecords(record);
       }
     }
   }

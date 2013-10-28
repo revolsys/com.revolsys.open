@@ -3,6 +3,7 @@ package com.revolsys.swing.tree.file;
 import java.awt.Component;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
@@ -52,17 +53,8 @@ public class FolderConnectionFileModel extends
     final boolean leaf, final int row, final boolean hasFocus) {
     final JLabel renderer = (JLabel)super.getRenderer(file, tree, selected,
       expanded, leaf, row, hasFocus);
-    if (file.exists()) {
-      final String name = file.getName();
-      if (file.isDirectory()) {
-        renderer.setIcon(ICON_FOLDER);
-      } else if (StringUtils.hasText(name)) {
-      } else {
-        renderer.setIcon(FileModel.ICON_FOLDER_DRIVE);
-      }
-    } else {
-      renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
-    }
+    final Icon icon = FileModel.getIcon(file.getFile());
+    renderer.setIcon(icon);
     return renderer;
   }
 

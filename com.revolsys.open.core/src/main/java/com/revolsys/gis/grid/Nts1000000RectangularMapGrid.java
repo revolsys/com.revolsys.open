@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -177,7 +178,11 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
     final int numX = maxXCeil - minXCeil;
     final int numY = maxYCeil - minYFloor;
-    if (numX > 8 || numY > 8) {
+    final int max = 100;
+    if (numX > max || numY > max) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Request would return too many tiles width=" + numX + " (max=" + max
+          + ") height=" + numY + "(max=" + max + ").");
       return tiles;
     }
     for (int y = 0; y < numY; y++) {

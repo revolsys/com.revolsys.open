@@ -48,7 +48,7 @@ public class FolderConnectionModel extends
   @Override
   protected List<FolderConnectionFile> getChildren(
     final FolderConnection connection) {
-    final FolderConnectionFile file = connection.getFile();
+    final FolderConnectionFile file = connection.getFileConnection();
     final List<FolderConnectionFile> files = file.getFiles();
     return files;
   }
@@ -57,12 +57,10 @@ public class FolderConnectionModel extends
   public Component getRenderer(final FolderConnection connection,
     final JTree tree, final boolean selected, final boolean expanded,
     final boolean leaf, final int row, final boolean hasFocus) {
-    final FolderConnectionFile file = connection.getFile();
+    final FolderConnectionFile file = connection.getFileConnection();
     final JLabel renderer = (JLabel)super.getRenderer(connection, tree,
       selected, expanded, leaf, row, hasFocus);
     if (file == null || !file.exists()) {
-      renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
-    } else if (file == null || !file.exists()) {
       renderer.setIcon(FileModel.ICON_FOLDER_MISSING);
     } else {
       renderer.setIcon(FileModel.ICON_FOLDER_LINK);

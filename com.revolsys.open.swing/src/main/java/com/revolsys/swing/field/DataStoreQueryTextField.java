@@ -179,7 +179,7 @@ public class DataStoreQueryTextField extends TextField implements
   protected String getDisplayText(final Object value) {
     final String stringValue = StringConverterRegistry.toString(value);
     String displayText = valueToDisplayMap.get(stringValue);
-    if (!StringUtils.hasText(displayText)) {
+    if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
       final DataObject record = dataStore.queryFirst(Query.equal(metaData,
         idAttributeName, stringValue));
       if (record == null) {

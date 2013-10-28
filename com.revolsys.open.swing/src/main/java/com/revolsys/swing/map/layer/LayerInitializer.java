@@ -12,14 +12,17 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
 
   private static final int MAX_WORKERS = 5;
 
-  private static final LinkedList<Layer> INITIALIZING_LAYERS = new LinkedList<Layer>();
+  private static final LinkedList<Layer> LAYERS_TO_INITIALIZE = new LinkedList<Layer>();
+
+  private static final LinkedList<Layer> LAYERS_CURRENTLY_INITIALIZING = new LinkedList<Layer>();
 
   private static int instanceCount;
 
   public static void initialize(final Layer layer) {
-    synchronized (INITIALIZING_LAYERS) {
-      if (!INITIALIZING_LAYERS.contains(layer) && !layer.isInitialized()) {
-        INITIALIZING_LAYERS.add(layer);
+    synchronized (LAYERS_TO_INITIALIZE) {
+      if (!LAYERS_CURRENTLY_INITIALIZING.contains(layer)
+        && !LAYERS_TO_INITIALIZE.contains(layer) && !layer.isInitialized()) {
+        LAYERS_TO_INITIALIZE.add(layer);
         if (instanceCount < MAX_WORKERS) {
           instanceCount++;
           final LayerInitializer initializer = new LayerInitializer();
@@ -41,13 +44,13 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
       DataObjectStoreConnectionRegistry.setForThread(dataStoreRegistry);
       while (true) {
         Layer layer;
-        synchronized (INITIALIZING_LAYERS) {
-          if (INITIALIZING_LAYERS.isEmpty()) {
+        synchronized (LAYERS_TO_INITIALIZE) {
+          if (LAYERS_TO_INITIALIZE.isEmpty()) {
             instanceCount--;
             return null;
           } else {
-            layer = INITIALIZING_LAYERS.removeFirst();
-
+            layer = LAYERS_TO_INITIALIZE.removeFirst();
+            LAYERS_CURRENTLY_INITIALIZING.add(layer);
           }
         }
         try {
@@ -55,6 +58,8 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
         } catch (final Throwable e) {
           ExceptionUtil.log(layer.getClass(), "Unable to iniaitlize layer: "
             + layer.getName(), e);
+        } finally {
+          LAYERS_CURRENTLY_INITIALIZING.remove(layer);
         }
       }
     } finally {

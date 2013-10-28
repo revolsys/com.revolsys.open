@@ -35,4 +35,5 @@ public interface Field {
 
   void setUndoManager(UndoManager undoManager);
 
+  void updateFieldValue();
 }

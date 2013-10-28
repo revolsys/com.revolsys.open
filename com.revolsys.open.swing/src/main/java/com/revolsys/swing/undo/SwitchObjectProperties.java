@@ -3,12 +3,8 @@ package com.revolsys.swing.undo;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
 
-@SuppressWarnings("serial")
 public class SwitchObjectProperties extends AbstractUndoableEdit {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private final Object object;
@@ -43,10 +39,8 @@ public class SwitchObjectProperties extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Object value1 = Property.get(this.object,
-        this.propertyName1);
-      final Object value2 = Property.get(this.object,
-        this.propertyName2);
+      final Object value1 = Property.get(this.object, this.propertyName1);
+      final Object value2 = Property.get(this.object, this.propertyName2);
       if (!EqualsRegistry.equal(value1, value2)) {
         if (EqualsRegistry.equal(this.value1, value1)) {
           if (EqualsRegistry.equal(this.value2, value2)) {
@@ -61,10 +55,8 @@ public class SwitchObjectProperties extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Object value1 = Property.get(this.object,
-        this.propertyName1);
-      final Object value2 = Property.get(this.object,
-        this.propertyName2);
+      final Object value1 = Property.get(this.object, this.propertyName1);
+      final Object value2 = Property.get(this.object, this.propertyName2);
       if (EqualsRegistry.equal(this.value1, value2)) {
         if (EqualsRegistry.equal(this.value2, value1)) {
           return true;

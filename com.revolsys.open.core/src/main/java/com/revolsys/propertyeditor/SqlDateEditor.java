@@ -2,14 +2,14 @@ package com.revolsys.propertyeditor;
 
 import java.beans.PropertyEditorSupport;
 import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
+
+import com.revolsys.util.DateUtil;
 
 public class SqlDateEditor extends PropertyEditorSupport {
-  private final DateFormat dateFormat;
+  private final String pattern;
 
-  public SqlDateEditor(final DateFormat dateFormat) {
-    this.dateFormat = dateFormat;
+  public SqlDateEditor(final String pattern) {
+    this.pattern = pattern;
   }
 
   @Override
@@ -18,7 +18,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (value == null) {
       return "";
     } else {
-      return dateFormat.format(value);
+      return DateUtil.format(pattern, value);
     }
   }
 
@@ -27,14 +27,10 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (text == null || text.trim().length() == 0) {
       setValue(null);
     } else {
-      try {
-        final java.util.Date date = dateFormat.parse(text);
-        final long time = date.getTime();
-        final Date sqlDate = new Date(time);
-        setValue(sqlDate);
-      } catch (final ParseException e) {
-        throw new IllegalArgumentException("Could not parse date", e);
-      }
+      final java.util.Date date = DateUtil.parse(pattern, text);
+      final long time = date.getTime();
+      final Date sqlDate = new Date(time);
+      setValue(sqlDate);
     }
   }
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.Child;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
@@ -13,7 +14,7 @@ import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
-  MapSerializer {
+  MapSerializer, Child<LayerGroup> {
   void addPropertyChangeListener(PropertyChangeListener listener);
 
   void addPropertyChangeListener(String propertyName,
