@@ -98,15 +98,19 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   protected boolean addCachedRecords(final List<LayerDataObject> records,
     final LayerDataObject record) {
     final String id = getId(record);
-    synchronized (this.cachedRecords) {
-      final LayerDataObject cachedRecord = this.cachedRecords.get(id);
-      if (cachedRecord == null) {
-        records.add(record);
-      } else {
-        if (cachedRecord.getState() == DataObjectState.Deleted) {
-          return false;
+    if (id == null) {
+      records.add(record);
+    } else {
+      synchronized (this.cachedRecords) {
+        final LayerDataObject cachedRecord = this.cachedRecords.get(id);
+        if (cachedRecord == null) {
+          records.add(record);
         } else {
-          records.add(cachedRecord);
+          if (cachedRecord.getState() == DataObjectState.Deleted) {
+            return false;
+          } else {
+            records.add(cachedRecord);
+          }
         }
       }
     }
@@ -384,7 +388,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final GeometryFactory geometryFactory = getGeometryFactory();
       polygon = geometryFactory.project(polygon);
 
-      final List records = getIndex().queryIntersects(polygon);
+      final DataObjectQuadTree index = getIndex();
+
+      final List records = index.queryIntersects(polygon);
       return records;
     }
   }
@@ -436,7 +442,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private LayerDataObject getCacheRecord(final String id,
     final LayerDataObject record) {
-    if (record != null && isLayerRecord(record)) {
+    if (id != null && record != null && isLayerRecord(record)) {
       if (record.getState() == DataObjectState.New) {
         return record;
       } else {

@@ -35,6 +35,8 @@ public class LayerRendererOverlay extends JComponent implements
 
   private LayerRendererOverlaySwingWorker imageWorker;
 
+  private boolean loadImage = true;
+
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
   }
@@ -73,7 +75,7 @@ public class LayerRendererOverlay extends JComponent implements
       synchronized (this.loadSync) {
         image = this.image;
 
-        if (image == null && imageWorker == null) {
+        if ((image == null || this.loadImage) && imageWorker == null) {
           final BoundingBox boundingBox = this.viewport.getBoundingBox();
           final int viewWidthPixels = this.viewport.getViewWidthPixels();
           final int viewHeightPixels = this.viewport.getViewHeightPixels();
@@ -103,7 +105,7 @@ public class LayerRendererOverlay extends JComponent implements
   public void redraw() {
     if (isValid() && layer.isExists() && layer.isVisible()) {
       synchronized (this.loadSync) {
-        this.image = null;
+        this.loadImage = true;
         if (this.imageWorker != null) {
           this.imageWorker.cancel(true);
           this.imageWorker = null;
@@ -124,6 +126,7 @@ public class LayerRendererOverlay extends JComponent implements
       if (this.imageWorker == imageWorker) {
         this.image = imageWorker.getReferencedImage();
         if (this.image != null) {
+          this.loadImage = false;
           this.imageWorker = null;
         }
         firePropertyChange("imageLoaded", false, true);

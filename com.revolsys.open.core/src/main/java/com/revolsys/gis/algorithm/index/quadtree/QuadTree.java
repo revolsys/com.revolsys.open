@@ -61,11 +61,15 @@ public class QuadTree<T> {
     }
   }
 
-  public int depth() {
-    if (root != null) {
-      return root.depth();
+  protected BoundingBox convert(BoundingBox boundingBox) {
+    if (geometryFactory != null) {
+      boundingBox = boundingBox.convert(geometryFactory);
     }
-    return 0;
+    return boundingBox;
+  }
+
+  public int depth() {
+    return root.depth();
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -80,9 +84,7 @@ public class QuadTree<T> {
     if (boundingBox == null) {
       throw new IllegalArgumentException("Item envelope must not be null");
     } else {
-      if (geometryFactory != null) {
-        boundingBox = boundingBox.convert(geometryFactory);
-      }
+      boundingBox = convert(boundingBox);
       size++;
       collectStats(boundingBox);
       final Envelope insertEnv = ensureExtent(boundingBox, minExtent);
@@ -110,16 +112,8 @@ public class QuadTree<T> {
   }
 
   public void query(BoundingBox boundingBox, final Visitor<T> visitor) {
-    boundingBox = boundingBox.convert(geometryFactory);
+    boundingBox = convert(boundingBox);
     root.visit(boundingBox, visitor);
-  }
-
-  public List<T> query(final Envelope envelope) {
-    return query(new BoundingBox(envelope));
-  }
-
-  public void query(final Envelope envelope, final Visitor<T> visitor) {
-    query(new BoundingBox(envelope), visitor);
   }
 
   public List<T> queryAll() {
@@ -128,11 +122,7 @@ public class QuadTree<T> {
     return visitor.getList();
   }
 
-  public List<T> queryEnvelope(final BoundingBox boundingBox) {
-    return query(boundingBox);
-  }
-
-  public List<T> queryEnvelope(final Geometry geometry) {
+  public List<T> queryBoundingBox(final Geometry geometry) {
     final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
     return query(boundingBox);
   }
@@ -148,8 +138,9 @@ public class QuadTree<T> {
     return queryFirst(boundingBox, filter);
   }
 
-  public boolean remove(final Envelope envelope, final T item) {
-    final Envelope posEnv = ensureExtent(envelope, minExtent);
+  public boolean remove(BoundingBox boundingBox, final T item) {
+    boundingBox = convert(boundingBox);
+    final Envelope posEnv = ensureExtent(boundingBox, minExtent);
     final boolean removed = root.remove(posEnv, item);
     if (removed) {
       size--;
@@ -158,10 +149,7 @@ public class QuadTree<T> {
   }
 
   public int size() {
-    if (root != null) {
-      return root.size();
-    }
-    return 0;
+    return getSize();
   }
 
 }

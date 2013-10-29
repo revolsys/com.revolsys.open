@@ -40,6 +40,8 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   String getName();
 
+  String getPath();
+
   List<Layer> getPathList();
 
   Project getProject();

@@ -34,6 +34,8 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
 
   private final DataObjectStoreConnectionRegistry dataStoreRegistry;
 
+  private Layer layer;
+
   public LayerInitializer() {
     dataStoreRegistry = DataObjectStoreConnectionRegistry.getForThread();
   }
@@ -43,7 +45,6 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
     try {
       DataObjectStoreConnectionRegistry.setForThread(dataStoreRegistry);
       while (true) {
-        Layer layer;
         synchronized (LAYERS_TO_INITIALIZE) {
           if (LAYERS_TO_INITIALIZE.isEmpty()) {
             instanceCount--;
@@ -64,11 +65,16 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
       }
     } finally {
       DataObjectStoreConnectionRegistry.setForThread(null);
+      layer = null;
     }
   }
 
   @Override
   public String toString() {
-    return "Initializing layers";
+    if (layer != null) {
+      return "Initializing layers";
+    } else {
+      return "Initializing layer: " + layer.getPath();
+    }
   }
 }

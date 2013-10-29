@@ -34,8 +34,8 @@ public class LoadingWorker extends
     if (query != null) {
       query = query.clone();
       query.setBoundingBox(queryBoundingBox);
-      final List<LayerDataObject> objects = this.layer.query(query);
-      index.insertAll(objects);
+      final List<LayerDataObject> records = this.layer.query(query);
+      index.insertAll(records);
     }
     return index;
   }

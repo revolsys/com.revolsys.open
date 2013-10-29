@@ -42,7 +42,7 @@ public abstract class NodeBase<T> {
 
   private final List<Envelope> envelopes = new ArrayList<Envelope>();
 
-  private final List<Node<T>> nodes = new ArrayList<Node<T>>();
+  private final List<Node<T>> nodes = new ArrayList<Node<T>>(4);
 
   public NodeBase() {
     for (int i = 0; i < 4; i++) {
@@ -169,6 +169,11 @@ public abstract class NodeBase<T> {
       }
     }
     return subSize + items.size();
+  }
+
+  @Override
+  public String toString() {
+    return nodes + "=" + items.size();
   }
 
   public boolean visit(final Envelope envelope, final Visitor<T> visitor) {
