@@ -964,8 +964,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         }
       }
       final StringBuffer text = new StringBuffer("<html>");
-      appendLocations(text, "Move Verticies", vertexLocations);
-      appendLocations(text, "Insert Verticies", segmentLocations);
+      appendLocations(text, "Move Vertices", vertexLocations);
+      appendLocations(text, "Insert Vertices", segmentLocations);
       text.append("</html>");
       getMap().setToolTipText(eventPoint, text);
 

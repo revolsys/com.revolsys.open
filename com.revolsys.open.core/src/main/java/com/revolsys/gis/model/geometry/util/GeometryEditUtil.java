@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.geometry.util;
 
-import java.awt.Toolkit;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -155,7 +154,6 @@ public class GeometryEditUtil {
       final int pointIndex = vertexId[vertexId.length - 1];
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       if (geometry instanceof Point) {
-        Toolkit.getDefaultToolkit().beep();
         return geometry;
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
@@ -206,7 +204,6 @@ public class GeometryEditUtil {
     final CoordinatesList newPoints = deleteVertex(points, pointIndex);
     if (newPoints != points) {
       if (newPoints.size() == 1) {
-        Toolkit.getDefaultToolkit().beep();
         return line;
       } else {
         return geometryFactory.createLineString(newPoints);
@@ -232,7 +229,6 @@ public class GeometryEditUtil {
     if (newPoints == points) {
       return polygon;
     } else if (newPoints.size() < 4) {
-      Toolkit.getDefaultToolkit().beep();
       return polygon;
     } else {
       rings.set(ringIndex, newPoints);
