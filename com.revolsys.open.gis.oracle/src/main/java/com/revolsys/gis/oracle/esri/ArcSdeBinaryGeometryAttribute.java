@@ -36,10 +36,10 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   public ArcSdeBinaryGeometryAttribute(
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String name,
-    final DataType type, final boolean required,
+    final DataType type, final boolean required, final String description,
     final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int numAxis) {
-    super(name, type, -1, 0, 0, required, properties);
+    super(name, type, -1, 0, 0, required, description, properties);
     this.sdeUtil = sdeUtil;
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();

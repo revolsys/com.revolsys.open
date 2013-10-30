@@ -26,6 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
@@ -54,6 +55,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.transaction.DataSourceTransactionManagerFactory;
+import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
@@ -89,6 +91,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   private final Object writerKey = new Object();
 
   private Map<String, Map<String, List<String>>> schemaTablePermissions;
+
+  private final Map<String, Map<String, String>> schemaTableDescriptions = new HashMap<String, Map<String, String>>();
 
   private String primaryKeySql;
 
@@ -130,24 +134,26 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   protected void addAttribute(final DataObjectMetaDataImpl metaData,
     final String name, final String dataType, final int sqlType,
-    final int length, final int scale, final boolean required) {
+    final int length, final int scale, final boolean required,
+    final String description) {
     JdbcAttributeAdder attributeAdder = attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
     }
     attributeAdder.addAttribute(metaData, name, dataType, sqlType, length,
-      scale, required);
+      scale, required, description);
   }
 
   protected void addAttribute(final ResultSetMetaData resultSetMetaData,
-    final DataObjectMetaDataImpl metaData, final String name, final int i)
-    throws SQLException {
+    final DataObjectMetaDataImpl metaData, final String name, final int i,
+    final String description) throws SQLException {
     final String dataType = resultSetMetaData.getColumnTypeName(i);
     final int sqlType = resultSetMetaData.getColumnType(i);
     final int length = resultSetMetaData.getPrecision(i);
     final int scale = resultSetMetaData.getScale(i);
     final boolean required = false;
-    addAttribute(metaData, name, dataType, sqlType, length, scale, required);
+    addAttribute(metaData, name, dataType, sqlType, length, scale, required,
+      description);
   }
 
   public void addAttributeAdder(final String sqlTypeName,
@@ -465,7 +471,7 @@ public abstract class AbstractJdbcDataObjectStore extends
         if (name.equals(idAttributeName)) {
           metaData.setIdAttributeIndex(i - 1);
         }
-        addAttribute(resultSetMetaData, metaData, name, i);
+        addAttribute(resultSetMetaData, metaData, name, i, null);
       }
 
       addMetaDataProperties(metaData);
@@ -517,11 +523,11 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected Map<String, Map<String, List<String>>> getSchemaTablePermissions() {
-    if (schemaTablePermissions == null) {
+    if (this.schemaTablePermissions == null) {
       synchronized (this) {
-        if (schemaTablePermissions == null) {
+        if (this.schemaTablePermissions == null) {
 
-          final Map<String, Map<String, List<String>>> schemaTablePermissions1 = new HashMap<String, Map<String, List<String>>>();
+          final Map<String, Map<String, List<String>>> schemaTablePermissions = new HashMap<String, Map<String, List<String>>>();
           try {
             final Connection connection = getDbConnection();
             try {
@@ -530,17 +536,18 @@ public abstract class AbstractJdbcDataObjectStore extends
 
               try {
                 while (resultSet.next()) {
-                  final String owner = resultSet.getString("SCHEMA_NAME");
-                  allSchemaNames.add(owner.toUpperCase());
-                  if (!isSchemaExcluded(owner)) {
+                  final String schemaName = resultSet.getString("SCHEMA_NAME");
+                  allSchemaNames.add(schemaName.toUpperCase());
+                  if (!isSchemaExcluded(schemaName)) {
                     final String dbTableName = resultSet.getString("TABLE_NAME");
-                    if (!isExcluded(owner, dbTableName)) {
+                    if (!isExcluded(schemaName, dbTableName)) {
 
                       final String privilege = resultSet.getString("PRIVILEGE");
-                      Map<String, List<String>> schemaPermissions = schemaTablePermissions1.get(owner);
+                      Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(schemaName);
                       if (schemaPermissions == null) {
                         schemaPermissions = new TreeMap<String, List<String>>();
-                        schemaTablePermissions1.put(owner, schemaPermissions);
+                        schemaTablePermissions.put(schemaName,
+                          schemaPermissions);
                       }
                       List<String> tablePermissions = schemaPermissions.get(dbTableName);
                       if (tablePermissions == null) {
@@ -548,6 +555,11 @@ public abstract class AbstractJdbcDataObjectStore extends
                         schemaPermissions.put(dbTableName, tablePermissions);
                       }
                       tablePermissions.add(privilege);
+                      final String description = resultSet.getString("REMARKS");
+                      if (StringUtils.hasText(description)) {
+                        CollectionUtil.put(schemaTableDescriptions, schemaName,
+                          dbTableName, description);
+                      }
                     }
                   }
                 }
@@ -561,13 +573,12 @@ public abstract class AbstractJdbcDataObjectStore extends
             LoggerFactory.getLogger(getClass()).error(
               "Unable to get schema and table permissions", e);
           }
-          final Map<String, Map<String, List<String>>> schemaTablePermissions = schemaTablePermissions1;
           this.schemaTablePermissions = schemaTablePermissions;
 
         }
       }
     }
-    return schemaTablePermissions;
+    return this.schemaTablePermissions;
   }
 
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
@@ -773,6 +784,9 @@ public abstract class AbstractJdbcDataObjectStore extends
         tableNameMap.put(typePath, dbTableName);
         final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
           this, schema, typePath);
+        final String description = CollectionUtil.getMap(
+          schemaTableDescriptions, dbSchemaName, dbTableName);
+        metaData.setDescription(description);
         final List<String> permissions = getTablePermissions(dbSchemaName,
           dbTableName);
         metaData.setProperty("permissions", permissions);
@@ -799,8 +813,9 @@ public abstract class AbstractJdbcDataObjectStore extends
             }
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
+            final String description = columnsRs.getString("REMARKS");
             addAttribute(metaData, name, dataType, sqlType, length, scale,
-              required);
+              required, description);
           }
         }
 

@@ -49,8 +49,9 @@ public class SpatiaLiteGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, String dataTypeName, final int sqlType,
-    final int length, final int scale, final boolean required) {
+    final String name, final String dataTypeName, final int sqlType,
+    final int length, final int scale, final boolean required,
+    final String description) {
     final String typePath = metaData.getPath();
     String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
     if (owner.equals("")) {
@@ -84,7 +85,7 @@ public class SpatiaLiteGeometryAttributeAdder extends JdbcAttributeAdder {
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new SpatiaLiteGeometryJdbcAttribute(name,
-        dataType, required, null, srid, numAxis, geometryFactory);
+        dataType, required, description, null, srid, numAxis, geometryFactory);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

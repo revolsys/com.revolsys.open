@@ -10,15 +10,16 @@ import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcFloatAttribute extends JdbcAttribute {
   public JdbcFloatAttribute(final String name, final int sqlType,
-    final int length, final boolean required,
+    final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.FLOAT, sqlType, length, 0, required, properties);
+    super(name, DataTypes.FLOAT, sqlType, length, 0, required, description,
+      properties);
   }
 
   @Override
   public JdbcFloatAttribute clone() {
     return new JdbcFloatAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getProperties());
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override

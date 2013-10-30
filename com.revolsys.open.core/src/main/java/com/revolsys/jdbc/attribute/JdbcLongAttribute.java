@@ -10,19 +10,20 @@ import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcLongAttribute extends JdbcAttribute {
   public JdbcLongAttribute(final String name) {
-    super(name, DataTypes.LONG, 0, 0, 0, false, null);
+    super(name, DataTypes.LONG, 0, 0, 0, false, null, null);
   }
 
   public JdbcLongAttribute(final String name, final int sqlType,
-    final int length, final boolean required,
+    final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.LONG, sqlType, length, 0, required, properties);
+    super(name, DataTypes.LONG, sqlType, length, 0, required, description,
+      properties);
   }
 
   @Override
   public JdbcLongAttribute clone() {
     return new JdbcLongAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getProperties());
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override

@@ -16,9 +16,10 @@ import com.revolsys.jdbc.LocalBlob;
 
 public class JdbcBlobAttribute extends JdbcAttribute {
   public JdbcBlobAttribute(final String name, final int sqlType,
-    final int length, final boolean required,
+    final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.BLOB, sqlType, length, 0, required, properties);
+    super(name, DataTypes.BLOB, sqlType, length, 0, required, description,
+      properties);
   }
 
   @Override

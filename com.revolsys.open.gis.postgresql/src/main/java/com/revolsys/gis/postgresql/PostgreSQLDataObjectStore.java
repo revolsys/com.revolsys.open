@@ -210,10 +210,10 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
     setPrimaryKeySql("select p.table_name,c.column_name from information_schema.table_constraints p join information_schema.key_column_usage c using (constraint_catalog, constraint_schema, constraint_name) where p.constraint_type = 'PRIMARY KEY' and p.table_schema = ?");
-    setPermissionsSql("select distinct table_schema as \"SCHEMA_NAME\", table_name, privilege_type as \"PRIVILEGE\" from information_schema.role_table_grants "
-      + "where (grantee  in (current_user, 'PUBLIC') or grantee in (select role_name from information_schema.applicable_roles where grantee = current_user)) AND "
+    setPermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
+      + "where (t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-      + "order by table_schema, table_name, privilege_type");
+      + "order by t.table_schema, t.table_name, t.privilege_type");
   }
 
   @Override

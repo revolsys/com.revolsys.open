@@ -51,7 +51,8 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
     final String name, final String dataTypeName, final int sqlType,
-    final int length, final int scale, final boolean required) {
+    final int length, final int scale, final boolean required,
+    final String description) {
     final String typePath = metaData.getPath();
     String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
     if (!StringUtils.hasText(owner)) {
@@ -85,7 +86,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
-        dataType, required, null, srid, numAxis, geometryFactory);
+        dataType, required, description, null, srid, numAxis, geometryFactory);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

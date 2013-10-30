@@ -10,15 +10,16 @@ import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcIntegerAttribute extends JdbcAttribute {
   public JdbcIntegerAttribute(final String name, final int sqlType,
-    final int length, final boolean required,
+    final int length, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.INT, sqlType, length, 0, required, properties);
+    super(name, DataTypes.INT, sqlType, length, 0, required, description,
+      properties);
   }
 
   @Override
   public JdbcIntegerAttribute clone() {
     return new JdbcIntegerAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getProperties());
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override

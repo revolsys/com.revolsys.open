@@ -32,9 +32,10 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
   private final GeometryFactory geometryFactory;
 
   public ArcSdeStGeometryAttribute(final String name, final DataType type,
-    final boolean required, final Map<String, Object> properties,
+    final boolean required, final String description,
+    final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int dimension) {
-    super(name, type, -1, 0, 0, required, properties);
+    super(name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
     final GeometryFactory factory = spatialReference.getGeometryFactory();
     this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
@@ -61,7 +62,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
   @Override
   public ArcSdeStGeometryAttribute clone() {
     return new ArcSdeStGeometryAttribute(getName(), getType(), isRequired(),
-      getProperties(), this.spatialReference, this.dimension);
+      getDescription(), getProperties(), this.spatialReference, this.dimension);
   }
 
   @Override

@@ -373,6 +373,12 @@ public final class CollectionUtil {
     return value;
   }
 
+  public static <K1, K2, V> V getMap(final Map<K1, Map<K2, V>> map,
+    final K1 key1, final K2 key2) {
+    final Map<K2, V> values = getMap(map, key1);
+    return values.get(key2);
+  }
+
   public static <K, V> List<V> getNotNull(final Map<K, V> map,
     final Collection<K> keys) {
     final List<V> values = new ArrayList<V>();

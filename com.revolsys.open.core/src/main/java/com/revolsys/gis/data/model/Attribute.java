@@ -234,6 +234,19 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.allowedValues.put(value, text);
   }
 
+  public void appendType(final StringBuffer string) {
+    string.append(type);
+    if (length > 0) {
+      string.append('(');
+      string.append(length);
+      if (scale > 0) {
+        string.append(',');
+        string.append(scale);
+      }
+      string.append(')');
+    }
+  }
+
   @Override
   public Attribute clone() {
     return new Attribute(this);
@@ -351,17 +364,14 @@ public class Attribute extends AbstractObjectWithProperties implements
    */
   public String getTypeDescription() {
     final StringBuffer typeDescription = new StringBuffer();
-    typeDescription.append(type);
-    if (length > 0) {
-      typeDescription.append('(');
-      typeDescription.append(length);
-      if (scale > 0) {
-        typeDescription.append(',');
-        typeDescription.append(scale);
-      }
-      typeDescription.append(')');
-    }
+    appendType(typeDescription);
     return typeDescription.toString();
+  }
+
+  public String getTypeString() {
+    final StringBuffer string = new StringBuffer();
+    appendType(string);
+    return string.toString();
   }
 
   /**
@@ -441,16 +451,7 @@ public class Attribute extends AbstractObjectWithProperties implements
   public String toString() {
     final StringBuffer string = new StringBuffer(name);
     string.append(':');
-    string.append(type);
-    if (length > 0) {
-      string.append('(');
-      string.append(length);
-      if (scale > 0) {
-        string.append(',');
-        string.append(scale);
-      }
-      string.append(')');
-    }
+    appendType(string);
     return string.toString();
   }
 }

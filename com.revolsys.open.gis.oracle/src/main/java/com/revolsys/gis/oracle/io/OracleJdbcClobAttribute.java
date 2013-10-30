@@ -21,8 +21,8 @@ import com.revolsys.spring.SpringUtil;
 
 public class OracleJdbcClobAttribute extends JdbcAttribute {
   public OracleJdbcClobAttribute(final String name, final int sqlType,
-    final int length, final boolean required) {
-    super(name, DataTypes.STRING, sqlType, length, 0, required,
+    final int length, final boolean required, final String description) {
+    super(name, DataTypes.STRING, sqlType, length, 0, required, description,
       Collections.<String, Object> emptyMap());
   }
 

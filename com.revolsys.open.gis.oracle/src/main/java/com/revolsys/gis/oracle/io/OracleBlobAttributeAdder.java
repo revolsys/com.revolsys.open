@@ -12,9 +12,10 @@ public class OracleBlobAttributeAdder extends JdbcAttributeAdder {
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
     final String name, final String dataTypeName, final int sqlType,
-    final int length, final int scale, final boolean required) {
+    final int length, final int scale, final boolean required,
+    final String description) {
     final OracleJdbcBlobAttribute attribute = new OracleJdbcBlobAttribute(name,
-      sqlType, length, required);
+      sqlType, length, required, description);
     metaData.addAttribute(attribute);
     return attribute;
   }

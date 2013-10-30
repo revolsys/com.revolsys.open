@@ -39,7 +39,8 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
       final boolean required = attribute.isRequired();
       final Map<String, Object> properties = attribute.getProperties();
       return new ArcSdeObjectIdJdbcAttribute(name, type, length, scale,
-        required, properties, schemaName, registrationId);
+        required, attribute.getDescription(), properties, schemaName,
+        registrationId);
     } catch (final IllegalArgumentException e) {
       LOG.error("Cannot get sde.table_registry values for " + schemaName + "."
         + tableName);
@@ -59,9 +60,9 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
 
   public ArcSdeObjectIdJdbcAttribute(final String name, final DataType type,
     final int length, final int scale, final boolean required,
-    final Map<String, Object> properties, final String schemaName,
-    final long registrationId) {
-    super(name, type, -1, length, scale, required, properties);
+    final String description, final Map<String, Object> properties,
+    final String schemaName, final long registrationId) {
+    super(name, type, -1, length, scale, required, description, properties);
     this.schemaName = schemaName;
     this.registrationId = registrationId;
   }
@@ -83,8 +84,8 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   @Override
   public ArcSdeObjectIdJdbcAttribute clone() {
     return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
-      getScale(), isRequired(), getProperties(), this.schemaName,
-      this.registrationId);
+      getScale(), isRequired(), getDescription(), getProperties(),
+      this.schemaName, this.registrationId);
   }
 
   /**

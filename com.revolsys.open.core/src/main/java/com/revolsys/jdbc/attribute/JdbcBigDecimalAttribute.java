@@ -10,14 +10,14 @@ import com.revolsys.gis.data.model.DataObject;
 public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   public JdbcBigDecimalAttribute(final String name, final int sqlType,
     final int length, final int scale, final boolean required,
-    final Map<String, Object> properties) {
-    super(name, sqlType, length, scale, required, properties);
+    final String description, final Map<String, Object> properties) {
+    super(name, sqlType, length, scale, required, description, properties);
   }
 
   @Override
   public JdbcBigDecimalAttribute clone() {
     return new JdbcBigDecimalAttribute(getName(), getSqlType(), getLength(),
-      getScale(), isRequired(), getProperties());
+      getScale(), isRequired(), getDescription(), getProperties());
   }
 
   @Override

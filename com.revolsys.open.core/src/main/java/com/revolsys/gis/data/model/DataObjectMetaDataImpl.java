@@ -83,6 +83,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   private List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
+  private String description;
+
   public DataObjectMetaDataImpl() {
   }
 
@@ -470,6 +472,10 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return defaultValues;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
   @Override
   public Attribute getGeometryAttribute() {
     if (geometryAttributeIndex == -1) {
@@ -629,6 +635,10 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public void setDefaultValues(final Map<String, ? extends Object> defaultValues) {
     this.defaultValues = new HashMap<String, Object>(defaultValues);
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
   }
 
   /**

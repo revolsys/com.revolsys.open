@@ -102,7 +102,8 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
       this, columnName, dataType, attribute.isRequired(),
-      attribute.getProperties(), spatialReference, numAxis);
+      "The GEOMETRY reference", attribute.getProperties(), spatialReference,
+      numAxis);
     ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute, sdeAttribute);
     sdeAttribute.setMetaData(metaData);
 

@@ -51,10 +51,10 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   private final PrecisionModel[] precisionModels;
 
   public OracleSdoGeometryJdbcAttribute(final String name, final DataType type,
-    final int sqlType, final boolean required,
+    final int sqlType, final boolean required, final String description,
     final Map<String, Object> properties,
     final GeometryFactory geometryFactory, final int dimension) {
-    super(name, type, sqlType, 0, 0, required, properties);
+    super(name, type, sqlType, 0, 0, required, description, properties);
     this.geometryFactory = geometryFactory;
     this.dimension = dimension;
     this.precisionModels = new PrecisionModel[dimension];
@@ -90,8 +90,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   @Override
   public OracleSdoGeometryJdbcAttribute clone() {
     return new OracleSdoGeometryJdbcAttribute(getName(), getType(),
-      getSqlType(), isRequired(), getProperties(), this.geometryFactory,
-      this.dimension);
+      getSqlType(), isRequired(), getDescription(), getProperties(),
+      this.geometryFactory, this.dimension);
   }
 
   @Override
