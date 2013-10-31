@@ -84,6 +84,15 @@ public final class MathUtil {
     return left.add(new BigDecimal(StringConverterRegistry.toString(right)));
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V extends Number> V add(final Number left, final Number right,
+    final Class<V> resultClass) {
+    final BigDecimal a = getBigDecimal(left);
+    final BigDecimal b = getBigDecimal(right);
+    final BigDecimal result = a.add(b);
+    return (V)StringConverterRegistry.toObject(resultClass, result);
+  }
+
   /**
    * Calculate the angle of a coordinates
    * 
@@ -608,10 +617,16 @@ public final class MathUtil {
   @SuppressWarnings("unchecked")
   public static <V extends Number> V subtract(final Number left,
     final Number right, final Class<V> resultClass) {
-    final BigDecimal a = getBigDecimal(left);
-    final BigDecimal b = getBigDecimal(right);
-    final BigDecimal result = a.subtract(b);
-    return (V)StringConverterRegistry.toObject(resultClass, result);
+    if (left == null) {
+      return null;
+    } else if (right == null) {
+      return (V)StringConverterRegistry.toObject(resultClass, left);
+    } else {
+      final BigDecimal a = getBigDecimal(left);
+      final BigDecimal b = getBigDecimal(right);
+      final BigDecimal result = a.subtract(b);
+      return (V)StringConverterRegistry.toObject(resultClass, result);
+    }
   }
 
   public static double[] toDoubleArray(final List<? extends Number> numbers) {

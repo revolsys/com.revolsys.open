@@ -335,6 +335,29 @@ public class Attribute extends AbstractObjectWithProperties implements
     return scale;
   }
 
+  public String getSimpleType() {
+    final StringBuffer string = new StringBuffer();
+    String typeName;
+    if (Number.class.isAssignableFrom(getTypeClass())) {
+      typeName = "NUMBER";
+    } else if (CharSequence.class.isAssignableFrom(getTypeClass())) {
+      typeName = "CHARACTER";
+    } else {
+      typeName = type.getName().toUpperCase();
+    }
+    string.append(typeName);
+    if (length > 0) {
+      string.append('(');
+      string.append(length);
+      if (scale > 0) {
+        string.append(',');
+        string.append(scale);
+      }
+      string.append(')');
+    }
+    return string.toString();
+  }
+
   public String getTitle() {
     return title;
   }
@@ -366,12 +389,6 @@ public class Attribute extends AbstractObjectWithProperties implements
     final StringBuffer typeDescription = new StringBuffer();
     appendType(typeDescription);
     return typeDescription.toString();
-  }
-
-  public String getTypeString() {
-    final StringBuffer string = new StringBuffer();
-    appendType(string);
-    return string.toString();
   }
 
   /**

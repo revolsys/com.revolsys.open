@@ -1105,8 +1105,11 @@ public class DataObjectLayerForm extends JPanel implements
     final Object oldValue = getFieldValue(fieldName);
     final DataObjectMetaData metaData = getMetaData();
     if (metaData != null) {
-      final Class<?> attributeClass = metaData.getAttributeClass(fieldName);
-      value = StringConverterRegistry.toObject(attributeClass, value);
+      try {
+        final Class<?> attributeClass = metaData.getAttributeClass(fieldName);
+        value = StringConverterRegistry.toObject(attributeClass, value);
+      } catch (final Throwable e) {
+      }
     }
     this.fieldValues.put(fieldName, value);
     final JComponent field = (JComponent)getField(fieldName);

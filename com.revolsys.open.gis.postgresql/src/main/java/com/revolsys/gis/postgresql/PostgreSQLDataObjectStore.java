@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -74,13 +73,6 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
     setIteratorFactory(ITERATOR_FACTORY);
 
-  }
-
-  @Override
-  protected Set<String> getDatabaseSchemaNames() {
-    final Set<String> databaseSchemaNames = super.getDatabaseSchemaNames();
-    databaseSchemaNames.removeAll(POSTGRESQL_INTERNAL_SCHEMAS);
-    return databaseSchemaNames;
   }
 
   @Override
@@ -210,8 +202,14 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
     setPrimaryKeySql("select p.table_name,c.column_name from information_schema.table_constraints p join information_schema.key_column_usage c using (constraint_catalog, constraint_schema, constraint_name) where p.constraint_type = 'PRIMARY KEY' and p.table_schema = ?");
-    setPermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
-      + "where (t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
+    setSchemaPermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\" "
+      + "from information_schema.role_table_grants t  "
+      + "where (t.grantee  in (current_user, 'PUBLIC') or "
+      + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
+      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
+    setTablePermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
+      + "where t.table_schema = ? and "
+      + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
       + "order by t.table_schema, t.table_name, t.privilege_type");
   }

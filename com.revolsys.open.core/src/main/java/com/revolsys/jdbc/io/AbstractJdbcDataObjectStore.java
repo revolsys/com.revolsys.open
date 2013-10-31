@@ -26,7 +26,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
@@ -60,6 +59,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
   AbstractDataObjectStore implements JdbcDataObjectStore {
+  public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
+
   private Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
   private int batchSize;
@@ -80,7 +81,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String sqlSuffix;
 
-  private String permissionsSql;
+  private String schemaPermissionsSql;
 
   private Map<String, String> schemaNameMap = new HashMap<String, String>();
 
@@ -89,10 +90,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   private JdbcDatabaseFactory databaseFactory;
 
   private final Object writerKey = new Object();
-
-  private Map<String, Map<String, List<String>>> schemaTablePermissions;
-
-  private final Map<String, Map<String, String>> schemaTableDescriptions = new HashMap<String, Map<String, String>>();
 
   private String primaryKeySql;
 
@@ -106,6 +103,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     final Map<String, Object> properties) {
     return new JdbcQueryIterator(dataStore, query, properties);
   }
+
+  private String tablePermissionsSql;
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -286,23 +285,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
-  @Override
-  public void deleteAll(final Collection<DataObject> objects) {
-    final JdbcWriter writer = getWriter();
-    try {
-      for (final DataObject object : objects) {
-        if (object.getState() == DataObjectState.Persisted
-          || object.getState() == DataObjectState.Modified) {
-          object.setState(DataObjectState.Deleted);
-          writer.write(object);
-        }
-      }
-    } finally {
-      writer.close();
-    }
-  }
-
   // protected Set<String> getDatabaseSchemaNames() {
   // final Set<String> databaseSchemaNames = new TreeSet<String>();
   // try {
@@ -328,8 +310,21 @@ public abstract class AbstractJdbcDataObjectStore extends
   // return databaseSchemaNames;
   // }
 
-  public Set<String> getAllSchemaNames() {
-    return allSchemaNames;
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void deleteAll(final Collection<DataObject> objects) {
+    final JdbcWriter writer = getWriter();
+    try {
+      for (final DataObject object : objects) {
+        if (object.getState() == DataObjectState.Persisted
+          || object.getState() == DataObjectState.Modified) {
+          object.setState(DataObjectState.Deleted);
+          writer.write(object);
+        }
+      }
+    } finally {
+      writer.close();
+    }
   }
 
   // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
@@ -359,6 +354,10 @@ public abstract class AbstractJdbcDataObjectStore extends
   // releaseConnection(connection);
   // }
   // }
+
+  public Set<String> getAllSchemaNames() {
+    return allSchemaNames;
+  }
 
   public JdbcAttribute getAttribute(final String schemaName,
     final String tableName, final String columnName) {
@@ -408,20 +407,37 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected Set<String> getDatabaseSchemaNames() {
-    final Map<String, Map<String, List<String>>> tablePermissions = getSchemaTablePermissions();
-    return tablePermissions.keySet();
+    final Set<String> schemaNames = new TreeSet<String>();
+    try {
+      final Connection connection = getDbConnection();
+      try {
+        final PreparedStatement statement = connection.prepareStatement(schemaPermissionsSql);
+        final ResultSet resultSet = statement.executeQuery();
+
+        try {
+          while (resultSet.next()) {
+            final String schemaName = resultSet.getString("SCHEMA_NAME");
+            allSchemaNames.add(schemaName.toUpperCase());
+            if (!isSchemaExcluded(schemaName)) {
+              schemaNames.add(schemaName);
+            }
+          }
+        } finally {
+          JdbcUtils.close(resultSet);
+        }
+      } finally {
+        releaseConnection(connection);
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to get schema and table permissions", e);
+    }
+    return schemaNames;
   }
 
   @Override
   public String getDatabaseTableName(final String typePath) {
     return tableNameMap.get(typePath);
-  }
-
-  protected Set<String> getDatabaseTableNames(final String dbSchemaName)
-    throws SQLException {
-    final Map<String, Map<String, List<String>>> schemaTablePermissions = getSchemaTablePermissions();
-    final Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(dbSchemaName);
-    return schemaPermissions.keySet();
   }
 
   @Override
@@ -522,65 +538,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  protected Map<String, Map<String, List<String>>> getSchemaTablePermissions() {
-    if (this.schemaTablePermissions == null) {
-      synchronized (this) {
-        if (this.schemaTablePermissions == null) {
-
-          final Map<String, Map<String, List<String>>> schemaTablePermissions = new HashMap<String, Map<String, List<String>>>();
-          try {
-            final Connection connection = getDbConnection();
-            try {
-              final PreparedStatement statement = connection.prepareStatement(permissionsSql);
-              final ResultSet resultSet = statement.executeQuery();
-
-              try {
-                while (resultSet.next()) {
-                  final String schemaName = resultSet.getString("SCHEMA_NAME");
-                  allSchemaNames.add(schemaName.toUpperCase());
-                  if (!isSchemaExcluded(schemaName)) {
-                    final String dbTableName = resultSet.getString("TABLE_NAME");
-                    if (!isExcluded(schemaName, dbTableName)) {
-
-                      final String privilege = resultSet.getString("PRIVILEGE");
-                      Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(schemaName);
-                      if (schemaPermissions == null) {
-                        schemaPermissions = new TreeMap<String, List<String>>();
-                        schemaTablePermissions.put(schemaName,
-                          schemaPermissions);
-                      }
-                      List<String> tablePermissions = schemaPermissions.get(dbTableName);
-                      if (tablePermissions == null) {
-                        tablePermissions = new ArrayList<String>();
-                        schemaPermissions.put(dbTableName, tablePermissions);
-                      }
-                      tablePermissions.add(privilege);
-                      final String description = resultSet.getString("REMARKS");
-                      if (StringUtils.hasText(description)) {
-                        CollectionUtil.put(schemaTableDescriptions, schemaName,
-                          dbTableName, description);
-                      }
-                    }
-                  }
-                }
-              } finally {
-                JdbcUtils.close(resultSet);
-              }
-            } finally {
-              releaseConnection(connection);
-            }
-          } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error(
-              "Unable to get schema and table permissions", e);
-          }
-          this.schemaTablePermissions = schemaTablePermissions;
-
-        }
-      }
-    }
-    return this.schemaTablePermissions;
-  }
-
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
@@ -638,17 +595,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     return sqlSuffix;
   }
 
-  public List<String> getTablePermissions(final String schema,
-    final String table) {
-    final Map<String, Map<String, List<String>>> schemaTablePermissions = getSchemaTablePermissions();
-    final Map<String, List<String>> schemaPermissions = schemaTablePermissions.get(schema);
-    if (schemaPermissions != null) {
-      final List<String> tablePermissions = schemaPermissions.get(table);
-      if (tablePermissions != null) {
-        return tablePermissions;
-      }
-    }
-    return Arrays.asList("SELECT");
+  public String getTablePermissionsSql() {
+    return tablePermissionsSql;
   }
 
   @Override
@@ -772,23 +720,27 @@ public abstract class AbstractJdbcDataObjectStore extends
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
       attributeAdder.initialize(schema);
     }
+    final Map<String, String> tableDescriptionMap = new HashMap<String, String>();
+    final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
+    loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap,
+      tableDescriptionMap);
+
     final Connection connection = getDbConnection();
     try {
       final DatabaseMetaData databaseMetaData = connection.getMetaData();
 
       final Map<String, String> idAttributeNames = loadIdColumnNames(dbSchemaName);
-      final Set<String> tableNames = getDatabaseTableNames(dbSchemaName);
+      final Set<String> tableNames = tablePermissionsMap.keySet();
       for (final String dbTableName : tableNames) {
         final String tableName = dbTableName.toUpperCase();
         final String typePath = PathUtil.toPath(schemaName, tableName);
         tableNameMap.put(typePath, dbTableName);
         final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
           this, schema, typePath);
-        final String description = CollectionUtil.getMap(
-          schemaTableDescriptions, dbSchemaName, dbTableName);
+        final String description = tableDescriptionMap.get(dbTableName);
         metaData.setDescription(description);
-        final List<String> permissions = getTablePermissions(dbSchemaName,
-          dbTableName);
+        final List<String> permissions = CollectionUtil.get(
+          tablePermissionsMap, dbTableName, DEFAULT_PERMISSIONS);
         metaData.setProperty("permissions", permissions);
         metaDataMap.put(typePath, metaData);
       }
@@ -850,6 +802,40 @@ public abstract class AbstractJdbcDataObjectStore extends
       final DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
         schemaName);
       schemaMap.put(schemaName, schema);
+    }
+  }
+
+  protected void loadSchemaTablePermissions(final String schemaName,
+    final Map<String, List<String>> tablePermissionsMap,
+    final Map<String, String> tableDescriptionMap) {
+    try {
+      final Connection connection = getDbConnection();
+      try {
+        final PreparedStatement statement = connection.prepareStatement(tablePermissionsSql);
+        statement.setString(1, schemaName);
+        final ResultSet resultSet = statement.executeQuery();
+
+        try {
+          while (resultSet.next()) {
+            final String dbTableName = resultSet.getString("TABLE_NAME");
+            if (!isExcluded(schemaName, dbTableName)) {
+              final String privilege = resultSet.getString("PRIVILEGE");
+              CollectionUtil.addToList(tablePermissionsMap, dbTableName,
+                privilege);
+
+              final String description = resultSet.getString("REMARKS");
+              tableDescriptionMap.put(dbTableName, description);
+            }
+          }
+        } finally {
+          JdbcUtils.close(resultSet);
+        }
+      } finally {
+        releaseConnection(connection);
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to get schema and table permissions", e);
     }
   }
 
@@ -932,12 +918,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.hints = hints;
   }
 
-  protected void setPermissionsSql(final String permissionsSql) {
-    this.permissionsSql = permissionsSql;
-  }
-
   public void setPrimaryKeySql(final String primaryKeySql) {
     this.primaryKeySql = primaryKeySql;
+  }
+
+  protected void setSchemaPermissionsSql(final String scehmaPermissionsSql) {
+    this.schemaPermissionsSql = scehmaPermissionsSql;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {
@@ -946,6 +932,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public void setSqlSuffix(final String sqlSuffix) {
     this.sqlSuffix = sqlSuffix;
+  }
+
+  public void setTablePermissionsSql(final String tablePermissionsSql) {
+    this.tablePermissionsSql = tablePermissionsSql;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
