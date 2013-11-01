@@ -21,9 +21,8 @@ public class EnumRows {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
-  }
+   protected void finalize() {
+   }
 
   public synchronized void delete() {
     if (swigCPtr != 0) {

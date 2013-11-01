@@ -14,7 +14,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
  */
 public class ArrayDataObject extends BaseDataObject {
   /** Serialization version */
-  private static final long serialVersionUID = 2704226494490082708L;
+  private static final long serialVersionUID = 1L;
 
   /** The object's attribute values. */
   private Object[] attributes;
@@ -86,6 +86,11 @@ public class ArrayDataObject extends BaseDataObject {
   @Override
   public List<Object> getValues() {
     return Arrays.asList(attributes);
+  }
+
+  @Override
+  public int hashCode() {
+    return attributes.hashCode();
   }
 
   /**

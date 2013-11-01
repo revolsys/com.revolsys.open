@@ -9,10 +9,12 @@ public abstract class AbstractWriter<T> extends AbstractObjectWithProperties
   public static void close(final Writer<?>... writers) {
     final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
     for (final Writer<?> writer : writers) {
-      try {
-        writer.close();
-      } catch (final RuntimeException e) {
-        exceptions.add(e);
+      if (writer != null) {
+        try {
+          writer.close();
+        } catch (final RuntimeException e) {
+          exceptions.add(e);
+        }
       }
     }
     if (!exceptions.isEmpty()) {

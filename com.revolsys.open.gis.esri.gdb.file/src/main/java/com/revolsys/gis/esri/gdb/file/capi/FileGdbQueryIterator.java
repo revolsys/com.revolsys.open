@@ -102,18 +102,15 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     if (dataStore != null) {
       try {
         dataStore.closeEnumRows(rows);
+      } catch (final Throwable e) {
+      } finally {
         rows = null;
-        if (table != null) {
-          dataStore.closeTable(table);
-          table = null;
-        }
+        table = null;
         dataStore = null;
         metaData = null;
         fields = null;
         whereClause = null;
         boundingBox = null;
-      } catch (final Throwable t) {
-        t.printStackTrace();
       }
     }
   }

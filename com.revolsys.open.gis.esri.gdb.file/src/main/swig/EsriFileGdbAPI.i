@@ -139,6 +139,15 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %rename(openGeodatabase2) FileGDBAPI::OpenGeodatabase;
 %rename(closeGeodatabase2) FileGDBAPI::CloseGeodatabase;
 %rename(deleteGeodatabase2) FileGDBAPI::DeleteGeodatabase;
+
+%typemap(javafinalize) FileGDBAPI::Geodatabase %{
+   protected void finalize() {
+   }
+%}
+%typemap(javafinalize) FileGDBAPI::Table %{
+   protected void finalize() {
+   }
+%}
 %ignore FileGDBAPI::Geodatabase::ExecuteSQL;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDefinition;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDocumentation;
@@ -725,6 +734,11 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %ignore FileGDBAPI::EnumRows::Next;
 %ignore FileGDBAPI::EnumRows::GetFields;
 %newobject FileGDBAPI::EnumRows::next;
+
+%typemap(javafinalize) FileGDBAPI::EnumRows %{
+   protected void finalize() {
+   }
+%}
 %extend FileGDBAPI::EnumRows {
   FileGDBAPI::Row* next() {
     FileGDBAPI::Row* value = new FileGDBAPI::Row();

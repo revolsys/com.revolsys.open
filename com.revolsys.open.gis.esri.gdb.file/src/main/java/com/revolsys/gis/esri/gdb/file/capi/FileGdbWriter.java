@@ -44,7 +44,6 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       } catch (final Throwable e) {
         LOG.error("Unable to close table", e);
       }
-      dataStore.closeTable(table);
     }
     tables = null;
     dataStore = null;

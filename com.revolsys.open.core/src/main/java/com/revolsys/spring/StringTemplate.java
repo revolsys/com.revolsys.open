@@ -9,13 +9,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+import com.revolsys.util.ExceptionUtil;
 
 public class StringTemplate implements Serializable {
-
   /**
-   * Static inner class to parse URI template strings into a matching regular
-   * expression.
-   */
+  * Static inner class to parse URI template strings into a matching regular
+  * expression.
+  */
   private static class Parser {
 
     private final List<String> variableNames = new LinkedList<String>();
@@ -23,7 +25,7 @@ public class StringTemplate implements Serializable {
     private final StringBuilder patternBuilder = new StringBuilder();
 
     private Parser(final String uriTemplate) {
-      Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
+      Assert.hasText(uriTemplate, "'template' must not be null");
       final Matcher m = NAMES_PATTERN.matcher(uriTemplate);
       int end = 0;
       while (m.find()) {
@@ -39,10 +41,6 @@ public class StringTemplate implements Serializable {
       }
     }
 
-    private Pattern getMatchPattern() {
-      return Pattern.compile(this.patternBuilder.toString());
-    }
-
     private List<String> getVariableNames() {
       return Collections.unmodifiableList(this.variableNames);
     }
@@ -55,37 +53,51 @@ public class StringTemplate implements Serializable {
     }
   }
 
+  private static final long serialVersionUID = 1L;
+
   private static final Pattern NAMES_PATTERN = Pattern.compile("\\{([^/]+?)\\}");
 
   private static final String VALUE_REGEX = "(.*)";
 
-  private final List<String> variableNames;
+  private List<String> variableNames;
 
-  private final String uriTemplate;
+  private final String template;
 
-  public StringTemplate(final String uriTemplate) {
-    final Parser parser = new Parser(uriTemplate);
-    this.uriTemplate = uriTemplate;
-    this.variableNames = parser.getVariableNames();
-  }
-
-  public String expand(final Map<String, ?> uriVariables) {
-    Assert.notNull(uriVariables, "'uriVariables' must not be null");
-    final Object[] values = new Object[this.variableNames.size()];
-    if (uriVariables != null) {
-      for (int i = 0; i < this.variableNames.size(); i++) {
-        final String name = this.variableNames.get(i);
-        if (uriVariables.containsKey(name)) {
-          values[i] = uriVariables.get(name);
-
-        }
+  public StringTemplate(final String template) {
+    this.template = template;
+    if (StringUtils.hasText(template)) {
+      try {
+        final Parser parser = new Parser(template);
+        this.variableNames = parser.getVariableNames();
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Invalid Template:" + template, e);
       }
     }
-    return expand(values);
+  }
+
+  public String expand(Map<String, ?> uriVariables) {
+    if (variableNames == null) {
+      return template;
+    } else {
+      if (uriVariables == null) {
+        uriVariables = Collections.emptyMap();
+      }
+      final Object[] values = new Object[this.variableNames.size()];
+      if (uriVariables != null) {
+        for (int i = 0; i < this.variableNames.size(); i++) {
+          final String name = this.variableNames.get(i);
+          if (uriVariables.containsKey(name)) {
+            values[i] = uriVariables.get(name);
+
+          }
+        }
+      }
+      return expand(values);
+    }
   }
 
   private String expand(final Object... uriVariableValues) {
-    final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
+    final Matcher matcher = NAMES_PATTERN.matcher(this.template);
     final StringBuffer buffer = new StringBuffer();
     int i = 0;
     while (matcher.find()) {
@@ -108,7 +120,7 @@ public class StringTemplate implements Serializable {
 
   @Override
   public String toString() {
-    return uriTemplate;
+    return template;
   }
 
 }

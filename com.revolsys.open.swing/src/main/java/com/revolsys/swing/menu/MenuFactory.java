@@ -14,11 +14,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
-public class MenuFactory implements ComponentFactory<JMenuItem> {
+public class MenuFactory extends AbstractObjectWithProperties implements
+  ComponentFactory<JMenuItem> {
 
   private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<String, List<ComponentFactory<?>>>();
 

@@ -2,7 +2,6 @@ package com.revolsys.gis.esri.gdb.file.capi;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,6 +94,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   private static final String CATALOG_PATH_PROPERTY = CapiFileGdbDataObjectStore.class
     + ".CatalogPath";
 
+  private static final Object API_SYNC = new Object();
+
   private static void addFieldTypeAttributeConstructor(
     final FieldType fieldType,
     final Class<? extends AbstractFileGdbAttribute> attributeClass) {
@@ -115,7 +116,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       return null;
     } else {
       final String wkt;
-      synchronized (EsriFileGdb.class) {
+      synchronized (API_SYNC) {
         wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSRID());
       }
       final SpatialReference spatialReference = SpatialReference.get(
@@ -192,12 +193,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public void addChildSchema(final String path) {
-    synchronized (EsriFileGdb.class) {
-      final VectorOfWString childDatasets = geodatabase.getChildDatasets(path,
-        "Feature Dataset");
-      for (int i = 0; i < childDatasets.size(); i++) {
-        final String childPath = childDatasets.get(i);
-        addFeatureDatasetSchema(childPath);
+    synchronized (API_SYNC) {
+      if (this.geodatabase != null) {
+        final VectorOfWString childDatasets = geodatabase.getChildDatasets(
+          path, "Feature Dataset");
+        for (int i = 0; i < childDatasets.size(); i++) {
+          final String childPath = childDatasets.get(i);
+          addFeatureDatasetSchema(childPath);
+        }
       }
     }
   }
@@ -205,7 +208,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   public void addCodeTable(final CodeTable codeTable) {
     super.addCodeTable(codeTable);
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       if (codeTable instanceof Domain) {
         final Domain domain = (Domain)codeTable;
         createDomain(domain);
@@ -224,16 +227,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private void addTableMetaData(final String schemaName, final String path) {
-    final String tableDefinition = geodatabase.getTableDefinition(path);
-    final DataObjectMetaData metaData = getMetaData(schemaName, path,
-      tableDefinition);
-    addMetaData(metaData);
+    if (this.geodatabase != null) {
+      final String tableDefinition = geodatabase.getTableDefinition(path);
+      final DataObjectMetaData metaData = getMetaData(schemaName, path,
+        tableDefinition);
+      addMetaData(metaData);
+    }
   }
 
   public void alterDomain(final CodedValueDomain domain) {
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
-    synchronized (EsriFileGdb.class) {
-      geodatabase.alterDomain(domainDefinition);
+    synchronized (API_SYNC) {
+      if (this.geodatabase != null) {
+        geodatabase.alterDomain(domainDefinition);
+      }
     }
   }
 
@@ -350,75 +357,99 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   @PreDestroy
   public void close() {
-    synchronized (EsriFileGdb.class) {
-      for (final EnumRows rows : new ArrayList<EnumRows>(enumRowsToClose)) {
-        closeEnumRows(rows);
-      }
-      for (final Table table : tablesToClose.values()) {
-        doCloseTable(table);
-      }
-      tablesToClose.clear();
-      if (geodatabase != null) {
-        EsriFileGdb.CloseGeodatabase(geodatabase);
-        geodatabase = null;
-        System.gc();
-      }
-    }
-    super.close();
-  }
+    try {
+      synchronized (API_SYNC) {
+        if (geodatabase != null) {
+          closeEnumRows();
+          closeTables();
 
-  public void closeEnumRows(EnumRows rows) {
-    synchronized (EsriFileGdb.class) {
-      if (rows != null) {
-        if (enumRowsToClose.remove(rows)) {
-          try {
-            rows.Close();
-          } catch (final NullPointerException e) {
-          } finally {
-            rows.delete();
-            rows = null;
-          }
+          EsriFileGdb.CloseGeodatabase(this.geodatabase);
+          this.geodatabase = null;
         }
       }
+    } finally {
+      super.close();
     }
   }
 
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
+  protected void closeEnumRows() {
+    synchronized (API_SYNC) {
+      for (final Iterator<EnumRows> iterator = enumRowsToClose.iterator(); iterator.hasNext();) {
+        final EnumRows rows = iterator.next();
+        try {
+          rows.Close();
+        } catch (final Throwable e) {
+        } finally {
+          rows.delete();
+        }
+        iterator.remove();
+      }
+      enumRowsToClose.clear();
+    }
+  }
+
+  public void closeEnumRows(final EnumRows rows) {
+    synchronized (API_SYNC) {
+      if (isOpen(rows)) {
+        try {
+          rows.Close();
+        } catch (final Throwable e) {
+        } finally {
+          try {
+            rows.delete();
+          } catch (final Throwable t) {
+          }
+        }
+        enumRowsToClose.remove(rows);
+      }
+    }
+  }
 
   protected void closeRow(final Row row) {
     if (row != null) {
-      synchronized (EsriFileGdb.class) {
+      synchronized (API_SYNC) {
         row.delete();
       }
     }
   }
 
-  protected synchronized void closeTable(final Table table) {
-    // TODO add reference counting before actually closing the table
-
+  protected void closeTables() {
+    synchronized (API_SYNC) {
+      for (final Iterator<Entry<String, Table>> iterator = tablesToClose.entrySet()
+        .iterator(); iterator.hasNext();) {
+        final Entry<String, Table> entry = iterator.next();
+        final Table table = entry.getValue();
+        try {
+          if (geodatabase != null) {
+            geodatabase.closeTable(table);
+          }
+        } catch (final Throwable e) {
+        } finally {
+          try {
+            table.delete();
+          } catch (final Throwable t) {
+          }
+        }
+        iterator.remove();
+      }
+      tablesToClose.clear();
+    }
   }
 
   public synchronized void createDomain(final Domain domain) {
-    final String domainName = domain.getDomainName();
-    if (!domainColumNames.containsKey(domainName)) {
-      synchronized (EsriFileGdb.class) {
-        final String domainDef = EsriGdbXmlSerializer.toString(domain);
-        try {
-          geodatabase.createDomain(domainDef);
-        } catch (final Exception e) {
-          LOG.debug(domainDef);
-          LOG.error("Unable to create domain", e);
+    if (this.geodatabase != null) {
+      final String domainName = domain.getDomainName();
+      if (!domainColumNames.containsKey(domainName)) {
+        synchronized (API_SYNC) {
+          final String domainDef = EsriGdbXmlSerializer.toString(domain);
+          try {
+            geodatabase.createDomain(domainDef);
+          } catch (final Exception e) {
+            LOG.debug(domainDef);
+            LOG.error("Unable to create domain", e);
+          }
+          loadDomain(domain.getDomainName());
         }
-        loadDomain(domain.getDomainName());
       }
     }
   }
@@ -427,7 +458,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   public AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       String typePath = query.getTypeName();
       DataObjectMetaData metaData = query.getMetaData();
       if (metaData == null) {
@@ -490,7 +521,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @SuppressWarnings("unchecked")
   @Override
   public <T> T createPrimaryIdValue(final String typePath) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       final DataObjectMetaData metaData = getMetaData(typePath);
       if (metaData == null) {
         return null;
@@ -523,58 +554,68 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected Row createRowObject(final Table table) {
-    synchronized (EsriFileGdb.class) {
-      return table.createRowObject();
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        return table.createRowObject();
+      } else {
+        return null;
+      }
     }
   }
 
   private DataObjectStoreSchema createSchema(final DETable table) {
-    synchronized (EsriFileGdb.class) {
-      final String catalogPath = table.getParentCatalogPath();
-      final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
-      for (final DEFeatureDataset dataset : datasets) {
-        final String path = dataset.getCatalogPath();
-        final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-        try {
-          geodatabase.createFeatureDataset(datasetDefinition);
-          addFeatureDatasetSchema(path);
-        } catch (final Throwable t) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(datasetDefinition);
+    synchronized (API_SYNC) {
+      if (this.geodatabase == null) {
+        return null;
+      } else {
+        final String catalogPath = table.getParentCatalogPath();
+        final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
+        for (final DEFeatureDataset dataset : datasets) {
+          final String path = dataset.getCatalogPath();
+          final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+          try {
+            geodatabase.createFeatureDataset(datasetDefinition);
+            addFeatureDatasetSchema(path);
+          } catch (final Throwable t) {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(datasetDefinition);
+            }
+            throw new RuntimeException("Unable to create feature dataset "
+              + path, t);
           }
-          throw new RuntimeException(
-            "Unable to create feature dataset " + path, t);
         }
+        return getSchema(catalogPath.replaceAll("\\\\", "/"));
       }
-      return getSchema(catalogPath.replaceAll("\\\\", "/"));
     }
   }
 
   public void createSchema(final String schemaName,
     final GeometryFactory geometryFactory) {
-    synchronized (EsriFileGdb.class) {
-      final SpatialReference spatialReference = getSpatialReference(geometryFactory);
-      final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
-        schemaName, spatialReference);
-      for (final DEFeatureDataset dataset : datasets) {
-        final String path = dataset.getCatalogPath();
-        final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-        try {
-          geodatabase.createFeatureDataset(datasetDefinition);
-          addFeatureDatasetSchema(path);
-        } catch (final Throwable t) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(datasetDefinition);
+    synchronized (API_SYNC) {
+      if (this.geodatabase != null) {
+        final SpatialReference spatialReference = getSpatialReference(geometryFactory);
+        final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
+          schemaName, spatialReference);
+        for (final DEFeatureDataset dataset : datasets) {
+          final String path = dataset.getCatalogPath();
+          final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+          try {
+            geodatabase.createFeatureDataset(datasetDefinition);
+            addFeatureDatasetSchema(path);
+          } catch (final Throwable t) {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(datasetDefinition);
+            }
+            throw new RuntimeException("Unable to create feature dataset "
+              + path, t);
           }
-          throw new RuntimeException(
-            "Unable to create feature dataset " + path, t);
         }
       }
     }
   }
 
   private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
       final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 
@@ -590,62 +631,67 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected DataObjectMetaDataImpl createTable(final DETable deTable) {
-    synchronized (EsriFileGdb.class) {
-      String schemaPath = deTable.getParentCatalogPath();
-      String schemaName = schemaPath.replaceAll("\\\\", "/");
-      DataObjectStoreSchema schema = getSchema(schemaName);
-      if (schema == null) {
-        if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-          schema = createSchema(deTable);
-        } else {
-          schema = new DataObjectStoreSchema(this, schemaName);
-          addSchema(schema);
+    synchronized (API_SYNC) {
+      if (this.geodatabase == null) {
+        return null;
+      } else {
+        String schemaPath = deTable.getParentCatalogPath();
+        String schemaName = schemaPath.replaceAll("\\\\", "/");
+        DataObjectStoreSchema schema = getSchema(schemaName);
+        if (schema == null) {
+          if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
+            schema = createSchema(deTable);
+          } else {
+            schema = new DataObjectStoreSchema(this, schemaName);
+            addSchema(schema);
+          }
+        } else if (schema.getProperty(CATALOG_PATH_PROPERTY) == null) {
+          if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
+            createSchema(deTable);
+          }
         }
-      } else if (schema.getProperty(CATALOG_PATH_PROPERTY) == null) {
-        if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-          createSchema(deTable);
-        }
-      }
-      if (schemaName.equals(defaultSchema)) {
-        if (!(deTable instanceof DEFeatureClass)) {
-          schemaPath = "\\";
-          // @TODO clone
-          deTable.setCatalogPath("\\" + deTable.getName());
+        if (schemaName.equals(defaultSchema)) {
+          if (!(deTable instanceof DEFeatureClass)) {
+            schemaPath = "\\";
+            // @TODO clone
+            deTable.setCatalogPath("\\" + deTable.getName());
 
+          }
+        } else if (schemaName.equals("")) {
+          schemaName = defaultSchema;
         }
-      } else if (schemaName.equals("")) {
-        schemaName = defaultSchema;
-      }
-      for (final Field field : deTable.getFields()) {
-        final String fieldName = field.getName();
-        final CodeTable codeTable = getCodeTableByColumn(fieldName);
-        if (codeTable instanceof FileGdbDomainCodeTable) {
-          final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
-          field.setDomain(domainCodeTable.getDomain());
+        for (final Field field : deTable.getFields()) {
+          final String fieldName = field.getName();
+          final CodeTable codeTable = getCodeTableByColumn(fieldName);
+          if (codeTable instanceof FileGdbDomainCodeTable) {
+            final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
+            field.setDomain(domainCodeTable.getDomain());
+          }
         }
-      }
-      final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
-      try {
-        final Table table = geodatabase.createTable(tableDefinition, schemaPath);
-        final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
-          schemaPath, tableDefinition);
-        addMetaData(metaData);
-        tablesToClose.put(metaData.getPath(), table);
-        return metaData;
+        final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
+        try {
+          final Table table = geodatabase.createTable(tableDefinition,
+            schemaPath);
+          final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
+            schemaPath, tableDefinition);
+          addMetaData(metaData);
+          tablesToClose.put(metaData.getPath(), table);
+          return metaData;
 
-      } catch (final Throwable t) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(tableDefinition);
+        } catch (final Throwable t) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(tableDefinition);
+          }
+          throw new RuntimeException("Unable to create table "
+            + deTable.getCatalogPath(), t);
         }
-        throw new RuntimeException("Unable to create table "
-          + deTable.getCatalogPath(), t);
       }
     }
   }
 
   @Override
   public Writer<DataObject> createWriter() {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       return new FileGdbWriter(this);
     }
   }
@@ -663,38 +709,38 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected void deletedRow(final Table table, final Row row) {
-    synchronized (EsriFileGdb.class) {
-      table.deleteRow(row);
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        table.deleteRow(row);
+      }
     }
   }
 
   @Override
   public void deleteGeodatabase() {
-    synchronized (EsriFileGdb.class) {
-      close();
-      if (new File(fileName).exists()) {
-        EsriFileGdb.DeleteGeodatabase(fileName);
+    synchronized (API_SYNC) {
+      final String fileName = this.fileName;
+      try {
+        close();
+      } finally {
+        if (new File(fileName).exists()) {
+          EsriFileGdb.DeleteGeodatabase(fileName);
+        }
       }
     }
   }
 
-  private void doCloseTable(final Table table) {
-    synchronized (EsriFileGdb.class) {
-      try {
-        tablesToClose.remove(table);
-        if (geodatabase != null) {
-          geodatabase.closeTable(table);
-          table.delete();
-        }
-      } catch (final Throwable e) {
-        LOG.error("Unable to close table", e);
-      }
-    }
+  @Override
+  protected void finalize() throws Throwable {
+    System.out.println("Finalize:" + fileName);
+    super.finalize();
   }
 
   protected void freeWriteLock(final Table table) {
-    synchronized (EsriFileGdb.class) {
-      table.freeWriteLock();
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        table.freeWriteLock();
+      }
     }
   }
 
@@ -712,7 +758,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       DataObjectMetaData metaData = super.getMetaData(objectMetaData);
       if (createMissingTables && metaData == null) {
         metaData = createTable(objectMetaData);
@@ -723,7 +769,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public DataObjectMetaDataImpl getMetaData(final String schemaName,
     final String path, final String tableDefinition) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       try {
         final XmlProcessor parser = new EsriGdbXmlParser();
         final DETable deTable = parser.process(tableDefinition);
@@ -788,7 +834,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public int getRowCount(final Query query) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       String typePath = query.getTypeName();
       DataObjectMetaData metaData = query.getMetaData();
       if (metaData == null) {
@@ -822,7 +868,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           }
           return count;
         } finally {
-          rows.Close();
+          closeEnumRows(rows);
         }
       } else {
         final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
@@ -850,7 +896,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             }
             return count;
           } finally {
-            rows.Close();
+            closeEnumRows(rows);
           }
         }
       }
@@ -858,8 +904,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected Table getTable(final String typePath) {
-    synchronized (EsriFileGdb.class) {
-      if (getMetaData(typePath) == null) {
+    synchronized (API_SYNC) {
+      if (geodatabase == null || getMetaData(typePath) == null) {
         return null;
       } else {
         final String path = typePath.replaceAll("/", "\\\\");
@@ -893,7 +939,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public Writer<DataObject> getWriter() {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       Writer<DataObject> writer = getSharedAttribute("writer");
       if (writer == null) {
         writer = createWriter();
@@ -906,7 +952,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   @PostConstruct
   public void initialize() {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       if (!initialized) {
         initialized = true;
         super.initialize();
@@ -980,8 +1026,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected void insertRow(final Table table, final Row row) {
-    synchronized (EsriFileGdb.class) {
-      table.insertRow(row);
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        table.insertRow(row);
+      }
     }
   }
 
@@ -994,14 +1042,34 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public boolean isNull(final Row row, final String name) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       return row.isNull(name);
+    }
+  }
+
+  public boolean isOpen(final EnumRows enumRows) {
+    synchronized (API_SYNC) {
+      if (enumRows == null) {
+        return false;
+      } else {
+        return enumRowsToClose.contains(enumRows);
+      }
+    }
+  }
+
+  public boolean isOpen(final Table table) {
+    synchronized (API_SYNC) {
+      if (table == null) {
+        return false;
+      } else {
+        return tablesToClose.containsValue(table);
+      }
     }
   }
 
   @Override
   public DataObject load(final String typePath, final Object id) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       final DataObjectMetaData metaData = getMetaData(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Unknown type " + typePath);
@@ -1022,18 +1090,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected void loadDomain(final String domainName) {
-    synchronized (EsriFileGdb.class) {
-      final String domainDef = geodatabase.getDomainDefinition(domainName);
-      final Domain domain = EsriGdbXmlParser.parse(domainDef);
-      if (domain instanceof CodedValueDomain) {
-        final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-        final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
-          this, codedValueDomain);
-        super.addCodeTable(codeTable);
-        final List<String> columnNames = domainColumNames.get(domainName);
-        if (columnNames != null) {
-          for (final String columnName : columnNames) {
-            addCodeTable(columnName, codeTable);
+    synchronized (API_SYNC) {
+      if (this.geodatabase != null) {
+        final String domainDef = geodatabase.getDomainDefinition(domainName);
+        final Domain domain = EsriGdbXmlParser.parse(domainDef);
+        if (domain instanceof CodedValueDomain) {
+          final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
+          final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
+            this, codedValueDomain);
+          super.addCodeTable(codeTable);
+          final List<String> columnNames = domainColumNames.get(domainName);
+          if (columnNames != null) {
+            for (final String columnName : columnNames) {
+              addCodeTable(columnName, codeTable);
+            }
           }
         }
       }
@@ -1044,7 +1114,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
     final Map<String, DataObjectMetaData> metaDataMap) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       final String schemaName = schema.getPath();
       if (schemaName.equals(defaultSchema)) {
         loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\",
@@ -1061,19 +1131,21 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public void loadSchemaDataObjectMetaData(
     final Map<String, DataObjectMetaData> metaDataMap, final String schemaName,
     final String path, final String datasetType) {
-    synchronized (EsriFileGdb.class) {
-      try {
-        final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
-          path, datasetType);
-        for (int i = 0; i < childFeatureClasses.size(); i++) {
-          final String childPath = childFeatureClasses.get(i);
-          addTableMetaData(schemaName, childPath);
-        }
-      } catch (final RuntimeException e) {
-        final String message = e.getMessage();
-        if (message == null
-          || !message.equals("-2147211775\tThe item was not found.")) {
-          throw e;
+    synchronized (API_SYNC) {
+      if (this.geodatabase != null) {
+        try {
+          final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
+            path, datasetType);
+          for (int i = 0; i < childFeatureClasses.size(); i++) {
+            final String childPath = childFeatureClasses.get(i);
+            addTableMetaData(schemaName, childPath);
+          }
+        } catch (final RuntimeException e) {
+          final String message = e.getMessage();
+          if (message == null
+            || !message.equals("-2147211775\tThe item was not found.")) {
+            throw e;
+          }
         }
       }
     }
@@ -1081,57 +1153,68 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       addSchema(new DataObjectStoreSchema(this, defaultSchema));
       addChildSchema("\\");
     }
   }
 
   protected Row nextRow(final EnumRows rows) {
-    if (rows == null) {
-      return null;
-    } else {
-      synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
+      if (isOpen(rows)) {
         return rows.next();
+      } else {
+        return null;
       }
     }
   }
 
   public EnumRows query(final String sql, final boolean recycling) {
-    synchronized (EsriFileGdb.class) {
-      return geodatabase.query(sql, recycling);
+    synchronized (API_SYNC) {
+      if (this.geodatabase == null) {
+        return null;
+      } else {
+        final EnumRows enumRows = geodatabase.query(sql, recycling);
+        enumRowsToClose.add(enumRows);
+        return enumRows;
+      }
     }
   }
 
   public EnumRows search(final Table table, final String fields,
     final String whereClause, final boolean recycling) {
-    synchronized (EsriFileGdb.class) {
-      try {
-        final EnumRows rows = table.search(fields, whereClause, recycling);
-        enumRowsToClose.add(rows);
-        return rows;
-      } catch (final Throwable t) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to execute query " + fields + " WHERE " + whereClause, t);
-        return null;
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        try {
+          final EnumRows rows = table.search(fields, whereClause, recycling);
+          enumRowsToClose.add(rows);
+          return rows;
+        } catch (final Throwable t) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Unable to execute query " + fields + " WHERE " + whereClause, t);
+
+        }
       }
+      return null;
     }
   }
 
   public EnumRows search(final Table table, final String fields,
     final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
-    synchronized (EsriFileGdb.class) {
-      try {
-        final EnumRows rows = table.search(fields, whereClause, boundingBox,
-          recycling);
-        enumRowsToClose.add(rows);
-        return rows;
-      } catch (final Exception e) {
-        LOG.error("ERROR executing query SELECT " + fields + " WHERE "
-          + whereClause + " AND " + boundingBox, e);
-        return null;
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        try {
+          final EnumRows rows = table.search(fields, whereClause, boundingBox,
+            recycling);
+          enumRowsToClose.add(rows);
+          return rows;
+        } catch (final Exception e) {
+          LOG.error("ERROR executing query SELECT " + fields + " WHERE "
+            + whereClause + " AND " + boundingBox, e);
+        }
       }
+      return null;
     }
   }
 
@@ -1147,7 +1230,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public void setDefaultSchema(final String defaultSchema) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       if (StringUtils.hasText(defaultSchema)) {
         if (!defaultSchema.startsWith("/")) {
           this.defaultSchema = "/" + defaultSchema;
@@ -1171,7 +1254,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public void setNull(final Row row, final String name) {
-    synchronized (EsriFileGdb.class) {
+    synchronized (API_SYNC) {
       row.setNull(name);
     }
   }
@@ -1181,8 +1264,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected void setWriteLock(final Table table) {
-    synchronized (EsriFileGdb.class) {
-      table.setWriteLock();
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        table.setWriteLock();
+      }
     }
   }
 
@@ -1199,8 +1284,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected void updateRow(final Table table, final Row row) {
-    synchronized (EsriFileGdb.class) {
-      table.updateRow(row);
+    synchronized (API_SYNC) {
+      if (isOpen(table)) {
+        table.updateRow(row);
+      }
     }
   }
 }

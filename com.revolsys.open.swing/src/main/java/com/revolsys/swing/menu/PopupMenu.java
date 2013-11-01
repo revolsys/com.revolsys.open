@@ -82,12 +82,15 @@ public class PopupMenu implements MouseListener {
         final MenuFactory menu = getMenu();
         final JTextComponent textComponent = (JTextComponent)component;
         if (autoCreateDnd) {
-          menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut",
-            textComponent, "cut");
-          menu.addMenuItemTitleIcon("dataTransfer", "Copy", "page_copy",
-            textComponent, "copy");
-          menu.addMenuItemTitleIcon("dataTransfer", "Paste", "paste_plain",
-            textComponent, "paste");
+          if (!menu.getProperty("hasDndMenu", Boolean.FALSE)) {
+            menu.setProperty("hasDndMenu", Boolean.TRUE);
+            menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut",
+              textComponent, "cut");
+            menu.addMenuItemTitleIcon("dataTransfer", "Copy", "page_copy",
+              textComponent, "copy");
+            menu.addMenuItemTitleIcon("dataTransfer", "Paste", "paste_plain",
+              textComponent, "paste");
+          }
         }
         textComponent.setDragEnabled(true);
       }
