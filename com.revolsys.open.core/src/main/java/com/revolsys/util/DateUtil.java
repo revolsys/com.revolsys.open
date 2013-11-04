@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.springframework.util.StringUtils;
@@ -23,6 +24,15 @@ public class DateUtil {
 
   public static String format(final String pattern) {
     return format(pattern, new Date(System.currentTimeMillis()));
+  }
+
+  public static String format(final String pattern, final Calendar calendar) {
+    if (calendar == null) {
+      return null;
+    } else {
+      final Date date = calendar.getTime();
+      return format(pattern, date);
+    }
   }
 
   public static String format(final String pattern, final Date date) {

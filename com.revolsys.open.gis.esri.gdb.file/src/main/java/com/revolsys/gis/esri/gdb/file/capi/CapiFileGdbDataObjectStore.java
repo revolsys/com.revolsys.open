@@ -732,7 +732,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   protected void finalize() throws Throwable {
-    System.out.println("Finalize:" + fileName);
     super.finalize();
   }
 

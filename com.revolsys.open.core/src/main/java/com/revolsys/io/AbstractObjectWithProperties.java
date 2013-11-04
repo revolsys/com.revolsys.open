@@ -39,19 +39,23 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
     final Map<String, Object> properties = getProperties();
-    Object value = properties.get(name);
-    if (value instanceof Reference) {
-      final Reference<C> reference = (Reference<C>)value;
-      if (reference.isEnqueued()) {
-        value = null;
-      } else {
-        value = reference.get();
+    if (properties == null) {
+      return null;
+    } else {
+      Object value = properties.get(name);
+      if (value instanceof Reference) {
+        final Reference<C> reference = (Reference<C>)value;
+        if (reference.isEnqueued()) {
+          value = null;
+        } else {
+          value = reference.get();
+        }
+        if (value == null) {
+          properties.remove(name);
+        }
       }
-      if (value == null) {
-        properties.remove(name);
-      }
+      return (C)value;
     }
-    return (C)value;
   }
 
   @Override
