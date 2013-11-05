@@ -38,6 +38,8 @@ public abstract class Field extends Element {
 
   private Object initialValue;
 
+  private String defaultInstructions;
+
   public Field() {
   }
 
@@ -51,6 +53,10 @@ public abstract class Field extends Element {
       validationErrors = new ArrayList<String>();
     }
     validationErrors.add(error);
+  }
+
+  public String getDefaultInstructions() {
+    return defaultInstructions;
   }
 
   /**
@@ -117,6 +123,10 @@ public abstract class Field extends Element {
   }
 
   public void postInit(final HttpServletRequest request) {
+  }
+
+  public void setDefaultInstructions(final String defaultIntstructions) {
+    this.defaultInstructions = defaultIntstructions;
   }
 
   /**

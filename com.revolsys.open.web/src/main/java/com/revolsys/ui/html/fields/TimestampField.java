@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.fields;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,23 +12,16 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.DateUtil;
 
-public class DatePickerField extends Field {
+public class TimestampField extends Field {
 
   private String inputValue;
 
-  /**
-   * @param name
-   * @param required
-   */
-  public DatePickerField(final String name, final boolean required) {
-    super(name, required);
-  }
-
-  public DatePickerField(final String name, final boolean required,
+  public TimestampField(final String name, final boolean required,
     final Object defaultValue) {
     super(name, required);
     setInitialValue(defaultValue);
     setValue(defaultValue);
+    setDefaultInstructions("Enter Timestamp in format yyyy-MM-dd HH:mm:ss.SSS");
   }
 
   @Override
@@ -51,11 +44,10 @@ public class DatePickerField extends Field {
 
       if (valid) {
         try {
-          final Date date = new Date(DateUtil.parse("yyyy-MM-dd", inputValue)
-            .getTime());
+          final Date date = DateUtil.parseDate(inputValue);
           setValue(date);
         } catch (final Throwable e) {
-          addValidationError("Invalid Date");
+          addValidationError("Invalid Timestamp");
           valid = false;
 
         }
@@ -66,20 +58,13 @@ public class DatePickerField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
-    out.text("$(function() {$(\"#" + getForm().getName() + " input[name='"
-      + getName() + "']\").datepicker("
-      + "{changeMonth: true,changeYear: true, dateFormat:'" + "yy-mm-dd"
-      + "'});});");
-    out.endTag(HtmlUtil.SCRIPT);
-
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
     if (StringUtils.hasText(inputValue)) {
       out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
     }
+    out.attribute(HtmlUtil.ATTR_SIZE, 34);
     if (isRequired()) {
       out.attribute(HtmlUtil.ATTR_CLASS, "required");
     }

@@ -195,7 +195,18 @@ $(document).ready(
       });
     });
     $('div.jqueryTabs').tabs({
-      show : function(event, ui) {
+      create : function(event, ui) {
+        var table = $.fn.dataTable.fnTables(true);
+        if ( table.length > 0 ) {
+          $(table).dataTable().fnAdjustColumnSizing(false);
+        }
+        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+      },
+      activate : function(event, ui) {
+        var table = $.fn.dataTable.fnTables(true);
+        if ( table.length > 0 ) {
+          $(table).dataTable().fnAdjustColumnSizing(false);
+        }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
       select : function(event, ui) {

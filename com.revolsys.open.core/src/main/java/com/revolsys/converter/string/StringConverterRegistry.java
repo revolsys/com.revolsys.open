@@ -109,11 +109,13 @@ public class StringConverterRegistry {
     addConverter(new DoubleStringConverter());
     addConverter(new FloatStringConverter());
     addConverter(new DateStringConverter());
+    addConverter(new TimestampStringConverter());
     addConverter(new DateTimeStringConverter());
     addConverter(new IntegerStringConverter());
     addConverter(new LongStringConverter());
     addConverter(new ShortStringConverter());
     addConverter(new StringStringConverter());
+    addConverter(new UrlStringConverter());
     final GeometryStringConverter geometryConverter = new GeometryStringConverter();
     addConverter(geometryConverter);
     addConverter(Point.class, geometryConverter);

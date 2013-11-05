@@ -17,6 +17,8 @@ public class TableView extends Element {
 
   private String title;
 
+  private String width;
+
   public TableView(final TableSerializer model) {
     this.model = model;
   }
@@ -54,6 +56,10 @@ public class TableView extends Element {
     return noRecordsMessgae;
   }
 
+  public String getWidth() {
+    return width;
+  }
+
   @Override
   public void serializeElement(final XmlWriter out) {
     final int rowCount = model.getBodyRowCount();
@@ -71,6 +77,7 @@ public class TableView extends Element {
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
       out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      out.attribute(HtmlUtil.ATTR_WIDTH, width);
 
       serializeHeadings(out);
       serializeFooter(out);
@@ -198,7 +205,7 @@ public class TableView extends Element {
     out.endTag(HtmlUtil.TBODY);
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -209,8 +216,12 @@ public class TableView extends Element {
     this.noRecordsMessgae = noRecordsMessgae;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(final String title) {
     this.title = title;
+  }
+
+  public void setWidth(final String width) {
+    this.width = width;
   }
 
 }

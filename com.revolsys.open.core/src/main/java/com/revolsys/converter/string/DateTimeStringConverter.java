@@ -2,8 +2,6 @@ package com.revolsys.converter.string;
 
 import java.util.Date;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.util.DateUtil;
 
 public class DateTimeStringConverter implements StringConverter<Date> {
@@ -34,11 +32,7 @@ public class DateTimeStringConverter implements StringConverter<Date> {
 
   @Override
   public Date toObject(final String string) {
-    if (StringUtils.hasText(string)) {
-      return DateUtil.parse("yyyy-MM-dd HH:mm:ss", string);
-    } else {
-      return null;
-    }
+    return DateUtil.parseDate(string);
   }
 
   @Override
@@ -47,7 +41,7 @@ public class DateTimeStringConverter implements StringConverter<Date> {
       return null;
     } else if (value instanceof Date) {
       final Date date = (Date)value;
-      return DateUtil.format("yyyy-MM-dd HH:mm:ss", date);
+      return DateUtil.format("yyyy-MM-dd HH:mm:ss.SSS", date);
     } else {
       return value.toString();
     }

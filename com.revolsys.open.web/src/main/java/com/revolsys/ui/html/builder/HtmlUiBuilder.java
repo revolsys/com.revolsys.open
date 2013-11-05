@@ -377,6 +377,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       serializers, rows);
     final String typeName = getTypeName();
     final TableView tableView = new TableView(model, typeName);
+    tableView.setWidth("100%");
     final String tableId = typeName + "_" + pageName + "_table";
     tableView.setId(tableId);
     tableView.setNoRecordsMessgae(null);
@@ -392,7 +393,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     } else {
       tableParams.put("sScrollY", scrollY);
     }
-    tableParams.put("sScrollX", "100%");
+    final String scrollX = (String)parameters.get("scrollX");
+    if (scrollX == null) {
+      tableParams.put("sScrollX", "100%");
+    } else {
+      tableParams.put("sScrollX", scrollX);
+    }
     tableParams.put("iDisplayLength", 50);
     tableParams.put("aaSorting", getListSortOrder(pageName));
 
