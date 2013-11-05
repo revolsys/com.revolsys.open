@@ -30,7 +30,6 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Project extends LayerGroup {
@@ -68,7 +67,6 @@ public class Project extends LayerGroup {
 
   public Project(final String name) {
     super(name);
-    Property.addListener(zoomBookmarks, this);
     this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
   }
@@ -88,15 +86,7 @@ public class Project extends LayerGroup {
 
   public void addZoomBookmark(final String name, final BoundingBox boundingBox) {
     if (name != null && boundingBox != null) {
-      final BoundingBox oldValue = zoomBookmarks.get(name);
-      int index;
-      if (oldValue == null) {
-        index = zoomBookmarks.size();
-      } else {
-        index = new ArrayList<String>(zoomBookmarks.keySet()).indexOf(name);
-      }
       zoomBookmarks.put(name, boundingBox);
-      fireIndexedPropertyChange("zoomBookmarks", index, "", name);
     }
   }
 
@@ -288,14 +278,7 @@ public class Project extends LayerGroup {
 
   public void removeZoomBookmark(final String name) {
     if (name != null) {
-      int index;
-      if (zoomBookmarks.containsKey(name)) {
-        index = new ArrayList<String>(zoomBookmarks.keySet()).indexOf(name);
-        zoomBookmarks.remove(name);
-        fireIndexedPropertyChange("zoomBookmarks", index, null, name);
-      } else {
-        index = zoomBookmarks.size();
-      }
+      zoomBookmarks.remove(name);
     }
   }
 
@@ -509,7 +492,6 @@ public class Project extends LayerGroup {
         }
       }
       this.zoomBookmarks = bookmarks;
-      firePropertyChange("zoomBookmarks", null, zoomBookmarks);
     }
   }
 

@@ -60,6 +60,7 @@ public class GeoReferencedImageLayerRenderer extends
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
               graphics.drawImage(image, 0, 0, (int)Math.ceil(imageScreenWidth),
                 (int)Math.ceil(imageScreenHeight), null);
+            } catch (final OutOfMemoryError e) {
             } finally {
               graphics.setTransform(transform);
             }
