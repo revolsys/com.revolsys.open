@@ -19,6 +19,8 @@ public class Statistics {
 
   private int providerCount = 0;
 
+  private boolean logCounts = true;
+
   public Statistics() {
     this(null);
   }
@@ -115,10 +117,20 @@ public class Statistics {
     return counts.keySet();
   }
 
+  public boolean isLogCounts() {
+    return logCounts;
+  }
+
   public synchronized void logCounts() {
-    final StringBuffer sb = new StringBuffer();
-    addCountsText(sb);
-    log.info(sb.toString());
+    if (isLogCounts()) {
+      final StringBuffer sb = new StringBuffer();
+      addCountsText(sb);
+      log.info(sb.toString());
+    }
+  }
+
+  public void setLogCounts(final boolean logCounts) {
+    this.logCounts = logCounts;
   }
 
   public void setMessage(final String message) {

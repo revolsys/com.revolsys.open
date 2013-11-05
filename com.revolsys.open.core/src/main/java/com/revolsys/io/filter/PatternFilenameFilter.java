@@ -21,7 +21,7 @@ import java.io.FilenameFilter;
 import java.util.regex.Pattern;
 
 /**
- * The PatternFileFilter is a {@link FileFilter} that only returns files if they
+ * The PatternFileNameFilter is a {@link FileFilter} that only returns files if they
  * match the regular expression.
  * 
  * @author Paul Austin
@@ -31,7 +31,7 @@ public class PatternFilenameFilter implements FilenameFilter {
   private final Pattern pattern;
 
   /**
-   * Construct a new PatternFileFilter.
+   * Construct a new PatternFileNameFilter.
    * 
    * @param regex The regular expression.
    */

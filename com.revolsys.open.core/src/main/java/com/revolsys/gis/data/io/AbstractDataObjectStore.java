@@ -673,6 +673,10 @@ public abstract class AbstractDataObjectStore extends
     statistics.setPrefix(label);
   }
 
+  public void setLogCounts(final boolean logCounts) {
+    statistics.setLogCounts(logCounts);
+  }
+
   public void setSchemaMap(final Map<String, DataObjectStoreSchema> schemaMap) {
     this.schemaMap = new DataObjectStoreSchemaMapProxy(this, schemaMap);
   }

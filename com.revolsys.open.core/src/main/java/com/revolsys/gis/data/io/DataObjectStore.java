@@ -131,6 +131,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   void setLabel(String label);
 
+  void setLogCounts(boolean logCounts);
+
   void update(DataObject object);
 
   void updateAll(Collection<DataObject> objects);

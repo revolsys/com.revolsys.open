@@ -37,16 +37,21 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   @Override
   @PreDestroy
   public void close() {
-    for (final Entry<String, Table> entry : tables.entrySet()) {
-      final Table table = entry.getValue();
-      try {
-        dataStore.freeWriteLock(table);
-      } catch (final Throwable e) {
-        LOG.error("Unable to close table", e);
+    try {
+      if (dataStore != null) {
+        for (final Entry<String, Table> entry : tables.entrySet()) {
+          final Table table = entry.getValue();
+          try {
+            dataStore.freeWriteLock(table);
+          } catch (final Throwable e) {
+            LOG.error("Unable to close table", e);
+          }
+        }
       }
+    } finally {
+      this.tables = null;
+      this.dataStore = null;
     }
-    tables = null;
-    dataStore = null;
   }
 
   private void delete(final DataObject object) {

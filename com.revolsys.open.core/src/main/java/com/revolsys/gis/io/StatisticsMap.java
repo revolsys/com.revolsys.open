@@ -18,6 +18,8 @@ public class StatisticsMap {
 
   private String prefix;
 
+  private boolean logCounts;
+
   public StatisticsMap() {
   }
 
@@ -103,6 +105,7 @@ public class StatisticsMap {
       Statistics statistics = statisticsMap.get(name);
       if (statistics == null) {
         statistics = new Statistics(name);
+        statistics.setLogCounts(logCounts);
         statisticsMap.put(name, statistics);
       }
       return statistics;
@@ -111,6 +114,13 @@ public class StatisticsMap {
 
   public synchronized Set<String> getStatisticsNames() {
     return statisticsMap.keySet();
+  }
+
+  public synchronized void setLogCounts(final boolean logCounts) {
+    this.logCounts = logCounts;
+    for (final Statistics statistics : statisticsMap.values()) {
+      statistics.setLogCounts(logCounts);
+    }
   }
 
   public void setPrefix(final String prefix) {

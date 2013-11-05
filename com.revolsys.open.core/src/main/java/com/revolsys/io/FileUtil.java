@@ -16,6 +16,7 @@
 package com.revolsys.io;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -876,6 +877,23 @@ public final class FileUtil {
     if (file != null && file.isDirectory()) {
       final List<File> visibleFiles = new ArrayList<File>();
       final File[] files = file.listFiles();
+      if (files != null) {
+        for (final File childFile : files) {
+          if (!childFile.exists() || !childFile.isHidden()) {
+            visibleFiles.add(childFile);
+          }
+        }
+      }
+      return visibleFiles;
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<File> listVisibleFiles(final File file,
+    final FileFilter filter) {
+    if (file != null && file.isDirectory()) {
+      final List<File> visibleFiles = new ArrayList<File>();
+      final File[] files = file.listFiles(filter);
       if (files != null) {
         for (final File childFile : files) {
           if (!childFile.exists() || !childFile.isHidden()) {
