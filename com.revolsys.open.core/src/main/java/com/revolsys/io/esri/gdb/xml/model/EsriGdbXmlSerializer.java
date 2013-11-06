@@ -348,7 +348,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
               serializeObjectProperties(propertyTagName, value);
               endTag(propertyTagName);
             } else {
-              JavaBeanUtil.invokeMethod(method, this, value);
+              JavaBeanUtil.method(method, this, value);
             }
           }
         }

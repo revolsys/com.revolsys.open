@@ -37,7 +37,7 @@ public class MethodInvoker extends AbstractRunnable {
 
   @SuppressWarnings("unchecked")
   public <T> T invoke() {
-    return (T)JavaBeanUtil.invokeMethod(method, object, parameters);
+    return (T)JavaBeanUtil.method(method, object, parameters);
   }
 
   @Override

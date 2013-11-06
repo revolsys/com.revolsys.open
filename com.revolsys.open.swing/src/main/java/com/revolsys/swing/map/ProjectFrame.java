@@ -426,8 +426,8 @@ public class ProjectFrame extends BaseFrame {
     createMenuBar();
   }
 
-  public void loadProject(final File projectFile) {
-    final FileSystemResource resource = new FileSystemResource(projectFile);
+  public void loadProject(final File projectDirectory) {
+    final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
 
     final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();

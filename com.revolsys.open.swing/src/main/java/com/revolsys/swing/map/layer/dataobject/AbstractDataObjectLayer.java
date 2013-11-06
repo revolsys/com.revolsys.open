@@ -1999,11 +1999,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
     if (!super.isReadOnly()) {
-      MapSerializerUtil.add(map, "canAddRecords", this.canAddRecords, true);
-      MapSerializerUtil.add(map, "canDeleteRecords", this.canDeleteRecords,
-        true);
-      MapSerializerUtil.add(map, "canEditRecords", this.canEditRecords, true);
-      MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers, false);
+      MapSerializerUtil.add(map, "canAddRecords", this.canAddRecords);
+      MapSerializerUtil.add(map, "canDeleteRecords", this.canDeleteRecords);
+      MapSerializerUtil.add(map, "canEditRecords", this.canEditRecords);
+      MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers);
     }
     MapSerializerUtil.add(map, "columnNameOrder", this.columnNameOrder);
     map.remove("TableView");

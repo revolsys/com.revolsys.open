@@ -86,6 +86,7 @@ import com.revolsys.io.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -478,7 +479,15 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       if (orderBy.isEmpty()) {
         sql = whereClause;
       } else {
-        sql.append("SELECT * FROM ");
+        sql.append("SELECT ");
+
+        final List<String> attributeNames = query.getAttributeNames();
+        if (attributeNames.isEmpty()) {
+          CollectionUtil.append(sql, metaData.getAttributeNames());
+        } else {
+          CollectionUtil.append(sql, attributeNames);
+        }
+        sql.append(" FROM ");
         sql.append(JdbcUtils.getTableName(typePath));
         if (whereClause.length() > 0) {
           sql.append(" WHERE ");
@@ -506,6 +515,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
                 sql.append(" DESC");
               }
 
+            } else {
+              LoggerFactory.getLogger(getClass()).error(
+                "Unable to sort on " + metaData.getPath() + "." + column
+                  + " as the ESRI library can't sort on " + dataType
+                  + " columns");
             }
           }
         }
@@ -1173,9 +1187,13 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       if (this.geodatabase == null) {
         return null;
       } else {
-        final EnumRows enumRows = geodatabase.query(sql, recycling);
-        enumRowsToClose.add(enumRows);
-        return enumRows;
+        try {
+          final EnumRows enumRows = geodatabase.query(sql, recycling);
+          enumRowsToClose.add(enumRows);
+          return enumRows;
+        } catch (final Throwable t) {
+          throw new RuntimeException("Error running sql: " + sql, t);
+        }
       }
     }
   }

@@ -26,7 +26,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   private String fields;
 
-  private String whereClause;
+  private String sql;
 
   private BoundingBox boundingBox;
 
@@ -80,7 +80,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final String typePath, final String fields, final String whereClause,
+    final String typePath, final String fields, final String sql,
     final BoundingBox boundingBox, final int offset, final int limit) {
     this.dataStore = dataStore;
     this.typePath = typePath;
@@ -90,7 +90,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     }
     this.table = dataStore.getTable(typePath);
     this.fields = fields;
-    this.whereClause = whereClause;
+    this.sql = sql;
     setBoundingBox(boundingBox);
     this.dataObjectFactory = dataStore.getDataObjectFactory();
     this.offset = offset;
@@ -109,7 +109,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
         dataStore = null;
         metaData = null;
         fields = null;
-        whereClause = null;
+        sql = null;
         boundingBox = null;
       }
     }
@@ -119,10 +119,10 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   protected void doInit() {
     synchronized (dataStore) {
       if (boundingBox == null) {
-        if (whereClause.startsWith("SELECT *")) {
-          rows = dataStore.query(whereClause, false);
+        if (sql.startsWith("SELECT")) {
+          rows = dataStore.query(sql, false);
         } else {
-          rows = dataStore.search(table, fields, whereClause, true);
+          rows = dataStore.search(table, fields, sql, true);
         }
       } else {
         BoundingBox boundingBox = this.boundingBox;
@@ -133,7 +133,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
           boundingBox = boundingBox.expand(0, 1);
         }
         final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
-        rows = dataStore.search(table, fields, whereClause, envelope, true);
+        rows = dataStore.search(table, fields, sql, envelope, true);
       }
     }
   }
@@ -198,8 +198,8 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     }
   }
 
-  public void setWhereClause(final String whereClause) {
-    this.whereClause = whereClause;
+  public void setSql(final String whereClause) {
+    this.sql = whereClause;
   }
 
   @Override

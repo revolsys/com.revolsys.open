@@ -425,6 +425,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return (V)getLayerGroup();
   }
 
+  @Override
   public String getPath() {
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup == null) {
@@ -845,22 +846,21 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     MapSerializerUtil.add(map, "type", this.type);
     MapSerializerUtil.add(map, "name", this.name);
-    MapSerializerUtil.add(map, "visible", this.visible, true);
-    MapSerializerUtil.add(map, "querySupported", this.querySupported, true);
+    MapSerializerUtil.add(map, "visible", this.visible);
+    MapSerializerUtil.add(map, "querySupported", this.querySupported);
     if (this.querySupported) {
-      MapSerializerUtil.add(map, "queryable", this.queryable, true);
+      MapSerializerUtil.add(map, "queryable", this.queryable);
     }
-    MapSerializerUtil.add(map, "readOnly", this.readOnly, false);
+    MapSerializerUtil.add(map, "readOnly", this.readOnly);
     if (!this.readOnly) {
-      MapSerializerUtil.add(map, "editable", this.editable, false);
+      MapSerializerUtil.add(map, "editable", this.editable);
     }
     if (this.selectSupported) {
-      MapSerializerUtil.add(map, "selectable", this.selectable, true);
+      MapSerializerUtil.add(map, "selectable", this.selectable);
     }
-    MapSerializerUtil.add(map, "selectSupported", this.selectSupported, true);
-    MapSerializerUtil.add(map, "maximumScale", this.maximumScale, 0L);
-    MapSerializerUtil.add(map, "minimumScale", this.minimumScale,
-      Long.MAX_VALUE);
+    MapSerializerUtil.add(map, "selectSupported", this.selectSupported);
+    MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
+    MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
     MapSerializerUtil.add(map, "style", this.renderer);
     final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil.getValue(getProperties());
     if (properties != null) {

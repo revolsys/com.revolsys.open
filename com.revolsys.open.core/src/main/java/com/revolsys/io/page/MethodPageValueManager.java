@@ -188,18 +188,18 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
 
   @Override
   public byte[] getBytes(final Page page) {
-    return (byte[])JavaBeanUtil.invokeMethod(getBytesMethod, getClass(), page);
+    return (byte[])JavaBeanUtil.method(getBytesMethod, getClass(), page);
   }
 
   @Override
   public byte[] getBytes(final T value) {
-    return JavaBeanUtil.invokeMethod(byteArrayWriteMethod, getClass(), value);
+    return JavaBeanUtil.method(byteArrayWriteMethod, getClass(), value);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <V extends T> V getValue(final byte[] bytes) {
-    return (V)JavaBeanUtil.invokeMethod(getValueMethod, getClass(), bytes);
+    return (V)JavaBeanUtil.method(getValueMethod, getClass(), bytes);
   }
 
   @Override

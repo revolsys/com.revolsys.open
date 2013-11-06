@@ -708,7 +708,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     if (form.isPosted() && form.isMainFormTask()) {
       if (form.isValid()) {
-        if ((Boolean)JavaBeanUtil.invokeMethod(this, preInsertMethod, form,
+        if ((Boolean)JavaBeanUtil.method(this, preInsertMethod, form,
           object)) {
           insertObject(object);
           parameters.put("message", "Saved");

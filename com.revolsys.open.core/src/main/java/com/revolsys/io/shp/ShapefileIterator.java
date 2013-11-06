@@ -27,7 +27,6 @@ import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.shp.geometry.JtsGeometryConverter;
 import com.revolsys.io.xbase.XbaseIterator;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
@@ -36,29 +35,29 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShapefileIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
 
+  private boolean closeFile = true;
+
   private final DataObjectFactory dataObjectFactory;
 
-  private JtsGeometryConverter geometryReader;
+  private GeometryFactory geometryFactory;
 
   private EndianInput in;
+
+  private EndianMappedByteBuffer indexIn;
+
+  private boolean mappedFile;
 
   private DataObjectMetaData metaData;
 
   private final String name;
 
-  private final Resource resource;
+  private int position;
 
-  private XbaseIterator xbaseIterator;
+  private final Resource resource;
 
   private int shapeType;
 
-  private EndianMappedByteBuffer indexIn;
-
-  private boolean closeFile = true;
-
-  private boolean mappedFile;
-
-  private int position;
+  private XbaseIterator xbaseIterator;
 
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
@@ -118,7 +117,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
         } else {
           numAxis = 4;
         }
-        GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         final Resource projResource = this.resource.createRelative(name
           + ".prj");
         if (projResource.exists()) {
@@ -136,7 +135,6 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           }
           geometryFactory = GeometryFactory.getFactory(srid, numAxis);
         }
-        geometryReader = new JtsGeometryConverter(geometryFactory);
 
         if (xbaseIterator != null) {
           xbaseIterator.hasNext();
@@ -179,7 +177,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           object = xbaseIterator.next();
           for (int i = 0; i < xbaseIterator.getDeletedCount(); i++) {
             position++;
-            geometryReader.readGeometry(in);
+            readGeometry();
           }
         } else {
           throw new NoSuchElementException();
@@ -188,7 +186,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
         object = dataObjectFactory.createDataObject(metaData);
       }
 
-      final Geometry geometry = geometryReader.readGeometry(in);
+      final Geometry geometry = readGeometry();
       object.setGeometryValue(geometry);
     } catch (final EOFException e) {
       throw new NoSuchElementException();
@@ -225,6 +223,14 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     final double maxZ = in.readLEDouble();
     final double minM = in.readLEDouble();
     final double maxM = in.readLEDouble();
+  }
+
+  private Geometry readGeometry() throws IOException {
+    final int recordNumber = in.readInt();
+    final int recordLength = in.readInt();
+    final int shapeType = in.readLEInt();
+    return ShapefileGeometryUtil.SHP_INSTANCE.read(geometryFactory, in,
+      shapeType);
   }
 
   public void setCloseFile(final boolean closeFile) {

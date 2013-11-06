@@ -197,7 +197,7 @@ public class Project extends LayerGroup {
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
         this.baseMapLayers.loadLayers(properties);
-        if (!this.baseMapLayers.isEmpty()) {
+        if (this.baseMapLayers != null && !this.baseMapLayers.isEmpty()) {
           this.baseMapLayers.get(0).setVisible(true);
         }
       } finally {

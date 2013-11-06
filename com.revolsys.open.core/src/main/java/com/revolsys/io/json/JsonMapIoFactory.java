@@ -29,46 +29,73 @@ import com.revolsys.spring.SpringUtil;
 public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    return toMap(resource);
+    if (file == null) {
+      return new LinkedHashMap<String, Object>();
+    } else {
+      final FileSystemResource resource = new FileSystemResource(file);
+      return toMap(resource);
+    }
+  }
+
+  public static Map<String, Object> toMap(final File directory,
+    final String path) {
+    if (directory == null || path == null) {
+      return new LinkedHashMap<String, Object>();
+    } else {
+      final File file = FileUtil.getFile(directory, path);
+      if (file.exists() && !file.isDirectory()) {
+        final FileSystemResource resource = new FileSystemResource(file);
+        return toMap(resource);
+      } else {
+        return new LinkedHashMap<String, Object>();
+      }
+    }
   }
 
   public static Map<String, Object> toMap(final InputStream in) {
-
-    try {
+    if (in == null) {
+      return new LinkedHashMap<String, Object>();
+    } else {
       try {
-        final java.io.Reader reader = new InputStreamReader(in);
-        final JsonMapIterator iterator = new JsonMapIterator(reader, true);
         try {
-          if (iterator.hasNext()) {
-            return iterator.next();
-          } else {
-            return null;
+          final java.io.Reader reader = new InputStreamReader(in);
+          final JsonMapIterator iterator = new JsonMapIterator(reader, true);
+          try {
+            if (iterator.hasNext()) {
+              return iterator.next();
+            } else {
+              return null;
+            }
+          } finally {
+            iterator.close();
           }
         } finally {
-          iterator.close();
+          FileUtil.closeSilent(in);
         }
-      } finally {
-        FileUtil.closeSilent(in);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to read JSON map", e);
       }
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to read JSON map", e);
     }
   }
 
   public static final Map<String, Object> toMap(final Resource resource) {
-    try {
-      final InputStream in = resource.getInputStream();
-      return toMap(in);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to open stream for " + resource, e);
+    if (resource != null
+      && (!(resource instanceof FileSystemResource) || resource.exists())) {
+      try {
+        final InputStream in = resource.getInputStream();
+        return toMap(in);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to open stream for " + resource, e);
+      }
+    } else {
+      return new LinkedHashMap<String, Object>();
     }
   }
 
   public static Map<String, String> toMap(final String string) {
     final Map<String, Object> map = toObjectMap(string);
     if (map.isEmpty()) {
-      return Collections.emptyMap();
+      return new LinkedHashMap<String, String>();
     } else {
       final Map<String, String> stringMap = new LinkedHashMap<String, String>();
       for (final Entry<String, Object> entry : map.entrySet()) {

@@ -334,7 +334,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T invokeMethod(final Method method, final Object object,
+  public static <T> T method(final Method method, final Object object,
     final Object... args) {
     try {
       @SuppressWarnings("unchecked")
@@ -359,7 +359,7 @@ public final class JavaBeanUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T invokeMethod(final Object object,
+  public static <T> T method(final Object object,
     final String methodName, final Object... args) {
     try {
       return (T)MethodUtils.invokeMethod(object, methodName, args);
@@ -505,7 +505,7 @@ public final class JavaBeanUtil {
                   setMethodName, Double.TYPE);
               }
               if (setMethod != null) {
-                invokeMethod(setMethod, target, value);
+                method(setMethod, target, value);
                 return true;
               }
 

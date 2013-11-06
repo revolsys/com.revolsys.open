@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -360,7 +359,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     map.remove("editable");
     map.remove("TableView");
     MapSerializerUtil.add(map, "url", this.url);
-    MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage, false);
+    MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage);
 
     final BoundingBox boundingBox;
     if (image == null) {
@@ -379,7 +378,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       tiePoints = image.getTiePoints();
     }
-    MapSerializerUtil.add(map, "tiePoints", tiePoints, Collections.emptyList());
+    MapSerializerUtil.add(map, "tiePoints", tiePoints);
     return map;
   }
 }

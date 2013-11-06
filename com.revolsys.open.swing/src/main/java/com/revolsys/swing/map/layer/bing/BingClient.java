@@ -108,12 +108,16 @@ public class BingClient {
   public BufferedImage getMapImage(final ImagerySet imagerySet,
     final MapLayer mapLayer, final String quadKey) {
     final String url = getMapUrl(imagerySet, mapLayer, quadKey);
-    try {
-      final URLConnection connection = new URL(url).openConnection();
-      final InputStream in = connection.getInputStream();
-      return ImageIO.read(in);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to download image from: " + url, e);
+    if (url == null) {
+      return null;
+    } else {
+      try {
+        final URLConnection connection = new URL(url).openConnection();
+        final InputStream in = connection.getInputStream();
+        return ImageIO.read(in);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to download image from: " + url, e);
+      }
     }
   }
 
@@ -144,27 +148,32 @@ public class BingClient {
     }
     final Map<String, Object> metaData = getImageryMetadata(imagerySet);
     final List<Map<String, Object>> recordSets = (List<Map<String, Object>>)metaData.get("resourceSets");
-    final Map<String, Object> recordSet = recordSets.get(0);
-    final List<Map<String, Object>> resources = (List<Map<String, Object>>)recordSet.get("resources");
-    final Map<String, Object> resource = resources.get(0);
-    final String imageUrl = (String)resource.get("imageUrl");
-
-    final UriTemplate uriTemplate = new UriTemplate(imageUrl);
-
-    // http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1173&mkt={culture}&shading=hill
-    final Map<String, Object> parameters = createParameterMap();
-    final Map<String, Object> templateParameters = createParameterMap();
-    if (mapLayer == null) {
-      templateParameters.put("culture", "");
+    if (recordSets == null) {
+      return null;
     } else {
-      templateParameters.put("culture", mapLayer);
+      final Map<String, Object> recordSet = recordSets.get(0);
+      final List<Map<String, Object>> resources = (List<Map<String, Object>>)recordSet.get("resources");
+      final Map<String, Object> resource = resources.get(0);
+      final String imageUrl = (String)resource.get("imageUrl");
+
+      final UriTemplate uriTemplate = new UriTemplate(imageUrl);
+
+      // http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1173&mkt={culture}&shading=hill
+      final Map<String, Object> parameters = createParameterMap();
+      final Map<String, Object> templateParameters = createParameterMap();
+      if (mapLayer == null) {
+        templateParameters.put("culture", "");
+      } else {
+        templateParameters.put("culture", mapLayer);
+      }
+      templateParameters.put("quadkey", quadKey);
+      templateParameters.put("subdomain", "t0");
+
+      final URI uri = uriTemplate.expand(templateParameters);
+
+      return UrlUtil.getUrl(uri, parameters);
     }
-    templateParameters.put("quadkey", quadKey);
-    templateParameters.put("subdomain", "t0");
 
-    final URI uri = uriTemplate.expand(templateParameters);
-
-    return UrlUtil.getUrl(uri, parameters);
   }
 
   public String getMapUrl(ImagerySet imagerySet, final MapLayer mapLayer,

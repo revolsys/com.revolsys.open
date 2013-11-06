@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
 
@@ -43,13 +44,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.shp.geometry.LineString2DConverter;
-import com.revolsys.io.shp.geometry.LineString3DConverter;
-import com.revolsys.io.shp.geometry.Point2DConverter;
-import com.revolsys.io.shp.geometry.Point3DConverter;
-import com.revolsys.io.shp.geometry.Polygon2DConverter;
-import com.revolsys.io.shp.geometry.Polygon3DConverter;
-import com.revolsys.io.shp.geometry.ShapefileGeometryWriter;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.spring.NonExistingResource;
@@ -57,20 +51,19 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private static final Logger LOG = Logger.getLogger(ShapefileDataObjectWriter.class);
 
+  private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
+
   private final Envelope envelope = new Envelope();
 
-  private ShapefileGeometryWriter geometryConverter;
+  private GeometryFactory geometryFactory;
 
   private String geometryPropertyName = "geometry";
+
+  private Method geometryWriteMethod;
 
   private boolean hasGeometry = false;
 
@@ -78,15 +71,15 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private ResourceEndianOutput out;
 
-  private final Resource resource;
-
   private int recordNumber = 1;
+
+  private final Resource resource;
 
   private final double zMax = 0; // Double.MIN_VALUE;
 
   private final double zMin = 0; // Double.MAX_VALUE;
 
-  private GeometryFactory geometryFactory;
+  private int shapeType = ShapefileConstants.NULL_SHAPE;
 
   public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
@@ -127,40 +120,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   private void createGeometryWriter(final Geometry geometry) {
-    final int numAxis = geometryFactory.getNumAxis();
-    if (geometry instanceof Point) {
-      if (numAxis == 2) {
-        geometryConverter = new Point2DConverter();
-      } else {
-        geometryConverter = new Point3DConverter();
-      }
-    } else if (geometry instanceof LineString) {
-      if (numAxis == 2) {
-        geometryConverter = new LineString2DConverter();
-      } else {
-        geometryConverter = new LineString3DConverter();
-      }
-    } else if (geometry instanceof MultiLineString) {
-      if (numAxis == 2) {
-        geometryConverter = new LineString2DConverter();
-      } else {
-        geometryConverter = new LineString3DConverter();
-      }
-    } else if (geometry instanceof Polygon) {
-      if (numAxis == 2) {
-        geometryConverter = new Polygon2DConverter();
-      } else {
-        geometryConverter = new Polygon3DConverter();
-      }
-    } else if (geometry instanceof MultiPolygon) {
-      if (numAxis == 2) {
-        geometryConverter = new Polygon2DConverter();
-      } else {
-        geometryConverter = new Polygon3DConverter();
-      }
-    } else {
-      throw new RuntimeException("Not supported" + geometry.getClass());
-    }
+    geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(geometry);
+    shapeType = ShapefileGeometryUtil.getShapeType(geometry);
   }
 
   private void createPrjFile(final GeometryFactory geometryFactory)
@@ -241,10 +202,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private void updateHeader(final ResourceEndianOutput out) throws IOException {
     if (out != null) {
-      int shapeType = ShapefileConstants.NULL_SHAPE;
-      if (geometryConverter != null) {
-        shapeType = geometryConverter.getShapeType();
-      }
+
       out.seek(24);
       final int sizeInShorts = (int)(out.length() / 2);
       out.writeInt(sizeInShorts);
@@ -282,14 +240,14 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       Geometry geometry = object.getGeometryValue();
       geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
       envelope.expandToInclude(geometry.getEnvelopeInternal());
-      if (geometry.isEmpty()) {
+      if (geometry == null || geometry.isEmpty()) {
         writeNull(out);
       } else {
-        if (geometryConverter == null) {
+        if (geometryWriteMethod == null) {
           createGeometryWriter(geometry);
         }
         out.writeInt(recordNumber);
-        geometryConverter.write(out, geometry);
+        SHP_WRITER.write(geometryWriteMethod, indexOut, geometry);
 
         recordNumber++;
         if (indexOut != null) {

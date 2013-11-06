@@ -24,16 +24,12 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 import com.revolsys.io.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
-import com.revolsys.io.shp.geometry.ShapefileGeometryUtil;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.io.shp.ShapefileGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttribute extends AbstractFileGdbAttribute {
-  private static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<String, Method>();
 
-  private static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<String, Method>();
-
-  private static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<GeometryType, DataType>();
+  public static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<GeometryType, DataType>();
 
   static {
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint,
@@ -44,52 +40,10 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       DataTypes.MULTI_LINE_STRING);
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon,
       DataTypes.MULTI_POLYGON);
-
-    addReadWriteMethods("Point");
-    addReadWriteMethods("Polygon");
-    addReadWriteMethods("Polyline");
-    addReadWriteMethods("Multipoint");
-    addReadWriteMethods("MultiPatch");
   }
 
-  private static ShapefileGeometryUtil geometryUtil = new ShapefileGeometryUtil(
+  private static final ShapefileGeometryUtil SHP_UTIL = new ShapefileGeometryUtil(
     true);
-
-  private static void addMethod(final String action,
-    final Map<String, Method> methodMap, final String geometryType,
-    final boolean hasZ, final boolean hasM, final Class<?>... parameterTypes) {
-    final String geometryTypeKey = "esriGeometry" + geometryType + hasZ + hasM;
-    String methodName = action + geometryType;
-    if (hasZ) {
-      methodName += "Z";
-    }
-    if (hasM) {
-      methodName += "M";
-    }
-    final Method method = JavaBeanUtil.getMethod(ShapefileGeometryUtil.class,
-      methodName, parameterTypes);
-    methodMap.put(geometryTypeKey, method);
-  }
-
-  private static void addReadWriteMethods(final String geometryType) {
-    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false,
-      false, GeometryFactory.class, EndianInput.class);
-    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, false,
-      GeometryFactory.class, EndianInput.class);
-    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false, true,
-      GeometryFactory.class, EndianInput.class);
-    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, true,
-      GeometryFactory.class, EndianInput.class);
-
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false,
-      false, EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true,
-      false, EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false,
-      true, EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true,
-      true, EndianOutput.class, Geometry.class);
-  }
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
@@ -141,12 +95,12 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
 
         final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
-        readMethod = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
+        readMethod = ShapefileGeometryUtil.getReadMethod(geometryTypeKey);
         if (readMethod == null) {
           throw new IllegalArgumentException(
             "No read method for geometry type " + geometryTypeKey);
         }
-        writeMethod = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey);
+        writeMethod = ShapefileGeometryUtil.getWriteMethod(geometryTypeKey);
         if (writeMethod == null) {
           throw new IllegalArgumentException(
             "No write method for geometry type " + geometryTypeKey);
@@ -178,8 +132,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         if (type == 0) {
           return null;
         } else {
-          final Geometry geometry = JavaBeanUtil.invokeMethod(readMethod,
-            geometryUtil, geometryFactory, in);
+          final Geometry geometry = SHP_UTIL.readPolygon(geometryFactory, in);
           return geometry;
         }
       } catch (final IOException e) {
@@ -208,8 +161,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
-      JavaBeanUtil.invokeMethod(writeMethod, geometryUtil, out,
-        projectedGeometry);
+      SHP_UTIL.write(writeMethod, out, projectedGeometry);
       final byte[] bytes = byteOut.toByteArray();
       synchronized (getDataStore()) {
         row.setGeometry(bytes);

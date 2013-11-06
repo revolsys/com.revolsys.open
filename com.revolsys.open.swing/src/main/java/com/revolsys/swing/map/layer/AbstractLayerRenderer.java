@@ -267,7 +267,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     MapSerializerUtil.add(map, "type", this.type);
     MapSerializerUtil.add(map, "name", this.name);
-    MapSerializerUtil.add(map, "visible", this.visible, true);
+    MapSerializerUtil.add(map, "visible", this.visible);
     final Map<String, Object> newDefaults = new LinkedHashMap<String, Object>(
       this.defaults);
     for (final Entry<String, Object> entry : defaults.entrySet()) {
@@ -285,9 +285,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     if (!newDefaults.isEmpty()) {
       map.put("defaults", newDefaults);
     }
-    MapSerializerUtil.add(map, "maximumScale", this.maximumScale, 0);
-    MapSerializerUtil.add(map, "minimumScale", this.minimumScale,
-      Long.MAX_VALUE);
+    MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
+    MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
     return map;
   }
 
