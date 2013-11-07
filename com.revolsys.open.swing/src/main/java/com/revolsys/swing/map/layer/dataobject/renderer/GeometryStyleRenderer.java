@@ -180,9 +180,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
     super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
-    final Map<String, Object> style = getAllDefaults();
-    style.putAll(geometryStyle);
-    this.style = new GeometryStyle(style);
+    this.style = new GeometryStyle(geometryStyle);
     setIcon(ICON);
   }
 
@@ -260,11 +258,10 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   @Override
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
-    final Map<String, Object> map = super.toMap(defaults);
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
     if (this.style != null) {
-      final Map<String, Object> allDefaults = getAllDefaults();
-      final Map<String, Object> styleMap = this.style.toMap(allDefaults);
+      final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);
     }
     return map;

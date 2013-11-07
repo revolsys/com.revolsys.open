@@ -94,7 +94,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         }
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
 
-        final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
+        final String geometryTypeKey = dataType.toString() + hasZ + hasM;
         readMethod = ShapefileGeometryUtil.getReadMethod(geometryTypeKey);
         if (readMethod == null) {
           throw new IllegalArgumentException(
@@ -132,7 +132,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         if (type == 0) {
           return null;
         } else {
-          final Geometry geometry = SHP_UTIL.readPolygon(geometryFactory, in);
+          final Geometry geometry = SHP_UTIL.read(readMethod, geometryFactory,
+            in);
           return geometry;
         }
       } catch (final IOException e) {

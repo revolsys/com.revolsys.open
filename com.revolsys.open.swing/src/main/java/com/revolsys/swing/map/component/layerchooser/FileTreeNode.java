@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
@@ -11,6 +12,7 @@ import javax.swing.tree.TreeNode;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.swing.tree.file.FileModel;
 import com.revolsys.swing.tree.model.node.AbstractTreeNode;
@@ -22,7 +24,15 @@ public class FileTreeNode extends AbstractTreeNode {
     if (files != null) {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
-          if (childFile.isDirectory() || FileModel.isDataStore(childFile)) {
+          if (FileModel.isDataStore(childFile)) {
+            final Map<String, Object> connection = Collections.<String, Object> singletonMap(
+              "url", FileUtil.toUrlString(childFile));
+            final Map<String, Object> dataStoreConfig = Collections.<String, Object> singletonMap(
+              "connection", connection);
+            final DataObjectStoreTreeNode dataStoreNode = new DataObjectStoreTreeNode(
+              childFile.getName(), dataStoreConfig);
+            children.add(dataStoreNode);
+          } else if (childFile.isDirectory()) {
             final FileTreeNode child = new FileTreeNode(parent, childFile);
             children.add(child);
           }
@@ -74,8 +84,6 @@ public class FileTreeNode extends AbstractTreeNode {
       if (roots != null) {
         count += roots.length;
       }
-    } else if (FileModel.isDataStore(file)) {
-      // TODO connect to store, cache it
     } else if (!file.exists()) {
     } else if (file.isDirectory()) {
 

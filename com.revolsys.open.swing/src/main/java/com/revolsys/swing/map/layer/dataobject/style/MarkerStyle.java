@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -533,10 +532,10 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   @Override
   public Map<String, Object> toMap() {
-    return toMap(Collections.<String, Object> emptyMap());
-  }
-
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
+    // return toMap(Collections.<String, Object> emptyMap());
+    // }
+    //
+    // public Map<String, Object> toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
@@ -549,11 +548,11 @@ public class MarkerStyle implements Cloneable, MapSerializer {
           defaultValue = getValue(name, defaultValue);
           defaultEqual = EqualsRegistry.equal(defaultValue, value);
         }
-        if (defaults.containsKey(name)) {
-          Object defaultValue = defaults.get(name);
-          defaultValue = getValue(name, defaultValue);
-          defaultEqual = EqualsRegistry.equal(defaultValue, value);
-        }
+        // if (defaults.containsKey(name)) {
+        // Object defaultValue = defaults.get(name);
+        // defaultValue = getValue(name, defaultValue);
+        // defaultEqual = EqualsRegistry.equal(defaultValue, value);
+        // }
         if (!defaultEqual) {
           MapSerializerUtil.add(map, name, value);
         }
@@ -564,6 +563,6 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   @Override
   public String toString() {
-    return toMap(DEFAULT_VALUES).toString();
+    return toMap().toString();
   }
 }

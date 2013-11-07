@@ -641,7 +641,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  protected boolean saveAllSettings(final File directory) {
+  public boolean saveAllSettings(final File directory) {
     boolean saved = true;
     final File groupDirectory = getGroupSettingsDirectory(directory);
     if (canSaveSettings(directory)) {

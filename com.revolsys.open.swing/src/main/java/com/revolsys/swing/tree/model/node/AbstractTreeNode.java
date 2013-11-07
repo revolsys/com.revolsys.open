@@ -7,16 +7,21 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.collection.IteratorEnumeration;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
-  private final boolean allowsChildren;
+  private boolean allowsChildren;
 
   private final Object userObject;
 
-  private final TreeNode parent;
+  private TreeNode parent;
+
+  private String title;
 
   private Icon icon;
 
@@ -99,6 +104,10 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return (V)parent;
   }
 
+  public String getTitle() {
+    return title;
+  }
+
   @SuppressWarnings("unchecked")
   public <V> V getUserObject() {
     return (V)userObject;
@@ -129,7 +138,33 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return children.iterator();
   }
 
+  public void setAllowsChildren(final boolean allowsChildren) {
+    this.allowsChildren = allowsChildren;
+  }
+
   protected void setIcon(final Icon icon) {
     this.icon = icon;
+  }
+
+  public void setParent(final TreeNode parent) {
+    this.parent = parent;
+  }
+
+  public void setTitle(final String title) {
+    this.title = title;
+  }
+
+  @Override
+  public String toString() {
+    if (StringUtils.hasText(title)) {
+      return title;
+    } else {
+      final Object userObject = getUserObject();
+      if (userObject == null) {
+        return "???";
+      } else {
+        return StringConverterRegistry.toString(userObject);
+      }
+    }
   }
 }

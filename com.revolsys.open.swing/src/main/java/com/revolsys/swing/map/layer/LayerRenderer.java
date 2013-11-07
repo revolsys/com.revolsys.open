@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -17,8 +16,6 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   ValueField createStylePanel();
 
-  Map<String, Object> getAllDefaults();
-
   Icon getIcon();
 
   T getLayer();
@@ -29,8 +26,6 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   @Override
   PropertyChangeSupport getPropertyChangeSupport();
-
-  <V> V getValue(String name);
 
   boolean isVisible();
 

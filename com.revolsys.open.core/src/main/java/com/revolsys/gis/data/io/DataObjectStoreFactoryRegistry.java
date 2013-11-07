@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.revolsys.util.JavaBeanUtil;
+
 public class DataObjectStoreFactoryRegistry {
 
   private static Map<Pattern, DataObjectStoreFactory> dataStoreFactoryUrlPatterns = new HashMap<Pattern, DataObjectStoreFactory>();
@@ -26,6 +28,11 @@ public class DataObjectStoreFactoryRegistry {
       "classpath*:META-INF/com.revolsys.gis.dataStore.sf.xml");
   }
 
+  /**
+   * Create an initialized data store.
+   * @param connectionProperties
+   * @return
+   */
   @SuppressWarnings("unchecked")
   public static <T extends DataObjectStore> T createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
@@ -51,6 +58,22 @@ public class DataObjectStoreFactoryRegistry {
       connectionProperties.put("url", url);
       return (T)factory.createDataObjectStore(connectionProperties);
     }
+  }
+
+  /**
+   * Get an initialized data store.
+   * @param connectionProperties
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends DataObjectStore> T getDataObjectStore(
+    Map<String, ? extends Object> config) {
+    config = JavaBeanUtil.clone(config);
+    final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)config.get("connection");
+    final T dataStore = (T)createDataObjectStore(connectionProperties);
+    dataStore.setProperties(config);
+    dataStore.initialize();
+    return dataStore;
   }
 
   public static Class<?> getDataObjectStoreInterfaceClass(

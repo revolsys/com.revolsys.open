@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -354,10 +353,6 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   @Override
   public Map<String, Object> toMap() {
-    return toMap(Collections.<String, Object> emptyMap());
-  }
-
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
       Object value = Property.get(this, name);
@@ -371,11 +366,6 @@ public class TextStyle implements MapSerializer, Cloneable {
         defaultValue = getValue(name, defaultValue);
         defaultEqual = EqualsRegistry.equal(defaultValue, value);
       }
-      if (defaults.containsKey(name)) {
-        Object defaultValue = defaults.get(name);
-        defaultValue = getValue(name, defaultValue);
-        defaultEqual = EqualsRegistry.equal(defaultValue, value);
-      }
       if (!defaultEqual) {
 
         MapSerializerUtil.add(map, name, value);
@@ -386,6 +376,6 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   @Override
   public String toString() {
-    return toMap(DEFAULT_VALUES).toString();
+    return toMap().toString();
   }
 }

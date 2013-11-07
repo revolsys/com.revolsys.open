@@ -36,8 +36,10 @@ public final class ShapefileGeometryUtil {
     addReadWriteMethods("Polyline");
     addReadWriteMethods("Multipoint");
 
-    for (final boolean hasZ : Arrays.asList(false, true)) {
-      for (final boolean hasM : Arrays.asList(false, true)) {
+    for (final boolean z : Arrays.asList(false, true)) {
+      for (final boolean m : Arrays.asList(false, true)) {
+        final String hasZ = String.valueOf(z).toUpperCase();
+        final String hasM = String.valueOf(m).toUpperCase();
         GEOMETRY_TYPE_READ_METHOD_MAP.put("LINESTRING" + hasZ + hasM,
           GEOMETRY_TYPE_READ_METHOD_MAP.get("POLYLINE" + hasZ + hasM));
         GEOMETRY_TYPE_WRITE_METHOD_MAP.put("LINESTRING" + hasZ + hasM,
@@ -63,7 +65,7 @@ public final class ShapefileGeometryUtil {
   private static void addMethod(final String action,
     final Map<String, Method> methodMap, final String geometryType,
     final boolean hasZ, final boolean hasM, final Class<?>... parameterTypes) {
-    final String geometryTypeKey = "esriGeometry" + geometryType + hasZ + hasM;
+    final String geometryTypeKey = (geometryType + hasZ + hasM).toUpperCase();
     String methodName = action + geometryType;
     if (hasZ) {
       methodName += "Z";
@@ -73,7 +75,7 @@ public final class ShapefileGeometryUtil {
     }
     final Method method = JavaBeanUtil.getMethod(ShapefileGeometryUtil.class,
       methodName, parameterTypes);
-    methodMap.put(geometryTypeKey.toString(), method);
+    methodMap.put(geometryTypeKey, method);
   }
 
   private static void addReadWriteMethods(final String geometryType) {
@@ -96,8 +98,9 @@ public final class ShapefileGeometryUtil {
       true, EndianOutput.class, Geometry.class);
   }
 
-  public static Method getReadMethod(final String geometryTypeKey) {
-    final Method method = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey.toUpperCase());
+  public static Method getReadMethod(String geometryTypeKey) {
+    geometryTypeKey = geometryTypeKey.toUpperCase();
+    final Method method = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
     if (method == null) {
       throw new IllegalArgumentException("Cannot get Shape Reader for: "
         + geometryTypeKey);
@@ -164,8 +167,9 @@ public final class ShapefileGeometryUtil {
     return getWriteMethod(geometryTypeKey);
   }
 
-  public static Method getWriteMethod(final String geometryTypeKey) {
-    final Method method = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey.toUpperCase());
+  public static Method getWriteMethod(String geometryTypeKey) {
+    geometryTypeKey = geometryTypeKey.toUpperCase();
+    final Method method = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey);
     if (method == null) {
       throw new IllegalArgumentException("Cannot get Shape Writer for: "
         + geometryTypeKey);

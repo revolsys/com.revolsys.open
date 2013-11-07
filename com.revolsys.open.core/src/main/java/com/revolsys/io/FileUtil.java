@@ -914,6 +914,10 @@ public final class FileUtil {
     }
   }
 
+  public static String toUrlString(final File file) {
+    return toUrl(file).toString();
+  }
+
   /**
    * Construct a new FileUtil.
    */

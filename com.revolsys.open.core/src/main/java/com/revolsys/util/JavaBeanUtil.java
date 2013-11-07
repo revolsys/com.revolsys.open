@@ -28,8 +28,10 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.Converter;
@@ -66,7 +68,15 @@ public final class JavaBeanUtil {
    */
   @SuppressWarnings("unchecked")
   public static <V> V clone(final V value) {
-    if (value instanceof Cloneable) {
+    if (value instanceof Map) {
+      final Map<Object, Object> map = new LinkedHashMap<Object, Object>(
+        (Map<Object, Object>)value);
+      for (final Entry<Object, Object> entry : map.entrySet()) {
+        final Object mapValue = entry.getValue();
+        final Object clonedMapValue = clone(mapValue);
+        entry.setValue(clonedMapValue);
+      }
+    } else if (value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
         final Method method = valueClass.getMethod("clone", new Class[0]);
@@ -334,53 +344,6 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T method(final Method method, final Object object,
-    final Object... args) {
-    try {
-      @SuppressWarnings("unchecked")
-      final T result = (T)method.invoke(object, args);
-      return result;
-    } catch (final RuntimeException e) {
-      throw e;
-    } catch (final Error e) {
-      throw e;
-    } catch (final InvocationTargetException e) {
-      final Throwable t = e.getTargetException();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
-        throw new WrappedException(t);
-      }
-    } catch (final Exception e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> T method(final Object object,
-    final String methodName, final Object... args) {
-    try {
-      return (T)MethodUtils.invokeMethod(object, methodName, args);
-    } catch (final RuntimeException e) {
-      throw e;
-    } catch (final Error e) {
-      throw e;
-    } catch (final InvocationTargetException e) {
-      final Throwable t = e.getTargetException();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
-        throw new RuntimeException(t.getMessage(), t);
-      }
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   public static boolean isAssignableFrom(final Collection<Class<?>> classes,
     final Class<?> objectClass) {
     for (final Class<?> allowedClass : classes) {
@@ -419,6 +382,53 @@ public final class JavaBeanUtil {
       return false;
     } else {
       return true;
+    }
+  }
+
+  public static <T> T method(final Method method, final Object object,
+    final Object... args) {
+    try {
+      @SuppressWarnings("unchecked")
+      final T result = (T)method.invoke(object, args);
+      return result;
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new WrappedException(t);
+      }
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T method(final Object object, final String methodName,
+    final Object... args) {
+    try {
+      return (T)MethodUtils.invokeMethod(object, methodName, args);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
     }
   }
 

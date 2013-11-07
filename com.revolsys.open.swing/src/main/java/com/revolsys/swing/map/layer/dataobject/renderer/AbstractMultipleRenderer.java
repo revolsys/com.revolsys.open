@@ -248,13 +248,12 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   @Override
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
-    final Map<String, Object> map = super.toMap(defaults);
-    final Map<String, Object> allDefaults = getAllDefaults();
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
     if (!this.renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
       for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
-        rendererMaps.add(renderer.toMap(allDefaults));
+        rendererMaps.add(renderer.toMap());
       }
       MapSerializerUtil.add(map, "styles", rendererMaps);
     }

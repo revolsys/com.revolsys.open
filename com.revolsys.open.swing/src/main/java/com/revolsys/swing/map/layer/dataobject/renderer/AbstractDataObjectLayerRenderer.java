@@ -216,8 +216,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   @Override
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
-    final Map<String, Object> map = super.toMap(defaults);
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
     if (!(this.filter instanceof AcceptAllFilter)) {
       MapSerializerUtil.add(map, "filter", this.filter);
     }

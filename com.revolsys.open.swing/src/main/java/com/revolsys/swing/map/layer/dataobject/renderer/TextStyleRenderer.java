@@ -318,9 +318,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   public TextStyleRenderer(final AbstractDataObjectLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
     super("textStyle", "Text Style", layer, parent, textStyle);
-    final Map<String, Object> style = getAllDefaults();
-    style.putAll(textStyle);
-    this.style = new TextStyle(style);
+    this.style = new TextStyle(textStyle);
     setIcon(ICON);
   }
 
@@ -353,11 +351,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   @Override
-  public Map<String, Object> toMap(final Map<String, Object> defaults) {
-    final Map<String, Object> map = super.toMap(defaults);
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
     if (this.style != null) {
-      final Map<String, Object> allDefaults = getAllDefaults();
-      final Map<String, Object> styleMap = this.style.toMap(allDefaults);
+      final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);
     }
     return map;

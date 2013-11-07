@@ -85,9 +85,6 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     this.dataStore = dataStore;
     this.typePath = typePath;
     this.metaData = dataStore.getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typePath);
-    }
     this.table = dataStore.getTable(typePath);
     this.fields = fields;
     this.sql = sql;
@@ -117,23 +114,25 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   protected void doInit() {
-    synchronized (dataStore) {
-      if (boundingBox == null) {
-        if (sql.startsWith("SELECT")) {
-          rows = dataStore.query(sql, false);
+    if (metaData != null) {
+      synchronized (dataStore) {
+        if (boundingBox == null) {
+          if (sql.startsWith("SELECT")) {
+            rows = dataStore.query(sql, false);
+          } else {
+            rows = dataStore.search(table, fields, sql, true);
+          }
         } else {
-          rows = dataStore.search(table, fields, sql, true);
+          BoundingBox boundingBox = this.boundingBox;
+          if (boundingBox.getWidth() == 0) {
+            boundingBox = boundingBox.expand(1, 0);
+          }
+          if (boundingBox.getHeight() == 0) {
+            boundingBox = boundingBox.expand(0, 1);
+          }
+          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
+          rows = dataStore.search(table, fields, sql, envelope, true);
         }
-      } else {
-        BoundingBox boundingBox = this.boundingBox;
-        if (boundingBox.getWidth() == 0) {
-          boundingBox = boundingBox.expand(1, 0);
-        }
-        if (boundingBox.getHeight() == 0) {
-          boundingBox = boundingBox.expand(0, 1);
-        }
-        final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
-        rows = dataStore.search(table, fields, sql, envelope, true);
       }
     }
   }
@@ -147,7 +146,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   protected DataObject getNext() throws NoSuchElementException {
-    if (rows == null) {
+    if (rows == null || metaData == null) {
       throw new NoSuchElementException();
     } else {
       Row row = null;

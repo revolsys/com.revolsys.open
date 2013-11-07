@@ -709,9 +709,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties == null || !this.getProperties().equals(properties)) {
-      this.propertyChangeSupport.firePropertyChange("properties",
-        this.getProperties(), properties);
       super.setProperties(properties);
+      this.propertyChangeSupport.firePropertyChange("properties", null,
+        properties);
     }
   }
 

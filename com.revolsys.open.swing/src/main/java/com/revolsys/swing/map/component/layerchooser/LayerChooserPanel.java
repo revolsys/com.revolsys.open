@@ -74,8 +74,8 @@ public class LayerChooserPanel extends ValueField implements
 
   private JComponent createTree() {
     final ListTreeNode root = new ListTreeNode();
-    final FileTreeNode fileTreeNode = new FileTreeNode(root);
-    root.add(fileTreeNode);
+    final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode(root);
+    root.add(fileSystems);
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode(
       root);
     root.add(folderConnections);
