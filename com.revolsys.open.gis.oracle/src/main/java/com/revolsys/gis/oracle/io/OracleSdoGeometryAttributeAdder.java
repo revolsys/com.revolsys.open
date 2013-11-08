@@ -127,45 +127,32 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
     final DataObjectStoreSchema schema = metaData.getSchema();
-    int srid = getIntegerColumnProperty(schema, typePath, columnName,
-      OracleSdoGeometryJdbcAttribute.SRID_PROPERTY);
-    if (srid == -1) {
-      srid = 0;
-    }
-    int dimension = getIntegerColumnProperty(schema, typePath, columnName,
-      OracleSdoGeometryJdbcAttribute.COORDINATE_DIMENSION_PROPERTY);
-    if (dimension == -1) {
-      dimension = 2;
-    }
-    final double precision = getDoubleColumnProperty(schema, typePath,
-      columnName, OracleSdoGeometryJdbcAttribute.COORDINATE_PRECISION_PROPERTY);
 
-    final double geometryScale = 1 / precision;
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
-      dimension, geometryScale, 0);
-    DataType dataType = DataTypes.GEOMETRY;
-    final String schemaName = JdbcUtils.getSchemaName(typePath).toUpperCase();
-    final String tableName = JdbcUtils.getTableName(typePath).toUpperCase();
-    final String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
-    try {
-      final int geometryType = JdbcUtils.selectInt(this.dataSource, sql,
-        schemaName, tableName, columnName);
-      dataType = ID_TO_DATA_TYPE.get(geometryType);
-    } catch (final IllegalArgumentException e) {
-      this.LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typePath + "."
-        + columnName);
-    } catch (final RuntimeException e) {
-      this.LOG.error("Unable to get geometry type for " + typePath + "."
-        + columnName, e);
+    GeometryFactory geometryFactory = getColumnProperty(schema, typePath,
+      columnName, GEOMETRY_FACTORY);
+    if (geometryFactory == null) {
+      geometryFactory = schema.getGeometryFactory();
     }
+
+    DataType dataType = getColumnProperty(schema, typePath, columnName,
+      GEOMETRY_TYPE);
+    if (dataType == null) {
+      dataType = DataTypes.GEOMETRY;
+    }
+
+    int numAxis = getIntegerColumnProperty(schema, typePath, columnName,
+      NUM_AXIS);
+    if (numAxis == -1) {
+      numAxis = geometryFactory.getNumAxis();
+    }
+
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
-      dataType, sqlType, required, description, null, geometryFactory,
-      dimension);
+      dataType, sqlType, required, description, null, geometryFactory, numAxis);
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
     attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
-      "SDO_GEOM.SDO_BUFFER(", "," + precision + ")"));
+      "SDO_GEOM.SDO_BUFFER(", "," + 1 / geometryFactory.getScaleXY() + ")"));
     attribute.setProperty(JdbcConstants.FUNCTION_EQUAL, new SqlFunction(
       "SDO_EQUAL(", ") = 'TRUE'"));
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
@@ -173,115 +160,87 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   }
 
-  private Object getColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
-    final Map<String, Map<String, Object>> columnsProperties = columnProperties.get(typePath);
-    if (columnsProperties != null) {
-      final Map<String, Object> properties = columnsProperties.get(columnName);
-      if (properties != null) {
-        final Object value = properties.get(propertyName);
-        return value;
+  protected double getScale(final Datum[] values, final int axisIndex)
+    throws SQLException {
+    if (axisIndex >= values.length) {
+      return 0;
+    } else {
+      final STRUCT dim = (STRUCT)values[axisIndex];
+      final Object[] attributes = dim.getAttributes();
+      final double precision = ((Number)attributes[3]).doubleValue();
+      if (precision <= 0) {
+        return 0;
+      } else {
+        return 1 / precision;
       }
-    }
-    return null;
-  }
-
-  private double getDoubleColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Object value = getColumnProperty(schema, typePath, columnName,
-      propertyName);
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.doubleValue();
-    } else {
-      return 11;
-    }
-  }
-
-  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Object value = getColumnProperty(schema, typePath, columnName,
-      propertyName);
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      return -1;
     }
   }
 
   @Override
   public void initialize(final DataObjectStoreSchema schema) {
-    Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
-    if (columnProperties == null) {
-      columnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
-      schema.setProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY,
-        columnProperties);
-
+    try {
+      final Connection connection = JdbcUtils.getConnection(this.dataSource);
       try {
-        final Connection connection = JdbcUtils.getConnection(this.dataSource);
+        final String schemaName = this.dataStore.getDatabaseSchemaName(schema);
+        final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
+          + "from ALL_SDO_GEOM_METADATA M "
+          + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
+          + "where OWNER = ?";
+        final PreparedStatement statement = connection.prepareStatement(sridSql);
         try {
-          final String schemaName = this.dataStore.getDatabaseSchemaName(schema);
-          final String sridSql = "select TABLE_NAME, COLUMN_NAME, SRID, DIMINFO from ALL_SDO_GEOM_METADATA where OWNER = ?";
-          final PreparedStatement statement = connection.prepareStatement(sridSql);
+          statement.setString(1, schemaName);
+          final ResultSet resultSet = statement.executeQuery();
           try {
-            statement.setString(1, schemaName);
-            final ResultSet resultSet = statement.executeQuery();
-            try {
-              while (resultSet.next()) {
-                final String tableName = resultSet.getString(1);
-                final String columnName = resultSet.getString(2);
-                final int srid = resultSet.getInt(3);
-                final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
-                final int dimension = dimInfo.length();
-                final Datum[] values = dimInfo.getOracleArray();
-                final STRUCT xDim = (STRUCT)values[0];
-                final Object[] attributes = xDim.getAttributes();
-                final double precision = ((Number)attributes[3]).doubleValue();
+            while (resultSet.next()) {
+              final String tableName = resultSet.getString(1);
+              final String columnName = resultSet.getString(2);
+              final String typePath = PathUtil.toPath(schemaName, tableName);
 
-                setColumnProperty(columnProperties, schemaName, tableName,
-                  columnName, OracleSdoGeometryJdbcAttribute.SRID_PROPERTY,
-                  srid);
-                setColumnProperty(columnProperties, schemaName, tableName,
-                  columnName,
-                  OracleSdoGeometryJdbcAttribute.COORDINATE_DIMENSION_PROPERTY,
-                  dimension);
-                setColumnProperty(columnProperties, schemaName, tableName,
-                  columnName,
-                  OracleSdoGeometryJdbcAttribute.COORDINATE_PRECISION_PROPERTY,
-                  precision);
+              int srid = resultSet.getInt(3);
+              if (resultSet.wasNull() || srid < 0) {
+                srid = 0;
               }
-            } finally {
-              JdbcUtils.close(resultSet);
+              final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
+              int numAxis = dimInfo.length();
+              setColumnProperty(schema, typePath, columnName, NUM_AXIS, numAxis);
+              if (numAxis < 2) {
+                numAxis = 2;
+              } else if (numAxis > 4) {
+                numAxis = 4;
+              }
+              final Datum[] values = dimInfo.getOracleArray();
+              final double scaleXy = getScale(values, 0);
+              final double scaleZ = getScale(values, 2);
+              final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+                srid, numAxis, scaleXy, scaleZ);
+              setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
+                geometryFactory);
+
+              final int geometryType = resultSet.getInt(5);
+              DataType geometryDataType;
+              if (resultSet.wasNull()) {
+                geometryDataType = DataTypes.GEOMETRY;
+              } else {
+                geometryDataType = ID_TO_DATA_TYPE.get(geometryType);
+                if (geometryDataType == null) {
+                  geometryDataType = DataTypes.GEOMETRY;
+                }
+              }
+              setColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE,
+                geometryDataType);
             }
           } finally {
-            JdbcUtils.close(statement);
+            JdbcUtils.close(resultSet);
           }
         } finally {
-          JdbcUtils.release(connection, this.dataSource);
+          JdbcUtils.close(statement);
         }
-      } catch (final SQLException e) {
-        this.LOG.error("Unable to initialize", e);
+      } finally {
+        JdbcUtils.release(connection, this.dataSource);
       }
+    } catch (final SQLException e) {
+      this.LOG.error("Unable to initialize", e);
     }
   }
 
-  private void setColumnProperty(
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName, final String tableName, final String columnName,
-    final String propertyName, final Object propertyValue) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
-    Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
-    if (typeColumnMap == null) {
-      typeColumnMap = new HashMap<String, Map<String, Object>>();
-      esriColumnProperties.put(typePath, typeColumnMap);
-    }
-    Map<String, Object> columnProperties = typeColumnMap.get(columnName);
-    if (columnProperties == null) {
-      columnProperties = new HashMap<String, Object>();
-      typeColumnMap.put(columnName, columnProperties);
-    }
-    columnProperties.put(propertyName, propertyValue);
-  }
 }

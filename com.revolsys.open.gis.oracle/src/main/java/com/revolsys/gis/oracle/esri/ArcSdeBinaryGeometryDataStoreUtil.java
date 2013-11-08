@@ -26,11 +26,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
@@ -81,36 +83,29 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     final DataObjectStoreSchema schema, final DataObjectMetaData metaData,
     final String typePath, final String columnName,
     final Map<String, Object> columnProperties) {
-    final ArcSdeSpatialReference spatialReference = (ArcSdeSpatialReference)columnProperties.get(ArcSdeConstants.SPATIAL_REFERENCE);
     final Attribute attribute = metaData.getAttribute(columnName);
 
-    int numAxis = ArcSdeConstants.getIntegerColumnProperty(schema, typePath,
-      columnName, ArcSdeConstants.NUM_AXIS);
-    if (numAxis == -1) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Column not found in SDE.GEOMETRY_COLUMNS table " + metaData + "."
-          + columnName);
-    } else {
-      numAxis = Math.min(Math.max(numAxis, 2), 3);
-    }
-    final DataType dataType = ArcSdeConstants.getColumnProperty(schema,
-      typePath, columnName, ArcSdeConstants.DATA_TYPE);
+    DataType dataType = JdbcAttributeAdder.getColumnProperty(schema, typePath,
+      columnName, JdbcAttributeAdder.GEOMETRY_TYPE);
     if (dataType == null) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Column not found in SDE.GEOMETRY_COLUMNS table " + metaData + "."
-          + columnName);
+      dataType = DataTypes.GEOMETRY;
     }
+
+    GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+      schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
+    if (geometryFactory == null) {
+      geometryFactory = schema.getGeometryFactory();
+    }
+
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
       this, columnName, dataType, attribute.isRequired(),
-      "The GEOMETRY reference", attribute.getProperties(), spatialReference,
-      numAxis);
+      "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
     ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute, sdeAttribute);
     sdeAttribute.setMetaData(metaData);
 
     metaData.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
 
     ((DataObjectMetaDataImpl)metaData).setGeometryAttributeName(columnName);
-    ArcSdeConstants.addObjectIdAttribute(dataStore, metaData);
   }
 
   public AbstractIterator<DataObject> createIterator(

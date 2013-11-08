@@ -4,22 +4,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class ArcSdeStGeometryDataStoreExtension implements
   DataObjectStoreExtension {
@@ -38,10 +36,13 @@ public class ArcSdeStGeometryDataStoreExtension implements
       stGeometryAttributeAdder);
   }
 
-  private void initializeColumnProperties(final DataObjectStoreSchema schema,
-    final String schemaName, final Connection connection,
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties)
-    throws SQLException {
+  @Override
+  public boolean isEnabled(final DataObjectStore dataStore) {
+    return ArcSdeConstants.isSdeAvailable(dataStore);
+  }
+
+  private void loadColumnProperties(final DataObjectStoreSchema schema,
+    final String schemaName, final Connection connection) throws SQLException {
 
     final String sql = "SELECT GC.F_TABLE_NAME, GC.F_GEOMETRY_COLUMN, GC.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION, SG.GEOMETRY_TYPE GEOMETRY_DATA_TYPE FROM SDE.GEOMETRY_COLUMNS GC LEFT OUTER JOIN SDE.ST_GEOMETRY_COLUMNS SG ON GC.F_TABLE_SCHEMA = SG.OWNER AND GC.F_TABLE_NAME = SG.TABLE_NAME WHERE GC.F_TABLE_SCHEMA = ?";
     final PreparedStatement statement = connection.prepareStatement(sql);
@@ -53,31 +54,47 @@ public class ArcSdeStGeometryDataStoreExtension implements
           final String tableName = resultSet.getString(1);
           final String columnName = resultSet.getString(2);
 
+          final String typePath = PathUtil.toPath(schemaName, tableName);
+
           final int esriSrid = resultSet.getInt(3);
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
+
+          int numAxis = resultSet.getInt(5);
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcAttributeAdder.NUM_AXIS, numAxis);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
             schema, esriSrid);
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
+
+          GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+            schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
+          int srid = spatialReference.getSrid();
+          final double scaleXy = spatialReference.getXyScale();
+          final double scaleZ = spatialReference.getZScale();
+          if (srid <= 0) {
+            srid = geometryFactory.getSRID();
+          }
+          numAxis = Math.min(Math.max(numAxis, 2), 3);
+          geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXy,
+            scaleZ);
+
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcAttributeAdder.GEOMETRY_FACTORY, geometryFactory);
 
           final int geometryType = resultSet.getInt(4);
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.DATA_TYPE,
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcAttributeAdder.GEOMETRY_TYPE,
             ArcSdeConstants.getGeometryDataType(geometryType));
-
-          final int numAxis = resultSet.getInt(5);
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.NUM_AXIS, numAxis);
 
           String geometryColumnType = resultSet.getString(6);
           if (!StringUtils.hasText(geometryColumnType)) {
             geometryColumnType = ArcSdeConstants.SDEBINARY;
           }
-          setColumnProperty(esriColumnProperties, schemaName, tableName,
-            columnName, ArcSdeConstants.GEOMETRY_COLUMN_TYPE,
-            geometryColumnType);
+          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+            ArcSdeConstants.GEOMETRY_COLUMN_TYPE, geometryColumnType);
         }
       } finally {
         JdbcUtils.close(resultSet);
@@ -87,18 +104,48 @@ public class ArcSdeStGeometryDataStoreExtension implements
     }
   }
 
-  @Override
-  public boolean isEnabled(final DataObjectStore dataStore) {
-    return ArcSdeConstants.isSdeAvailable(dataStore);
+  private void loadTableProperties(final Connection connection,
+    final DataObjectStoreSchema schema, final String schemaName) {
+    final String sql = "SELECT registration_id, table_name, rowid_column FROM sde.table_registry WHERE owner = ?";
+    PreparedStatement statement = null;
+    ResultSet resultSet = null;
+    try {
+      statement = connection.prepareStatement(sql);
+      statement.setString(1, schemaName);
+      resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        final String tableName = resultSet.getString(2);
+        final String typePath = PathUtil.toPath(schemaName, tableName)
+          .toUpperCase();
+
+        final int registrationId = resultSet.getInt(1);
+        JdbcAttributeAdder.setTableProperty(schema, typePath,
+          ArcSdeConstants.REGISTRATION_ID, registrationId);
+
+        final String rowidColumn = resultSet.getString(3);
+        JdbcAttributeAdder.setTableProperty(schema, typePath,
+          ArcSdeConstants.ROWID_COLUMN, rowidColumn);
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Unable to load rowid columns for " + schemaName, e);
+    } finally {
+      JdbcUtils.close(statement, resultSet);
+    }
   }
 
   @Override
   public void postProcess(final DataObjectStoreSchema schema) {
-    final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
+    final String schemaName = schema.getName();
     for (final DataObjectMetaData metaData : schema.getTypes()) {
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
-        ArcSdeConstants.addObjectIdAttribute(dataStore, metaData);
+      final String typePath = metaData.getPath();
+      final Integer registrationId = JdbcAttributeAdder.getTableProperty(
+        schema, typePath, ArcSdeConstants.REGISTRATION_ID);
+      final String rowIdColumn = JdbcAttributeAdder.getTableProperty(schema,
+        typePath, ArcSdeConstants.ROWID_COLUMN);
+      if (registrationId != null && rowIdColumn != null) {
+        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName, metaData,
+          registrationId, rowIdColumn);
       }
     }
   }
@@ -107,18 +154,12 @@ public class ArcSdeStGeometryDataStoreExtension implements
   public void preProcess(final DataObjectStoreSchema schema) {
     final DataObjectStore dataStore = schema.getDataStore();
     final OracleDataObjectStore oracleDataStore = (OracleDataObjectStore)dataStore;
-    Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY);
-    if (esriColumnProperties == null) {
-      esriColumnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
-      schema.setProperty(ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
-        esriColumnProperties);
-    }
     try {
       final Connection connection = oracleDataStore.getSqlConnection();
       try {
         final String schemaName = oracleDataStore.getDatabaseSchemaName(schema);
-        initializeColumnProperties(schema, schemaName, connection,
-          esriColumnProperties);
+        loadTableProperties(connection, schema, schemaName);
+        loadColumnProperties(schema, schemaName, connection);
       } finally {
         oracleDataStore.releaseSqlConnection(connection);
       }
@@ -127,23 +168,4 @@ public class ArcSdeStGeometryDataStoreExtension implements
         "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
     }
   }
-
-  private void setColumnProperty(
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName, final String tableName, final String columnName,
-    final String propertyName, final Object propertyValue) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
-    Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
-    if (typeColumnMap == null) {
-      typeColumnMap = new HashMap<String, Map<String, Object>>();
-      esriColumnProperties.put(typePath, typeColumnMap);
-    }
-    Map<String, Object> columnProperties = typeColumnMap.get(columnName);
-    if (columnProperties == null) {
-      columnProperties = new HashMap<String, Object>();
-      typeColumnMap.put(columnName, columnProperties);
-    }
-    columnProperties.put(propertyName, propertyValue);
-  }
-
 }

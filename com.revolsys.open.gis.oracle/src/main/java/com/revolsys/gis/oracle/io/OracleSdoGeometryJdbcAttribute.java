@@ -36,15 +36,8 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
-  public static final String COORDINATE_DIMENSION_PROPERTY = "coordinateDimension";
 
-  public static final String COORDINATE_PRECISION_PROPERTY = "coordinatePrecision";
-
-  public static final String SCHEMA_PROPERTY = OracleSdoGeometryJdbcAttribute.class.getName();
-
-  public static final String SRID_PROPERTY = "srid";
-
-  private final int dimension;
+  private final int numAxis;
 
   private final GeometryFactory geometryFactory;
 
@@ -53,11 +46,11 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   public OracleSdoGeometryJdbcAttribute(final String name, final DataType type,
     final int sqlType, final boolean required, final String description,
     final Map<String, Object> properties,
-    final GeometryFactory geometryFactory, final int dimension) {
+    final GeometryFactory geometryFactory, final int numAxis) {
     super(name, type, sqlType, 0, 0, required, description, properties);
     this.geometryFactory = geometryFactory;
-    this.dimension = dimension;
-    this.precisionModels = new PrecisionModel[dimension];
+    this.numAxis = numAxis;
+    this.precisionModels = new PrecisionModel[numAxis];
     final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
     if (precisionModel != null) {
       this.precisionModels[0] = precisionModel;
@@ -91,7 +84,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   public OracleSdoGeometryJdbcAttribute clone() {
     return new OracleSdoGeometryJdbcAttribute(getName(), getType(),
       getSqlType(), isRequired(), getDescription(), getProperties(),
-      this.geometryFactory, this.dimension);
+      this.geometryFactory, this.numAxis);
   }
 
   @Override
@@ -138,7 +131,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     } else {
       synchronized (STRUCT.class) {
         final Connection connection = statement.getConnection();
-        final STRUCT oracleValue = toJdbc(connection, value, this.dimension);
+        final STRUCT oracleValue = toJdbc(connection, value, this.numAxis);
         ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
           oracleValue);
       }

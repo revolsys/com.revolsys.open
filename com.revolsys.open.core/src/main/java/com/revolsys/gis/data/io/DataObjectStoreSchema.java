@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
@@ -57,6 +58,15 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   public DataObjectStore getDataStore() {
     return dataStore;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    final GeometryFactory geometryFactory = getProperty("geometryFactory");
+    if (geometryFactory == null) {
+      return dataStore.getGeometryFactory();
+    } else {
+      return geometryFactory;
+    }
   }
 
   public synchronized DataObjectMetaData getMetaData(String typePath) {

@@ -20,11 +20,7 @@ import com.revolsys.util.ExceptionUtil;
 
 public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
-  private final ArcSdeSpatialReference spatialReference;
-
   private final GeometryFactory geometryFactory;
-
-  private final int numAxis;
 
   private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
@@ -37,28 +33,15 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   public ArcSdeBinaryGeometryAttribute(
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String name,
     final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties,
-    final ArcSdeSpatialReference spatialReference, final int numAxis) {
+    final Map<String, Object> properties, final GeometryFactory geometryFactory) {
     super(name, type, -1, 0, 0, required, description, properties);
     this.sdeUtil = sdeUtil;
-    this.spatialReference = spatialReference;
-    final GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
-      numAxis, factory.getScaleXY(), factory.getScaleZ());
-    this.numAxis = numAxis;
+    this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  public int getNumAxis() {
-    return this.numAxis;
-  }
-
-  public ArcSdeSpatialReference getSpatialReference() {
-    return this.spatialReference;
   }
 
   @Override

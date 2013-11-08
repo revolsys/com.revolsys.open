@@ -35,27 +35,30 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final String owner = this.dataStore.getDatabaseSchemaName(schema);
     final String tableName = this.dataStore.getDatabaseTableName(typePath);
     final String columnName = name.toUpperCase();
-    final int esriSrid = ArcSdeConstants.getIntegerColumnProperty(schema,
+    final int esriSrid = JdbcAttributeAdder.getIntegerColumnProperty(schema,
       typePath, columnName, ArcSdeConstants.ESRI_SRID_PROPERTY);
     if (esriSrid == -1) {
       LOG.error("Column not registered in SDE.ST_GEOMETRY table " + owner + "."
         + tableName + "." + name);
     }
-    final int numAxis = ArcSdeConstants.getIntegerColumnProperty(schema,
-      typePath, columnName, ArcSdeConstants.NUM_AXIS);
+    final int numAxis = JdbcAttributeAdder.getIntegerColumnProperty(schema,
+      typePath, columnName, JdbcAttributeAdder.NUM_AXIS);
     if (numAxis == -1) {
       LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "."
         + tableName + "." + name);
     }
-    final DataType dataType = ArcSdeConstants.getColumnProperty(schema,
-      typePath, columnName, ArcSdeConstants.DATA_TYPE);
+    final DataType dataType = JdbcAttributeAdder.getColumnProperty(schema,
+      typePath, columnName, JdbcAttributeAdder.GEOMETRY_TYPE);
     if (dataType == null) {
       LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "."
         + tableName + "." + name);
     }
 
-    final ArcSdeSpatialReference spatialReference = ArcSdeConstants.getColumnProperty(
+    final ArcSdeSpatialReference spatialReference = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, ArcSdeConstants.SPATIAL_REFERENCE);
+
+    final GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+      schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
 
     final Attribute attribute = new ArcSdeStGeometryAttribute(name, dataType,
       required, description, null, spatialReference, numAxis);
@@ -65,15 +68,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
       "SDE.ST_ENVINTERSECTS(", ") = 1"));
     attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
       "SDE.ST_BUFFER(", ")"));
-    if (spatialReference != null) {
-      final int srid = spatialReference.getSrid();
-      final Double scaleXy = spatialReference.getXyScale();
-      final Double scaleZ = spatialReference.getZScale();
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
-        scaleXy, scaleZ);
-      attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
-        geometryFactory);
-    }
+    attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
   }
 

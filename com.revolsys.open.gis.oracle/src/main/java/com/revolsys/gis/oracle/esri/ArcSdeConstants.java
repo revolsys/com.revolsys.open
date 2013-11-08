@@ -1,8 +1,6 @@
 package com.revolsys.gis.oracle.esri;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,14 +9,9 @@ import oracle.sql.SQLName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -94,13 +87,7 @@ public final class ArcSdeConstants {
     GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
   }
 
-  public static final String NUM_AXIS = "numAxis";
-
-  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeStGeometryAttribute.class.getName();
-
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
-
-  public static final String DATA_TYPE = "dataType";
 
   public static final String SPATIAL_REFERENCE = "spatialReference";
 
@@ -108,39 +95,9 @@ public final class ArcSdeConstants {
 
   public static final String SDEBINARY = "SDEBINARY";
 
-  public static void addObjectIdAttribute(
-    final AbstractJdbcDataObjectStore dataStore,
-    final DataObjectMetaData metaData) {
-    final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute("OBJECTID");
-    if (objectIdAttribute != null) {
-      final Connection connection = dataStore.getSqlConnection();
-      try {
-        final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
-          objectIdAttribute, connection, metaData.getPath());
-        if (newObjectIdAttribute != null) {
-          ((DataObjectMetaDataImpl)metaData).replaceAttribute(
-            objectIdAttribute, newObjectIdAttribute);
-        }
-      } finally {
-        dataStore.releaseSqlConnection(connection);
-      }
-    }
-  }
+  public static final String REGISTRATION_ID = "REGISTRATION_ID";
 
-  @SuppressWarnings("unchecked")
-  public static <T> T getColumnProperty(final DataObjectStoreSchema schema,
-    final String typePath, final String columnName, final String propertyName) {
-    final Map<String, Map<String, Object>> typeColumnProperties = getTypeColumnProperties(
-      schema, typePath);
-    if (typeColumnProperties != null) {
-      final Map<String, Object> properties = typeColumnProperties.get(columnName);
-      if (properties != null) {
-        final Object value = properties.get(propertyName);
-        return (T)value;
-      }
-    }
-    return null;
-  }
+  public static final String ROWID_COLUMN = "ROWID_COLUMN";
 
   public static DataType getGeometryDataType(final int geometryType) {
     final DataType dataType = DATA_TYPE_MAP.get(geometryType);
@@ -148,19 +105,6 @@ public final class ArcSdeConstants {
       return DataTypes.GEOMETRY;
     } else {
       return dataType;
-    }
-  }
-
-  public static int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema, final String typePath,
-    final String columnName, final String propertyName) {
-    final Object value = getColumnProperty(schema, typePath, columnName,
-      propertyName);
-    if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      return -1;
     }
   }
 
@@ -172,19 +116,6 @@ public final class ArcSdeConstants {
         + geometryClass);
     } else {
       return type;
-    }
-  }
-
-  public static Map<String, Map<String, Object>> getTypeColumnProperties(
-    final DataObjectStoreSchema schema, final String typePath) {
-    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(
-      ArcSdeConstants.ESRI_SCHEMA_PROPERTY,
-      Collections.<String, Map<String, Map<String, Object>>> emptyMap());
-    final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties.get(typePath);
-    if (typeColumnProperties == null) {
-      return Collections.emptyMap();
-    } else {
-      return typeColumnProperties;
     }
   }
 

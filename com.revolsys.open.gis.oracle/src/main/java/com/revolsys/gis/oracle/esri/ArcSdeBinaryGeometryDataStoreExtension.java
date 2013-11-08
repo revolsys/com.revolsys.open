@@ -9,6 +9,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class ArcSdeBinaryGeometryDataStoreExtension implements
@@ -40,7 +41,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
     final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
     for (final DataObjectMetaData metaData : schema.getTypes()) {
       final String typePath = metaData.getPath();
-      final Map<String, Map<String, Object>> typeColumnProperties = ArcSdeConstants.getTypeColumnProperties(
+      final Map<String, Map<String, Object>> typeColumnProperties = JdbcAttributeAdder.getTypeColumnProperties(
         schema, typePath);
       for (final Entry<String, Map<String, Object>> columnEntry : typeColumnProperties.entrySet()) {
         final String columnName = columnEntry.getKey();

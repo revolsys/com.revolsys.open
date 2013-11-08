@@ -33,6 +33,8 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -58,7 +60,8 @@ import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
-  AbstractDataObjectStore implements JdbcDataObjectStore {
+  AbstractDataObjectStore implements JdbcDataObjectStore,
+  DataObjectStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
   private Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
@@ -113,11 +116,12 @@ public abstract class AbstractJdbcDataObjectStore extends
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     setIteratorFactory(ITERATOR_FACTORY);
+    addDataStoreExtension(this);
   }
 
   public AbstractJdbcDataObjectStore(final DataSource dataSource) {
+    this();
     setDataSource(dataSource);
-    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   public AbstractJdbcDataObjectStore(final JdbcDatabaseFactory databaseFactory) {
@@ -126,9 +130,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public AbstractJdbcDataObjectStore(final JdbcDatabaseFactory databaseFactory,
     final DataObjectFactory dataObjectFactory) {
-    super(dataObjectFactory);
+    this(dataObjectFactory);
     this.databaseFactory = databaseFactory;
-    setIteratorFactory(ITERATOR_FACTORY);
   }
 
   protected void addAttribute(final DataObjectMetaDataImpl metaData,
@@ -285,6 +288,27 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void deleteAll(final Collection<DataObject> objects) {
+    final JdbcWriter writer = getWriter();
+    try {
+      for (final DataObject object : objects) {
+        if (object.getState() == DataObjectState.Persisted
+          || object.getState() == DataObjectState.Modified) {
+          object.setState(DataObjectState.Deleted);
+          writer.write(object);
+        }
+      }
+    } finally {
+      writer.close();
+    }
+  }
+
+  public Set<String> getAllSchemaNames() {
+    return allSchemaNames;
+  }
+
   // protected Set<String> getDatabaseSchemaNames() {
   // final Set<String> databaseSchemaNames = new TreeSet<String>();
   // try {
@@ -310,20 +334,15 @@ public abstract class AbstractJdbcDataObjectStore extends
   // return databaseSchemaNames;
   // }
 
-  @Transactional(propagation = Propagation.REQUIRED)
-  @Override
-  public void deleteAll(final Collection<DataObject> objects) {
-    final JdbcWriter writer = getWriter();
-    try {
-      for (final DataObject object : objects) {
-        if (object.getState() == DataObjectState.Persisted
-          || object.getState() == DataObjectState.Modified) {
-          object.setState(DataObjectState.Deleted);
-          writer.write(object);
-        }
-      }
-    } finally {
-      writer.close();
+  public JdbcAttribute getAttribute(final String schemaName,
+    final String tableName, final String columnName) {
+    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      final Attribute attribute = metaData.getAttribute(columnName);
+      return (JdbcAttribute)attribute;
     }
   }
 
@@ -354,22 +373,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   // releaseConnection(connection);
   // }
   // }
-
-  public Set<String> getAllSchemaNames() {
-    return allSchemaNames;
-  }
-
-  public JdbcAttribute getAttribute(final String schemaName,
-    final String tableName, final String columnName) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      return null;
-    } else {
-      final Attribute attribute = metaData.getAttribute(columnName);
-      return (JdbcAttribute)attribute;
-    }
-  }
 
   public int getBatchSize() {
     return batchSize;
@@ -637,6 +640,11 @@ public abstract class AbstractJdbcDataObjectStore extends
     return writer;
   }
 
+  @Override
+  public void initialize(final DataObjectStore dataStore,
+    final Map<String, Object> connectionProperties) {
+  }
+
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void insert(final DataObject object) {
@@ -665,6 +673,11 @@ public abstract class AbstractJdbcDataObjectStore extends
   public boolean isEditable(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     return metaData.getIdAttributeIndex() != -1;
+  }
+
+  @Override
+  public boolean isEnabled(final DataObjectStore dataStore) {
+    return true;
   }
 
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
@@ -717,9 +730,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
     final String schemaName = schema.getPath();
     final String dbSchemaName = getDatabaseSchemaName(schemaName);
-    for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
-      attributeAdder.initialize(schema);
-    }
     final Map<String, String> tableDescriptionMap = new HashMap<String, String>();
     final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
     loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap,
@@ -842,6 +852,17 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public ResultPager<DataObject> page(final Query query) {
     return new JdbcQueryResultPager(this, getProperties(), query);
+  }
+
+  @Override
+  public void postProcess(final DataObjectStoreSchema schema) {
+  }
+
+  @Override
+  public void preProcess(final DataObjectStoreSchema schema) {
+    for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
+      attributeAdder.initialize(schema);
+    }
   }
 
   @Override

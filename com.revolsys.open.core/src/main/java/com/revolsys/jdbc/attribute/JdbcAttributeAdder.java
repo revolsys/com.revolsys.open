@@ -1,6 +1,9 @@
 package com.revolsys.jdbc.attribute;
 
 import java.sql.Types;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
@@ -9,6 +12,135 @@ import com.revolsys.gis.data.model.types.DataType;
 
 public class JdbcAttributeAdder {
   private DataType dataType;
+
+  public static String GEOMETRY_FACTORY = "geometryFactory";
+
+  public static String NUM_AXIS = "numAxis";
+
+  public static String GEOMETRY_TYPE = "geometryType";
+
+  public static final String COLUMN_PROPERTIES = "columnProperties";
+
+  public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
+    final DataObjectStoreSchema schema) {
+    synchronized (schema) {
+      Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(COLUMN_PROPERTIES);
+      if (columnProperties == null) {
+        columnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
+        schema.setProperty(COLUMN_PROPERTIES, columnProperties);
+      }
+      return columnProperties;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V getColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
+    final Map<String, Map<String, Object>> columnsProperties = getTypeColumnProperties(
+      schema, typePath);
+    final Map<String, Object> properties = columnsProperties.get(columnName);
+    if (properties != null) {
+      final Object value = properties.get(propertyName);
+      return (V)value;
+    }
+    return null;
+  }
+
+  public static double getDoubleColumnProperty(
+    final DataObjectStoreSchema schema, final String typePath,
+    final String columnName, final String propertyName) {
+    final Object value = getColumnProperty(schema, typePath, columnName,
+      propertyName);
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.doubleValue();
+    } else {
+      return 11;
+    }
+  }
+
+  public static int getIntegerColumnProperty(
+    final DataObjectStoreSchema schema, final String typePath,
+    final String columnName, final String propertyName) {
+    final Object value = getColumnProperty(schema, typePath, columnName,
+      propertyName);
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.intValue();
+    } else {
+      return -1;
+    }
+  }
+
+  public static Map<String, Map<String, Object>> getTableProperties(
+    final DataObjectStoreSchema schema) {
+    synchronized (schema) {
+      Map<String, Map<String, Object>> tableProperties = schema.getProperty(COLUMN_PROPERTIES);
+      if (tableProperties == null) {
+        tableProperties = new HashMap<String, Map<String, Object>>();
+        schema.setProperty(COLUMN_PROPERTIES, tableProperties);
+      }
+      return tableProperties;
+    }
+  }
+
+  public static Map<String, Object> getTableProperties(
+    final DataObjectStoreSchema schema, final String typePath) {
+    final Map<String, Map<String, Object>> tableProperties = getTableProperties(schema);
+    synchronized (tableProperties) {
+      Map<String, Object> properties = tableProperties.get(typePath);
+      if (properties == null) {
+        properties = new HashMap<String, Object>();
+        tableProperties.put(typePath, properties);
+      }
+      return properties;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V getTableProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String propertyName) {
+    final Map<String, Object> properties = getTableProperties(schema, typePath);
+    final Object value = properties.get(propertyName);
+    return (V)value;
+  }
+
+  public static Map<String, Map<String, Object>> getTypeColumnProperties(
+    final DataObjectStoreSchema schema, final String typePath) {
+    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(schema);
+    final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties.get(typePath);
+    if (typeColumnProperties == null) {
+      return Collections.emptyMap();
+    } else {
+      return typeColumnProperties;
+    }
+  }
+
+  public static void setColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName,
+    final Object propertyValue) {
+    final Map<String, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(schema);
+    synchronized (tableColumnProperties) {
+
+      Map<String, Map<String, Object>> typeColumnMap = tableColumnProperties.get(typePath);
+      if (typeColumnMap == null) {
+        typeColumnMap = new HashMap<String, Map<String, Object>>();
+        tableColumnProperties.put(typePath, typeColumnMap);
+      }
+      Map<String, Object> columnProperties = typeColumnMap.get(columnName);
+      if (columnProperties == null) {
+        columnProperties = new HashMap<String, Object>();
+        typeColumnMap.put(columnName, columnProperties);
+      }
+      columnProperties.put(propertyName, propertyValue);
+    }
+  }
+
+  public static void setTableProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String propertyName, final Object value) {
+    final Map<String, Object> properties = getTableProperties(schema, typePath);
+    properties.put(propertyName, value);
+  }
 
   public JdbcAttributeAdder() {
   }
