@@ -21,6 +21,8 @@ public class JdbcAttributeAdder {
 
   public static final String COLUMN_PROPERTIES = "columnProperties";
 
+  public static final String TABLE_PROPERTIES = "tableProperties";
+
   public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
     final DataObjectStoreSchema schema) {
     synchronized (schema) {
@@ -75,7 +77,7 @@ public class JdbcAttributeAdder {
   public static Map<String, Map<String, Object>> getTableProperties(
     final DataObjectStoreSchema schema) {
     synchronized (schema) {
-      Map<String, Map<String, Object>> tableProperties = schema.getProperty(COLUMN_PROPERTIES);
+      Map<String, Map<String, Object>> tableProperties = schema.getProperty(TABLE_PROPERTIES);
       if (tableProperties == null) {
         tableProperties = new HashMap<String, Map<String, Object>>();
         schema.setProperty(COLUMN_PROPERTIES, tableProperties);

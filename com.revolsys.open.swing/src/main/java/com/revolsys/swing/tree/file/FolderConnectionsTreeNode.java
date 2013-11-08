@@ -15,7 +15,7 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
     super(parent, null);
     setName("Folder Connections");
     setType("Folder Connections");
-    setIcon(FileModel.ICON_FOLDER_LINK);
+    setIcon(FileTreeUtil.ICON_FOLDER_LINK);
     setAllowsChildren(true);
   }
 

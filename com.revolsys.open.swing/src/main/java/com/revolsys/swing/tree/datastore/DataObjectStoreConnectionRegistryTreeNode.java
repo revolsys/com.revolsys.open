@@ -7,7 +7,7 @@ import javax.swing.tree.TreeNode;
 
 import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
-import com.revolsys.swing.tree.file.FileModel;
+import com.revolsys.swing.tree.file.FileTreeUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class DataObjectStoreConnectionRegistryTreeNode extends LazyLoadTreeNode {
@@ -18,7 +18,7 @@ public class DataObjectStoreConnectionRegistryTreeNode extends LazyLoadTreeNode 
     super(parent, registry);
     setType("DataObjectStore Connections");
     setName(registry.getName());
-    setIcon(FileModel.ICON_FOLDER_LINK);
+    setIcon(FileTreeUtil.ICON_FOLDER_LINK);
     setAllowsChildren(true);
   }
 

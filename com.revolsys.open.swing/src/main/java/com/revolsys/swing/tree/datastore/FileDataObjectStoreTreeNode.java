@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.datastore;
 
-import java.awt.TextField;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,14 +14,8 @@ import com.revolsys.gis.data.io.DataObjectStoreConnectionMapProxy;
 import com.revolsys.gis.data.io.DataObjectStoreProxy;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
-import com.revolsys.io.file.FolderConnectionRegistry;
-import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.DirectoryNameField;
-import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.file.FileModel;
 import com.revolsys.swing.tree.file.FileTreeNode;
+import com.revolsys.swing.tree.file.FileTreeUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
@@ -32,36 +25,8 @@ public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
     super(parent, file);
     setType("Data Store");
     setName(file.getName());
-    setIcon(FileModel.ICON_FILE_DATABASE);
+    setIcon(FileTreeUtil.ICON_FILE_DATABASE);
     setAllowsChildren(true);
-  }
-
-  // TODo
-  public void addConnection() {
-    final Object object = BaseTree.getMouseClickItem();
-    if (object instanceof FolderConnectionRegistry) {
-      final FolderConnectionRegistry registry = (FolderConnectionRegistry)object;
-      final ValueField panel = new ValueField();
-      panel.setTitle("Add Folder Connection");
-      SwingUtil.setTitledBorder(panel, "Folder Connection");
-      SwingUtil.addLabel(panel, "Name");
-      final TextField nameField = new TextField(20);
-      panel.add(nameField);
-
-      SwingUtil.addLabel(panel, "Folder");
-      final DirectoryNameField folderField = new DirectoryNameField();
-      panel.add(folderField);
-
-      GroupLayoutUtil.makeColumns(panel, 2, true);
-      panel.showDialog();
-      if (panel.isSaved()) {
-        final File file = folderField.getDirectoryFile();
-        if (file != null && file.exists()) {
-          registry.addConnection(nameField.getText(), file);
-        }
-      }
-    }
-
   }
 
   @Override

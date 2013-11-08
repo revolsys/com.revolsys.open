@@ -12,7 +12,7 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
     super(parent, null);
     setType("File Systems");
     setName("File Systems");
-    setIcon(FileModel.ICON_FOLDER_DRIVE);
+    setIcon(FileTreeUtil.ICON_FOLDER_DRIVE);
     setAllowsChildren(true);
   }
 

@@ -15,7 +15,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
 
-public class FileModel {
+public class FileTreeUtil {
 
   public static final Icon ICON_FILE_DATABASE = SilkIconLoader.getIcon("file_database");
 
