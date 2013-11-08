@@ -80,7 +80,7 @@ public class JdbcAttributeAdder {
       Map<String, Map<String, Object>> tableProperties = schema.getProperty(TABLE_PROPERTIES);
       if (tableProperties == null) {
         tableProperties = new HashMap<String, Map<String, Object>>();
-        schema.setProperty(COLUMN_PROPERTIES, tableProperties);
+        schema.setProperty(TABLE_PROPERTIES, tableProperties);
       }
       return tableProperties;
     }

@@ -7,7 +7,7 @@ import java.util.Map;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
@@ -18,16 +18,11 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
     if (objectIdAttribute != null
       && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcAttribute)) {
       final String name = objectIdAttribute.getName();
-      final DataType type = objectIdAttribute.getType();
-      final int length = objectIdAttribute.getLength();
-      final int scale = objectIdAttribute.getScale();
-      final boolean required = objectIdAttribute.isRequired();
       final String description = objectIdAttribute.getDescription();
       final Map<String, Object> properties = objectIdAttribute.getProperties();
 
       final ArcSdeObjectIdJdbcAttribute newObjectIdAttribute = new ArcSdeObjectIdJdbcAttribute(
-        name, type, length, scale, required, description, properties,
-        schemaName, registrationId);
+        name, description, properties, schemaName, registrationId);
       final DataObjectMetaDataImpl metaDataImpl = (DataObjectMetaDataImpl)metaData;
       metaDataImpl.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
       if (metaData.getIdAttributeName() == null) {
@@ -42,11 +37,10 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   /** The name of the database schema the table owned by. */
   private final String schemaName;
 
-  public ArcSdeObjectIdJdbcAttribute(final String name, final DataType type,
-    final int length, final int scale, final boolean required,
+  public ArcSdeObjectIdJdbcAttribute(final String name,
     final String description, final Map<String, Object> properties,
     final String schemaName, final long registrationId) {
-    super(name, type, -1, length, scale, required, description, properties);
+    super(name, DataTypes.INT, -1, 19, 0, true, description, properties);
     this.schemaName = schemaName;
     this.registrationId = registrationId;
   }
@@ -67,9 +61,8 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
 
   @Override
   public ArcSdeObjectIdJdbcAttribute clone() {
-    return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
-      getScale(), isRequired(), getDescription(), getProperties(),
-      this.schemaName, this.registrationId);
+    return new ArcSdeObjectIdJdbcAttribute(getName(), getDescription(),
+      getProperties(), this.schemaName, this.registrationId);
   }
 
   /**

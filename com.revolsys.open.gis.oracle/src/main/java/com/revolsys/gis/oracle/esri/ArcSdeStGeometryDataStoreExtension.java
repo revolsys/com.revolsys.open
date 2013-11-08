@@ -43,7 +43,6 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
   private void loadColumnProperties(final DataObjectStoreSchema schema,
     final String schemaName, final Connection connection) throws SQLException {
-
     final String sql = "SELECT GC.F_TABLE_NAME, GC.F_GEOMETRY_COLUMN, GC.SRID, GC.GEOMETRY_TYPE, GC.COORD_DIMENSION, SG.GEOMETRY_TYPE GEOMETRY_DATA_TYPE FROM SDE.GEOMETRY_COLUMNS GC LEFT OUTER JOIN SDE.ST_GEOMETRY_COLUMNS SG ON GC.F_TABLE_SCHEMA = SG.OWNER AND GC.F_TABLE_NAME = SG.TABLE_NAME WHERE GC.F_TABLE_SCHEMA = ?";
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -61,6 +60,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
             ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
 
           int numAxis = resultSet.getInt(5);
+          numAxis = Math.max(numAxis, 2);
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
             JdbcAttributeAdder.NUM_AXIS, numAxis);
 
@@ -77,7 +77,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
           if (srid <= 0) {
             srid = geometryFactory.getSRID();
           }
-          numAxis = Math.min(Math.max(numAxis, 2), 3);
+          numAxis = Math.min(numAxis, 3);
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXy,
             scaleZ);
 
