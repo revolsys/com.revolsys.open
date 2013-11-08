@@ -73,6 +73,42 @@ public final class UrlUtil {
       .replaceAll("^file://", "file:///");
   }
 
+  public static String decodeHost(final String encodedHost) {
+    final int len = encodedHost.length();
+    final StringBuilder decoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char ch = encodedHost.charAt(i);
+      if (ch == '%') {
+        final String hex = encodedHost.substring(i + 1, i + 3);
+        ch = (char)Integer.parseInt(hex, 16);
+        i += 2;
+      }
+      decoded.append(ch);
+
+    }
+    return decoded.toString();
+  }
+
+  public static String encodeHost(final String host) {
+    final int len = host.length();
+    final StringBuilder encoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      final char ch = host.charAt(i);
+      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '~'
+        || ch == '~') {
+        encoded.append(ch);
+      } else {
+        encoded.append('%');
+        if (ch < 0x10) {
+          encoded.append('0');
+        }
+        encoded.append(Integer.toHexString(ch));
+      }
+    }
+    return encoded.toString();
+  }
+
   public static String getContent(final String urlString) {
     try {
       final URL url = UrlUtil.getUrl(urlString);
@@ -151,6 +187,14 @@ public final class UrlUtil {
       return new URI(uri);
     } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Unknown URI: " + uri, e);
+    }
+  }
+
+  public static URI getUri(final URL url) {
+    try {
+      return url.toURI();
+    } catch (final URISyntaxException e) {
+      throw new IllegalArgumentException("Unknown URI: " + url, e);
     }
   }
 
@@ -253,6 +297,28 @@ public final class UrlUtil {
       return url + "#" + fragment;
     } else {
       return url;
+    }
+  }
+
+  public static URL getUrl(final URL parent, final String child) {
+    if (parent == null) {
+      return null;
+    } else {
+      try {
+        return new URL(parent, child);
+      } catch (final MalformedURLException e) {
+        throw new IllegalArgumentException("Cannot create child URL for "
+          + parent + " + " + child);
+      }
+    }
+  }
+
+  public static URL getUrl(final UrlProxy parent, final String child) {
+    if (parent == null) {
+      return null;
+    } else {
+      final URL parentUrl = parent.getUrl();
+      return getUrl(parentUrl, child);
     }
   }
 

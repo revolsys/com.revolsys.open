@@ -1,6 +1,8 @@
 package com.revolsys.io.file;
 
 import java.io.File;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +14,8 @@ import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OS;
 
 public class FolderConnectionManager extends
-  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection> {
+  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection>
+  implements URLStreamHandlerFactory {
 
   private static final FolderConnectionManager INSTANCE;
 
@@ -62,6 +65,11 @@ public class FolderConnectionManager extends
       this, name, resource, false);
     addConnectionRegistry(registry);
     return registry;
+  }
+
+  @Override
+  public URLStreamHandler createURLStreamHandler(final String protocol) {
+    return null;
   }
 
 }

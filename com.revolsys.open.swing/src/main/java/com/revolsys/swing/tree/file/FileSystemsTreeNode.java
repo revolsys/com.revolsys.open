@@ -1,19 +1,25 @@
-package com.revolsys.swing.map.component.layerchooser;
+package com.revolsys.swing.tree.file;
 
 import java.io.File;
 import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
-import com.revolsys.swing.tree.file.FileModel;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class FileSystemsTreeNode extends LazyLoadTreeNode {
   public FileSystemsTreeNode(final TreeNode parent) {
-    super(null);
-    setTitle("File Systems");
+    super(parent, null);
+    setType("File Systems");
+    setName("File Systems");
     setIcon(FileModel.ICON_FOLDER_DRIVE);
     setAllowsChildren(true);
+  }
+
+  @Override
+  protected List<TreeNode> doLoadChildren() {
+    final File[] roots = File.listRoots();
+    return FileTreeNode.getFileNodes(this, roots);
   }
 
   @Override
@@ -27,11 +33,5 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
   @Override
   public int hashCode() {
     return 0;
-  }
-
-  @Override
-  protected List<TreeNode> loadChildren() {
-    final File[] roots = File.listRoots();
-    return FileTreeNode.getFileNodes(this, roots);
   }
 }

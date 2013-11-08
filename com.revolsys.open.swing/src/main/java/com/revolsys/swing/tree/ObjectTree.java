@@ -1,23 +1,18 @@
 package com.revolsys.swing.tree;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DropMode;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
@@ -31,12 +26,9 @@ import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 import com.revolsys.util.JavaBeanUtil;
 
-public class ObjectTree extends JTree implements PropertyChangeListener,
-  MouseListener {
+public class ObjectTree extends BaseTree implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
-
-  private static Object mouseClickItem = null;
 
   public static TreePath createTreePath(final Collection<? extends Object> path) {
     final Object[] pathArray = path.toArray();
@@ -55,45 +47,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     return new TreePath(pathArray);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <V> V getMouseClickItem() {
-    return (V)mouseClickItem;
-  }
-
-  public static void showMenu(final MenuFactory menuFactory,
-    final Object object, final Component component, final int x, final int y) {
-    if (menuFactory != null) {
-      mouseClickItem = object;
-      final JPopupMenu menu = menuFactory.createJPopupMenu();
-      if (menu != null) {
-        final int numItems = menu.getSubElements().length;
-        if (menu != null && numItems > 0) {
-          final Window window = SwingUtilities.windowForComponent(component);
-          if (window != null) {
-            if (window.isAlwaysOnTop()) {
-              window.setAlwaysOnTop(true);
-              window.setAlwaysOnTop(false);
-            }
-            window.toFront();
-          }
-          menu.show(component, x, y);
-          // TODO add listener to set item=null
-        }
-      }
-    }
-  }
-
-  public static void showMenu(final Object object, final Component component,
-    final int x, final int y) {
-    if (object != null) {
-      final MenuFactory menu = ObjectTreeModel.findMenu(object);
-      showMenu(menu, object, component, x, y);
-    }
-  }
-
   private final ObjectTreeModel model;
-
-  private boolean menuEnabled = true;
 
   public ObjectTree(final ObjectTreeModel model) {
     super(model);
@@ -233,6 +187,17 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
   }
 
   @Override
+  public MenuFactory getMenuFactory(final TreePath path) {
+    final Object node = path.getLastPathComponent();
+    final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+    if (nodeModel != null) {
+      final MenuFactory menu = nodeModel.getMenu(node);
+      return menu;
+    }
+    return null;
+  }
+
+  @Override
   public ObjectTreeModel getModel() {
     return model;
   }
@@ -262,10 +227,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     return values;
   }
 
-  public boolean isMenuEnabled() {
-    return this.menuEnabled;
-  }
-
   @Override
   public void mouseClicked(final MouseEvent e) {
     final int x = e.getX();
@@ -278,60 +239,10 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
         final MouseListener listener = nodeModel.getMouseListener(node);
         if (listener != null) {
           try {
-            mouseClickItem = node;
+            BaseTree.mouseClickItem = node;
             listener.mouseClicked(e);
           } finally {
           }
-        }
-      }
-    }
-  }
-
-  @Override
-  public void mouseEntered(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      popup(this.model, e);
-      repaint();
-    }
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      popup(this.model, e);
-      repaint();
-    }
-  }
-
-  private void popup(final ObjectTreeModel model, final MouseEvent e) {
-    if (this.menuEnabled) {
-      final int x = e.getX();
-      final int y = e.getY();
-      final TreePath path = ObjectTree.this.getPathForLocation(x, y);
-      if (path != null) {
-
-        TreePath[] selectionPaths = getSelectionPaths();
-        if (selectionPaths == null
-          || !Arrays.asList(selectionPaths).contains(path)) {
-          selectionPaths = new TreePath[] {
-            path
-          };
-          setSelectionPaths(selectionPaths);
-        }
-
-        final Object node = path.getLastPathComponent();
-        final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
-        if (nodeModel != null) {
-          final MenuFactory menu = nodeModel.getMenu(node);
-          showMenu(menu, node, this, x, y);
         }
       }
     }
@@ -377,10 +288,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener,
     } else {
       Invoke.later(this, "propertyChange", event);
     }
-  }
-
-  public void setMenuEnabled(final boolean menuEnabled) {
-    this.menuEnabled = menuEnabled;
   }
 
   public void setRoot(final Object object) {

@@ -91,6 +91,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.DataObjectLayerStylePanel;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
@@ -258,6 +259,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setSelectSupported(true);
     setQuerySupported(true);
     setRenderer(new GeometryStyleRenderer(this));
+    if (!properties.containsKey("style")) {
+      final GeometryStyleRenderer renderer = getRenderer();
+      renderer.setStyle(GeometryStyle.createStyle());
+    }
     setProperties(properties);
   }
 
@@ -1751,13 +1756,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void setSelectedRecordsById(final Object id) {
     final DataObjectMetaData metaData = getMetaData();
-    final String idAttributeName = metaData.getIdAttributeName();
-    if (idAttributeName == null) {
-      clearSelectedRecords();
-    } else {
-      final Query query = Query.equal(metaData, idAttributeName, id);
-      final List<LayerDataObject> records = query(query);
-      setSelectedRecords(records);
+    if (metaData != null) {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
+        clearSelectedRecords();
+      } else {
+        final Query query = Query.equal(metaData, idAttributeName, id);
+        final List<LayerDataObject> records = query(query);
+        setSelectedRecords(records);
+      }
     }
   }
 

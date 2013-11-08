@@ -3,85 +3,59 @@ package com.revolsys.swing.map.component.layerchooser;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.ListCellRenderer;
+import javax.swing.JTable;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.jdesktop.swingx.JXList;
-import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.springframework.util.StringUtils;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.list.BaseListModel;
-import com.revolsys.swing.tree.file.FileModel;
+import com.revolsys.swing.table.object.ObjectListTable;
+import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionsTreeNode;
+import com.revolsys.swing.tree.file.FileSystemsTreeNode;
+import com.revolsys.swing.tree.file.FolderConnectionsTreeNode;
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 import com.revolsys.swing.tree.model.node.ListTreeNode;
 import com.revolsys.swing.tree.renderer.BaseTreeCellRenderer;
 
 public class LayerChooserPanel extends ValueField implements
-  TreeSelectionListener, ListCellRenderer {
+  TreeSelectionListener, TableCellRenderer {
   private static final long serialVersionUID = 1L;
 
-  private JXTree tree;
-
-  private JXList layerList;
-
-  private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
-
-  private BaseListModel<Object> layerListModel;
-
-  public LayerChooserPanel() {
-    super(new BorderLayout());
-    setPreferredSize(new Dimension(640, 480));
-
-    final JComponent tree = createTree();
-    final JScrollPane list = createList();
-    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-      true, tree, list);
-    splitPane.setDividerLocation(300);
-    add(splitPane, BorderLayout.CENTER);
-  }
-
-  public JScrollPane createList() {
-    layerListModel = new BaseListModel<Object>();
-    layerList = new JXList(layerListModel);
-    layerList.setCellRenderer(this);
-    layerList.addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
-      WebColors.LightSteelBlue, WebColors.Black, WebColors.Navy,
-      WebColors.White));
-    layerList.addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
-      WebColors.White, WebColors.Black, WebColors.Blue, WebColors.White));
-
-    return new JScrollPane(layerList);
-  }
-
-  private JComponent createTree() {
+  public static BaseTree createTree() {
     final ListTreeNode root = new ListTreeNode();
+
+    final DataObjectStoreConnectionsTreeNode dataStores = new DataObjectStoreConnectionsTreeNode(
+      root);
+    root.add(dataStores);
+
     final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode(root);
     root.add(fileSystems);
+
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode(
       root);
     root.add(folderConnections);
 
     final TreeModel treeModel = new DefaultTreeModel(root, true);
-    tree = new JXTree(treeModel);
+    final BaseTree tree = new BaseTree(treeModel);
     tree.setRootVisible(false);
     tree.setShowsRootHandles(true);
     tree.setLargeModel(true);
@@ -90,77 +64,83 @@ public class LayerChooserPanel extends ValueField implements
     final DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setSelectionModel(selectionModel);
+    return tree;
+  }
+
+  private final BaseTree tree;
+
+  private ObjectListTable<TreeNode> childNodesTable;
+
+  private final DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
+
+  public LayerChooserPanel() {
+    super(new BorderLayout());
+    setPreferredSize(new Dimension(640, 480));
+
+    tree = createTree();
+    final TreeSelectionModel selectionModel = tree.getSelectionModel();
     selectionModel.addTreeSelectionListener(this);
-    final JScrollPane scrollPane = new JScrollPane(tree);
-    return scrollPane;
+    final JScrollPane treeScroll = new JScrollPane(tree);
+
+    final JScrollPane list = createList();
+    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+      true, treeScroll, list);
+    splitPane.setDividerLocation(300);
+    add(splitPane, BorderLayout.CENTER);
+  }
+
+  public JScrollPane createList() {
+    childNodesTable = new ObjectListTable<TreeNode>("name", "type");
+    childNodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    childNodesTable.setSortable(true);
+    childNodesTable.addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
+      WebColors.LightSteelBlue, WebColors.Black, WebColors.Navy,
+      WebColors.White));
+    childNodesTable.addHighlighter(new ColorHighlighter(
+      HighlightPredicate.EVEN, WebColors.White, WebColors.Black,
+      WebColors.Blue, WebColors.White));
+    for (int columnIndex = 0; columnIndex < childNodesTable.getColumnCount(); columnIndex++) {
+      final TableColumnExt column = childNodesTable.getColumnExt(columnIndex);
+      if (columnIndex == 0) {
+        column.setPreferredWidth(70);
+        column.setCellRenderer(this);
+      } else {
+        column.setPreferredWidth(30);
+      }
+    }
+    return new JScrollPane(childNodesTable);
   }
 
   @Override
-  public Component getListCellRendererComponent(final JList list,
-    final Object value, final int index, final boolean selected,
-    final boolean cellHasFocus) {
-    String text;
-    if (value instanceof File) {
-      final File file = (File)value;
-      text = file.getName();
-      if (!StringUtils.hasText(text)) {
-        text = "/";
-      }
-    } else {
-      text = StringConverterRegistry.toString(value);
-    }
-    listCellRenderer.getListCellRendererComponent(list, text, index, selected,
-      cellHasFocus);
-    if (value instanceof File) {
-      final File file = (File)value;
-      final Icon icon = FileModel.getIcon(file);
-      listCellRenderer.setIcon(icon);
-    }
-    return listCellRenderer;
-  }
-
-  private void setFiles(final File[] files) {
-    layerListModel.clear();
-    if (files != null) {
-      for (final File file : files) {
-        layerListModel.add(file);
+  public Component getTableCellRendererComponent(final JTable table,
+    final Object value, final boolean isSelected, final boolean hasFocus,
+    final int row, final int column) {
+    tableCellRenderer.getTableCellRendererComponent(table, value, isSelected,
+      hasFocus, row, column);
+    if (column == 0) {
+      final TreeNode node = childNodesTable.getObjects().get(row);
+      if (node instanceof AbstractTreeNode) {
+        final AbstractTreeNode iconNode = (AbstractTreeNode)node;
+        final Icon icon = iconNode.getIcon();
+        tableCellRenderer.setIcon(icon);
       }
     }
-  }
-
-  public void updateList(final File file) {
-    if (file == null) {
-      setFiles(File.listRoots());
-    } else if (!file.exists()) {
-    } else if (FileModel.isDataStore(file)) {
-
-    } else if (file.isDirectory()) {
-      setFiles(file.listFiles());
-    }
+    return tableCellRenderer;
   }
 
   @Override
   public void valueChanged(final TreeSelectionEvent event) {
     if (event.isAddedPath()) {
+      List<TreeNode> children;
       final TreePath path = event.getPath();
       final Object selectedItem = path.getLastPathComponent();
-      if (selectedItem instanceof FileTreeNode) {
-        final FileTreeNode fileNode = (FileTreeNode)selectedItem;
-        final File file = fileNode.getFile();
-        updateList(file);
-      } else if (selectedItem instanceof FolderConnectionsTreeNode) {
-        final FolderConnectionsTreeNode fileConnectionNode = (FolderConnectionsTreeNode)selectedItem;
-        final Object object = fileConnectionNode.getUserObject();
-        if (object instanceof File) {
-          final File file = (File)object;
-          updateList(file);
-        } else if (object instanceof FolderConnection) {
-          final FolderConnection folderConnection = (FolderConnection)object;
-          final File file = folderConnection.getFile();
-          updateList(file);
-        }
+      if (selectedItem instanceof AbstractTreeNode) {
+        final AbstractTreeNode treeNode = (AbstractTreeNode)selectedItem;
+        children = treeNode.getChildren();
+      } else {
+        children = Collections.emptyList();
       }
-
+      childNodesTable.setObjects(children);
     }
   }
 }

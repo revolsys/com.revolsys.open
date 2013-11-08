@@ -19,6 +19,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
@@ -35,14 +36,10 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
-import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistryManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
-import com.revolsys.io.file.FileSystemConnectionManager;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.net.urlcache.FileResponseCache;
@@ -53,6 +50,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
+import com.revolsys.swing.map.component.layerchooser.LayerChooserPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -72,13 +70,10 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
-import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionManagerModel;
-import com.revolsys.swing.tree.file.FileSystemConnectionManagerModel;
-import com.revolsys.swing.tree.file.FolderConnectionManagerModel;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
-import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.util.OS;
 
 public class ProjectFrame extends BaseFrame {
@@ -137,7 +132,7 @@ public class ProjectFrame extends BaseFrame {
 
   private MapPanel mapPanel;
 
-  private ObjectTreePanel catalogPanel;
+  private BaseTree catalogTree;
 
   private boolean exitOnClose = true;
 
@@ -174,37 +169,42 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addCatalogPanel() {
+    catalogTree = LayerChooserPanel.createTree();
 
-    final PropertyChangeArrayList<Object> connectionManagers = new PropertyChangeArrayList<Object>();
+    // final PropertyChangeArrayList<Object> connectionManagers = new
+    // PropertyChangeArrayList<Object>();
+    //
+    // connectionManagers.add(DataObjectStoreConnectionManager.get());
+    // connectionManagers.add(FileSystemConnectionManager.get());
+    // connectionManagers.add(FolderConnectionManager.get());
+    //
+    // final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
+    // new DataObjectStoreConnectionManagerModel(),
+    // new FileSystemConnectionManagerModel(),
+    // new FolderConnectionManagerModel());
+    // catalogPanel = new ObjectTreePanel(connectionManagers, listModel);
+    // final ObjectTree tree = catalogPanel.getTree();
+    // tree.setDragEnabled(false);
+    //
+    // for (final Object connectionManager : connectionManagers) {
+    // tree.expandPath(connectionManagers, connectionManager);
+    // if (connectionManager instanceof ConnectionRegistryManager) {
+    // final ConnectionRegistryManager<?> manager =
+    // (ConnectionRegistryManager<?>)connectionManager;
+    // for (final Object registry : manager.getVisibleConnectionRegistries()) {
+    // tree.expandPath(connectionManagers, connectionManager, registry);
+    // }
+    // }
+    // }
+    // connectionManagers.getPropertyChangeSupport().addPropertyChangeListener(
+    // "registries",
+    // new InvokeMethodPropertyChangeListener(true, this,
+    // "expandConnectionManagers", PropertyChangeEvent.class));
 
-    connectionManagers.add(DataObjectStoreConnectionManager.get());
-    connectionManagers.add(FileSystemConnectionManager.get());
-    connectionManagers.add(FolderConnectionManager.get());
-
-    final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
-      new DataObjectStoreConnectionManagerModel(),
-      new FileSystemConnectionManagerModel(),
-      new FolderConnectionManagerModel());
-    catalogPanel = new ObjectTreePanel(connectionManagers, listModel);
-    final ObjectTree tree = catalogPanel.getTree();
-    tree.setDragEnabled(false);
-
-    for (final Object connectionManager : connectionManagers) {
-      tree.expandPath(connectionManagers, connectionManager);
-      if (connectionManager instanceof ConnectionRegistryManager) {
-        final ConnectionRegistryManager<?> manager = (ConnectionRegistryManager<?>)connectionManager;
-        for (final Object registry : manager.getVisibleConnectionRegistries()) {
-          tree.expandPath(connectionManagers, connectionManager, registry);
-        }
-      }
-    }
-    connectionManagers.getPropertyChangeSupport().addPropertyChangeListener(
-      "registries",
-      new InvokeMethodPropertyChangeListener(true, this,
-        "expandConnectionManagers", PropertyChangeEvent.class));
     final LayerGroup project = getProject();
+
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
-      "catalog", "Catalog", catalogPanel);
+      "catalog", "Catalog", new JScrollPane(catalogTree));
 
     ((DefaultSingleCDockable)getDockControl().getSingleDockable("toc")).toFront();
 
@@ -346,20 +346,22 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public void expandConnectionManagers(final PropertyChangeEvent event) {
-    final Object newValue = event.getNewValue();
-    if (newValue instanceof ConnectionRegistry) {
-      final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-      final ConnectionRegistryManager<?> connectionManager = registry.getConnectionManager();
-      if (connectionManager != null) {
-        final List<?> connectionRegistries = connectionManager.getConnectionRegistries();
-        if (connectionRegistries != null) {
-          final ObjectTree tree = catalogPanel.getTree();
-          tree.expandPath(connectionRegistries, connectionManager, registry);
-        }
-      }
-    }
-  }
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
 
   public void expandLayers(final Layer layer) {
     if (SwingUtilities.isEventDispatchThread()) {

@@ -269,7 +269,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final String name = connectionProperties.get("name");
       DataObjectStore dataStore;
       if (StringUtils.hasText(name)) {
-        dataStore = DataObjectStoreConnectionManager.getConnection(name);
+        dataStore = DataObjectStoreConnectionManager.getDataStore(name);
         // TODO give option to create new data store
         // if (dataStore == null) {
         // final DataObjectStoreConnectionManager connectionManager =

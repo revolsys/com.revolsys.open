@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.collection.PropertyChangeArrayList;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
@@ -49,18 +50,26 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     }
     Property.addListener(this.objects, this);
     this.columnNames.addAll(columnNames);
-    this.columnTitles.addAll(columnTitles);
+    for (int i = 0; i < columnNames.size(); i++) {
+      final String columnName = columnNames.get(i);
+      String columnTitle;
+      if (columnTitles == null || i >= columnTitles.size()) {
+        columnTitle = CaseConverter.toCapitalizedWords(columnName);
+      } else {
+        columnTitle = columnTitles.get(i);
+      }
+      this.columnTitles.add(columnTitle);
+    }
     setEditable(true);
   }
 
   public ObjectListTableModel(final List<String> columnNames,
-    final List<String> columnTiList) {
-    this(Collections.<T> emptyList(), columnNames, columnTiList);
+    final List<String> columnTitles) {
+    this(Collections.<T> emptyList(), columnNames, columnTitles);
   }
 
   public ObjectListTableModel(final String... columnNames) {
-    this(Collections.<T> emptyList(), Arrays.asList(columnNames),
-      Arrays.asList(columnNames));
+    this(Collections.<T> emptyList(), Arrays.asList(columnNames), null);
     setEditable(false);
   }
 
@@ -150,8 +159,12 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     if (object == null) {
       return null;
     } else {
-      final String name = getAttributeName(columnIndex);
-      return Property.get(object, name);
+      try {
+        final String name = getAttributeName(columnIndex);
+        return Property.get(object, name);
+      } catch (final Throwable t) {
+        return null;
+      }
     }
   }
 

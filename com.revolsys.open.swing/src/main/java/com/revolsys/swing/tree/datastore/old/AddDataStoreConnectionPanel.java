@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree.datastore;
+package com.revolsys.swing.tree.datastore.old;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

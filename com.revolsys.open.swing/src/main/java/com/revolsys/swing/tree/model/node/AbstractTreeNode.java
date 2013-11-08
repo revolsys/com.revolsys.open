@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.menu.MenuFactory;
 
 public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
@@ -21,9 +22,11 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
   private TreeNode parent;
 
-  private String title;
+  private String name;
 
   private Icon icon;
+
+  private String type;
 
   public AbstractTreeNode(final Object userObject) {
     this(userObject, false);
@@ -82,7 +85,7 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return children.size();
   }
 
-  protected abstract List<TreeNode> getChildren();
+  public abstract List<TreeNode> getChildren();
 
   public Icon getIcon() {
     return icon;
@@ -92,6 +95,14 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   public int getIndex(final TreeNode node) {
     final List<TreeNode> children = getChildren();
     return children.indexOf(node);
+  }
+
+  public MenuFactory getMenu() {
+    return null;
+  }
+
+  public String getName() {
+    return name;
   }
 
   @Override
@@ -104,8 +115,8 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return (V)parent;
   }
 
-  public String getTitle() {
-    return title;
+  public String getType() {
+    return type;
   }
 
   @SuppressWarnings("unchecked")
@@ -146,18 +157,22 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     this.icon = icon;
   }
 
+  public void setName(final String name) {
+    this.name = name;
+  }
+
   public void setParent(final TreeNode parent) {
     this.parent = parent;
   }
 
-  public void setTitle(final String title) {
-    this.title = title;
+  public void setType(final String type) {
+    this.type = type;
   }
 
   @Override
   public String toString() {
-    if (StringUtils.hasText(title)) {
-      return title;
+    if (StringUtils.hasText(name)) {
+      return name;
     } else {
       final Object userObject = getUserObject();
       if (userObject == null) {

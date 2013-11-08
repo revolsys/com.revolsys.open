@@ -31,7 +31,7 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
 
   @Override
   protected File getFile(final URI uri) throws IOException {
-    return FileUtil.getUrlFile(uri);
+    return FileUtil.getFile(uri);
   }
 
   @Override

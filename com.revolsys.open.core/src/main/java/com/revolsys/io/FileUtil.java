@@ -30,13 +30,11 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -58,6 +56,7 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.UrlUtil;
 
 /**
  * The FileUtil class is a utility class for performing common tasks with
@@ -649,6 +648,40 @@ public final class FileUtil {
     }
   }
 
+  public static File getFile(final URI uri) {
+    if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
+      final String authority = uri.getAuthority();
+      final String connectionName = UrlUtil.decodeHost(authority);
+
+      final String path = uri.getPath();
+
+      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
+        .getConnectionRegistries()) {
+        final FolderConnection connection = registry.getConnection(connectionName);
+        if (connection != null) {
+          final File directory = connection.getFileConnection().getFile();
+          final File file = new File(directory, path);
+          if (file.exists()) {
+            return getFile(file);
+          }
+        }
+      }
+      throw new IllegalArgumentException(
+        "Cannot find folder connection for file: " + uri);
+    } else {
+      return getFile(new File(uri));
+    }
+  }
+
+  public static File getFile(final URL url) {
+    if (url == null) {
+      return null;
+    } else {
+      final URI uri = UrlUtil.getUri(url);
+      return getFile(uri);
+    }
+  }
+
   public static String getFileAsString(final String fileName) {
     final File file = new File(fileName);
     final StringWriter out = new StringWriter();
@@ -825,38 +858,10 @@ public final class FileUtil {
   public static File getUrlFile(final String url) {
     try {
       final URI uri = new URI(url);
-      return getUrlFile(uri);
+      return getFile(uri);
     } catch (final URISyntaxException e) {
       ExceptionUtil.throwUncheckedException(e);
       return null;
-    }
-  }
-
-  public static File getUrlFile(final URI uri) {
-    if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
-      String connectionName = uri.getAuthority();
-      if (StringUtils.hasText(connectionName)) {
-        try {
-          connectionName = URLDecoder.decode(connectionName, "UTF-8");
-        } catch (final UnsupportedEncodingException e) {
-        }
-      }
-      final String path = uri.getPath();
-
-      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-        .getConnectionRegistries()) {
-        final FolderConnection connection = registry.getConnection(connectionName);
-        if (connection != null) {
-          final File directory = connection.getFileConnection().getFile();
-          final File file = new File(directory, path);
-          if (file.exists()) {
-            return getFile(file);
-          }
-        }
-      }
-      return getFile(path);
-    } else {
-      return getFile(new File(uri));
     }
   }
 

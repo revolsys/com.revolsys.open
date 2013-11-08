@@ -3,13 +3,18 @@ package com.revolsys.io.datastore;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
 
 public class DataObjectStoreConnectionManager
@@ -25,11 +30,46 @@ public class DataObjectStoreConnectionManager
       dataStoresDirectory));
   }
 
+  // TODO make this garbage collectable with reference counting.
+  private static Map<Map<String, Object>, DataObjectStore> dataStores = new HashMap<Map<String, Object>, DataObjectStore>();
+
   public static DataObjectStoreConnectionManager get() {
     return INSTANCE;
   }
 
-  public static DataObjectStore getConnection(final String name) {
+  public static <V extends DataObjectStore> V getDataStore(final File file) {
+    final Map<String, String> connectionProperties = Collections.singletonMap(
+      "url", FileUtil.toUrlString(file));
+    final Map<String, Object> config = Collections.<String, Object> singletonMap(
+      "connection", connectionProperties);
+    return getDataStore(config);
+  }
+
+  /**
+   * Get an initialized data store.
+   * @param connectionProperties
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends DataObjectStore> T getDataStore(
+    final Map<String, ? extends Object> config) {
+    @SuppressWarnings("rawtypes")
+    final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
+    synchronized (dataStores) {
+      DataObjectStore dataStore = dataStores.get(configClone);
+      if (dataStore == null) {
+        System.out.println(config);
+        final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
+        dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
+        dataStore.setProperties(config);
+        dataStore.initialize();
+        dataStores.put(configClone, dataStore);
+      }
+      return (T)dataStore;
+    }
+  }
+
+  public static DataObjectStore getDataStore(final String name) {
     final DataObjectStoreConnectionManager connectionManager = get();
     final List<DataObjectStoreConnectionRegistry> registries = new ArrayList<DataObjectStoreConnectionRegistry>();
     registries.addAll(connectionManager.getConnectionRegistries());

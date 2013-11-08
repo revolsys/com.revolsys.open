@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.beans.MethodInvoker;
@@ -146,6 +147,27 @@ public class Invoke {
 
   public static boolean isWorkerRunning(final SwingWorker<?, ?> worker) {
     return CollectionUtil.containsReference(RUNNING_WORKERS, worker);
+  }
+
+  public static void later(final Object object, final Method method,
+    final Object... parameters) {
+    later(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          method.invoke(object, parameters);
+        } catch (final InvocationTargetException e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Error invoking method " + method + " "
+              + Arrays.toString(parameters), e.getTargetException());
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Error invoking method " + method + " "
+              + Arrays.toString(parameters), e);
+        }
+      }
+    });
   }
 
   public static void later(final Object object, final String methodName,
