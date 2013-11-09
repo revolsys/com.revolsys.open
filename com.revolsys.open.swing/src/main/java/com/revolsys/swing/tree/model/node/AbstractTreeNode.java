@@ -5,7 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.springframework.util.StringUtils;
 
@@ -13,12 +17,69 @@ import com.revolsys.collection.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
+  public static void collapse(final TreeNode node) {
+    collapseDescendents(node);
+    if (node instanceof AbstractTreeNode) {
+      final AbstractTreeNode treeNode = (AbstractTreeNode)node;
+      final JTree tree = treeNode.getTree();
+      final TreePath treePath = treeNode.getTreePath();
+      tree.collapsePath(treePath);
+    }
+  }
+
+  public static void collapseDescendents(final TreeNode node) {
+    final Enumeration children = node.children();
+    while (children.hasMoreElements()) {
+      final Object child = children.nextElement();
+      if (child instanceof TreeNode) {
+        final TreeNode childNode = (TreeNode)child;
+        collapse(childNode);
+      }
+    }
+  }
+
+  public static void expand(final TreeNode node) {
+    if (node instanceof AbstractTreeNode) {
+      final AbstractTreeNode treeNode = (AbstractTreeNode)node;
+      final JTree tree = treeNode.getTree();
+      final TreePath treePath = treeNode.getTreePath();
+      tree.expandPath(treePath);
+    }
+  }
+
+  public static void expandChildren(final TreeNode node) {
+    expand(node);
+    final Enumeration children = node.children();
+    while (children.hasMoreElements()) {
+      final Object child = children.nextElement();
+      if (child instanceof TreeNode) {
+        final TreeNode childNode = (TreeNode)child;
+        expand(childNode);
+      }
+    }
+  }
+
+  public static TreePath getTreePath(final TreeNode node) {
+    if (node == null) {
+      return null;
+    } else {
+      final TreeNode parent = node.getParent();
+      if (parent == null) {
+        return new TreePath(node);
+      } else {
+        final TreePath parentPath = getTreePath(parent);
+        return parentPath.pathByAddingChild(node);
+      }
+    }
+  }
+
   private boolean allowsChildren;
 
-  private final Object userObject;
+  private Object userObject;
 
   private TreeNode parent;
 
@@ -27,6 +88,8 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   private Icon icon;
 
   private String type;
+
+  private JTree tree;
 
   public AbstractTreeNode(final Object userObject) {
     this(userObject, false);
@@ -53,6 +116,46 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return IteratorEnumeration.create(getChildren());
   }
 
+  public void collapse() {
+    collapse(this);
+  }
+
+  public void collapseChildren() {
+    collapseDescendents(this);
+  }
+
+  public final void delete() {
+    try {
+      final List<TreeNode> children = this.getChildren();
+      delete(children);
+      doDelete();
+    } catch (final Throwable e) {
+      ExceptionUtil.log(getClass(), "Error deleting tree node: " + getName(), e);
+    } finally {
+      parent = null;
+      name = "";
+      type = "";
+      tree = null;
+      userObject = null;
+    }
+  }
+
+  protected void delete(final List<TreeNode> children) {
+    for (final TreeNode child : children) {
+      try {
+        if (child instanceof AbstractTreeNode) {
+          final AbstractTreeNode treeNode = (AbstractTreeNode)child;
+          treeNode.delete();
+        }
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Error deleting tree node: " + child, e);
+      }
+    }
+  }
+
+  protected void doDelete() {
+  }
+
   @Override
   public boolean equals(final Object object) {
     if (object == this) {
@@ -65,6 +168,19 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     } else {
       return false;
     }
+  }
+
+  public void expand() {
+    expand(this);
+  }
+
+  public void expandChildren() {
+    expandChildren(this);
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    delete();
   }
 
   @Override
@@ -82,7 +198,8 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   @Override
   public int getChildCount() {
     final List<TreeNode> children = getChildren();
-    return children.size();
+    final int size = children.size();
+    return size;
   }
 
   public abstract List<TreeNode> getChildren();
@@ -113,6 +230,34 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   @SuppressWarnings("unchecked")
   public <V extends TreeNode> V getParentNode() {
     return (V)parent;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends JTree> V getTree() {
+    if (tree == null) {
+      TreeNode parent = getParent();
+      while (parent != null) {
+        if (parent instanceof AbstractTreeNode) {
+          final AbstractTreeNode treeNode = (AbstractTreeNode)parent;
+          return (V)treeNode.getTree();
+        }
+        parent = parent.getParent();
+
+      }
+      return null;
+    } else {
+      return (V)tree;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends TreeModel> V getTreeModel() {
+    final JTree tree = getTree();
+    return (V)tree.getModel();
+  }
+
+  public TreePath getTreePath() {
+    return getTreePath(this);
   }
 
   public String getType() {
@@ -149,6 +294,47 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return children.iterator();
   }
 
+  protected void nodeChanged() {
+    final TreeModel model = getTreeModel();
+    if (model instanceof DefaultTreeModel) {
+      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
+      treeModel.nodeChanged(this);
+    }
+  }
+
+  public void nodeCollapsed(final AbstractTreeNode treeNode) {
+  }
+
+  protected void nodeRemoved(final int index, final Object child) {
+    nodesRemoved(new int[] {
+      index
+    }, child);
+  }
+
+  protected void nodesChanged(final int... indicies) {
+    final TreeModel model = getTreeModel();
+    if (model instanceof DefaultTreeModel) {
+      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
+      treeModel.nodesChanged(this, indicies);
+    }
+  }
+
+  protected void nodesInserted(final int... indicies) {
+    final TreeModel model = getTreeModel();
+    if (model instanceof DefaultTreeModel) {
+      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
+      treeModel.nodesWereInserted(this, indicies);
+    }
+  }
+
+  protected void nodesRemoved(final int[] indicies, final Object... children) {
+    final TreeModel model = getTreeModel();
+    if (model instanceof DefaultTreeModel) {
+      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
+      treeModel.nodesWereRemoved(this, indicies, children);
+    }
+  }
+
   public void setAllowsChildren(final boolean allowsChildren) {
     this.allowsChildren = allowsChildren;
   }
@@ -163,6 +349,10 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
   public void setParent(final TreeNode parent) {
     this.parent = parent;
+  }
+
+  public void setTree(final JTree tree) {
+    this.tree = tree;
   }
 
   public void setType(final String type) {

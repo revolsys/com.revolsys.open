@@ -64,6 +64,9 @@ public class LayerChooserPanel extends ValueField implements
     final DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setSelectionModel(selectionModel);
+    dataStores.expandChildren();
+    fileSystems.expand();
+    folderConnections.expandChildren();
     return tree;
   }
 

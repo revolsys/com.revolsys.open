@@ -542,6 +542,22 @@ public final class FileUtil {
     }
   }
 
+  public static String fromSafeName(final String fileName) {
+    final int len = fileName.length();
+    final StringBuilder decoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char ch = fileName.charAt(i);
+      if (ch == '%') {
+        final String hex = fileName.substring(i + 1, i + 3);
+        ch = (char)Integer.parseInt(hex, 16);
+        i += 2;
+      }
+      decoded.append(ch);
+
+    }
+    return decoded.toString();
+  }
+
   public static String getBaseName(final File file) {
     final String fileName = file.getName();
     return getBaseName(fileName);
@@ -651,23 +667,23 @@ public final class FileUtil {
   public static File getFile(final URI uri) {
     if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
       final String authority = uri.getAuthority();
-      final String connectionName = UrlUtil.decodeHost(authority);
+      final String connectionName = UrlUtil.percentDecode(authority);
 
       final String path = uri.getPath();
 
+      File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
         .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
-          final File directory = connection.getFileConnection().getFile();
-          final File file = new File(directory, path);
+          final File directory = connection.getFile();
+          file = new File(directory, path);
           if (file.exists()) {
             return getFile(file);
           }
         }
       }
-      throw new IllegalArgumentException(
-        "Cannot find folder connection for file: " + uri);
+      return file;
     } else {
       return getFile(new File(uri));
     }
@@ -911,9 +927,30 @@ public final class FileUtil {
     return Collections.emptyList();
   }
 
+  public static String toSafeName(final String host) {
+    final int len = host.length();
+    final StringBuilder encoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      final char ch = host.charAt(i);
+      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '.'
+        || ch == '_' || ch == '~' || ch == ' ') {
+        encoded.append(ch);
+      } else {
+        encoded.append('%');
+        if (ch < 0x10) {
+          encoded.append('0');
+        }
+        encoded.append(Integer.toHexString(ch));
+      }
+    }
+    return encoded.toString();
+  }
+
   public static URL toUrl(final File file) {
     try {
-      return file.toURI().toURL();
+      final URI uri = file.toURI();
+      return uri.toURL();
     } catch (final MalformedURLException e) {
       throw new IllegalArgumentException("Cannot get file url " + file, e);
     }

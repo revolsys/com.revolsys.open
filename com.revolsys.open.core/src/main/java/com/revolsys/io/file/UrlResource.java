@@ -8,7 +8,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.UrlUtil;
 
 public class UrlResource extends org.springframework.core.io.UrlResource {
 
@@ -25,8 +28,47 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
   }
 
   @Override
+  public Resource createRelative(String relativePath)
+    throws MalformedURLException {
+    try {
+      if (relativePath.startsWith("/")) {
+        relativePath = relativePath.substring(1);
+      }
+      final URL url = getURL();
+      final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
+      return new UrlResource(relativeUrl);
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Unable to create relative URL "
+        + this + " " + relativePath, e);
+    }
+  }
+
+  @Override
+  public boolean exists() {
+    if (isFolderConnection()) {
+      try {
+        final File file = getFile();
+        if (file == null) {
+          return false;
+        } else {
+          return file.exists();
+        }
+      } catch (final IOException e) {
+        return false;
+      }
+    } else {
+      return super.exists();
+    }
+  }
+
+  @Override
   public File getFile() throws IOException {
-    return super.getFile();
+    final URL url = getURL();
+    if (isFolderConnection()) {
+      return FileUtil.getFile(url);
+    } else {
+      return super.getFile();
+    }
   }
 
   @Override
@@ -36,11 +78,21 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
 
   @Override
   public InputStream getInputStream() throws IOException {
-    if ("folderConnection".equalsIgnoreCase(getURI().getScheme())) {
+    if (isFolderConnection()) {
       final File file = getFile();
       return new FileInputStream(file);
     } else {
       return super.getInputStream();
+    }
+  }
+
+  public boolean isFolderConnection() {
+    try {
+      final URL url = getURL();
+      final String protocol = url.getProtocol();
+      return "folderConnection".equalsIgnoreCase(protocol);
+    } catch (final IOException e) {
+      return false;
     }
   }
 }

@@ -10,6 +10,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeModel;
@@ -21,7 +22,7 @@ import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class BaseTree extends JTree implements MouseListener,
-  TreeWillExpandListener {
+  TreeWillExpandListener, TreeExpansionListener {
   private static final long serialVersionUID = 1L;
 
   private boolean menuEnabled = true;
@@ -70,8 +71,25 @@ public class BaseTree extends JTree implements MouseListener,
 
   public BaseTree(final TreeModel newModel) {
     super(newModel);
+    final Object root = newModel.getRoot();
+    if (root instanceof AbstractTreeNode) {
+      final AbstractTreeNode treeNode = (AbstractTreeNode)root;
+      treeNode.setTree(this);
+    }
     addTreeWillExpandListener(this);
+    addTreeExpansionListener(this);
     addMouseListener(this);
+  }
+
+  @Override
+  public void collapsePath(final TreePath path) {
+    final Object node = path.getLastPathComponent();
+    if (node instanceof AbstractTreeNode) {
+      final AbstractTreeNode treeNode = (AbstractTreeNode)node;
+      treeNode.collapseChildren();
+      treeNode.nodeCollapsed(treeNode);
+    }
+    super.collapsePath(path);
   }
 
   public MenuFactory getMenuFactory(final TreePath path) {
@@ -144,6 +162,14 @@ public class BaseTree extends JTree implements MouseListener,
   }
 
   @Override
+  public void treeCollapsed(final TreeExpansionEvent event) {
+  }
+
+  @Override
+  public void treeExpanded(final TreeExpansionEvent event) {
+  }
+
+  @Override
   public void treeWillCollapse(final TreeExpansionEvent event)
     throws ExpandVetoException {
   }
@@ -155,8 +181,7 @@ public class BaseTree extends JTree implements MouseListener,
     final Object node = path.getLastPathComponent();
     if (node instanceof LazyLoadTreeNode) {
       final LazyLoadTreeNode lazyLoadTreeNode = (LazyLoadTreeNode)node;
-      lazyLoadTreeNode.loadChildren(this);
+      lazyLoadTreeNode.loadChildren();
     }
   }
-
 }

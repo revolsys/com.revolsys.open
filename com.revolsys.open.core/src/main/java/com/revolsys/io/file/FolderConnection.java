@@ -15,7 +15,7 @@ public class FolderConnection implements MapSerializer {
 
   private String name;
 
-  private FolderConnectionFile fileConnection;
+  private File file;
 
   private FolderConnectionRegistry registry;
 
@@ -29,8 +29,6 @@ public class FolderConnection implements MapSerializer {
     if (registry != null) {
       registry.removeConnection(this);
     }
-    name = null;
-    fileConnection = null;
     registry = null;
   }
 
@@ -40,8 +38,7 @@ public class FolderConnection implements MapSerializer {
       final FolderConnection folderConnection = (FolderConnection)obj;
       if (registry == folderConnection.registry) {
         if (EqualsRegistry.equal(name, folderConnection.name)) {
-          if (EqualsRegistry.equal(fileConnection.getFile(),
-            folderConnection.fileConnection.getFile())) {
+          if (EqualsRegistry.equal(getFile(), folderConnection.getFile())) {
             return true;
           }
         }
@@ -51,11 +48,7 @@ public class FolderConnection implements MapSerializer {
   }
 
   public File getFile() {
-    return fileConnection.getFile();
-  }
-
-  public FolderConnectionFile getFileConnection() {
-    return fileConnection;
+    return file;
   }
 
   public String getName() {
@@ -95,7 +88,7 @@ public class FolderConnection implements MapSerializer {
         this.name = "/";
       }
     }
-    this.fileConnection = new FolderConnectionFile(this, file);
+    this.file = file;
     this.config.put("type", "folderConnection");
     this.config.put("name", this.name);
     this.config.put("file", FileUtil.getCanonicalPath(file));

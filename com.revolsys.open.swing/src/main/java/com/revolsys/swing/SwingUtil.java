@@ -309,6 +309,7 @@ public class SwingUtil {
   public static JFileChooser createFileChooser(final Class<?> preferencesClass,
     final String preferenceName) {
     final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Open File");
     final String currentDirectoryName = PreferencesUtil.getString(
       preferencesClass, preferenceName);
     if (StringUtils.hasText(currentDirectoryName)) {

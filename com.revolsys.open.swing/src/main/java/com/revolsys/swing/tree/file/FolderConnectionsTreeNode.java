@@ -7,9 +7,11 @@ import javax.swing.tree.TreeNode;
 
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
-import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 
-public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
+public class FolderConnectionsTreeNode extends AbstractTreeNode {
+
+  private ArrayList<TreeNode> children;
 
   public FolderConnectionsTreeNode(final TreeNode parent) {
     super(parent, null);
@@ -17,11 +19,16 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
     setType("Folder Connections");
     setIcon(FileTreeUtil.ICON_FOLDER_LINK);
     setAllowsChildren(true);
+    init();
   }
 
   @Override
-  protected List<TreeNode> doLoadChildren() {
-    final List<TreeNode> children = new ArrayList<TreeNode>();
+  public List<TreeNode> getChildren() {
+    return children;
+  }
+
+  protected void init() {
+    children = new ArrayList<TreeNode>();
     final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
       .getVisibleConnectionRegistries();
     for (final FolderConnectionRegistry childRegistry : registries) {
@@ -29,6 +36,5 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
         this, childRegistry);
       children.add(child);
     }
-    return children;
   }
 }

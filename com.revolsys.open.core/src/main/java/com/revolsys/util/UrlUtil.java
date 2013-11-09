@@ -73,42 +73,6 @@ public final class UrlUtil {
       .replaceAll("^file://", "file:///");
   }
 
-  public static String decodeHost(final String encodedHost) {
-    final int len = encodedHost.length();
-    final StringBuilder decoded = new StringBuilder(len);
-    for (int i = 0; i < len; i++) {
-      char ch = encodedHost.charAt(i);
-      if (ch == '%') {
-        final String hex = encodedHost.substring(i + 1, i + 3);
-        ch = (char)Integer.parseInt(hex, 16);
-        i += 2;
-      }
-      decoded.append(ch);
-
-    }
-    return decoded.toString();
-  }
-
-  public static String encodeHost(final String host) {
-    final int len = host.length();
-    final StringBuilder encoded = new StringBuilder(len);
-    for (int i = 0; i < len; i++) {
-      final char ch = host.charAt(i);
-      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
-        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '~'
-        || ch == '~') {
-        encoded.append(ch);
-      } else {
-        encoded.append('%');
-        if (ch < 0x10) {
-          encoded.append('0');
-        }
-        encoded.append(Integer.toHexString(ch));
-      }
-    }
-    return encoded.toString();
-  }
-
   public static String getContent(final String urlString) {
     try {
       final URL url = UrlUtil.getUrl(urlString);
@@ -305,7 +269,8 @@ public final class UrlUtil {
       return null;
     } else {
       try {
-        return new URL(parent, child);
+        final String encodedChild = percentEncode(child);
+        return new URL(parent, encodedChild);
       } catch (final MalformedURLException e) {
         throw new IllegalArgumentException("Cannot create child URL for "
           + parent + " + " + child);
@@ -344,6 +309,42 @@ public final class UrlUtil {
         params.put(key, value);
       }
     }
+  }
+
+  public static String percentDecode(final String encodedText) {
+    final int len = encodedText.length();
+    final StringBuilder decoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char ch = encodedText.charAt(i);
+      if (ch == '%') {
+        final String hex = encodedText.substring(i + 1, i + 3);
+        ch = (char)Integer.parseInt(hex, 16);
+        i += 2;
+      }
+      decoded.append(ch);
+
+    }
+    return decoded.toString();
+  }
+
+  public static String percentEncode(final String text) {
+    final int len = text.length();
+    final StringBuilder encoded = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      final char ch = text.charAt(i);
+      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '.'
+        || ch == '_' || ch == '~' || ch == '/') {
+        encoded.append(ch);
+      } else {
+        encoded.append('%');
+        if (ch < 0x10) {
+          encoded.append('0');
+        }
+        encoded.append(Integer.toHexString(ch));
+      }
+    }
+    return encoded.toString();
   }
 
   /**

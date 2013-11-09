@@ -76,11 +76,11 @@ public class DataObjectStoreSchemaTreeNode extends LazyLoadTreeNode implements
   }
 
   @Override
-  public Map<String, Object> getDataStoreConnection() {
+  public Map<String, Object> getDataStoreConnectionMap() {
     final TreeNode parent = getParent();
     if (parent instanceof DataObjectStoreConnectionMapProxy) {
       final DataObjectStoreConnectionMapProxy proxy = (DataObjectStoreConnectionMapProxy)parent;
-      return proxy.getDataStoreConnection();
+      return proxy.getDataStoreConnectionMap();
     } else {
       return Collections.emptyMap();
     }

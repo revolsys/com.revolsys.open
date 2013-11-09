@@ -232,15 +232,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
           image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
           if (image == null) {
             LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-              "Cannot load image:" + this.url);
+              "Cannot load image: " + this.url);
           }
         } catch (final RuntimeException e) {
           LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-            "Unable to load image" + this.url, e);
+            "Unable to load image: " + this.url, e);
         }
       } else {
         LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-          "Image does not exist:" + this.url);
+          "Image does not exist: " + this.url);
       }
       setImage(image);
     } else {

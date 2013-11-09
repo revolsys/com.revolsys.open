@@ -22,11 +22,45 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public final class ArcSdeConstants {
 
+  public static final int COLLECTION = 6;
+
+  public static final int CURVE = 2;
+
+  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
+
+  public static final String ESRI_SRID_PROPERTY = "esriSrid";
+
+  public static final int GEOMETRY = 0;
+
+  public static final Map<Class<?>, Integer> GEOMETRY_CLASS_ST_TYPE = new HashMap<Class<?>, Integer>();
+
+  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
+
+  public static final int LINESTRING = 3;
+
+  public static final int MULT_SURFACE = 10;
+
+  public static final int MULTI_CURVE = 8;
+
+  public static final int MULTI_LINESTRING = 9;
+
+  public static final int MULTI_POINT = 7;
+
+  public static final int MULTI_POLYGON = 11;
+
+  public static final int POINT = 1;
+
+  public static final int POLYGON = 5;
+
+  public static final String REGISTRATION_ID = "REGISTRATION_ID";
+
+  public static final String ROWID_COLUMN = "ROWID_COLUMN";
+
+  public static final String SDEBINARY = "SDEBINARY";
+
+  public static final String SPATIAL_REFERENCE = "spatialReference";
+
   public static final int ST_GEOMETRY_LINESTRING = 4;
-
-  public static final int ST_GEOMETRY_POINT = 1;
-
-  public static final int ST_GEOMETRY_POLYGON = 8;
 
   public static final int ST_GEOMETRY_MULTI_LINESTRING = 260;
 
@@ -34,35 +68,13 @@ public final class ArcSdeConstants {
 
   public static final int ST_GEOMETRY_MULTI_POLYGON = 264;
 
+  public static final int ST_GEOMETRY_POINT = 1;
+
+  public static final int ST_GEOMETRY_POLYGON = 8;
+
   public static final SQLName ST_GEOMETRY_SQL_NAME;
 
-  public static final int GEOMETRY = 0;
-
-  public static final int POINT = 1;
-
-  public static final int CURVE = 2;
-
-  public static final int LINESTRING = 3;
-
   public static final int SURFACE = 4;
-
-  public static final int POLYGON = 5;
-
-  public static final int COLLECTION = 6;
-
-  public static final int MULTI_POINT = 7;
-
-  public static final int MULTI_CURVE = 8;
-
-  public static final int MULTI_LINESTRING = 9;
-
-  public static final int MULT_SURFACE = 10;
-
-  public static final int MULTI_POLYGON = 11;
-
-  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
-
-  public static final Map<Class<?>, Integer> GEOMETRY_CLASS_ST_TYPE = new HashMap<Class<?>, Integer>();
 
   static {
     try {
@@ -86,18 +98,6 @@ public final class ArcSdeConstants {
     GEOMETRY_CLASS_ST_TYPE.put(Polygon.class, ST_GEOMETRY_POLYGON);
     GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
   }
-
-  public static final String ESRI_SRID_PROPERTY = "esriSrid";
-
-  public static final String SPATIAL_REFERENCE = "spatialReference";
-
-  public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
-
-  public static final String SDEBINARY = "SDEBINARY";
-
-  public static final String REGISTRATION_ID = "REGISTRATION_ID";
-
-  public static final String ROWID_COLUMN = "ROWID_COLUMN";
 
   public static DataType getGeometryDataType(final int geometryType) {
     final DataType dataType = DATA_TYPE_MAP.get(geometryType);

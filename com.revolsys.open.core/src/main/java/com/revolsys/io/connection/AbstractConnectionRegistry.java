@@ -111,8 +111,7 @@ public abstract class AbstractConnectionRegistry<T> implements
         return null;
       }
     }
-    final String fileName = name.replaceAll("[^a-zA-Z0-9\\-_ ]", "_") + "."
-      + fileExtension;
+    final String fileName = FileUtil.toSafeName(name) + "." + fileExtension;
     final File file = new File(directory, fileName);
     return file;
   }

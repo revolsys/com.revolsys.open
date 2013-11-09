@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -563,22 +564,26 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     if ("rgobject".equals(extension)) {
       loadLayer(file);
     } else {
-      final FileSystemResource resource = new FileSystemResource(file);
-      final Map<String, Object> properties = new HashMap<String, Object>();
-      final String url = SpringUtil.getUrl(resource).toString();
-      properties.put("url", url);
-      properties.put("name", FileUtil.getBaseName(url));
-      if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(resource)) {
-        final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-          properties);
-        add(layer);
-        layer.setEditable(true);
-      } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(resource)) {
-        final DataObjectFileLayer layer = new DataObjectFileLayer(properties);
-        final GeometryStyleRenderer renderer = layer.getRenderer();
-        renderer.setStyle(GeometryStyle.createStyle());
-        add(layer);
-      }
+      final URL url = FileUtil.toUrl(file);
+      openFile(url);
+    }
+  }
+
+  public void openFile(final URL url) {
+    final String urlString = url.toString();
+    final Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("url", urlString);
+    properties.put("name", FileUtil.getBaseName(urlString));
+    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
+      final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
+        properties);
+      add(layer);
+      layer.setEditable(true);
+    } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(urlString)) {
+      final DataObjectFileLayer layer = new DataObjectFileLayer(properties);
+      final GeometryStyleRenderer renderer = layer.getRenderer();
+      renderer.setStyle(GeometryStyle.createStyle());
+      add(layer);
     }
   }
 

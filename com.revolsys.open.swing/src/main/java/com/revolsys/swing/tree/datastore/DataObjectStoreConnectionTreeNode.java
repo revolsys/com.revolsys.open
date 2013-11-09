@@ -36,16 +36,14 @@ public class DataObjectStoreConnectionTreeNode extends LazyLoadTreeNode
   }
 
   public static void deleteConnection() {
-    final Object object = BaseTree.getMouseClickItem();
-    if (object instanceof DataObjectStoreConnection) {
-      final DataObjectStoreConnection connection = (DataObjectStoreConnection)object;
-      final int confirm = JOptionPane.showConfirmDialog(
-        SwingUtil.getActiveWindow(), "Delete data store connection '"
-          + connection.getName() + "'? This action cannot be undone.",
-        "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-      if (confirm == JOptionPane.OK_OPTION) {
-        connection.delete();
-      }
+    final DataObjectStoreConnectionTreeNode node = BaseTree.getMouseClickItem();
+    final DataObjectStoreConnection connection = node.getConnection();
+    final int confirm = JOptionPane.showConfirmDialog(
+      SwingUtil.getActiveWindow(), "Delete data store connection '"
+        + connection.getName() + "'? This action cannot be undone.",
+      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+    if (confirm == JOptionPane.OK_OPTION) {
+      connection.delete();
     }
   }
 
@@ -74,15 +72,20 @@ public class DataObjectStoreConnectionTreeNode extends LazyLoadTreeNode
     return children;
   }
 
+  public DataObjectStoreConnection getConnection() {
+    final DataObjectStoreConnection connection = getUserObject();
+    return connection;
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public <V extends DataObjectStore> V getDataStore() {
-    final DataObjectStoreConnection connection = getUserObject();
+    final DataObjectStoreConnection connection = getConnection();
     return (V)connection.getDataStore();
   }
 
   @Override
-  public Map<String, Object> getDataStoreConnection() {
+  public Map<String, Object> getDataStoreConnectionMap() {
     return Collections.<String, Object> singletonMap("name", getName());
   }
 
@@ -92,7 +95,7 @@ public class DataObjectStoreConnectionTreeNode extends LazyLoadTreeNode
   }
 
   public boolean isReadOnly() {
-    final DataObjectStoreConnection connection = getUserObject();
+    final DataObjectStoreConnection connection = getConnection();
     return connection.isReadOnly();
   }
 

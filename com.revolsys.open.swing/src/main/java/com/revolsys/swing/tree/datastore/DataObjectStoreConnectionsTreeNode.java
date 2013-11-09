@@ -9,10 +9,12 @@ import javax.swing.tree.TreeNode;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
-import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 
-public class DataObjectStoreConnectionsTreeNode extends LazyLoadTreeNode {
+public class DataObjectStoreConnectionsTreeNode extends AbstractTreeNode {
   public static final Icon ICON = SilkIconLoader.getIcon("folder_database");
+
+  private ArrayList<TreeNode> children;
 
   public DataObjectStoreConnectionsTreeNode(final TreeNode parent) {
     super(parent, null);
@@ -20,11 +22,16 @@ public class DataObjectStoreConnectionsTreeNode extends LazyLoadTreeNode {
     setType("Data Stores");
     setIcon(ICON);
     setAllowsChildren(true);
+    init();
   }
 
   @Override
-  protected List<TreeNode> doLoadChildren() {
-    final List<TreeNode> children = new ArrayList<TreeNode>();
+  public List<TreeNode> getChildren() {
+    return children;
+  }
+
+  protected void init() {
+    children = new ArrayList<TreeNode>();
     final List<DataObjectStoreConnectionRegistry> registries = DataObjectStoreConnectionManager.get()
       .getVisibleConnectionRegistries();
     for (final DataObjectStoreConnectionRegistry registry : registries) {
@@ -32,6 +39,6 @@ public class DataObjectStoreConnectionsTreeNode extends LazyLoadTreeNode {
         this, registry);
       children.add(child);
     }
-    return children;
   }
+
 }

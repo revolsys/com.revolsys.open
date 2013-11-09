@@ -16,8 +16,20 @@ public abstract class AbstractGeoReferencedImageFactory extends
     return factory;
   }
 
+  public static GeoReferencedImageFactory getGeoReferencedImageFactory(
+    final String fileName) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    final GeoReferencedImageFactory factory = ioFactoryRegistry.getFactoryByFileName(
+      GeoReferencedImageFactory.class, fileName);
+    return factory;
+  }
+
   public static boolean hasGeoReferencedImageFactory(final Resource resource) {
     return getGeoReferencedImageFactory(resource) != null;
+  }
+
+  public static boolean hasGeoReferencedImageFactory(final String fileName) {
+    return getGeoReferencedImageFactory(fileName) != null;
   }
 
   public static GeoReferencedImage loadGeoReferencedImage(

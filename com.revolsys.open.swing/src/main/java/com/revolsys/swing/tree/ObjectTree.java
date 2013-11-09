@@ -74,7 +74,6 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     setDragEnabled(true);
     setDropMode(DropMode.ON_OR_INSERT);
 
-    addMouseListener(this);
   }
 
   @Override

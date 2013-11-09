@@ -45,8 +45,20 @@ public abstract class AbstractDataObjectReaderFactory extends
     return readerFactory;
   }
 
+  public static DataObjectReaderFactory getDataObjectReaderFactory(
+    final String fileName) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
+      DataObjectReaderFactory.class, fileName);
+    return readerFactory;
+  }
+
   public static boolean hasDataObjectReaderFactory(final Resource resource) {
     return getDataObjectReaderFactory(resource) != null;
+  }
+
+  public static boolean hasDataObjectReaderFactory(final String fileName) {
+    return getDataObjectReaderFactory(fileName) != null;
   }
 
   private final boolean binary;

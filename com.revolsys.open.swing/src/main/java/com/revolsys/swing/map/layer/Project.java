@@ -283,7 +283,6 @@ public class Project extends LayerGroup {
   }
 
   public void save() {
-    System.out.println("Save");
   }
 
   public boolean saveAllSettings() {

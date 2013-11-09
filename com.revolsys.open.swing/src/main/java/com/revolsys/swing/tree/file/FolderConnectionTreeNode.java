@@ -75,7 +75,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
   @Override
   public URL getUrl() {
     final String name = getName();
-    final String urlstring = "folderconnection://" + UrlUtil.encodeHost(name)
+    final String urlstring = "folderconnection://" + UrlUtil.percentEncode(name)
       + "/";
     try {
       final URL url = new URL(urlstring);

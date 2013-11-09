@@ -5,21 +5,18 @@ import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
-import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 
-public class FileSystemsTreeNode extends LazyLoadTreeNode {
+public class FileSystemsTreeNode extends AbstractTreeNode {
+  private List<TreeNode> children;
+
   public FileSystemsTreeNode(final TreeNode parent) {
     super(parent, null);
     setType("File Systems");
     setName("File Systems");
     setIcon(FileTreeUtil.ICON_FOLDER_DRIVE);
     setAllowsChildren(true);
-  }
-
-  @Override
-  protected List<TreeNode> doLoadChildren() {
-    final File[] roots = File.listRoots();
-    return FileTreeNode.getFileNodes(this, roots);
+    init();
   }
 
   @Override
@@ -31,7 +28,17 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
   }
 
   @Override
+  public List<TreeNode> getChildren() {
+    return children;
+  }
+
+  @Override
   public int hashCode() {
     return 0;
+  }
+
+  protected void init() {
+    final File[] roots = File.listRoots();
+    children = FileTreeNode.getFileNodes(this, roots);
   }
 }

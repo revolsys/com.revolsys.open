@@ -15,6 +15,7 @@ import javax.swing.tree.TreeNode;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -25,10 +26,11 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.datastore.DataObjectStoreTableTreeNode;
 import com.revolsys.swing.tree.datastore.FileDataObjectStoreTreeNode;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
@@ -38,11 +40,14 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   private static final MenuFactory MENU = new MenuFactory();
   static {
-    final EnableCheck isDirectory = new TreeItemPropertyEnableCheck(
-      "isDirectory");
+    final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
+    final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
+
+    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
+      FileTreeNode.class, "addLayer");
 
     MENU.addMenuItemTitleIcon("default", "Add Folder Connection", "link_add",
-      isDirectory, DataObjectStoreTableTreeNode.class, "addFolderConnection");
+      isDirectory, FileTreeNode.class, "addFolderConnection");
   }
 
   public static void addFolderConnection() {
@@ -89,7 +94,12 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
         registry.addConnection(connectionName, directory);
       }
     }
+  }
 
+  public static void addLayer() {
+    final FileTreeNode node = BaseTree.getMouseClickItem();
+    final URL url = node.getUrl();
+    Project.get().openFile(url);
   }
 
   public static List<TreeNode> getFileNodes(final TreeNode parent,
@@ -122,6 +132,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (parent instanceof UrlProxy) {
       final UrlProxy parentProxy = (UrlProxy)parent;
       String childPath = file.getName();
+
       if (file.isDirectory()) {
         childPath += "/";
       }
@@ -236,5 +247,17 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public boolean isDirectory() {
     final File file = getFile();
     return file.isDirectory();
+  }
+
+  public boolean isFileLayer() {
+    final File file = getFile();
+    final String fileName = file.getName();
+    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
+      return true;
+    } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(fileName)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -58,7 +58,6 @@ public class DataObjectStoreConnectionManager
     synchronized (dataStores) {
       DataObjectStore dataStore = dataStores.get(configClone);
       if (dataStore == null) {
-        System.out.println(config);
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
         dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
         dataStore.setProperties(config);

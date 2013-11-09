@@ -41,7 +41,7 @@ public class DataObjectStoreTableTreeNode extends LazyLoadTreeNode {
     final DataObjectStoreTableTreeNode node = BaseTree.getMouseClickItem();
     final String typePath = node.getTypePath();
     final DataObjectStoreSchemaTreeNode schemaNode = node.getParentNode();
-    final Map<String, Object> connection = schemaNode.getDataStoreConnection();
+    final Map<String, Object> connection = schemaNode.getDataStoreConnectionMap();
     final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
     layerConfig.put("type", "dataStore");
     layerConfig.put("name", node.getName());

@@ -4,17 +4,18 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.util.ExceptionUtil;
 
 public abstract class LazyLoadTreeNode extends AbstractTreeNode {
+
+  private final AtomicInteger updateIndicies = new AtomicInteger();
 
   private static final DefaultMutableTreeNode LOADING_NODE = new DefaultMutableTreeNode(
     "Loading...");
@@ -31,12 +32,11 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
     LOADING_NODE.setAllowsChildren(false);
     try {
       final Class<LazyLoadTreeNode> clazz = LazyLoadTreeNode.class;
-      setChildrenMethod = clazz.getDeclaredMethod("setChildren",
-        BaseTree.class, List.class);
+      setChildrenMethod = clazz.getDeclaredMethod("setChildren", Integer.TYPE,
+        List.class);
       setChildrenMethod.setAccessible(true);
-    } catch (final SecurityException e) {
-    } catch (final NoSuchMethodException e) {
-      e.printStackTrace();
+    } catch (final Throwable e) {
+      ExceptionUtil.log(LazyLoadTreeNode.class, e);
     }
   }
 
@@ -45,13 +45,21 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
 
   }
 
-  protected List<TreeNode> doLoadChildren() {
-    return new ArrayList<TreeNode>();
+  protected void addNode(final int index, final TreeNode node) {
+    final List<TreeNode> children = this.children;
+    if (children != LOADING_NODES) {
+      children.add(index, node);
+    }
   }
 
   @Override
-  public int getChildCount() {
-    return getChildren().size();
+  protected void doDelete() {
+    children = LOADING_NODES;
+    super.doDelete();
+  }
+
+  protected List<TreeNode> doLoadChildren() {
+    return new ArrayList<TreeNode>();
   }
 
   @Override
@@ -59,39 +67,71 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
     return children;
   }
 
-  public void loadChildren(final BaseTree tree) {
+  protected int getUpdateIndex() {
+    synchronized (updateIndicies) {
+      return updateIndicies.incrementAndGet();
+    }
+  }
+
+  public void loadChildren() {
     if (SwingUtilities.isEventDispatchThread()) {
       if (children == LOADING_NODES) {
         Invoke.background("Load tree node " + this.getName(), this,
-          "loadChildren", tree);
+          "loadChildren");
       }
     } else {
       synchronized (sync) {
         if (children == LOADING_NODES) {
-          final List<TreeNode> children = doLoadChildren();
-          this.children = children.subList(0, 1);
-          Invoke.later(this, setChildrenMethod, tree, children);
-
+          final int updateIndex = getUpdateIndex();
+          List<TreeNode> children = doLoadChildren();
+          if (children == null) {
+            children = Collections.emptyList();
+          }
+          Invoke.later(this, setChildrenMethod, updateIndex, children);
         }
       }
     }
   }
 
-  protected void setChildren(final BaseTree tree, final List<TreeNode> children) {
+  @Override
+  public void nodeCollapsed(final AbstractTreeNode treeNode) {
+    super.nodeCollapsed(treeNode);
+    if (treeNode != this) {
+      final int updateIndex = getUpdateIndex();
+      setChildren(updateIndex, LOADING_NODES);
+    }
+  }
 
-    final TreeModel model = tree.getModel();
-    if (model instanceof DefaultTreeModel) {
-      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
-      treeModel.nodeChanged(this);
-      treeModel.nodesChanged(this, new int[] {
-        0
-      });
-      this.children = children;
-      final int[] newIndicies = new int[children.size() - 1];
-      for (int i = 1; i < newIndicies.length; i++) {
-        newIndicies[i] = i;
+  protected void removeNode(final int index) {
+    final List<TreeNode> children = this.children;
+    if (children != LOADING_NODES) {
+      children.remove(index);
+    }
+  }
+
+  protected void removeNode(final TreeNode node) {
+    final List<TreeNode> children = this.children;
+    if (children != LOADING_NODES) {
+      children.remove(node);
+    }
+  }
+
+  protected void setChildren(final int updateIndex,
+    final List<TreeNode> children) {
+    synchronized (updateIndicies) {
+      if (updateIndex == updateIndicies.get()) {
+        nodeChanged();
+        this.children = Collections.emptyList();
+        nodeRemoved(0, LOADING_NODE);
+        this.children = children;
+        final int[] newIndicies = new int[children.size()];
+        for (int i = 0; i < newIndicies.length; i++) {
+          newIndicies[i] = i;
+        }
+        nodesInserted(newIndicies);
+      } else if (children != LOADING_NODES) {
+        delete(children);
       }
-      treeModel.nodesWereInserted(this, newIndicies);
     }
   }
 }

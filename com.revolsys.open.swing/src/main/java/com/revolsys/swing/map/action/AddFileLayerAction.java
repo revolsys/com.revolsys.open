@@ -63,13 +63,8 @@ public class AddFileLayerAction extends AbstractAction {
     getFilters(dataObjectFileFilters, allDataObjectExtensions,
       DataObjectReaderFactory.class);
 
-    final List<FileFilter> fileDataStoreFilters = new ArrayList<FileFilter>();
-    final Set<String> allFileDataStoreExtensions = new TreeSet<String>();
-    getFileDataStoreFilters(fileDataStoreFilters, allFileDataStoreExtensions);
-
     final Set<String> allExtensions = new TreeSet<String>();
     allExtensions.addAll(allDataObjectExtensions);
-    allExtensions.addAll(allFileDataStoreExtensions);
     allExtensions.addAll(allImageExtensions);
     final FileNameExtensionFilter allFilter = createFilter(
       "All Supported files", allExtensions);
@@ -77,17 +72,11 @@ public class AddFileLayerAction extends AbstractAction {
 
     fileChooser.addChoosableFileFilter(createFilter("All Vector/Data files",
       allDataObjectExtensions));
-    fileChooser.addChoosableFileFilter(createFilter("All Database files",
-      allFileDataStoreExtensions));
 
     fileChooser.addChoosableFileFilter(createFilter("All Image files",
       allImageExtensions));
 
     for (final FileFilter fileFilter : dataObjectFileFilters) {
-      fileChooser.addChoosableFileFilter(fileFilter);
-    }
-
-    for (final FileFilter fileFilter : fileDataStoreFilters) {
       fileChooser.addChoosableFileFilter(fileFilter);
     }
 
