@@ -2,6 +2,7 @@ package com.revolsys.swing.map.tree.renderer;
 
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
@@ -18,6 +19,7 @@ public class LayerGroupTreeCellRenderer extends DefaultTreeCellRenderer {
     final ImageIcon icon = SilkIconLoader.getIcon("folder");
     setOpenIcon(icon);
     setClosedIcon(icon);
+    setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
   }
 
   @Override

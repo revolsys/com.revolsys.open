@@ -79,6 +79,7 @@ public class BaseTree extends JTree implements MouseListener,
     addTreeWillExpandListener(this);
     addTreeExpansionListener(this);
     addMouseListener(this);
+    setRowHeight(0);
   }
 
   @Override

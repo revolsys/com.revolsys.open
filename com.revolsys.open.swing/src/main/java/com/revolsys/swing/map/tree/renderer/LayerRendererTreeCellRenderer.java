@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -103,6 +104,10 @@ public class LayerRendererTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     return new ImageIcon(newImage);
+  }
+
+  public LayerRendererTreeCellRenderer() {
+    setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
   }
 
   @Override

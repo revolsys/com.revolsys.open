@@ -2,6 +2,7 @@ package com.revolsys.swing.tree.renderer;
 
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
@@ -13,13 +14,15 @@ import com.revolsys.util.JavaBeanUtil;
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
   private static final long serialVersionUID = 1L;
 
-  private String labelPropertyName;
+  private final String labelPropertyName;
 
   public BaseTreeCellRenderer() {
+    this(null);
   }
 
   public BaseTreeCellRenderer(final String labelPropertyName) {
     this.labelPropertyName = labelPropertyName;
+    setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
   }
 
   @Override
