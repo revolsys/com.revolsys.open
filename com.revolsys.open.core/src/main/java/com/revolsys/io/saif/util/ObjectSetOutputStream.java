@@ -28,6 +28,8 @@ import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.FileUtil;
+
 public class ObjectSetOutputStream extends OutputStream {
   private static final Logger log = Logger.getLogger(ObjectSetOutputStream.class);
 
@@ -58,7 +60,8 @@ public class ObjectSetOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + file.getName() + "' from writing");
+      log.debug("Closing object subset '" + FileUtil.getFileName(file)
+        + "' from writing");
     }
     out.close();
   }
@@ -70,7 +73,7 @@ public class ObjectSetOutputStream extends OutputStream {
 
   private void openFile() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Creating object subset '" + file.getName() + "'");
+      log.debug("Creating object subset '" + FileUtil.getFileName(file) + "'");
     }
     out = new BufferedOutputStream(new FileOutputStream(file), 4096);
   }

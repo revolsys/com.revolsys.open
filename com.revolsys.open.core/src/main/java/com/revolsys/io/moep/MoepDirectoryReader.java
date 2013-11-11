@@ -12,6 +12,7 @@ import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.util.DateUtil;
 
@@ -75,7 +76,7 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
   @Override
   public void setDirectory(final File directory) {
     super.setDirectory(directory);
-    final String name = directory.getName();
+    final String name = FileUtil.getFileName(directory);
     final File file = new File(directory, name + "s.bin");
     final Reader<DataObject> supDataReader = createReader(new FileSystemResource(
       file));

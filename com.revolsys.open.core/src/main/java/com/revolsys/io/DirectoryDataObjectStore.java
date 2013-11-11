@@ -178,7 +178,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     final File[] directories = directory.listFiles(new DirectoryFilenameFilter());
     if (directories != null) {
       for (final File subDirectory : directories) {
-        final String directoryName = subDirectory.getName();
+        final String directoryName = FileUtil.getFileName(subDirectory);
         addSchema(new DataObjectStoreSchema(this, directoryName));
       }
     }

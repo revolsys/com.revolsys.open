@@ -6,16 +6,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -28,6 +33,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.AbstractGeoReferencedImageFactory;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -38,7 +44,28 @@ import com.revolsys.util.UrlUtil;
 
 public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
+  public static final Icon ICON_FILE = SilkIconLoader.getIcon("file");
+
+  public static final Icon ICON_FILE_DATABASE = SilkIconLoader.getIcon("file_database");
+
+  public static final Icon ICON_FILE_IMAGE = SilkIconLoader.getIcon("file_image");
+
+  public static final Icon ICON_FILE_TABLE = SilkIconLoader.getIcon("file_table");
+
+  public static final Icon ICON_FILE_VECTOR = SilkIconLoader.getIcon("file_table");
+
+  public static final Icon ICON_FOLDER = SilkIconLoader.getIcon("folder");
+
+  public static final Icon ICON_DRIVE = SilkIconLoader.getIcon("drive");
+
+  public static final Icon ICON_DRIVE_MISSING = SilkIconLoader.getIcon("drive_error");
+
+  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIcon("folder_link");
+
+  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIcon("folder_error");
+
   private static final MenuFactory MENU = new MenuFactory();
+
   static {
     final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
     final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
@@ -114,7 +141,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (files != null) {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
-          if (FileTreeUtil.isDataStore(childFile)) {
+          if (FileTreeNode.isDataStore(childFile)) {
             final FileDataObjectStoreTreeNode dataStoreNode = new FileDataObjectStoreTreeNode(
               parent, childFile);
             children.add(dataStoreNode);
@@ -128,10 +155,37 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return children;
   }
 
+  public static Icon getIcon(final File file) {
+    if (file == null) {
+      return ICON_FOLDER_MISSING;
+    } else if (file.exists()) {
+      final String name = FileUtil.getFileName(file);
+      if ("/".equals(name) || name.matches("[A..Z]:")) {
+        if (file.exists()) {
+          return ICON_DRIVE;
+        } else {
+          return ICON_DRIVE_MISSING;
+        }
+      } else if (isDataStore(file)) {
+        return ICON_FILE_DATABASE;
+      } else if (isImage(file)) {
+        return ICON_FILE_IMAGE;
+      } else if (isVector(file)) {
+        return ICON_FILE_TABLE;
+      } else if (file.isDirectory()) {
+        return ICON_FOLDER;
+      } else {
+        return ICON_FILE;
+      }
+    } else {
+      return ICON_FOLDER_MISSING;
+    }
+  }
+
   public static URL getUrl(final TreeNode parent, final File file) {
     if (parent instanceof UrlProxy) {
       final UrlProxy parentProxy = (UrlProxy)parent;
-      String childPath = file.getName();
+      String childPath = FileUtil.getFileName(file);
 
       if (file.isDirectory()) {
         childPath += "/";
@@ -154,12 +208,29 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
+  public static boolean isDataStore(final File file) {
+    final Set<String> fileExtensions = DataObjectStoreFactoryRegistry.getFileExtensions();
+    final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
+    return fileExtensions.contains(extension);
+  }
+
+  public static boolean isImage(final File file) {
+    final String fileNameExtension = FileUtil.getFileNameExtension(file);
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    return ioFactoryRegistry.isFileExtensionSupported(
+      GeoReferencedImageFactory.class, fileNameExtension);
+  }
+
+  public static boolean isVector(final File file) {
+    final String fileNameExtension = FileUtil.getFileNameExtension(file);
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    return ioFactoryRegistry.isFileExtensionSupported(
+      DataObjectReaderFactory.class, fileNameExtension);
+  }
+
   public FileTreeNode(final TreeNode parent, final File file) {
     super(parent, file);
-    String fileName = file.getName();
-    if (!StringUtils.hasText(fileName)) {
-      fileName = "/";
-    }
+    final String fileName = FileUtil.getFileName(file);
     setName(fileName);
   }
 
@@ -193,7 +264,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   @Override
   public Icon getIcon() {
     final File file = getUserObject();
-    return FileTreeUtil.getIcon(file);
+    return FileTreeNode.getIcon(file);
   }
 
   @Override
@@ -251,7 +322,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public boolean isFileLayer() {
     final File file = getFile();
-    final String fileName = file.getName();
+    final String fileName = FileUtil.getFileName(file);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
       return true;
     } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(fileName)) {

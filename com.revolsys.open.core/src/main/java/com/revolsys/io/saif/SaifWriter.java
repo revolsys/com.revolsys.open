@@ -486,7 +486,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       if (!parentDir.exists()) {
         parentDir.mkdirs();
       }
-      String fileName = file.getName();
+      String fileName = FileUtil.getFileName(file);
       String filePrefix = fileName;
       final int extensionIndex = fileName.lastIndexOf('.');
       if (extensionIndex != -1) {

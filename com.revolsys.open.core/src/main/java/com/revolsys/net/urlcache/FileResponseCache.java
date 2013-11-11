@@ -16,6 +16,10 @@ import com.revolsys.io.FileUtil;
 public class FileResponseCache extends ResponseCache {
   private final File directory;
 
+  public FileResponseCache() {
+    this(System.getProperty("java.io.tmpdir"));
+  }
+
   public FileResponseCache(final File directory) {
     if (!directory.exists()) {
       directory.mkdirs();
@@ -25,10 +29,6 @@ public class FileResponseCache extends ResponseCache {
 
   public FileResponseCache(final String directory) {
     this(new File(directory));
-  }
-
-  public FileResponseCache() {
-    this(System.getProperty("java.io.tmpdir"));
   }
 
   @Override
@@ -81,7 +81,7 @@ public class FileResponseCache extends ResponseCache {
           if (extension.length() > 0) {
             fileName = FileUtil.getFileNamePrefix(file);
           } else {
-            fileName = file.getName();
+            fileName = FileUtil.getFileName(file);
           }
           file = file.getParentFile();
         }

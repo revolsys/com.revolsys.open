@@ -43,6 +43,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.EnumerationDataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.saif.SaifConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -209,7 +210,7 @@ public class OsnSerializer {
 
   private void openFile() throws IOException {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Creating object subset '" + file.getName() + "'");
+      LOG.debug("Creating object subset '" + FileUtil.getFileName(file) + "'");
     }
     out = new BufferedOutputStream(new FileOutputStream(file), 4096);
   }

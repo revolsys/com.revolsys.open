@@ -177,7 +177,7 @@ public final class FileUtil {
       final File[] files = src.listFiles();
       if (files != null) {
         for (final File file : files) {
-          final String name = file.getName();
+          final String name = getFileName(file);
           final File destFile = new File(dest, name);
           copy(file, destFile);
         }
@@ -187,7 +187,7 @@ public final class FileUtil {
         final FileInputStream in = new FileInputStream(src);
         File destFile;
         if (dest.isDirectory()) {
-          final String name = src.getName();
+          final String name = getFileName(src);
           destFile = new File(dest, name);
         } else {
           destFile = dest;
@@ -461,7 +461,7 @@ public final class FileUtil {
     if (files != null) {
       for (int i = 0; i < files.length; i++) {
         final File file = files[i];
-        if (file.exists() && filter.accept(directory, file.getName())) {
+        if (file.exists() && filter.accept(directory, getFileName(file))) {
           if (file.isDirectory()) {
             deleteDirectory(file, true);
           } else {
@@ -559,7 +559,7 @@ public final class FileUtil {
   }
 
   public static String getBaseName(final File file) {
-    final String fileName = file.getName();
+    final String fileName = getFileName(file);
     return getBaseName(fileName);
   }
 
@@ -620,7 +620,8 @@ public final class FileUtil {
     if (files != null) {
       for (final File file : files) {
         if (file.isDirectory()) {
-          directories.add(file.getName());
+          final String fileName = getFileName(file);
+          directories.add(fileName);
         }
       }
     }
@@ -724,11 +725,11 @@ public final class FileUtil {
     if (file == null) {
       return null;
     } else {
-      String string = file.getName();
-      if (!StringUtils.hasText(string)) {
-        string = "/";
+      String fileName = file.getName();
+      if (!StringUtils.hasText(fileName)) {
+        fileName = file.getPath().replaceAll("\\\\$", "");
       }
-      return string;
+      return fileName;
     }
   }
 
@@ -747,7 +748,7 @@ public final class FileUtil {
   }
 
   public static String getFileNameExtension(final File file) {
-    final String fileName = file.getName();
+    final String fileName = getFileName(file);
     return getFileNameExtension(fileName);
   }
 
@@ -761,7 +762,7 @@ public final class FileUtil {
   }
 
   public static String getFileNamePrefix(final File file) {
-    final String fileName = file.getName();
+    final String fileName = getFileName(file);
     return getBaseName(fileName);
   }
 
@@ -771,7 +772,7 @@ public final class FileUtil {
     final File[] files = directory.listFiles(filter);
     if (files != null) {
       for (final File file : files) {
-        final String name = file.getName();
+        final String name = getFileName(file);
         names.add(name);
       }
     }

@@ -3,18 +3,21 @@ package com.revolsys.swing.tree.file;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 
 public class FileSystemsTreeNode extends AbstractTreeNode {
   private List<TreeNode> children;
+  public static final Icon ICON_FOLDER_DRIVE = SilkIconLoader.getIcon("folder_drive");
 
   public FileSystemsTreeNode(final TreeNode parent) {
     super(parent, null);
     setType("File Systems");
     setName("File Systems");
-    setIcon(FileTreeUtil.ICON_FOLDER_DRIVE);
+    setIcon(FileSystemsTreeNode.ICON_FOLDER_DRIVE);
     setAllowsChildren(true);
     init();
   }

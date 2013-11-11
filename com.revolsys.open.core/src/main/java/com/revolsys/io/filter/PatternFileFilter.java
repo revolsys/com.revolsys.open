@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.regex.Pattern;
 
+import com.revolsys.io.FileUtil;
+
 /**
  * The PatternFileNameFilter is a {@link FileFilter} that only returns files if they
  * match the regular expression.
@@ -31,7 +33,7 @@ public class PatternFileFilter implements FileFilter {
    */
   @Override
   public boolean accept(final File file) {
-    final String fileName = file.getName();
+    final String fileName = FileUtil.getFileName(file);
     return pattern.matcher(fileName).matches();
   }
 }

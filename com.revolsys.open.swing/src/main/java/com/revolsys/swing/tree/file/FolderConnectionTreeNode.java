@@ -46,7 +46,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
     super(parent, connection);
     setType("Folder Connection");
     setName(connection.getName());
-    setIcon(FileTreeUtil.ICON_FOLDER_LINK);
+    setIcon(FileTreeNode.ICON_FOLDER_LINK);
     setAllowsChildren(true);
   }
 
@@ -63,7 +63,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
     if (file.exists()) {
       return super.getIcon();
     } else {
-      return FileTreeUtil.ICON_FOLDER_MISSING;
+      return FileTreeNode.ICON_FOLDER_MISSING;
     }
   }
 

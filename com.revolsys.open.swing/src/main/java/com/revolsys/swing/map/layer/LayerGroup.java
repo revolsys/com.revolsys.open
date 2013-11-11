@@ -343,7 +343,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   }
 
   protected File getGroupSettingsDirectory(final File directory) {
-    final String name = getName();
+    final String name = FileUtil.getFileName(directory);
     final String groupDirectoryName = FileUtil.getSafeFileName(name);
     final File groupDirectory = FileUtil.getDirectory(directory,
       groupDirectoryName);

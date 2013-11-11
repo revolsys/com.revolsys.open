@@ -22,6 +22,8 @@ package com.revolsys.io.saif.util;
 
 import java.io.File;
 
+import com.revolsys.io.FileUtil;
+
 public final class ObjectSetUtil {
   public static final String[] OBJECT_SUBSET_NUMBERS = {
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e",
@@ -40,7 +42,7 @@ public final class ObjectSetUtil {
   }
 
   public static String getObjectSubsetPrefix(final File file) {
-    final String fileName = file.getName();
+    final String fileName = FileUtil.getFileName(file);
     return getObjectSubsetPrefix(fileName);
   }
 

@@ -83,10 +83,7 @@ public class FolderConnection implements MapSerializer {
     if (StringUtils.hasText(name)) {
       this.name = name;
     } else {
-      this.name = file.getName();
-      if (!StringUtils.hasText(this.name)) {
-        this.name = "/";
-      }
+      this.name = FileUtil.getFileName(file);
     }
     this.file = file;
     this.config.put("type", "folderConnection");

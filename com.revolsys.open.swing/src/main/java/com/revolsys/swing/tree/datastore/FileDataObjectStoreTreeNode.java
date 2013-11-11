@@ -29,7 +29,6 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.file.FileTreeNode;
-import com.revolsys.swing.tree.file.FileTreeUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
@@ -93,8 +92,8 @@ public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
   public FileDataObjectStoreTreeNode(final TreeNode parent, final File file) {
     super(parent, file);
     setType("Data Store");
-    setName(file.getName());
-    setIcon(FileTreeUtil.ICON_FILE_DATABASE);
+    setName(FileUtil.getFileName(file));
+    setIcon(FileTreeNode.ICON_FILE_DATABASE);
     setAllowsChildren(true);
   }
 

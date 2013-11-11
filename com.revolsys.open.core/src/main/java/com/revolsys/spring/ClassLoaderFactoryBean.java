@@ -42,7 +42,8 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     final Collection<URL> urls = new LinkedHashSet<URL>();
     if (file.isDirectory()) {
       addJars(urls, file);
-    } else if (JAR_FILTER.accept(file.getParentFile(), file.getName())) {
+    } else if (JAR_FILTER.accept(file.getParentFile(),
+      FileUtil.getFileName(file))) {
       urls.add(FileUtil.toUrl(file));
     }
     return createClassLoader(parentClassLoader, urls);

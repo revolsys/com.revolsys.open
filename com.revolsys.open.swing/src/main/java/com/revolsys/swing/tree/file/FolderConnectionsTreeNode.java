@@ -17,7 +17,7 @@ public class FolderConnectionsTreeNode extends AbstractTreeNode {
     super(parent, null);
     setName("Folder Connections");
     setType("Folder Connections");
-    setIcon(FileTreeUtil.ICON_FOLDER_LINK);
+    setIcon(FileTreeNode.ICON_FOLDER_LINK);
     setAllowsChildren(true);
     init();
   }

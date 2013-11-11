@@ -250,7 +250,7 @@ public class ProcessorPipelineTool {
     final File[] files = sourceDirectory.listFiles();
     for (int i = 0; i < files.length; i++) {
       final File file = files[i];
-      final String fileName = file.getName();
+      final String fileName = FileUtil.getFileName(file);
       if (file.isDirectory()) {
         processDirectory(file, new File(targetDirectory, fileName), new File(
           logDirectory, fileName), sourceFileExtension);

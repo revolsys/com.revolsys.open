@@ -32,7 +32,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     super(parent, registry);
     setType("Folder Connections");
     setName(registry.getName());
-    setIcon(FileTreeUtil.ICON_FOLDER_LINK);
+    setIcon(FileTreeNode.ICON_FOLDER_LINK);
     setAllowsChildren(true);
     Property.addListener(registry, this);
   }
