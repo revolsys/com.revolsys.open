@@ -573,7 +573,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("url", urlString);
-    properties.put("name", FileUtil.getBaseName(urlString));
+    String name = FileUtil.getBaseName(urlString);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
         properties);
