@@ -895,6 +895,12 @@ public final class FileUtil {
     }
   }
 
+  public static boolean isRoot(File file) {
+    file = getFile(file);
+    final String name = file.getName();
+    return "".equals(name);
+  }
+
   public static List<File> listVisibleFiles(final File file) {
     if (file != null && file.isDirectory()) {
       final List<File> visibleFiles = new ArrayList<File>();

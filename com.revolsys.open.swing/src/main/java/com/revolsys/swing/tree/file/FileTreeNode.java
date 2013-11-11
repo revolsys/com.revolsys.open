@@ -158,27 +158,29 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static Icon getIcon(final File file) {
     if (file == null) {
       return ICON_FOLDER_MISSING;
-    } else if (file.exists()) {
-      final String name = FileUtil.getFileName(file);
-      if ("/".equals(name) || name.matches("[A..Z]:")) {
-        if (file.exists()) {
+    } else {
+      final boolean exists = file.exists();
+      if (FileUtil.isRoot(file)) {
+        if (exists) {
           return ICON_DRIVE;
         } else {
           return ICON_DRIVE_MISSING;
         }
-      } else if (isDataStore(file)) {
-        return ICON_FILE_DATABASE;
-      } else if (isImage(file)) {
-        return ICON_FILE_IMAGE;
-      } else if (isVector(file)) {
-        return ICON_FILE_TABLE;
-      } else if (file.isDirectory()) {
-        return ICON_FOLDER;
+      } else if (exists) {
+        if (isDataStore(file)) {
+          return ICON_FILE_DATABASE;
+        } else if (isImage(file)) {
+          return ICON_FILE_IMAGE;
+        } else if (isVector(file)) {
+          return ICON_FILE_TABLE;
+        } else if (file.isDirectory()) {
+          return ICON_FOLDER;
+        } else {
+          return ICON_FILE;
+        }
       } else {
-        return ICON_FILE;
+        return ICON_FOLDER_MISSING;
       }
-    } else {
-      return ICON_FOLDER_MISSING;
     }
   }
 
