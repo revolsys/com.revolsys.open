@@ -165,7 +165,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       final JPanel extentPanel = new JPanel();
       SwingUtil.setTitledBorder(extentPanel, "Extent");
       final BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox == null || boundingBox.isNull()) {
+      if (boundingBox == null || boundingBox.isEmpty()) {
         extentPanel.add(new JLabel("Unknown"));
 
       } else {

@@ -813,7 +813,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void zoomToSelected(final Layer layer) {
     final BoundingBox boundingBox = layer.getSelectedBoundingBox();
-    if (!boundingBox.isNull()) {
+    if (!boundingBox.isEmpty()) {
       zoomTo(boundingBox);
     }
   }

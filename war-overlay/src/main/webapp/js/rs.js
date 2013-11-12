@@ -234,7 +234,11 @@ $(document).ready(
         var form = $('form', this);
         var validate = form.validate({
           errorContainer : $('div.errorContainer', formWrapper),
-          wrapper : "div class=\"errorMessage\"",
+          wrapper : 'div',
+          errorPlacement: function(label, element) {
+            label.addClass('errorMessage');
+            label.insertAfter(element);
+          },
           highlight : function(element, errorClass, validClass) {
             $(element).closest('div.fieldComponent').addClass('invalid');
             $(element).addClass(errorClass).removeClass(validClass);

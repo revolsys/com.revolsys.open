@@ -60,7 +60,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
-      if (!viewExtent.isNull()) {
+      if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           final GeometryFactory geometryFactory = viewport.getGeometryFactory();

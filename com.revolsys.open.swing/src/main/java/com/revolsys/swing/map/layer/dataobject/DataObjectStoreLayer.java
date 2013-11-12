@@ -369,7 +369,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   protected List<LayerDataObject> doQueryBackground(
     final BoundingBox boundingBox) {
-    if (boundingBox == null || boundingBox.isNull()) {
+    if (boundingBox == null || boundingBox.isEmpty()) {
       return Collections.emptyList();
     } else {
       synchronized (this.sync) {

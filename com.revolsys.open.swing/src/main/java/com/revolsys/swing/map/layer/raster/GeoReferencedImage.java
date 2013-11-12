@@ -7,16 +7,26 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
@@ -24,18 +34,28 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.xml.DomUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
+import com.vividsolutions.jts.geom.Point;
 
 public class GeoReferencedImage extends AbstractPropertyChangeObject implements
-  PropertyChangeListener {
+  PropertyChangeListener, MapSerializer {
 
-  private BoundingBox boundingBox;
+  private BoundingBox boundingBox = new BoundingBox();
 
   private BufferedImage image;
 
@@ -61,6 +81,8 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   private final int degree = 1;
 
+  private boolean hasChanges;
+
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
     this(boundingBox, image.getWidth(), image.getHeight());
@@ -80,7 +102,15 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     this.imageResource = imageResource;
     setImage(createBufferedImage());
     loadImageMetaData();
+    setHasChanges(false);
     Property.addListener(tiePoints, this);
+  }
+
+  public void cancelChanges() {
+    if (this.imageResource != null) {
+      loadImageMetaData();
+      setHasChanges(false);
+    }
   }
 
   protected synchronized void clearWarp() {
@@ -237,15 +267,111 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     return warpFilter;
   }
 
+  public String getWorldFileExtension() {
+    return "tfw";
+  }
+
+  public boolean hasBoundingBox() {
+    return !boundingBox.isEmpty();
+  }
+
+  public boolean hasGeometryFactory() {
+    return geometryFactory.getSRID() > 0;
+  }
+
   @Override
   public int hashCode() {
     return this.boundingBox.hashCode();
   }
 
-  protected void loadImageMetaData() {
+  public boolean isHasChanages() {
+    return hasChanges;
   }
 
-  protected void loadProjectionFile(final Resource resource) {
+  protected void loadAuxXmlFile(final long modifiedTime) {
+    final Resource resource = getImageResource();
+
+    final String extension = SpringUtil.getFileNameExtension(resource);
+    final Resource auxFile = SpringUtil.getResourceWithExtension(resource,
+      extension + ".aux.xml");
+    if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
+      loadWorldFileX();
+      try {
+        int srid = 0;
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        final DocumentBuilder builder = factory.newDocumentBuilder();
+        final InputStream in = auxFile.getInputStream();
+        try {
+          final Document doc = builder.parse(in);
+          final NodeList spatialReferences = doc.getElementsByTagName("SpatialReference");
+          for (int i = 0; i < spatialReferences.getLength() && srid == 0; i++) {
+            final Node spatialReference = spatialReferences.item(i);
+            Element sridElement = DomUtil.getFirstChildElement(
+              spatialReference, "LatestWKID");
+            if (sridElement == null) {
+              sridElement = DomUtil.getFirstChildElement(spatialReference,
+                "WKID");
+            }
+            if (sridElement != null) {
+              srid = DomUtil.getInteger(sridElement);
+            }
+          }
+          final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+            srid, 2);
+          setGeometryFactory(geometryFactory);
+
+          final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc,
+            "SourceGCPs");
+          final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
+            "TargetGCPs");
+          if (sourceControlPoints.size() == targetControlPoints.size()) {
+            final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
+            for (int i = 0; i < sourceControlPoints.size(); i += 2) {
+              final int dpi = 72; // need to read from Image
+              final double imageX = sourceControlPoints.get(i) * dpi;
+              final double imageY = sourceControlPoints.get(i + 1) * dpi;
+              final Coordinates sourcePixel = new DoubleCoordinates(imageX,
+                imageY);
+
+              final double x = targetControlPoints.get(i);
+              final double y = targetControlPoints.get(i + 1);
+              final Point targetPoint = geometryFactory.createPoint(x, y);
+              final MappedLocation tiePoint = new MappedLocation(sourcePixel,
+                targetPoint);
+              tiePoints.add(tiePoint);
+            }
+            setTiePoints(tiePoints);
+          }
+        } finally {
+          FileUtil.closeSilent(in);
+        }
+
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error("Unable to read: " + auxFile,
+          e);
+      }
+
+    }
+  }
+
+  private void loadImageMetaData() {
+    loadMetaDataFromImage();
+    final long modifiedTime = loadSettings();
+    loadAuxXmlFile(modifiedTime);
+    if (!hasGeometryFactory()) {
+      loadProjectionFile();
+    }
+    if (!hasBoundingBox()) {
+      loadWorldFile();
+    }
+  }
+
+  protected void loadMetaDataFromImage() {
+  }
+
+  protected void loadProjectionFile() {
+    final Resource resource = getImageResource();
     final Resource projectionFile = SpringUtil.getResourceWithExtension(
       resource, "prj");
     if (projectionFile.exists()) {
@@ -254,35 +380,96 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     }
   }
 
-  @SuppressWarnings("unused")
-  protected void loadWorldFile(final Resource resource,
-    final String worldFileExtension) {
-
-    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
-      worldFileExtension);
-    if (worldFile.exists()) {
+  protected long loadSettings() {
+    final Resource resource = getImageResource();
+    final Resource settingsFile = SpringUtil.addExtension(resource, "rgobject");
+    if (settingsFile.exists()) {
       try {
-        final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
-        try {
-          final double pixelWidth = Double.parseDouble(reader.readLine());
-          final double yRotation = Double.parseDouble(reader.readLine());
-          final double xRotation = Double.parseDouble(reader.readLine());
-          final double pixelHeight = Double.parseDouble(reader.readLine());
-          // Top left
-          final double x1 = Double.parseDouble(reader.readLine());
-          final double y1 = Double.parseDouble(reader.readLine());
-          setResolution(pixelWidth);
-
-          // TODO rotation
-          setBoundingBox(x1, y1, pixelWidth, pixelHeight);
-        } finally {
-          reader.close();
+        final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
+        final String boundingBoxWkt = (String)settings.get("boundingBox");
+        if (StringUtils.hasText(boundingBoxWkt)) {
+          final BoundingBox boundingBox = BoundingBox.create(boundingBoxWkt);
+          if (!boundingBox.isEmpty()) {
+            setBoundingBox(boundingBox);
+          }
         }
-      } catch (final IOException e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Error reading world file " + worldFile, e);
+
+        final List<?> tiePointsProperty = (List<?>)settings.get("tiePoints");
+        final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
+        if (tiePointsProperty != null) {
+          for (final Object tiePointValue : tiePointsProperty) {
+            if (tiePointValue instanceof MappedLocation) {
+              tiePoints.add((MappedLocation)tiePointValue);
+            } else if (tiePointValue instanceof Map) {
+              @SuppressWarnings("unchecked")
+              final Map<String, Object> map = (Map<String, Object>)tiePointValue;
+              tiePoints.add(new MappedLocation(map));
+            }
+          }
+        }
+        if (!tiePoints.isEmpty()) {
+          setTiePoints(tiePoints);
+        }
+
+        return SpringUtil.getLastModified(settingsFile);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to load:" + settingsFile, e);
+        return -1;
+      }
+    } else {
+      return -1;
+    }
+  }
+
+  protected void loadWorldFile() {
+    final Resource resource = getImageResource();
+    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
+      getWorldFileExtension());
+    loadWorldFile(worldFile);
+  }
+
+  @SuppressWarnings("unused")
+  protected void loadWorldFile(final Resource worldFile) {
+    if (boundingBox.isEmpty()) {
+      if (worldFile.exists()) {
+        try {
+          final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
+          try {
+            final double pixelWidth = Double.parseDouble(reader.readLine());
+            final double yRotation = Double.parseDouble(reader.readLine());
+            final double xRotation = Double.parseDouble(reader.readLine());
+            final double pixelHeight = Double.parseDouble(reader.readLine());
+            // Top left
+            final double x1 = Double.parseDouble(reader.readLine());
+            final double y1 = Double.parseDouble(reader.readLine());
+            setResolution(pixelWidth);
+            // TODO rotation using a warp filter
+            setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
+            // worldWarpFilter = new WarpAffineFilter(new BoundingBox(
+            // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
+            // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
+            // yRotation);
+          } finally {
+            reader.close();
+          }
+        } catch (final IOException e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Error reading world file " + worldFile, e);
+        }
       }
     }
+  }
+
+  protected void loadWorldFileX() {
+    final Resource resource = getImageResource();
+    final Resource worldFile = SpringUtil.getResourceWithExtension(resource,
+      getWorldFileExtension() + "x");
+    if (worldFile.exists()) {
+      loadWorldFile(worldFile);
+    } else {
+      loadWorldFile();
+    }
+
   }
 
   @Override
@@ -301,21 +488,33 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       }
       clearWarp();
     } else if (source instanceof MappedLocation) {
+      setHasChanges(true);
       clearWarp();
     }
     firePropertyChange(event);
   }
 
-  public void revert() {
-    if (this.imageResource != null) {
-      loadImageMetaData();
+  public boolean saveChanges() {
+    try {
+      final Resource rgResource = SpringUtil.addExtension(imageResource,
+        "rgobject");
+      MapObjectFactoryRegistry.write(rgResource, this);
+      setHasChanges(false);
+      return true;
+    } catch (final Throwable e) {
+      ExceptionUtil.log(getClass(), "Unable to save: " + imageResource
+        + ".rgobject", e);
+      return false;
     }
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    this.geometryFactory = boundingBox.getGeometryFactory();
-    this.boundingBox = boundingBox;
-    clearWarp();
+    if (!EqualsRegistry.equal(boundingBox, this.boundingBox)) {
+      this.geometryFactory = boundingBox.getGeometryFactory();
+      this.boundingBox = boundingBox;
+      clearWarp();
+      setHasChanges(true);
+    }
   }
 
   public void setBoundingBox(final double x1, final double y1,
@@ -338,6 +537,10 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  protected void setHasChanges(final boolean hasChanges) {
+    this.hasChanges = hasChanges;
   }
 
   public void setImage(final BufferedImage image) {
@@ -370,7 +573,21 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       for (final MappedLocation mappedLocation : tiePoints) {
         mappedLocation.addListener(this);
       }
+      setHasChanges(true);
       clearWarp();
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "image");
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox != null) {
+      MapSerializerUtil.add(map, "boundingBox", boundingBox.toString());
+    }
+    final List<MappedLocation> tiePoints = getTiePoints();
+    MapSerializerUtil.add(map, "tiePoints", tiePoints);
+    return map;
   }
 }

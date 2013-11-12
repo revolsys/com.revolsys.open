@@ -79,12 +79,7 @@ public class PdfImage extends GeoReferencedImage {
   }
 
   @Override
-  protected void loadImageMetaData() {
-    final Resource resource = getImageResource();
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox == null || boundingBox.isNull()) {
-      loadProjectionFile(resource);
-      loadWorldFile(resource, "pfw");
-    }
+  public String getWorldFileExtension() {
+    return "pfw";
   }
 }

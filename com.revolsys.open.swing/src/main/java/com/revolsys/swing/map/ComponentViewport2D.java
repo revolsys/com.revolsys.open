@@ -83,7 +83,7 @@ public class ComponentViewport2D extends Viewport2D {
     // Clip the bounding box with the map's visible area
     BoundingBox intersection = boundingBox.intersection(boundingBox);
     // If the clipped bounding box is null then move the map to the new BBOX
-    if (intersection.isNull()) {
+    if (intersection.isEmpty()) {
       intersection = boundingBox;
     }
     return intersection;
@@ -249,7 +249,7 @@ public class ComponentViewport2D extends Viewport2D {
       if (boundingBox != null) {
         final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
         final BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
-        if (intersection.isNull()) {
+        if (intersection.isEmpty()) {
           setBoundingBox(areaBoundingBox);
         } else {
           setBoundingBox(intersection);

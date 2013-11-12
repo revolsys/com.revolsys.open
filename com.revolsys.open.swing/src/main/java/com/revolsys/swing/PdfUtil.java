@@ -71,7 +71,7 @@ public class PdfUtil {
         final COSDictionary viewport = (COSDictionary)item;
         final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(
           mediaBox, viewport);
-        if (!boundingBox.isNull()) {
+        if (!boundingBox.isEmpty()) {
           return boundingBox;
         }
       }

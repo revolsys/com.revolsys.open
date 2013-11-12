@@ -40,7 +40,7 @@ public class GeoReferencedImageLayerRenderer extends
         final int imageWidth = geoReferencedImage.getImageWidth();
         final int imageHeight = geoReferencedImage.getImageHeight();
         if (imageWidth != -1 && imageHeight != -1) {
-          if (boundingBox != null && !boundingBox.isNull()) {
+          if (boundingBox != null && !boundingBox.isEmpty()) {
             final Point point = boundingBox.getTopLeftPoint();
             final double minX = point.getX();
             final double maxY = point.getY();
@@ -83,7 +83,7 @@ public class GeoReferencedImageLayerRenderer extends
         final GeoReferencedImage image = layer.getImage();
         if (image != null) {
           BoundingBox boundingBox = layer.getBoundingBox();
-          if (boundingBox == null || boundingBox.isNull()) {
+          if (boundingBox == null || boundingBox.isEmpty()) {
             boundingBox = layer.fitToViewport();
           }
           if (viewport.getBoundingBox().intersects(boundingBox)) {

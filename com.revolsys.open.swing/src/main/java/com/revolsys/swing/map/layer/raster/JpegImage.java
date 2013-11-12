@@ -9,9 +9,7 @@ public class JpegImage extends GeoReferencedImage {
   }
 
   @Override
-  protected void loadImageMetaData() {
-    final Resource resource = getImageResource();
-    loadProjectionFile(resource);
-    loadWorldFile(resource, "jgw");
+  public String getWorldFileExtension() {
+    return "jgw";
   }
 }

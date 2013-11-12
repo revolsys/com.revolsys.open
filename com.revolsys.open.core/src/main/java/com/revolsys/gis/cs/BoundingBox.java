@@ -453,7 +453,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     if (this.geometryFactory == null || geometryFactory == null
-      || this.geometryFactory.equals(geometryFactory) || isNull()) {
+      || this.geometryFactory.equals(geometryFactory) || isEmpty()) {
       return this;
     } else {
       final Polygon polygon = toPolygon();
@@ -483,10 +483,10 @@ public class BoundingBox extends Envelope implements Cloneable {
   public boolean equals(final Object other) {
     if (other instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)other;
-      if (isNull()) {
-        return boundingBox.isNull();
-      } else if (boundingBox.isNull()) {
-        return true;
+      if (isEmpty()) {
+        return boundingBox.isEmpty();
+      } else if (boundingBox.isEmpty()) {
+        return false;
       } else if (getSrid() == boundingBox.getSrid()) {
         if (getMaxX() == boundingBox.getMaxX()) {
           if (getMaxY() == boundingBox.getMaxY()) {
@@ -508,7 +508,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox expand(final double deltaX, final double deltaY) {
-    if (isNull() || (deltaX == 0 && deltaY == 0)) {
+    if (isEmpty() || (deltaX == 0 && deltaY == 0)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -530,7 +530,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox expandPercent(final double factorX, final double factorY) {
-    if (isNull()) {
+    if (isEmpty()) {
       return this;
     } else {
       final double deltaX = getWidth() * factorX / 2;
@@ -540,12 +540,12 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox expandToInclude(final BoundingBox other) {
-    if (other.isNull()) {
+    if (other.isEmpty()) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedOther = other.convert(geometryFactory);
-      if (isNull()) {
+      if (isEmpty()) {
         return convertedOther;
       } else if (contains(convertedOther)) {
         return this;
@@ -561,7 +561,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox expandToInclude(final Coordinates coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isNull()) {
+    if (isEmpty()) {
       return new BoundingBox(geometryFactory, coordinates);
     } else {
       final double x = coordinates.getX();
@@ -827,7 +827,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox intersection(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-    if (isNull() || convertedBoundingBox.isNull()
+    if (isEmpty() || convertedBoundingBox.isEmpty()
       || !intersects((Envelope)convertedBoundingBox)) {
       return new BoundingBox(geometryFactory);
     } else {
@@ -859,7 +859,7 @@ public class BoundingBox extends Envelope implements Cloneable {
    * @return The moved bounding box.
    */
   public BoundingBox move(final double xDisplacement, final double yDisplacement) {
-    if (isNull() || (xDisplacement == 0 && yDisplacement == 0)) {
+    if (isEmpty() || (xDisplacement == 0 && yDisplacement == 0)) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -876,7 +876,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public void setMaxZ(final double maxZ) {
-    if (isNull()) {
+    if (isEmpty()) {
       this.minZ = maxZ;
       this.maxZ = maxZ;
     }
@@ -889,7 +889,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public void setMinZ(final double minZ) {
-    if (isNull()) {
+    if (isEmpty()) {
       this.minZ = minZ;
       this.maxZ = minZ;
     }
@@ -993,7 +993,7 @@ public class BoundingBox extends Envelope implements Cloneable {
       s.append(geometryFactory.getSRID());
       s.append(";");
     }
-    if (isNull()) {
+    if (isEmpty()) {
       s.append("BBOX EMPTY");
     } else {
       s.append("BBOX(");

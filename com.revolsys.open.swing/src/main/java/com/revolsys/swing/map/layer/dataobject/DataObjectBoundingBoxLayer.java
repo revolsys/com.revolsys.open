@@ -41,7 +41,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
 
   @Override
   public List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
-    if (boundingBox.isNull()) {
+    if (boundingBox.isEmpty()) {
       return Collections.emptyList();
     } else {
       synchronized (this.sync) {

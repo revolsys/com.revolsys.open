@@ -92,6 +92,11 @@ public class TiffImage extends GeoReferencedImage {
     super(imageResource);
   }
 
+  @Override
+  public String getWorldFileExtension() {
+    return "tfw";
+  }
+
   private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);
     Short coordinateSystemId = (Short)geoKeys.get(PROJECTED_CS_TYPE_GEO_KEY);
@@ -154,7 +159,7 @@ public class TiffImage extends GeoReferencedImage {
   }
 
   @Override
-  protected void loadImageMetaData() {
+  protected void loadMetaDataFromImage() {
     final Resource resource = getImageResource();
     final PlanarImage image = getJaiImage();
     final Object tiffDirectory = image.getProperty("tiff.directory");
@@ -164,8 +169,6 @@ public class TiffImage extends GeoReferencedImage {
     } else {
       if (!(tiffDirectory instanceof XTIFFDirectory)
         || !loadGeoTiffMetaData((XTIFFDirectory)tiffDirectory)) {
-        loadProjectionFile(resource);
-        loadWorldFile(resource, "tfw");
       }
     }
   }

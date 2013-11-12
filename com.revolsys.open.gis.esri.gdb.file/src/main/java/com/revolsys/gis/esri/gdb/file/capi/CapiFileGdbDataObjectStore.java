@@ -885,7 +885,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         }
       } else {
         final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
-        if (geometryAttribute == null || boundingBox.isNull()) {
+        if (geometryAttribute == null || boundingBox.isEmpty()) {
           return 0;
         } else {
           final StringBuffer sql = new StringBuffer();

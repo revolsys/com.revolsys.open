@@ -772,7 +772,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         LoggerFactory.getLogger(getClass()).error("Unable to render image", e);
       }
 
-      if (outlineBoundingBox != null && !outlineBoundingBox.isNull()) {
+      if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
         final Polygon imageBoundary = outlineBoundingBox.toPolygon(1);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -858,7 +858,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         if ("boundingBox".equals(propertyName)) {
           final BoundingBox boundingBox = layer.getBoundingBox();
           setImageBoundingBox(boundingBox);
-        } else if ("revert".equals(propertyName)) {
+        } else if ("hasChanges".equals(propertyName)) {
           clear();
           setLayer(layer);
         } else if ("deleted".equals(propertyName)) {

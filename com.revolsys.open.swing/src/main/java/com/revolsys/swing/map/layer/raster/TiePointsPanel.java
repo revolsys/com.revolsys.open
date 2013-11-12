@@ -30,8 +30,8 @@ public class TiePointsPanel extends TablePanel {
   private static final List<String> COLUMN_NAMES = Arrays.asList(
     "sourcePixel.x", "sourcePixel.y", "targetPoint.x", "targetPoint.y");
 
-  private static final List<String> TITLES = Arrays.asList("Source Pixel Y",
-    "Source Pixel Y", "TargetPoint X", "Target Point Y");
+  private static final List<String> TITLES = Arrays.asList("Source Pixel X",
+    "Source Pixel Y", "Target Point X", "Target Point Y");
 
   private final GeoReferencedImageLayer layer;
 

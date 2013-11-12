@@ -295,7 +295,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
-      if (!layerBoundingBox.isNull()) {
+      if (!layerBoundingBox.isEmpty()) {
         boudingBox = boudingBox.expandToInclude(layerBoundingBox);
       }
     }
@@ -309,7 +309,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       for (final Layer layer : this) {
         if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {
           final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
-          if (!layerBoundingBox.isNull()) {
+          if (!layerBoundingBox.isEmpty()) {
             boudingBox = boudingBox.expandToInclude(layerBoundingBox);
           }
         }
@@ -343,7 +343,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   }
 
   protected File getGroupSettingsDirectory(final File directory) {
-    final String name = FileUtil.getFileName(directory);
+    final String name = getName();
     final String groupDirectoryName = FileUtil.getSafeFileName(name);
     final File groupDirectory = FileUtil.getDirectory(directory,
       groupDirectoryName);
@@ -711,6 +711,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
+    map.remove("querySupported");
+    map.remove("queryable");
+    map.remove("editable");
+    map.remove("selectable");
+    map.remove("selectSupported");
 
     final List<String> layerFiles = new ArrayList<String>();
     final List<Layer> layers = getLayers();

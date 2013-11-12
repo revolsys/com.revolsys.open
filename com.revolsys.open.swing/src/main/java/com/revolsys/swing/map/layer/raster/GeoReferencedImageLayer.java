@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.raster;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.SwingUtilities;
@@ -16,7 +14,6 @@ import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.map.MapObjectFactory;
@@ -33,7 +30,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
-import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -60,11 +56,13 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
       "pencil", readonly, "toggleEditable"), editable);
 
-    // final EnableCheck hasChanges = new
-    // TreeItemPropertyEnableCheck("hasChanges");
+    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
 
-    // menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
-    // "table_save", hasChanges, "saveChanges"));
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
+      "map_save", hasChanges, "saveChanges"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
+      "map_cancel", "cancelChanges"));
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("View Tie-Points",
       "table_go", "showTiePointsTable"));
@@ -75,10 +73,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
       "arrow_out", editable, "fitToViewport"));
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Revert to Saved",
-      "arrow_revert", editable, "revert"));
-
   }
 
   public static GeoReferencedImageLayer create(
@@ -102,6 +96,32 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setRenderer(new GeoReferencedImageLayerRenderer(this));
   }
 
+  public void cancelChanges() {
+    if (this.image == null && this.resource != null) {
+      GeoReferencedImage image = null;
+      final Resource imageResource = SpringUtil.getResource(this.url);
+      if (imageResource.exists()) {
+        try {
+          image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
+          if (image == null) {
+            LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+              "Cannot load image: " + this.url);
+          }
+        } catch (final RuntimeException e) {
+          LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+            "Unable to load image: " + this.url, e);
+        }
+      } else {
+        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
+          "Image does not exist: " + this.url);
+      }
+      setImage(image);
+    } else {
+      this.image.cancelChanges();
+    }
+    firePropertyChange("hasChanges", true, false);
+  }
+
   @Override
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
@@ -118,7 +138,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (StringUtils.hasText(url)) {
       this.url = url;
       resource = SpringUtil.getResource(url);
-      revert();
+      cancelChanges();
       return true;
     } else {
       LoggerFactory.getLogger(getClass()).error(
@@ -127,14 +147,23 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
+  @Override
+  protected boolean doSaveChanges() {
+    if (image == null) {
+      return true;
+    } else {
+      return image.saveChanges();
+    }
+  }
+
   public BoundingBox fitToViewport() {
     final Project project = getProject();
-    if (project == null || this.image == null) {
+    if (project == null || this.image == null || !isInitialized()) {
       return new BoundingBox();
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-      if (viewBoundingBox.isNull()) {
+      if (viewBoundingBox.isEmpty()) {
         return viewBoundingBox;
       } else {
         final double viewRatio = viewBoundingBox.getAspectRatio();
@@ -163,7 +192,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       return new BoundingBox();
     } else {
       final BoundingBox boundingBox = image.getBoundingBox();
-      if (boundingBox == null || boundingBox.isNull()) {
+      if (boundingBox.isEmpty()) {
         return fitToViewport();
       }
       return boundingBox;
@@ -188,23 +217,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return this.image;
   }
 
-  protected List<MappedLocation> getTiePointsProperty() {
-    final List<?> tiePointsProperty = getProperty("tiePoints");
-    final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
-    if (tiePointsProperty != null) {
-      for (final Object tiePointValue : tiePointsProperty) {
-        if (tiePointValue instanceof MappedLocation) {
-          tiePoints.add((MappedLocation)tiePointValue);
-        } else if (tiePointValue instanceof Map) {
-          final Map<String, Object> map = (Map<String, Object>)tiePointValue;
-          tiePoints.add(new MappedLocation(map));
-        }
-      }
-
-    }
-    return tiePoints;
-  }
-
   public WarpFilter getWarpFilter() {
     if (isShowOriginalImage()) {
       return new WarpAffineFilter(getBoundingBox(), image.getImageWidth(),
@@ -216,49 +228,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public boolean isHasChanges() {
-    return false;
+    if (image == null) {
+      return false;
+    } else {
+      return image.isHasChanages();
+    }
   }
 
   public boolean isShowOriginalImage() {
     return showOriginalImage;
-  }
-
-  public void revert() {
-    if (this.image == null && this.resource != null) {
-      GeoReferencedImage image = null;
-      final Resource imageResource = SpringUtil.getResource(this.url);
-      if (imageResource.exists()) {
-        try {
-          image = AbstractGeoReferencedImageFactory.loadGeoReferencedImage(imageResource);
-          if (image == null) {
-            LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-              "Cannot load image: " + this.url);
-          }
-        } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-            "Unable to load image: " + this.url, e);
-        }
-      } else {
-        LoggerFactory.getLogger(GeoReferencedImageLayer.class).error(
-          "Image does not exist: " + this.url);
-      }
-      setImage(image);
-    } else {
-      this.image.revert();
-    }
-    if (this.image != null) {
-      final Object boundingBoxProperty = getProperty("boundingBox");
-      final BoundingBox boundingBox = StringConverterRegistry.toObject(
-        BoundingBox.class, boundingBoxProperty);
-      if (boundingBox != null && !boundingBox.isEmpty()) {
-        image.setBoundingBox(boundingBox);
-      }
-
-      final List<MappedLocation> tiePoints = getTiePointsProperty();
-      image.setTiePoints(tiePoints);
-
-    }
-    firePropertyChange("revert", false, true);
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -280,14 +258,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       Property.addListener(image, this);
     }
     firePropertyChange("image", old, this.image);
-  }
-
-  @Override
-  public void setProperty(final String name, Object value) {
-    if ("boundingBox".equals(name)) {
-      value = StringConverterRegistry.toObject(BoundingBox.class, value);
-    }
-    super.setProperty(name, value);
   }
 
   public void setShowOriginalImage(final boolean showOriginalImage) {
@@ -361,24 +331,14 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     MapSerializerUtil.add(map, "url", this.url);
     MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage);
 
-    final BoundingBox boundingBox;
+    final Map<String, Object> imageSettings;
     if (image == null) {
-      final Object boundingBoxProperty = getProperty("boundingBox");
-      boundingBox = StringConverterRegistry.toObject(BoundingBox.class,
-        boundingBoxProperty);
+      imageSettings = getProperty("imageSettings");
     } else {
-      boundingBox = image.getBoundingBox();
+      imageSettings = image.toMap();
     }
-    if (boundingBox != null) {
-      MapSerializerUtil.add(map, "boundingBox", boundingBox.toString());
-    }
-    List<MappedLocation> tiePoints;
-    if (image == null) {
-      tiePoints = getTiePointsProperty();
-    } else {
-      tiePoints = image.getTiePoints();
-    }
-    MapSerializerUtil.add(map, "tiePoints", tiePoints);
+    MapSerializerUtil.add(map, "imageSettings", imageSettings);
+
     return map;
   }
 }

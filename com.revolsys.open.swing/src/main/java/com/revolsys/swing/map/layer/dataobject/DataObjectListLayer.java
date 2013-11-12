@@ -198,7 +198,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
     final double width = boundingBox.getWidth();
     final double height = boundingBox.getHeight();
-    if (boundingBox.isNull() || width == 0 || height == 0) {
+    if (boundingBox.isEmpty() || width == 0 || height == 0) {
       return Collections.emptyList();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();

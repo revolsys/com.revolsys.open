@@ -188,7 +188,7 @@ public class Viewport2D {
   public Geometry getGeometry(final Geometry geometry) {
     final BoundingBox viewExtent = getBoundingBox();
     if (geometry != null && !geometry.isEmpty()) {
-      if (!viewExtent.isNull()) {
+      if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           final GeometryFactory geometryFactory = getGeometryFactory();
@@ -444,7 +444,7 @@ public class Viewport2D {
       double unitsPerPixel = 0;
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      if (!convertedBoundingBox.isNull()) {
+      if (!convertedBoundingBox.isEmpty()) {
         BoundingBox newBoundingBox = convertedBoundingBox;
 
         final int viewWidthPixels = getViewWidthPixels();

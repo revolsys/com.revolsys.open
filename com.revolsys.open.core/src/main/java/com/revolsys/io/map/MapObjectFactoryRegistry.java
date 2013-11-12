@@ -69,4 +69,10 @@ public class MapObjectFactoryRegistry {
     final Map<String, Object> properties = serializer.toMap();
     JsonMapIoFactory.write(properties, file, true);
   }
+
+  public static void write(final Resource resource,
+    final MapSerializer serializer) {
+    final Map<String, Object> properties = serializer.toMap();
+    JsonMapIoFactory.write(properties, resource, true);
+  }
 }

@@ -35,6 +35,17 @@ public class SpringUtil {
 
   private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 
+  public static Resource addExtension(final Resource resource,
+    final String extension) {
+    final String fileName = resource.getFilename();
+    final String newFileName = fileName + "." + extension;
+    try {
+      return resource.createRelative(newFileName);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get resource " + newFileName, e);
+    }
+  }
+
   public static void close(
     final ConfigurableApplicationContext applicationContext) {
     if (applicationContext != null) {
@@ -271,7 +282,6 @@ public class SpringUtil {
     } catch (final IOException e) {
       throw new RuntimeException("Unable to get resource " + newFileName, e);
     }
-
   }
 
   public static String getString(final Resource resource) {
@@ -297,5 +307,13 @@ public class SpringUtil {
     final Resource oldResource = SpringUtil.BASE_RESOURCE.get();
     SpringUtil.BASE_RESOURCE.set(baseResource);
     return oldResource;
+  }
+
+  public static long getLastModified(final Resource resource) {
+    try {
+      return resource.lastModified();
+    } catch (final IOException e) {
+      return Long.MAX_VALUE;
+    }
   }
 }
