@@ -39,10 +39,12 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   }
 
   public void insert(final DataObject object) {
-    final Geometry geometry = object.getGeometryValue();
-    if (geometry != null && !geometry.isEmpty()) {
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
-      insert(boundingBox, object);
+    if (object != null) {
+      final Geometry geometry = object.getGeometryValue();
+      if (geometry != null && !geometry.isEmpty()) {
+        final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+        insert(boundingBox, object);
+      }
     }
   }
 

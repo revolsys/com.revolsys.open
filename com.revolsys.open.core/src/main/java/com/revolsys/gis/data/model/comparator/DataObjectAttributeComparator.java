@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.util.CompareUtil;
 
 public class DataObjectAttributeComparator implements Comparator<DataObject> {
   private List<String> attributeNames;
@@ -66,7 +67,7 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
         return -1;
       }
     } else {
-      final int compare = value1.compareTo(value2);
+      final int compare = CompareUtil.compare(value1, value2);
       if (invert) {
         return -compare;
       } else {

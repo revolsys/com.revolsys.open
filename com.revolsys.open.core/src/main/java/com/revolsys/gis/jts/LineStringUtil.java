@@ -558,6 +558,14 @@ public final class LineStringUtil {
     return z;
   }
 
+  public static Point getEndPoint(final LineString line, final boolean fromPoint) {
+    if (fromPoint) {
+      return getFromPoint(line);
+    } else {
+      return getToPoint(line);
+    }
+  }
+
   public static Coordinates getFromCoordinates(final LineString line) {
     return getCoordinates(line, 0);
   }
