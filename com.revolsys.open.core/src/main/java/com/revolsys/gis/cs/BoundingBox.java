@@ -845,6 +845,16 @@ public class BoundingBox extends Envelope implements Cloneable {
     return intersects((Envelope)convertedBoundingBox);
   }
 
+  public boolean intersects(final DataObject record) {
+    final BoundingBox boundingBox = getBoundingBox(record);
+    return intersects(boundingBox);
+  }
+
+  public boolean intersects(final Geometry geometry) {
+    final BoundingBox boundingBox = getBoundingBox(geometry);
+    return intersects(boundingBox);
+  }
+
   public boolean isEmpty() {
     return isNull();
   }

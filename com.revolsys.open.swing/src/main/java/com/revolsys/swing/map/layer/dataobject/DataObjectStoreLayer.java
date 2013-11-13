@@ -95,14 +95,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.saveRecordChangesMethod.setAccessible(true);
   }
 
-  protected boolean addCachedRecords(final List<LayerDataObject> records,
-    final LayerDataObject record) {
+  @SuppressWarnings("unchecked")
+  protected <V extends LayerDataObject> boolean addCachedRecord(
+    final List<V> records, final V record) {
     final String id = getId(record);
     if (id == null) {
       records.add(record);
     } else {
       synchronized (this.cachedRecords) {
-        final LayerDataObject cachedRecord = this.cachedRecords.get(id);
+        final V cachedRecord = (V)this.cachedRecords.get(id);
         if (cachedRecord == null) {
           records.add(record);
         } else {
@@ -115,6 +116,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
     }
     return true;
+  }
+
+  protected void addIds(final Set<String> ids,
+    final Collection<? extends DataObject> records) {
+    for (final DataObject record : records) {
+      final String id = getId((LayerDataObject)record);
+      if (id != null) {
+        ids.add(id);
+      }
+    }
   }
 
   @Override
@@ -168,33 +179,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
    */
   private void cleanCachedRecords() {
     synchronized (this.cachedRecords) {
-      final Set<String> ids = new HashSet<String>();
-      ids.addAll(this.deletedRecordIds);
-      ids.addAll(this.formRecordIds);
-      for (final LayerDataObject record : getSelectedRecords()) {
-        final String id = getId(record);
-        if (id != null) {
-          ids.add(id);
-        }
-      }
-      for (final LayerDataObject record : getHighlightedRecords()) {
-        final String id = getId(record);
-        if (id != null) {
-          ids.add(id);
-        }
-      }
-      for (final LayerDataObject record : getModifiedRecords()) {
-        final String id = getId(record);
-        if (id != null) {
-          ids.add(id);
-        }
-      }
-      for (final DataObject record : getIndex().queryAll()) {
-        final String id = getId((LayerDataObject)record);
-        if (id != null) {
-          ids.add(id);
-        }
-      }
+      final Set<String> ids = getIdsToCache();
       this.cachedRecords.keySet().retainAll(ids);
     }
   }
@@ -405,11 +390,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return getCoordinateSystem().getAreaBoundingBox();
   }
 
-  protected List<LayerDataObject> getCachedRecords(
-    final List<LayerDataObject> records) {
-    final List<LayerDataObject> cachedRecords = new ArrayList<LayerDataObject>();
-    for (final LayerDataObject record : records) {
-      addCachedRecords(cachedRecords, record);
+  protected <V extends LayerDataObject> List<V> getCachedRecords(
+    final Collection<? extends V> records) {
+    final List<V> cachedRecords = new ArrayList<V>();
+    for (final V record : records) {
+      addCachedRecord(cachedRecords, record);
     }
     return cachedRecords;
   }
@@ -471,6 +456,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } else {
       return null;
     }
+  }
+
+  protected Set<String> getIdsToCache() {
+    final Set<String> ids = new HashSet<String>();
+    ids.addAll(this.deletedRecordIds);
+    ids.addAll(this.formRecordIds);
+    addIds(ids, getSelectedRecords());
+    addIds(ids, getHighlightedRecords());
+    addIds(ids, getModifiedRecords());
+    addIds(ids, getIndex().queryAll());
+    return ids;
   }
 
   public BoundingBox getLoadingBoundingBox() {
@@ -643,7 +639,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           try {
             final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
             for (final LayerDataObject record : reader) {
-              final boolean added = addCachedRecords(records, record);
+              final boolean added = addCachedRecord(records, record);
               if (added && statistics != null) {
                 statistics.add(record);
               }

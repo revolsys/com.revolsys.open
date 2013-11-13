@@ -77,6 +77,17 @@ public class SpringUtil {
     }
   }
 
+  public static boolean delete(final Resource resource) {
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
+      final File file = fileResource.getFile();
+      if (resource.exists()) {
+        return file.delete();
+      }
+    }
+    return false;
+  }
+
   public static GenericApplicationContext getApplicationContext(
     final ClassLoader classLoader, final Resource... resources) {
     final GenericApplicationContext applicationContext = new GenericApplicationContext();
@@ -175,6 +186,14 @@ public class SpringUtil {
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open stream to resource "
         + resource, e);
+    }
+  }
+
+  public static long getLastModified(final Resource resource) {
+    try {
+      return resource.lastModified();
+    } catch (final IOException e) {
+      return Long.MAX_VALUE;
     }
   }
 
@@ -307,13 +326,5 @@ public class SpringUtil {
     final Resource oldResource = SpringUtil.BASE_RESOURCE.get();
     SpringUtil.BASE_RESOURCE.set(baseResource);
     return oldResource;
-  }
-
-  public static long getLastModified(final Resource resource) {
-    try {
-      return resource.lastModified();
-    } catch (final IOException e) {
-      return Long.MAX_VALUE;
-    }
   }
 }

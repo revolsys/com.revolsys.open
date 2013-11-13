@@ -52,6 +52,7 @@ public class MavenRepositoryCache extends MavenRepository {
         SpringUtil.copy(repositoryResource, resource);
         return true;
       } catch (final Exception e) {
+        SpringUtil.delete(repositoryResource);
         LOG.warn("Unable to download " + repositoryResource, e);
       }
     }

@@ -27,6 +27,8 @@ public class PointDataObjectMap {
 
   private int size = 0;
 
+  private boolean removeEmptyLists;
+
   public PointDataObjectMap() {
   }
 
@@ -61,6 +63,11 @@ public class PointDataObjectMap {
   public void clear() {
     size = 0;
     objectMap = new HashMap<Coordinates, List<DataObject>>();
+  }
+
+  public boolean containsKey(final Point point) {
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    return objectMap.containsKey(coordinates);
   }
 
   public List<DataObject> getAll() {
@@ -114,6 +121,10 @@ public class PointDataObjectMap {
     return objects;
   }
 
+  public boolean isRemoveEmptyLists() {
+    return removeEmptyLists;
+  }
+
   public void remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     final Coordinates coordinates = CoordinatesUtil.get(geometry);
@@ -121,12 +132,18 @@ public class PointDataObjectMap {
     if (objects != null) {
       objects.remove(object);
       if (objects.isEmpty()) {
-        objectMap.remove(coordinates);
+        if (isRemoveEmptyLists()) {
+          objectMap.remove(coordinates);
+        }
       } else if (comparator != null) {
         Collections.sort(objects, comparator);
       }
     }
     size--;
+  }
+
+  public void setRemoveEmptyLists(final boolean removeEmptyLists) {
+    this.removeEmptyLists = removeEmptyLists;
   }
 
   public int size() {
