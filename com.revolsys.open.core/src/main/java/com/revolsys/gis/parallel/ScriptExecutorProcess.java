@@ -24,6 +24,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
+import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.BaseInProcess;
@@ -52,18 +54,14 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
   protected void destroy() {
     try {
       while (!tasks.isEmpty()) {
-        try {
-          synchronized (this) {
-            wait(1000);
-            for (final Iterator<Future<?>> taskIter = tasks.iterator(); taskIter.hasNext();) {
-              final Future<?> task = taskIter.next();
-              if (task.isDone()) {
-                taskIter.remove();
-              }
+        synchronized (this) {
+          ThreadUtil.pause(this, 1000);
+          for (final Iterator<Future<?>> taskIter = tasks.iterator(); taskIter.hasNext();) {
+            final Future<?> task = taskIter.next();
+            if (task.isDone()) {
+              taskIter.remove();
             }
           }
-        } catch (final InterruptedException e) {
-          throw new RuntimeException(e);
         }
       }
     } finally {
@@ -93,7 +91,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
         while (tasks.size() >= maxConcurrentScripts) {
           try {
             synchronized (this) {
-              wait(1000);
+              ThreadUtil.pause(1000);
               for (final Iterator<Future<?>> taskIter = tasks.iterator(); taskIter.hasNext();) {
                 final Future<?> task = taskIter.next();
                 if (task.isDone()) {
@@ -101,7 +99,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
                 }
               }
             }
-          } catch (final InterruptedException e) {
+          } catch (final ThreadInterruptedException e) {
             throw new ClosedException(e);
           }
         }

@@ -423,7 +423,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Map<String, Object> columnDef = new LinkedHashMap<String, Object>();
       columnDef.put("aTargets", Arrays.asList(i));
       columnDef.put("sName", serializer.getKey());
-      columnDef.put("sClass", serializer.getKey());
+      columnDef.put("sClass",
+        serializer.getKey().replaceAll("[^A-Za-z0-9]", "_"));
       columnDef.put("sTitle", serializer.getLabel());
 
       final Boolean sortable = serializer.getProperty("sortable");
@@ -708,8 +709,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     if (form.isPosted() && form.isMainFormTask()) {
       if (form.isValid()) {
-        if ((Boolean)JavaBeanUtil.method(this, preInsertMethod, form,
-          object)) {
+        if ((Boolean)JavaBeanUtil.method(this, preInsertMethod, form, object)) {
           insertObject(object);
           parameters.put("message", "Saved");
           final Object id = Property.get(object, getIdPropertyName());

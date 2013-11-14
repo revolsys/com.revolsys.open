@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.parallel.ThreadUtil;
+
 public class NamedChannelBundle<T> {
 
   /** Flag indicating if the channel has been closed. */
@@ -168,7 +171,7 @@ public class NamedChannelBundle<T> {
           Queue<T> queue = getNextValueQueue(names);
           if (timeout == 0) {
             while (queue == null) {
-              monitor.wait();
+              ThreadUtil.pause(monitor);
               if (isClosed()) {
                 throw new ClosedException();
               }
@@ -178,7 +181,7 @@ public class NamedChannelBundle<T> {
           } else if (timeout > 0) {
             long waitTime = maxTime - System.currentTimeMillis();
             while (queue == null && waitTime > 0) {
-              monitor.wait(waitTime);
+              ThreadUtil.pause(monitor, waitTime);
               if (isClosed()) {
                 throw new ClosedException();
               }
@@ -196,7 +199,7 @@ public class NamedChannelBundle<T> {
             monitor.notifyAll();
             return value;
           }
-        } catch (final InterruptedException e) {
+        } catch (final ThreadInterruptedException e) {
           close();
           monitor.notifyAll();
           throw new ClosedException();

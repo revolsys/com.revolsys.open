@@ -7,6 +7,9 @@ import java.util.UUID;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
+import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.parallel.ThreadUtil;
+
 public abstract class AbstractResetableProcess extends AbstractProcess {
   private String status = "initialized";
 
@@ -100,9 +103,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
             } else {
               status = "waiting";
             }
-            synchronized (this) {
-              wait(waitTime);
-            }
+            ThreadUtil.pause(this, waitTime);
           }
         }
 
@@ -112,7 +113,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
           }
         }
       }
-    } catch (final InterruptedException e) {
+    } catch (final ThreadInterruptedException e) {
     } finally {
       try {
         postRun();
@@ -152,11 +153,9 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
     }
   }
 
-  protected void waitOnExecutions() throws InterruptedException {
-    synchronized (executions) {
-      status = "waiting on executions";
-      executions.wait(waitTime);
-    }
+  protected void waitOnExecutions() {
+    status = "waiting on executions";
+    ThreadUtil.pause(executions, waitTime);
   }
 
 }

@@ -1,5 +1,6 @@
 package com.revolsys.ui.web.controller;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -9,6 +10,12 @@ import com.revolsys.ui.model.Menu;
 
 public abstract class BaseController extends AbstractController {
   private Menu actionMenu = new Menu();
+
+  @PreDestroy
+  public void destroy() {
+    setApplicationContext(null);
+    actionMenu = null;
+  }
 
   public Menu getActionMenu() {
     return actionMenu;

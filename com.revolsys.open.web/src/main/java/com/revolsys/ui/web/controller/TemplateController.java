@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,10 +19,18 @@ public class TemplateController extends AbstractController {
 
   private String viewName;
 
-  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public TemplateController() {
     urlPathHelper.setAlwaysUseFullPath(true);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    setApplicationContext(null);
+    attributes = Collections.emptyMap();
+    viewName = null;
+    urlPathHelper = null;
   }
 
   public Map<String, Object> getAttributes() {
@@ -33,8 +42,7 @@ public class TemplateController extends AbstractController {
   }
 
   @Override
-  public ModelAndView handleRequestInternal(
-    final HttpServletRequest request,
+  public ModelAndView handleRequestInternal(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     String path = urlPathHelper.getOriginatingRequestUri(request);
 

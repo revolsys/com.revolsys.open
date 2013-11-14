@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.parallel.ThreadInterruptedException;
+
 public final class JavaProcess {
 
   public static Process exec(final List<String> javaArguments,
@@ -48,10 +50,13 @@ public final class JavaProcess {
   }
 
   public static int execAndWait(final List<String> javaArguments,
-    final Class<?> klass, final List<String> programArguments)
-    throws InterruptedException {
+    final Class<?> klass, final List<String> programArguments) {
     final Process process = exec(javaArguments, klass, programArguments);
-    process.waitFor();
+    try {
+      process.waitFor();
+    } catch (final InterruptedException e) {
+      throw new ThreadInterruptedException(e);
+    }
     return process.exitValue();
   }
 

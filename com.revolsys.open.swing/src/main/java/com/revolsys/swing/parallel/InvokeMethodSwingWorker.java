@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.InvokeMethodCallable;
+import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
@@ -90,7 +91,7 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
         result = get();
       }
     } catch (final InterruptedException e) {
-      return;
+      throw new ThreadInterruptedException(e);
     } catch (final ExecutionException e) {
       final Throwable cause = e.getCause();
       ExceptionUtil.log(getClass(), "Error running " + this.description
@@ -111,8 +112,8 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
           "Error running "
             + this.description
             + " using "
-            + Property.toString(this.doneObject,
-              this.doneMethodName, parameters), e);
+            + Property.toString(this.doneObject, this.doneMethodName,
+              parameters), e);
       }
     }
   }

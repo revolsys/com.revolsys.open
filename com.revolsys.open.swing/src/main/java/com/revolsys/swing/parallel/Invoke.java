@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.beans.MethodInvoker;
+import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.transaction.TransactionUtils;
 import com.revolsys.util.CollectionUtil;
@@ -79,7 +80,7 @@ public class Invoke {
       try {
         SwingUtilities.invokeAndWait(runnable);
       } catch (final InterruptedException e) {
-        ExceptionUtil.throwUncheckedException(e);
+        throw new ThreadInterruptedException(e);
       } catch (final InvocationTargetException e) {
         ExceptionUtil.throwCauseException(e);
       }

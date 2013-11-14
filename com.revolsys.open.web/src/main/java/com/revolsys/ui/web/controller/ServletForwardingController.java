@@ -16,6 +16,7 @@
 
 package com.revolsys.ui.web.controller;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,9 +36,15 @@ public class ServletForwardingController extends AbstractController implements
 
   private String beanName;
 
+  @PreDestroy
+  public void destroy() {
+    setApplicationContext(null);
+    servletName = null;
+    beanName = null;
+  }
+
   @Override
-  protected ModelAndView handleRequestInternal(
-    HttpServletRequest request,
+  protected ModelAndView handleRequestInternal(HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
 
     final ServletContext servletContext = getServletContext();
@@ -76,6 +83,7 @@ public class ServletForwardingController extends AbstractController implements
     return null;
   }
 
+  @Override
   public void setBeanName(final String name) {
     this.beanName = name;
     if (this.servletName == null) {
@@ -104,8 +112,7 @@ public class ServletForwardingController extends AbstractController implements
    * @see javax.servlet.ServletResponse#isCommitted
    * @see org.springframework.web.util.WebUtils#isIncludeRequest
    */
-  protected boolean useInclude(
-    final HttpServletRequest request,
+  protected boolean useInclude(final HttpServletRequest request,
     final HttpServletResponse response) {
     return (WebUtils.isIncludeRequest(request) || response.isCommitted());
   }

@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.swing.map.layer.Layer;
 
 public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -102,7 +103,7 @@ public class LayerTreeCellRenderer extends DefaultTreeCellRenderer {
     try {
       tracker.waitForAll();
     } catch (final InterruptedException e) {
-      throw new RuntimeException(e);
+      throw new ThreadInterruptedException(e);
     }
 
     if (maxWidth == 0) {

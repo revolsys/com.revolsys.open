@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.parallel.NamedThreadFactory;
+import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.MultiInputSelector;
@@ -63,13 +65,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     if (command != null) {
       while (!isShutdown()) {
         if (taskCount.get() >= getMaximumPoolSize()) {
-          synchronized (monitor) {
-            try {
-              monitor.wait();
-            } catch (final InterruptedException e) {
-              return;
-            }
-          }
+          ThreadUtil.pause(monitor);
         }
         taskCount.incrementAndGet();
         try {
@@ -138,9 +134,8 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           }
         } catch (final ClosedException e) {
           final Throwable cause = e.getCause();
-          if (cause instanceof InterruptedException) {
-            final InterruptedException interrupedException = (InterruptedException)cause;
-            throw interrupedException;
+          if (cause instanceof ThreadInterruptedException) {
+            throw (ThreadInterruptedException)cause;
           }
           synchronized (monitor) {
             for (final Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator.hasNext();) {
@@ -155,7 +150,8 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           }
         }
       }
-    } catch (final InterruptedException e) {
+    } catch (final ThreadInterruptedException e) {
+      throw e;
     } catch (final Throwable t) {
       if (!isShutdown()) {
         LoggerFactory.getLogger(getClass()).error("Unexexpected error ", t);

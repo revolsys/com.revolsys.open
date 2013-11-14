@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.parallel.ThreadUtil;
+
 public class MultiInputSelector {
   private int enabledChannels = 0;
 
@@ -161,8 +164,8 @@ public class MultiInputSelector {
       synchronized (monitor) {
         if (!scheduled) {
           try {
-            monitor.wait(Math.min(msecs, maxWait), nsecs);
-          } catch (final InterruptedException e) {
+            ThreadUtil.pause(monitor, Math.min(msecs, maxWait), nsecs);
+          } catch (final ThreadInterruptedException e) {
             throw new ClosedException(e);
           }
         }
@@ -178,9 +181,9 @@ public class MultiInputSelector {
         synchronized (monitor) {
           try {
             if (!scheduled) {
-              monitor.wait(Math.min(msecs, maxWait), nsecs);
+              ThreadUtil.pause(monitor, Math.min(msecs, maxWait), nsecs);
             }
-          } catch (final InterruptedException e) {
+          } catch (final ThreadInterruptedException e) {
             throw new ClosedException(e);
           }
         }

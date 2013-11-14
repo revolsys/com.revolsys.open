@@ -234,7 +234,8 @@ $(document).ready(
         var form = $('form', this);
         var validate = form.validate({
           errorContainer : $('div.errorContainer', formWrapper),
-          wrapper : 'div',
+          errorLabelContainer: 'div.errorContainer ul',
+          wrapper : 'li',
           errorPlacement: function(label, element) {
             label.addClass('errorMessage');
             label.insertAfter(element);

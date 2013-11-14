@@ -95,7 +95,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
 
   private String beanName;
 
-  private final Set<String> beanNamesNotToExport = new HashSet<String>();
+  private Set<String> beanNamesNotToExport = new HashSet<String>();
 
   public ModuleImport() {
     beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");
@@ -114,6 +114,15 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     if (applicationContext != null) {
       applicationContext.close();
       applicationContext = null;
+      beanName = null;
+      beanNamesNotToExport = null;
+      exportBeanAliases = null;
+      exportBeanNames = null;
+      importBeanAliases = null;
+      importBeanNames = null;
+      parameters = null;
+      resourceEditorRegistrar = null;
+      resources = null;
     }
   }
 

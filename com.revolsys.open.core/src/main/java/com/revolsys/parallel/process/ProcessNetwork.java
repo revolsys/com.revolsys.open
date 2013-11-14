@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,6 +19,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
+import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
 
@@ -25,9 +28,9 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   private int count = 0;
 
-  private Map<Process, Thread> processes = new HashMap<Process, Thread>();
+  private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
 
-  boolean running = false;
+  private boolean running = false;
 
   private ThreadGroup threadGroup;
 
@@ -46,12 +49,18 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public void addProcess(final Process process) {
     synchronized (sync) {
-      if (processes != null && !processes.containsKey(process)) {
-        processes.put(process, null);
+      if (stopping) {
+        return;
+      } else {
+        if (!stopping) {
+          if (processes != null && !processes.containsKey(process)) {
+            processes.put(process, null);
+          }
+        }
       }
     }
     if (parent == null) {
-      if (running) {
+      if (running && !stopping) {
         start(process);
       }
     } else {
@@ -60,8 +69,10 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   private void finishRunning() {
-    running = false;
-    processes = null;
+    synchronized (sync) {
+      running = false;
+      processes.clear();
+    }
   }
 
   public String getName() {
@@ -246,35 +257,55 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
+  @SuppressWarnings("deprecation")
   @PreDestroy
   public void stop() {
+    final List<Thread> threads;
     synchronized (sync) {
       stopping = true;
       sync.notifyAll();
-      if (processes != null) {
-        try {
-          for (final Thread thread : new ArrayList<Thread>(processes.values())) {
-            if (thread != null && Thread.currentThread() != thread
-              && thread.isAlive()) {
-              try {
-                thread.interrupt();
-              } catch (final Exception e) {
+      threads = new ArrayList<Thread>(this.processes.values());
+    }
+    boolean interrupted = false;
+    try {
+      final long maxWait = System.currentTimeMillis() + 10000;
+      while (!threads.isEmpty() && System.currentTimeMillis() < maxWait) {
+        for (final Iterator<Thread> threadIter = threads.iterator(); threadIter.hasNext();) {
+          final Thread thread = threadIter.next();
+          if (thread == null || !thread.isAlive()
+            || Thread.currentThread() == thread) {
+            threadIter.remove();
+          } else {
+            try {
+              thread.interrupt();
+            } catch (final Exception e) {
+              if (e instanceof InterruptedException) {
+                interrupted = true;
               }
             }
-          }
-          for (final Thread thread : new ArrayList<Thread>(processes.values())) {
-            if (thread != null && Thread.currentThread() != thread
-              && thread.isAlive()) {
-              try {
-                thread.stop();
-              } catch (final Exception e) {
-              }
+            if (!thread.isAlive()) {
+              threadIter.remove();
             }
           }
-        } finally {
-          finishRunning();
         }
       }
+
+      for (final Thread thread : threads) {
+        if (thread.isAlive()) {
+          try {
+            thread.stop();
+          } catch (final Exception e) {
+            if (e instanceof InterruptedException) {
+              interrupted = true;
+            }
+          }
+        }
+      }
+      if (interrupted) {
+        Thread.currentThread().interrupt();
+      }
+    } finally {
+      finishRunning();
     }
   }
 
@@ -285,15 +316,10 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public void waitTillFinished() {
     if (parent == null) {
-
       synchronized (sync) {
         try {
           while (!stopping && count > 0) {
-            try {
-              sync.wait();
-            } catch (final InterruptedException e) {
-              return;
-            }
+            ThreadUtil.pause(sync);
           }
         } finally {
           finishRunning();
