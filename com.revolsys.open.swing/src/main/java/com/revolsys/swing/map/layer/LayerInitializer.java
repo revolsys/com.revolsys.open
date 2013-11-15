@@ -71,7 +71,7 @@ public class LayerInitializer extends SwingWorker<Void, Void> {
 
   @Override
   public String toString() {
-    if (layer != null) {
+    if (layer == null) {
       return "Initializing layers";
     } else {
       return "Initializing layer: " + layer.getPath();

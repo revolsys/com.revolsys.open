@@ -5,7 +5,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.ui.web.utils.HttpServletUtils;
@@ -13,6 +16,20 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 public class DispatcherServlet extends
   org.springframework.web.servlet.DispatcherServlet {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherServlet.class);
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    final WebApplicationContext webApplicationContext = getWebApplicationContext();
+    if (webApplicationContext instanceof AbstractApplicationContext) {
+      final AbstractApplicationContext cwac = (AbstractApplicationContext)webApplicationContext;
+      cwac.getApplicationListeners().clear();
+      final ApplicationEventMulticaster eventMultiCaster = cwac.getBean(
+        AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+        ApplicationEventMulticaster.class);
+      eventMultiCaster.removeAllListeners();
+    }
+  }
 
   @Override
   protected void doService(final HttpServletRequest request,
@@ -40,5 +57,4 @@ public class DispatcherServlet extends
       }
     }
   }
-
 }

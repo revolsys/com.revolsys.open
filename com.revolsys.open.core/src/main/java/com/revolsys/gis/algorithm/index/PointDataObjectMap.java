@@ -46,13 +46,7 @@ public class PointDataObjectMap {
   public void add(final DataObject object) {
     final Point point = object.getGeometryValue();
     final Coordinates coordinates = CoordinatesUtil.get(point);
-    List<DataObject> objects = objectMap.get(coordinates);
-    if (objects == null) {
-      objects = new ArrayList<DataObject>(1);
-      final Coordinates indexCoordinates = new DoubleCoordinates(
-        coordinates.getX(), coordinates.getY());
-      objectMap.put(indexCoordinates, objects);
-    }
+    final List<DataObject> objects = getObjectInternal(coordinates);
     objects.add(object);
     if (comparator != null) {
       Collections.sort(objects, comparator);
@@ -93,11 +87,32 @@ public class PointDataObjectMap {
     return null;
   }
 
+  public <V extends DataObject> V getFirstMatch(final Point point) {
+    final List<DataObject> objects = getObjects(point);
+    if (objects.isEmpty()) {
+      return null;
+    } else {
+      return (V)objects.get(0);
+    }
+
+  }
+
   public List<DataObject> getMatches(final DataObject object,
     final Filter<DataObject> filter) {
     final List<DataObject> objects = getObjects(object);
     final List<DataObject> filteredObjects = FilterUtil.filter(objects, filter);
     return filteredObjects;
+  }
+
+  protected List<DataObject> getObjectInternal(final Coordinates coordinates) {
+    List<DataObject> objects = objectMap.get(coordinates);
+    if (objects == null) {
+      objects = new ArrayList<DataObject>(1);
+      final Coordinates indexCoordinates = new DoubleCoordinates(
+        coordinates.getX(), coordinates.getY());
+      objectMap.put(indexCoordinates, objects);
+    }
+    return objects;
   }
 
   public List<DataObject> getObjects(final Coordinates coordinates) {
@@ -119,6 +134,13 @@ public class PointDataObjectMap {
     final Coordinates coordinates = CoordinatesUtil.get(point);
     final List<DataObject> objects = getObjects(coordinates);
     return objects;
+  }
+
+  public void initialize(final Point point) {
+    if (!isRemoveEmptyLists()) {
+      final Coordinates coordinates = CoordinatesUtil.get(point);
+      getObjectInternal(coordinates);
+    }
   }
 
   public boolean isRemoveEmptyLists() {
