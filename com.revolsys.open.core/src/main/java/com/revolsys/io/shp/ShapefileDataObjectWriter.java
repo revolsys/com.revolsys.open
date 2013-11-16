@@ -247,7 +247,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
           createGeometryWriter(geometry);
         }
         out.writeInt(recordNumber);
-        SHP_WRITER.write(geometryWriteMethod, indexOut, geometry);
+        SHP_WRITER.write(geometryWriteMethod, out, geometry);
 
         recordNumber++;
         if (indexOut != null) {

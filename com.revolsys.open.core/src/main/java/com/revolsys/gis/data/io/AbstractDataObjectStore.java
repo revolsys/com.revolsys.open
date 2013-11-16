@@ -166,13 +166,17 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public void addStatistic(final String statisticName, final DataObject object) {
-    statistics.add(statisticName, object);
+    if (statistics != null) {
+      statistics.add(statisticName, object);
+    }
   }
 
   @Override
   public void addStatistic(final String statisticName, final String typePath,
     final int count) {
-    statistics.add(statisticName, typePath, count);
+    if (statistics != null) {
+      statistics.add(statisticName, typePath, count);
+    }
   }
 
   @Override
@@ -673,6 +677,7 @@ public abstract class AbstractDataObjectStore extends
     statistics.setPrefix(label);
   }
 
+  @Override
   public void setLogCounts(final boolean logCounts) {
     statistics.setLogCounts(logCounts);
   }
