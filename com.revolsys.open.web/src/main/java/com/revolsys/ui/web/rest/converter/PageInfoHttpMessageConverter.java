@@ -425,7 +425,7 @@ public class PageInfoHttpMessageConverter extends
     final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
       MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
-      final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
+      final MapWriter writer = writerFactory.getMapWriter(new OutputStreamWriter(
         out, charset));
       writer.setProperty(IoConstants.INDENT_PROPERTY, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);

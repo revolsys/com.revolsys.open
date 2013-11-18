@@ -52,6 +52,14 @@ public final class StaxUtils {
     }
   }
 
+  public static XMLStreamReader createXmlReader(final InputStream inputStream) {
+    try {
+      return StaxUtils.FACTORY.createXMLStreamReader(inputStream);
+    } catch (final XMLStreamException e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
+
   public static XMLStreamReader createXmlReader(final Reader reader)
     throws IOException {
     try {
@@ -62,12 +70,8 @@ public final class StaxUtils {
   }
 
   public static XMLStreamReader createXmlReader(final Resource resource) {
-    try {
-      final InputStream inputStream = SpringUtil.getInputStream(resource);
-      return StaxUtils.FACTORY.createXMLStreamReader(inputStream);
-    } catch (final XMLStreamException e) {
-      throw new IllegalArgumentException(e.getMessage(), e);
-    }
+    final InputStream inputStream = SpringUtil.getInputStream(resource);
+    return createXmlReader(inputStream);
   }
 
   public static String getAttribute(final XMLStreamReader parser,

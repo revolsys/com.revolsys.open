@@ -21,19 +21,19 @@ public class XhtmlMapIoFactory extends AbstractIoFactory implements
   }
 
   @Override
-  public MapWriter getWriter(final OutputStream out) {
+  public MapWriter getMapWriter(final OutputStream out) {
     final Writer writer = new OutputStreamWriter(out);
-    return getWriter(writer);
+    return getMapWriter(writer);
   }
 
   @Override
-  public MapWriter getWriter(final Resource resource) {
+  public MapWriter getMapWriter(final Resource resource) {
     final Writer writer = SpringUtil.getWriter(resource);
-    return getWriter(writer);
+    return getMapWriter(writer);
   }
 
   @Override
-  public MapWriter getWriter(final Writer out) {
+  public MapWriter getMapWriter(final Writer out) {
     return new XhtmlMapWriter(out);
   }
 

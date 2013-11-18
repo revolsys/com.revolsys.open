@@ -1,7 +1,6 @@
 package com.revolsys.io.kml;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,12 +28,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   private final XMLStreamReader in;
 
-  public KmlGeometryIterator(final Reader reader) {
-    try {
-      this.in = StaxUtils.createXmlReader(reader);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to open resource " + reader);
-    }
+  public KmlGeometryIterator(final InputStream in) {
+    this.in = StaxUtils.createXmlReader(in);
   }
 
   public KmlGeometryIterator(final Resource resource) {

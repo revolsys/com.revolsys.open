@@ -582,6 +582,8 @@ public final class EpsgCoordinateSystems {
     return degrees;
   }
 
+  public static final CoordinateSystem WGS_84 = getCoordinateSystem(4326);
+
   private EpsgCoordinateSystems() {
   }
 }

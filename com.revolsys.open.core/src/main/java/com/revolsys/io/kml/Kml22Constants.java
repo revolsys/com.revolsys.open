@@ -34,13 +34,9 @@ public interface Kml22Constants {
 
   QName EXTENDED_DATA = new QName(KML_NS_URI, "ExtendedData");
 
-  String FILE_EXTENSION = "kml";
-
   QName FILL = new QName(KML_NS_URI, "fill");
 
   QName FOLDER = new QName(KML_NS_URI, "Folder");
-
-  String FORMAT_DESCRIPTION = "KML";
 
   QName GROUND_OVERLAY = new QName(KML_NS_URI, "GroundOverlay");
 
@@ -55,6 +51,18 @@ public interface Kml22Constants {
   QName INNER_BOUNDARY_IS = new QName(KML_NS_URI, "innerBoundaryIs");
 
   QName KML = new QName(KML_NS_URI, "kml");
+
+  String KML_FILE_EXTENSION = "kml";
+
+  String KML_FORMAT_DESCRIPTION = "KML - Google Earth";
+
+  String KML_MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
+
+  String KMZ_FILE_EXTENSION = "kmz";
+
+  String KMZ_FORMAT_DESCRIPTION = "KMZ - Google Earth";
+
+  String KMZ_MEDIA_TYPE = "application/vnd.google-earth.kmz";
 
   QName LABEL_STYLE = new QName(KML_NS_URI, "LabelStyle");
 
@@ -76,19 +84,17 @@ public interface Kml22Constants {
 
   QName LOOK_AT = new QName(KML_NS_URI, "LookAt");
 
+  String LOOK_AT_MAX_RANGE_PROPERTY = "kmlLookAtMaxRange";
+
+  String LOOK_AT_MIN_RANGE_PROPERTY = "kmlLookAtMinRange";
+
   String LOOK_AT_POINT_PROPERTY = "kmlLookAtPoint";
 
   String LOOK_AT_RANGE_PROPERTY = "kmlLookAtRange";
 
-  String LOOK_AT_MIN_RANGE_PROPERTY = "kmlLookAtMinRange";
-
-  String LOOK_AT_MAX_RANGE_PROPERTY = "kmlLookAtMaxRange";
-
   QName MAX_LINES = new QName("maxLines");
 
   QName MAX_LOD_PIXELS = new QName(KML_NS_URI, "maxLodPixels");
-
-  String MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
 
   QName MIN_LOD_PIXELS = new QName(KML_NS_URI, "minLodPixels");
 
@@ -107,8 +113,6 @@ public interface Kml22Constants {
   QName PLACEMARK = new QName(KML_NS_URI, "Placemark");
 
   String PLACEMARK_DESCRIPTION_PROPERTY = "kmlPlacemarkDescription";
-
-  String WRITE_NULLS_PROPERTY = "kmlWriteNulls";
 
   String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "kmlPlaceMarkNameAttribute";
 
@@ -147,4 +151,6 @@ public interface Kml22Constants {
   QName VISIBLITY = new QName(KML_NS_URI, "visibility");
 
   QName WEST = new QName(KML_NS_URI, "west");
+
+  String WRITE_NULLS_PROPERTY = "kmlWriteNulls";
 }

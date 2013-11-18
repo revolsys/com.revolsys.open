@@ -92,7 +92,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   @Override
   public String toString() {
-    return null;
+    return "KML Writer";
   }
 
   @Override
