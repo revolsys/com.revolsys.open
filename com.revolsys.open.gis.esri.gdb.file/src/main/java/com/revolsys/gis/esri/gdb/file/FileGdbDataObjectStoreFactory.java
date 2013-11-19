@@ -2,15 +2,17 @@ package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactory;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.esri.gdb.file.capi.CapiFileGdbDataObjectStore;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.CollectionUtil;
 
 public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
@@ -19,11 +21,43 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
   private static final List<String> URL_PATTERNS = Arrays.asList(
     "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
 
-  public static FileGdbDataObjectStore create(final File file) {
-    FileGdbDataObjectStore dataObjectStore;
-    dataObjectStore = new CapiFileGdbDataObjectStore(file);
-    dataObjectStore.setCreateMissingDataStore(false);
-    return dataObjectStore;
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
+
+  private static final Map<String, CapiFileGdbDataObjectStore> DATA_STORES = new HashMap<String, CapiFileGdbDataObjectStore>();
+
+  public static CapiFileGdbDataObjectStore create(final File file) {
+    if (file == null) {
+      return null;
+    } else {
+      synchronized (COUNTS) {
+        final String fileName = FileUtil.getCanonicalPath(file);
+        final AtomicInteger count = CollectionUtil.get(COUNTS, fileName,
+          new AtomicInteger());
+        count.incrementAndGet();
+        CapiFileGdbDataObjectStore dataStore = DATA_STORES.get(fileName);
+        if (dataStore == null) {
+          dataStore = new CapiFileGdbDataObjectStore(file);
+          dataStore.setCreateMissingDataStore(false);
+          DATA_STORES.put(fileName, dataStore);
+        }
+        return dataStore;
+      }
+    }
+  }
+
+  static void release(final String fileName) {
+    if (fileName != null) {
+      synchronized (COUNTS) {
+        final AtomicInteger counts = CollectionUtil.get(COUNTS, fileName,
+          new AtomicInteger());
+        final int count = counts.decrementAndGet();
+        if (count <= 0) {
+          final CapiFileGdbDataObjectStore dataStore = DATA_STORES.remove(fileName);
+          dataStore.doClose();
+          COUNTS.remove(fileName);
+        }
+      }
+    }
   }
 
   @Override

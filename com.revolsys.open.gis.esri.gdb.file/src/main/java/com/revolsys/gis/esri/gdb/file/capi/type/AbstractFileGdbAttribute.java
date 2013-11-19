@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.esri.gdb.file.capi.CapiFileGdbDataObjectStore;
+import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public abstract class AbstractFileGdbAttribute extends Attribute {

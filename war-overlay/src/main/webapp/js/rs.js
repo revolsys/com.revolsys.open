@@ -164,6 +164,47 @@ function tableShowEvents(table, heightPercent) {
   }
 }
 
+function validateIntegerNumber(element, value, min, max) {
+  var text = $.trim(value);
+  if (!text) {
+    if (this.optional(element)) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (/^-?\d+$/.test(text)) {
+    var number = parseInt(text);
+    if (min && number < min) {
+      return false;
+    } else if (max && number > max) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
+
+function validateDecimalNumber(element, value, min, max) {
+  var text = $.trim(value);
+  if (!text) {
+    if (this.optional(element)) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (/^-?\d+(\.\d*)?$/.test(text)) {
+    var number = parseFloat(text);
+    if (min && number < min) {
+      return false;
+    } else if (max && number > max) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
 
 $(document).ready(
   function() {
@@ -209,10 +250,19 @@ $(document).ready(
         }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
-      select : function(event, ui) {
-        window.location.replace(ui.tab.hash);
+      beforeActivate: function (event, ui) {
+        window.location.hash = ui.newPanel.selector;
       }
     });
+ 
+    $(window).bind('hashchange', function() {
+      var hash = window.location.hash;
+      if (hash) {
+        var anchor = $('a.ui-tabs-anchor[href=' + hash + ']');
+        anchor.click();
+      }
+    });
+     
     $('div.objectList table').dataTable({
       "bJQueryUI" : true,
       "bPaginate" : false,
@@ -257,56 +307,36 @@ $(document).ready(
           validate.form();
         }
       });
+
     jQuery.validator.addMethod("integer", function(value, element) {
-      if (this.optional(element)) {
-        return true;
-      } else if (/^-?\d+$/.test(value)) {
-        return true;
-      }
-      return false;
+      return validateIntegerNumber(element, value);
     }, "Please enter a valid integer number.");
+
     jQuery.validator.addMethod("byte", function(value, element) {
-      if (this.optional(element)) {
-        return true;
-      } else if (/^-?\d+$/.test(value)) {
-        var number = parseInt(value);
-        if (number >= -128 && number <= 127) {
-          return true;
-        }
-      }
-      return false;
+      return validateIntegerNumber(element, value, -128, 127);
     }, "Please enter a valid integer number -128 >=< 127.");
+
     jQuery.validator.addMethod("short", function(value, element) {
-      if (this.optional(element)) {
-        return true;
-      } else if (/^-?\d+$/.test(value)) {
-        var number = parseInt(value);
-        if (number >= -32768 && number <= 32767) {
-          return true;
-        }
-      }
-      return false;
+      return validateIntegerNumber(element, value, -32768, 32767);
     }, "Please enter a valid integer number -32768 >=< 32767.");
+
     jQuery.validator.addMethod("int", function(value, element) {
-      if (this.optional(element)) {
-        return true;
-      } else if (/^-?\d+$/.test(value)) {
-        var number = parseInt(value);
-        if (number >= -2147483648 && number <= 2147483647) {
-          return true;
-        }
-      }
-      return false;
+      return validateIntegerNumber(element, value, -2147483648, 2147483647);
     }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
+
     jQuery.validator.addMethod("long", function(value, element) {
-      if (this.optional(element)) {
-        return true;
-      } else if (/^-?\d+$/.test(value)) {
-        var number = parseInt(value);
-        if (number >= -9223372036854775808 && number <= 9223372036854775807) {
-          return true;
-        }
-      }
-      return false;
+      return validateIntegerNumber(element, value, -9223372036854775808, 9223372036854775807);
     }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
+
+    jQuery.validator.addMethod("number", function(value, element) {
+      return validateDecimalNumber(element, value);
+    }, "Please enter a valid number.");
+
+    jQuery.validator.addMethod("float", function(value, element) {
+      return validateDecimalNumber(element, value);
+    }, "Please enter a valid float number.");
+
+    jQuery.validator.addMethod("double", function(value, element) {
+      return validateDecimalNumber(element, value);
+    }, "Please enter a valid double number.");
   });

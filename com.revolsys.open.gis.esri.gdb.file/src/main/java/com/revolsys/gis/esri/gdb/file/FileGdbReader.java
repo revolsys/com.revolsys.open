@@ -1,4 +1,4 @@
-package com.revolsys.gis.esri.gdb.file.capi;
+package com.revolsys.gis.esri.gdb.file;
 
 import java.util.ArrayList;
 import java.util.List;

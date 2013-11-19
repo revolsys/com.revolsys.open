@@ -64,7 +64,7 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
 
   @Override
   public boolean isBinary() {
-    return false;
+    return true;
   }
 
   @Override

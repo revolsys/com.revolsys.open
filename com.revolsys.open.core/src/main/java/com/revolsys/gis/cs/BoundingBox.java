@@ -41,7 +41,9 @@ public class BoundingBox extends Envelope implements Cloneable {
     ConvertUtils.register(new Converter() {
 
       @Override
-      public Object convert(final Class paramClass, final Object paramObject) {
+      public Object convert(
+        @SuppressWarnings("rawtypes") final Class paramClass,
+        final Object paramObject) {
         if (paramObject == null) {
           return null;
         } else if (BoundingBox.class.isAssignableFrom(BoundingBox.class)) {
@@ -441,6 +443,15 @@ public class BoundingBox extends Envelope implements Cloneable {
       final double x = coordinate.getX();
       final double y = coordinate.getY();
       return contains(x, y);
+    }
+  }
+
+  public boolean contains(final Geometry geometry) {
+    if (geometry == null) {
+      return false;
+    } else {
+      final BoundingBox boundingBox = getBoundingBox(geometry);
+      return contains(boundingBox);
     }
   }
 
