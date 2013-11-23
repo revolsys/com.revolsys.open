@@ -213,8 +213,12 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   protected LayerDataObject getEventRowObject() {
     final DataObjectRowTableModel model = getTableModel();
     final int row = getEventRow();
-    final LayerDataObject object = model.getObject(row);
-    return object;
+    if (row > -1) {
+      final LayerDataObject object = model.getObject(row);
+      return object;
+    } else {
+      return null;
+    }
   }
 
   public AbstractDataObjectLayer getLayer() {

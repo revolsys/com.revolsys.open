@@ -281,16 +281,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   @Override
-  public LayerDataObject addComplete(final AbstractOverlay overlay,
-    final Geometry geometry) {
-    if (geometry == null) {
-      return null;
-    } else {
+  public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
+    if (geometry != null) {
       final DataObjectMetaData metaData = getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put(geometryAttributeName, geometry);
-      return showAddForm(parameters);
+      showAddForm(parameters);
     }
   }
 

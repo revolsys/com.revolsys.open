@@ -83,15 +83,19 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   public Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final String pageName,
     final Map<String, Object> parameters) {
-    final String search = request.getParameter("sSearch");
-    final DataObjectMetaData metaData = getDataStore().getMetaData(
-      getTableName());
+    final DataObjectMetaData metaData = getMetaData();
     final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
     final Query query = Query.and(metaData, filter);
 
     final String fromClause = (String)parameters.get("fromClause");
     query.setFromClause(fromClause);
 
+    return createDataTableMap(request, pageName, query);
+  }
+
+  protected Map<String, Object> createDataTableMap(
+    final HttpServletRequest request, final String pageName, final Query query) {
+    final String search = request.getParameter("sSearch");
     if (StringUtils.hasText(search)) {
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
       final MultipleCondition or = Conditions.or();
@@ -108,10 +112,8 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
         query.and(or);
       }
     }
-
     final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
     query.setOrderBy(orderBy);
-
     final ResultPager<DataObject> pager = getResultPager(query);
     try {
       return createDataTableMap(request, pager, pageName);
@@ -148,6 +150,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   public DataObjectStore getDataStore() {
     return dataStore;
+  }
+
+  protected DataObjectMetaData getMetaData() {
+    return getDataStore().getMetaData(getTableName());
   }
 
   public ResultPager<DataObject> getResultPager(final Query query) {

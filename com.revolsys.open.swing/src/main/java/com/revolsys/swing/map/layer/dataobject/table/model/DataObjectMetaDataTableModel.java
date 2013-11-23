@@ -9,20 +9,15 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.table.BaseJxTable;
 
-@SuppressWarnings("serial")
 public class DataObjectMetaDataTableModel extends AbstractTableModel {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Column",
-    "Type", "Length", "Scale", "Required");
+    "Type", "Length", "Scale", "Required", "Description");
 
   private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(
     Integer.class, String.class, String.class, Integer.class, Integer.class,
-    Boolean.class);
+    Boolean.class, String.class);
 
   public static BaseJxTable createTable(final DataObjectMetaData metaData) {
     if (metaData == null) {
@@ -49,7 +44,7 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return 6;
+    return 7;
   }
 
   @Override
@@ -81,6 +76,8 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
           return attribute.getScale();
         case 5:
           return attribute.isRequired();
+        case 6:
+          return attribute.getDescription();
         default:
           return "...";
       }

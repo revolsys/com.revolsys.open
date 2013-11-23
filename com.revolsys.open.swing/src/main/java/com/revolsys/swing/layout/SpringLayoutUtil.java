@@ -173,9 +173,9 @@ public class SpringLayoutUtil {
     }
 
     // Set the parent's size.
-    final SpringLayout.Constraints pCons = layout.getConstraints(parent);
-    pCons.setConstraint(SpringLayout.SOUTH, y);
-    pCons.setConstraint(SpringLayout.EAST, x);
+    final SpringLayout.Constraints parenConstraints = layout.getConstraints(parent);
+    parenConstraints.setConstraint(SpringLayout.SOUTH, y);
+    parenConstraints.setConstraint(SpringLayout.EAST, x);
   }
 
   /**

@@ -107,7 +107,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private int overlayIndex = 1;
 
-  private Project project;
+  private final Project project;
 
   private double scale = 500000000;
 
@@ -560,17 +560,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final Project project = getProject();
     if (project != null) {
       project.refresh();
-    }
-  }
-
-  @Override
-  public void removeNotify() {
-    super.removeNotify();
-    final LayerGroup project = this.project;
-    this.project = null;
-    if (project != null) {
-      project.removePropertyChangeListener(this);
-      project.delete();
     }
   }
 
