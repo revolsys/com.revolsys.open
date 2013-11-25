@@ -681,6 +681,10 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
+  public Color getErrorForegroundColor() {
+    return WebColors.Red;
+  }
+
   @SuppressWarnings("unchecked")
   protected <T extends Field> T getField(final String fieldName) {
     synchronized (this.fields) {
@@ -1209,15 +1213,16 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  public void setTabColor(final int index, final Color color) {
+  public void setTabColor(final int index, final Color foregroundColor,
+    final Color backgroundColor) {
     if (index > -1) {
       if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setBackgroundAt(index, color);
+        this.tabs.setBackgroundAt(index, foregroundColor);
       } else {
-        if (color == null) {
+        if (foregroundColor == null) {
           Invoke.later(this, "setTabColor", index);
         } else {
-          Invoke.later(this, "setTabColor", index, color);
+          Invoke.later(this, "setTabColor", index, foregroundColor);
         }
       }
     }
@@ -1294,15 +1299,15 @@ public class DataObjectLayerForm extends JPanel implements
   public boolean updateTabValid(final int tabIndex) {
     final boolean tabValid = isTabValid(tabIndex);
     if (tabValid) {
-      setTabColor(tabIndex, null);
+      setTabColor(tabIndex, null, null);
     } else {
-      Color color;
+      Color backgroundColor;
       if (OS.isMac()) {
-        color = WebColors.Red;
+        backgroundColor = WebColors.Red;
       } else {
-        color = WebColors.Pink;
+        backgroundColor = WebColors.Pink;
       }
-      setTabColor(tabIndex, color);
+      setTabColor(tabIndex, WebColors.Red, backgroundColor);
     }
     return tabValid;
   }
