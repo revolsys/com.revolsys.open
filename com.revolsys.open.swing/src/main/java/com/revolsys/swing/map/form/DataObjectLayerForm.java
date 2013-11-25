@@ -97,6 +97,7 @@ import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
 import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.OS;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
@@ -203,7 +204,7 @@ public class DataObjectLayerForm extends JPanel implements
     this.layer = layer;
     final DataObjectMetaData metaData = layer.getMetaData();
     setMetaData(metaData);
-    addToolBar();
+    addToolBar(layer);
 
     final ActionMap map = getActionMap();
     map.put("copy", TransferHandler.getCopyAction());
@@ -459,7 +460,7 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  public ToolBar addToolBar() {
+  public ToolBar addToolBar(final AbstractDataObjectLayer layer) {
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
     final DataObjectMetaData metaData = getMetaData();
@@ -467,12 +468,13 @@ public class DataObjectLayerForm extends JPanel implements
     final boolean hasGeometry = geometryAttribute != null;
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
 
-    final MenuFactory menuFactory = ObjectTreeModel.findMenu(this.layer);
-    if (menuFactory != null) {
-      this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        ObjectTree.class, "showMenu", menuFactory, this.layer, this, 10, 10);
+    if (layer != null) {
+      final MenuFactory menuFactory = ObjectTreeModel.findMenu(layer);
+      if (menuFactory != null) {
+        this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
+          ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
+      }
     }
-
     final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(
       this, "deletable");
     this.toolBar.addButton("record", "Delete Record", "table_row_delete",
@@ -552,8 +554,13 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public boolean canPasteRecordGeometry() {
-    final LayerDataObject record = getObject();
-    return this.layer.canPasteRecordGeometry(record);
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer == null) {
+      return false;
+    } else {
+      final LayerDataObject record = getObject();
+      return layer.canPasteRecordGeometry(record);
+    }
   }
 
   public void closeWindow() {
@@ -581,6 +588,18 @@ public class DataObjectLayerForm extends JPanel implements
     final LayerDataObject object = getObject();
     if (object != null) {
       getLayer().deleteRecords(object);
+    }
+  }
+
+  public void destroy() {
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer != null) {
+      this.layer = null;
+      if (this.allAttributes != null) {
+        layer.removePropertyChangeListener(this.allAttributes);
+        this.allAttributes = null;
+      }
+      layer.removePropertyChangeListener(this);
     }
   }
 
@@ -893,22 +912,29 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void pasteGeometry() {
     final LayerDataObject record = getObject();
-    if (record != null) {
-      this.layer.pasteRecordGeometry(record);
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer != null) {
+      if (record != null) {
+        layer.pasteRecordGeometry(record);
+      }
     }
   }
 
   public void pasteValues(final Map<String, Object> map) {
-    final Map<String, Object> newValues = new LinkedHashMap<String, Object>(map);
-    final Collection<String> ignorePasteFields = this.layer.getProperty("ignorePasteFields");
-    if (ignorePasteFields != null) {
-      newValues.keySet().removeAll(ignorePasteFields);
-    }
-    newValues.keySet().removeAll(getReadOnlyFieldNames());
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer != null) {
+      final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
+        map);
+      final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
+      if (ignorePasteFields != null) {
+        newValues.keySet().removeAll(ignorePasteFields);
+      }
+      newValues.keySet().removeAll(getReadOnlyFieldNames());
 
-    final Map<String, Object> values = getValues();
-    values.putAll(newValues);
-    setValues(values);
+      final Map<String, Object> values = getValues();
+      values.putAll(newValues);
+      setValues(values);
+    }
   }
 
   protected void postValidate() {
@@ -917,48 +943,50 @@ public class DataObjectLayerForm extends JPanel implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (this.object != null) {
-      final Object source = event.getSource();
-      if (source instanceof Field) {
-        final Field field = (Field)source;
-        final String fieldName = field.getFieldName();
-        final Object fieldValue = field.getFieldValue();
-        final Object objectValue = this.object.getValue(fieldName);
-        if (!EqualsRegistry.equal(objectValue, fieldValue)) {
-          boolean equal = false;
-          if (fieldValue instanceof String) {
-            final String string = (String)fieldValue;
-            if (!StringUtils.hasText(string) && objectValue == null) {
-              equal = true;
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer != null) {
+      final LayerDataObject object = getObject();
+      if (object != null) {
+        final Object source = event.getSource();
+        if (source instanceof Field) {
+          final Field field = (Field)source;
+          final String fieldName = field.getFieldName();
+          final Object fieldValue = field.getFieldValue();
+          final Object objectValue = this.object.getValue(fieldName);
+          if (!EqualsRegistry.equal(objectValue, fieldValue)) {
+            boolean equal = false;
+            if (fieldValue instanceof String) {
+              final String string = (String)fieldValue;
+              if (!StringUtils.hasText(string) && objectValue == null) {
+                equal = true;
+              }
+            }
+            if (!equal && layer.isEditable()) {
+              this.object.setValueByPath(fieldName, fieldValue);
             }
           }
-          if (!equal && layer.isEditable()) {
-            this.object.setValueByPath(fieldName, fieldValue);
+        } else {
+          if (source == object) {
+            if (object.isDeleted()) {
+              final Window window = SwingUtilities.getWindowAncestor(this);
+              SwingUtil.setVisible(window, false);
+            }
+            final String propertyName = event.getPropertyName();
+            final Object value = event.getNewValue();
+            final DataObjectMetaData metaData = getMetaData();
+            if ("errorsUpdated".equals(propertyName)) {
+              updateErrors();
+            } else if (metaData.hasAttribute(propertyName)) {
+              setFieldValue(propertyName, value, isFieldValidationEnabled());
+            }
+            final boolean modifiedOrDeleted = isModifiedOrDeleted();
+            this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+              !modifiedOrDeleted, modifiedOrDeleted);
+            final boolean deletable = isDeletable();
+            this.propertyChangeSupport.firePropertyChange("deletable",
+              !deletable, deletable);
+            repaint();
           }
-        }
-      } else {
-        final LayerDataObject object = getObject();
-        if (source == object) {
-          if (object.isDeleted()) {
-            final Window window = SwingUtilities.getWindowAncestor(this);
-            SwingUtil.setVisible(window, false);
-
-          }
-          final String propertyName = event.getPropertyName();
-          final Object value = event.getNewValue();
-          final DataObjectMetaData metaData = getMetaData();
-          if ("errorsUpdated".equals(propertyName)) {
-            updateErrors();
-          } else if (metaData.hasAttribute(propertyName)) {
-            setFieldValue(propertyName, value, isFieldValidationEnabled());
-          }
-          final boolean modifiedOrDeleted = isModifiedOrDeleted();
-          this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-            !modifiedOrDeleted, modifiedOrDeleted);
-          final boolean deletable = isDeletable();
-          this.propertyChangeSupport.firePropertyChange("deletable",
-            !deletable, deletable);
-          repaint();
         }
       }
     }
@@ -969,14 +997,7 @@ public class DataObjectLayerForm extends JPanel implements
     try {
       super.removeNotify();
     } finally {
-      if (this.layer != null) {
-        if (this.allAttributes != null) {
-          this.layer.removePropertyChangeListener(this.allAttributes);
-          this.allAttributes = null;
-        }
-        this.layer.removePropertyChangeListener(this);
-        this.layer = null;
-      }
+      destroy();
     }
   }
 
@@ -1034,7 +1055,7 @@ public class DataObjectLayerForm extends JPanel implements
         this.fieldInValidMessage.put(fieldName, message);
         this.fieldsValid = false;
         final Field field = getField(fieldName);
-        field.setFieldInvalid(message, WebColors.Red);
+        field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
 
         this.fieldValidMap.put(fieldName, false);
         final int tabIndex = getTabIndex(fieldName);
@@ -1275,7 +1296,13 @@ public class DataObjectLayerForm extends JPanel implements
     if (tabValid) {
       setTabColor(tabIndex, null);
     } else {
-      setTabColor(tabIndex, WebColors.Red);
+      Color color;
+      if (OS.isMac()) {
+        color = WebColors.Red;
+      } else {
+        color = WebColors.Pink;
+      }
+      setTabColor(tabIndex, color);
     }
     return tabValid;
   }

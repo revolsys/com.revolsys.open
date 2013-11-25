@@ -53,7 +53,9 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
         final int count = counts.decrementAndGet();
         if (count <= 0) {
           final CapiFileGdbDataObjectStore dataStore = DATA_STORES.remove(fileName);
-          dataStore.doClose();
+          if (dataStore != null) {
+            dataStore.doClose();
+          }
           COUNTS.remove(fileName);
         }
       }

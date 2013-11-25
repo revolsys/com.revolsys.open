@@ -374,6 +374,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     try {
       if (i == -1) {
         return null;
+      } else if (attributes == null) {
+        return null;
       } else {
         final Attribute attribute = attributes.get(i);
         return attribute.getName();

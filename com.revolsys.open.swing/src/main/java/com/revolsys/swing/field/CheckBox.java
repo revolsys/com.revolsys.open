@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
@@ -101,9 +100,9 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    setForeground(color);
-    setBackground(ColorUtil.setAlpha(color, 50));
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+    setForeground(foregroundColor);
+    setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
   }

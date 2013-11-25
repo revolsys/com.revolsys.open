@@ -153,9 +153,9 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    setForeground(color);
-    setBackground(ColorUtil.setAlpha(color, 50));
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+    setForeground(foregroundColor);
+    setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
   }

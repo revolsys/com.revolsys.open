@@ -225,7 +225,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Object editSync;
 
-  private final Map<DataObject, Window> forms = new HashMap<DataObject, Window>();
+  private final Map<DataObject, Component> forms = new HashMap<DataObject, Component>();
+
+  private final Map<DataObject, Window> formWindows = new HashMap<DataObject, Window>();
 
   private DataObjectMetaData metaData;
 
@@ -561,14 +563,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     super.delete();
     setIndex(null);
     if (this.forms != null) {
-      for (final Window window : this.forms.values()) {
+      for (final Window window : this.formWindows.values()) {
         if (window != null) {
           window.dispose();
+        }
+      }
+      for (final Component form : this.forms.values()) {
+        if (form != null) {
+          if (form instanceof DataObjectLayerForm) {
+            final DataObjectLayerForm recordForm = (DataObjectLayerForm)form;
+            recordForm.destroy();
+          }
         }
       }
     }
     deletedRecords.clear();
     forms.clear();
+    formWindows.clear();
     highlightedRecords.clear();
     modifiedRecords.clear();
     newRecords.clear();
@@ -1498,17 +1509,34 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected void removeForm(final LayerDataObject record) {
-    final Window form = this.forms.remove(record);
-    if (form != null) {
-      form.dispose();
-      form.removeNotify();
-
+    if (record != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final Window window = this.formWindows.remove(record);
+        if (window != null) {
+          window.dispose();
+        }
+        final Component form = this.forms.remove(record);
+        if (form != null) {
+          if (form instanceof DataObjectLayerForm) {
+            final DataObjectLayerForm recordForm = (DataObjectLayerForm)form;
+            recordForm.destroy();
+          }
+        }
+      } else {
+        Invoke.later(this, "removeForm", record);
+      }
     }
   }
 
-  public void removeForm(final Set<LayerDataObject> records) {
-    for (final LayerDataObject record : records) {
-      removeForm(record);
+  public void removeForms(final Collection<LayerDataObject> records) {
+    if (records != null && !records.isEmpty()) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        for (final LayerDataObject record : records) {
+          removeForm(record);
+        }
+      } else {
+        Invoke.later(this, "removeForms", records);
+      }
     }
   }
 
@@ -1828,11 +1856,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (record == null) {
       return null;
     } else {
-      synchronized (this.forms) {
-        Window window = this.forms.get(record);
+      if (SwingUtilities.isEventDispatchThread()) {
+        Window window = this.formWindows.get(record);
         if (window == null) {
-          final Object id = record.getIdValue();
           final Component form = createForm(record);
+          final Object id = record.getIdValue();
           if (form == null) {
             return null;
           } else {
@@ -1853,7 +1881,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window.add(form);
             window.pack();
             SwingUtil.autoAdjustPosition(window);
-            this.forms.put(record, window);
+            this.forms.put(record, form);
+            this.formWindows.put(record, window);
             window.addWindowListener(new WindowAdapter() {
 
               @Override
@@ -1877,9 +1906,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           }
           return null;
         }
+      } else {
+        Invoke.later(this, "showForm", record);
+        return null;
       }
     }
-
   }
 
   public void showRecordsTable() {

@@ -10,7 +10,6 @@ import javax.swing.text.Element;
 
 import jsyntaxpane.DefaultSyntaxKit;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -132,10 +131,10 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    setForeground(color);
-    setSelectedTextColor(color);
-    setBackground(ColorUtil.setAlpha(color, 50));
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+    setForeground(foregroundColor);
+    setSelectedTextColor(foregroundColor);
+    setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
   }

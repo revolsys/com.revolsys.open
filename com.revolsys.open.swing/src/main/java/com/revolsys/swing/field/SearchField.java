@@ -5,7 +5,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -89,10 +88,10 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    setForeground(color);
-    setSelectedTextColor(color);
-    setBackground(ColorUtil.setAlpha(color, 50));
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+    setForeground(foregroundColor);
+    setSelectedTextColor(foregroundColor);
+    setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
   }

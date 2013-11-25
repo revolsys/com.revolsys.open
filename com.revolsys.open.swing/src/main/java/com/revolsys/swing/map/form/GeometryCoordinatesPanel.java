@@ -55,11 +55,11 @@ public class GeometryCoordinatesPanel extends ValueField implements
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
-    super.setFieldInvalid(message, color);
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+    super.setFieldInvalid(message, foregroundColor, backgroundColor);
     setForeground(null);
     setBackground(null);
-    this.tablePanel.setBorder(BorderFactory.createLineBorder(color, 3));
+    this.tablePanel.setBorder(BorderFactory.createLineBorder(foregroundColor, 3));
   }
 
   @Override

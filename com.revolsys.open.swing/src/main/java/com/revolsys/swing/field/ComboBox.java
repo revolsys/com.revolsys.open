@@ -16,7 +16,6 @@ import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -147,11 +146,11 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color color) {
+  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();
-    component.setForeground(color);
-    component.setBackground(ColorUtil.setAlpha(color, 50));
+    component.setForeground(foregroundColor);
+    component.setBackground(backgroundColor);
     this.errorMessage = message;
     setFieldToolTip(this.errorMessage);
   }

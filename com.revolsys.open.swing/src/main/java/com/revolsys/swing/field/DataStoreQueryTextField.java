@@ -411,6 +411,11 @@ public class DataStoreQueryTextField extends TextField implements
   }
 
   @Override
+  public void updateFieldValue() {
+    // setFieldValue(listModel.getSelectedItem());
+  }
+
+  @Override
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
       final DataObject value = (DataObject)this.list.getSelectedValue();
