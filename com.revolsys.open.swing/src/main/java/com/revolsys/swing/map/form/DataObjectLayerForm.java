@@ -1217,12 +1217,14 @@ public class DataObjectLayerForm extends JPanel implements
     final Color backgroundColor) {
     if (index > -1) {
       if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setBackgroundAt(index, foregroundColor);
+        this.tabs.setForegroundAt(index, foregroundColor);
+        this.tabs.setBackgroundAt(index, backgroundColor);
       } else {
         if (foregroundColor == null) {
           Invoke.later(this, "setTabColor", index);
         } else {
-          Invoke.later(this, "setTabColor", index, foregroundColor);
+          Invoke.later(this, "setTabColor", index, foregroundColor,
+            backgroundColor);
         }
       }
     }
