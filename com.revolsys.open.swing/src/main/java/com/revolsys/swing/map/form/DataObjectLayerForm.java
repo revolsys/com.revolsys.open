@@ -97,7 +97,6 @@ import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
 import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.OS;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
@@ -560,6 +559,16 @@ public class DataObjectLayerForm extends JPanel implements
     } else {
       final LayerDataObject record = getObject();
       return layer.canPasteRecordGeometry(record);
+    }
+  }
+
+  public void clearTabColor(final int index) {
+    if (index > -1) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        this.tabs.setTabComponentAt(index, null);
+      } else {
+        Invoke.later(this, "setTabColor", index);
+      }
     }
   }
 
@@ -1203,28 +1212,18 @@ public class DataObjectLayerForm extends JPanel implements
     this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
   }
 
-  public void setTabColor(final int index) {
+  public void setTabColor(final int index, final Color foregroundColor) {
     if (index > -1) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setBackgroundAt(index, null);
-      } else {
-        Invoke.later(this, "setTabColor", index);
-      }
-    }
-  }
+      if (foregroundColor == null) {
 
-  public void setTabColor(final int index, final Color foregroundColor,
-    final Color backgroundColor) {
-    if (index > -1) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        this.tabs.setForegroundAt(index, foregroundColor);
-        this.tabs.setBackgroundAt(index, backgroundColor);
       } else {
-        if (foregroundColor == null) {
-          Invoke.later(this, "setTabColor", index);
+        if (SwingUtilities.isEventDispatchThread()) {
+          final JLabel label = new JLabel(this.tabs.getTitleAt(index));
+          label.setOpaque(false);
+          label.setForeground(foregroundColor);
+          tabs.setTabComponentAt(index, label);
         } else {
-          Invoke.later(this, "setTabColor", index, foregroundColor,
-            backgroundColor);
+          Invoke.later(this, "setTabColor", index, foregroundColor);
         }
       }
     }
@@ -1301,15 +1300,9 @@ public class DataObjectLayerForm extends JPanel implements
   public boolean updateTabValid(final int tabIndex) {
     final boolean tabValid = isTabValid(tabIndex);
     if (tabValid) {
-      setTabColor(tabIndex, null, null);
+      setTabColor(tabIndex, null);
     } else {
-      Color backgroundColor;
-      if (OS.isMac()) {
-        backgroundColor = WebColors.Red;
-      } else {
-        backgroundColor = WebColors.Pink;
-      }
-      setTabColor(tabIndex, WebColors.Red, backgroundColor);
+      setTabColor(tabIndex, WebColors.Red);
     }
     return tabValid;
   }
