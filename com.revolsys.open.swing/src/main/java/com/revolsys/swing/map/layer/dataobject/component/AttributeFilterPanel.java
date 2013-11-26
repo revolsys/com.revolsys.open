@@ -250,7 +250,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
             final Value value = (Value)rightCondition;
             nameField.setFieldValue(column.getName());
             operatorField.setFieldValue("=");
-            field.setFieldValue(StringConverterRegistry.toString(value.getValue()));
+            final String text = StringConverterRegistry.toString(value.getValue());
+            final Object oldValue = field.getFieldValue();
+            if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue.toString()))) {
+              field.setFieldValue(text);
+            }
             simple = true;
           }
         } else if ("LIKE".equalsIgnoreCase(binaryCondition.getOperator())) {
@@ -322,7 +326,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         && StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
         final String searchOperator = getSearchOperator();
         if ("Like".equalsIgnoreCase(searchOperator)) {
-          final String searchText = (String)searchValue;
+          final String searchText = StringConverterRegistry.toString(searchValue);
           if (StringUtils.hasText(searchText)) {
             condition = Conditions.likeUpper(searchAttribute, searchText);
           }
