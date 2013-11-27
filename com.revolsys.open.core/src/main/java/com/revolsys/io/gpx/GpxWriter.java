@@ -50,7 +50,8 @@ public class GpxWriter extends AbstractWriter<DataObject> {
   public GpxWriter(final Writer writer) throws IOException {
     out = new XmlWriter(new BufferedWriter(writer));
     out.setIndent(false);
-    out.startDocument();
+    out.startDocument("UTF-8", "1.0");
+
     out.startTag(GpxConstants.GPX_ELEMENT);
     out.attribute(GpxConstants.VERSION_ATTRIBUTE, "1.1");
     out.attribute(GpxConstants.CREATOR_ATTRIBUTE,

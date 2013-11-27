@@ -16,12 +16,11 @@
 package com.revolsys.ui.html.view;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.form.Form;
@@ -56,7 +55,7 @@ public class Element implements Cloneable {
   }
 
   public void serialize(final OutputStream outputStream) {
-    serialize(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
+    serialize(FileUtil.createUtf8Writer(outputStream));
   }
 
   public final void serialize(final Writer out) {

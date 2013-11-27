@@ -9,6 +9,7 @@ import java.util.zip.ZipOutputStream;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.FileUtil;
 
 public class KmzDataObjectWriter extends AbstractWriter<DataObject> {
 
@@ -21,7 +22,7 @@ public class KmzDataObjectWriter extends AbstractWriter<DataObject> {
       zipOut = new ZipOutputStream(out);
       final ZipEntry entry = new ZipEntry("doc.kml");
       zipOut.putNextEntry(entry);
-      final OutputStreamWriter writer = new OutputStreamWriter(zipOut, charset);
+      final OutputStreamWriter writer = FileUtil.createUtf8Writer(zipOut);
       kmlWriter = new KmlDataObjectWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file", e);

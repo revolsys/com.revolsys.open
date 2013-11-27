@@ -2,7 +2,6 @@ package com.revolsys.ui.web.rest.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public class PageInfoHttpMessageConverter extends
       "resource");
     pageMap.put("resourceUri", url);
     pageMap.put("title", pageInfo.getTitle());
-    String description = pageInfo.getDescription();
+    final String description = pageInfo.getDescription();
     if (StringUtils.hasText(description)) {
       pageMap.put("description", description);
     }
@@ -138,7 +137,7 @@ public class PageInfoHttpMessageConverter extends
           url = HttpServletUtils.getServerUrl() + url;
         }
 
-        boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
+        final boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
 
         final HttpHeaders headers = outputMessage.getHeaders();
         headers.setContentType(mediaType);
@@ -158,25 +157,14 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeInstructions(final XmlWriter writer,
-    final ParameterInfo parameter) {
-    final String description = parameter.getDescription();
-    if (StringUtils.hasText(description)) {
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "fieldDescription");
-      writer.text(description);
-      writer.endTag(HtmlUtil.DIV);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   private void writeHtml(final OutputStream out, final String url,
-    final PageInfo pageInfo, boolean showTitle) {
+    final PageInfo pageInfo, final boolean showTitle) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
     if (showTitle) {
       writer.element(HtmlUtil.H1, pageInfo.getTitle());
-      DocInfo docInfo = pageInfo.getDefaultDocumentation();
+      final DocInfo docInfo = pageInfo.getDefaultDocumentation();
       if (docInfo != null) {
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_STYLE, "margin-bottom: 1em");
@@ -350,6 +338,17 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.TR);
   }
 
+  private void writeInstructions(final XmlWriter writer,
+    final ParameterInfo parameter) {
+    final String description = parameter.getDescription();
+    if (StringUtils.hasText(description)) {
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "fieldDescription");
+      writer.text(description);
+      writer.endTag(HtmlUtil.DIV);
+    }
+  }
+
   private void writeMethod(final XmlWriter writer, final String url,
     final PageInfo pageInfo, final String method,
     final Map<String, Object> values) {
@@ -416,17 +415,17 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  public void writeResourceList(final MediaType mediaType,
-    final Charset charset, final OutputStream out, final String url,
-    final PageInfo pageInfo) {
-
+  public void writeResourceList(final MediaType mediaType, Charset charset,
+    final OutputStream out, final String url, final PageInfo pageInfo) {
+    if (charset == null) {
+      charset = FileUtil.UTF8;
+    }
     final String mediaTypeString = mediaType.getType() + "/"
       + mediaType.getSubtype();
     final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
       MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
-      final MapWriter writer = writerFactory.getMapWriter(new OutputStreamWriter(
-        out, charset));
+      final MapWriter writer = writerFactory.getMapWriter(out, charset);
       writer.setProperty(IoConstants.INDENT_PROPERTY, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
       final HttpServletRequest request = HttpServletUtils.getRequest();
@@ -445,8 +444,7 @@ public class PageInfoHttpMessageConverter extends
 
   private void writeUriList(final OutputStream out, final String url,
     final PageInfo pageInfo) throws IOException {
-    final Writer writer = new OutputStreamWriter(out,
-      Charset.forName("US-ASCII"));
+    final Writer writer = FileUtil.createUtf8Writer(out);
 
     try {
       for (final String childPath : pageInfo.getPages().keySet()) {
@@ -467,7 +465,7 @@ public class PageInfoHttpMessageConverter extends
   private void writeWadl(final OutputStream out, final String url,
     final PageInfo pageInfo) {
     final XmlWriter writer = new XmlWriter(out);
-    writer.startDocument();
+    writer.startDocument("UTF-8", "1.0");
     writer.startTag(APPLICATION);
 
     writer.startTag(RESOURCES);

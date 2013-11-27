@@ -14,6 +14,7 @@ import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Writer;
@@ -34,8 +35,7 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
-      charset);
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new KmlDataObjectWriter(writer);
   }
 
@@ -57,8 +57,13 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
 
   @Override
   public MapWriter getMapWriter(final OutputStream out) {
-    final java.io.Writer writer = new OutputStreamWriter(out);
+    final java.io.Writer writer = FileUtil.createUtf8Writer(out);
     return getMapWriter(writer);
+  }
+
+  @Override
+  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
+    return getMapWriter(out);
   }
 
   @Override

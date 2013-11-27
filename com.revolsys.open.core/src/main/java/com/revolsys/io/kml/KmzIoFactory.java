@@ -57,6 +57,11 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   }
 
   @Override
+  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
+    return getMapWriter(out);
+  }
+
+  @Override
   public MapWriter getMapWriter(final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     return getMapWriter(out);

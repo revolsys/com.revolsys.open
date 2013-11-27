@@ -2,7 +2,6 @@ package com.revolsys.ui.web.rest.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -13,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.collection.ArrayListOfMap;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
@@ -21,8 +21,6 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ListOfMapHttpMessageConverter extends
   AbstractHttpMessageConverter<ArrayListOfMap> {
-
-  private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
@@ -39,7 +37,7 @@ public class ListOfMapHttpMessageConverter extends
     if (!HttpServletUtils.getResponse().isCommitted()) {
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = DEFAULT_CHARSET;
+        charset = FileUtil.UTF8;
       }
       outputMessage.getHeaders().setContentType(mediaType);
       final OutputStream body = outputMessage.getBody();
@@ -47,8 +45,7 @@ public class ListOfMapHttpMessageConverter extends
         + mediaType.getSubtype();
       final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
-      final MapWriter writer = writerFactory.getMapWriter(new OutputStreamWriter(
-        body, charset));
+      final MapWriter writer = writerFactory.getMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT_PROPERTY, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
       final HttpServletRequest request = HttpServletUtils.getRequest();

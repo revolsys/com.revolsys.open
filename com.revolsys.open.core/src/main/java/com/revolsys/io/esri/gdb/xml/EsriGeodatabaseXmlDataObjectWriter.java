@@ -321,7 +321,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   private void writeHeader(final Geometry geometry) {
     opened = true;
-    out.startDocument();
+    out.startDocument("UTF-8", "1.0");
     out.startTag(WORKSPACE);
     out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
     out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,

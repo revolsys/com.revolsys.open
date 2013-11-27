@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -318,7 +317,7 @@ public class SpringUtil {
 
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
-    return new OutputStreamWriter(stream);
+    return FileUtil.createUtf8Writer(stream);
   }
 
   public static Resource setBaseResource(final Resource baseResource) {

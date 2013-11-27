@@ -139,7 +139,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private void writeHeader() {
     if (wrap) {
-      out.startDocument();
+      out.startDocument("UT-8", "1.0");
       out.startTag(HtmlUtil.HTML);
 
       out.startTag(HtmlUtil.HEAD);

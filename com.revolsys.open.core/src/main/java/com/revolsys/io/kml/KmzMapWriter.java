@@ -2,12 +2,12 @@ package com.revolsys.io.kml;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.revolsys.io.AbstractMapWriter;
+import com.revolsys.io.FileUtil;
 
 public class KmzMapWriter extends AbstractMapWriter {
 
@@ -20,7 +20,7 @@ public class KmzMapWriter extends AbstractMapWriter {
       zipOut = new ZipOutputStream(out);
       final ZipEntry entry = new ZipEntry("doc.kml");
       zipOut.putNextEntry(entry);
-      final java.io.Writer writer = new OutputStreamWriter(zipOut);
+      final java.io.Writer writer = FileUtil.createUtf8Writer(zipOut);
       kmlWriter = new KmlMapWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file ", e);

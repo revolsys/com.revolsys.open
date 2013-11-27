@@ -18,6 +18,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.DirectoryDataObjectStore;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
@@ -76,8 +77,10 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new EcsvDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
+
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+
+    return new EcsvDataObjectWriter(metaData, writer);
   }
 
   @Override

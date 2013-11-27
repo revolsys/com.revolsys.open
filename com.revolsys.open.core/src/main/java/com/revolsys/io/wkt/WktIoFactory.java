@@ -13,6 +13,7 @@ import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
@@ -39,7 +40,8 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new WktDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+
+    return new WktDataObjectWriter(metaData, writer);
   }
 }

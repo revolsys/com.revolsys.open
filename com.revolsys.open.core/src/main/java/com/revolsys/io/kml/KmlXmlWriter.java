@@ -1,7 +1,6 @@
 package com.revolsys.io.kml;
 
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Map;
@@ -83,16 +82,6 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public KmlXmlWriter(final OutputStream out, final boolean useNamespaces) {
     super(out, useNamespaces);
-  }
-
-  public KmlXmlWriter(final OutputStream out, final String charsetName)
-    throws UnsupportedEncodingException {
-    super(out, charsetName);
-  }
-
-  public KmlXmlWriter(final OutputStream out, final String charsetName,
-    final boolean useNamespaces) throws UnsupportedEncodingException {
-    super(out, charsetName, useNamespaces);
   }
 
   public KmlXmlWriter(final Writer out) {

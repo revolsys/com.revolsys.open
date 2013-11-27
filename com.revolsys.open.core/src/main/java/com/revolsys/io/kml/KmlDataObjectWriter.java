@@ -184,7 +184,8 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private void writeHeader() {
     opened = true;
-    writer.startDocument();
+    writer.startDocument("UTF-8", "1.0");
+
     writer.startTag(KML);
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
       writer.startTag(DOCUMENT);

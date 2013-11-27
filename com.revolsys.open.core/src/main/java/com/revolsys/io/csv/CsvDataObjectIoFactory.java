@@ -50,8 +50,10 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new CsvDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
+    final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
+      charset);
+
+    return new CsvDataObjectWriter(metaData, writer);
   }
 
   @Override

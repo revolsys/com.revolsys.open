@@ -1,7 +1,6 @@
 package com.revolsys.io.json;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -13,6 +12,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Writer;
 
@@ -93,8 +93,8 @@ public class JsonDataObjectIoFactory extends
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new JsonDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
+    return new JsonDataObjectWriter(metaData,
+      FileUtil.createUtf8Writer(outputStream));
   }
 
 }

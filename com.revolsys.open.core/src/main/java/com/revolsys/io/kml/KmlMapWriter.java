@@ -67,7 +67,7 @@ public class KmlMapWriter extends AbstractMapWriter {
   }
 
   private void writeHeader() {
-    out.startDocument();
+    out.startDocument("UTF-8", "1.0");
     out.startTag(Kml22Constants.KML);
     out.startTag(Kml22Constants.DOCUMENT);
   }

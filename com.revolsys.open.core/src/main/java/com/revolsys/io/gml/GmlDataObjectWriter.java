@@ -144,7 +144,8 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private void writeHeader() {
     opened = true;
-    out.startDocument();
+    out.startDocument("UTF-8", "1.0");
+
     out.startTag(FEATURE_COLLECTION);
     if (geometryFactory != null) {
       out.startTag(BOUNDED_BY);

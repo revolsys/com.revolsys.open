@@ -22,7 +22,6 @@ package com.revolsys.io.shp;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 
@@ -43,6 +42,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
@@ -135,7 +135,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         if (!(prjResource instanceof NonExistingResource)) {
           final OutputStream out = SpringUtil.getOutputStream(prjResource);
           final PrintWriter writer = new PrintWriter(
-            new OutputStreamWriter(out));
+            FileUtil.createUtf8Writer(out));
           final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
             "ESRI", String.valueOf(srid)));
           EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);

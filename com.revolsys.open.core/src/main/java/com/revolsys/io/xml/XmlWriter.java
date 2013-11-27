@@ -17,9 +17,7 @@ package com.revolsys.io.xml;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -37,6 +35,7 @@ import javax.xml.namespace.QName;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.io.FileUtil;
 
 /**
  * <p>
@@ -185,33 +184,7 @@ public class XmlWriter extends Writer {
    *          should be ignored.
    */
   public XmlWriter(final OutputStream out, final boolean useNamespaces) {
-    this(new OutputStreamWriter(out), useNamespaces);
-  }
-
-  /**
-   * Construct a new XmlWriter.
-   * 
-   * @param out The output stream to write to.
-   * @param charsetName The character set to output using.
-   * @throws UnsupportedEncodingException
-   */
-  public XmlWriter(final OutputStream out, final String charsetName)
-    throws UnsupportedEncodingException {
-    this(out, charsetName, true);
-  }
-
-  /**
-   * Construct a new XmlWriter.
-   * 
-   * @param out The output stream to write to.
-   * @param charsetName The character set to output using.
-   * @param useNamespaces True if namespaces should be written, false if they
-   *          should be ignored.
-   * @throws UnsupportedEncodingException
-   */
-  public XmlWriter(final OutputStream out, final String charsetName,
-    final boolean useNamespaces) throws UnsupportedEncodingException {
-    this(new OutputStreamWriter(out, charsetName), useNamespaces);
+    this(FileUtil.createUtf8Writer(out), useNamespaces);
   }
 
   /**

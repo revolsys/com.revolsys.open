@@ -12,6 +12,7 @@ import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class GeoJsonIoFactory extends
@@ -27,8 +28,9 @@ public class GeoJsonIoFactory extends
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new GeoJsonDataObjectWriter(new OutputStreamWriter(outputStream,
-      charset));
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+
+    return new GeoJsonDataObjectWriter(writer);
   }
 
   @Override

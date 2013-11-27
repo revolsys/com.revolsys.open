@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -210,8 +210,13 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
 
   @Override
   public MapWriter getMapWriter(final OutputStream out) {
-    final Writer writer = new OutputStreamWriter(out);
+    final Writer writer = FileUtil.createUtf8Writer(out);
     return getMapWriter(writer);
+  }
+
+  @Override
+  public MapWriter getMapWriter(final OutputStream out, final Charset charset) {
+    return getMapWriter(out);
   }
 
   @Override

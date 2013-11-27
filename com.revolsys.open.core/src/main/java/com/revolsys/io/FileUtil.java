@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -77,6 +78,8 @@ public final class FileUtil {
 
   /** The file path separator for UNIX based systems. */
   public static final char UNIX_FILE_SEPARATOR = '/';
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
 
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
@@ -409,7 +412,11 @@ public final class FileUtil {
   }
 
   public static InputStreamReader createUtf8Reader(final InputStream in) {
-    return new InputStreamReader(in, Charset.forName("UTF-8"));
+    return new InputStreamReader(in, UTF8);
+  }
+
+  public static OutputStreamWriter createUtf8Writer(final OutputStream out) {
+    return new OutputStreamWriter(out, UTF8);
   }
 
   /**

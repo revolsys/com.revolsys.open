@@ -11,6 +11,7 @@ import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
@@ -25,8 +26,7 @@ public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
-      charset);
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new GmlDataObjectWriter(metaData, writer);
   }
 
