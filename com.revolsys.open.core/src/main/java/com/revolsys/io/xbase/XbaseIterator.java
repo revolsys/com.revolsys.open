@@ -89,7 +89,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private final Resource resource;
 
-  private Charset charset = Charset.forName("UTF-8");
+  private Charset charset = FileUtil.UTF8;
 
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {

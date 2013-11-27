@@ -1,7 +1,6 @@
 package com.revolsys.gis.data.io;
 
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -76,7 +75,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
-      Charset.defaultCharset());
+      FileUtil.UTF8);
   }
 
   @Override

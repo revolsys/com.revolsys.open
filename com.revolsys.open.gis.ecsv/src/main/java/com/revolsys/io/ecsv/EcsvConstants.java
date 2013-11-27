@@ -1,13 +1,10 @@
 package com.revolsys.io.ecsv;
 
-import java.nio.charset.Charset;
 
 public interface EcsvConstants extends EcsvProperties {
   String _NS_PREFIX = "";
 
   String _NS_URI = "";
-
-  Charset CHARACTER_SET = Charset.forName("UTF-8");
 
   String COLLECTION_END = ")";
 

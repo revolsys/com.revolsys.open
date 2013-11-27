@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.spring.InputStreamResource;
@@ -21,8 +22,6 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
 public class GeometryReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<GeometryReader> {
-
-  public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private GeometryFactory geometryFactory;
 
@@ -38,8 +37,7 @@ public class GeometryReaderHttpMessageConverter extends
   }
 
   @Override
-  public GeometryReader read(
-    final Class<? extends GeometryReader> clazz,
+  public GeometryReader read(final Class<? extends GeometryReader> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -47,7 +45,7 @@ public class GeometryReaderHttpMessageConverter extends
       final MediaType mediaType = headers.getContentType();
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = DEFAULT_CHARSET;
+        charset = FileUtil.UTF8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"

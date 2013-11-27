@@ -125,6 +125,7 @@ import org.springframework.web.servlet.support.WebContentGenerator;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
@@ -221,6 +222,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       this.pathComparator = pathComparator;
     }
 
+    @Override
     public int compare(final RequestMappingInfo info1,
       final RequestMappingInfo info2) {
       final String path1 = info1.bestMatchedPath();
@@ -527,7 +529,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
           Charset charset = contentType.getCharSet();
           if (charset == null) {
-            charset = Charset.forName(WebUtils.DEFAULT_CHARACTER_ENCODING);
+            charset = FileUtil.UTF8;
           }
           final String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
             inputMessage.getBody(), charset));
@@ -558,10 +560,12 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
             defaultMediaType, bodyFile.getOriginalFilename());
           headers.setContentType(contentType);
           final HttpInputMessage newInputMessage = new HttpInputMessage() {
+            @Override
             public InputStream getBody() throws IOException {
               return bodyFile.getInputStream();
             }
 
+            @Override
             public HttpHeaders getHeaders() {
               return headers;
             }
@@ -587,10 +591,12 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           final InputStream bodyIn = new ByteArrayInputStream(bytes);
           final HttpInputMessage newInputMessage = new HttpInputMessage() {
 
+            @Override
             public InputStream getBody() throws IOException {
               return bodyIn;
             }
 
+            @Override
             public HttpHeaders getHeaders() {
               return headers;
             }
@@ -945,6 +951,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return new ServletRequestDataBinder(target, objectName);
   }
 
+  @Override
   public long getLastModified(final HttpServletRequest request,
     final Object handler) {
     return -1;
@@ -975,10 +982,12 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return resolver;
   }
 
+  @Override
   public int getOrder() {
     return this.order;
   }
 
+  @Override
   public ModelAndView handle(final HttpServletRequest request,
     final HttpServletResponse response, final Object handler) throws Exception {
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
@@ -1061,6 +1070,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory beanFactory) {
     if (beanFactory instanceof ConfigurableBeanFactory) {
       this.beanFactory = (ConfigurableBeanFactory)beanFactory;
@@ -1307,6 +1317,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     this.webBindingInitializer = webBindingInitializer;
   }
 
+  @Override
   public boolean supports(final Object handler) {
     return getMethodResolver(handler).hasHandlerMethods();
   }

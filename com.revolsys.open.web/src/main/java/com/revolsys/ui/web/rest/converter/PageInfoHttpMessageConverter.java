@@ -44,8 +44,6 @@ public class PageInfoHttpMessageConverter extends
   AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
 
-  private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
-
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
@@ -121,7 +119,7 @@ public class PageInfoHttpMessageConverter extends
       if (pageInfo != null) {
         Charset charset = mediaType.getCharSet();
         if (charset == null) {
-          charset = DEFAULT_CHARSET;
+          charset = FileUtil.UTF8;
         }
 
         final HttpServletRequest request = HttpServletUtils.getRequest();

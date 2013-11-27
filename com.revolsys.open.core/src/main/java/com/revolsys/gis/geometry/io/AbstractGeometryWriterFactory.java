@@ -1,7 +1,6 @@
 package com.revolsys.gis.geometry.io;
 
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
@@ -55,7 +54,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
-    return createGeometryWriter(baseName, out, Charset.forName("UTF-8"));
+    return createGeometryWriter(baseName, out, FileUtil.UTF8);
 
   }
 

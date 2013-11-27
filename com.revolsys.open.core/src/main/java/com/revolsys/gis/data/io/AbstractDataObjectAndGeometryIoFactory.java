@@ -51,7 +51,7 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
-      Charset.defaultCharset());
+      FileUtil.UTF8);
   }
 
   @Override

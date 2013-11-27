@@ -24,6 +24,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.FileUtil;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
@@ -50,7 +51,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private Map<String, String> shortNames = new HashMap<String, String>();
 
-  private Charset charset = Charset.forName("UTF-8");
+  private Charset charset = FileUtil.UTF8;
 
   public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {

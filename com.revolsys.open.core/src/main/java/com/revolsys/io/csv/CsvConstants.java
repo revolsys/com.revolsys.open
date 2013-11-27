@@ -1,9 +1,7 @@
 package com.revolsys.io.csv;
 
-import java.nio.charset.Charset;
 
 public interface CsvConstants {
-  Charset CHARACTER_SET = Charset.forName("UTF-8");
 
   String DESCRIPTION = "Comma Separated Variable";
 

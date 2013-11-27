@@ -27,6 +27,7 @@ import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
@@ -39,8 +40,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<DataObjectReader> {
-
-  public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private List<String> requestAttributeNames = Arrays.asList(
     IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
@@ -78,7 +77,7 @@ public class DataObjectReaderHttpMessageConverter extends
       final MediaType mediaType = headers.getContentType();
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = DEFAULT_CHARSET;
+        charset = FileUtil.UTF8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
@@ -128,7 +127,7 @@ public class DataObjectReaderHttpMessageConverter extends
       if (actualMediaType != null) {
         Charset charset = actualMediaType.getCharSet();
         if (charset == null) {
-          charset = DEFAULT_CHARSET;
+          charset = FileUtil.UTF8;
           actualMediaType = new MediaType(actualMediaType,
             Collections.singletonMap("charset", charset.name()));
         }

@@ -19,6 +19,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
@@ -30,8 +31,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryHttpMessageConverter extends
   AbstractHttpMessageConverter<Geometry> {
-  public static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
-
   private static final Logger LOG = LoggerFactory.getLogger(GeometryHttpMessageConverter.class);
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
@@ -57,7 +56,7 @@ public class GeometryHttpMessageConverter extends
     try {
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = DEFAULT_CHARSET;
+        charset = FileUtil.UTF8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
@@ -109,7 +108,7 @@ public class GeometryHttpMessageConverter extends
       if (actualMediaType != null) {
         Charset charset = actualMediaType.getCharSet();
         if (charset == null) {
-          charset = DEFAULT_CHARSET;
+          charset = FileUtil.UTF8;
         }
         final HttpHeaders headers = outputMessage.getHeaders();
         headers.setContentType(actualMediaType);

@@ -12,13 +12,12 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ElementHttpMessageConverter extends
   AbstractHttpMessageConverter<Element> {
-
-  private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
   private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
     MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML);
@@ -35,7 +34,7 @@ public class ElementHttpMessageConverter extends
       if (element != null) {
         Charset charset = mediaType.getCharSet();
         if (charset == null) {
-          charset = DEFAULT_CHARSET;
+          charset = FileUtil.UTF8;
         }
 
         final HttpHeaders headers = outputMessage.getHeaders();
