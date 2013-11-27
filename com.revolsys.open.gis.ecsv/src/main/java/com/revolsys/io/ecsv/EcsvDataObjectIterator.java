@@ -2,7 +2,6 @@ package com.revolsys.io.ecsv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -117,8 +116,8 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   protected void doInit() {
     if (in == null) {
       try {
-        this.in = new BufferedReader(new InputStreamReader(
-          resource.getInputStream()));
+        this.in = new BufferedReader(
+          FileUtil.createUtf8Reader(resource.getInputStream()));
         readFileProperties();
         readRecordHeader();
         final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);

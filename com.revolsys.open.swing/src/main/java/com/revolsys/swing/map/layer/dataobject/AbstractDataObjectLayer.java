@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.dataobject;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.WindowAdapter;
@@ -24,7 +25,6 @@ import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
@@ -77,6 +77,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
@@ -493,7 +494,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final DataObjectMetaData metaData = getMetaData();
     final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
 
-    final JPanel fieldPanel = new JPanel(new BorderLayout());
+    final BasePanel fieldPanel = new BasePanel(new BorderLayout());
+    fieldPanel.setPreferredSize(new Dimension(500, 400));
     final JScrollPane fieldScroll = new JScrollPane(fieldTable);
     fieldPanel.add(fieldScroll, BorderLayout.CENTER);
     propertiesPanel.addTab("Fields", fieldPanel);

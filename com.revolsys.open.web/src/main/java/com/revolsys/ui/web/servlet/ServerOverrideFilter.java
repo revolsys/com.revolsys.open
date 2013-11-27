@@ -16,10 +16,12 @@ public class ServerOverrideFilter extends SavedRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(final HttpServletRequest request,
+    final HttpServletResponse response, final FilterChain filterChain)
+    throws ServletException, IOException {
+    if (request.getCharacterEncoding() == null) {
+      request.setCharacterEncoding("UTF-8");
+    }
     final HttpServletRequest overrideRequest = new ServerOverrideHttpServletRequest(
       serverUrl, request);
     super.doFilterInternal(overrideRequest, response, filterChain);

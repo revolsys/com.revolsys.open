@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -132,7 +131,7 @@ public class SpringUtil {
 
   public static String getContents(final Resource resource) {
     final InputStream in = getInputStream(resource);
-    final Reader reader = new InputStreamReader(in);
+    final Reader reader = FileUtil.createUtf8Reader(in);
     try {
       final Writer writer = new StringWriter();
       try {
@@ -259,7 +258,7 @@ public class SpringUtil {
 
   public static Reader getReader(final Resource resource) {
     final InputStream in = getInputStream(resource);
-    return new InputStreamReader(in);
+    return FileUtil.createUtf8Reader(in);
   }
 
   public static Resource getResource(final File directory, final String fileName) {

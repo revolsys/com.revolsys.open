@@ -2,7 +2,6 @@ package com.revolsys.io.wkt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
@@ -34,8 +33,8 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
   public WktDataObjectIterator(final DataObjectFactory factory,
     final Resource resource) throws IOException {
     this.factory = factory;
-    this.in = new BufferedReader(new InputStreamReader(
-      resource.getInputStream()));
+    this.in = new BufferedReader(
+      FileUtil.createUtf8Reader(resource.getInputStream()));
     this.metaData = DataObjectUtil.GEOMETRY_META_DATA.clone();
   }
 

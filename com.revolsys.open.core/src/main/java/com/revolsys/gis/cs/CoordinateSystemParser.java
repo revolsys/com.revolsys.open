@@ -3,17 +3,19 @@ package com.revolsys.gis.cs;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.io.FileUtil;
+
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
     final String authorityName, final InputStream in) {
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    final BufferedReader reader = new BufferedReader(
+      FileUtil.createUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {
         final String[] fields = line.split("\t");
@@ -56,7 +58,8 @@ public class CoordinateSystemParser {
     final Map<Integer, CoordinateSystem> geoCsById, final String authorityName,
     final InputStream in) {
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    final BufferedReader reader = new BufferedReader(
+      FileUtil.createUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {
         final String[] fields = line.split("\t");

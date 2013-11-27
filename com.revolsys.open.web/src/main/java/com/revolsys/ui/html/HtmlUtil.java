@@ -192,6 +192,8 @@ public final class HtmlUtil {
 
   public static final QName ATTR_ENCTYPE = new QName("enctype");
 
+  public static final QName ATTR_ACCEPT_CHARSET = new QName("accept-charset");
+
   public static void serializeA(final XmlWriter out, final String cssClass,
     final String url, final Object content) {
     if (content != null) {

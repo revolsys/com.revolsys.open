@@ -18,13 +18,14 @@ package com.revolsys.ui.html.domain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import com.revolsys.io.FileUtil;
 
 public final class Region {
   private static Map countryRegions = new HashMap();
@@ -48,8 +49,7 @@ public final class Region {
     return (Region)getRegionCodeMap(country).get(code.toUpperCase());
   }
 
-  public static Region getRegionByCode(
-    final String countryCode,
+  public static Region getRegionByCode(final String countryCode,
     final String code) {
     return getRegionByCode(Country.getCountry(countryCode), code);
   }
@@ -58,8 +58,7 @@ public final class Region {
     return (Region)getRegionNameMap(country).get(name.toUpperCase());
   }
 
-  public static Region getRegionByName(
-    final String countryCode,
+  public static Region getRegionByName(final String countryCode,
     final String name) {
     return getRegionByName(Country.getCountry(countryCode), name);
   }
@@ -114,7 +113,7 @@ public final class Region {
       regionMap = new HashMap();
       regionNameMap = new HashMap();
       final BufferedReader lineReader = new BufferedReader(
-        new InputStreamReader(in));
+        FileUtil.createUtf8Reader(in));
       try {
         for (String line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
           final StringTokenizer columns = new StringTokenizer(line, "\t");

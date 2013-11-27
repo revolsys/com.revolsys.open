@@ -5,11 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
@@ -24,6 +26,7 @@ import com.revolsys.gis.io.EndianMappedByteBuffer;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
 
@@ -86,12 +89,25 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private final Resource resource;
 
+  private Charset charset = Charset.forName("UTF-8");
+
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = FileUtil.getBaseName(resource.getFilename());
     this.resource = resource;
 
     this.dataObjectFactory = dataObjectFactory;
+    final Resource codePageResource = SpringUtil.getResourceWithExtension(
+      resource, "cpg");
+    if (!(codePageResource instanceof NonExistingResource)) {
+      final String charsetName = SpringUtil.getContents(codePageResource);
+      try {
+        charset = Charset.forName(charsetName);
+      } catch (final Exception e) {
+        LoggerFactory.getLogger(getClass()).debug(
+          "Charset " + charsetName + " not supported for " + resource, e);
+      }
+    }
   }
 
   public XbaseIterator(final Resource in,
@@ -245,7 +261,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   private String getString(final int startIndex, final int len) {
-    return new String(recordBuffer, startIndex, len).trim();
+    return new String(recordBuffer, startIndex, len, charset).trim();
   }
 
   public boolean isCloseFile() {

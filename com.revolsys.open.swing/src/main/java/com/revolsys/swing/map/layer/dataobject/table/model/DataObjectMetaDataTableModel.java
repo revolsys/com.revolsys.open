@@ -12,12 +12,12 @@ import com.revolsys.swing.table.BaseJxTable;
 public class DataObjectMetaDataTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
 
-  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Column",
-    "Type", "Length", "Scale", "Required", "Description");
+  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Field",
+    "Type", "Length", "Scale", "Min", "Max", "Required", "Description");
 
   private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(
     Integer.class, String.class, String.class, Integer.class, Integer.class,
-    Boolean.class, String.class);
+    Object.class, Object.class, Boolean.class, String.class);
 
   public static BaseJxTable createTable(final DataObjectMetaData metaData) {
     if (metaData == null) {
@@ -44,7 +44,7 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return 7;
+    return 9;
   }
 
   @Override
@@ -75,8 +75,12 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
         case 4:
           return attribute.getScale();
         case 5:
-          return attribute.isRequired();
+          return attribute.getMinValue();
         case 6:
+          return attribute.getMaxValue();
+        case 7:
+          return attribute.isRequired();
+        case 8:
           return attribute.getDescription();
         default:
           return "...";

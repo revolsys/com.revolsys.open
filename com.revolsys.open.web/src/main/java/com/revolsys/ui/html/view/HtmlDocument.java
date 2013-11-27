@@ -18,13 +18,13 @@ package com.revolsys.ui.html.view;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -37,7 +37,7 @@ public class HtmlDocument extends ElementContainer {
   private final List<BufferedReader> styles = new ArrayList<BufferedReader>();
 
   public void addStyle(final InputStream styleIn) {
-    styles.add(new BufferedReader(new InputStreamReader(styleIn)));
+    styles.add(new BufferedReader(FileUtil.createUtf8Reader(styleIn)));
   }
 
   public void addStyle(final Reader styleIn) {

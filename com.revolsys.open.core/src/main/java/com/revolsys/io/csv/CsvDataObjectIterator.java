@@ -2,7 +2,6 @@ package com.revolsys.io.csv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,6 +23,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class CsvDataObjectIterator extends AbstractIterator<DataObject>
@@ -123,12 +123,12 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       }
       geometryFactory = getProperty("geometryFactory");
 
-      this.in = new BufferedReader(new InputStreamReader(
-        this.resource.getInputStream(), CsvConstants.CHARACTER_SET));
+      this.in = new BufferedReader(
+        FileUtil.createUtf8Reader(this.resource.getInputStream()));
       final String[] line = readNextRecord();
       createMetaData(line);
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to open " + resource, e);
+      ExceptionUtil.log(getClass(), "Unable to open " + resource, e);
     }
   }
 

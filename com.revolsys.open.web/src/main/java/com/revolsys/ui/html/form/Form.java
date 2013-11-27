@@ -69,6 +69,10 @@ public class Form extends ElementContainer {
 
   public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
+  private boolean valid = true;
+
+  private String acceptCharset = "UTF-8";
+
   public Form() {
   }
 
@@ -103,6 +107,10 @@ public class Form extends ElementContainer {
 
   public void addSavedParameter(final String name, final Object value) {
     this.savedParameters.put(name, value);
+  }
+
+  public String getAcceptCharset() {
+    return acceptCharset;
   }
 
   /**
@@ -211,8 +219,6 @@ public class Form extends ElementContainer {
     return posted;
   }
 
-  private boolean valid = true;
-
   public boolean isValid() {
     boolean success = true;
     for (final Field field : getFields().values()) {
@@ -297,7 +303,12 @@ public class Form extends ElementContainer {
     out.attribute(HtmlUtil.ATTR_ACTION, getAction());
     out.attribute(HtmlUtil.ATTR_METHOD, getMethod());
     out.attribute(HtmlUtil.ATTR_ENCTYPE, getEncType());
+    out.attribute(HtmlUtil.ATTR_ACCEPT_CHARSET, getAcceptCharset());
     out.startTag(HtmlUtil.DIV);
+  }
+
+  public void setAcceptCharset(final String acceptCharset) {
+    this.acceptCharset = acceptCharset;
   }
 
   /**

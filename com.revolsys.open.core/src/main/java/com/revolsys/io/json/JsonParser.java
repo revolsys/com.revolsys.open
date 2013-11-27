@@ -3,7 +3,6 @@ package com.revolsys.io.json;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -177,7 +176,24 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
 
   @SuppressWarnings("unchecked")
   public static <V> V read(final InputStream in) {
-    return (V)read(new InputStreamReader(in));
+    return (V)read(FileUtil.createUtf8Reader(in));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(final Object in) {
+    Reader reader;
+    if (in instanceof Clob) {
+      try {
+        reader = ((Clob)in).getCharacterStream();
+      } catch (final SQLException e) {
+        throw new RuntimeException("Unable to read clob", e);
+      }
+    } else if (in instanceof Reader) {
+      reader = (Reader)in;
+    } else {
+      reader = new StringReader(in.toString());
+    }
+    return (V)read(reader);
   }
 
   @SuppressWarnings("unchecked")
@@ -199,23 +215,6 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   @SuppressWarnings("unchecked")
   public static <V> V read(final String in) {
     return (V)read(new StringReader(in));
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <V> V read(final Object in) {
-    Reader reader;
-    if (in instanceof Clob) {
-      try {
-        reader = ((Clob)in).getCharacterStream();
-      } catch (SQLException e) {
-        throw new RuntimeException("Unable to read clob", e);
-      }
-    } else if (in instanceof Reader) {
-      reader = (Reader)in;
-    } else {
-      reader = new StringReader(in.toString());
-    }
-    return (V)read(reader);
   }
 
   /**
@@ -279,7 +278,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   private final Reader reader;
 
   public JsonParser(final InputStream in) {
-    this(new InputStreamReader(in));
+    this(FileUtil.createUtf8Reader(in));
   }
 
   public JsonParser(final Reader reader) {

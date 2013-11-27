@@ -1,7 +1,6 @@
 package com.revolsys.gis.cs;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,19 +23,19 @@ public class WktCsParser {
   private final String value;
 
   public WktCsParser(final InputStream in) {
-    this(new InputStreamReader(in));
+    this(FileUtil.createUtf8Reader(in));
   }
 
-  public WktCsParser(Reader reader) {
+  public WktCsParser(final Reader reader) {
     this(FileUtil.getString(reader));
+  }
+
+  public WktCsParser(final Resource resource) {
+    this(SpringUtil.getString(resource));
   }
 
   public WktCsParser(final String value) {
     this.value = value;
-  }
-
-  public WktCsParser(Resource resource) {
-    this(SpringUtil.getString(resource));
   }
 
   public CoordinateSystem parse() {

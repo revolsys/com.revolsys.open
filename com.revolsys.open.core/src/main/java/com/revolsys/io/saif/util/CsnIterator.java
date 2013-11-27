@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -133,7 +132,7 @@ public class CsnIterator {
 
   public CsnIterator(final String fileName, final InputStream in)
     throws IOException {
-    this(fileName, new InputStreamReader(in));
+    this(fileName, FileUtil.createUtf8Reader(in));
   }
 
   public CsnIterator(final String fileName, final Reader reader)

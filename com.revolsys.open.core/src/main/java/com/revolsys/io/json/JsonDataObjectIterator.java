@@ -2,7 +2,6 @@ package com.revolsys.io.json;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,6 +15,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.FileUtil;
 
 public class JsonDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
@@ -26,7 +26,7 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
 
   public JsonDataObjectIterator(final DataObjectMetaData metaData,
     final InputStream in) {
-    this(metaData, new InputStreamReader(in));
+    this(metaData, FileUtil.createUtf8Reader(in));
   }
 
   public JsonDataObjectIterator(final DataObjectMetaData metaData,

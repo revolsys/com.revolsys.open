@@ -1,7 +1,6 @@
 package com.revolsys.gis.cs.epsg;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +54,8 @@ public final class EpsgCoordinateSystems {
   private static Map<Integer, LinearUnit> linearUnits;
 
   private static int nextSrid = 2000000;
+
+  public static final CoordinateSystem WGS_84 = getCoordinateSystem(4326);
 
   private static void addCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
@@ -258,7 +259,7 @@ public final class EpsgCoordinateSystems {
     if (resource != null) {
       try {
 
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -288,7 +289,7 @@ public final class EpsgCoordinateSystems {
     if (resource != null) {
       try {
 
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -322,7 +323,7 @@ public final class EpsgCoordinateSystems {
     if (resource != null) {
       try {
 
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -356,7 +357,7 @@ public final class EpsgCoordinateSystems {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
     if (resource != null) {
       try {
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -388,7 +389,7 @@ public final class EpsgCoordinateSystems {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
     if (resource != null) {
       try {
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -422,7 +423,7 @@ public final class EpsgCoordinateSystems {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
     if (resource != null) {
       try {
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -451,7 +452,7 @@ public final class EpsgCoordinateSystems {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
     if (resource != null) {
       try {
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -479,7 +480,7 @@ public final class EpsgCoordinateSystems {
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
     if (resource != null) {
       try {
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -535,7 +536,7 @@ public final class EpsgCoordinateSystems {
     if (resource != null) {
       try {
 
-        final java.io.Reader reader = new InputStreamReader(resource);
+        final java.io.Reader reader = FileUtil.createUtf8Reader(resource);
         final CsvIterator csv = new CsvIterator(reader);
         if (csv.hasNext()) {
           csv.next();
@@ -581,8 +582,6 @@ public final class EpsgCoordinateSystems {
     }
     return degrees;
   }
-
-  public static final CoordinateSystem WGS_84 = getCoordinateSystem(4326);
 
   private EpsgCoordinateSystems() {
   }

@@ -38,6 +38,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -405,6 +406,10 @@ public final class FileUtil {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static InputStreamReader createUtf8Reader(final InputStream in) {
+    return new InputStreamReader(in, Charset.forName("UTF-8"));
   }
 
   /**
@@ -858,7 +863,7 @@ public final class FileUtil {
   }
 
   public static String getString(final InputStream in) {
-    final Reader reader = new InputStreamReader(in);
+    final Reader reader = FileUtil.createUtf8Reader(in);
     return getString(reader);
   }
 

@@ -26,7 +26,7 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
 
-  private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
+  private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 

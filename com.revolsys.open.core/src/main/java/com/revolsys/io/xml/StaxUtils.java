@@ -15,7 +15,6 @@
  */
 package com.revolsys.io.xml;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Arrays;
@@ -30,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.io.input.XmlStreamReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
@@ -54,18 +54,20 @@ public final class StaxUtils {
 
   public static XMLStreamReader createXmlReader(final InputStream inputStream) {
     try {
-      return StaxUtils.FACTORY.createXMLStreamReader(inputStream);
-    } catch (final XMLStreamException e) {
-      throw new IllegalArgumentException(e.getMessage(), e);
+      final XmlStreamReader reader = new XmlStreamReader(inputStream);
+      return StaxUtils.FACTORY.createXMLStreamReader(reader);
+    } catch (final Throwable e) {
+      ExceptionUtil.throwUncheckedException(e);
+      return null;
     }
   }
 
-  public static XMLStreamReader createXmlReader(final Reader reader)
-    throws IOException {
+  public static XMLStreamReader createXmlReader(final Reader reader) {
     try {
       return StaxUtils.FACTORY.createXMLStreamReader(reader);
-    } catch (final XMLStreamException e) {
-      throw new IllegalArgumentException(e.getMessage(), e);
+    } catch (final Throwable e) {
+      ExceptionUtil.throwUncheckedException(e);
+      return null;
     }
   }
 

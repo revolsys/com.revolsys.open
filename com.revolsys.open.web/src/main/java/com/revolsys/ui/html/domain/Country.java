@@ -18,13 +18,14 @@ package com.revolsys.ui.html.domain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import com.revolsys.io.FileUtil;
 
 /**
  * @author Paul Austin
@@ -139,7 +140,7 @@ public final class Country implements Serializable {
       final InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
       if (in != null) {
         final BufferedReader lineReader = new BufferedReader(
-          new InputStreamReader(in));
+          FileUtil.createUtf8Reader(in));
         try {
           String line = lineReader.readLine();
           for (line = lineReader.readLine(); line != null; line = lineReader.readLine()) {

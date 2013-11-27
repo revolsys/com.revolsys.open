@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -501,7 +500,7 @@ public class SwingUtil {
         in = process.getInputStream();
         out = process.getOutputStream();
         err = process.getErrorStream();
-        inr = new BufferedReader(new InputStreamReader(in));
+        inr = new BufferedReader(FileUtil.createUtf8Reader(in));
         String line = inr.readLine();
         while (line != null) {
           line = line.toLowerCase().trim();

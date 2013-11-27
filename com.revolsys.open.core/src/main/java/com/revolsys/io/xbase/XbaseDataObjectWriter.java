@@ -50,6 +50,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private Map<String, String> shortNames = new HashMap<String, String>();
 
+  private Charset charset = Charset.forName("UTF-8");
+
   public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
     this.metaData = metaData;
@@ -162,6 +164,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     out.flush();
   }
 
+  public Charset getCharset() {
+    return charset;
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
@@ -194,7 +200,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       if (!(codePageResource instanceof NonExistingResource)) {
         final PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
         try {
-          writer.print("UTF-8");
+          writer.print(charset.name());
         } finally {
           writer.close();
         }
@@ -207,6 +213,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   protected void preFirstWrite(final DataObject object) throws IOException {
+  }
+
+  public void setCharset(final Charset charset) {
+    this.charset = charset;
   }
 
   public void setShortNames(final Map<String, String> shortNames) {
@@ -316,7 +326,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             string = StringConverterRegistry.toString(value);
           }
-          final byte[] bytes = string.getBytes(Charset.forName("ISO-8859-1"));
+          final byte[] bytes = string.getBytes(charset);
           if (bytes.length >= fieldLength) {
             out.write(bytes, 0, fieldLength);
           } else {

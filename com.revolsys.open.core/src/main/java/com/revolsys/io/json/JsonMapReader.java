@@ -2,8 +2,6 @@ package com.revolsys.io.json;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -21,7 +19,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
   private boolean single = false;
 
   public JsonMapReader(final InputStream in) {
-    this.in = new InputStreamReader(in, Charset.forName("UTF-8"));
+    this.in = FileUtil.createUtf8Reader(in);
   }
 
   public JsonMapReader(final java.io.Reader in) {
