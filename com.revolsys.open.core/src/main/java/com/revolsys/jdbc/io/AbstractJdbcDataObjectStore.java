@@ -64,7 +64,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   DataObjectStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  private Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
+  private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
   private int batchSize;
 
@@ -78,7 +78,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String hints;
 
-  private Map<String, String> sequenceTypeSqlMap = new HashMap<String, String>();
+  private final Map<String, String> sequenceTypeSqlMap = new HashMap<String, String>();
 
   private String sqlPrefix;
 
@@ -86,9 +86,9 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String schemaPermissionsSql;
 
-  private Map<String, String> schemaNameMap = new HashMap<String, String>();
+  private final Map<String, String> schemaNameMap = new HashMap<String, String>();
 
-  private Map<String, String> tableNameMap = new HashMap<String, String>();
+  private final Map<String, String> tableNameMap = new HashMap<String, String>();
 
   private JdbcDatabaseFactory databaseFactory;
 
@@ -177,16 +177,18 @@ public abstract class AbstractJdbcDataObjectStore extends
         databaseFactory.closeDataSource(dataSource);
       }
     } finally {
-      attributeAdders = null;
+      allSchemaNames.clear();
+      attributeAdders.clear();
       connection = null;
+      databaseFactory = null;
       dataSource = null;
-      excludeTablePatterns = null;
+      excludeTablePatterns.clear();
       hints = null;
-      schemaNameMap = null;
-      sequenceTypeSqlMap = null;
+      schemaNameMap.clear();
+      sequenceTypeSqlMap.clear();
       sqlPrefix = null;
       sqlSuffix = null;
-      tableNameMap = null;
+      tableNameMap.clear();
     }
   }
 

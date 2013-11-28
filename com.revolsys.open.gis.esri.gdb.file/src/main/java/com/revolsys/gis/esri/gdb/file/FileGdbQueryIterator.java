@@ -185,13 +185,16 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-    if (boundingBox != null) {
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      if (geometryAttribute != null) {
-        final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-        if (geometryFactory != null) {
-          this.boundingBox = boundingBox.convert(geometryFactory);
+    final DataObjectMetaData metaData = this.metaData;
+    if (metaData != null) {
+      this.boundingBox = boundingBox;
+      if (boundingBox != null) {
+        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        if (geometryAttribute != null) {
+          final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+          if (geometryFactory != null) {
+            this.boundingBox = boundingBox.convert(geometryFactory);
+          }
         }
       }
     }

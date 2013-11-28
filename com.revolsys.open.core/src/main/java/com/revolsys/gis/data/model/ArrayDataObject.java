@@ -42,11 +42,15 @@ public class ArrayDataObject extends BaseDataObject {
   public ArrayDataObject(final DataObjectMetaData metaData,
     final Map<String, ? extends Object> values) {
     super(metaData);
-    final int attributeCount = metaData.getAttributeCount();
-    attributes = new Object[attributeCount];
-    final Map<String, Object> defaultValues = metaData.getDefaultValues();
-    setValuesByPath(defaultValues);
-    setValues(values);
+    if (metaData == null) {
+      attributes = new Object[0];
+    } else {
+      final int attributeCount = metaData.getAttributeCount();
+      attributes = new Object[attributeCount];
+      final Map<String, Object> defaultValues = metaData.getDefaultValues();
+      setValuesByPath(defaultValues);
+      setValues(values);
+    }
     setState(DataObjectState.New);
   }
 

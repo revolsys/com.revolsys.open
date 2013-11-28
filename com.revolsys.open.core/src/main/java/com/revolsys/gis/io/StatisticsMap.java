@@ -72,6 +72,10 @@ public class StatisticsMap {
     }
   }
 
+  public void clear() {
+    statisticsMap.clear();
+  }
+
   @PostConstruct
   public synchronized void connect() {
     providerCount++;

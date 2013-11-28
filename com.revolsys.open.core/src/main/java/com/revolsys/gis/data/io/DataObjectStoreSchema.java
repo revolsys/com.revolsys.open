@@ -21,6 +21,9 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   private String path;
 
+  public DataObjectStoreSchema() {
+  }
+
   public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
     final String path) {
     this.dataStore = dataObjectStore;

@@ -143,6 +143,12 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       out.startTag(HtmlUtil.HTML);
 
       out.startTag(HtmlUtil.HEAD);
+
+      out.startTag(HtmlUtil.META);
+      out.attribute(HtmlUtil.ATTR_HTTP_EQUIV, "Content-Type");
+      out.attribute(HtmlUtil.ATTR_CONTENT, "text/html; charset=utf-8");
+      out.endTag(HtmlUtil.META);
+
       if (StringUtils.hasText(title)) {
         out.element(HtmlUtil.TITLE, title);
       }

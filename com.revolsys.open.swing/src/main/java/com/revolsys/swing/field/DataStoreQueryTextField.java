@@ -1,5 +1,6 @@
 package com.revolsys.swing.field;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ItemSelectable;
@@ -16,8 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
@@ -36,6 +40,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -45,6 +50,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 
@@ -52,26 +58,32 @@ public class DataStoreQueryTextField extends TextField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
   ListDataListener, ItemSelectable, Field, ListSelectionListener,
   HighlightPredicate {
+  private static final Icon ICON_DELETE = SilkIconLoader.getIcon("delete");
+
   private static final long serialVersionUID = 1L;
-
-  private final String displayAttributeName;
-
-  private final JXList list;
-
-  private final JPopupMenu menu = new JPopupMenu();
-
-  private final DataStoreQueryListModel listModel;
-
-  public DataObject selectedItem;
-
-  private final String idAttributeName;
-
-  private final DataObjectMetaData metaData;
 
   private final DataObjectStore dataStore;
 
+  private final String displayAttributeName;
+
+  private final String idAttributeName;
+
+  private final JXList list;
+
+  private final DataStoreQueryListModel listModel;
+
+  private final JPopupMenu menu = new JPopupMenu();
+
+  private final DataObjectMetaData metaData;
+
+  private final JLabel oldValueItem;
+
+  public DataObject selectedItem;
+
   private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
     100);
+
+  private Object originalValue;
 
   public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
@@ -95,6 +107,14 @@ public class DataStoreQueryTextField extends TextField implements
     addKeyListener(this);
     addMouseListener(this);
 
+    menu.setLayout(new BorderLayout(2, 2));
+    this.oldValueItem = new JLabel();
+    oldValueItem.addMouseListener(this);
+    oldValueItem.setForeground(new Color(128, 128, 128));
+    oldValueItem.setFont(SwingUtil.FONT);
+    oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
+    this.menu.add(oldValueItem, BorderLayout.NORTH);
+
     this.listModel = new DataStoreQueryListModel(dataStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
@@ -107,7 +127,8 @@ public class DataStoreQueryTextField extends TextField implements
     this.list.addListSelectionListener(this);
     this.list.addHighlighter(new ColorHighlighter(this, WebColors.Blue,
       WebColors.White));
-    this.menu.add(this.list);
+
+    this.menu.add(this.list, BorderLayout.CENTER);
     this.menu.setFocusable(false);
     this.menu.setBorderPainted(true);
     this.menu.setBorder(BorderFactory.createCompoundBorder(
@@ -191,12 +212,13 @@ public class DataStoreQueryTextField extends TextField implements
     return displayText;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
     if (this.selectedItem == null) {
-      return null;
+      return (T)super.getFieldValue();
     } else {
-      return this.selectedItem.getIdValue();
+      return (T)this.selectedItem.getIdValue();
     }
   }
 
@@ -319,19 +341,14 @@ public class DataStoreQueryTextField extends TextField implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    // if (e.getSource() == this.list) {
-    // final Point point = e.getPoint();
-    // final int index = this.list.locationToIndex(point);
-    // if (index > -1) {
-    // this.list.setSelectedIndex(index);
-    // final DataObject value = this.listModel.getElementAt(index);
-    // if (value != null) {
-    // final String label = value.getString(this.displayAttributeName);
-    // setText(label);
-    // }
-    // requestFocus();
-    // }
-    // }
+    if (e.getSource() == oldValueItem) {
+      if (e.getX() < 18) {
+        setFieldValue(null);
+      } else {
+        setFieldValue(originalValue);
+      }
+      menu.setVisible(false);
+    }
   }
 
   @Override
@@ -387,6 +404,23 @@ public class DataStoreQueryTextField extends TextField implements
     setToolTipText(toolTip);
   }
 
+  @Override
+  public void setFieldValue(final Object value) {
+    super.setFieldValue(value);
+    this.originalValue = value;
+    Icon icon;
+    String originalText;
+    if (value == null) {
+      originalText = "-";
+      icon = null;
+    } else {
+      originalText = getDisplayText(value);
+      icon = ICON_DELETE;
+    }
+    oldValueItem.setIcon(icon);
+    oldValueItem.setText(originalText);
+  }
+
   public void setMaxResults(final int maxResults) {
     this.listModel.setMaxResults(maxResults);
   }
@@ -422,7 +456,7 @@ public class DataStoreQueryTextField extends TextField implements
       if (value != null) {
         final String label = value.getString(this.displayAttributeName);
         if (!EqualsRegistry.equal(label, getText())) {
-          setText(label);
+          setFieldValue(value.getIdInteger());
         }
       }
       menu.setVisible(false);

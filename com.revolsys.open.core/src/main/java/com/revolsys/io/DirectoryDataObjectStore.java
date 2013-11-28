@@ -26,7 +26,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
   private boolean createMissingTables = true;
 
-  private Map<String, Writer<DataObject>> writers = new HashMap<String, Writer<DataObject>>();
+  private final Map<String, Writer<DataObject>> writers = new HashMap<String, Writer<DataObject>>();
 
   private File directory;
 
@@ -49,7 +49,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
       for (final Writer<DataObject> writer : writers.values()) {
         writer.close();
       }
-      writers = null;
+      writers.clear();
     }
     if (writer != null) {
       writer.close();
@@ -104,7 +104,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
   @Override
   public synchronized Writer<DataObject> getWriter() {
-    if (writer == null) {
+    if (writer == null && directory != null) {
       writer = new DirectoryDataObjectStoreWriter(this);
     }
     return writer;

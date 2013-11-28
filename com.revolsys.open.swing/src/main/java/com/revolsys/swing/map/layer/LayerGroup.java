@@ -276,6 +276,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         layer.delete();
       }
       super.delete();
+      layers.clear();
     }
   }
 

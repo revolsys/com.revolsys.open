@@ -75,7 +75,7 @@ public abstract class AbstractDataObjectStore extends
 
   private DataObjectFactory dataObjectFactory;
 
-  private Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
+  private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
 
   private String label;
 
@@ -83,9 +83,9 @@ public abstract class AbstractDataObjectStore extends
 
   private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
 
-  private Map<String, Map<String, Object>> typeMetaDataProperties = new HashMap<String, Map<String, Object>>();
+  private final Map<String, Map<String, Object>> typeMetaDataProperties = new HashMap<String, Map<String, Object>>();
 
-  private StatisticsMap statistics = new StatisticsMap();
+  private final StatisticsMap statistics = new StatisticsMap();
 
   private GeometryFactory geometryFactory;
 
@@ -194,16 +194,17 @@ public abstract class AbstractDataObjectStore extends
         schemaMap.clear();
       }
     } finally {
-      codeTableColumNames = null;
-      columnToTableMap = null;
-      commonMetaDataProperties = null;
-      dataObjectFactory = null;
-      geometryFactory = null;
-      label = null;
-
-      schemaMap = null;
-      statistics = null;
-      typeMetaDataProperties = null;
+      codeTableColumNames.clear();
+      columnToTableMap.clear();
+      commonMetaDataProperties.clear();
+      connectionProperties.clear();
+      dataObjectFactory = ArrayDataObjectFactory.getInstance();
+      dataStoreExtensions.clear();
+      iteratorFactory = null;
+      label = "deleted";
+      schemaMap.clear();
+      statistics.clear();
+      typeMetaDataProperties.clear();
     }
   }
 

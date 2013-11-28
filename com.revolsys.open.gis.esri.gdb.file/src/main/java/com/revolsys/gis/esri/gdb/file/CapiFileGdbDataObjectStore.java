@@ -190,7 +190,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public void addChildSchema(final String path) {
     synchronized (apiSync) {
-      if (this.geodatabase != null) {
+      if (geodatabase != null) {
         final VectorOfWString childDatasets = geodatabase.getChildDatasets(
           path, "Feature Dataset");
         for (int i = 0; i < childDatasets.size(); i++) {
@@ -223,7 +223,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private void addTableMetaData(final String schemaName, final String path) {
-    if (this.geodatabase != null) {
+    if (geodatabase != null) {
       final String tableDefinition = geodatabase.getTableDefinition(path);
       final DataObjectMetaData metaData = getMetaData(schemaName, path,
         tableDefinition);
@@ -234,7 +234,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public void alterDomain(final CodedValueDomain domain) {
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
     synchronized (apiSync) {
-      if (this.geodatabase != null) {
+      if (geodatabase != null) {
         geodatabase.alterDomain(domainDefinition);
       }
     }
@@ -421,7 +421,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public synchronized void createDomain(final Domain domain) {
-    if (this.geodatabase != null) {
+    if (geodatabase != null) {
       final String domainName = domain.getDomainName();
       if (!domainColumNames.containsKey(domainName)) {
         synchronized (apiSync) {
@@ -562,7 +562,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private DataObjectStoreSchema createSchema(final DETable table) {
     synchronized (apiSync) {
-      if (this.geodatabase == null) {
+      final Geodatabase geodatabase = this.geodatabase;
+      if (geodatabase == null) {
         return null;
       } else {
         final String catalogPath = table.getParentCatalogPath();
@@ -589,7 +590,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   public void createSchema(final String schemaName,
     final GeometryFactory geometryFactory) {
     synchronized (apiSync) {
-      if (this.geodatabase != null) {
+      if (geodatabase != null) {
         final SpatialReference spatialReference = getSpatialReference(geometryFactory);
         final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
           schemaName, spatialReference);
@@ -629,7 +630,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   protected DataObjectMetaDataImpl createTable(final DETable deTable) {
     synchronized (apiSync) {
-      if (this.geodatabase == null) {
+      final Geodatabase geodatabase = this.geodatabase;
+      if (geodatabase == null) {
         return null;
       } else {
         String schemaPath = deTable.getParentCatalogPath();
@@ -857,8 +859,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         typePath = query.getTypeName();
         metaData = getMetaData(typePath);
         if (metaData == null) {
-          throw new IllegalArgumentException("Type name does not exist "
-            + typePath);
+          return 0;
         }
       } else {
         typePath = metaData.getPath();
@@ -1110,7 +1111,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   protected void loadDomain(final String domainName) {
     synchronized (apiSync) {
-      if (this.geodatabase != null) {
+      if (geodatabase != null) {
         final String domainDef = geodatabase.getDomainDefinition(domainName);
         final Domain domain = EsriGdbXmlParser.parse(domainDef);
         if (domain instanceof CodedValueDomain) {
@@ -1151,7 +1152,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final Map<String, DataObjectMetaData> metaDataMap, final String schemaName,
     final String path, final String datasetType) {
     synchronized (apiSync) {
-      if (this.geodatabase != null) {
+      if (geodatabase != null) {
         try {
           final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
             path, datasetType);
@@ -1190,7 +1191,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public EnumRows query(final String sql, final boolean recycling) {
     synchronized (apiSync) {
-      if (this.geodatabase == null) {
+      final Geodatabase geodatabase = this.geodatabase;
+      if (geodatabase == null) {
         return null;
       } else {
         try {

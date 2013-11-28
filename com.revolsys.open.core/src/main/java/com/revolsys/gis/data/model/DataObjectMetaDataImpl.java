@@ -44,13 +44,13 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return METADATA_CACHE.get(instanceId);
   }
 
-  private Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
+  private final Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
-  private Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
+  private final Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
 
-  private List<String> attributeNames = new ArrayList<String>();
+  private final List<String> attributeNames = new ArrayList<String>();
 
-  private List<Attribute> attributes = new ArrayList<Attribute>();
+  private final List<Attribute> attributes = new ArrayList<Attribute>();
 
   private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
 
@@ -65,9 +65,9 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
-  private List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
+  private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
-  private List<String> geometryAttributeNames = new ArrayList<String>();
+  private final List<String> geometryAttributeNames = new ArrayList<String>();
 
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
@@ -77,11 +77,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /** The path of the data type. */
   private String path;
 
-  private Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
+  private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
-  protected DataObjectStoreSchema schema;
+  private DataObjectStoreSchema schema;
 
-  private List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
+  private final List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
   private String description;
 
@@ -283,20 +283,22 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public void destroy() {
     super.close();
     METADATA_CACHE.remove(instanceId);
-    attributeIdMap = null;
-    attributeMap = null;
-    attributeNames = null;
-    attributes = null;
-    dataObjectFactory = null;
-    dataObjectMetaDataFactory = null;
+    attributeIdMap.clear();
+    attributeMap.clear();
+    attributeNames.clear();
+    attributes.clear();
+    codeTableByColumnMap.clear();
+    dataObjectFactory = ArrayDataObjectFactory.getInstance();
+    dataObjectMetaDataFactory = new DataObjectMetaDataFactoryImpl();
     dataObjectStore = null;
-    defaultValues = null;
-    geometryAttributeIndexes = null;
-    geometryAttributeNames = null;
-    path = null;
-    restrictions = null;
-    schema = null;
-    superClasses = null;
+    defaultValues.clear();
+    description = "";
+    geometryAttributeIndex = -1;
+    geometryAttributeIndexes.clear();
+    geometryAttributeNames.clear();
+    restrictions.clear();
+    schema = new DataObjectStoreSchema();
+    superClasses.clear();
   }
 
   @Override
