@@ -631,10 +631,10 @@ public class SwingUtil {
     final Dimension size = new Dimension((int)(screenWidth - minusX),
       (int)(screenHeight - minusY));
     frame.setLocation(minusX / 2, minusY / 2);
-    frame.setSize(size);
     frame.setPreferredSize(size);
-    frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
-    frame.setState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
+    frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+    frame.setState(Frame.MAXIMIZED_BOTH);
+    frame.pack();
   }
 
   public static void setTitledBorder(final JComponent component,
