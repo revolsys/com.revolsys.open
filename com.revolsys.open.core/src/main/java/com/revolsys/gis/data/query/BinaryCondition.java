@@ -6,18 +6,17 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.util.JavaBeanUtil;
 
-public class BinaryCondition extends AbstractCondition {
+public class BinaryCondition extends Condition {
+
+  private QueryValue left;
 
   private final String operator;
 
-  private final Condition left;
+  private QueryValue right;
 
-  private final Condition right;
-
-  public BinaryCondition(final Condition left, final String operator,
-    final Condition right) {
+  public BinaryCondition(final QueryValue left, final String operator,
+    final QueryValue right) {
     this.left = left;
     this.operator = operator;
     this.right = right;
@@ -58,9 +57,10 @@ public class BinaryCondition extends AbstractCondition {
 
   @Override
   public BinaryCondition clone() {
-    final Condition leftClone = JavaBeanUtil.clone(left);
-    final Condition rightClone = JavaBeanUtil.clone(right);
-    return new BinaryCondition(leftClone, operator, rightClone);
+    final BinaryCondition clone = (BinaryCondition)super.clone();
+    clone.left = left.clone();
+    clone.right = right.clone();
+    return clone;
   }
 
   @Override
@@ -78,12 +78,7 @@ public class BinaryCondition extends AbstractCondition {
     return false;
   }
 
-  @Override
-  public List<Condition> getConditions() {
-    return Arrays.asList(left, right);
-  }
-
-  public Condition getLeft() {
+  public QueryValue getLeft() {
     return left;
   }
 
@@ -91,7 +86,12 @@ public class BinaryCondition extends AbstractCondition {
     return operator;
   }
 
-  public Condition getRight() {
+  @Override
+  public List<QueryValue> getQueryValues() {
+    return Arrays.asList(left, right);
+  }
+
+  public QueryValue getRight() {
     return right;
   }
 

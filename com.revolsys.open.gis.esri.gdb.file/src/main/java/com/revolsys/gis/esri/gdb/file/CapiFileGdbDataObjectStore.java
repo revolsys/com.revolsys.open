@@ -34,13 +34,14 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.query.AbstractMultiCondition;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.LeftUnaryCondition;
-import com.revolsys.gis.data.query.MultipleCondition;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.RightUnaryCondition;
 import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.data.query.Value;
@@ -241,37 +242,37 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private void appendCondition(final StringBuffer buffer,
-    final Condition condition) {
+    final QueryValue condition) {
     if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
-      final Condition right = unaryCondition.getCondition();
+      final Condition right = unaryCondition.getQueryValue();
       buffer.append(operator);
       buffer.append(" ");
       appendCondition(buffer, right);
     } else if (condition instanceof RightUnaryCondition) {
       final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
-      final Condition left = unaryCondition.getCondition();
+      final QueryValue left = unaryCondition.getValue();
       final String operator = unaryCondition.getOperator();
       appendCondition(buffer, left);
       buffer.append(" ");
       buffer.append(operator);
     } else if (condition instanceof BinaryCondition) {
       final BinaryCondition binaryCondition = (BinaryCondition)condition;
-      final Condition left = binaryCondition.getLeft();
+      final QueryValue left = binaryCondition.getLeft();
       final String operator = binaryCondition.getOperator();
-      final Condition right = binaryCondition.getRight();
+      final QueryValue right = binaryCondition.getRight();
       appendCondition(buffer, left);
       buffer.append(" ");
       buffer.append(operator);
       buffer.append(" ");
       appendCondition(buffer, right);
-    } else if (condition instanceof MultipleCondition) {
-      final MultipleCondition multipleCondition = (MultipleCondition)condition;
+    } else if (condition instanceof AbstractMultiCondition) {
+      final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
       buffer.append("(");
       boolean first = true;
       final String operator = multipleCondition.getOperator();
-      for (final Condition subCondition : multipleCondition.getConditions()) {
+      for (final QueryValue subCondition : multipleCondition.getQueryValues()) {
         if (first) {
           first = false;
         } else {

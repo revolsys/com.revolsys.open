@@ -3,15 +3,21 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class ParenthesisCondition extends AbstractCondition {
+public class ParenthesisCondition extends Condition {
 
-  private final Condition condition;
+  private Condition condition;
 
   public ParenthesisCondition(final Condition condition) {
     this.condition = condition;
+  }
+
+  @Override
+  public boolean accept(final Map<String, Object> record) {
+    return condition.accept(record);
   }
 
   @Override
@@ -28,7 +34,9 @@ public class ParenthesisCondition extends AbstractCondition {
 
   @Override
   public ParenthesisCondition clone() {
-    return new ParenthesisCondition(condition.clone());
+    final ParenthesisCondition clone = (ParenthesisCondition)super.clone();
+    clone.condition = condition.clone();
+    return clone;
   }
 
   @Override
@@ -47,8 +55,13 @@ public class ParenthesisCondition extends AbstractCondition {
   }
 
   @Override
-  public List<Condition> getConditions() {
-    return Collections.singletonList(condition);
+  public List<QueryValue> getQueryValues() {
+    return Collections.<QueryValue> singletonList(condition);
+  }
+
+  @Override
+  public <V> V getValue(final Map<String, Object> record) {
+    return condition.getValue(record);
   }
 
   @Override

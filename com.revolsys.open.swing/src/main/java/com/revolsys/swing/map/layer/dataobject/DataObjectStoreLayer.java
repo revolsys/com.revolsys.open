@@ -352,6 +352,40 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     "rawtypes", "unchecked"
   })
   @Override
+  protected List<LayerDataObject> doQuery(final Query query) {
+    if (isExists()) {
+      final DataObjectStore dataStore = getDataStore();
+      if (dataStore != null) {
+        final boolean enabled = setEventsEnabled(false);
+        try {
+          final Statistics statistics = query.getProperty("statistics");
+          query.setProperty("dataObjectFactory", this);
+          final Reader<LayerDataObject> reader = (Reader)dataStore.query(query);
+          try {
+            final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+            for (final LayerDataObject record : reader) {
+              final boolean added = addCachedRecord(records, record);
+              if (added && statistics != null) {
+                statistics.add(record);
+              }
+            }
+            return records;
+
+          } finally {
+            reader.close();
+          }
+        } finally {
+          setEventsEnabled(enabled);
+        }
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  @Override
   protected List<LayerDataObject> doQueryBackground(
     final BoundingBox boundingBox) {
     if (boundingBox == null || boundingBox.isEmpty()) {
@@ -621,40 +655,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final DataObjectMetaData metaData = getMetaData();
     final Query query = Query.and(metaData, filter);
     return query(query);
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  @Override
-  public List<LayerDataObject> query(final Query query) {
-    if (isExists()) {
-      final DataObjectStore dataStore = getDataStore();
-      if (dataStore != null) {
-        final boolean enabled = setEventsEnabled(false);
-        try {
-          final Statistics statistics = query.getProperty("statistics");
-          query.setProperty("dataObjectFactory", this);
-          final Reader<LayerDataObject> reader = (Reader)dataStore.query(query);
-          try {
-            final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
-            for (final LayerDataObject record : reader) {
-              final boolean added = addCachedRecord(records, record);
-              if (added && statistics != null) {
-                statistics.add(record);
-              }
-            }
-            return records;
-
-          } finally {
-            reader.close();
-          }
-        } finally {
-          setEventsEnabled(enabled);
-        }
-      }
-    }
-    return Collections.emptyList();
   }
 
   @Override

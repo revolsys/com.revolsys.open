@@ -167,7 +167,9 @@ public abstract class DataObjectRowTableModel extends
         return null;
       } else {
         final String name = getAttributeName(columnIndex);
-        return object.getValue(name);
+
+        final Object value = object.getValue(name);
+        return value;
       }
     }
   }

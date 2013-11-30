@@ -16,6 +16,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
@@ -213,6 +215,22 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   public List<LayerDataObject> doQuery(Geometry geometry, final double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
     return (List)getIndex().queryDistance(geometry, distance);
+  }
+
+  @Override
+  protected List<LayerDataObject> doQuery(final Query query) {
+    final Condition whereCondition = query.getWhereCondition();
+    if (whereCondition == null) {
+      return new ArrayList<LayerDataObject>(records);
+    } else {
+      final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+      for (final LayerDataObject record : records) {
+        if (whereCondition.accept(record)) {
+          records.add(record);
+        }
+      }
+      return records;
+    }
   }
 
   @Override

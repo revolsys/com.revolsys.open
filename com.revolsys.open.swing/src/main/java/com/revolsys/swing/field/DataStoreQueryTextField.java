@@ -20,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
@@ -45,6 +46,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.Equal;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
@@ -87,7 +89,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
-    this(metaData, displayAttributeName, new Query(metaData, Conditions.equal(
+    this(metaData, displayAttributeName, new Query(metaData, new Equal(
       Function.upper(displayAttributeName), new Value(null))), new Query(
       metaData, Conditions.likeUpper(displayAttributeName, "")));
 
@@ -128,7 +130,7 @@ public class DataStoreQueryTextField extends TextField implements
     this.list.addHighlighter(new ColorHighlighter(this, WebColors.Blue,
       WebColors.White));
 
-    this.menu.add(this.list, BorderLayout.CENTER);
+    this.menu.add(new JScrollPane(this.list), BorderLayout.CENTER);
     this.menu.setFocusable(false);
     this.menu.setBorderPainted(true);
     this.menu.setBorder(BorderFactory.createCompoundBorder(
@@ -148,9 +150,9 @@ public class DataStoreQueryTextField extends TextField implements
   public DataStoreQueryTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
     this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
-      typeName, Conditions.equal(Function.upper(displayAttributeName),
-        new Value(null))), new Query(typeName, Conditions.likeUpper(
-      displayAttributeName, "")));
+      typeName,
+      new Equal(Function.upper(displayAttributeName), new Value(null))),
+      new Query(typeName, Conditions.likeUpper(displayAttributeName, "")));
   }
 
   @Override
@@ -439,7 +441,7 @@ public class DataStoreQueryTextField extends TextField implements
       this.menu.setVisible(false);
     } else {
       this.menu.setVisible(true);
-      this.menu.show(this, 0, this.getHeight());
+      this.menu.show(this, this.getWidth(), 0);
       this.menu.pack();
     }
   }

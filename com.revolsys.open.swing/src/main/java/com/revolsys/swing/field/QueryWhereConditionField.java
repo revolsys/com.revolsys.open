@@ -60,15 +60,21 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.BetweenCondition;
+import com.revolsys.gis.data.query.And;
+import com.revolsys.gis.data.query.Between;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Cast;
-import com.revolsys.gis.data.query.CollectionCondition;
+import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Function;
-import com.revolsys.gis.data.query.MultipleCondition;
+import com.revolsys.gis.data.query.In;
+import com.revolsys.gis.data.query.IsNotNull;
+import com.revolsys.gis.data.query.IsNull;
+import com.revolsys.gis.data.query.Not;
+import com.revolsys.gis.data.query.Or;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -361,7 +367,7 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   @SuppressWarnings("unchecked")
-  private <V extends Condition> V toCondition(final ValueNode expression) {
+  private <V extends QueryValue> V toCondition(final ValueNode expression) {
     if (expression instanceof BetweenOperatorNode) {
       final BetweenOperatorNode betweenExpression = (BetweenOperatorNode)expression;
       final ValueNode leftValueNode = betweenExpression.getLeftOperand();
@@ -390,7 +396,7 @@ public class QueryWhereConditionField extends ValueField implements
       final Attribute attribute = metaData.getAttribute(column.getName());
       min.convert(attribute);
       max.convert(attribute);
-      return (V)new BetweenCondition(column, min, max);
+      return (V)new Between(column, min, max);
     } else if (expression instanceof BinaryLogicalOperatorNode) {
       final BinaryLogicalOperatorNode binaryOperatorNode = (BinaryLogicalOperatorNode)expression;
       final String operator = binaryOperatorNode.getOperator().toUpperCase();
@@ -398,15 +404,23 @@ public class QueryWhereConditionField extends ValueField implements
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
       final Condition leftCondition = toCondition(leftValueNode);
       final Condition rightCondition = toCondition(rightValueNode);
-      return (V)new MultipleCondition(operator, leftCondition, rightCondition);
+      if ("AND".equals(operator)) {
+        return (V)new And(leftCondition, rightCondition);
+      } else if ("OR".equals(operator)) {
+        return (V)new Or(leftCondition, rightCondition);
+      } else {
+        setInvalidMessage("Binary logical operator " + operator
+          + " not supported.");
+        return null;
+      }
     } else if (expression instanceof BinaryOperatorNode) {
       final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
       final String operator = binaryOperatorNode.getOperator();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
       if (SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
-        final Condition leftCondition = toCondition(leftValueNode);
-        Condition rightCondition = toCondition(rightValueNode);
+        final QueryValue leftCondition = toCondition(leftValueNode);
+        QueryValue rightCondition = toCondition(rightValueNode);
 
         if (leftCondition instanceof Column) {
           if (rightCondition instanceof Value) {
@@ -464,7 +478,7 @@ public class QueryWhereConditionField extends ValueField implements
       final NotNode notNode = (NotNode)expression;
       final ValueNode operand = notNode.getOperand();
       final Condition condition = toCondition(operand);
-      return (V)Conditions.not(condition);
+      return (V)new Not(condition);
     } else if (expression instanceof InListOperatorNode) {
       final InListOperatorNode inListOperatorNode = (InListOperatorNode)expression;
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
@@ -476,16 +490,15 @@ public class QueryWhereConditionField extends ValueField implements
         final Condition itemCondition = toCondition(itemValueNode);
         conditions.add(itemCondition);
       }
-      return (V)Conditions.in(leftCondition,
-        new CollectionCondition(conditions));
+      return (V)new In(leftCondition, new CollectionValue(conditions));
     } else if (expression instanceof IsNullNode) {
       final IsNullNode isNullNode = (IsNullNode)expression;
       final ValueNode operand = isNullNode.getOperand();
       final Condition condition = toCondition(operand);
       if (isNullNode.getNodeType() == NodeTypes.IS_NOT_NULL_NODE) {
-        return (V)Conditions.isNotNull(condition);
+        return (V)new IsNotNull(condition);
       } else {
-        return (V)Conditions.isNull(condition);
+        return (V)new IsNull(condition);
       }
       // } else if (expression instanceof Parenthesis) {
       // final Parenthesis parenthesis = (Parenthesis)expression;

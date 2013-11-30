@@ -17,8 +17,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
-import com.revolsys.gis.data.query.Conditions;
-import com.revolsys.gis.data.query.MultipleCondition;
+import com.revolsys.gis.data.query.And;
+import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.Equal;
+import com.revolsys.gis.data.query.IsNull;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -219,7 +221,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-	  DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+    final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
     final Query query = new Query(typePath);
     query.setAttributeNames(metaData.getAttributeNames());
     for (final String order : orderBy) {
@@ -244,16 +246,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
       id = getId(values, false);
     } else {
       final Query query = new Query(typePath);
-      final MultipleCondition and = Conditions.and();
+      Condition[] conditions = {};
+      final And and = new And(conditions);
       if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
           final Object value = values.get(i);
           if (value == null) {
-            and.add(Conditions.isNull(attributeName));
+            and.add(IsNull.column(attributeName));
           } else {
             final Attribute attribute = metaData.getAttribute(attributeName);
-            and.add(Conditions.equal(attribute, value));
+            and.add(Equal.equal(attribute, value));
           }
           i++;
         }

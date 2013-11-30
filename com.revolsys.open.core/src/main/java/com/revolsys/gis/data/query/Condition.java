@@ -1,19 +1,34 @@
 package com.revolsys.gis.data.query;
 
-import java.sql.PreparedStatement;
-import java.util.List;
+import java.util.Map;
 
-public interface Condition extends Cloneable {
-  // TODO wrap in a more generic structure
-  int appendParameters(int index, PreparedStatement statement);
+import com.revolsys.filter.Filter;
 
-  void appendSql(StringBuffer buffer);
+public abstract class Condition extends QueryValue implements
+  Filter<Map<String, Object>> {
+  @Override
+  public boolean accept(final Map<String, Object> record) {
+    throw new UnsupportedOperationException("Cannot filter using " + toString());
+  }
 
-  Condition clone();
+  @Override
+  public Condition clone() {
+    return (Condition)super.clone();
+  }
 
-  List<Condition> getConditions();
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V getValue(final Map<String, Object> record) {
+    final Boolean value = accept(record);
+    return (V)value;
+  }
 
-  boolean isEmpty();
+  public boolean isEmpty() {
+    return false;
+  }
 
-  String toFormattedString();
+  @Override
+  public String toFormattedString() {
+    return toString();
+  }
 }

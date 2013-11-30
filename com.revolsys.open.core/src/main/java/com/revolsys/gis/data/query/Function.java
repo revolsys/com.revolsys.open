@@ -21,13 +21,13 @@ public class Function extends AbstractMultiCondition {
 
   private final String name;
 
-  public Function(final String name, final Condition... parameters) {
-    this(name, Arrays.asList(parameters));
-  }
-
-  public Function(final String name, final List<Condition> parameters) {
+  public Function(final String name, final List<QueryValue> parameters) {
     super(parameters);
     this.name = name;
+  }
+
+  public Function(final String name, final QueryValue... parameters) {
+    this(name, Arrays.asList(parameters));
   }
 
   @Override
@@ -35,7 +35,7 @@ public class Function extends AbstractMultiCondition {
     buffer.append(name);
     buffer.append("(");
     boolean first = true;
-    for (final Condition parameter : getConditions()) {
+    for (final QueryValue parameter : getQueryValues()) {
       if (first) {
         first = false;
       } else {

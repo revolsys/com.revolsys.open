@@ -1215,7 +1215,7 @@ public class DataObjectLayerForm extends JPanel implements
   public void setTabColor(final int index, final Color foregroundColor) {
     if (index > -1) {
       if (foregroundColor == null) {
-
+        tabs.setTabComponentAt(index, null);
       } else {
         if (SwingUtilities.isEventDispatchThread()) {
           final JLabel label = new JLabel(this.tabs.getTitleAt(index));

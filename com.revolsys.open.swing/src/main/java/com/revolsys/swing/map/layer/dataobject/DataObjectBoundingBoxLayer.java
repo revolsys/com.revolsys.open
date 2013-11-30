@@ -15,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Polygon;
@@ -86,6 +87,11 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
       }
       return (List)getIndex().queryIntersects(polygon);
     }
+  }
+
+  @Override
+  protected List<LayerDataObject> doQuery(final Query query) {
+    return Collections.emptyList();
   }
 
   @Override

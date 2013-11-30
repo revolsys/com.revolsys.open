@@ -56,13 +56,14 @@ public class WindowManager implements WindowFocusListener {
   }
 
   public synchronized static void removeWindow(final Window window) {
-    final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
-    if (menuItem != null) {
-      menu.remove(menuItem);
-      windowMenuItemMap.remove(menuItem);
+    if (window != null) {
+      final JCheckBoxMenuItem menuItem = windowMenuItemMap.remove(window);
+      if (menuItem != null) {
+        menu.remove(menuItem);
+      }
+      windows.remove(window);
+      window.removeWindowFocusListener(INSTANCE);
     }
-    windows.remove(menuItem);
-    window.removeWindowFocusListener(INSTANCE);
   }
 
   private WindowManager() {

@@ -65,6 +65,7 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -648,6 +649,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return Collections.emptyList();
   }
 
+  protected abstract List<LayerDataObject> doQuery(final Query query);
+
   protected List<LayerDataObject> doQueryBackground(
     final BoundingBox boundingBox) {
     return doQuery(boundingBox);
@@ -695,6 +698,23 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         results.remove(record);
       }
     }
+  }
+
+  public boolean filter(final Query query, final LayerDataObject record) {
+    boolean accept = true;
+    final Collection<LayerDataObject> deletedRecords = getDeletedRecords();
+    if (deletedRecords.contains(record)) {
+      accept = false;
+    } else {
+      final Condition whereCondition = query.getWhereCondition();
+      final Collection<LayerDataObject> modifiedRecords = getModifiedRecords();
+      if (whereCondition != null && modifiedRecords.contains(record)) {
+        if (!whereCondition.accept(record)) {
+          accept = false;
+        }
+      }
+    }
+    return accept;
   }
 
   protected void filterUpdates(final List<LayerDataObject> results,
@@ -1498,7 +1518,24 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public List<LayerDataObject> query(final Query query) {
-    throw new UnsupportedOperationException("Query not currently supported");
+    // TODO sorting
+    final List<LayerDataObject> results = doQuery(query);
+    for (final Iterator<LayerDataObject> iterator = results.iterator(); iterator.hasNext();) {
+      final LayerDataObject record = iterator.next();
+      final boolean accept = filter(query, record);
+      if (!accept) {
+        iterator.remove();
+      }
+    }
+    for (final LayerDataObject record : getModifiedRecords()) {
+      if (filter(query, record)) {
+        results.add(record);
+      }
+    }
+    for (final LayerDataObject record : getNewRecords()) {
+      results.add(record);
+    }
+    return results;
   }
 
   public final List<LayerDataObject> queryBackground(

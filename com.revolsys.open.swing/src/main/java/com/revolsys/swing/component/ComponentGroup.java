@@ -50,6 +50,12 @@ public class ComponentGroup {
     getGroup(groupName);
   }
 
+  public void clear() {
+    buttonGroups.clear();
+    groupNames.clear();
+    groups.clear();
+  }
+
   public ButtonGroup getButtonGroup(final String groupName) {
     ButtonGroup buttonGroup = this.buttonGroups.get(groupName);
     if (buttonGroup == null) {

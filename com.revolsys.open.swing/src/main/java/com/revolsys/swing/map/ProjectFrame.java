@@ -325,11 +325,28 @@ public class ProjectFrame extends BaseFrame {
         if (Project.get() == this.project) {
           Project.set(null);
         }
-        this.tocPanel = null;
-        this.project = null;
-        this.dockControl = null;
-        this.mapPanel = null;
       }
+      if (tocPanel != null) {
+        tocPanel.destroy();
+      }
+
+      this.tocPanel = null;
+      this.project = null;
+      if (dockControl != null) {
+        this.dockControl.destroy();
+        this.dockControl.setRootWindow(null);
+      }
+      this.dockControl = null;
+      if (mapPanel != null) {
+        mapPanel.dispose();
+      }
+      this.mapPanel = null;
+      setMenuBar(null);
+      final ActionMap actionMap = getRootPane().getActionMap();
+      actionMap.put(SAVE_PROJECT_KEY, null);
+      actionMap.put(SAVE_CHANGES_KEY, null);
+
+      setRootPane(new JRootPane());
     } else {
       Invoke.later(this, "dispose");
     }

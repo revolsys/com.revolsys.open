@@ -1,10 +1,11 @@
 package com.revolsys.gis.data.query;
 
 import java.sql.PreparedStatement;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class Column extends AbstractCondition {
+public class Column extends Condition {
 
   private final String name;
 
@@ -39,6 +40,12 @@ public class Column extends AbstractCondition {
 
   public String getName() {
     return name;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V getValue(final Map<String, Object> object) {
+    final String name = getName();
+    return (V)object.get(name);
   }
 
   @Override

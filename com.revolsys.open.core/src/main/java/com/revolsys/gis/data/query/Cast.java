@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class Cast extends AbstractCondition {
+public class Cast extends Condition {
   private final Condition condition;
 
   private final String dataType;

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -23,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import org.jdesktop.swingx.JXStatusBar;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -32,6 +32,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.listener.InvokeMethodSelectedItemListener;
@@ -113,9 +114,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private final UndoManager undoManager = new UndoManager();
 
-  private final JXStatusBar leftStatusBar = new JXStatusBar();
+  private BasePanel leftStatusBar = new BasePanel(new FlowLayout(
+    FlowLayout.LEFT));
 
-  private final JXStatusBar rightStatusBar = new JXStatusBar();
+  private BasePanel rightStatusBar = new BasePanel(new FlowLayout(
+    FlowLayout.RIGHT));
 
   private final ToolBar toolBar = new ToolBar();
 
@@ -134,6 +137,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private SwingWorkerProgressBar progressBar;
 
   private JButton zoomBookmarkButton;
+
+  private JPanel statusBarPanel;
 
   public MapPanel() {
     this(new Project());
@@ -277,10 +282,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   protected void addStatusBar() {
-    final JPanel panel = new JPanel(new BorderLayout());
-    add(panel, BorderLayout.SOUTH);
-    panel.add(this.leftStatusBar, BorderLayout.WEST);
-    panel.add(this.rightStatusBar, BorderLayout.EAST);
+    statusBarPanel = new JPanel(new BorderLayout());
+    statusBarPanel.setMinimumSize(new Dimension(200, 30));
+    add(statusBarPanel, BorderLayout.SOUTH);
+    statusBarPanel.add(this.leftStatusBar, BorderLayout.WEST);
+    statusBarPanel.add(this.rightStatusBar, BorderLayout.EAST);
 
     addPointerLocation(false);
     addPointerLocation(true);
@@ -385,6 +391,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void dispose() {
+    statusBarPanel.removeAll();
+    leftStatusBar = null;
+    rightStatusBar = null;
     this.layerOverlay.dispose();
   }
 
@@ -422,7 +431,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.layerOverlay;
   }
 
-  public JXStatusBar getLeftStatusBar() {
+  public JPanel getLeftStatusBar() {
     return this.leftStatusBar;
   }
 
@@ -469,7 +478,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.project;
   }
 
-  public JXStatusBar getRightStatusBar() {
+  public JPanel getRightStatusBar() {
     return rightStatusBar;
   }
 

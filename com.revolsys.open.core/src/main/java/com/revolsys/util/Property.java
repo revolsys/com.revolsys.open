@@ -4,6 +4,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeListenerProxy;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -248,6 +249,18 @@ public final class Property {
   }
 
   private Property() {
+  }
+
+  public static void removeAllListeners(
+    final PropertyChangeSupport propertyChangeSupport) {
+    for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
+      if (listener instanceof PropertyChangeListenerProxy) {
+        final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
+        propertyChangeSupport.removePropertyChangeListener(
+          proxy.getPropertyName(), listener);
+      }
+      propertyChangeSupport.removePropertyChangeListener(listener);
+    }
   }
 
 }

@@ -3,22 +3,47 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 
-public class BetweenCondition extends AbstractCondition {
+public class Between extends Condition {
 
-  private final Value min;
+  private Column column;
 
-  private final Value max;
+  private Value max;
 
-  private final Column column;
+  private Value min;
 
-  public BetweenCondition(final Column column, final Value min, final Value max) {
+  public Between(final Column column, final Value min, final Value max) {
     this.column = column;
     this.min = min;
     this.max = max;
+  }
+
+  @Override
+  public boolean accept(final Map<String, Object> record) {
+    final QueryValue colum = getColumn();
+    final Object columnValue = colum.getValue(record);
+    if (columnValue == null) {
+      return false;
+    } else {
+      final QueryValue min = getMin();
+      final Object minValue = min.getValue(record);
+      if (minValue == null || CompareUtil.compare(column, columnValue) < 0) {
+        return false;
+      } else {
+        final QueryValue max = getMin();
+        final Object maxValue = max.getValue(record);
+        if (maxValue == null || CompareUtil.compare(column, columnValue) > 0) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
   }
 
   @Override
@@ -39,17 +64,18 @@ public class BetweenCondition extends AbstractCondition {
   }
 
   @Override
-  public BetweenCondition clone() {
-    final Column column = JavaBeanUtil.clone(getColumn());
-    final Value min = JavaBeanUtil.clone(getMin());
-    final Value max = JavaBeanUtil.clone(getMax());
-    return new BetweenCondition(column, min, max);
+  public Between clone() {
+    final Between clone = (Between)super.clone();
+    clone.column = JavaBeanUtil.clone(getColumn());
+    clone.min = JavaBeanUtil.clone(getMin());
+    clone.max = JavaBeanUtil.clone(getMax());
+    return clone;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof BetweenCondition) {
-      final BetweenCondition condition = (BetweenCondition)obj;
+    if (obj instanceof Between) {
+      final Between condition = (Between)obj;
       if (EqualsRegistry.equal(condition.getColumn(), this.getColumn())) {
         if (EqualsRegistry.equal(condition.getMin(), this.getMin())) {
           if (EqualsRegistry.equal(condition.getMax(), this.getMax())) {
@@ -65,17 +91,17 @@ public class BetweenCondition extends AbstractCondition {
     return column;
   }
 
-  @Override
-  public List<Condition> getConditions() {
-    return Arrays.<Condition> asList(column, min, max);
-  }
-
   public Value getMax() {
     return max;
   }
 
   public Value getMin() {
     return min;
+  }
+
+  @Override
+  public List<QueryValue> getQueryValues() {
+    return Arrays.<QueryValue> asList(column, min, max);
   }
 
   @Override

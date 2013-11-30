@@ -31,6 +31,7 @@ import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
@@ -461,8 +462,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (searchCondition instanceof BinaryCondition) {
         final BinaryCondition binaryCondition = (BinaryCondition)searchCondition;
         final String operator = binaryCondition.getOperator();
-        Condition left = binaryCondition.getLeft();
-        final Condition right = binaryCondition.getRight();
+        QueryValue left = binaryCondition.getLeft();
+        final QueryValue right = binaryCondition.getRight();
         int columnIndex = -1;
         while (columnIndex == -1) {
           if (left instanceof Column) {
@@ -471,7 +472,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
             columnIndex = getMetaData().getAttributeIndex(columnName);
           } else if (left instanceof Function) {
             final Function function = (Function)left;
-            left = function.getConditions().get(0);
+            left = function.getQueryValues().get(0);
           } else if (left instanceof Cast) {
             final Cast cast = (Cast)left;
             left = cast.getCondition();

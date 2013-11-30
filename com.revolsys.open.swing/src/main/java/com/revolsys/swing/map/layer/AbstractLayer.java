@@ -318,6 +318,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     if (this.layerGroup != null) {
       this.layerGroup.remove(this);
     }
+    final PropertyChangeSupport propertyChangeSupport = this.propertyChangeSupport;
+    Property.removeAllListeners(propertyChangeSupport);
   }
 
   public void deleteWithConfirm() {

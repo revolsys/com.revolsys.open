@@ -133,6 +133,11 @@ public class ToolBar extends JToolBar {
       object, methodName, parameters);
   }
 
+  public void clear() {
+    super.removeAll();
+    groups.clear();
+  }
+
   protected JButton createButton(final Action action) {
     final JButton button = new JButton(action);
     if (action != null

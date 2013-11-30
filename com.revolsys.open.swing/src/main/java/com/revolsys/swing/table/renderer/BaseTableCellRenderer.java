@@ -45,30 +45,6 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
     final int row, final int columnIndex) {
     final Component component = super.getTableCellRendererComponent(table,
       value, isSelected, hasFocus, row, columnIndex);
-
-    // final int cellSpacingWidth = table.getIntercellSpacing().width;
-    // final int cellSpacingHeight = table.getIntercellSpacing().height;
-    // final TableColumnModel columnModel = table.getColumnModel();
-    // final int columnWidth = columnModel.getColumn(columnIndex).getWidth();
-    // component.setMinimumSize(new Dimension(columnWidth - cellSpacingWidth,
-    // 1));
-    // // component.setBounds(new Rectangle(0, 0, columnWidth -
-    // cellSpacingWidth,
-    // // Integer.MAX_VALUE));
-    // //
-    // final int cellHeight = component.getPreferredSize().height
-    // + cellSpacingHeight;
-    // if (columnIndex == 0) {
-    // rowHeight = cellHeight;
-    // } else {
-    // rowHeight = Math.max(rowHeight, cellHeight);
-    // }
-    // if (columnIndex == table.getColumnCount() - 1) {
-    // if (table.getRowHeight(row) != rowHeight) {
-    // // table.setRowHeight(row, rowHeight);
-    // }
-    // }
-    // System.out.println(cellHeight);
     return component;
   }
 }

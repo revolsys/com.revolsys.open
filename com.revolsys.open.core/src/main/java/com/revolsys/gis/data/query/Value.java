@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
@@ -12,10 +13,10 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
-public class Value extends AbstractCondition {
-  private Object value;
-
+public class Value extends QueryValue {
   private JdbcAttribute jdbcAttribute;
+
+  private Object value;
 
   public Value(final Attribute attribute, final Object value) {
     if (attribute instanceof JdbcAttribute) {
@@ -46,7 +47,7 @@ public class Value extends AbstractCondition {
 
   @Override
   public Value clone() {
-    return new Value(jdbcAttribute, value);
+    return (Value)super.clone();
   }
 
   public void convert(final Attribute attribute) {
@@ -81,6 +82,12 @@ public class Value extends AbstractCondition {
 
   public Object getValue() {
     return value;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V getValue(final Map<String, Object> record) {
+    return (V)value;
   }
 
   public void setValue(final Object value) {

@@ -10,12 +10,12 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
-public class SqlCondition extends AbstractCondition {
-  private final String sql;
+public class SqlCondition extends Condition {
+  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
 
   private List<Object> parameterValues = new ArrayList<Object>();
 
-  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
+  private final String sql;
 
   public SqlCondition(final String sql) {
     this.sql = sql;

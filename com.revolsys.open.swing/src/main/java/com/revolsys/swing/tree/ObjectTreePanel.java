@@ -14,6 +14,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
+import com.revolsys.util.Property;
 
 public class ObjectTreePanel extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -58,6 +59,10 @@ public class ObjectTreePanel extends JPanel {
   public ObjectTreePanel(final Object object,
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     this(object, true, objectTreeNodeModels);
+  }
+
+  public void destroy() {
+    Property.removeAllListeners(propertyChangeSupport);
   }
 
   @Override

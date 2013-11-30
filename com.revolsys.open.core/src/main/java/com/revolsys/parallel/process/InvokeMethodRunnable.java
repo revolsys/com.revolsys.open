@@ -1,5 +1,7 @@
 package com.revolsys.parallel.process;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class InvokeMethodRunnable extends AbstractRunnable {
   }
 
   /** The object to invoke the method on. */
-  private Object object;
+  private Reference<Object> object;
 
   /** The parameters to pass to the method. */
   private final Object[] parameters;
@@ -40,7 +42,7 @@ public class InvokeMethodRunnable extends AbstractRunnable {
    */
   public InvokeMethodRunnable(final Object object, final String methodName,
     final Object... parameters) {
-    this.object = object;
+    this.object = new WeakReference<Object>(object);
     this.methodName = methodName;
     this.parameters = parameters;
   }
@@ -73,17 +75,17 @@ public class InvokeMethodRunnable extends AbstractRunnable {
   }
 
   public Object getObject() {
-    return object;
+    return object.get();
   }
 
   protected void setObject(final Object object) {
-    this.object = object;
+    this.object = new WeakReference<Object>(object);
   }
 
   @Override
   public String toString() {
     final StringBuffer string = new StringBuffer();
-
+    final Object object = getObject();
     if (object == null) {
     } else if (object instanceof Class<?>) {
       string.append(object);

@@ -3,75 +3,114 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.util.CollectionUtil;
 
-public abstract class AbstractMultiCondition extends AbstractCondition {
+public abstract class AbstractMultiCondition extends Condition {
 
-  private final List<Condition> conditions;
+  private List<QueryValue> values;
 
-  public AbstractMultiCondition(final Collection<? extends Condition> conditions) {
-    this.conditions = new ArrayList<Condition>(conditions);
+  private String operator;
+
+  public AbstractMultiCondition(final Collection<? extends QueryValue> values) {
+    this.values = new ArrayList<QueryValue>(values);
   }
 
-  public void add(final Condition condition) {
-    conditions.add(condition);
+  public AbstractMultiCondition(final String operator,
+    final Collection<? extends QueryValue> values) {
+    this.operator = operator;
+    this.values = new ArrayList<QueryValue>(values);
+  }
+
+  public void add(final QueryValue value) {
+    values.add(value);
   }
 
   public void add(final String sql) {
-    final SqlCondition condition = new SqlCondition(sql);
-    add(condition);
+    final SqlCondition value = new SqlCondition(sql);
+    add(value);
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    for (final Condition condition : conditions) {
-      index = condition.appendParameters(index, statement);
+    for (final QueryValue value : getQueryValues()) {
+      index = value.appendParameters(index, statement);
     }
     return index;
   }
 
-  public void clear() {
-    conditions.clear();
+  @Override
+  public void appendSql(final StringBuffer buffer) {
+    buffer.append("(");
+    boolean first = true;
+
+    for (final QueryValue value : getQueryValues()) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(" ");
+        buffer.append(operator);
+        buffer.append(" ");
+      }
+      value.appendSql(buffer);
+    }
+    buffer.append(")");
   }
 
-  public List<Condition> cloneConditions() {
-    final List<Condition> conditions = new ArrayList<Condition>();
-    for (final Condition condition : this.conditions) {
-      conditions.add(condition.clone());
-    }
-    return conditions;
+  public void clear() {
+    values.clear();
+  }
+
+  @Override
+  public AbstractMultiCondition clone() {
+    final AbstractMultiCondition clone = (AbstractMultiCondition)super.clone();
+    clone.values = cloneQueryValues(this.values);
+    return clone;
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof AbstractMultiCondition) {
-      final AbstractMultiCondition condition = (AbstractMultiCondition)obj;
-      final List<Condition> conditions1 = getConditions();
-      final List<Condition> conditions2 = condition.getConditions();
-      if (conditions1.size() == conditions2.size()) {
-        for (int i = 0; i < conditions1.size(); i++) {
-          final Condition condition1 = conditions1.get(i);
-          final Condition condition2 = conditions2.get(i);
-          if (!EqualsRegistry.equal(condition1, condition2)) {
-            return false;
+      final AbstractMultiCondition value = (AbstractMultiCondition)obj;
+      if (EqualsRegistry.equal(getOperator(), value.getOperator())) {
+        final List<QueryValue> values1 = getQueryValues();
+        final List<QueryValue> values2 = value.getQueryValues();
+        if (values1.size() == values2.size()) {
+          for (int i = 0; i < values1.size(); i++) {
+            final QueryValue value1 = values1.get(i);
+            final QueryValue value2 = values2.get(i);
+            if (!EqualsRegistry.equal(value1, value2)) {
+              return false;
+            }
           }
+          return true;
         }
-        return true;
       }
     }
     return false;
   }
 
+  public String getOperator() {
+    return operator;
+  }
+
   @Override
-  public List<Condition> getConditions() {
-    return conditions;
+  public List<QueryValue> getQueryValues() {
+    return Collections.<QueryValue> unmodifiableList(values);
 
   }
 
   @Override
   public boolean isEmpty() {
-    return conditions.isEmpty();
+    return values.isEmpty();
+  }
+
+  @Override
+  public String toString() {
+    return "("
+      + CollectionUtil.toString(") " + operator + " (", getQueryValues()) + ")";
   }
 }

@@ -28,7 +28,9 @@ import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.Equal;
 import com.revolsys.gis.data.query.Function;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.spring.SpelUtil;
@@ -240,8 +242,8 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       boolean simple = condition == null;
       if (condition instanceof BinaryCondition) {
         final BinaryCondition binaryCondition = (BinaryCondition)condition;
-        Condition leftCondition = binaryCondition.getLeft();
-        final Condition rightCondition = binaryCondition.getRight();
+        QueryValue leftCondition = binaryCondition.getLeft();
+        final QueryValue rightCondition = binaryCondition.getRight();
         final Field field = (Field)searchField;
         if ("=".equals(binaryCondition.getOperator())) {
           if (leftCondition instanceof Column
@@ -261,7 +263,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           if (leftCondition instanceof Function) {
             final Function function = (Function)leftCondition;
             if ("UPPER".equals(function.getName())) {
-              final List<Condition> conditions = function.getConditions();
+              final List<QueryValue> conditions = function.getQueryValues();
               if (conditions.size() == 1) {
                 leftCondition = conditions.get(0);
               }
@@ -336,7 +338,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           try {
             final Object value = StringConverterRegistry.toObject(
               attributeClass, searchValue);
-            condition = Conditions.equal(searchAttribute, value);
+            condition = Equal.equal(searchAttribute, value);
           } catch (final Throwable t) {
           }
         }

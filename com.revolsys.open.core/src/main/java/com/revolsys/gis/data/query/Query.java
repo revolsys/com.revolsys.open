@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Query extends AbstractObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query,
     final DataObjectMetaData metaData, final Map<String, ?> filter,
-    final MultipleCondition multipleCondition) {
+    final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {
       for (final Entry<String, ?> entry : filter.entrySet()) {
         final String name = entry.getKey();
@@ -27,22 +27,22 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
         if (attribute == null) {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(Conditions.isNull(name));
+            multipleCondition.add(IsNull.column(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
-            multipleCondition.add(Conditions.in(name, values));
+            multipleCondition.add(new In(name, values));
           } else {
-            multipleCondition.add(Conditions.equal(name, value));
+            multipleCondition.add(Equal.equal(name, value));
           }
         } else {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(Conditions.isNull(name));
+            multipleCondition.add(IsNull.column(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
-            multipleCondition.add(Conditions.in(attribute, values));
+            multipleCondition.add(new In(attribute, values));
           } else {
-            multipleCondition.add(Conditions.equal(attribute, value));
+            multipleCondition.add(Equal.equal(attribute, value));
           }
         }
       }
@@ -53,7 +53,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   public static Query and(final DataObjectMetaData metaData,
     final Map<String, ?> filter) {
     final Query query = new Query(metaData);
-    final MultipleCondition and = Conditions.and();
+    final Condition[] conditions = {};
+    final And and = new And(conditions);
     addFilter(query, metaData, filter, and);
     return query;
   }
@@ -66,7 +67,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     } else {
       final Query query = new Query(metaData);
       final Value valueCondition = new Value(attribute, value);
-      final BinaryCondition equal = Conditions.equal(name, valueCondition);
+      final BinaryCondition equal = Equal.equal(name, valueCondition);
       query.setWhereCondition(equal);
       return query;
     }
@@ -75,7 +76,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   public static Query or(final DataObjectMetaData metaData,
     final Map<String, ?> filter) {
     final Query query = new Query(metaData);
-    final MultipleCondition or = Conditions.or();
+    final Condition[] conditions = {};
+    final Or or = new Or(conditions);
     addFilter(query, metaData, filter, or);
     return query;
   }
@@ -88,9 +90,13 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private Geometry geometry;
 
+  private int limit = -1;
+
   private boolean lockResults = false;
 
   private DataObjectMetaData metaData;
+
+  private int offset = 0;
 
   private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
 
@@ -101,10 +107,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   private String typeName;
 
   private String typePathAlias;
-
-  private int offset = 0;
-
-  private int limit = -1;
 
   private Condition whereCondition;
 
@@ -144,7 +146,10 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     if (whereCondition == null) {
       setWhereCondition(condition);
     } else {
-      setWhereCondition(Conditions.and(whereCondition, condition));
+      final Condition[] conditions = {
+        whereCondition, condition
+      };
+      setWhereCondition(new And(conditions));
     }
   }
 

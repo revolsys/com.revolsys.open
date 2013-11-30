@@ -6,40 +6,40 @@ import java.util.List;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class LeftUnaryCondition extends AbstractCondition {
+public class LeftUnaryCondition extends Condition {
 
-  private final Condition condition;
+  private final QueryValue value;
 
   private final String operator;
 
-  public LeftUnaryCondition(final String operator, final Condition condition) {
+  public LeftUnaryCondition(final String operator, final QueryValue value) {
     this.operator = operator;
-    this.condition = condition;
+    this.value = value;
   }
 
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
-    return condition.appendParameters(index, statement);
+    return value.appendParameters(index, statement);
   }
 
   @Override
   public void appendSql(final StringBuffer buffer) {
     buffer.append(operator);
     buffer.append(" ");
-    condition.appendSql(buffer);
+    value.appendSql(buffer);
   }
 
   @Override
   public LeftUnaryCondition clone() {
-    return new LeftUnaryCondition(operator, condition.clone());
+    return new LeftUnaryCondition(operator, value.clone());
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof LeftUnaryCondition) {
-      final LeftUnaryCondition condition = (LeftUnaryCondition)obj;
-      if (EqualsRegistry.equal(condition.getCondition(), this.getCondition())) {
-        if (EqualsRegistry.equal(condition.getOperator(), this.getOperator())) {
+      final LeftUnaryCondition value = (LeftUnaryCondition)obj;
+      if (EqualsRegistry.equal(value.getQueryValue(), this.getQueryValue())) {
+        if (EqualsRegistry.equal(value.getOperator(), this.getOperator())) {
           return true;
         }
       }
@@ -47,21 +47,22 @@ public class LeftUnaryCondition extends AbstractCondition {
     return false;
   }
 
-  public Condition getCondition() {
-    return condition;
-  }
-
-  @Override
-  public List<Condition> getConditions() {
-    return Collections.singletonList(condition);
-  }
-
   public String getOperator() {
     return operator;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V extends QueryValue> V getQueryValue() {
+    return (V)value;
+  }
+
+  @Override
+  public List<QueryValue> getQueryValues() {
+    return Collections.singletonList(value);
+  }
+
   @Override
   public String toString() {
-    return operator + " " + condition;
+    return operator + " " + value;
   }
 }
