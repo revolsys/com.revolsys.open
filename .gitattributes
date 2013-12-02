@@ -7,6 +7,7 @@
 *.h text eol=lf
 *.i text eol=lf
 *.java text eol=lf
+*.js text eol=lf
 *.jsp text eol=lf
 *.properties text eol=lf
 *.py text eol=lf
