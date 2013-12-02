@@ -121,6 +121,9 @@ public final class DataTypes {
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
 
+  public static final DataType URL = new SimpleDataType("url",
+    java.net.URL.class);
+
   public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
 
   public static final DataType COLOR = new SimpleDataType("color", Color.class);
