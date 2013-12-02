@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Random;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -43,6 +44,8 @@ public final class MathUtil {
 
   /** The number of cents in a dollar. */
   public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
+
+  private static final Random RANDOM = new Random();
 
   /** The scale for currency numbers. */
   public static final int CURRENCY_SCALE = 2;
@@ -552,6 +555,14 @@ public final class MathUtil {
 
     return Math.abs(s)
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
+  }
+
+  public static double randomGaussian(final double mean, final double variance) {
+    return mean + RANDOM.nextGaussian() * variance;
+  }
+
+  public static double randomRange(final double min, final double max) {
+    return min + RANDOM.nextDouble() * (max - min);
   }
 
   public static byte sgn(final byte x) {

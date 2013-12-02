@@ -39,7 +39,11 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
 
   public static Boolean valueOf(final String string) {
     if (StringUtils.hasText(string)) {
-      return Boolean.valueOf(string);
+      if ("on".equals(string)) {
+        return true;
+      } else {
+        return Boolean.valueOf(string);
+      }
     } else {
       return null;
     }

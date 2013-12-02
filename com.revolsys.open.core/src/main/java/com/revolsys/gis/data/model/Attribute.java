@@ -2,8 +2,8 @@ package com.revolsys.gis.data.model;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.data.model.types.DataType;
@@ -416,7 +416,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     return required;
   }
 
-  public void setAllowedValues(final List<?> allowedValues) {
+  public void setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
       this.allowedValues.put(allowedValue, allowedValue);
     }
