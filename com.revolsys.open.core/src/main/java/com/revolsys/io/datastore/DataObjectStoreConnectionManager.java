@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
@@ -31,7 +33,9 @@ public class DataObjectStoreConnectionManager
   }
 
   // TODO make this garbage collectable with reference counting.
-  private static Map<Map<String, Object>, DataObjectStore> dataStores = new HashMap<Map<String, Object>, DataObjectStore>();
+  private static Map<Map<String, Object>, DataObjectStore> dataStoreByConfig = new HashMap<Map<String, Object>, DataObjectStore>();
+
+  private static Map<Map<String, Object>, AtomicInteger> dataStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
 
   public static DataObjectStoreConnectionManager get() {
     return INSTANCE;
@@ -55,14 +59,27 @@ public class DataObjectStoreConnectionManager
     final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
-    synchronized (dataStores) {
-      DataObjectStore dataStore = dataStores.get(configClone);
+    synchronized (dataStoreByConfig) {
+      DataObjectStore dataStore = dataStoreByConfig.get(configClone);
       if (dataStore == null) {
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
-        dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
-        dataStore.setProperties(config);
-        dataStore.initialize();
-        dataStores.put(configClone, dataStore);
+        final String name = (String)connectionProperties.get("name");
+        if (StringUtils.hasText(name)) {
+          dataStore = getDataStore(name);
+          if (dataStore == null) {
+            // TODO give option to add
+            return null;
+          }
+        } else {
+          dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
+          dataStore.setProperties(config);
+          dataStore.initialize();
+        }
+        dataStoreByConfig.put(configClone, dataStore);
+        dataStoreCounts.put(configClone, new AtomicInteger(1));
+      } else {
+        final AtomicInteger count = dataStoreCounts.get(configClone);
+        count.incrementAndGet();
       }
       return (T)dataStore;
     }
@@ -84,6 +101,28 @@ public class DataObjectStoreConnectionManager
       }
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void releaseDataStore(final Map<String, ? extends Object> config) {
+    @SuppressWarnings("rawtypes")
+    final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
+    synchronized (dataStoreByConfig) {
+      final DataObjectStore dataStore = dataStoreByConfig.get(configClone);
+      if (dataStore != null) {
+        final AtomicInteger count = dataStoreCounts.get(configClone);
+        if (count.decrementAndGet() == 0) {
+          final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
+          final String name = (String)connectionProperties.get("name");
+          if (!StringUtils.hasText(name)) {
+            // TODO release for connections from connection registries
+            dataStore.close();
+          }
+          dataStoreByConfig.remove(configClone);
+          dataStoreCounts.remove(configClone);
+        }
+      }
+    }
   }
 
   public DataObjectStoreConnectionManager() {

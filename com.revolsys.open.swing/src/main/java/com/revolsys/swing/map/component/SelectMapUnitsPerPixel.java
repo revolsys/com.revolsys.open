@@ -7,6 +7,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Vector;
@@ -41,13 +43,13 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
 
   private static final long serialVersionUID = 1L;
 
-  private final MapPanel map;
+  private final Reference<MapPanel> map;
 
   private String unitString = "m";
 
   public SelectMapUnitsPerPixel(final MapPanel map) {
     super(PROJECTED_MODEL);
-    this.map = map;
+    this.map = new WeakReference<MapPanel>(map);
 
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
@@ -73,7 +75,10 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
       String string = StringConverterRegistry.toString(item);
       string = string.replaceAll("([^0-9\\.])+", "");
       final double unitsPerPixel = Double.parseDouble(string);
-      this.map.setUnitsPerPixel(unitsPerPixel);
+      final MapPanel map = getMap();
+      if (map != null) {
+        map.setUnitsPerPixel(unitsPerPixel);
+      }
     } catch (final Throwable t) {
     }
   }
@@ -95,48 +100,58 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
     }
   }
 
+  public MapPanel getMap() {
+    return map.get();
+  }
+
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    if (e.getStateChange() == ItemEvent.SELECTED) {
-      double unitsPerPixel = this.map.getUnitsPerPixel();
-      final Object value = e.getItem();
-      if (value instanceof Double) {
-        unitsPerPixel = (Double)value;
+    final MapPanel map = getMap();
+    if (map != null) {
+      if (e.getStateChange() == ItemEvent.SELECTED) {
+        double unitsPerPixel = map.getUnitsPerPixel();
+        final Object value = e.getItem();
+        if (value instanceof Double) {
+          unitsPerPixel = (Double)value;
+        }
+        map.setUnitsPerPixel(unitsPerPixel);
       }
-      this.map.setUnitsPerPixel(unitsPerPixel);
     }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final String propertyName = event.getPropertyName();
-    if ("scale".equals(propertyName) || "unitsPerPixel".equals(propertyName)) {
-      final double unitsPerPixel = this.map.getUnitsPerPixel();
-      if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
-        && !Double.isNaN(unitsPerPixel)) {
-        setSelectedItem(unitsPerPixel);
-      }
-    } else if ("boundingBox".equals(propertyName)) {
-      final BoundingBox boundingBox = this.map.getBoundingBox();
-      ComboBoxModel model = PROJECTED_MODEL;
-      if (boundingBox == null) {
-        setToolTipText("m/pixel");
-      } else {
-        final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-        if (coordinateSystem instanceof GeographicCoordinateSystem) {
-          model = GEOGRAPHIC_MODEL;
-        } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
-          model = GEOGRAPHIC_MODEL;
-        }
-        final Unit<Quantity> unit = coordinateSystem.getUnit();
-        this.unitString = unit.toString();
-        setToolTipText(unit + "/pixel");
-      }
-      if (model != getModel()) {
-        setModel(model);
-      }
+    final MapPanel map = getMap();
+    if (map != null) {
 
+      final String propertyName = event.getPropertyName();
+      if ("scale".equals(propertyName) || "unitsPerPixel".equals(propertyName)) {
+        final double unitsPerPixel = map.getUnitsPerPixel();
+        if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
+          && !Double.isNaN(unitsPerPixel)) {
+          setSelectedItem(unitsPerPixel);
+        }
+      } else if ("boundingBox".equals(propertyName)) {
+        final BoundingBox boundingBox = map.getBoundingBox();
+        ComboBoxModel model = PROJECTED_MODEL;
+        if (boundingBox == null) {
+          setToolTipText("m/pixel");
+        } else {
+          final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+          final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+          if (coordinateSystem instanceof GeographicCoordinateSystem) {
+            model = GEOGRAPHIC_MODEL;
+          } else if (coordinateSystem instanceof GeographicCoordinateSystem) {
+            model = GEOGRAPHIC_MODEL;
+          }
+          final Unit<Quantity> unit = coordinateSystem.getUnit();
+          this.unitString = unit.toString();
+          setToolTipText(unit + "/pixel");
+        }
+        if (model != getModel()) {
+          setModel(model);
+        }
+      }
     }
   }
 

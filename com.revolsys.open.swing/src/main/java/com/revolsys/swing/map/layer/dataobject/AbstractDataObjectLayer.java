@@ -564,7 +564,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @Override
   public void delete() {
     super.delete();
-    setIndex(null);
     if (this.forms != null) {
       for (final Window window : this.formWindows.values()) {
         if (window != null) {
@@ -580,14 +579,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
       }
     }
+    columnNameOrder.clear();
     deletedRecords.clear();
     forms.clear();
     formWindows.clear();
     highlightedRecords.clear();
+    if (index != null) {
+      index.clear();
+    }
     modifiedRecords.clear();
     newRecords.clear();
     selectedRecords.clear();
-    clearSelectedRecordsIndex();
+    if (selectedRecordsIndex != null) {
+      selectedRecordsIndex.clear();
+    }
   }
 
   protected void deleteRecord(final LayerDataObject record) {
@@ -803,7 +808,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public DataObjectStore getDataStore() {
-    return getMetaData().getDataObjectStore();
+    return getMetaData().getDataStore();
   }
 
   public Collection<LayerDataObject> getDeletedRecords() {
@@ -1731,7 +1736,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void setIndex(final DataObjectQuadTree index) {
-    if (index == null) {
+    if (index == null || !isExists()) {
       this.index = new DataObjectQuadTree();
     } else {
       this.index = index;

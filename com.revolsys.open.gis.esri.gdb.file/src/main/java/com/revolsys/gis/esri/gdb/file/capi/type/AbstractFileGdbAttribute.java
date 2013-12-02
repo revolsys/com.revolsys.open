@@ -1,5 +1,8 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -8,7 +11,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public abstract class AbstractFileGdbAttribute extends Attribute {
 
-  private CapiFileGdbDataObjectStore dataStore;
+  private Reference<CapiFileGdbDataObjectStore> dataStore;
 
   public AbstractFileGdbAttribute(final String name, final DataType dataType,
     final boolean required) {
@@ -21,13 +24,17 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
   }
 
   public CapiFileGdbDataObjectStore getDataStore() {
-    return dataStore;
+    if (dataStore == null) {
+      return null;
+    } else {
+      return dataStore.get();
+    }
   }
 
   public abstract Object getValue(Row row);
 
   public void setDataStore(final CapiFileGdbDataObjectStore dataStore) {
-    this.dataStore = dataStore;
+    this.dataStore = new WeakReference<CapiFileGdbDataObjectStore>(dataStore);
   }
 
   public Object setInsertValue(final DataObject object, final Row row,

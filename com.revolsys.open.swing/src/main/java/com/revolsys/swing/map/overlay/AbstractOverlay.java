@@ -80,11 +80,11 @@ public class AbstractOverlay extends JComponent implements
 
   private final int hotspotPixels = 6;
 
-  private final MapPanel map;
+  private MapPanel map;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
-  private final Project project;
+  private Project project;
 
   protected java.awt.Point snapEventPoint;
 
@@ -94,7 +94,7 @@ public class AbstractOverlay extends JComponent implements
 
   protected Map<Point, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
-  private final Viewport2D viewport;
+  private Viewport2D viewport;
 
   private Geometry xorGeometry;
 
@@ -164,6 +164,17 @@ public class AbstractOverlay extends JComponent implements
     addUndo(edit);
   }
 
+  public void destroy() {
+    this.map = null;
+    mouseOverLocations.clear();
+    this.project = null;
+    this.snapEventPoint = null;
+    this.snapPoint = null;
+    this.snapPointLocationMap.clear();
+    this.viewport = null;
+    this.xorGeometry = null;
+  }
+
   protected void drawXorGeometry(final Graphics2D graphics) {
     Geometry geometry = this.xorGeometry;
     if (geometry != null) {
@@ -192,9 +203,9 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
-  protected CloseLocation findCloseLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Geometry geometry,
-    final BoundingBox boundingBox) {
+  protected CloseLocation findCloseLocation(
+    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final Geometry geometry, final BoundingBox boundingBox) {
     CloseLocation closeLocation = findCloseVertexLocation(layer, object,
       geometry, boundingBox);
     if (closeLocation == null) {
@@ -215,9 +226,9 @@ public class AbstractOverlay extends JComponent implements
     return null;
   }
 
-  private CloseLocation findCloseSegmentLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Geometry geometry,
-    final BoundingBox boundingBox) {
+  private CloseLocation findCloseSegmentLocation(
+    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final Geometry geometry, final BoundingBox boundingBox) {
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
     final Geometry convertedGeometry = viewportGeometryFactory.copy(geometry);
@@ -252,9 +263,9 @@ public class AbstractOverlay extends JComponent implements
     return null;
   }
 
-  protected CloseLocation findCloseVertexLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Geometry geometry,
-    final BoundingBox boundingBox) {
+  protected CloseLocation findCloseVertexLocation(
+    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final Geometry geometry, final BoundingBox boundingBox) {
     final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
     if (index != null) {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();

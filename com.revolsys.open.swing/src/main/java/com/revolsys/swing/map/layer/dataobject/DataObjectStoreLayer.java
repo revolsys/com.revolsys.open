@@ -25,7 +25,6 @@ import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -210,10 +209,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void delete() {
+    if (dataStore != null) {
+      final Map<String, String> connectionProperties = getProperty("connection");
+      if (connectionProperties != null) {
+        final Map<String, Object> config = new HashMap<String, Object>();
+        config.put("connection", connectionProperties);
+        DataObjectStoreConnectionManager.releaseDataStore(config);
+      }
+      this.dataStore = null;
+    }
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
     this.boundingBox = new BoundingBox();
     this.cachedRecords.clear();
-    this.dataStore = null;
     this.loadingBoundingBox = new BoundingBox();
     this.loadingWorker = null;
     this.saveRecordChangesMethod = null;
@@ -251,22 +258,10 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
             + getPath());
     } else {
-      final String name = connectionProperties.get("name");
-      DataObjectStore dataStore;
-      if (StringUtils.hasText(name)) {
-        dataStore = DataObjectStoreConnectionManager.getDataStore(name);
-        // TODO give option to create new data store
-        // if (dataStore == null) {
-        // final DataObjectStoreConnectionManager connectionManager =
-        // DataObjectStoreConnectionManager.get();
-        // final ConnectionRegistry<DataObjectStoreConnection> registry =
-        // connectionManager.getConnectionRegistry("User");
-        // dataStore = new AddDataStoreConnectionPanel(registry,
-        // name).showDialog();
-        // }
-      } else {
-        dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(connectionProperties);
-      }
+      final Map<String, Object> config = new HashMap<String, Object>();
+      config.put("connection", connectionProperties);
+      final DataObjectStore dataStore = DataObjectStoreConnectionManager.getDataStore(config);
+
       if (dataStore == null) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to create data store for layer: " + getPath());

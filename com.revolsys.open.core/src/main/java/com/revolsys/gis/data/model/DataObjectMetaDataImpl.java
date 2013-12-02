@@ -2,6 +2,8 @@ package com.revolsys.gis.data.model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,7 +60,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   private DataObjectMetaDataFactory dataObjectMetaDataFactory;
 
-  private DataObjectStore dataObjectStore;
+  private Reference<DataObjectStore> dataStore;
 
   private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
@@ -97,7 +99,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
     final DataObjectStoreSchema schema, final DataObjectMetaData metaData) {
     this(metaData);
-    this.dataObjectStore = dataObjectStore;
+    this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
     METADATA_CACHE.put(instanceId, this);
@@ -106,7 +108,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
     final DataObjectStoreSchema schema, final String typePath) {
     this(typePath);
-    this.dataObjectStore = dataObjectStore;
+    this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
     METADATA_CACHE.put(instanceId, this);
@@ -271,10 +273,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public void delete(final DataObject dataObject) {
-    if (dataObjectStore == null) {
+    final DataObjectStore dataStore = getDataStore();
+    if (dataStore == null) {
       throw new UnsupportedOperationException();
     } else {
-      dataObjectStore.delete(dataObject);
+      dataStore.delete(dataObject);
     }
   }
 
@@ -290,7 +293,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     codeTableByColumnMap.clear();
     dataObjectFactory = ArrayDataObjectFactory.getInstance();
     dataObjectMetaDataFactory = new DataObjectMetaDataFactoryImpl();
-    dataObjectStore = null;
+    dataStore = null;
     defaultValues.clear();
     description = "";
     geometryAttributeIndex = -1;
@@ -440,11 +443,16 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public CodeTable getCodeTableByColumn(final String column) {
-    CodeTable codeTable = codeTableByColumnMap.get(column);
-    if (codeTable == null && dataObjectStore != null) {
-      codeTable = dataObjectStore.getCodeTableByColumn(column);
+    final DataObjectStore dataStore = getDataStore();
+    if (dataStore == null) {
+      return null;
+    } else {
+      CodeTable codeTable = codeTableByColumnMap.get(column);
+      if (codeTable == null && dataStore != null) {
+        codeTable = dataStore.getCodeTableByColumn(column);
+      }
+      return codeTable;
     }
-    return codeTable;
   }
 
   @Override
@@ -455,15 +463,20 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public DataObjectMetaDataFactory getDataObjectMetaDataFactory() {
     if (dataObjectMetaDataFactory == null) {
-      return dataObjectStore;
+      final DataObjectStore dataStore = getDataStore();
+      return dataStore;
     } else {
       return dataObjectMetaDataFactory;
     }
   }
 
   @Override
-  public DataObjectStore getDataObjectStore() {
-    return dataObjectStore;
+  public DataObjectStore getDataStore() {
+    if (dataStore == null) {
+      return null;
+    } else {
+      return dataStore.get();
+    }
   }
 
   @Override

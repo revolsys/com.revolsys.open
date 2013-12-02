@@ -190,7 +190,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   public void write(final DataObject object) {
     try {
       final DataObjectMetaData metaData = object.getMetaData();
-      final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+      final DataObjectStore dataObjectStore = metaData.getDataStore();
       if (dataObjectStore == this.dataStore) {
         switch (object.getState()) {
           case New:

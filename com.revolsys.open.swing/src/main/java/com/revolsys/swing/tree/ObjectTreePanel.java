@@ -62,7 +62,15 @@ public class ObjectTreePanel extends JPanel {
   }
 
   public void destroy() {
-    Property.removeAllListeners(propertyChangeSupport);
+    if (propertyChangeSupport != null) {
+      Property.removeAllListeners(propertyChangeSupport);
+      for (final PropertyChangeListener listener : this.listeners) {
+        this.propertyChangeSupport.removePropertyChangeListener(listener);
+      }
+      propertyChangeSupport = null;
+    }
+    listeners.clear();
+    tree.setRoot(null);
   }
 
   @Override

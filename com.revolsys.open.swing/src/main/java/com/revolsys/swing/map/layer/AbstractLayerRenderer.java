@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private Icon icon = ICON;
 
-  private T layer;
+  private Reference<T> layer;
 
   private long maximumScale = 0;
 
@@ -66,7 +68,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   public AbstractLayerRenderer(final String type, final T layer) {
     this.type = type;
-    this.layer = layer;
+    this.layer = new WeakReference<T>(layer);
     this.name = CaseConverter.toCapitalizedWords(type);
   }
 
@@ -93,7 +95,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public T getLayer() {
-    return this.layer;
+    return this.layer.get();
   }
 
   public long getMaximumScale() {
@@ -161,7 +163,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   public void setLayer(final T layer) {
     final Object oldValue = this.layer;
-    this.layer = layer;
+    this.layer = new WeakReference<T>(layer);
     firePropertyChange("layer", oldValue, layer);
   }
 

@@ -327,7 +327,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       } else {
         this.typePath = metaData.getPath();
         setName(PathUtil.getName(typePath));
-        this.dataStore = this.metaData.getDataObjectStore();
+        this.dataStore = this.metaData.getDataStore();
         metaData.setProperty(getPropertyName(), this);
         dataStore.addCodeTable(this);
       }

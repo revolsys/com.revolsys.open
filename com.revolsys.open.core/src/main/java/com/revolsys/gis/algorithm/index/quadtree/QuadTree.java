@@ -36,7 +36,7 @@ public class QuadTree<T> {
 
   private GeometryFactory geometryFactory;
 
-  private final Root<T> root = new Root<T>();;
+  private Root<T> root = new Root<T>();
 
   private double minExtent = 1.0;
 
@@ -47,6 +47,12 @@ public class QuadTree<T> {
 
   public QuadTree(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  public void clear() {
+    root = new Root<T>();
+    minExtent = 1.0;
+    size = 0;
   }
 
   private void collectStats(final Envelope envelope) {

@@ -48,6 +48,7 @@ import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.listener.FileDropTargetListener;
+import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
@@ -61,6 +62,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
@@ -96,19 +98,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private List<Long> scales = new ArrayList<Long>();
 
-  private final LayerGroup baseMapLayers;
+  private LayerGroup baseMapLayers;
 
-  private final LayerRendererOverlay baseMapOverlay;
+  private LayerRendererOverlay baseMapOverlay;
 
   private final JLayeredPane layeredPane;
 
-  private final LayerRendererOverlay layerOverlay;
+  private LayerRendererOverlay layerOverlay;
 
   private MouseOverlay mouseOverlay;
 
   private int overlayIndex = 1;
 
-  private final Project project;
+  private Project project;
 
   private double scale = 500000000;
 
@@ -122,13 +124,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private final ToolBar toolBar = new ToolBar();
 
-  private final Viewport2D viewport;
+  private Viewport2D viewport;
 
   private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
 
   private int zoomHistoryIndex = -1;
 
-  private final FileDropTargetListener fileDropListener;
+  private FileDropTargetListener fileDropListener;
 
   private boolean updateZoomHistory = true;
 
@@ -283,7 +285,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addStatusBar() {
     statusBarPanel = new JPanel(new BorderLayout());
-    statusBarPanel.setMinimumSize(new Dimension(200, 30));
+    statusBarPanel.setMinimumSize(new Dimension(200, 42));
     add(statusBarPanel, BorderLayout.SOUTH);
     statusBarPanel.add(this.leftStatusBar, BorderLayout.WEST);
     statusBarPanel.add(this.rightStatusBar, BorderLayout.EAST);
@@ -390,11 +392,38 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.scales = SCALES;
   }
 
-  public void dispose() {
+  public void destroy() {
+    Property.removeAllListeners(this);
+    setDropTarget(null);
+    this.layerOverlay.dispose();
+    for (final Component overlay : layeredPane.getComponents()) {
+      if (overlay instanceof AbstractOverlay) {
+        final AbstractOverlay abstractOverlay = (AbstractOverlay)overlay;
+        abstractOverlay.destroy();
+      }
+    }
+    removeAll();
+
+    this.layeredPane.removeAll();
     statusBarPanel.removeAll();
     leftStatusBar = null;
     rightStatusBar = null;
-    this.layerOverlay.dispose();
+    if (baseMapLayers != null) {
+      baseMapLayers.delete();
+    }
+    baseMapLayers = null;
+    baseMapOverlay = null;
+    fileDropListener = null;
+    layerOverlay = null;
+    progressBar = null;
+    project = null;
+    toolBar.clear();
+    toolTipOverlay = null;
+    undoManager.die();
+    Property.removeAllListeners(viewport.getPropertyChangeSupport());
+    viewport = null;
+    zoomBookmarkButton = null;
+    zoomHistory.clear();
   }
 
   @Override
@@ -499,7 +528,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public double getUnitsPerPixel() {
-    return viewport.getUnitsPerPixel();
+    if (viewport == null) {
+      return 1;
+    } else {
+      return viewport.getUnitsPerPixel();
+    }
   }
 
   public Viewport2D getViewport() {
@@ -673,7 +706,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void setUnitsPerPixel(final double unitsPerPixel) {
-    setScale(viewport.getScaleForUnitsPerPixel(unitsPerPixel));
+    if (viewport != null) {
+      setScale(viewport.getScaleForUnitsPerPixel(unitsPerPixel));
+    }
   }
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {

@@ -5,6 +5,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -35,19 +37,19 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
   private final boolean geographics;
 
-  private final MapPanel map;
+  private final Reference<MapPanel> map;
 
   public MapPointerLocation(final MapPanel map, final boolean geographics) {
-    this.map = map;
+    this.map = new WeakReference<MapPanel>(map);
     this.viewport = map.getViewport();
     this.geographics = geographics;
     setGeometryFactory(map.getGeometryFactory());
 
     map.addPropertyChangeListener("geometryFactory", this);
-    this.map.getMouseOverlay().addMouseMotionListener(this);
+    map.getMouseOverlay().addMouseMotionListener(this);
 
     setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-    setPreferredSize(new Dimension(250, 20));
+    setPreferredSize(new Dimension(250, 30));
   }
 
   @Override
@@ -75,7 +77,10 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    setGeometryFactory(this.map.getGeometryFactory());
+    final MapPanel map = this.map.get();
+    if (map != null) {
+      setGeometryFactory(map.getGeometryFactory());
+    }
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

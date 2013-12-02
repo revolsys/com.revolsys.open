@@ -683,7 +683,7 @@ public class DataObjectLayerForm extends JPanel implements
       if (this.metaData == null) {
         return null;
       } else {
-        return this.metaData.getDataObjectStore();
+        return this.metaData.getDataStore();
       }
     } else {
       return this.dataStore;
@@ -1171,7 +1171,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
-    setDataStore(metaData.getDataObjectStore());
+    setDataStore(metaData.getDataStore());
     final String idAttributeName = metaData.getIdAttributeName();
     if (StringUtils.hasText(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);

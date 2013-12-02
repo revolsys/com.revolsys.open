@@ -99,7 +99,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
     this.metaData = metaData;
-    this.dataStore = metaData.getDataObjectStore();
+    this.dataStore = metaData.getDataStore();
     this.idAttributeName = metaData.getIdAttributeName();
     this.displayAttributeName = displayAttributeName;
 

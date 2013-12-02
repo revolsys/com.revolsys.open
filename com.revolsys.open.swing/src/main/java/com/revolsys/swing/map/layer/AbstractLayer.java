@@ -8,6 +8,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,11 +96,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean editable = false;
 
-  private LayerGroup layerGroup;
+  private Reference<LayerGroup> layerGroup;
 
   private String name;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   private GeometryFactory geometryFactory;
@@ -315,11 +317,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
     firePropertyChange("deleted", false, true);
     setEventsEnabled(false);
-    if (this.layerGroup != null) {
-      this.layerGroup.remove(this);
+    final LayerGroup layerGroup = getLayerGroup();
+    if (layerGroup != null) {
+      layerGroup.remove(this);
     }
     final PropertyChangeSupport propertyChangeSupport = this.propertyChangeSupport;
-    Property.removeAllListeners(propertyChangeSupport);
+    if (propertyChangeSupport != null) {
+      Property.removeAllListeners(propertyChangeSupport);
+      this.propertyChangeSupport = null;
+    }
   }
 
   public void deleteWithConfirm() {
@@ -389,8 +395,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (this.geometryFactory == null && this.layerGroup != null) {
-      return this.layerGroup.getGeometryFactory();
+    final LayerGroup layerGroup = getLayerGroup();
+    if (this.geometryFactory == null && layerGroup != null) {
+      return layerGroup.getGeometryFactory();
     } else {
       return this.geometryFactory;
     }
@@ -403,7 +410,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public LayerGroup getLayerGroup() {
-    return this.layerGroup;
+    if (this.layerGroup == null) {
+      return null;
+    } else {
+      return this.layerGroup.get();
+    }
   }
 
   @Override
@@ -452,10 +463,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public Project getProject() {
-    if (this.layerGroup == null) {
+    final LayerGroup layerGroup = getLayerGroup();
+    if (layerGroup == null) {
       return null;
     } else {
-      return this.layerGroup.getProject();
+      return layerGroup.getProject();
     }
   }
 
@@ -514,6 +526,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   public boolean isEventsEnabled() {
     if (eventsEnabled.get() != Boolean.FALSE) {
+      final LayerGroup layerGroup = getLayerGroup();
       if (layerGroup == null) {
         return true;
       } else {
@@ -593,7 +606,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (isEventsEnabled()) {
+    if (propertyChangeSupport != null && isEventsEnabled()) {
       this.propertyChangeSupport.firePropertyChange(event);
     }
   }
@@ -679,12 +692,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setLayerGroup(final LayerGroup layerGroup) {
-    if (this.layerGroup != layerGroup) {
-      final LayerGroup old = this.layerGroup;
+    final LayerGroup old = getLayerGroup();
+    if (old != layerGroup) {
       if (old != null) {
         removePropertyChangeListener(old);
       }
-      this.layerGroup = layerGroup;
+      this.layerGroup = new WeakReference<LayerGroup>(layerGroup);
       addPropertyChangeListener(layerGroup);
       firePropertyChange("layerGroup", old, layerGroup);
     }
@@ -703,7 +716,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void setName(final String name) {
     if (!EqualsRegistry.equal(name, this.name)) {
-      this.propertyChangeSupport.firePropertyChange("name", this.name, name);
+      firePropertyChange("name", this.name, name);
       this.name = name;
     }
   }
@@ -712,8 +725,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties == null || !this.getProperties().equals(properties)) {
       super.setProperties(properties);
-      this.propertyChangeSupport.firePropertyChange("properties", null,
-        properties);
+      firePropertyChange("properties", null, properties);
     }
   }
 
@@ -731,8 +743,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
           this, "property", oldValue, value, name);
-        this.propertyChangeSupport.firePropertyChange(event);
-
+        if (propertyChangeSupport != null) {
+          this.propertyChangeSupport.firePropertyChange(event);
+        }
         try {
           JavaBeanUtil.setProperty(this, name, value);
           super.setProperty(name, value);
@@ -772,8 +785,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setSelectable(final boolean selectable) {
     final boolean oldValue = this.selectable;
     this.selectable = selectable;
-    this.propertyChangeSupport.firePropertyChange("selectable", oldValue,
-      selectable);
+    firePropertyChange("selectable", oldValue, selectable);
   }
 
   public void setSelectSupported(final boolean selectSupported) {
@@ -788,8 +800,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void setVisible(final boolean visible) {
     final boolean oldVisible = this.visible;
     this.visible = visible;
-    this.propertyChangeSupport.firePropertyChange("visible", oldVisible,
-      visible);
+    firePropertyChange("visible", oldVisible, visible);
   }
 
   @Override

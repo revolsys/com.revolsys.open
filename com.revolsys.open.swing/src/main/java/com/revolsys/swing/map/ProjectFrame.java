@@ -30,6 +30,9 @@ import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.MultipleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.location.TreeLocationRoot;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 import bibliothek.gui.dock.common.theme.CEclipseTheme;
@@ -75,6 +78,7 @@ import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public class ProjectFrame extends BaseFrame {
   public static final String SAVE_PROJECT_KEY = "Save Project";
@@ -318,6 +322,7 @@ public class ProjectFrame extends BaseFrame {
     if (SwingUtilities.isEventDispatchThread()) {
       setVisible(false);
       super.dispose();
+      Property.removeAllListeners(this);
       if (this.project != null) {
         final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
         DataObjectStoreConnectionManager.get().removeConnectionRegistry(
@@ -333,20 +338,36 @@ public class ProjectFrame extends BaseFrame {
       this.tocPanel = null;
       this.project = null;
       if (dockControl != null) {
+        int i = 0;
+        while (i < dockControl.getCDockableCount()) {
+          final CDockable dockable = dockControl.getCDockable(i);
+          if (dockable instanceof MultipleCDockable) {
+            final MultipleCDockable multiple = (MultipleCDockable)dockable;
+            dockControl.remove(multiple);
+
+          } else if (dockable instanceof SingleCDockable) {
+            final SingleCDockable multiple = (SingleCDockable)dockable;
+            dockControl.remove(multiple);
+
+          } else {
+            i++;
+          }
+        }
         this.dockControl.destroy();
         this.dockControl.setRootWindow(null);
+        this.dockControl = null;
       }
-      this.dockControl = null;
       if (mapPanel != null) {
-        mapPanel.dispose();
+        mapPanel.destroy();
+        this.mapPanel = null;
       }
-      this.mapPanel = null;
       setMenuBar(null);
       final ActionMap actionMap = getRootPane().getActionMap();
       actionMap.put(SAVE_PROJECT_KEY, null);
       actionMap.put(SAVE_CHANGES_KEY, null);
 
       setRootPane(new JRootPane());
+      removeAll();
     } else {
       Invoke.later(this, "dispose");
     }

@@ -659,7 +659,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   public synchronized void write(final DataObject object) {
     try {
       final DataObjectMetaData metaData = object.getMetaData();
-      final DataObjectStore dataStore = metaData.getDataObjectStore();
+      final DataObjectStore dataStore = metaData.getDataStore();
       final DataObjectState state = object.getState();
       if (dataStore != this.dataStore) {
         if (state != DataObjectState.Deleted) {

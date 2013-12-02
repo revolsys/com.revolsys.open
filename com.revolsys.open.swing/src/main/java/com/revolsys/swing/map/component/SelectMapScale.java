@@ -7,6 +7,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
@@ -20,11 +22,11 @@ public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
   private static final long serialVersionUID = 1L;
 
-  private final MapPanel map;
+  private final Reference<MapPanel> map;
 
   public SelectMapScale(final MapPanel map) {
     super(new Vector<Long>(map.getScales()));
-    this.map = map;
+    this.map = new WeakReference<MapPanel>(map);
 
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
@@ -45,35 +47,48 @@ public class SelectMapScale extends JComboBox implements ItemListener,
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    try {
-      final Object item = getSelectedItem();
-      String string = StringConverterRegistry.toString(item);
-      string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
-      final double scale = Double.parseDouble(string);
-      this.map.setScale(scale);
-    } catch (final Throwable t) {
+    final MapPanel map = getMap();
+    if (map != null) {
+      try {
+        final Object item = getSelectedItem();
+        String string = StringConverterRegistry.toString(item);
+        string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
+        final double scale = Double.parseDouble(string);
+        map.setScale(scale);
+      } catch (final Throwable t) {
+      }
     }
+  }
+
+  public MapPanel getMap() {
+    return map.get();
   }
 
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    if (e.getStateChange() == ItemEvent.SELECTED) {
-      double scale = this.map.getScale();
-      final Object value = e.getItem();
-      if (value instanceof Double) {
-        scale = (Double)value;
+    final MapPanel map = getMap();
+    if (map != null) {
+      if (e.getStateChange() == ItemEvent.SELECTED) {
+        double scale = map.getScale();
+        final Object value = e.getItem();
+        if (value instanceof Double) {
+          scale = (Double)value;
+        }
+        map.setScale(scale);
       }
-      this.map.setScale(scale);
     }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final String propertyName = event.getPropertyName();
-    if ("scale".equals(propertyName)) {
-      final double scale = this.map.getScale();
-      if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
-        setSelectedItem(scale);
+    final MapPanel map = getMap();
+    if (map != null) {
+      final String propertyName = event.getPropertyName();
+      if ("scale".equals(propertyName)) {
+        final double scale = map.getScale();
+        if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
+          setSelectedItem(scale);
+        }
       }
     }
   }

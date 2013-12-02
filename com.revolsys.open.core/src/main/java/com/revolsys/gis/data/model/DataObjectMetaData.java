@@ -118,7 +118,7 @@ public interface DataObjectMetaData extends ObjectWithProperties,
 
   DataObjectMetaDataFactory getDataObjectMetaDataFactory();
 
-  DataObjectStore getDataObjectStore();
+  DataObjectStore getDataStore();
 
   Object getDefaultValue(String attributeName);
 

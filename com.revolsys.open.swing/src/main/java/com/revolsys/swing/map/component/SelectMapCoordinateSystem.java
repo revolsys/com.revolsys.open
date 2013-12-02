@@ -5,6 +5,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -20,13 +22,13 @@ public class SelectMapCoordinateSystem extends ComboBox implements
   ItemListener, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private final MapPanel map;
+  private final Reference<MapPanel> map;
 
   public SelectMapCoordinateSystem(final MapPanel map) {
     super(3857, 3005// , 26907, 26908, 26909, 26910, 26911
     );
 
-    this.map = map;
+    this.map = new WeakReference<MapPanel>(map);
     setSelectedItem(map.getGeometryFactory().getSRID());
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
@@ -62,24 +64,34 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     return coordinateSystem;
   }
 
+  public MapPanel getMap() {
+    return map.get();
+  }
+
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    if (e.getStateChange() == ItemEvent.SELECTED) {
-      final Object value = e.getItem();
-      final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
-      if (coordinateSystem != null) {
-        this.map.setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+    final MapPanel map = getMap();
+    if (map != null) {
+      if (e.getStateChange() == ItemEvent.SELECTED) {
+        final Object value = e.getItem();
+        final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
+        if (coordinateSystem != null) {
+          map.setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+        }
       }
     }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final String propertyName = event.getPropertyName();
-    if ("geometryFactory".equals(propertyName)) {
-      final GeometryFactory geometryFactory = this.map.getGeometryFactory();
-      final int srid = geometryFactory.getSRID();
-      setSelectedItem(srid);
+    final MapPanel map = getMap();
+    if (map != null) {
+      final String propertyName = event.getPropertyName();
+      if ("geometryFactory".equals(propertyName)) {
+        final GeometryFactory geometryFactory = map.getGeometryFactory();
+        final int srid = geometryFactory.getSRID();
+        setSelectedItem(srid);
+      }
     }
   }
 

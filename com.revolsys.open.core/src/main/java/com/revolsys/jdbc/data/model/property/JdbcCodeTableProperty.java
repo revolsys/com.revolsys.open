@@ -88,7 +88,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   @Override
   public void setMetaData(final DataObjectMetaData metaData) {
     super.setMetaData(metaData);
-    dataStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
+    dataStore = (JdbcDataObjectStore)metaData.getDataStore();
     dataSource = dataStore.getDataSource();
     if (metaData != null) {
       this.tableName = JdbcUtils.getQualifiedTableName(metaData.getPath());

@@ -1,5 +1,6 @@
 package com.revolsys.util;
 
+import java.awt.Component;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -160,6 +161,30 @@ public final class Property {
     return readMethod(object.getClass(), name);
   }
 
+  public static void removeAllListeners(final Component component) {
+    for (final PropertyChangeListener listener : component.getPropertyChangeListeners()) {
+      if (listener instanceof PropertyChangeListenerProxy) {
+        final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
+        final String propertyName = proxy.getPropertyName();
+        component.removePropertyChangeListener(propertyName, listener);
+      }
+      component.removePropertyChangeListener(listener);
+    }
+  }
+
+  public static void removeAllListeners(
+    final PropertyChangeSupport propertyChangeSupport) {
+    for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
+      if (listener instanceof PropertyChangeListenerProxy) {
+        final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
+        final String propertyName = proxy.getPropertyName();
+        propertyChangeSupport.removePropertyChangeListener(propertyName,
+          listener);
+      }
+      propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+  }
+
   public static void removeListener(final Object object,
     final PropertyChangeListener listener) {
     if (listener != null) {
@@ -249,18 +274,6 @@ public final class Property {
   }
 
   private Property() {
-  }
-
-  public static void removeAllListeners(
-    final PropertyChangeSupport propertyChangeSupport) {
-    for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
-      if (listener instanceof PropertyChangeListenerProxy) {
-        final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)listener;
-        propertyChangeSupport.removePropertyChangeListener(
-          proxy.getPropertyName(), listener);
-      }
-      propertyChangeSupport.removePropertyChangeListener(listener);
-    }
   }
 
 }

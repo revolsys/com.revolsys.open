@@ -11,12 +11,13 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
@@ -53,6 +54,9 @@ public class LayerRendererOverlay extends JComponent implements
       this.layer.removePropertyChangeListener(this);
       this.layer = null;
     }
+    Property.removeAllListeners(this);
+    this.image = null;
+    this.imageWorker = null;
     this.viewport = null;
   }
 
@@ -60,7 +64,7 @@ public class LayerRendererOverlay extends JComponent implements
     return this.layer;
   }
 
-  public LayerGroup getProject() {
+  public Project getProject() {
     return this.layer.getProject();
   }
 

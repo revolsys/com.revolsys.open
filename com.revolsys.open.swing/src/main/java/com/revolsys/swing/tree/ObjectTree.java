@@ -293,6 +293,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     final Object oldRoot = model.getRoot();
     if (oldRoot != null) {
       collapsePath(new TreePath(oldRoot));
+      clearToggledPaths();
     }
     setSelectionPath(null);
     model.setRoot(object);

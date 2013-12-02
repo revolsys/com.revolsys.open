@@ -1,5 +1,7 @@
 package com.revolsys.gis.data.io;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +17,8 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class DataObjectStoreSchema extends AbstractObjectWithProperties {
-  private AbstractDataObjectStore dataStore;
+
+  private Reference<AbstractDataObjectStore> dataStore;
 
   private Map<String, DataObjectMetaData> metaDataCache = new TreeMap<String, DataObjectMetaData>();
 
@@ -24,9 +27,9 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   public DataObjectStoreSchema() {
   }
 
-  public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
+  public DataObjectStoreSchema(final AbstractDataObjectStore dataStore,
     final String path) {
-    this.dataStore = dataObjectStore;
+    this.dataStore = new WeakReference<AbstractDataObjectStore>(dataStore);
     this.path = path;
   }
 
@@ -59,14 +62,24 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     return metaData;
   }
 
-  public DataObjectStore getDataStore() {
-    return dataStore;
+  @SuppressWarnings("unchecked")
+  public <V extends DataObjectStore> V getDataStore() {
+    if (dataStore == null) {
+      return null;
+    } else {
+      return (V)dataStore.get();
+    }
   }
 
   public GeometryFactory getGeometryFactory() {
     final GeometryFactory geometryFactory = getProperty("geometryFactory");
     if (geometryFactory == null) {
-      return dataStore.getGeometryFactory();
+      final AbstractDataObjectStore dataStore = getDataStore();
+      if (dataStore == null) {
+        return GeometryFactory.getFactory();
+      } else {
+        return dataStore.getGeometryFactory();
+      }
     } else {
       return geometryFactory;
     }
@@ -113,26 +126,29 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   }
 
   public void refreshMetaData() {
-    final Collection<DataObjectStoreExtension> extensions = dataStore.getDataStoreExtensions();
-    for (final DataObjectStoreExtension extension : extensions) {
-      try {
-        if (extension.isEnabled(dataStore)) {
-          extension.preProcess(this);
+    final AbstractDataObjectStore dataStore = getDataStore();
+    if (dataStore != null) {
+      final Collection<DataObjectStoreExtension> extensions = dataStore.getDataStoreExtensions();
+      for (final DataObjectStoreExtension extension : extensions) {
+        try {
+          if (extension.isEnabled(dataStore)) {
+            extension.preProcess(this);
+          }
+        } catch (final Throwable e) {
+          ExceptionUtil.log(extension.getClass(),
+            "Unable to pre-process schema " + this, e);
         }
-      } catch (final Throwable e) {
-        ExceptionUtil.log(extension.getClass(), "Unable to pre-process schema "
-          + this, e);
       }
-    }
-    dataStore.loadSchemaDataObjectMetaData(this, metaDataCache);
-    for (final DataObjectStoreExtension extension : extensions) {
-      try {
-        if (extension.isEnabled(dataStore)) {
-          extension.postProcess(this);
+      dataStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+      for (final DataObjectStoreExtension extension : extensions) {
+        try {
+          if (extension.isEnabled(dataStore)) {
+            extension.postProcess(this);
+          }
+        } catch (final Throwable e) {
+          ExceptionUtil.log(extension.getClass(),
+            "Unable to post-process schema " + this, e);
         }
-      } catch (final Throwable e) {
-        ExceptionUtil.log(extension.getClass(),
-          "Unable to post-process schema " + this, e);
       }
     }
   }

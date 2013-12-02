@@ -1,5 +1,7 @@
 package com.revolsys.gis.data.model;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,7 @@ public class Attribute extends AbstractObjectWithProperties implements
   /** The data type of the attribute value. */
   private DataType type;
 
-  private DataObjectMetaData metaData;
+  private Reference<DataObjectMetaData> metaData;
 
   private String title;
 
@@ -309,7 +311,11 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   public DataObjectMetaData getMetaData() {
-    return metaData;
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.get();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -441,7 +447,7 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   protected void setMetaData(final DataObjectMetaData metaData) {
-    this.metaData = metaData;
+    this.metaData = new WeakReference<DataObjectMetaData>(metaData);
   }
 
   public void setMinValue(final Object minValue) {

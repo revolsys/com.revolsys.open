@@ -7,6 +7,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +28,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
-import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -87,7 +89,7 @@ public class Viewport2D {
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
-  private LayerGroup project;
+  private Reference<Project> project;
 
   private AffineTransform modelToScreenTransform;
 
@@ -112,13 +114,13 @@ public class Viewport2D {
   public Viewport2D() {
   }
 
-  public Viewport2D(final LayerGroup project) {
-    this.project = project;
+  public Viewport2D(final Project project) {
+    this.project = new WeakReference<Project>(project);
     this.geometryFactory = project.getGeometryFactory();
   }
 
-  public Viewport2D(final LayerGroup project, final int width,
-    final int height, final BoundingBox boundingBox) {
+  public Viewport2D(final Project project, final int width, final int height,
+    final BoundingBox boundingBox) {
     this(project);
     this.viewWidth = width;
     this.viewHeight = height;
@@ -250,8 +252,12 @@ public class Viewport2D {
     return this.pixelsPerYUnit;
   }
 
-  public LayerGroup getProject() {
-    return this.project;
+  public Project getProject() {
+    if (this.project == null) {
+      return null;
+    } else {
+      return this.project.get();
+    }
   }
 
   /**
