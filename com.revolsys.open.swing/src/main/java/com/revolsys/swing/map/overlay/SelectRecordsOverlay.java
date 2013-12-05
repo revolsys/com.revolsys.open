@@ -241,7 +241,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       repaint();
     } else if ("editable".equals(propertyName)) {
       repaint();
-    } else if ("updateObject".equals(propertyName)) {
+    } else if ("updateRecord".equals(propertyName)) {
       repaint();
     } else if ("hasSelectedRecords".equals(propertyName)) {
       clearUndoHistory();

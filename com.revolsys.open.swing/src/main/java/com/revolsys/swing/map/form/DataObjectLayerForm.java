@@ -16,6 +16,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -100,7 +102,7 @@ import com.revolsys.util.CollectionUtil;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
-  PropertyChangeSupportProxy {
+  PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -195,6 +197,8 @@ public class DataObjectLayerForm extends JPanel implements
     }
 
   };
+
+  private String focussedFieldName;
 
   public DataObjectLayerForm(final AbstractDataObjectLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
@@ -638,6 +642,16 @@ public class DataObjectLayerForm extends JPanel implements
 
   @Override
   public void focusGained(final FocusEvent e) {
+    Component component = e.getComponent();
+    while (component != null) {
+      if (component instanceof Field) {
+        final Field field = (Field)component;
+        this.focussedFieldName = field.getFieldName();
+        return;
+      } else {
+        component = component.getParent();
+      }
+    }
   }
 
   @Override
@@ -645,7 +659,8 @@ public class DataObjectLayerForm extends JPanel implements
     Component component = e.getComponent();
     while (component != null) {
       if (component instanceof Field) {
-        this.lastFocussedFieldName = ((Field)component).getFieldName();
+        final Field field = (Field)component;
+        this.lastFocussedFieldName = field.getFieldName();
         return;
       } else {
         component = component.getParent();
@@ -1005,15 +1020,6 @@ public class DataObjectLayerForm extends JPanel implements
     }
   }
 
-  @Override
-  public void removeNotify() {
-    try {
-      super.removeNotify();
-    } finally {
-      destroy();
-    }
-  }
-
   public void revertChanges() {
     final LayerDataObject object = getObject();
     if (object != null) {
@@ -1273,6 +1279,7 @@ public class DataObjectLayerForm extends JPanel implements
 
     dialog.pack();
     dialog.setLocation(50, 50);
+    dialog.addWindowListener(this);
     dialog.setVisible(true);
     final LayerDataObject object = getObject();
     dialog.dispose();
@@ -1280,6 +1287,13 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected void updateErrors() {
+  }
+
+  public void updateFocussedField() {
+    final Field field = getField(focussedFieldName);
+    if (field != null) {
+      field.updateFieldValue();
+    }
   }
 
   protected void updateReadOnlyFields() {
@@ -1371,5 +1385,38 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     return valid;
+  }
+
+  @Override
+  public void windowActivated(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowClosed(final WindowEvent e) {
+    destroy();
+    final Window window = (Window)e.getSource();
+    window.removeWindowListener(this);
+  }
+
+  @Override
+  public void windowClosing(final WindowEvent e) {
+    updateFocussedField();
+  }
+
+  @Override
+  public void windowDeactivated(final WindowEvent e) {
+    updateFocussedField();
+  }
+
+  @Override
+  public void windowDeiconified(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowIconified(final WindowEvent e) {
+  }
+
+  @Override
+  public void windowOpened(final WindowEvent e) {
   }
 }

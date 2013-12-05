@@ -52,7 +52,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
 
-  public static DataObjectStore close(final DataObjectStore... dataStores) {
+  public static DataObjectStore close(
+    final Collection<DataObjectStore> dataStores) {
     final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
     for (final DataObjectStore dataStore : dataStores) {
       if (dataStore != null) {
@@ -67,6 +68,10 @@ public abstract class AbstractDataObjectStore extends
       throw exceptions.get(0);
     }
     return null;
+  }
+
+  public static DataObjectStore close(final DataObjectStore... dataStores) {
+    return close(Arrays.asList(dataStores));
   }
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();

@@ -1927,6 +1927,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
+            if (form instanceof DataObjectLayerForm) {
+              final DataObjectLayerForm dataObjectForm = (DataObjectLayerForm)form;
+              window.addWindowListener(dataObjectForm);
+            }
             SwingUtil.autoAdjustPosition(window);
             this.forms.put(record, form);
             this.formWindows.put(record, window);

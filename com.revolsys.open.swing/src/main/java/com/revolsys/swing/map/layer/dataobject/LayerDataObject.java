@@ -103,6 +103,27 @@ public class LayerDataObject extends ArrayDataObject {
     }
   }
 
+  public boolean isSame(final LayerDataObject record) {
+    if (record == null) {
+      return false;
+    } else if (this == record) {
+      return true;
+    } else {
+      final AbstractDataObjectLayer layer = getLayer();
+      if (layer.isLayerRecord(record)) {
+        final Object id = getIdValue();
+        final Object otherId = record.getIdValue();
+        if (EqualsRegistry.equal(id, otherId)) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+  }
+
   @Override
   public boolean isValid(final int index) {
     final DataObjectMetaData metaData = getMetaData();
