@@ -39,7 +39,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   protected void addMetaData(final String typePath,
     final DataObjectMetaData metaData) {
-    metaDataCache.put(typePath, metaData);
+    metaDataCache.put(typePath.toUpperCase(), metaData);
   }
 
   @Override

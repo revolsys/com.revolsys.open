@@ -26,6 +26,10 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     insert(objects);
   }
 
+  public DataObjectQuadTree(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   public DataObjectQuadTree(final GeometryFactory geometryFactory,
     final Collection<? extends DataObject> objects) {
     super(geometryFactory);

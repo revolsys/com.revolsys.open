@@ -850,7 +850,7 @@ public final class FileUtil {
    * @throws IOException If an I/O error occurs.
    */
   public static String getRelativePath(final File parentDirectory,
-    final File file) throws IOException {
+    final File file) {
     final String parentPath = getCanonicalPath(parentDirectory);
     final String filePath = getCanonicalPath(file);
     if (filePath.startsWith(parentPath)) {

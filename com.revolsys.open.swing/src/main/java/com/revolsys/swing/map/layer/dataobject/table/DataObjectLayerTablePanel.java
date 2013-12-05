@@ -4,6 +4,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.swing.JComponent;
@@ -208,6 +209,10 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (object != null && !object.isDeleted()) {
       this.layer.showForm(object);
     }
+  }
+
+  public Collection<? extends String> getColumnNames() {
+    return layer.getColumnNames();
   }
 
   protected LayerDataObject getEventRowObject() {

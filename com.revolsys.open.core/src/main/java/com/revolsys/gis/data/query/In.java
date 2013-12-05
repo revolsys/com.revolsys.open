@@ -21,6 +21,10 @@ public class In extends BinaryCondition {
     this(new Column(name), new CollectionValue(values));
   }
 
+  public In(final String name, final CollectionValue values) {
+    this(new Column(name), values);
+  }
+
   public In(final String name, final Object... values) {
     this(name, Arrays.asList(values));
   }

@@ -136,6 +136,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       }
       throw new RuntimeException("Unable to insert row", e);
     }
+
   }
 
   private void update(final DataObject object) {

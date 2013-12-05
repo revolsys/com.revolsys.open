@@ -40,7 +40,7 @@ public class ErrorPredicate implements HighlightPredicate {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final DataObject object = this.model.getObject(rowIndex);
       if (object != null) {
-        final int columnIndex = adapter.convertRowIndexToModel(adapter.column);
+        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
         if (!object.isValid(columnIndex)) {
           return true;
         }

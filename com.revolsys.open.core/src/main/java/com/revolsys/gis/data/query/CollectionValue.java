@@ -65,6 +65,7 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public void appendSql(final StringBuffer buffer) {
+    buffer.append('(');
     for (int i = 0; i < queryValues.size(); i++) {
       if (i > 0) {
         buffer.append(", ");
@@ -82,6 +83,7 @@ public class CollectionValue extends QueryValue {
       }
 
     }
+    buffer.append(')');
   }
 
   @Override

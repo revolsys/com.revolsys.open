@@ -79,8 +79,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.layer = tablePanel.getLayer();
     this.metaData = layer.getMetaData();
 
-    this.attributeNames = new ArrayList<String>(
-      this.metaData.getAttributeNames());
+    this.attributeNames = new ArrayList<String>(tablePanel.getColumnNames());
     this.attributeNames.remove(this.metaData.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       this.metaData);

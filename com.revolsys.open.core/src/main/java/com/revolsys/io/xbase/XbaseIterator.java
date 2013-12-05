@@ -99,7 +99,8 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     this.dataObjectFactory = dataObjectFactory;
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
-    if (!(codePageResource instanceof NonExistingResource)) {
+    if (!(codePageResource instanceof NonExistingResource)
+      && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         charset = Charset.forName(charsetName);

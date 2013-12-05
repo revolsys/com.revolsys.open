@@ -1533,12 +1533,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     for (final LayerDataObject record : getModifiedRecords()) {
-      if (filter(query, record)) {
+      final boolean found = filter(query, record);
+      if (found && !results.contains(record)) {
         results.add(record);
       }
     }
     for (final LayerDataObject record : getNewRecords()) {
-      results.add(record);
+      if (filter(query, record)) {
+        results.add(record);
+      }
     }
     return results;
   }

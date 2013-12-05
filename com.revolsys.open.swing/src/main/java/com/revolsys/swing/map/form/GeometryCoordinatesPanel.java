@@ -55,7 +55,8 @@ public class GeometryCoordinatesPanel extends ValueField implements
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     super.setFieldInvalid(message, foregroundColor, backgroundColor);
     setForeground(null);
     setBackground(null);
@@ -82,7 +83,8 @@ public class GeometryCoordinatesPanel extends ValueField implements
     for (int i = 0; i < this.model.getColumnCount(); i++) {
       int width;
       if (i < this.model.getNumIndexItems()) {
-        width = (int)Math.ceil(this.model.getRowCount() / 10.0) * 20;
+
+        width = (int)Math.ceil(Math.log10(this.model.getRowCount())) * 20;
         if (i < this.model.getNumIndexItems() - 1) {
         } else {
           width += 20;

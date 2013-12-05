@@ -34,7 +34,7 @@ public class DeleteFiles {
                   + file);
               }
             }
-          } else {
+          } else if (file.exists()) {
             if (!file.delete()) {
               throw new RuntimeException("Unable to delete file: " + file);
             }
@@ -46,16 +46,16 @@ public class DeleteFiles {
     }
   }
 
-  public void setDeleteDirectories(boolean deleteDirectories) {
-    this.deleteDirectories = deleteDirectories;
+  public List<String> getFilePatterns() {
+    return filePatterns;
   }
 
   public boolean isDeleteDirectories() {
     return deleteDirectories;
   }
 
-  public List<String> getFilePatterns() {
-    return filePatterns;
+  public void setDeleteDirectories(final boolean deleteDirectories) {
+    this.deleteDirectories = deleteDirectories;
   }
 
   public void setFilePattern(final String filePattern) {

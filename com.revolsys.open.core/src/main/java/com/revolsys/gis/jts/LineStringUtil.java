@@ -617,6 +617,20 @@ public final class LineStringUtil {
     return geometryFactory.createPoint(coordinates);
   }
 
+  public static boolean hasEndPoint(final LineString line, final Point point) {
+    final Point fromPoint = getFromPoint(line);
+    if (fromPoint.equals(point)) {
+      return true;
+    } else {
+      final Point toPoint = getToPoint(line);
+      if (toPoint.equals(point)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static boolean hasEqualExact2d(final List<LineString> lines,
     final LineString newLine) {
     for (final LineString line : lines) {

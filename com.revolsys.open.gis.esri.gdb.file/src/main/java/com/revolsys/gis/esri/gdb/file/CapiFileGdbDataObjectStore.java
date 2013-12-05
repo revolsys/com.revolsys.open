@@ -127,6 +127,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  private final Set<String> loadOnlyByPath = new HashSet<String>();
+
   private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
@@ -184,6 +186,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   private final Set<EnumRows> enumRowsToClose = new HashSet<EnumRows>();
 
   private boolean initialized;
+
+  private boolean loadOnly;
 
   protected CapiFileGdbDataObjectStore(final File file) {
     this.fileName = file.getAbsolutePath();
@@ -594,7 +598,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       if (geodatabase != null) {
         final SpatialReference spatialReference = getSpatialReference(geometryFactory);
         final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
-          schemaName, spatialReference);
+          schemaName.replaceAll("/", ""), spatialReference);
         for (final DEFeatureDataset dataset : datasets) {
           final String path = dataset.getCatalogPath();
           final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
@@ -675,6 +679,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
             schemaPath, tableDefinition);
           addMetaData(metaData);
+          if (loadOnly) {
+            table.setWriteLock();
+            table.setLoadOnlyMode(loadOnly);
+          }
           tablesToClose.put(metaData.getPath(), table);
           return metaData;
 
@@ -932,6 +940,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           Table table = tablesToClose.get(typePath);
           if (table == null) {
             table = geodatabase.openTable(path);
+            table.setLoadOnlyMode(loadOnly);
             tablesToClose.put(typePath, table);
           }
           return table;
@@ -1060,6 +1069,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public boolean isCreateMissingTables() {
     return createMissingTables;
+  }
+
+  public boolean isLoadOnly(final String typePath) {
+    return loadOnlyByPath.contains(typePath);
   }
 
   public boolean isNull(final Row row, final String name) {
@@ -1277,6 +1290,33 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public void setFileName(final String fileName) {
     this.fileName = fileName;
+  }
+
+  public void setLoadOnly(final boolean loadOnly) {
+    synchronized (apiSync) {
+      this.loadOnly = loadOnly;
+      for (final Table table : tablesToClose.values()) {
+        table.setLoadOnlyMode(loadOnly);
+      }
+    }
+  }
+
+  public void setLoadOnly(final String typePath, final boolean loadOnly) {
+    synchronized (apiSync) {
+      final boolean oldLoadOnly = isLoadOnly(typePath);
+      if (oldLoadOnly != loadOnly) {
+        getTable(typePath).setLoadOnlyMode(loadOnly);
+      }
+      if (loadOnly) {
+        if (!oldLoadOnly) {
+          loadOnlyByPath.add(typePath);
+        }
+      } else {
+        if (oldLoadOnly) {
+          loadOnlyByPath.remove(typePath);
+        }
+      }
+    }
   }
 
   public void setNull(final Row row, final String name) {
