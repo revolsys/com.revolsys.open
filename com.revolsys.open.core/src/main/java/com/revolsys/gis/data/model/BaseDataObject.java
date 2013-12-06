@@ -393,6 +393,11 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   }
 
   @Override
+  public boolean isValid(final String attributeName) {
+    return true;
+  }
+
+  @Override
   public Object put(final String key, final Object value) {
     final Object oldValue = getValue(key);
     setValue(key, value);

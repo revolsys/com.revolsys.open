@@ -41,7 +41,8 @@ public class ErrorPredicate implements HighlightPredicate {
       final DataObject object = this.model.getObject(rowIndex);
       if (object != null) {
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        if (!object.isValid(columnIndex)) {
+        final String attributeName = model.getAttributeName(columnIndex);
+        if (!object.isValid(attributeName)) {
           return true;
         }
       }

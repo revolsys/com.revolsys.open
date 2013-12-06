@@ -721,7 +721,7 @@ public class DataObjectLayerForm extends JPanel implements
         } catch (final IllegalArgumentException e) {
         }
       }
-      if (!isEditable()) {
+      if (field != null && !isEditable()) {
         field.setEnabled(false);
       }
       return (T)field;
@@ -1290,7 +1290,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void updateFocussedField() {
-    final Field field = getField(focussedFieldName);
+    final Field field = fields.get(focussedFieldName);
     if (field != null) {
       field.updateFieldValue();
     }

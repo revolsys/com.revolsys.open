@@ -107,6 +107,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   boolean isValid(int index);
 
+  boolean isValid(String attributeName);
+
   /**
    * Set the value of the primary geometry attribute.
    * 
