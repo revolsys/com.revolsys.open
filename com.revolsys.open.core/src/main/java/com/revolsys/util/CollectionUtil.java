@@ -280,8 +280,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static Double getDouble(final Map<String, ? extends Object> object,
-    final String name, final Double defaultValue) {
+  public static double getDouble(final Map<String, ? extends Object> object,
+    final String name, final double defaultValue) {
     final Double value = getDouble(object, name);
     if (value == null) {
       return defaultValue;
@@ -322,8 +322,8 @@ public final class CollectionUtil {
     }
   }
 
-  public static Integer getInteger(final Map<String, ? extends Object> object,
-    final String name, final Integer defaultValue) {
+  public static int getInteger(final Map<String, ? extends Object> object,
+    final String name, final int defaultValue) {
     final Integer value = getInteger(object, name);
     if (value == null) {
       return defaultValue;

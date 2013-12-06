@@ -110,6 +110,27 @@ public final class Property {
   }
 
   @SuppressWarnings("unchecked")
+  public static <T> T getSimple(final Object object, final String key) {
+    if (object == null) {
+      return null;
+    } else {
+      if (object instanceof DataObject) {
+        final DataObject dataObject = (DataObject)object;
+        return dataObject.getValue(key);
+      } else if (object instanceof Map) {
+        final Map<String, ?> map = (Map<String, ?>)object;
+        return (T)map.get(key);
+      } else if (object instanceof Annotation) {
+        final Annotation annotation = (Annotation)object;
+        return (T)AnnotationUtils.getValue(annotation, key);
+      } else {
+        final Object value = JavaBeanUtil.getProperty(object, key);
+        return (T)value;
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   public static <V> V invoke(final Object object, final String methodName,
     final Object... parameterArray) {
     try {

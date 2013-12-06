@@ -210,8 +210,12 @@ public class IoFactoryRegistry {
 
   public <F extends IoFactory> F getFactoryByMediaType(
     final Class<F> factoryClass, final String mediaType) {
-    final Map<String, F> factoriesByMediaType = getFactoriesByMediaType(factoryClass);
-    return factoriesByMediaType.get(mediaType);
+    if (mediaType.contains("/")) {
+      final Map<String, F> factoriesByMediaType = getFactoriesByMediaType(factoryClass);
+      return factoriesByMediaType.get(mediaType);
+    } else {
+      return getFactoryByFileExtension(factoryClass, mediaType);
+    }
   }
 
   public <F extends IoFactory> F getFactoryByResource(
