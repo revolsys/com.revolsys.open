@@ -36,6 +36,7 @@ import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.util.PasswordUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -136,7 +137,9 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       database = "none";
     }
     final String username = (String)this.connectionProperties.get("username");
-    final String password = (String)this.connectionProperties.get("password");
+    String password = (String)this.connectionProperties.get("password");
+    password = PasswordUtil.decrypt(password);
+
     try {
       return new SeConnection(server, instance, database, username, password);
     } catch (final SeException e) {

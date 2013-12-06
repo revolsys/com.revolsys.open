@@ -11,7 +11,7 @@ public class PngImageFactory extends AbstractGeoReferencedImageFactory {
 
   @Override
   public GeoReferencedImage loadImage(final Resource resource) {
-    return new GeoReferencedImage(resource);
+    return new PngImage(resource);
   }
 
 }

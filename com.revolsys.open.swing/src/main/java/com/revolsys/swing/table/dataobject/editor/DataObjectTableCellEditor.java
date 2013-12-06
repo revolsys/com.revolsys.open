@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.EventObject;
 
 import javax.swing.AbstractCellEditor;
@@ -30,7 +31,7 @@ import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 
 public class DataObjectTableCellEditor extends AbstractCellEditor implements
-  TableCellEditor, KeyListener {
+  TableCellEditor, KeyListener, MouseListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -92,11 +93,13 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     this.rowIndex = rowIndex;
     this.columnIndex = columnIndex;
     editorComponent.addKeyListener(this);
+    editorComponent.addMouseListener(this);
     if (editorComponent instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
+      comboEditorComponent.addMouseListener(this);
     }
     if (popupMenu != null) {
       popupMenu.addToComponent(editorComponent);
@@ -147,6 +150,26 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public void keyTyped(final KeyEvent e) {
   }
 
+  @Override
+  public void mouseClicked(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+  }
+
+  @Override
+  public void mousePressed(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+  }
+
   public void setPopupMenu(final MenuFactory menu) {
     setPopupMenu(new PopupMenu(menu));
   }
@@ -181,12 +204,14 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     } finally {
       if (stopped) {
         if (editorComponent != null) {
+          editorComponent.removeMouseListener(this);
           editorComponent.removeKeyListener(this);
           if (editorComponent instanceof JComboBox) {
             final JComboBox comboBox = (JComboBox)editorComponent;
             final ComboBoxEditor editor = comboBox.getEditor();
             final Component comboEditorComponent = editor.getEditorComponent();
             comboEditorComponent.removeKeyListener(this);
+            comboEditorComponent.removeMouseListener(this);
           }
           if (popupMenu != null) {
             PopupMenu.removeFromComponent(editorComponent);
