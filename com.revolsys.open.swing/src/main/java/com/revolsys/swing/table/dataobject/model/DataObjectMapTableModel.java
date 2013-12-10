@@ -27,7 +27,7 @@ public class DataObjectMapTableModel extends AbstractSingleDataObjectTableModel 
 
   @Override
   public Object getObjectValue(final int attributeIndex) {
-    final String name = getAttributeName(attributeIndex);
+    final String name = getFieldName(attributeIndex);
     return this.values.get(name);
   }
 
@@ -37,7 +37,7 @@ public class DataObjectMapTableModel extends AbstractSingleDataObjectTableModel 
 
   @Override
   protected Object setObjectValue(final int rowIndex, final Object value) {
-    final String name = getAttributeName(rowIndex);
+    final String name = getFieldName(rowIndex);
     final Object oldValue = this.values.get(name);
     this.values.put(name, value);
     return oldValue;

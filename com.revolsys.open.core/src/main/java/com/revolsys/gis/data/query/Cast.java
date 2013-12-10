@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.query;
 
 import java.sql.PreparedStatement;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
@@ -16,6 +17,11 @@ public class Cast extends Condition {
 
   public Cast(final String name, final String dataType) {
     this(new Column(name), dataType);
+  }
+
+  @Override
+  public boolean accept(final Map<String, Object> record) {
+    return true;
   }
 
   @Override
@@ -53,4 +59,14 @@ public class Cast extends Condition {
     return dataType;
   }
 
+  @Override
+  public String toString() {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("CAST(");
+    buffer.append(condition);
+    buffer.append(" AS ");
+    buffer.append(dataType);
+    buffer.append(")");
+    return buffer.toString();
+  }
 }

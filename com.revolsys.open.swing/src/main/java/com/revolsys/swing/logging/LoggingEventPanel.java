@@ -19,12 +19,12 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.jdesktop.swingx.JXTextArea;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.CaseConverter;
@@ -33,6 +33,13 @@ import com.revolsys.util.Property;
 public class LoggingEventPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
+
+  public static void showDialog(final Component component,
+    final Class<?> category, final String message, final Throwable e) {
+    final LoggingEvent event = new LoggingEvent(Logger.class.getName(),
+      Logger.getLogger(component.getClass()), Level.ERROR, message, e);
+    showDialog(component, event);
+  }
 
   public static void showDialog(final Component component,
     final LoggingEvent event) {
@@ -54,13 +61,6 @@ public class LoggingEventPanel extends JPanel {
     dialog.setVisible(true);
   }
 
-  public static void showDialog(final Component component,
-    Class<?> category, final String message, final Throwable e) {
-    final LoggingEvent event = new LoggingEvent(Logger.class.getName(),
-      Logger.getLogger(component.getClass()), Level.ERROR, message, e);
-    showDialog(component, event);
-  }
-
   public LoggingEventPanel(final LoggingEvent event) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     final long time = event.getTimeStamp();
@@ -77,7 +77,7 @@ public class LoggingEventPanel extends JPanel {
     addLabel("Stack Trace");
     final String[] stack = event.getThrowableStrRep();
     if (stack != null) {
-      final JXTextArea textArea = SwingUtil.createTextArea(
+      final TextArea textArea = SwingUtil.createTextArea(
         Math.min(20, stack.length), 80);
       textArea.setEditable(false);
       for (final String trace : stack) {

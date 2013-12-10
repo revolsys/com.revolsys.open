@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.SwingUtil;
@@ -48,14 +47,17 @@ public class ValueField extends JPanel implements Field {
 
   public ValueField(final boolean isDoubleBuffered) {
     super(isDoubleBuffered);
+    setOpaque(false);
   }
 
   public ValueField(final LayoutManager layout) {
     super(layout);
+    setOpaque(false);
   }
 
   public ValueField(final LayoutManager layout, final boolean isDoubleBuffered) {
     super(layout, isDoubleBuffered);
+    setOpaque(false);
   }
 
   public ValueField(final Object fieldValue) {
@@ -66,6 +68,7 @@ public class ValueField extends JPanel implements Field {
     setFieldName(fieldName);
     setFieldValue(fieldValue);
     setTitle(CaseConverter.toCapitalizedWords(fieldName));
+    setOpaque(false);
   }
 
   public void cancel() {
@@ -153,7 +156,8 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setBackground(backgroundColor);
     this.errorMessage = message;

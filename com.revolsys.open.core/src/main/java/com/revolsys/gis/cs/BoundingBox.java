@@ -732,7 +732,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public <Q extends Quantity> Measurable<Q> getMaximumX() {
-    final Unit<Q> unit = getCoordinateSystem().getUnit();
+    final Unit<Q> unit = getUnit();
     return Measure.valueOf(super.getMaxX(), unit);
   }
 
@@ -744,7 +744,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public <Q extends Quantity> Measurable<Q> getMaximumY() {
-    final Unit<Q> unit = getCoordinateSystem().getUnit();
+    final Unit<Q> unit = getUnit();
     return Measure.valueOf(super.getMaxY(), unit);
   }
 
@@ -764,7 +764,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumX() {
-    final Unit<Q> unit = getCoordinateSystem().getUnit();
+    final Unit<Q> unit = getUnit();
     return Measure.valueOf(super.getMinX(), unit);
   }
 
@@ -776,7 +776,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumY() {
-    final Unit<Q> unit = getCoordinateSystem().getUnit();
+    final Unit<Q> unit = getUnit();
     return Measure.valueOf(super.getMinY(), unit);
   }
 
@@ -819,6 +819,16 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public Point getTopRightPoint() {
     return getGeometryFactory().createPoint(getMaxX(), getMaxY());
+  }
+
+  @SuppressWarnings("unchecked")
+  private <Q extends Quantity> Unit<Q> getUnit() {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem == null) {
+      return (Unit<Q>)SI.METRE;
+    } else {
+      return coordinateSystem.<Q> getUnit();
+    }
   }
 
   public LineSegment getWestLine() {

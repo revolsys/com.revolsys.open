@@ -56,7 +56,7 @@ public abstract class DataObjectRowTableModel extends
   }
 
   @Override
-  public String getAttributeName(final int columnIndex) {
+  public String getFieldName(final int columnIndex) {
     if (columnIndex < attributesOffset) {
       return null;
     } else {
@@ -76,8 +76,8 @@ public abstract class DataObjectRowTableModel extends
   }
 
   @Override
-  public String getAttributeName(final int rowIndex, final int columnIndex) {
-    return getAttributeName(columnIndex);
+  public String getFieldName(final int rowIndex, final int columnIndex) {
+    return getFieldName(columnIndex);
   }
 
   public int getAttributesOffset() {
@@ -92,7 +92,7 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return null;
     } else {
-      final String name = getAttributeName(columnIndex);
+      final String name = getFieldName(columnIndex);
       final DataObjectMetaData metaData = getMetaData();
       return metaData.getAttribute(name);
     }
@@ -103,7 +103,7 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return Object.class;
     } else {
-      final String name = getAttributeName(columnIndex);
+      final String name = getFieldName(columnIndex);
       final DataObjectMetaData metaData = getMetaData();
       final DataType type = metaData.getAttributeType(name);
       if (type == null) {
@@ -166,7 +166,7 @@ public abstract class DataObjectRowTableModel extends
       if (object == null) {
         return null;
       } else {
-        final String name = getAttributeName(columnIndex);
+        final String name = getFieldName(columnIndex);
 
         final Object value = object.getValue(name);
         return value;
@@ -177,7 +177,7 @@ public abstract class DataObjectRowTableModel extends
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final String attributeName = getAttributeName(rowIndex, columnIndex);
+      final String attributeName = getFieldName(rowIndex, columnIndex);
       if (attributeName != null) {
         if (!isReadOnly(attributeName)) {
           final Class<?> attributeClass = getMetaData().getAttributeClass(
@@ -224,7 +224,7 @@ public abstract class DataObjectRowTableModel extends
       if (i < attributeTitles.size()) {
         title = attributeTitles.get(i);
       } else {
-        final String attributeName = getAttributeName(i);
+        final String attributeName = getFieldName(i);
         final DataObjectMetaData metaData = getMetaData();
         final Attribute attribute = metaData.getAttribute(attributeName);
         title = attribute.getTitle();
@@ -263,7 +263,7 @@ public abstract class DataObjectRowTableModel extends
       if (columnIndex >= attributesOffset) {
         final DataObject object = getObject(rowIndex);
         if (object != null) {
-          final String name = getAttributeName(columnIndex);
+          final String name = getFieldName(columnIndex);
           final Object objectValue = toObjectValue(columnIndex, value);
           object.setValue(name, objectValue);
         }

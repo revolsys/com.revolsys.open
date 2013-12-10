@@ -112,7 +112,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final String attributeName = getAttributeName(rowIndex, columnIndex);
+      final String attributeName = getFieldName(rowIndex, columnIndex);
       if (isReadOnly(attributeName)) {
         return false;
       } else {
@@ -179,7 +179,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @Override
   public SortOrder setSortOrder(final int column) {
     final SortOrder sortOrder = super.setSortOrder(column);
-    final String attributeName = getAttributeName(column);
+    final String attributeName = getFieldName(column);
     final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
       sortOrder == SortOrder.ASCENDING, attributeName);
     Collections.sort(this.objects, comparitor);

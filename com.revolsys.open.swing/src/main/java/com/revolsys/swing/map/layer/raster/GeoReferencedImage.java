@@ -10,10 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
@@ -55,6 +59,28 @@ import com.vividsolutions.jts.geom.Point;
 public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   PropertyChangeListener, MapSerializer {
 
+  public static int[] getResolution(final ImageReader r) throws IOException {
+    int hdpi = 96, vdpi = 96;
+    final double mm2inch = 25.4;
+
+    NodeList lst;
+    final Element node = (Element)r.getImageMetadata(0).getAsTree(
+      "javax_imageio_1.0");
+    lst = node.getElementsByTagName("HorizontalPixelSize");
+    if (lst != null && lst.getLength() == 1) {
+      hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+    }
+
+    lst = node.getElementsByTagName("VerticalPixelSize");
+    if (lst != null && lst.getLength() == 1) {
+      vdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
+    }
+
+    return new int[] {
+      hdpi, vdpi
+    };
+  }
+
   private BoundingBox boundingBox = new BoundingBox();
 
   private BufferedImage image;
@@ -82,6 +108,8 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   private final int degree = 1;
 
   private boolean hasChanges;
+
+  private int[] dpi;
 
   public GeoReferencedImage(final BoundingBox boundingBox,
     final BufferedImage image) {
@@ -120,6 +148,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   protected BufferedImage createBufferedImage() {
     final File file = SpringUtil.getOrDownloadFile(this.imageResource);
+
     this.jaiImage = JAI.create("fileload", file.getAbsolutePath());
     return this.jaiImage.getAsBufferedImage();
   }
@@ -139,6 +168,40 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   public CoordinateSystem getCoordinateSystem() {
     return this.geometryFactory.getCoordinateSystem();
+  }
+
+  protected int[] getDpi() {
+    if (this.dpi == null) {
+      int[] dpi = new int[] {
+        96, 96
+      };
+      try {
+        final Resource imageResource = getImageResource();
+        final InputStream in = imageResource.getInputStream();
+        final ImageInputStream iis = ImageIO.createImageInputStream(in);
+        final Iterator<ImageReader> i = ImageIO.getImageReaders(iis);
+        if (i.hasNext()) {
+          final ImageReader r = i.next();
+          r.setInput(iis);
+
+          dpi = getResolution(r);
+
+          if (dpi[0] == 0) {
+            dpi[0] = 96;
+          }
+          if (dpi[1] == 0) {
+            dpi[1] = 96;
+          }
+
+          r.dispose();
+        }
+        iis.close();
+      } catch (final Throwable e) {
+        e.printStackTrace();
+      }
+      this.dpi = dpi;
+    }
+    return this.dpi;
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -296,6 +359,9 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       extension + ".aux.xml");
     if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
       loadWorldFileX();
+
+      final int[] dpi = getDpi();
+
       try {
         int srid = 0;
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -328,9 +394,8 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
           if (sourceControlPoints.size() == targetControlPoints.size()) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
             for (int i = 0; i < sourceControlPoints.size(); i += 2) {
-              final int dpi = 72; // need to read from Image
-              final double imageX = sourceControlPoints.get(i) * dpi;
-              final double imageY = sourceControlPoints.get(i + 1) * dpi;
+              final double imageX = sourceControlPoints.get(i) * dpi[0];
+              final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Coordinates sourcePixel = new DoubleCoordinates(imageX,
                 imageY);
 
@@ -430,34 +495,34 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   @SuppressWarnings("unused")
   protected void loadWorldFile(final Resource worldFile) {
-    if (boundingBox.isEmpty()) {
-      if (worldFile.exists()) {
+    // if (boundingBox.isEmpty()) {
+    if (worldFile.exists()) {
+      try {
+        final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
         try {
-          final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
-          try {
-            final double pixelWidth = Double.parseDouble(reader.readLine());
-            final double yRotation = Double.parseDouble(reader.readLine());
-            final double xRotation = Double.parseDouble(reader.readLine());
-            final double pixelHeight = Double.parseDouble(reader.readLine());
-            // Top left
-            final double x1 = Double.parseDouble(reader.readLine());
-            final double y1 = Double.parseDouble(reader.readLine());
-            setResolution(pixelWidth);
-            // TODO rotation using a warp filter
-            setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
-            // worldWarpFilter = new WarpAffineFilter(new BoundingBox(
-            // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
-            // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
-            // yRotation);
-          } finally {
-            reader.close();
-          }
-        } catch (final IOException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Error reading world file " + worldFile, e);
+          final double pixelWidth = Double.parseDouble(reader.readLine());
+          final double yRotation = Double.parseDouble(reader.readLine());
+          final double xRotation = Double.parseDouble(reader.readLine());
+          final double pixelHeight = Double.parseDouble(reader.readLine());
+          // Top left
+          final double x1 = Double.parseDouble(reader.readLine());
+          final double y1 = Double.parseDouble(reader.readLine());
+          setResolution(pixelWidth);
+          // TODO rotation using a warp filter
+          setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
+          // worldWarpFilter = new WarpAffineFilter(new BoundingBox(
+          // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
+          // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
+          // yRotation);
+        } finally {
+          reader.close();
         }
+      } catch (final IOException e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Error reading world file " + worldFile, e);
       }
     }
+    // }
   }
 
   protected void loadWorldFileX() {
@@ -533,6 +598,10 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   public void setCoordinateSystem(final CoordinateSystem coordinateSystem) {
     setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+  }
+
+  public void setDpi(final int... dpi) {
+    this.dpi = dpi;
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

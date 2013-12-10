@@ -16,13 +16,18 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
@@ -94,6 +99,30 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new GeoReferencedImageLayerRenderer(this));
+  }
+
+  @Override
+  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+
+    if (url.startsWith("file:")) {
+      final String fileName = url.replaceFirst("file:(//)?", "");
+      SwingUtil.addReadOnlyTextField(panel, "File", fileName);
+    } else {
+      SwingUtil.addReadOnlyTextField(panel, "URL", url);
+    }
+    final String fileNameExtension = FileUtil.getFileNameExtension(url);
+    if (StringUtils.hasText(fileNameExtension)) {
+      SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
+      final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
+        .getFactoryByFileExtension(GeoReferencedImageFactory.class,
+          fileNameExtension);
+      if (factory != null) {
+        SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
+      }
+    }
+    GroupLayoutUtil.makeColumns(panel, 2, true);
+    return panel;
   }
 
   public void cancelChanges() {
@@ -210,7 +239,11 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return getBoundingBox().getGeometryFactory();
+    if (image == null) {
+      return getBoundingBox().getGeometryFactory();
+    } else {
+      return image.getGeometryFactory();
+    }
   }
 
   public GeoReferencedImage getImage() {

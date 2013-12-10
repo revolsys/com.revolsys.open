@@ -7,8 +7,10 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -40,7 +42,6 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FontChooserField;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
-import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
@@ -48,12 +49,12 @@ import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.MarkerField;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.LineCap;
 import com.revolsys.swing.map.layer.dataobject.style.LineJoin;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseStylePanel extends ValueField implements
@@ -100,6 +101,10 @@ public class BaseStylePanel extends ValueField implements
 
   private final Set<String> readOnlyFieldNames = new HashSet<String>();
 
+  private final Set<String> rendererFieldNames = new HashSet<String>();
+
+  private final Map<String, Object> rendererFieldValues = new HashMap<String, Object>();
+
   public BaseStylePanel(final LayerRenderer<?> renderer) {
     super(renderer);
     setTitle("Style");
@@ -131,7 +136,6 @@ public class BaseStylePanel extends ValueField implements
     container.add(field);
   }
 
-  @SuppressWarnings("unchecked")
   protected Field addField(final JPanel container, final Object object,
     final String fieldName) {
     final Class<?> fieldClass = Property.getClass(object, fieldName);
@@ -140,35 +144,7 @@ public class BaseStylePanel extends ValueField implements
     } else {
       final Object value = Property.get(object, fieldName);
       SwingUtil.addLabel(container, fieldName);
-      Field field;
-      if (fieldName.equals("textFaceName")) {
-        field = new FontChooserField(fieldName, (String)value);
-      } else if (fieldName.endsWith("HorizontalAlignment")) {
-        field = createHorizontalAlignmentField(fieldName, (String)value);
-      } else if (fieldName.endsWith("VerticalAlignment")) {
-        field = createVerticalAlignmentField(fieldName, (String)value);
-      } else if (fieldName.equals("lineCap")) {
-        field = createLineCapField((LineCap)value);
-      } else if (fieldName.equals("lineJoin")) {
-        field = createLineJoinField((LineJoin)value);
-      } else if (fieldName.equals("queryFilter")) {
-        field = new TextArea(fieldName, 5, 30);
-        field.setFieldValue(value);
-      } else if (fieldName.equals("marker")) {
-        field = new MarkerField(fieldName, value);
-      } else if (fieldName.endsWith("Scale")) {
-        field = createScaleField(fieldName, (Long)value);
-      } else if (Color.class.equals(fieldClass)) {
-        field = new ColorChooserField(fieldName, (Color)value);
-      } else if (Boolean.TYPE.equals(fieldClass)
-        || Boolean.class.equals(fieldClass)) {
-        field = new CheckBox(fieldName, value);
-      } else if (Measure.class.equals(fieldClass)) {
-        field = new LengthMeasureTextField(fieldName, (Measure<Length>)value,
-          NonSI.PIXEL);
-      } else {
-        field = new TextField(fieldName, value, 20);
-      }
+      final Field field = createField(fieldName, fieldClass, value);
       if (readOnlyFieldNames.contains(fieldName)) {
         field.setEnabled(false);
       }
@@ -179,6 +155,10 @@ public class BaseStylePanel extends ValueField implements
       }
       field.addPropertyChangeListener("fieldValue", this);
       field.addPropertyChangeListener(fieldName, this);
+      if (object instanceof LayerRenderer) {
+        rendererFieldNames.add(fieldName);
+        rendererFieldValues.put(fieldName, value);
+      }
       return field;
     }
   }
@@ -260,6 +240,42 @@ public class BaseStylePanel extends ValueField implements
     container.add(field);
   }
 
+  @SuppressWarnings("unchecked")
+  protected Field createField(final String fieldName,
+    final Class<?> fieldClass, final Object value) {
+    Field field;
+    if (fieldName.equals("textFaceName")) {
+      field = new FontChooserField(fieldName, (String)value);
+    } else if (fieldName.endsWith("HorizontalAlignment")) {
+      field = createHorizontalAlignmentField(fieldName, (String)value);
+    } else if (fieldName.endsWith("VerticalAlignment")) {
+      field = createVerticalAlignmentField(fieldName, (String)value);
+    } else if (fieldName.equals("lineCap")) {
+      field = createLineCapField((LineCap)value);
+    } else if (fieldName.equals("lineJoin")) {
+      field = createLineJoinField((LineJoin)value);
+    } else if (fieldName.equals("queryFilter")) {
+      final AbstractDataObjectLayer layer = getLayer();
+      field = new QueryFilterField(layer, fieldName, value);
+      field.setFieldValue(value);
+    } else if (fieldName.equals("marker")) {
+      field = new MarkerField(fieldName, value);
+    } else if (fieldName.endsWith("Scale")) {
+      field = createScaleField(fieldName, (Long)value);
+    } else if (Color.class.equals(fieldClass)) {
+      field = new ColorChooserField(fieldName, (Color)value);
+    } else if (Boolean.TYPE.equals(fieldClass)
+      || Boolean.class.equals(fieldClass)) {
+      field = new CheckBox(fieldName, value);
+    } else if (Measure.class.equals(fieldClass)) {
+      field = new LengthMeasureTextField(fieldName, (Measure<Length>)value,
+        NonSI.PIXEL);
+    } else {
+      field = new TextField(fieldName, value, 20);
+    }
+    return field;
+  }
+
   protected TogglePanel createHorizontalAlignmentField(final String fieldName,
     String aligment) {
     if (!"left".equalsIgnoreCase(aligment)
@@ -310,25 +326,30 @@ public class BaseStylePanel extends ValueField implements
   }
 
   @SuppressWarnings("unchecked")
+  public <L extends Layer> L getLayer() {
+    final LayerRenderer<Layer> renderer = getRenderer();
+    return (L)renderer.getLayer();
+  }
+
+  @SuppressWarnings("unchecked")
   public <T extends LayerRenderer<Layer>> T getRenderer() {
     return (T)getFieldValue();
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (!scalePropertyChange(event)) {
+    if (!rendererPropertyChange(event)) {
       doPropertyChange(event);
     }
   }
 
-  public boolean scalePropertyChange(final PropertyChangeEvent event) {
+  protected boolean rendererPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
+      final Object fieldValue = field.getFieldValue();
       if (fieldName.endsWith("Scale")) {
-
-        final Object fieldValue = field.getFieldValue();
         long scale = 0;
         if (fieldValue instanceof Number) {
           final Number number = (Number)fieldValue;
@@ -343,10 +364,19 @@ public class BaseStylePanel extends ValueField implements
             scale = 0;
           }
         }
-        JavaBeanUtil.setProperty(getRenderer(), fieldName, scale);
+        rendererFieldValues.put(fieldName, scale);
         return true;
+      } else if (rendererFieldNames.contains(fieldName)) {
+        rendererFieldValues.put(fieldName, fieldValue);
       }
     }
     return false;
+  }
+
+  @Override
+  public void save() {
+    super.save();
+    final LayerRenderer<Layer> renderer = getRenderer();
+    Property.set(renderer, rendererFieldValues);
   }
 }

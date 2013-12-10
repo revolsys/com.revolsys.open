@@ -103,15 +103,14 @@ public class SwingUtil {
     }
   }
 
-  public static JComponent addField(final Container container,
-    final Object object, final String fieldName) {
-    return addField(container, object, fieldName, fieldName);
+  public static JComponent addField(final Container panel,
+    final String fieldName, final Object fieldValue) {
+    return addField(panel, fieldName, fieldName, fieldValue);
   }
 
-  public static JComponent addField(final Container panel, final Object object,
-    final String fieldName, final String label) {
+  public static JComponent addField(final Container panel,
+    final String fieldName, final String label, final Object fieldValue) {
     addLabel(panel, label);
-    final Object fieldValue = Property.get(object, fieldName);
     final JComponent field = SwingUtil.createField(fieldValue.getClass(),
       fieldName, fieldValue);
     panel.add(field);
@@ -119,18 +118,37 @@ public class SwingUtil {
   }
 
   public static JLabel addLabel(final Container container, final String text) {
-    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(text));
+    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(text)
+      + " ");
     label.setFont(BOLD_FONT);
     container.add(label);
     return label;
   }
 
+  public static JComponent addObjectField(final Container container,
+    final Object object, final String fieldName) {
+    return addObjectField(container, object, fieldName, fieldName);
+  }
+
+  public static JComponent addObjectField(final Container panel,
+    final Object object, final String fieldName, final String label) {
+    final Object fieldValue = Property.get(object, fieldName);
+    return addField(panel, fieldName, label, fieldValue);
+  }
+
+  public static void addReadOnlyTextField(final JPanel container,
+    final String fieldName, final Object value) {
+    final String string = StringConverterRegistry.toString(value);
+    final int length = Math.max(1, string.length());
+    addReadOnlyTextField(container, fieldName, value, length);
+  }
+
   public static void addReadOnlyTextField(final JPanel container,
     final String fieldName, final Object value, final int length) {
     addLabel(container, fieldName);
-    final TextField crsField = new TextField(fieldName, value, length);
-    crsField.setEditable(false);
-    container.add(crsField);
+    final TextField field = new TextField(fieldName, value, length);
+    field.setEditable(false);
+    container.add(field);
   }
 
   public static void autoAdjustPosition(final Window window) {

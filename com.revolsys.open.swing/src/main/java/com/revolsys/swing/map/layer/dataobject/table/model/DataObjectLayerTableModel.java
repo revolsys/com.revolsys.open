@@ -141,7 +141,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     this.layer = layer;
     layer.addPropertyChangeListener(this);
     setEditable(true);
-    setReadOnlyAttributeNames(layer.getUserReadOnlyFieldNames());
+    setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
   }
 
   public String getAttributeFilterMode() {
@@ -156,8 +156,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
       return 0;
     } else {
-      return this.rowCount + getLayer().getNewObjectCount();
+      int count = this.rowCount + getLayer().getNewObjectCount();
+      return count;
     }
+  }
+
+  @Override
+  public String getColumnName(final int columnIndex) {
+    final String fieldName = getFieldName(columnIndex);
+    return layer.getFieldTitle(fieldName);
   }
 
   protected Query getFilterQuery() {
@@ -533,7 +540,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public SortOrder setSortOrder(final int column) {
     final SortOrder sortOrder = super.setSortOrder(column);
-    final String attributeName = getAttributeName(column);
+    final String attributeName = getFieldName(column);
 
     Map<String, Boolean> orderBy;
     if (sortOrder == SortOrder.ASCENDING) {

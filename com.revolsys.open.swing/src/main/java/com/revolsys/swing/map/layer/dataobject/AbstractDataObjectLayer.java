@@ -145,6 +145,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return layers;
   }
 
+  private boolean useFieldTitles = false;
+
   private DataObjectQuadTree index = new DataObjectQuadTree();
 
   private boolean snapToAllLayers = false;
@@ -824,6 +826,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return editSync;
   }
 
+  public String getFieldTitle(final String fieldName) {
+    if (isUseFieldTitles()) {
+      DataObjectMetaData metaData = getMetaData();
+      return metaData.getAttributeTitle(fieldName);
+    } else {
+      return fieldName;
+    }
+  }
+
   public String getGeometryAttributeName() {
     if (this.metaData == null) {
       return "";
@@ -1298,6 +1309,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public boolean isSnapToAllLayers() {
     return snapToAllLayers;
+  }
+
+  public boolean isUseFieldTitles() {
+    return useFieldTitles;
   }
 
   public boolean isVisible(final LayerDataObject record) {
@@ -1870,6 +1885,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     this.snapToAllLayers = snapToAllLayers;
   }
 
+  public void setUseFieldTitles(final boolean useFieldTitles) {
+    this.useFieldTitles = useFieldTitles;
+  }
+
   public void setUserReadOnlyFieldNames(
     final Collection<String> userReadOnlyFieldNames) {
     this.userReadOnlyFieldNames = new LinkedHashSet<String>(
@@ -2091,6 +2110,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers);
     }
     MapSerializerUtil.add(map, "columnNameOrder", this.columnNameOrder);
+    MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
     map.remove("TableView");
     return map;
   }

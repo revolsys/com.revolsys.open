@@ -1,5 +1,6 @@
 package com.revolsys.swing.component;
 
+import java.awt.Component;
 import java.awt.LayoutManager;
 
 import org.jdesktop.swingx.JXPanel;
@@ -25,6 +26,13 @@ public class BasePanel extends JXPanel {
     setScrollableWidthHint(ScrollableSizeHint.FIT);
     setScrollableHeightHint(ScrollableSizeHint.VERTICAL_STRETCH);
     setOpaque(false);
+  }
+
+  public BasePanel(final LayoutManager layout, final Component... components) {
+    this(layout);
+    for (final Component component : components) {
+      add(component);
+    }
   }
 
 }

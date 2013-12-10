@@ -95,6 +95,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   List<DataObjectMetaData> getTypes(String namespace);
 
+  String getUrl();
+
+  String getUsername();
+
   Writer<DataObject> getWriter();
 
   boolean hasSchema(String name);

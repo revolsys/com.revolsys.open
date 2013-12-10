@@ -70,6 +70,17 @@ public class TextStylePanel extends BaseStylePanel implements
   }
 
   @Override
+  protected Field createField(final String fieldName,
+    final Class<?> fieldClass, final Object value) {
+    if (fieldName.equals("textName")) {
+      final AbstractDataObjectLayer layer = getLayer();
+      return new TextNameField(layer, fieldName, value);
+    } else {
+      return super.createField(fieldName, fieldClass, value);
+    }
+  }
+
+  @Override
   public void doPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {

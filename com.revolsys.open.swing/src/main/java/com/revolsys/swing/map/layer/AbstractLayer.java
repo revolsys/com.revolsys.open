@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.border.TitledBorder;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
@@ -239,14 +241,41 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return null;
   }
 
-  protected ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
-    final ValueField panel = new ValueField(this);
-    tabPanel.addTab("General", panel);
+  protected JPanel addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = new BasePanel(new VerticalLayout(5));
+    generalPanel.setScrollableHeightHint(ScrollableSizeHint.FIT);
 
-    final Field nameField = (Field)SwingUtil.addField(panel, this, "name");
+    tabPanel.addTab("General", generalPanel);
+
+    addPropertiesTabGeneralPanelGeneral(generalPanel);
+    final ValueField sourcePanel = addPropertiesTabGeneralPanelSource(generalPanel);
+    if (sourcePanel.getComponentCount() == 0) {
+      generalPanel.remove(sourcePanel);
+    }
+    return generalPanel;
+  }
+
+  protected ValueField addPropertiesTabGeneralPanelGeneral(
+    final BasePanel parent) {
+    final ValueField panel = new ValueField(this);
+    SwingUtil.setTitledBorder(panel, "General");
+    final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
     nameField.addPropertyChangeListener("name", this.beanPropertyListener);
 
+    final Field typeField = (Field)SwingUtil.addObjectField(panel, this, "type");
+    typeField.setEnabled(false);
+
     GroupLayoutUtil.makeColumns(panel, 2, true);
+
+    parent.add(panel);
+    return panel;
+  }
+
+  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = new ValueField(this);
+    SwingUtil.setTitledBorder(panel, "Source");
+
+    parent.add(panel);
     return panel;
   }
 
@@ -715,10 +744,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setName(final String name) {
-    if (!EqualsRegistry.equal(name, this.name)) {
-      firePropertyChange("name", this.name, name);
-      this.name = name;
-    }
+    final Object oldValue = this.name;
+    this.name = name;
+    firePropertyChange("name", this.name, oldValue);
   }
 
   @Override
@@ -898,7 +926,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void zoomToLayer() {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
-    final BoundingBox boundingBox = getBoundingBox().convert(geometryFactory)
+    final BoundingBox layerBoundingBox = getBoundingBox();
+    final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
       .expandPercent(0.1)
       .clipToCoordinateSystem();
 

@@ -76,7 +76,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
     final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
-    this.attributeName = model.getAttributeName(rowIndex, columnIndex);
+    this.attributeName = model.getFieldName(rowIndex, columnIndex);
     final DataObjectMetaData metaData = model.getMetaData();
     dataType = metaData.getAttributeType(attributeName);
     this.editorComponent = (JComponent)SwingUtil.createField(metaData,

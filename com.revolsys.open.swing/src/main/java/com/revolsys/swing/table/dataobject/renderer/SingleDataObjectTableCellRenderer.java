@@ -45,15 +45,15 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
     final DataObjectMetaData metaData = model.getMetaData();
 
     JComponent component = null;
-    final String name = model.getAttributeName(rowIndex, columnIndex);
+    final String name = model.getFieldName(rowIndex, columnIndex);
     final boolean required = metaData.isAttributeRequired(name);
-    final String title = metaData.getAttributeTitle(name);
     if (columnIndex == 0) {
       this.valueComponent.setText(String.valueOf(rowIndex));
       valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
       valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       component = this.valueComponent;
     } else if (columnIndex == 1) {
+      final String title = model.getFieldTitle(name);
       this.labelComponent.setText(title);
       component = this.labelComponent;
     } else {

@@ -35,7 +35,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final String fieldName = model.getAttributeName(rowIndex);
+      final String fieldName = model.getFieldName(rowIndex);
       if (fieldName != null) {
         if (form.isFieldValid(fieldName)) {
           if (form.hasOriginalValue(fieldName)) {

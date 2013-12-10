@@ -2,6 +2,7 @@ package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -191,6 +192,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   protected CapiFileGdbDataObjectStore(final File file) {
     this.fileName = file.getAbsolutePath();
+    setConnectionProperties(Collections.singletonMap("url",
+      FileUtil.toUrl(file).toString()));
   }
 
   public void addChildSchema(final String path) {

@@ -44,7 +44,7 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     setAttributesOffset(1);
     this.mergedObject = mergedObject;
     setEditable(true);
-    setReadOnlyAttributeNames(layer.getUserReadOnlyFieldNames());
+    setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
   }
 
   @Override

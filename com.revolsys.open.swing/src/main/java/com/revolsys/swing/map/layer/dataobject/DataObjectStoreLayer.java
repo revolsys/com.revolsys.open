@@ -36,6 +36,10 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
@@ -133,6 +137,41 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (cacheObject != null) {
       super.addModifiedRecord(cacheObject);
     }
+  }
+
+  @Override
+  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+    final Map<String, String> connectionProperties = getProperty("connection");
+    String connectionName = null;
+    String url = null;
+    String username = null;
+    if (isExists()) {
+      final DataObjectStore dataStore = getDataStore();
+      url = dataStore.getUrl();
+      username = dataStore.getUsername();
+    }
+    if (connectionProperties != null) {
+      connectionName = connectionProperties.get("name");
+      if (!isExists()) {
+        url = connectionProperties.get("url");
+        username = connectionProperties.get("username");
+
+      }
+    }
+    if (connectionName != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store Name", connectionName);
+    }
+    if (url != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store URL", url);
+    }
+    if (username != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store Username", username);
+    }
+    SwingUtil.addReadOnlyTextField(panel, "Type Path", typePath);
+
+    GroupLayoutUtil.makeColumns(panel, 2, true);
+    return panel;
   }
 
   @Override

@@ -484,6 +484,14 @@ public abstract class AbstractDataObjectStore extends
     return types;
   }
 
+  public String getUrl() {
+    return (String)connectionProperties.get("url");
+  }
+
+  public String getUsername() {
+    return (String)connectionProperties.get("username");
+  }
+
   @Override
   public Writer<DataObject> getWriter() {
     return createWriter();

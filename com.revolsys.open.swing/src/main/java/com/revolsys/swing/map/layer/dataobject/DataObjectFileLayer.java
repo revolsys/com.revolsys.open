@@ -12,12 +12,19 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,6 +44,31 @@ public class DataObjectFileLayer extends DataObjectListLayer {
   public DataObjectFileLayer(final Map<String, ? extends Object> properties) {
     super(properties);
     setType("dataObjectFile");
+  }
+
+  @Override
+  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+
+    final String url = getUrl();
+    if (url.startsWith("file:")) {
+      final String fileName = url.replaceFirst("file:(//)?", "");
+      SwingUtil.addReadOnlyTextField(panel, "File", fileName);
+    } else {
+      SwingUtil.addReadOnlyTextField(panel, "URL", url);
+    }
+    final String fileNameExtension = FileUtil.getFileNameExtension(url);
+    if (StringUtils.hasText(fileNameExtension)) {
+      SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
+      final DataObjectReaderFactory factory = IoFactoryRegistry.getInstance()
+        .getFactoryByFileExtension(DataObjectReaderFactory.class,
+          fileNameExtension);
+      if (factory != null) {
+        SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
+      }
+    }
+    GroupLayoutUtil.makeColumns(panel, 2, true);
+    return panel;
   }
 
   @Override

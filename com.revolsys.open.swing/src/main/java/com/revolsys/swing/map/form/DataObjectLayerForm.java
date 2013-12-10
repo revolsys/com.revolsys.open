@@ -749,11 +749,6 @@ public class DataObjectLayerForm extends JPanel implements
     return this.fieldTabIndex;
   }
 
-  public String getFieldTitle(final String fieldName) {
-    final DataObjectMetaData metaData = getMetaData();
-    return metaData.getAttributeTitle(fieldName);
-  }
-
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
     final Object value = this.fieldValues.get(name);
@@ -783,7 +778,8 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected JLabel getLabel(final String fieldName) {
-    String title = this.metaData.getAttributeTitle(fieldName);
+    AbstractDataObjectLayer layer = getLayer();
+    String title = layer.getFieldTitle(fieldName);
     title = title.replaceAll(" Code$", "");
     title = title.replaceAll(" Ind$", "");
     final JLabel label = new JLabel(title);
@@ -1307,7 +1303,7 @@ public class DataObjectLayerForm extends JPanel implements
       }
     }
     if (this.allAttributes != null) {
-      this.allAttributes.setReadOnlyAttributeNames(this.readOnlyFieldNames);
+      this.allAttributes.setReadOnlyFieldNames(this.readOnlyFieldNames);
     }
   }
 

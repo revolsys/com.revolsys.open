@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import org.jdesktop.swingx.JXTextArea;
+import javax.swing.JTextArea;
+
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -13,7 +14,7 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 
-public class TextArea extends JXTextArea implements Field, FocusListener {
+public class TextArea extends JTextArea implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
 
   private final String fieldName;
@@ -31,9 +32,7 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   public TextArea(final int rows, final int columns) {
-    this("text");
-    setRows(rows);
-    setColumns(columns);
+    this("text", rows, columns);
   }
 
   public TextArea(final String fieldName) {
@@ -41,12 +40,17 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   public TextArea(final String fieldName, final int rows, final int columns) {
-    this(fieldName, "");
-    setRows(rows);
-    setColumns(columns);
+    this(fieldName, "", rows, columns);
   }
 
   public TextArea(final String fieldName, final Object fieldValue) {
+    this(fieldName, fieldValue, 0, 0);
+  }
+
+  public TextArea(final String fieldName, final Object fieldValue,
+    final int rows, final int columns) {
+    setRows(rows);
+    setColumns(columns);
     this.fieldName = fieldName;
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setDocument(new PropertyChangeDocument(this));
@@ -54,6 +58,8 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
     addFocusListener(this);
     PopupMenu.getPopupMenuFactory(this);
     this.undoManager.addKeyMap(this);
+    setRows(rows);
+    setColumns(columns);
   }
 
   @Override
@@ -110,7 +116,8 @@ public class TextArea extends JXTextArea implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);

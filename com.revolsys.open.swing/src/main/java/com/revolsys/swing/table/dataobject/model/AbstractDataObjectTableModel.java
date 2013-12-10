@@ -28,7 +28,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
 
   private DataObjectMetaData metaData;
 
-  private Set<String> readOnlyAttributeNames = new HashSet<String>();
+  private Set<String> readOnlyFieldNames = new HashSet<String>();
 
   private boolean editable;
 
@@ -48,9 +48,9 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     this.propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
   }
 
-  public void addReadOnlyAttributeNames(final String... readOnlyAttributeNames) {
-    if (readOnlyAttributeNames != null) {
-      this.readOnlyAttributeNames.addAll(Arrays.asList(readOnlyAttributeNames));
+  public void addReadOnlyFieldNames(final String... readOnlyFieldNames) {
+    if (readOnlyFieldNames != null) {
+      this.readOnlyFieldNames.addAll(Arrays.asList(readOnlyFieldNames));
     }
   }
 
@@ -74,12 +74,12 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
   }
 
-  public String getAttributeName(final int attributeIndex) {
+  public String getFieldName(final int attributeIndex) {
     final DataObjectMetaData metaData = getMetaData();
     return metaData.getAttributeName(attributeIndex);
   }
 
-  public abstract String getAttributeName(int rowIndex, int columnIndex);
+  public abstract String getFieldName(int rowIndex, int columnIndex);
 
   public DataObjectMetaData getMetaData() {
     return metaData;
@@ -90,8 +90,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     return propertyChangeSupport;
   }
 
-  public Set<String> getReadOnlyAttributeNames() {
-    return this.readOnlyAttributeNames;
+  public Set<String> getReadOnlyFieldNames() {
+    return this.readOnlyFieldNames;
   }
 
   public boolean isEditable() {
@@ -99,7 +99,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   }
 
   public boolean isReadOnly(final String attributeName) {
-    return this.readOnlyAttributeNames.contains(attributeName);
+    return this.readOnlyFieldNames.contains(attributeName);
   }
 
   public abstract boolean isSelected(boolean selected, int rowIndex,
@@ -121,12 +121,11 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     }
   }
 
-  public void setReadOnlyAttributeNames(
-    final Collection<String> readOnlyAttributeNames) {
-    if (readOnlyAttributeNames == null) {
-      this.readOnlyAttributeNames = new HashSet<String>();
+  public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
+    if (readOnlyFieldNames == null) {
+      this.readOnlyFieldNames = new HashSet<String>();
     } else {
-      this.readOnlyAttributeNames = new HashSet<String>(readOnlyAttributeNames);
+      this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
     }
   }
 
@@ -134,10 +133,10 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
     final Object objectValue) {
     String text;
     final DataObjectMetaData metaData = getMetaData();
-    final String idAttributeName = metaData.getIdAttributeName();
-    final String name = getAttributeName(attributeIndex);
+    final String idFieldName = metaData.getIdAttributeName();
+    final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
-      if (name.equals(idAttributeName)) {
+      if (name.equals(idFieldName)) {
         return "NEW";
       } else {
         text = "-";
@@ -148,7 +147,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
         return geometry.getGeometryType();
       }
       CodeTable codeTable = null;
-      if (!name.equals(idAttributeName)) {
+      if (!name.equals(idFieldName)) {
         codeTable = metaData.getCodeTableByColumn(name);
       }
       if (codeTable == null) {
@@ -180,12 +179,12 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
       }
     }
     final DataObjectMetaData metaData = getMetaData();
-    final String name = getAttributeName(attributeIndex);
+    final String name = getFieldName(attributeIndex);
     final CodeTable codeTable = metaData.getCodeTableByColumn(name);
     if (codeTable == null) {
-      final Class<?> attributeClass = metaData.getAttributeClass(name);
-      final Object objectValue = StringConverterRegistry.toObject(
-        attributeClass, displayValue);
+      final Class<?> fieldClass = metaData.getAttributeClass(name);
+      final Object objectValue = StringConverterRegistry.toObject(fieldClass,
+        displayValue);
       return objectValue;
     } else {
       final Object objectValue = codeTable.getId(displayValue);

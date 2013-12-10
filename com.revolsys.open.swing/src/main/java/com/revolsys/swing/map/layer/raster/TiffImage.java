@@ -15,10 +15,15 @@ import org.libtiff.jai.operator.XTIFFDescriptor;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.util.ExceptionUtil;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
 public class TiffImage extends GeoReferencedImage {
+  private static final int TAG_X_RESOLUTION = 282;
+
+  private static final int TAG_Y_RESOLUTION = 283;
+
   static {
     try {
       final OperationRegistry reg = JAI.getDefaultInstance()
@@ -98,6 +103,13 @@ public class TiffImage extends GeoReferencedImage {
   }
 
   private boolean loadGeoTiffMetaData(final XTIFFDirectory directory) {
+    try {
+      final int xResolution = (int)directory.getFieldAsDouble(TAG_X_RESOLUTION);
+      final int yResolution = (int)directory.getFieldAsDouble(TAG_Y_RESOLUTION);
+      setDpi(xResolution, yResolution);
+    } catch (final Throwable e) {
+      ExceptionUtil.log(getClass(), e);
+    }
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);
     Short coordinateSystemId = (Short)geoKeys.get(PROJECTED_CS_TYPE_GEO_KEY);
     if (coordinateSystemId == null) {
@@ -160,7 +172,6 @@ public class TiffImage extends GeoReferencedImage {
 
   @Override
   protected void loadMetaDataFromImage() {
-    final Resource resource = getImageResource();
     final PlanarImage image = getJaiImage();
     final Object tiffDirectory = image.getProperty("tiff.directory");
     if (tiffDirectory == null) {

@@ -10,16 +10,16 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter
   implements ListCellRenderer {
-  private final DataObjectMetaData metaData;
+  private final AbstractDataObjectLayer layer;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
-  public AttributeTitleStringConveter(final DataObjectMetaData metaData) {
-    this.metaData = metaData;
+  public AttributeTitleStringConveter(final AbstractDataObjectLayer layer) {
+    this.layer = layer;
   }
 
   @Override
@@ -35,15 +35,10 @@ public class AttributeTitleStringConveter extends ObjectToStringConverter
   public String getPreferredStringForItem(final Object item) {
     if (item instanceof Attribute) {
       final Attribute attribute = (Attribute)item;
-      return attribute.getTitle();
+      return layer.getFieldTitle(attribute.getName());
     } else if (item instanceof String) {
       final String attributeName = (String)item;
-      final Attribute attribute = this.metaData.getAttribute(attributeName);
-      if (attribute == null) {
-        return attributeName;
-      } else {
-        return attribute.getTitle();
-      }
+      return layer.getFieldTitle(attributeName);
     }
     return StringConverterRegistry.toString(item);
   }

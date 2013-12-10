@@ -218,12 +218,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         paintSelected(graphics2d, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-        for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
-          if (record != null && dataObjectLayer.isVisible(record)
-            && !dataObjectLayer.isHighlighted(record)) {
-            final Geometry geometry = record.getGeometryValue();
-            SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
-              graphics2d, geometry);
+        if (dataObjectLayer.isSelectable()) {
+          for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
+            if (record != null && dataObjectLayer.isVisible(record)
+              && !dataObjectLayer.isHighlighted(record)) {
+              final Geometry geometry = record.getGeometryValue();
+              SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
+                graphics2d, geometry);
+            }
           }
         }
       }
@@ -245,32 +247,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       repaint();
     } else if ("hasSelectedRecords".equals(propertyName)) {
       clearUndoHistory();
-    }
-  }
-
-  public void unSelectRecords(final BoundingBox boundingBox) {
-    final LayerGroup project = getProject();
-    unSelectRecords(project, boundingBox);
-    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
-    overlay.redraw();
-  }
-
-  private void unSelectRecords(final LayerGroup group,
-    final BoundingBox boundingBox) {
-
-    final double scale = getViewport().getScale();
-    final List<Layer> layers = group.getLayers();
-    Collections.reverse(layers);
-    for (final Layer layer : layers) {
-      if (layer instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)layer;
-        unSelectRecords(childGroup, boundingBox);
-      } else if (layer instanceof AbstractDataObjectLayer) {
-        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-        if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.unSelectRecords(boundingBox);
-        }
-      }
     }
   }
 
@@ -358,6 +334,32 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           dataObjectLayer.setSelectedRecords(boundingBox);
         } else {
           dataObjectLayer.clearSelectedRecords();
+        }
+      }
+    }
+  }
+
+  public void unSelectRecords(final BoundingBox boundingBox) {
+    final LayerGroup project = getProject();
+    unSelectRecords(project, boundingBox);
+    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+    overlay.redraw();
+  }
+
+  private void unSelectRecords(final LayerGroup group,
+    final BoundingBox boundingBox) {
+
+    final double scale = getViewport().getScale();
+    final List<Layer> layers = group.getLayers();
+    Collections.reverse(layers);
+    for (final Layer layer : layers) {
+      if (layer instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)layer;
+        unSelectRecords(childGroup, boundingBox);
+      } else if (layer instanceof AbstractDataObjectLayer) {
+        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+        if (dataObjectLayer.isSelectable(scale)) {
+          dataObjectLayer.unSelectRecords(boundingBox);
         }
       }
     }

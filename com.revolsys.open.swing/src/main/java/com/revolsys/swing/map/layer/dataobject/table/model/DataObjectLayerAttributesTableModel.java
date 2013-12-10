@@ -43,6 +43,11 @@ public class DataObjectLayerAttributesTableModel extends
     }
   }
 
+  @Override
+  public String getFieldTitle(final String fieldName) {
+    return layer.getFieldTitle(fieldName);
+  }
+
   public LayerDataObject getObject() {
     return this.object;
   }
@@ -61,7 +66,7 @@ public class DataObjectLayerAttributesTableModel extends
     if (this.object == null) {
       return null;
     } else if (columnIndex == 3) {
-      final String attributeName = getAttributeName(rowIndex);
+      final String attributeName = getFieldName(rowIndex);
       return this.object.getOriginalValue(attributeName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
@@ -73,7 +78,7 @@ public class DataObjectLayerAttributesTableModel extends
     if (columnIndex == 2) {
       if (this.form.isEditable()) {
         final String idAttributeName = getMetaData().getIdAttributeName();
-        final String attributeName = getAttributeName(rowIndex);
+        final String attributeName = getFieldName(rowIndex);
         if (attributeName.equals(idAttributeName)) {
           return false;
         } else {
@@ -88,7 +93,7 @@ public class DataObjectLayerAttributesTableModel extends
   }
 
   public boolean isModified(final int rowIndex) {
-    final String attributeName = getAttributeName(rowIndex);
+    final String attributeName = getFieldName(rowIndex);
     final Object originalValue = this.object.getOriginalValue(attributeName);
     final Object value = this.object.getValue(attributeName);
     return !EqualsRegistry.equal(originalValue, value);

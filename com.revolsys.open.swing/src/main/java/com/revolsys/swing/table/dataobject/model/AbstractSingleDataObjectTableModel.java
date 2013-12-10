@@ -5,7 +5,6 @@ import javax.swing.JTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
@@ -19,7 +18,8 @@ public abstract class AbstractSingleDataObjectTableModel extends
     "#", "Name", "Value"
   };
 
-  public static BaseJxTable createTable(final AbstractDataObjectTableModel model) {
+  public static BaseJxTable createTable(
+    final AbstractSingleDataObjectTableModel model) {
     final BaseJxTable table = new BaseJxTable(model);
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -32,9 +32,9 @@ public abstract class AbstractSingleDataObjectTableModel extends
     final DataObjectMetaData metaData = model.getMetaData();
 
     int maxTitleWidth = 100;
-    for (final Attribute attribute : metaData.getAttributes()) {
-      final String title = attribute.getTitle();
-      final int titleWidth = title.length() * 7;
+    for (final String fieldName : metaData.getAttributeNames()) {
+      final String title = model.getFieldTitle(fieldName);
+      final int titleWidth = Math.max(title.length(), fieldName.length()) * 8;
       if (titleWidth > maxTitleWidth) {
         maxTitleWidth = titleWidth;
       }
@@ -77,11 +77,6 @@ public abstract class AbstractSingleDataObjectTableModel extends
   }
 
   @Override
-  public String getAttributeName(final int row, final int column) {
-    return getAttributeName(row);
-  }
-
-  @Override
   public int getColumnCount() {
     return 3;
   }
@@ -89,6 +84,16 @@ public abstract class AbstractSingleDataObjectTableModel extends
   @Override
   public String getColumnName(final int column) {
     return COLUMN_NAMES[column];
+  }
+
+  @Override
+  public String getFieldName(final int row, final int column) {
+    return getFieldName(row);
+  }
+
+  public String getFieldTitle(final String fieldName) {
+    final DataObjectMetaData metaData = getMetaData();
+    return metaData.getAttributeTitle(fieldName);
   }
 
   public abstract Object getObjectValue(final int attributeIndex);
@@ -106,9 +111,8 @@ public abstract class AbstractSingleDataObjectTableModel extends
       case 0:
         return rowIndex;
       case 1:
-        final String attributeName = getAttributeName(rowIndex);
-        final DataObjectMetaData metaData = getMetaData();
-        final String title = metaData.getAttributeTitle(attributeName);
+        final String fieldName = getFieldName(rowIndex);
+        final String title = getFieldTitle(fieldName);
         return title;
       case 2:
         return getObjectValue(rowIndex);
@@ -125,7 +129,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
         if (rowIndex == metaData.getIdAttributeIndex()) {
           return false;
         } else {
-          final String attributeName = getAttributeName(rowIndex);
+          final String attributeName = getFieldName(rowIndex);
           return !isReadOnly(attributeName);
         }
       } else {
@@ -162,7 +166,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
     if (isCellEditable(rowIndex, columnIndex)) {
 
       final Object oldValue = setDisplayValue(rowIndex, value);
-      final String propertyName = getAttributeName(rowIndex);
+      final String propertyName = getFieldName(rowIndex);
       firePropertyChange(propertyName, oldValue, value);
     }
   }

@@ -14,8 +14,6 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.swing.component.TabbedValuePanel;
-import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
@@ -45,11 +43,6 @@ public class BingLayer extends AbstractTiledImageLayer {
     super(properties);
     setType("bing");
     setVisible(true);
-  }
-
-  @Override
-  public ValueField addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
-    return super.addPropertiesTabGeneral(tabPanel);
   }
 
   @Override

@@ -99,7 +99,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
     final int viewIndex = column.getModelIndex();
     final int attributesOffset = model.getAttributesOffset();
     if (viewIndex < attributesOffset) {
-      final String attributeName = model.getAttributeName(viewIndex
+      final String attributeName = model.getFieldName(viewIndex
         - attributesOffset);
       final Attribute attribute = metaData.getAttribute(attributeName);
       if (attribute != null) {

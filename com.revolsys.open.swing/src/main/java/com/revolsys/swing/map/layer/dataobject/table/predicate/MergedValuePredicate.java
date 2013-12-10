@@ -40,7 +40,7 @@ public class MergedValuePredicate implements HighlightPredicate {
       if (object == mergedObject) {
         return false;
       } else {
-        final String attributeName = this.model.getAttributeName(columnIndex);
+        final String attributeName = this.model.getFieldName(columnIndex);
         final Object value = object.getValue(attributeName);
         final Object mergedValue = mergedObject.getValue(attributeName);
         if (value instanceof Geometry) {

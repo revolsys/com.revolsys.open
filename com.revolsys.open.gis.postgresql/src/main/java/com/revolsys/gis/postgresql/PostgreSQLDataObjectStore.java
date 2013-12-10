@@ -72,7 +72,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
     setIteratorFactory(ITERATOR_FACTORY);
-
+    setConnectionProperties(connectionProperties);
   }
 
   @Override

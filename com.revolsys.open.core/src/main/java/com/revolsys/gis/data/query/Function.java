@@ -2,6 +2,7 @@ package com.revolsys.gis.data.query;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
@@ -28,6 +29,11 @@ public class Function extends AbstractMultiCondition {
 
   public Function(final String name, final QueryValue... parameters) {
     this(name, Arrays.asList(parameters));
+  }
+
+  @Override
+  public boolean accept(final Map<String, Object> record) {
+    return true;
   }
 
   @Override
