@@ -463,7 +463,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Script script = new Script();
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
-      + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}";
+      + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
+      + ",\"fnInitComplete\": function() {this.fnAdjustColumnSizing(true);}";
     // if (serverSide) {
     // jsonMap +=
     // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";

@@ -45,6 +45,8 @@ public class NamedChannelBundle<T> {
   /** The monitor writes must synchronize on */
   private final Object writeMonitor = new Object();
 
+  private int readerNotifyCount = 0;
+
   public NamedChannelBundle() {
   }
 
@@ -129,6 +131,13 @@ public class NamedChannelBundle<T> {
     return closed;
   }
 
+  public void notifyReaders() {
+    synchronized (monitor) {
+      readerNotifyCount++;
+      monitor.notifyAll();
+    }
+  }
+
   /**
    * Reads an Object from the Channel. This method also ensures only one of the
    * readers can actually be reading at any time. All other readers are blocked
@@ -160,6 +169,7 @@ public class NamedChannelBundle<T> {
   public T read(final long timeout, final Collection<String> names) {
     synchronized (readMonitor) {
       synchronized (monitor) {
+        final int readerNotifyCount = this.readerNotifyCount;
         try {
           long maxTime = 0;
           if (timeout > 0) {
@@ -170,7 +180,7 @@ public class NamedChannelBundle<T> {
           }
           Queue<T> queue = getNextValueQueue(names);
           if (timeout == 0) {
-            while (queue == null) {
+            while (queue == null && readerNotifyCount == this.readerNotifyCount) {
               ThreadUtil.pause(monitor);
               if (isClosed()) {
                 throw new ClosedException();
@@ -180,7 +190,8 @@ public class NamedChannelBundle<T> {
             }
           } else if (timeout > 0) {
             long waitTime = maxTime - System.currentTimeMillis();
-            while (queue == null && waitTime > 0) {
+            while (queue == null && waitTime > 0
+              && readerNotifyCount == this.readerNotifyCount) {
               ThreadUtil.pause(monitor, waitTime);
               if (isClosed()) {
                 throw new ClosedException();

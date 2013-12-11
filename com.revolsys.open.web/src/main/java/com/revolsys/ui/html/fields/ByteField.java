@@ -10,13 +10,13 @@ public class ByteField extends NumberField {
   }
 
   public ByteField(final String name, final boolean required,
-    Object defaultValue) {
-    super(name, 3, 3, defaultValue, required, Byte.MIN_VALUE, Byte.MAX_VALUE);
+    final Object defaultValue) {
+    super(name, 4, 4, defaultValue, required, Byte.MIN_VALUE, Byte.MAX_VALUE);
     setCssClass("byte");
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return Byte.valueOf(value);
   }
 

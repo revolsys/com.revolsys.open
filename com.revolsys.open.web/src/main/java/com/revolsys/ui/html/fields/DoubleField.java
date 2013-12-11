@@ -11,7 +11,7 @@ public class DoubleField extends NumberField {
 
   public DoubleField(final String name, final boolean required,
     final Object defaultValue) {
-    super(name, 23, 19, defaultValue, required, Double.MIN_VALUE,
+    super(name, 23, 20, defaultValue, required, Double.MIN_VALUE,
       Double.MAX_VALUE);
   }
 

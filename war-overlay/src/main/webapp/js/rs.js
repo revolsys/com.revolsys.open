@@ -239,17 +239,23 @@ $(document).ready(
       create : function(event, ui) {
         var table = $.fn.dataTable.fnTables(true);
         if ( table.length > 0 ) {
-          $(table).dataTable().fnAdjustColumnSizing(false);
+          $(table).dataTable().fnAdjustColumnSizing(true);
         }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
       activate : function(event, ui) {
         var table = $.fn.dataTable.fnTables(true);
         if ( table.length > 0 ) {
-          $(table).dataTable().fnAdjustColumnSizing(false);
+          $(table).dataTable().fnAdjustColumnSizing(true);
         }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
+      load: function (event, ui) {
+        var table = $.fn.dataTable.fnTables(true);
+        if (table.length > 0) {
+          $(table).dataTable().fnAdjustColumnSizing();
+        }
+      }
       beforeActivate: function (event, ui) {
         window.location.hash = ui.newPanel.selector;
       }

@@ -29,6 +29,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
@@ -246,9 +247,13 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private BigDecimal getNumber(final int startIndex, final int len) {
     BigDecimal number = null;
-    final String numberString = getString(startIndex, len);
+    final String numberString = getString(startIndex, len).replaceAll("\\*", "");
     if (numberString.trim().length() != 0) {
-      number = new BigDecimal(numberString.trim());
+      try {
+        number = new BigDecimal(numberString.trim());
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Not a valid number: " + numberString, e);
+      }
     }
     return number;
   }
