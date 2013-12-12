@@ -464,7 +464,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
-      + ",\"fnInitComplete\": function() {this.fnAdjustColumnSizing(true);}";
+      + ",\"fnInitComplete\": function() {this.fnAdjustColumnSizing(false);}";
     // if (serverSide) {
     // jsonMap +=
     // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
@@ -552,6 +552,21 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (isDataTableCallback(request)) {
       try {
         final Collection<? extends Object> rows = rowsCallable.call();
+        return createDataTableMap(request, rows, pageName);
+      } catch (final Exception e) {
+        throw new RuntimeException("Unable to get rows", e);
+      }
+    } else {
+      return redirectToTab(parentBuilder, parentPageName, pageName);
+    }
+  }
+
+  public Object createDataTableHandlerOrRedirect(
+    final HttpServletRequest request, final HttpServletResponse response,
+    final String pageName, final Collection<? extends Object> rows,
+    final Object parentBuilder, final String parentPageName) {
+    if (isDataTableCallback(request)) {
+      try {
         return createDataTableMap(request, rows, pageName);
       } catch (final Exception e) {
         throw new RuntimeException("Unable to get rows", e);
