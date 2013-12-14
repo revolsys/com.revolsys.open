@@ -491,6 +491,14 @@ public class SwingUtil {
     }
   }
 
+  public static boolean isEventDispatchThread() {
+    try {
+      return SwingUtilities.isEventDispatchThread();
+    } catch (final NullPointerException e) {
+      return false;
+    }
+  }
+
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)

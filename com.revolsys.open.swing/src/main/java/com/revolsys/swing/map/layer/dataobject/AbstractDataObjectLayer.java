@@ -386,9 +386,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final boolean eventsEnabled = setEventsEnabled(false);
       boolean cancelled = true;
       try {
-        cancelled &= internalCancelChanges(getNewRecords());
-        cancelled &= internalCancelChanges(getDeletedRecords());
-        cancelled &= internalCancelChanges(getModifiedRecords());
+        cancelled &= internalCancelChanges(newRecords);
+        cancelled &= internalCancelChanges(deletedRecords);
+        cancelled &= internalCancelChanges(modifiedRecords);
       } finally {
         setEventsEnabled(eventsEnabled);
         fireRecordsChanged();
@@ -828,7 +828,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public String getFieldTitle(final String fieldName) {
     if (isUseFieldTitles()) {
-      DataObjectMetaData metaData = getMetaData();
+      final DataObjectMetaData metaData = getMetaData();
       return metaData.getAttributeTitle(fieldName);
     } else {
       return fieldName;
@@ -1602,10 +1602,32 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  protected void removeHighlightedRecord(final LayerDataObject record) {
+    synchronized (this.highlightedRecords) {
+      for (final Iterator<LayerDataObject> iterator = this.highlightedRecords.iterator(); iterator.hasNext();) {
+        final LayerDataObject highlightedRecord = iterator.next();
+        if (highlightedRecord.isSame(record)) {
+          iterator.remove();
+        }
+      }
+    }
+  }
+
   protected void removeSelectedRecord(final LayerDataObject record) {
     synchronized (this.selectedRecords) {
-      this.selectedRecords.remove(record);
+      for (final Iterator<LayerDataObject> iterator = selectedRecords.iterator(); iterator.hasNext();) {
+        final LayerDataObject selectedRecord = iterator.next();
+        if (selectedRecord.isSame(record)) {
+          iterator.remove();
+        }
+      }
     }
+    removeHighlightedRecord(record);
+  }
+
+  public void replaceValues(final LayerDataObject record,
+    final Map<String, Object> values) {
+    record.setValues(values);
   }
 
   public void revertChanges(final LayerDataObject record) {
@@ -2118,7 +2140,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void unHighlightRecords(
     final Collection<? extends LayerDataObject> records) {
     synchronized (this.highlightedRecords) {
-      this.highlightedRecords.removeAll(records);
+      for (final LayerDataObject record : records) {
+        removeHighlightedRecord(record);
+      }
     }
     fireHighlighted();
   }
@@ -2127,8 +2151,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (isSelectable()) {
       final List<LayerDataObject> records = query(boundingBox);
       for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerDataObject layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject) || internalIsDeleted(layerDataObject)) {
+        final LayerDataObject record = iterator.next();
+        if (!isVisible(record) || internalIsDeleted(record)) {
           iterator.remove();
         }
       }

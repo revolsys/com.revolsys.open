@@ -27,13 +27,21 @@ public abstract class AbstractRunnable implements Runnable {
     return activeWindow;
   }
 
+  private static boolean isEventDispatchThread() {
+    try {
+      return SwingUtilities.isEventDispatchThread();
+    } catch (final NullPointerException e) {
+      return false;
+    }
+  }
+
   protected void doRun() {
 
   }
 
   @Override
   public final void run() {
-    if (SwingUtilities.isEventDispatchThread()) {
+    if (isEventDispatchThread()) {
       final Window activeWindow = getActiveWindow();
       if (activeWindow == null) {
         doRun();

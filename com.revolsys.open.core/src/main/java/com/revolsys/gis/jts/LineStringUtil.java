@@ -26,6 +26,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -907,7 +908,7 @@ public final class LineStringUtil {
     }
   }
 
-  public static boolean isFirstPoint(final LineString line,
+  public static boolean isFromPoint(final LineString line,
     final Coordinates point) {
     final Coordinates fromPoint = getFromCoordinates(line);
     return fromPoint.equals(point);
@@ -1120,16 +1121,19 @@ public final class LineStringUtil {
 
   public static List<LineString> split(final LineString line,
     final Coordinates point) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Map<String, Number> result = findClosestSegmentAndCoordinate(line,
       point);
-    final int segmentIndex = result.get("segmentIndex").intValue();
+    final int segmentIndex = CollectionUtil.getInteger(result, "segmentIndex");
     if (segmentIndex != -1) {
       List<LineString> lines;
-      final int coordinateIndex = result.get("coordinateIndex").intValue();
-      final int coordinateDistance = result.get("coordinateDistance")
-        .intValue();
-      final int segmentDistance = result.get("segmentDistance").intValue();
+      final int coordinateIndex = CollectionUtil.getInteger(result,
+        "coordinateIndex");
+      final double coordinateDistance = geometryFactory.makeXyPrecise(CollectionUtil.getDouble(
+        result, "coordinateDistance"));
+      final double segmentDistance = geometryFactory.makeXyPrecise(CollectionUtil.getDouble(
+        result, "segmentDistance"));
       if (coordinateIndex == 0) {
         if (coordinateDistance == 0) {
           return Collections.singletonList(line);

@@ -992,7 +992,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final Coordinates point, final DataObject object) {
     final LineString newLine = object.getGeometryValue();
     if (newLine != null) {
-      final boolean firstPoint = LineStringUtil.isFirstPoint(newLine, point);
+      final boolean firstPoint = LineStringUtil.isFromPoint(newLine, point);
       final boolean toPoint = LineStringUtil.isToPoint(newLine, point);
       if (firstPoint) {
         if (!toPoint) {

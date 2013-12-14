@@ -187,9 +187,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         paintHighlighted(graphics2d, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-        for (final LayerDataObject object : dataObjectLayer.getHighlightedRecords()) {
-          if (object != null && dataObjectLayer.isVisible(object)) {
-            final Geometry geometry = object.getGeometryValue();
+        for (final LayerDataObject record : dataObjectLayer.getHighlightedRecords()) {
+          if (record != null && dataObjectLayer.isVisible(record)) {
+            final Geometry geometry = record.getGeometryValue();
             HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
               graphics2d, geometry);
           }

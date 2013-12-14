@@ -3,19 +3,19 @@ package com.revolsys.swing.undo;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.data.equals.MapEquals;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 
 public class SetRecordValuesUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  private final DataObject record;
+  private final LayerDataObject record;
 
   private final Map<String, Object> originalValues = new HashMap<String, Object>();
 
   private final Map<String, Object> newValues = new HashMap<String, Object>();
 
-  public SetRecordValuesUndo(final DataObject record,
+  public SetRecordValuesUndo(final LayerDataObject record,
     final Map<String, Object> newValues) {
     this.record = record;
     if (record != null) {
@@ -45,14 +45,14 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   protected void doRedo() {
     if (record != null) {
-      record.setValues(newValues);
+      record.getLayer().replaceValues(record, newValues);
     }
   }
 
   @Override
   protected void doUndo() {
     if (record != null) {
-      record.setValues(originalValues);
+      record.getLayer().replaceValues(record, originalValues);
     }
   }
 
