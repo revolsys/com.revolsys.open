@@ -1,5 +1,6 @@
 package com.revolsys.swing.table.dataobject.editor;
 
+import java.awt.AWTEventMulticaster;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -25,6 +26,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.listener.Listener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.BaseJxTable;
@@ -49,8 +51,16 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   private DataType dataType;
 
+  private MouseListener mouseListener;
+
   public DataObjectTableCellEditor(final BaseJxTable table) {
     this.table = table;
+  }
+
+  public synchronized void addMouseListener(final MouseListener l) {
+    if (l != null) {
+      mouseListener = AWTEventMulticaster.add(mouseListener, l);
+    }
   }
 
   public String getAttributeName() {
@@ -152,22 +162,33 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
+    Listener.mouseEvent(mouseListener, e);
   }
 
   @Override
   public void mouseEntered(final MouseEvent e) {
+    Listener.mouseEvent(mouseListener, e);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
+    Listener.mouseEvent(mouseListener, e);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    Listener.mouseEvent(mouseListener, e);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    Listener.mouseEvent(mouseListener, e);
+  }
+
+  public synchronized void removeMouseListener(final MouseListener l) {
+    if (l != null) {
+      mouseListener = AWTEventMulticaster.remove(mouseListener, l);
+    }
   }
 
   public void setPopupMenu(final MenuFactory menu) {

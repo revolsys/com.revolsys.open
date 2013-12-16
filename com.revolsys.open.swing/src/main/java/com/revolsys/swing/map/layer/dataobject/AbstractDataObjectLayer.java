@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -120,6 +121,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectFactory, AddGeometryCompleteAction {
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  private static AtomicInteger formCount = new AtomicInteger();
 
   public static void addVisibleLayers(
     final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
@@ -1973,6 +1976,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               window.addWindowListener(dataObjectForm);
             }
             SwingUtil.autoAdjustPosition(window);
+            final int offset = Math.abs(formCount.incrementAndGet() % 10);
+            window.setLocation(50 + offset * 20, 100 + offset * 20);
             this.forms.put(record, form);
             this.formWindows.put(record, window);
             window.addWindowListener(new WindowAdapter() {

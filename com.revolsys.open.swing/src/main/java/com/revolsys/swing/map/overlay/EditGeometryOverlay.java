@@ -17,12 +17,14 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
@@ -59,6 +61,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public class EditGeometryOverlay extends AbstractOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -202,6 +206,30 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           this.addGeometryPartIndex = new int[] {
             0, 0
           };
+        }
+      }
+    }
+  }
+
+  private void addRecords(final List<LayerDataObject> results,
+    final LayerGroup group, final PreparedGeometry boundingBox) {
+    final double scale = getViewport().getScale();
+    final List<Layer> layers = group.getLayers();
+    Collections.reverse(layers);
+    for (final Layer layer : layers) {
+      if (layer instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)layer;
+        addRecords(results, childGroup, boundingBox);
+      } else if (layer instanceof AbstractDataObjectLayer) {
+        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+        if (dataObjectLayer.isSelectable(scale)) {
+          final List<LayerDataObject> selectedRecords = dataObjectLayer.getSelectedRecords();
+          for (final LayerDataObject selectedRecord : selectedRecords) {
+            final Geometry geometry = selectedRecord.getGeometryValue();
+            if (boundingBox.intersects(geometry)) {
+              results.add(selectedRecord);
+            }
+          }
         }
       }
     }
@@ -735,6 +763,32 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void mouseClicked(final MouseEvent event) {
     if (modeAddMouseClick(event)) {
+    } else if (SwingUtil.isLeftButtonAndNoModifiers(event)
+      && event.getClickCount() == 2) {
+      final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+      final BoundingBox boundingBox = getHotspotBoundingBox(event);
+      final PreparedGeometry boundary = PreparedGeometryFactory.prepare(boundingBox.toPolygon());
+      addRecords(records, getProject(), boundary);
+
+      final int size = records.size();
+      if (size == 0) {
+
+      } else if (size < 10) {
+        for (final LayerDataObject record : records) {
+          final AbstractDataObjectLayer layer = record.getLayer();
+          layer.showForm(record);
+
+        }
+        event.consume();
+      } else {
+        JOptionPane.showMessageDialog(
+          this,
+          "There are too many "
+            + size
+            + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
+          "Too Many Selected Records", JOptionPane.ERROR_MESSAGE);
+        event.consume();
+      }
     }
   }
 

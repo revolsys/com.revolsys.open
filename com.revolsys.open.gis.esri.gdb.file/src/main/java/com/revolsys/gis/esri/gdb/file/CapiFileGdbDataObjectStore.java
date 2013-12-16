@@ -89,6 +89,7 @@ import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -231,11 +232,13 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private void addTableMetaData(final String schemaName, final String path) {
-    if (geodatabase != null) {
-      final String tableDefinition = geodatabase.getTableDefinition(path);
-      final DataObjectMetaData metaData = getMetaData(schemaName, path,
-        tableDefinition);
-      addMetaData(metaData);
+    synchronized (apiSync) {
+      if (geodatabase != null) {
+        final String tableDefinition = geodatabase.getTableDefinition(path);
+        final DataObjectMetaData metaData = getMetaData(schemaName, path,
+          tableDefinition);
+        addMetaData(metaData);
+      }
     }
   }
 
@@ -570,7 +573,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private DataObjectStoreSchema createSchema(final DETable table) {
     synchronized (apiSync) {
-      final Geodatabase geodatabase = this.geodatabase;
       if (geodatabase == null) {
         return null;
       } else {
@@ -638,7 +640,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   protected DataObjectMetaDataImpl createTable(final DETable deTable) {
     synchronized (apiSync) {
-      final Geodatabase geodatabase = this.geodatabase;
       if (geodatabase == null) {
         return null;
       } else {
@@ -733,7 +734,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       synchronized (API_SYNC) {
         final String fileName = this.fileName;
         try {
-          close();
+          doClose();
         } finally {
           if (new File(fileName).exists()) {
             EsriFileGdb.DeleteGeodatabase(fileName);
@@ -750,9 +751,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           if (geodatabase != null) {
             closeEnumRows();
             closeTables();
-
-            EsriFileGdb.CloseGeodatabase(this.geodatabase);
-            this.geodatabase = null;
+            try {
+              EsriFileGdb.CloseGeodatabase(this.geodatabase);
+            } finally {
+              this.geodatabase = null;
+            }
           }
         }
       }
@@ -864,48 +867,27 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   public int getRowCount(final Query query) {
-    synchronized (apiSync) {
-      String typePath = query.getTypeName();
-      DataObjectMetaData metaData = query.getMetaData();
-      if (metaData == null) {
-        typePath = query.getTypeName();
-        metaData = getMetaData(typePath);
+    if (query == null) {
+      return 0;
+    } else {
+      synchronized (apiSync) {
+        String typePath = query.getTypeName();
+        DataObjectMetaData metaData = query.getMetaData();
         if (metaData == null) {
-          return 0;
-        }
-      } else {
-        typePath = metaData.getPath();
-      }
-      final StringBuffer whereClause = getWhereClause(query);
-      final BoundingBox boundingBox = query.getBoundingBox();
-
-      if (boundingBox == null) {
-        final StringBuffer sql = new StringBuffer();
-        sql.append("SELECT OBJECTID FROM ");
-        sql.append(JdbcUtils.getTableName(typePath));
-        if (whereClause.length() > 0) {
-          sql.append(" WHERE ");
-          sql.append(whereClause);
-        }
-
-        final EnumRows rows = query(sql.toString(), false);
-        try {
-          int count = 0;
-          for (Row row = rows.next(); row != null; row = rows.next()) {
-            count++;
-            row.delete();
+          typePath = query.getTypeName();
+          metaData = getMetaData(typePath);
+          if (metaData == null) {
+            return 0;
           }
-          return count;
-        } finally {
-          closeEnumRows(rows);
-        }
-      } else {
-        final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
-        if (geometryAttribute == null || boundingBox.isEmpty()) {
-          return 0;
         } else {
+          typePath = metaData.getPath();
+        }
+        final StringBuffer whereClause = getWhereClause(query);
+        final BoundingBox boundingBox = query.getBoundingBox();
+
+        if (boundingBox == null) {
           final StringBuffer sql = new StringBuffer();
-          sql.append("SELECT " + geometryAttribute.getName() + " FROM ");
+          sql.append("SELECT OBJECTID FROM ");
           sql.append(JdbcUtils.getTableName(typePath));
           if (whereClause.length() > 0) {
             sql.append(" WHERE ");
@@ -916,16 +898,41 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           try {
             int count = 0;
             for (Row row = rows.next(); row != null; row = rows.next()) {
-              final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
-              final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
-              if (geometryBoundingBox.intersects(boundingBox)) {
-                count++;
-              }
+              count++;
               row.delete();
             }
             return count;
           } finally {
             closeEnumRows(rows);
+          }
+        } else {
+          final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
+          if (geometryAttribute == null || boundingBox.isEmpty()) {
+            return 0;
+          } else {
+            final StringBuffer sql = new StringBuffer();
+            sql.append("SELECT " + geometryAttribute.getName() + " FROM ");
+            sql.append(JdbcUtils.getTableName(typePath));
+            if (whereClause.length() > 0) {
+              sql.append(" WHERE ");
+              sql.append(whereClause);
+            }
+
+            final EnumRows rows = query(sql.toString(), false);
+            try {
+              int count = 0;
+              for (Row row = rows.next(); row != null; row = rows.next()) {
+                final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
+                final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
+                if (geometryBoundingBox.intersects(boundingBox)) {
+                  count++;
+                }
+                row.delete();
+              }
+              return count;
+            } finally {
+              closeEnumRows(rows);
+            }
           }
         }
       }
@@ -986,65 +993,71 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       synchronized (API_SYNC) {
         if (!initialized) {
           initialized = true;
-          super.initialize();
-          final File file = new File(fileName);
-          if (file.exists()) {
-            if (file.isDirectory()) {
-              if (new File(fileName, "gdb").exists()) {
-                geodatabase = EsriFileGdb.openGeodatabase(fileName);
+          try {
+            super.initialize();
+            final File file = new File(fileName);
+            if (file.exists()) {
+              if (file.isDirectory()) {
+                if (new File(fileName, "gdb").exists()) {
+                  geodatabase = EsriFileGdb.openGeodatabase(fileName);
+                } else {
+                  throw new IllegalArgumentException(
+                    FileUtil.getCanonicalPath(file)
+                      + " is not a valid ESRI File Geodatabase");
+                }
               } else {
                 throw new IllegalArgumentException(
                   FileUtil.getCanonicalPath(file)
-                    + " is not a valid ESRI File Geodatabase");
+                    + " ESRI File Geodatabase must be a directory");
+              }
+            } else if (createMissingDataStore) {
+              if (template == null) {
+                geodatabase = EsriFileGdb.createGeodatabase(fileName);
+              } else if (template.exists()) {
+                if (template instanceof FileSystemResource) {
+                  final FileSystemResource fileResource = (FileSystemResource)template;
+                  final File templateFile = fileResource.getFile();
+                  if (templateFile.isDirectory()) {
+                    try {
+                      FileUtil.copy(templateFile, file);
+                    } catch (final Throwable e) {
+                      throw new IllegalArgumentException(
+                        "Unable to copy template ESRI geodatabase " + template,
+                        e);
+                    }
+                    geodatabase = EsriFileGdb.openGeodatabase(fileName);
+                  }
+                }
+                if (geodatabase == null) {
+                  geodatabase = EsriFileGdb.createGeodatabase(fileName);
+                  final Workspace workspace = EsriGdbXmlParser.parse(template);
+                  final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
+                  for (final Domain domain : workspaceDefinition.getDomains()) {
+                    createDomain(domain);
+                  }
+                  for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
+                    if (dataElement instanceof DETable) {
+                      final DETable table = (DETable)dataElement;
+                      createTable(table);
+                    }
+                  }
+                }
+              } else {
+                throw new IllegalArgumentException("Template does not exist "
+                  + template);
               }
             } else {
               throw new IllegalArgumentException(
-                FileUtil.getCanonicalPath(file)
-                  + " ESRI File Geodatabase must be a directory");
+                "ESRI file geodatabase not found " + fileName);
             }
-          } else if (createMissingDataStore) {
-            if (template == null) {
-              geodatabase = EsriFileGdb.createGeodatabase(fileName);
-            } else if (template.exists()) {
-              if (template instanceof FileSystemResource) {
-                final FileSystemResource fileResource = (FileSystemResource)template;
-                final File templateFile = fileResource.getFile();
-                if (templateFile.isDirectory()) {
-                  try {
-                    FileUtil.copy(templateFile, file);
-                  } catch (final Throwable e) {
-                    throw new IllegalArgumentException(
-                      "Unable to copy template ESRI geodatabase " + template, e);
-                  }
-                  geodatabase = EsriFileGdb.openGeodatabase(fileName);
-                }
-              }
-              if (geodatabase == null) {
-                geodatabase = EsriFileGdb.createGeodatabase(fileName);
-                final Workspace workspace = EsriGdbXmlParser.parse(template);
-                final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
-                for (final Domain domain : workspaceDefinition.getDomains()) {
-                  createDomain(domain);
-                }
-                for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
-                  if (dataElement instanceof DETable) {
-                    final DETable table = (DETable)dataElement;
-                    createTable(table);
-                  }
-                }
-              }
-            } else {
-              throw new IllegalArgumentException("Template does not exist "
-                + template);
+            final VectorOfWString domainNames = geodatabase.getDomains();
+            for (int i = 0; i < domainNames.size(); i++) {
+              final String domainName = domainNames.get(i);
+              loadDomain(domainName);
             }
-          } else {
-            throw new IllegalArgumentException(
-              "ESRI file geodatabase not found " + fileName);
-          }
-          final VectorOfWString domainNames = geodatabase.getDomains();
-          for (int i = 0; i < domainNames.size(); i++) {
-            final String domainName = domainNames.get(i);
-            loadDomain(domainName);
+          } catch (final Throwable e) {
+            geodatabase = null;
+            ExceptionUtil.throwUncheckedException(e);
           }
         }
       }

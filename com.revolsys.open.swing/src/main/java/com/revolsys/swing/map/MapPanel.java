@@ -142,6 +142,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private JPanel statusBarPanel;
 
+  private boolean settingBoundingBox = false;
+
   public MapPanel() {
     this(new Project());
   }
@@ -613,51 +615,59 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public void setBoundingBox(final BoundingBox boundingBox) {
-    final BoundingBox oldBoundingBox = getBoundingBox();
-    final double oldUnitsPerPixel = getUnitsPerPixel();
+  public synchronized void setBoundingBox(final BoundingBox boundingBox) {
+    if (!settingBoundingBox) {
+      settingBoundingBox = true;
+      try {
+        final BoundingBox oldBoundingBox = getBoundingBox();
+        final double oldUnitsPerPixel = getUnitsPerPixel();
 
-    final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
-    final boolean zoomNextEnabled = isZoomNextEnabled();
-    final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
-    if (this.project != null) {
-      this.project.setViewBoundingBox(resizedBoundingBox);
+        final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
+        final boolean zoomNextEnabled = isZoomNextEnabled();
+        final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
+        if (this.project != null) {
+          this.project.setViewBoundingBox(resizedBoundingBox);
 
-      setScale(this.viewport.getScale());
-      synchronized (this.zoomHistory) {
-        if (this.updateZoomHistory) {
-          BoundingBox currentBoundingBox = null;
-          if (this.zoomHistoryIndex > -1) {
-            currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
-            if (!currentBoundingBox.equals(resizedBoundingBox)) {
-              while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
-                this.zoomHistory.removeLast();
-              }
-              for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
-                this.zoomHistory.remove(i);
-              }
-              this.zoomHistory.add(resizedBoundingBox);
-              this.zoomHistoryIndex = this.zoomHistory.size() - 1;
-              if (this.zoomHistory.size() > 50) {
-                this.zoomHistory.removeFirst();
+          setScale(this.viewport.getScale());
+          synchronized (this.zoomHistory) {
+            if (this.updateZoomHistory) {
+              BoundingBox currentBoundingBox = null;
+              if (this.zoomHistoryIndex > -1) {
+                currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
+                if (!currentBoundingBox.equals(resizedBoundingBox)) {
+                  while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
+                    this.zoomHistory.removeLast();
+                  }
+                  for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
+                    this.zoomHistory.remove(i);
+                  }
+                  this.zoomHistory.add(resizedBoundingBox);
+                  this.zoomHistoryIndex = this.zoomHistory.size() - 1;
+                  if (this.zoomHistory.size() > 50) {
+                    this.zoomHistory.removeFirst();
 
-                this.zoomHistoryIndex--;
+                    this.zoomHistoryIndex--;
+                  }
+                }
+              } else {
+                this.zoomHistory.add(resizedBoundingBox);
+                this.zoomHistoryIndex = 0;
               }
             }
-          } else {
-            this.zoomHistory.add(resizedBoundingBox);
-            this.zoomHistoryIndex = 0;
           }
-        }
-      }
-      firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
-      firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
-      firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
-        isZoomPreviousEnabled());
-      firePropertyChange("zoomNextEnabled", zoomNextEnabled,
-        isZoomNextEnabled());
+          firePropertyChange("unitsPerPixel", oldUnitsPerPixel,
+            getUnitsPerPixel());
+          firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
+          firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
+            isZoomPreviousEnabled());
+          firePropertyChange("zoomNextEnabled", zoomNextEnabled,
+            isZoomNextEnabled());
 
-      repaint();
+          repaint();
+        }
+      } finally {
+        settingBoundingBox = false;
+      }
     }
   }
 

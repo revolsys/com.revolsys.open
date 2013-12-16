@@ -320,25 +320,28 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   public void updateCondition() {
     if (eventsEnabled) {
-      final String searchAttribute = getSearchAttribute();
+      final String fieldName = getSearchAttribute();
       final Object searchValue = getSearchValue();
       Condition condition = null;
-      if (StringUtils.hasText(searchAttribute)
-        && StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
-        final String searchOperator = getSearchOperator();
-        if ("Like".equalsIgnoreCase(searchOperator)) {
-          final String searchText = StringConverterRegistry.toString(searchValue);
-          if (StringUtils.hasText(searchText)) {
-            condition = Conditions.likeUpper(searchAttribute, searchText);
-          }
-        } else {
-          final DataObjectMetaData metaData = this.tableModel.getMetaData();
-          final Class<?> attributeClass = metaData.getAttributeClass(searchAttribute);
-          try {
-            final Object value = StringConverterRegistry.toObject(
-              attributeClass, searchValue);
-            condition = Equal.equal(searchAttribute, value);
-          } catch (final Throwable t) {
+      if (StringUtils.hasText(fieldName)) {
+        layer.setProperty("searchField", fieldName);
+        if (StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
+
+          final String searchOperator = getSearchOperator();
+          if ("Like".equalsIgnoreCase(searchOperator)) {
+            final String searchText = StringConverterRegistry.toString(searchValue);
+            if (StringUtils.hasText(searchText)) {
+              condition = Conditions.likeUpper(fieldName, searchText);
+            }
+          } else {
+            final DataObjectMetaData metaData = this.tableModel.getMetaData();
+            final Class<?> attributeClass = metaData.getAttributeClass(fieldName);
+            try {
+              final Object value = StringConverterRegistry.toObject(
+                attributeClass, searchValue);
+              condition = Equal.equal(fieldName, value);
+            } catch (final Throwable t) {
+            }
           }
         }
       }

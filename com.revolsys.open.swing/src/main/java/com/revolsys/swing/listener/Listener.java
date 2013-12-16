@@ -2,11 +2,13 @@ package com.revolsys.swing.listener;
 
 import java.awt.Component;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
 public class Listener {
+
   public static void addKey(final Object object, final KeyListener listener) {
     if (object instanceof Component) {
       final Component component = (Component)object;
@@ -34,6 +36,30 @@ public class Listener {
     if (object instanceof Component) {
       final Component component = (Component)object;
       component.addMouseWheelListener(listener);
+    }
+  }
+
+  public static void mouseEvent(final MouseListener listener,
+    final MouseEvent e) {
+    if (listener != null) {
+      final int id = e.getID();
+      switch (id) {
+        case MouseEvent.MOUSE_PRESSED:
+          listener.mousePressed(e);
+        break;
+        case MouseEvent.MOUSE_RELEASED:
+          listener.mouseReleased(e);
+        break;
+        case MouseEvent.MOUSE_CLICKED:
+          listener.mouseClicked(e);
+        break;
+        case MouseEvent.MOUSE_EXITED:
+          listener.mouseExited(e);
+        break;
+        case MouseEvent.MOUSE_ENTERED:
+          listener.mouseEntered(e);
+        break;
+      }
     }
   }
 

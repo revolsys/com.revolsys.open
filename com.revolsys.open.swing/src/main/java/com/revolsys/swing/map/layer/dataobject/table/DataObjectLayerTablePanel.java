@@ -10,6 +10,7 @@ import java.util.Collections;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -61,6 +62,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     this.layer = layer;
     tableCellEditor = table.getTableCellEditor();
     tableCellEditor.setPopupMenu(getMenu());
+    table.getTableCellEditor().addMouseListener(this);
     this.tableModel = getTableModel();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -240,7 +242,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   @Override
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
-    if (SwingUtil.isLeftButtonAndNoModifiers(e) && e.getClickCount() == 2) {
+    if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
       editRecord();
     }
   }
