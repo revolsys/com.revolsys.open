@@ -23,8 +23,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -222,16 +222,23 @@ public final class UrlUtil {
                   query.append('&');
                 }
               }
-            } else if (value instanceof List) {
-              final List values = (List)value;
-              for (int i = 0; i < values.size(); i++) {
-                query.append(name)
-                  .append('=')
-                  .append(URLEncoder.encode((String)values.get(i), "US-ASCII"));
-                if (i < values.size() - 1) {
-                  query.append('&');
+            } else if (value instanceof Collection) {
+              boolean first = true;
+              final Collection values = (Collection)value;
+              for (final Object childValue : values) {
+                if (childValue != null) {
+                  if (first == true) {
+                    first = false;
+                  } else {
+                    query.append('&');
+                  }
+                  query.append(name)
+                    .append('=')
+                    .append(
+                      URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
+
             } else {
               query.append(name)
                 .append('=')

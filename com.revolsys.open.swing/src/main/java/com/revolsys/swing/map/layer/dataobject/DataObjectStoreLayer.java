@@ -362,20 +362,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final Geometry queryGeometry = geometryFactory.copy(geometry);
       BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
       boundingBox = boundingBox.expand(distance);
-      if (this.boundingBox == null || this.boundingBox.contains(boundingBox)) {
-        return (List)getIndex().queryDistance(queryGeometry, distance);
-      } else {
-        final String typePath = getTypePath();
-        final DataObjectStore dataStore = getDataStore();
-        final Reader reader = dataStore.query(this, typePath, queryGeometry,
-          distance);
-        try {
-          final List<LayerDataObject> readObjects = reader.read();
-          final List<LayerDataObject> records = getCachedRecords(readObjects);
-          return records;
-        } finally {
-          reader.close();
-        }
+      final String typePath = getTypePath();
+      final DataObjectStore dataStore = getDataStore();
+      final Reader reader = dataStore.query(this, typePath, queryGeometry,
+        distance);
+      try {
+        final List<LayerDataObject> results = reader.read();
+        final List<LayerDataObject> records = getCachedRecords(results);
+        return records;
+      } finally {
+        reader.close();
       }
     } finally {
       setEventsEnabled(enabled);

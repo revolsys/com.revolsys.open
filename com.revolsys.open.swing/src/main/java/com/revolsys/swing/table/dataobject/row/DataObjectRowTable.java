@@ -16,9 +16,11 @@ import javax.swing.table.TableModel;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.ModifiedAttributePredicate;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
@@ -150,20 +152,24 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    final TableModel model = getModel();
-    if (model instanceof DataObjectLayerTableModel) {
-      final DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
-      final String mode = layerModel.getAttributeFilterMode();
-      final List<String> sortableModes = layerModel.getSortableModes();
-      if (sortableModes.contains(mode)) {
-        setSortable(true);
-      } else {
-        setSortable(false);
+    if (SwingUtil.isEventDispatchThread()) {
+      final TableModel model = getModel();
+      if (model instanceof DataObjectLayerTableModel) {
+        final DataObjectLayerTableModel layerModel = (DataObjectLayerTableModel)model;
+        final String mode = layerModel.getAttributeFilterMode();
+        final List<String> sortableModes = layerModel.getSortableModes();
+        if (sortableModes.contains(mode)) {
+          setSortable(true);
+        } else {
+          setSortable(false);
+        }
       }
-    }
-    super.tableChanged(e);
-    if (this.tableHeader != null) {
-      this.tableHeader.resizeAndRepaint();
+      super.tableChanged(e);
+      if (this.tableHeader != null) {
+        this.tableHeader.resizeAndRepaint();
+      }
+    } else {
+      Invoke.later(this, "tableChanged", e);
     }
   }
 }

@@ -1262,4 +1262,15 @@ public final class LineStringUtil {
     return subLineString(line, null, 0, length, coordinate);
   }
 
+  public static Coordinates getClosestEndsCoordinates(final LineString line,
+    final Coordinates coordinates) {
+    Coordinates fromCoordinates = getFromCoordinates(line);
+    Coordinates toCoordinates = getToCoordinates(line);
+    if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
+      return fromCoordinates;
+    } else {
+      return toCoordinates;
+    }
+  }
+
 }

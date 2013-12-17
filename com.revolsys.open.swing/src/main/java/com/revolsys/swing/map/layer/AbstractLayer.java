@@ -556,7 +556,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isEventsEnabled() {
     if (eventsEnabled.get() != Boolean.FALSE) {
       final LayerGroup layerGroup = getLayerGroup();
-      if (layerGroup == null) {
+      if (layerGroup == null || layerGroup == this) {
         return true;
       } else {
         return layerGroup.isEventsEnabled();

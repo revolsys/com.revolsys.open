@@ -2,16 +2,23 @@ package com.revolsys.gis.data.query;
 
 import java.util.Map;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.util.CompareUtil;
 
 public class LessThan extends BinaryCondition {
 
-  public static Condition lessThan(final String name, final Object value) {
+  public static LessThan lessThan(final Attribute attribute, final Object value) {
+    final String name = attribute.getName();
+    final Value valueCondition = new Value(attribute, value);
+    return lessThan(name, valueCondition);
+  }
+
+  public static LessThan lessThan(final String name, final Object value) {
     final Value valueCondition = new Value(value);
     return new LessThan(name, valueCondition);
   }
 
-  public static Condition lessThan(final String name, final QueryValue right) {
+  public static LessThan lessThan(final String name, final QueryValue right) {
     final Column column = new Column(name);
     return new LessThan(column, right);
   }

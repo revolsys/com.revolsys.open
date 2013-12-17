@@ -1880,24 +1880,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  public int setSelectedWithinDistance(final boolean selected,
-    final Geometry geometry, final int distance) {
-    clearSelectedRecordsIndex();
-    final List<LayerDataObject> records = query(geometry, distance);
-    for (final Iterator<LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
-      final LayerDataObject layerDataObject = iterator.next();
-      if (!isVisible(layerDataObject)) {
-        iterator.remove();
-      }
-    }
-    if (selected) {
-      addSelectedRecords(records);
-    } else {
-      unSelectRecords(records);
-    }
-    return records.size();
-  }
-
   public void setSnapLayerPaths(final Collection<String> snapLayerPaths) {
     if (snapLayerPaths == null || snapLayerPaths.isEmpty()) {
       removeProperty("snapLayers");
@@ -1923,7 +1905,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public LayerDataObject showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
       final LayerDataObject newRecord = createRecord(parameters);
-      // newRecord.setGeometryValue(getGeometryFactory().createEmptyGeometry());
       final DataObjectLayerForm form = createForm(newRecord);
       if (form == null) {
         return null;

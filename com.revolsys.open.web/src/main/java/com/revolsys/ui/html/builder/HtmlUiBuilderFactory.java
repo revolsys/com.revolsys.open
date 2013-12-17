@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
 public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   @SuppressWarnings("unchecked")
-  public static <T extends HtmlUiBuilder> T get(
-    final BeanFactory factory,
+  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
     final String typePath) {
     final String beanName = typePath + "-htmlbuilder";
     if (factory.containsBean(beanName)) {
@@ -24,8 +25,7 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   private static HtmlUiBuilder<?> get(
     final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
-    final Set<Class<?>> interfaces,
-    final BeanFactory factory,
+    final Set<Class<?>> interfaces, final BeanFactory factory,
     final Class<?> objectClass) {
     HtmlUiBuilder<?> builder = null;
     if (objectClass != null) {
@@ -53,8 +53,7 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
   private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>>();
 
   @SuppressWarnings("unchecked")
-  public static <T extends HtmlUiBuilder> T get(
-    final BeanFactory factory,
+  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
     final Class<?> objectClass) {
     HtmlUiBuilder<?> builder = null;
     if (objectClass != null) {
@@ -77,8 +76,7 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   private static HtmlUiBuilder<?> get(
     final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
-    final BeanFactory factory,
-    final Class<?> objectClass,
+    final BeanFactory factory, final Class<?> objectClass,
     final Set<Class<?>> interfaces) {
     HtmlUiBuilder<?> builder = null;
     for (final Class<?> interfaceClass : interfaces) {
@@ -91,6 +89,11 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     return builder;
   }
 
+  @PreDestroy
+  public void destory() {
+    buildersByFactoryAndClass.remove(beanFactory);
+  }
+
   public <T extends HtmlUiBuilder<?>> T get(final Class<?> objectClass) {
     return (T)get(beanFactory, objectClass);
   }
@@ -99,6 +102,7 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     return (T)get(beanFactory, objectClassName);
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
