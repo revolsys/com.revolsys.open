@@ -847,6 +847,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             final TabbedValuePanel panel = createPropertiesPanel();
             panel.setSelectdTab(tabName);
             panel.showDialog(window);
+            refresh();
           } finally {
             removeProperty("INTERNAL_PROPERTIES_VISIBLE");
           }

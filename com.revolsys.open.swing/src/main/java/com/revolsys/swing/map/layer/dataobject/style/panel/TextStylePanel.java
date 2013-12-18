@@ -74,7 +74,10 @@ public class TextStylePanel extends BaseStylePanel implements
     final Class<?> fieldClass, final Object value) {
     if (fieldName.equals("textName")) {
       final AbstractDataObjectLayer layer = getLayer();
-      return new TextNameField(layer, fieldName, value);
+      final TextNameField textNameField = new TextNameField(layer, fieldName,
+        value);
+      textNameField.addPropertyChangeListener(fieldName, this);
+      return textNameField;
     } else {
       return super.createField(fieldName, fieldClass, value);
     }

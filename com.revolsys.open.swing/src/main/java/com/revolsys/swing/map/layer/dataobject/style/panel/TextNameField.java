@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject.style.panel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -68,6 +69,13 @@ public class TextNameField extends ValueField {
       }
       ((JComponent)textNameField).requestFocusInWindow();
     }
+  }
+
+  @Override
+  public void addPropertyChangeListener(final String propertyName,
+    final PropertyChangeListener listener) {
+    super.addPropertyChangeListener(propertyName, listener);
+    textNameField.addPropertyChangeListener(propertyName, listener);
   }
 
   @Override

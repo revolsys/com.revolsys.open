@@ -258,6 +258,7 @@ public class BaseStylePanel extends ValueField implements
       final AbstractDataObjectLayer layer = getLayer();
       field = new QueryFilterField(layer, fieldName, value);
       field.setFieldValue(value);
+      field.addPropertyChangeListener(fieldName, this);
     } else if (fieldName.equals("marker")) {
       field = new MarkerField(fieldName, value);
     } else if (fieldName.endsWith("Scale")) {
@@ -377,6 +378,9 @@ public class BaseStylePanel extends ValueField implements
   public void save() {
     super.save();
     final LayerRenderer<Layer> renderer = getRenderer();
+    for (final String fieldName : rendererFieldNames) {
+
+    }
     Property.set(renderer, rendererFieldValues);
   }
 }

@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject.style.panel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -71,6 +72,13 @@ public class QueryFilterField extends ValueField {
   }
 
   @Override
+  public void addPropertyChangeListener(final String propertyName,
+    final PropertyChangeListener listener) {
+    super.addPropertyChangeListener(propertyName, listener);
+    filterField.addPropertyChangeListener(propertyName, listener);
+  }
+
+  @Override
   public String getFieldValidationMessage() {
     return filterField.getFieldValidationMessage();
   }
@@ -125,4 +133,5 @@ public class QueryFilterField extends ValueField {
   public void updateFieldValue() {
     filterField.updateFieldValue();
   }
+
 }

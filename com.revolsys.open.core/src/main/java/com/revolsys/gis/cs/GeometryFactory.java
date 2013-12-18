@@ -538,7 +538,7 @@ public class GeometryFactory extends
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
         return geometryFactory.createGeometry(geometry);
-      } else if (srid != 0 && geometrySrid != srid) {
+      } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
         if (geometry instanceof GeometryCollection) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
