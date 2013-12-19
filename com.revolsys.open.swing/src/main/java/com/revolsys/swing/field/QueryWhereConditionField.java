@@ -367,7 +367,7 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   @SuppressWarnings("unchecked")
-  private <V extends QueryValue> V toCondition(final ValueNode expression) {
+  private <V extends QueryValue> V toQueryValue(final ValueNode expression) {
     if (expression instanceof BetweenOperatorNode) {
       final BetweenOperatorNode betweenExpression = (BetweenOperatorNode)expression;
       final ValueNode leftValueNode = betweenExpression.getLeftOperand();
@@ -390,9 +390,9 @@ public class QueryWhereConditionField extends ValueField implements
           + betweenExpressionEnd);
         return null;
       }
-      final Column column = toCondition(leftValueNode);
-      final Value min = toCondition(betweenExpressionStart);
-      final Value max = toCondition(betweenExpressionEnd);
+      final Column column = toQueryValue(leftValueNode);
+      final Value min = toQueryValue(betweenExpressionStart);
+      final Value max = toQueryValue(betweenExpressionEnd);
       final Attribute attribute = metaData.getAttribute(column.getName());
       min.convert(attribute);
       max.convert(attribute);
@@ -402,8 +402,8 @@ public class QueryWhereConditionField extends ValueField implements
       final String operator = binaryOperatorNode.getOperator().toUpperCase();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      final Condition leftCondition = toCondition(leftValueNode);
-      final Condition rightCondition = toCondition(rightValueNode);
+      final Condition leftCondition = toQueryValue(leftValueNode);
+      final Condition rightCondition = toQueryValue(rightValueNode);
       if ("AND".equals(operator)) {
         return (V)new And(leftCondition, rightCondition);
       } else if ("OR".equals(operator)) {
@@ -419,8 +419,8 @@ public class QueryWhereConditionField extends ValueField implements
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
       if (SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
-        final QueryValue leftCondition = toCondition(leftValueNode);
-        QueryValue rightCondition = toCondition(rightValueNode);
+        final QueryValue leftCondition = toQueryValue(leftValueNode);
+        QueryValue rightCondition = toQueryValue(rightValueNode);
 
         if (leftCondition instanceof Column) {
           if (rightCondition instanceof Value) {
@@ -471,34 +471,34 @@ public class QueryWhereConditionField extends ValueField implements
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;
       final ValueNode leftValueNode = likeEscapeOperatorNode.getReceiver();
       final ValueNode rightValueNode = likeEscapeOperatorNode.getLeftOperand();
-      final Condition leftCondition = toCondition(leftValueNode);
-      final Condition rightCondition = toCondition(rightValueNode);
+      final QueryValue leftCondition = toQueryValue(leftValueNode);
+      final QueryValue rightCondition = toQueryValue(rightValueNode);
       return (V)Conditions.like(leftCondition, rightCondition);
     } else if (expression instanceof NotNode) {
       final NotNode notNode = (NotNode)expression;
       final ValueNode operand = notNode.getOperand();
-      final Condition condition = toCondition(operand);
+      final Condition condition = toQueryValue(operand);
       return (V)new Not(condition);
     } else if (expression instanceof InListOperatorNode) {
       final InListOperatorNode inListOperatorNode = (InListOperatorNode)expression;
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
-      final Condition leftCondition = toCondition(leftOperand);
+      final QueryValue leftCondition = toQueryValue(leftOperand);
 
-      final List<Condition> conditions = new ArrayList<Condition>();
+      final List<QueryValue> conditions = new ArrayList<QueryValue>();
       final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
       for (final ValueNode itemValueNode : itemsList.getNodeList()) {
-        final Condition itemCondition = toCondition(itemValueNode);
+        final QueryValue itemCondition = toQueryValue(itemValueNode);
         conditions.add(itemCondition);
       }
       return (V)new In(leftCondition, new CollectionValue(conditions));
     } else if (expression instanceof IsNullNode) {
       final IsNullNode isNullNode = (IsNullNode)expression;
       final ValueNode operand = isNullNode.getOperand();
-      final Condition condition = toCondition(operand);
+      final QueryValue value = toQueryValue(operand);
       if (isNullNode.getNodeType() == NodeTypes.IS_NOT_NULL_NODE) {
-        return (V)new IsNotNull(condition);
+        return (V)new IsNotNull(value);
       } else {
-        return (V)new IsNull(condition);
+        return (V)new IsNull(value);
       }
       // } else if (expression instanceof Parenthesis) {
       // final Parenthesis parenthesis = (Parenthesis)expression;
@@ -516,7 +516,7 @@ public class QueryWhereConditionField extends ValueField implements
       final RowConstructorNode rowConstructorNode = (RowConstructorNode)expression;
       final ValueNodeList values = rowConstructorNode.getNodeList();
       final ValueNode valueNode = values.get(0);
-      return (V)toCondition(valueNode);
+      return (V)toQueryValue(valueNode);
     } else if (expression instanceof UserTypeConstantNode) {
       final UserTypeConstantNode constant = (UserTypeConstantNode)expression;
       final Object objectValue = constant.getObjectValue();
@@ -529,13 +529,13 @@ public class QueryWhereConditionField extends ValueField implements
       final SimpleStringOperatorNode operatorNode = (SimpleStringOperatorNode)expression;
       final String functionName = operatorNode.getMethodName().toUpperCase();
       final ValueNode operand = operatorNode.getOperand();
-      final Condition condition = toCondition(operand);
+      final QueryValue condition = toQueryValue(operand);
       return (V)new Function(functionName, condition);
     } else if (expression instanceof CastNode) {
       final CastNode castNode = (CastNode)expression;
       final String typeName = castNode.getType().getSQLstring();
       final ValueNode operand = castNode.getCastOperand();
-      final Condition condition = toCondition(operand);
+      final QueryValue condition = toQueryValue(operand);
       return (V)new Cast(condition, typeName);
     } else if (expression == null) {
       return null;
@@ -562,7 +562,7 @@ public class QueryWhereConditionField extends ValueField implements
             if (resultSetNode instanceof SelectNode) {
               final SelectNode selectNode = (SelectNode)resultSetNode;
               final ValueNode where = selectNode.getWhereClause();
-              final Condition condition = toCondition(where);
+              final Condition condition = toQueryValue(where);
               if (valid) {
                 setFieldValue(condition);
                 statusLabel.setForeground(WebColors.DarkGreen);

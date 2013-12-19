@@ -16,7 +16,6 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.Query;
@@ -99,8 +98,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     final String search = request.getParameter("sSearch");
     if (StringUtils.hasText(search)) {
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
-      Condition[] conditions = {};
-      final Or or = new Or(conditions);
+      final Or or = new Or();
       final int numSortColumns = HttpServletUtils.getIntegerParameter(request,
         "iColumns");
       for (int i = 0; i < numSortColumns; i++) {

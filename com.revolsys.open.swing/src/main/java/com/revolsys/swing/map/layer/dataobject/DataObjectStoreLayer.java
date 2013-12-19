@@ -59,7 +59,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private BoundingBox boundingBox = new BoundingBox();
 
-  private final Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
+  private Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
 
   private DataObjectStore dataStore;
 
@@ -105,6 +105,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final String id = getId(record);
     if (id == null) {
       records.add(record);
+    } else if (record.getState() == DataObjectState.Deleted) {
+      return false;
     } else {
       synchronized (this.cachedRecords) {
         final V cachedRecord = (V)this.cachedRecords.get(id);
@@ -215,7 +217,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   private void cleanCachedRecords() {
     synchronized (this.cachedRecords) {
       final Set<String> ids = getIdsToCache();
-      this.cachedRecords.keySet().retainAll(ids);
+      final Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
+      for (final String id : ids) {
+        final LayerDataObject record = this.cachedRecords.get(id);
+        if (record != null) {
+          cachedRecords.put(id, record);
+        }
+      }
+      this.cachedRecords = cachedRecords;
     }
   }
 
@@ -256,7 +265,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
     this.boundingBox = new BoundingBox();
-    this.cachedRecords.clear();
+    this.cachedRecords = new HashMap<String, LayerDataObject>();
     this.loadingBoundingBox = new BoundingBox();
     this.loadingWorker = null;
     this.saveRecordChangesMethod = null;
@@ -468,7 +477,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return cachedRecords;
   }
 
-  protected LayerDataObject getCacheRecord(final LayerDataObject record) {
+  public LayerDataObject getCacheRecord(final LayerDataObject record) {
     if (record == null) {
       return null;
     } else {
@@ -477,32 +486,21 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  protected LayerDataObject getCacheRecord(final String id) {
-    synchronized (this.cachedRecords) {
-      if (id == null) {
-        return null;
-      } else {
-        LayerDataObject record = this.cachedRecords.get(id);
-        if (record == null) {
-          record = getRecordById(id);
-          if (record != null) {
-            this.cachedRecords.put(id, record);
-          }
-        }
-        return record;
-      }
-    }
-  }
-
   private LayerDataObject getCacheRecord(final String id,
     final LayerDataObject record) {
-    if (id != null && record != null && isLayerRecord(record)) {
+    if (StringUtils.hasText(id) && record != null && isLayerRecord(record)) {
       if (record.getState() == DataObjectState.New) {
+        return record;
+      } else if (record.getState() == DataObjectState.Deleted) {
         return record;
       } else {
         synchronized (this.cachedRecords) {
           if (this.cachedRecords.containsKey(id)) {
-            return this.cachedRecords.get(id);
+            final LayerDataObject cachedRecord = this.cachedRecords.get(id);
+            if (cachedRecord.getState() == DataObjectState.Deleted) {
+              this.cachedRecords.remove(id);
+            }
+            return cachedRecord;
           } else {
             this.cachedRecords.put(id, record);
             return record;
@@ -510,7 +508,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         }
       }
     } else {
-      return null;
+      return record;
     }
   }
 

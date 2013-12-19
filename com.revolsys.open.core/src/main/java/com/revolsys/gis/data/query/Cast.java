@@ -6,12 +6,12 @@ import java.util.Map;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class Cast extends Condition {
-  private final Condition condition;
+  private final QueryValue value;
 
   private final String dataType;
 
-  public Cast(final Condition condition, final String dataType) {
-    this.condition = condition;
+  public Cast(final QueryValue queryValue, final String dataType) {
+    this.value = queryValue;
     this.dataType = dataType;
   }
 
@@ -26,13 +26,13 @@ public class Cast extends Condition {
 
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
-    return condition.appendParameters(index, statement);
+    return value.appendParameters(index, statement);
   }
 
   @Override
   public void appendSql(final StringBuffer buffer) {
     buffer.append("CAST(");
-    condition.appendSql(buffer);
+    value.appendSql(buffer);
     buffer.append(" AS ");
     buffer.append(dataType);
     buffer.append(")");
@@ -42,7 +42,7 @@ public class Cast extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof Cast) {
       final Cast condition = (Cast)obj;
-      if (EqualsRegistry.equal(condition.getCondition(), this.getCondition())) {
+      if (EqualsRegistry.equal(condition.getValue(), this.getValue())) {
         if (EqualsRegistry.equal(condition.getDataType(), this.getDataType())) {
           return true;
         }
@@ -51,19 +51,19 @@ public class Cast extends Condition {
     return false;
   }
 
-  public Condition getCondition() {
-    return condition;
-  }
-
   public String getDataType() {
     return dataType;
+  }
+
+  public QueryValue getValue() {
+    return value;
   }
 
   @Override
   public String toString() {
     final StringBuffer buffer = new StringBuffer();
     buffer.append("CAST(");
-    buffer.append(condition);
+    buffer.append(value);
     buffer.append(" AS ");
     buffer.append(dataType);
     buffer.append(")");

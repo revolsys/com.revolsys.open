@@ -87,6 +87,8 @@ public class DataStoreQueryTextField extends TextField implements
 
   private Object originalValue;
 
+  private boolean below = false;
+
   public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
     this(metaData, displayAttributeName, new Query(metaData, new Equal(
@@ -401,6 +403,10 @@ public class DataStoreQueryTextField extends TextField implements
     }
   }
 
+  public void setBelow(final boolean below) {
+    this.below = below;
+  }
+
   @Override
   public void setFieldToolTip(final String toolTip) {
     setToolTipText(toolTip);
@@ -441,7 +447,16 @@ public class DataStoreQueryTextField extends TextField implements
       this.menu.setVisible(false);
     } else {
       this.menu.setVisible(true);
-      this.menu.show(this, this.getWidth(), 0);
+      int x;
+      int y;
+      if (below) {
+        x = 0;
+        y = this.getHeight();
+      } else {
+        x = this.getWidth();
+        y = 0;
+      }
+      this.menu.show(this, x, y);
       this.menu.pack();
     }
   }

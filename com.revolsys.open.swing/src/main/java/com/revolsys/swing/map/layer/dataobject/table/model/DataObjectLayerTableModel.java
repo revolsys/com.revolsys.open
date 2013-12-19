@@ -482,7 +482,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
             left = function.getQueryValues().get(0);
           } else if (left instanceof Cast) {
             final Cast cast = (Cast)left;
-            left = cast.getCondition();
+            left = cast.getValue();
           } else {
             return;
           }

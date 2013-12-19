@@ -251,20 +251,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private void appendCondition(final StringBuffer buffer,
+  private void appendQueryValue(final StringBuffer buffer,
     final QueryValue condition) {
     if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
-      final Condition right = unaryCondition.getQueryValue();
+      final QueryValue right = unaryCondition.getQueryValue();
       buffer.append(operator);
       buffer.append(" ");
-      appendCondition(buffer, right);
+      appendQueryValue(buffer, right);
     } else if (condition instanceof RightUnaryCondition) {
       final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
       final QueryValue left = unaryCondition.getValue();
       final String operator = unaryCondition.getOperator();
-      appendCondition(buffer, left);
+      appendQueryValue(buffer, left);
       buffer.append(" ");
       buffer.append(operator);
     } else if (condition instanceof BinaryCondition) {
@@ -272,11 +272,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final QueryValue left = binaryCondition.getLeft();
       final String operator = binaryCondition.getOperator();
       final QueryValue right = binaryCondition.getRight();
-      appendCondition(buffer, left);
+      appendQueryValue(buffer, left);
       buffer.append(" ");
       buffer.append(operator);
       buffer.append(" ");
-      appendCondition(buffer, right);
+      appendQueryValue(buffer, right);
     } else if (condition instanceof AbstractMultiCondition) {
       final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
       buffer.append("(");
@@ -290,7 +290,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           buffer.append(operator);
           buffer.append(" ");
         }
-        appendCondition(buffer, subCondition);
+        appendQueryValue(buffer, subCondition);
       }
       buffer.append(")");
     } else if (condition instanceof Value) {
@@ -973,7 +973,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final StringBuffer whereClause = new StringBuffer();
     final Condition whereCondition = query.getWhereCondition();
     if (whereCondition != null) {
-      appendCondition(whereClause, whereCondition);
+      appendQueryValue(whereClause, whereCondition);
     }
     return whereClause;
   }

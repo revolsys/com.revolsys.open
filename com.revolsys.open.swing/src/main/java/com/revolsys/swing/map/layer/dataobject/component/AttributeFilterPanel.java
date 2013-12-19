@@ -270,7 +270,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           }
           if (leftCondition instanceof Cast) {
             final Cast cast = (Cast)leftCondition;
-            leftCondition = cast.getCondition();
+            leftCondition = cast.getValue();
           }
           if (leftCondition instanceof Column
             && rightCondition instanceof Value) {

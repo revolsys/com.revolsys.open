@@ -18,7 +18,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.query.And;
-import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Equal;
 import com.revolsys.gis.data.query.IsNull;
 import com.revolsys.gis.data.query.Query;
@@ -246,8 +245,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       id = getId(values, false);
     } else {
       final Query query = new Query(typePath);
-      Condition[] conditions = {};
-      final And and = new And(conditions);
+      final And and = new And();
       if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
