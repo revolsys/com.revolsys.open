@@ -162,9 +162,6 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return null;
     } else {
-      if (rowIndex > 0) {
-        System.out.println();
-      }
       final DataObject object = getObject(rowIndex);
       if (object == null) {
         return null;
