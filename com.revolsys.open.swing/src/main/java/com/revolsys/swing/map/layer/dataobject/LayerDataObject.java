@@ -83,7 +83,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   @Override
   public boolean isModified() {
-    return this.originalValues != null;
+    return super.isModified();
   }
 
   public boolean isModified(final int index) {
@@ -132,6 +132,7 @@ public class LayerDataObject extends ArrayDataObject {
 
   }
 
+  @Override
   public boolean isValid(final String name) {
     final Attribute attribute = getMetaData().getAttribute(name);
     if (attribute.isRequired()) {

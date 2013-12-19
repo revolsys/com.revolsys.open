@@ -151,7 +151,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   }
 
   @Override
-  public void tableChanged(final TableModelEvent e) {
+  public void tableChanged(final TableModelEvent event) {
     if (SwingUtil.isEventDispatchThread()) {
       final TableModel model = getModel();
       if (model instanceof DataObjectLayerTableModel) {
@@ -164,12 +164,12 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
           setSortable(false);
         }
       }
-      super.tableChanged(e);
+      super.tableChanged(event);
       if (this.tableHeader != null) {
         this.tableHeader.resizeAndRepaint();
       }
     } else {
-      Invoke.later(this, "tableChanged", e);
+      Invoke.later(this, "tableChanged", event);
     }
   }
 }

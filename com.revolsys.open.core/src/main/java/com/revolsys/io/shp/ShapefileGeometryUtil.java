@@ -964,7 +964,7 @@ public final class ShapefileGeometryUtil {
         // final int recordLength = ((3 + numGeometries) * BYTES_IN_INT + (4 + 2
         // * numCoordinates)
         // * BYTES_IN_DOUBLE) / 2;
-        final int recordLength = 30 + numGeometries * 2 + numCoordinates
+        final int recordLength = 22 + numGeometries * 2 + numCoordinates
           * wordsPerPoint;
         out.writeInt(recordLength);
       }

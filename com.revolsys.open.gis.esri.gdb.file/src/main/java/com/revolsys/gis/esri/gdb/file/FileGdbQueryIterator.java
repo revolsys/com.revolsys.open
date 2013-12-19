@@ -45,15 +45,6 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   private int count;
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final DataObjectFactory dataObjectFactory, final String typePath,
-    final BoundingBox boundingBox) {
-    this(dataStore, typePath, "*", "", boundingBox, 0, -1);
-    if (dataObjectFactory != null) {
-      this.dataObjectFactory = dataObjectFactory;
-    }
-  }
-
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
     final String typePath) {
     this(dataStore, typePath, "*", "", null, 0, -1);
   }
@@ -72,11 +63,6 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     if (factory != null) {
       this.dataObjectFactory = factory;
     }
-  }
-
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final String typePath, final String fields, final String whereClause) {
-    this(dataStore, typePath, fields, whereClause, null, 0, -1);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,

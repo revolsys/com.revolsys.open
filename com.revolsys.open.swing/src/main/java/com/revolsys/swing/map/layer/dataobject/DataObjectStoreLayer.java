@@ -52,7 +52,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
 
-  public static DataObjectStoreLayer create(final Map<String, Object> properties) {
+  public static AbstractDataObjectLayer create(
+    final Map<String, Object> properties) {
     return new DataObjectStoreLayer(properties);
   }
 
@@ -197,10 +198,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       addSelectedRecords(records);
     }
-  }
-
-  protected void addToIndex(final LayerDataObject record) {
-    getIndex().insert(record);
   }
 
   protected void cacheRecords(final Collection<? extends DataObject> records) {
@@ -446,7 +443,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   protected boolean doSaveChanges(final LayerDataObject record) {
-    return invokeInTransaction(this.saveRecordChangesMethod, record);
+    final boolean deleted = isDeleted(record);
+    final boolean saved = invokeInTransaction(this.saveRecordChangesMethod,
+      record);
+    if (saved) {
+      if (!deleted) {
+        record.setState(DataObjectState.Persisted);
+      }
+    }
+    return saved;
   }
 
   @Override
@@ -582,9 +587,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final Polygon polygon = convertedBoundingBox.toPolygon();
       try {
         for (final LayerDataObject record : queryObjects) {
-          final Geometry geometry = record.getGeometryValue();
-          if (geometry.intersects(polygon)) {
-            allObjects.add(record);
+          if (!record.getState().equals(DataObjectState.Deleted)) {
+            final Geometry geometry = record.getGeometryValue();
+            if (geometry.intersects(polygon)) {
+              allObjects.add(record);
+            }
           }
         }
       } catch (final ClassCastException e) {
@@ -711,10 +718,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       super.removeForm(record);
     }
-  }
-
-  protected void removeFromIndex(final LayerDataObject record) {
-    getIndex().remove(record);
   }
 
   @Override
@@ -876,15 +879,4 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     cleanCachedRecords();
   }
 
-  @Override
-  protected void updateSpatialIndex(final LayerDataObject record,
-    final Geometry oldGeometry) {
-    if (oldGeometry != null) {
-      final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
-      if (getIndex().remove(oldBoundingBox, record)) {
-        addToIndex(record);
-      }
-    }
-
-  }
 }

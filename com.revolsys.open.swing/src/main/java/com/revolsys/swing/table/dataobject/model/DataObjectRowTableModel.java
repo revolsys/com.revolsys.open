@@ -55,31 +55,6 @@ public abstract class DataObjectRowTableModel extends
     this.sortedColumns = null;
   }
 
-  @Override
-  public String getFieldName(final int columnIndex) {
-    if (columnIndex < attributesOffset) {
-      return null;
-    } else {
-      final String attributeName = this.attributeNames.get(columnIndex
-        - attributesOffset);
-      if (attributeName == null) {
-        return null;
-      } else {
-        final int index = attributeName.indexOf('.');
-        if (index == -1) {
-          return attributeName;
-        } else {
-          return attributeName.substring(0, index);
-        }
-      }
-    }
-  }
-
-  @Override
-  public String getFieldName(final int rowIndex, final int columnIndex) {
-    return getFieldName(columnIndex);
-  }
-
   public int getAttributesOffset() {
     return attributesOffset;
   }
@@ -129,6 +104,31 @@ public abstract class DataObjectRowTableModel extends
     }
   }
 
+  @Override
+  public String getFieldName(final int columnIndex) {
+    if (columnIndex < attributesOffset) {
+      return null;
+    } else {
+      final String attributeName = this.attributeNames.get(columnIndex
+        - attributesOffset);
+      if (attributeName == null) {
+        return null;
+      } else {
+        final int index = attributeName.indexOf('.');
+        if (index == -1) {
+          return attributeName;
+        } else {
+          return attributeName.substring(0, index);
+        }
+      }
+    }
+  }
+
+  @Override
+  public String getFieldName(final int rowIndex, final int columnIndex) {
+    return getFieldName(columnIndex);
+  }
+
   public abstract <V extends DataObject> V getObject(final int row);
 
   public List<LayerDataObject> getObjects(final int[] rows) {
@@ -162,6 +162,9 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return null;
     } else {
+      if (rowIndex > 0) {
+        System.out.println();
+      }
       final DataObject object = getObject(rowIndex);
       if (object == null) {
         return null;

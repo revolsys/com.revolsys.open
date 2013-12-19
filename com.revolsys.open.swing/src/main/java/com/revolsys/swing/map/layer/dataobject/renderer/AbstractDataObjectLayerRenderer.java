@@ -157,9 +157,9 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
-  public boolean isVisible(final LayerDataObject object) {
-    if (isVisible()) {
-      return isFilterAccept(object);
+  public boolean isVisible(final LayerDataObject record) {
+    if (isVisible() && !record.isDeleted()) {
+      return isFilterAccept(record);
     } else {
       return false;
     }

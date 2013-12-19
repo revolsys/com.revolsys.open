@@ -14,14 +14,27 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
 
   private final Object value;
 
+  private boolean invert = false;
+
+  public DataObjectRowPropertyEnableCheck(final boolean invert,
+    final String propertyName) {
+    this(invert, propertyName, true);
+  }
+
+  public DataObjectRowPropertyEnableCheck(final boolean invert,
+    final String propertyName, final Object value) {
+    this.invert = invert;
+    this.propertyName = propertyName;
+    this.value = value;
+  }
+
   public DataObjectRowPropertyEnableCheck(final String propertyName) {
     this(propertyName, true);
   }
 
   public DataObjectRowPropertyEnableCheck(final String propertyName,
     final Object value) {
-    this.propertyName = propertyName;
-    this.value = value;
+    this(false, propertyName, value);
   }
 
   private DataObject getObject() {
@@ -43,10 +56,20 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
       final DataObject object = getObject();
       final Object value = JavaBeanUtil.getSimpleProperty(object,
         this.propertyName);
-      if (EqualsRegistry.equal(value, this.value)) {
-        return enabled();
+      final boolean equal = EqualsRegistry.equal(value, this.value);
+      if (equal) {
+        if (invert) {
+          return disabled();
+        } else {
+          return enabled();
+        }
+      } else {
+        if (invert) {
+          return enabled();
+        } else {
+          return disabled();
+        }
       }
-      return disabled();
 
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).debug("Enable check not valid", e);

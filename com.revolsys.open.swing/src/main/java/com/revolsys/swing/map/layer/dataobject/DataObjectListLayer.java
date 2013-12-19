@@ -105,7 +105,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   private void addAllInternal(
     final Collection<? extends LayerDataObject> records) {
     this.records.addAll(records);
-    getIndex().insert(records);
+    addToIndex(records);
   }
 
   public void addAllRecords(final Collection<? extends LayerDataObject> records) {
@@ -121,7 +121,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   private void addObjectInternal(final LayerDataObject object) {
     if (!this.records.contains(object)) {
       this.records.add(object);
-      getIndex().insert(object);
+      addToIndex(object);
     }
   }
 
@@ -189,7 +189,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
       final List<LayerDataObject> oldValue = new ArrayList<LayerDataObject>(
         this.records);
       this.records.removeAll(records);
-      getIndex().remove(records);
+      removeFromIndex(records);
       firePropertyChange("records", oldValue, new ArrayList<LayerDataObject>(
         this.records));
       firePropertyChange("rowCount", oldRowCount, getRowCount());

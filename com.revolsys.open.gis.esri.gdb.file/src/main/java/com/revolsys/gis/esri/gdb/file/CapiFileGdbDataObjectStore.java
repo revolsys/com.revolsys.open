@@ -470,7 +470,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final Map<String, Boolean> orderBy = query.getOrderBy();
       final StringBuffer whereClause = getWhereClause(query);
       StringBuffer sql = new StringBuffer();
-      if (orderBy.isEmpty()) {
+      if (orderBy.isEmpty() || boundingBox != null) {
+        if (!orderBy.isEmpty()) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Unable to sort on " + metaData.getPath() + " " + orderBy.keySet()
+              + " as the ESRI library can't sort with a bounding box query");
+        }
         sql = whereClause;
       } else {
         sql.append("SELECT ");
@@ -487,34 +492,33 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           sql.append(" WHERE ");
           sql.append(whereClause);
         }
-        if (!orderBy.isEmpty()) {
-          boolean first = true;
-          for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-            .iterator(); iterator.hasNext();) {
-            final Entry<String, Boolean> entry = iterator.next();
-            final String column = entry.getKey();
-            final DataType dataType = metaData.getAttributeType(column);
-            // TODO at the moment only numbers are supported
-            if (dataType != null
-              && Number.class.isAssignableFrom(dataType.getJavaClass())) {
-              if (first) {
-                sql.append(" ORDER BY ");
-                first = false;
-              } else {
-                sql.append(", ");
-              }
-              sql.append(column);
-              final Boolean ascending = entry.getValue();
-              if (!ascending) {
-                sql.append(" DESC");
-              }
-
+        boolean first = true;
+        for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+          .iterator(); iterator.hasNext();) {
+          final Entry<String, Boolean> entry = iterator.next();
+          final String column = entry.getKey();
+          final DataType dataType = metaData.getAttributeType(column);
+          // TODO at the moment only numbers are supported
+          if (dataType != null
+            && Number.class.isAssignableFrom(dataType.getJavaClass())) {
+            if (first) {
+              sql.append(" ORDER BY ");
+              first = false;
             } else {
-              LoggerFactory.getLogger(getClass()).error(
+              sql.append(", ");
+            }
+            sql.append(column);
+            final Boolean ascending = entry.getValue();
+            if (!ascending) {
+              sql.append(" DESC");
+            }
+
+          } else {
+            LoggerFactory.getLogger(getClass())
+              .error(
                 "Unable to sort on " + metaData.getPath() + "." + column
                   + " as the ESRI library can't sort on " + dataType
                   + " columns");
-            }
           }
         }
       }

@@ -209,6 +209,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
    * 
    * @throws IOException If an I/O error occurs.
    */
+  @SuppressWarnings("unused")
   private void loadHeader() throws IOException {
     in.readInt();
     in.skipBytes(20);
@@ -225,6 +226,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     final double maxM = in.readLEDouble();
   }
 
+  @SuppressWarnings("unused")
   private Geometry readGeometry() throws IOException {
     final int recordNumber = in.readInt();
     final int recordLength = in.readInt();
