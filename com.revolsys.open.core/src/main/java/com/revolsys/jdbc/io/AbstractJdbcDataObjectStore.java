@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,6 +110,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String tablePermissionsSql;
 
+  private Set<String> excludeTablePaths = new HashSet<String>();
+
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -132,6 +135,10 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectFactory dataObjectFactory) {
     this(dataObjectFactory);
     this.databaseFactory = databaseFactory;
+  }
+
+  protected void addAllSchemaNames(final String schemaName) {
+    allSchemaNames.add(schemaName.toUpperCase());
   }
 
   protected void addAttribute(final DataObjectMetaDataImpl metaData,
@@ -161,6 +168,10 @@ public abstract class AbstractJdbcDataObjectStore extends
   public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
     attributeAdders.put(sqlTypeName, adder);
+  }
+
+  public void addExcludeTablePaths(final String tableName) {
+    addExcludeTablePaths(tableName);
   }
 
   @Override
@@ -307,10 +318,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  public Set<String> getAllSchemaNames() {
-    return allSchemaNames;
-  }
-
   // protected Set<String> getDatabaseSchemaNames() {
   // final Set<String> databaseSchemaNames = new TreeSet<String>();
   // try {
@@ -336,16 +343,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   // return databaseSchemaNames;
   // }
 
-  public JdbcAttribute getAttribute(final String schemaName,
-    final String tableName, final String columnName) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      return null;
-    } else {
-      final Attribute attribute = metaData.getAttribute(columnName);
-      return (JdbcAttribute)attribute;
-    }
+  public Set<String> getAllSchemaNames() {
+    return allSchemaNames;
   }
 
   // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
@@ -375,6 +374,18 @@ public abstract class AbstractJdbcDataObjectStore extends
   // releaseConnection(connection);
   // }
   // }
+
+  public JdbcAttribute getAttribute(final String schemaName,
+    final String tableName, final String columnName) {
+    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      final Attribute attribute = metaData.getAttribute(columnName);
+      return (JdbcAttribute)attribute;
+    }
+  }
 
   public int getBatchSize() {
     return batchSize;
@@ -422,7 +433,7 @@ public abstract class AbstractJdbcDataObjectStore extends
         try {
           while (resultSet.next()) {
             final String schemaName = resultSet.getString("SCHEMA_NAME");
-            allSchemaNames.add(schemaName.toUpperCase());
+            addAllSchemaNames(schemaName);
             if (!isSchemaExcluded(schemaName)) {
               schemaNames.add(schemaName);
             }
@@ -456,6 +467,10 @@ public abstract class AbstractJdbcDataObjectStore extends
     } else {
       return connection;
     }
+  }
+
+  public Set<String> getExcludeTablePaths() {
+    return excludeTablePaths;
   }
 
   @Override
@@ -523,7 +538,7 @@ public abstract class AbstractJdbcDataObjectStore extends
         final ResultSet resultSet = statement.executeQuery();
         try {
           if (resultSet.next()) {
-            int rowCount = resultSet.getInt(1);
+            final int rowCount = resultSet.getInt(1);
             return rowCount;
           } else {
             return 0;
@@ -685,9 +700,13 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
     final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase();
-    for (final String pattern : excludeTablePatterns) {
-      if (path.matches(pattern) || tableName.matches(pattern)) {
-        return true;
+    if (excludeTablePaths.contains(path)) {
+      return true;
+    } else {
+      for (final String pattern : excludeTablePatterns) {
+        if (path.matches(pattern) || tableName.matches(pattern)) {
+          return true;
+        }
       }
     }
     return false;
@@ -706,16 +725,20 @@ public abstract class AbstractJdbcDataObjectStore extends
     final Connection connection = getDbConnection();
     try {
       final PreparedStatement statement = connection.prepareStatement(primaryKeySql);
-      statement.setString(1, dbSchemaName);
-      final ResultSet rs = statement.executeQuery();
       try {
-        while (rs.next()) {
-          final String tableName = rs.getString("TABLE_NAME").toUpperCase();
-          final String idAttributeName = rs.getString("COLUMN_NAME");
-          idColumnNames.put(schemaName + "/" + tableName, idAttributeName);
+        statement.setString(1, dbSchemaName);
+        final ResultSet rs = statement.executeQuery();
+        try {
+          while (rs.next()) {
+            final String tableName = rs.getString("TABLE_NAME").toUpperCase();
+            final String idAttributeName = rs.getString("COLUMN_NAME");
+            idColumnNames.put(schemaName + "/" + tableName, idAttributeName);
+          }
+        } finally {
+          JdbcUtils.close(rs);
         }
       } finally {
-        JdbcUtils.close(rs);
+        JdbcUtils.close(statement);
       }
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to primary keys for schema "
@@ -927,6 +950,14 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
+  }
+
+  public void setExcludeTablePaths(final Collection<String> excludeTablePaths) {
+    this.excludeTablePaths = new HashSet<String>(excludeTablePaths);
+  }
+
+  public void setExcludeTablePaths(final String... excludeTablePaths) {
+    setExcludeTablePaths(Arrays.asList(excludeTablePaths));
   }
 
   public void setExcludeTablePatterns(final String... excludeTablePatterns) {
