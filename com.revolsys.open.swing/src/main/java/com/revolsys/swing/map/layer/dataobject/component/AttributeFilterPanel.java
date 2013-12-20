@@ -23,13 +23,10 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.query.BinaryCondition;
-import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Equal;
-import com.revolsys.gis.data.query.Function;
+import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -173,7 +170,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   public void clear() {
     this.nameField.setSelectedIndex(0);
-    setSearchCondition(null);
+    setFilter(null);
   }
 
   public void fireSearchChanged(final String propertyName,
@@ -194,16 +191,16 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     return this.attributeNames;
   }
 
+  public Condition getFilter() {
+    return this.tableModel.getFilter();
+  }
+
   public AbstractDataObjectLayer getLayer() {
     return this.layer;
   }
 
   public String getSearchAttribute() {
     return (String)this.nameField.getSelectedItem();
-  }
-
-  public Condition getSearchCondition() {
-    return this.tableModel.getSearchCondition();
   }
 
   public final String getSearchOperator() {
@@ -233,61 +230,51 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     }
   }
 
-  public void setSearchCondition(final Condition condition) {
+  public void setFilter(final Condition filter) {
     final boolean eventsEnabled = this.eventsEnabled;
     try {
       this.eventsEnabled = false;
-      this.tableModel.setSearchCondition(condition);
-      boolean simple = condition == null;
-      if (condition instanceof BinaryCondition) {
-        final BinaryCondition binaryCondition = (BinaryCondition)condition;
-        QueryValue leftCondition = binaryCondition.getLeft();
-        final QueryValue rightCondition = binaryCondition.getRight();
-        final Field field = (Field)searchField;
-        if ("=".equals(binaryCondition.getOperator())) {
-          if (leftCondition instanceof Column
-            && rightCondition instanceof Value) {
-            final Column column = (Column)leftCondition;
-            final Value value = (Value)rightCondition;
-            nameField.setFieldValue(column.getName());
-            operatorField.setFieldValue("=");
-            final String text = StringConverterRegistry.toString(value.getValue());
-            final Object oldValue = field.getFieldValue();
-            if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue.toString()))) {
-              field.setFieldValue(text);
-            }
-            simple = true;
-          }
-        } else if ("LIKE".equalsIgnoreCase(binaryCondition.getOperator())) {
-          if (leftCondition instanceof Function) {
-            final Function function = (Function)leftCondition;
-            if ("UPPER".equals(function.getName())) {
-              final List<QueryValue> conditions = function.getQueryValues();
-              if (conditions.size() == 1) {
-                leftCondition = conditions.get(0);
-              }
-            }
-          }
-          if (leftCondition instanceof Cast) {
-            final Cast cast = (Cast)leftCondition;
-            leftCondition = cast.getValue();
-          }
-          if (leftCondition instanceof Column
-            && rightCondition instanceof Value) {
-            final Column column = (Column)leftCondition;
-            final Value value = (Value)rightCondition;
-            nameField.setFieldValue(column.getName());
-            operatorField.setFieldValue("Like");
-            final String searchValue = StringConverterRegistry.toString(
-              value.getValue()).replaceAll("%", "");
-            final String fieldValue = StringConverterRegistry.toString(field.getFieldValue());
+      this.tableModel.setFilter(filter);
+      boolean simple = filter == null;
+      final Field field = (Field)searchField;
+      if (filter == null) {
+        field.setFieldValue(null);
+      } else if (filter instanceof Equal) {
+        final Equal equal = (Equal)filter;
+        final QueryValue leftCondition = equal.getLeft();
+        final QueryValue rightCondition = equal.getRight();
 
-            if (searchValue == null || fieldValue == null
-              || !searchValue.equalsIgnoreCase(fieldValue)) {
-              field.setFieldValue(searchValue);
-            }
-            simple = true;
+        if (leftCondition instanceof Column && rightCondition instanceof Value) {
+          final Column column = (Column)leftCondition;
+          final Value value = (Value)rightCondition;
+          nameField.setFieldValue(column.getName());
+          operatorField.setFieldValue("=");
+          final String text = StringConverterRegistry.toString(value.getValue());
+          final Object oldValue = field.getFieldValue();
+          if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue.toString()))) {
+            field.setFieldValue(text);
           }
+          simple = true;
+        }
+      } else if (filter instanceof ILike) {
+        final ILike equal = (ILike)filter;
+        final QueryValue leftCondition = equal.getLeft();
+        final QueryValue rightCondition = equal.getRight();
+
+        if (leftCondition instanceof Column && rightCondition instanceof Value) {
+          final Column column = (Column)leftCondition;
+          final Value value = (Value)rightCondition;
+          nameField.setFieldValue(column.getName());
+          operatorField.setFieldValue("Like");
+          final String searchValue = StringConverterRegistry.toString(
+            value.getValue()).replaceAll("%", "");
+          final String fieldValue = StringConverterRegistry.toString(field.getFieldValue());
+
+          if (searchValue == null || fieldValue == null
+            || !searchValue.equalsIgnoreCase(fieldValue)) {
+            field.setFieldValue(searchValue);
+          }
+          simple = true;
         }
       }
       if (simple) {
@@ -331,7 +318,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           if ("Like".equalsIgnoreCase(searchOperator)) {
             final String searchText = StringConverterRegistry.toString(searchValue);
             if (StringUtils.hasText(searchText)) {
-              condition = Conditions.likeUpper(fieldName, searchText);
+              condition = ILike.iLike(fieldName, "%" + searchText + "%");
             }
           } else {
             final DataObjectMetaData metaData = this.tableModel.getMetaData();
@@ -345,7 +332,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           }
         }
       }
-      setSearchCondition(condition);
+      setFilter(condition);
     }
   }
 

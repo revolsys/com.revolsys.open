@@ -3,11 +3,19 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.Map;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class Column extends Condition {
 
   private final String name;
+
+  private Attribute attribute;
+
+  public Column(final Attribute attribute) {
+    this.name = attribute.getName();
+    this.attribute = attribute;
+  }
 
   public Column(final String name) {
     this.name = name;
@@ -38,10 +46,15 @@ public class Column extends Condition {
     }
   }
 
+  public Attribute getAttribute() {
+    return attribute;
+  }
+
   public String getName() {
     return name;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Map<String, Object> object) {
     final String name = getName();

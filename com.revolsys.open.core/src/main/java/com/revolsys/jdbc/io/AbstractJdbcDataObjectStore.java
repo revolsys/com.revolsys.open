@@ -523,7 +523,8 @@ public abstract class AbstractJdbcDataObjectStore extends
         final ResultSet resultSet = statement.executeQuery();
         try {
           if (resultSet.next()) {
-            return resultSet.getInt(1);
+            int rowCount = resultSet.getInt(1);
+            return rowCount;
           } else {
             return 0;
           }

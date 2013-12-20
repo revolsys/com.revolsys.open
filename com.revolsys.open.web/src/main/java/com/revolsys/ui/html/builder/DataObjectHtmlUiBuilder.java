@@ -105,7 +105,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
         if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           final KeySerializer serializer = serializers.get(i);
           final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-          or.add(Conditions.likeUpper("T." + columnName, search));
+          or.add(Conditions.iLike("T." + columnName, search));
         }
       }
       if (!or.isEmpty()) {

@@ -78,8 +78,9 @@ public class BinaryCondition extends Condition {
     return false;
   }
 
-  public QueryValue getLeft() {
-    return left;
+  @SuppressWarnings("unchecked")
+  public <V extends QueryValue> V getLeft() {
+    return (V)left;
   }
 
   public String getOperator() {
@@ -91,8 +92,9 @@ public class BinaryCondition extends Condition {
     return Arrays.asList(left, right);
   }
 
-  public QueryValue getRight() {
-    return right;
+  @SuppressWarnings("unchecked")
+  public <V extends QueryValue> V getRight() {
+    return (V)right;
   }
 
   @Override

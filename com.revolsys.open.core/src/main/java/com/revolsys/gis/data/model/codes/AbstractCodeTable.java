@@ -26,15 +26,6 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
 
   private JComponent swingEditor;
 
-  @Override
-  public JComponent getSwingEditor() {
-    return swingEditor;
-  }
-
-  public void setSwingEditor(JComponent swingEditor) {
-    this.swingEditor = swingEditor;
-  }
-
   private long maxId;
 
   private String name;
@@ -206,6 +197,11 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
   }
 
   @Override
+  public JComponent getSwingEditor() {
+    return swingEditor;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
@@ -295,5 +291,9 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public void setSwingEditor(final JComponent swingEditor) {
+    this.swingEditor = swingEditor;
   }
 }

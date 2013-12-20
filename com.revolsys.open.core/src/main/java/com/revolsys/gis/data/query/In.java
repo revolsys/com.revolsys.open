@@ -1,20 +1,35 @@
 package com.revolsys.gis.data.query;
 
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class In extends BinaryCondition {
+public class In extends Condition {
+
+  private QueryValue left;
+
+  private CollectionValue values;
 
   public In(final Attribute attribute, final Collection<? extends Object> values) {
     this(attribute.getName(), new CollectionValue(attribute, values));
   }
 
   public In(final QueryValue left, final CollectionValue values) {
-    super(left, "in", values);
+    this.left = left;
+    if (left instanceof Column) {
+      final Column column = (Column)left;
+      final Attribute attribute = column.getAttribute();
+      if (attribute != null) {
+        values.setAttribute(attribute);
+      }
+    }
+    this.values = values;
   }
 
   public In(final String name, final Collection<? extends Object> values) {
@@ -32,11 +47,82 @@ public class In extends BinaryCondition {
   @Override
   public boolean accept(final Map<String, Object> record) {
     final QueryValue left = getLeft();
-    final Object value1 = left.getValue(record);
+    final Object value = left.getValue(record);
 
-    final QueryValue right = getRight();
-    final Object value2 = right.getValue(record);
+    final CollectionValue right = getValues();
+    final List<Object> allowedValues = right.getValues();
 
-    return EqualsRegistry.equal(value1, value2);
+    for (final Object allowedValue : allowedValues) {
+      if (EqualsRegistry.equal(value, allowedValue)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public int appendParameters(int index, final PreparedStatement statement) {
+    if (left != null) {
+      index = left.appendParameters(index, statement);
+    }
+    if (values != null) {
+      index = values.appendParameters(index, statement);
+    }
+    return index;
+  }
+
+  @Override
+  public void appendSql(final StringBuffer buffer) {
+    if (left == null) {
+      buffer.append("NULL");
+    } else {
+      left.appendSql(buffer);
+    }
+    buffer.append(" ");
+    buffer.append(" IN ");
+    // buffer.append(" (");
+    values.appendSql(buffer);
+    // buffer.append(")");
+  }
+
+  @Override
+  public In clone() {
+    final In clone = (In)super.clone();
+    clone.left = left.clone();
+    clone.values = values.clone();
+    return clone;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof In) {
+      final In in = (In)obj;
+      if (EqualsRegistry.equal(in.getLeft(), this.getLeft())) {
+        if (EqualsRegistry.equal(in.getValues(), this.getValues())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends QueryValue> V getLeft() {
+    return (V)left;
+  }
+
+  @Override
+  public List<QueryValue> getQueryValues() {
+    return Arrays.asList(left, values);
+  }
+
+  public CollectionValue getValues() {
+    return values;
+  }
+
+  @Override
+  public String toString() {
+    return StringConverterRegistry.toString(left) + " IN "
+      + StringConverterRegistry.toString(values);
   }
 }

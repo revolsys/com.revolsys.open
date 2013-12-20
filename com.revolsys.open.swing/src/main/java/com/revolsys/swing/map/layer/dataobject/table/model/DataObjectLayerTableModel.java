@@ -103,7 +103,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private final DataObjectLayerHighlightedListSelectionModel highlightedModel = new DataObjectLayerHighlightedListSelectionModel(
     this);
 
-  private Condition searchCondition;
+  private Condition filter;
 
   private boolean filterByBoundingBox;
 
@@ -156,7 +156,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
       return 0;
     } else {
-      int count = this.rowCount + getLayer().getNewObjectCount();
+      final int count = this.rowCount + getLayer().getNewObjectCount();
       return count;
     }
   }
@@ -167,13 +167,17 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return layer.getFieldTitle(fieldName);
   }
 
+  public Condition getFilter() {
+    return this.filter;
+  }
+
   protected Query getFilterQuery() {
     Query query = this.layer.getQuery();
     if (query == null) {
       return null;
     } else {
       query = query.clone();
-      query.and(this.searchCondition);
+      query.and(this.filter);
       query.setOrderBy(this.orderBy);
       if (this.filterByBoundingBox) {
         final Project project = this.layer.getProject();
@@ -282,10 +286,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  public Condition getSearchCondition() {
-    return this.searchCondition;
-  }
-
   protected List<LayerDataObject> getSelectedObjects() {
     final AbstractDataObjectLayer layer = getLayer();
     final List<LayerDataObject> selectedObjects = layer.getSelectedRecords();
@@ -316,6 +316,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public boolean isFilterByBoundingBox() {
     return this.filterByBoundingBox;
+  }
+
+  public boolean isHasFilter() {
+    return this.filter != null;
   }
 
   @Override
@@ -450,6 +454,25 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
+  public boolean setFilter(final Condition filter) {
+    if (EqualsRegistry.equal(filter, this.filter)) {
+      return false;
+    } else {
+      final Object oldValue = this.filter;
+      this.filter = filter;
+      if (MODE_SELECTED.equals(getAttributeFilterMode())) {
+        setRowSorter(filter);
+      } else {
+        refresh();
+      }
+      propertyChangeSupport.firePropertyChange("filter", oldValue, this.filter);
+      final boolean hasFilter = isHasFilter();
+      propertyChangeSupport.firePropertyChange("hasFilter", !hasFilter,
+        hasFilter);
+      return true;
+    }
+  }
+
   public void setFilterByBoundingBox(final boolean filterByBoundingBox) {
     if (this.filterByBoundingBox != filterByBoundingBox) {
       this.filterByBoundingBox = filterByBoundingBox;
@@ -461,13 +484,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     this.attributeFilterModes = Arrays.asList(modes);
   }
 
-  protected void setRowSorter(final Condition searchCondition) {
+  protected void setRowSorter(final Condition filter) {
     final DataObjectLayerTable table = getTable();
-    if (searchCondition == null) {
+    if (filter == null) {
       table.setRowFilter(null);
     } else {
-      if (searchCondition instanceof BinaryCondition) {
-        final BinaryCondition binaryCondition = (BinaryCondition)searchCondition;
+      if (filter instanceof BinaryCondition) {
+        final BinaryCondition binaryCondition = (BinaryCondition)filter;
         final String operator = binaryCondition.getOperator();
         QueryValue left = binaryCondition.getLeft();
         final QueryValue right = binaryCondition.getRight();
@@ -496,40 +519,23 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
           }
           if (operator.equals("=")) {
-            RowFilter<Object, Object> filter;
+            RowFilter<Object, Object> rowFilter;
             if (value instanceof Number) {
               final Number number = (Number)value;
-              filter = RowFilter.numberFilter(ComparisonType.EQUAL, number,
+              rowFilter = RowFilter.numberFilter(ComparisonType.EQUAL, number,
                 columnIndex);
             } else {
-              filter = new EqualFilter(StringConverterRegistry.toString(value),
-                columnIndex);
+              rowFilter = new EqualFilter(
+                StringConverterRegistry.toString(value), columnIndex);
             }
-            table.setRowFilter(filter);
+            table.setRowFilter(rowFilter);
           } else if (operator.equals("LIKE")) {
-            final RowFilter<Object, Object> filter = new ContainsFilter(
+            final RowFilter<Object, Object> rowFilter = new ContainsFilter(
               StringConverterRegistry.toString(value), columnIndex);
-            table.setRowFilter(filter);
+            table.setRowFilter(rowFilter);
           }
         }
       }
-    }
-  }
-
-  public boolean setSearchCondition(final Condition searchCondition) {
-    if (EqualsRegistry.equal(searchCondition, this.searchCondition)) {
-      return false;
-    } else {
-      final Object oldValue = this.searchCondition;
-      this.searchCondition = searchCondition;
-      if (MODE_SELECTED.equals(getAttributeFilterMode())) {
-        setRowSorter(searchCondition);
-      } else {
-        refresh();
-      }
-      propertyChangeSupport.firePropertyChange("searchCondition", oldValue,
-        this.searchCondition);
-      return true;
     }
   }
 

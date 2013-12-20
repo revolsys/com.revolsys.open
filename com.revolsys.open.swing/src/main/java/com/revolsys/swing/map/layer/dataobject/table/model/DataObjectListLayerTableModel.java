@@ -130,9 +130,9 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public boolean setSearchCondition(final Condition searchCondition) {
-    if (super.setSearchCondition(searchCondition)) {
-      setRowSorter(searchCondition);
+  public boolean setFilter(final Condition filter) {
+    if (super.setFilter(filter)) {
+      setRowSorter(filter);
       return true;
     } else {
       return false;

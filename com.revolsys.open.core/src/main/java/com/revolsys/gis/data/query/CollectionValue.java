@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.util.CollectionUtil;
@@ -18,11 +20,11 @@ public class CollectionValue extends QueryValue {
 
   private JdbcAttribute jdbcAttribute;
 
+  private Attribute attribute;
+
   public CollectionValue(final Attribute attribute,
     final Collection<? extends Object> values) {
-    if (attribute instanceof JdbcAttribute) {
-      jdbcAttribute = (JdbcAttribute)attribute;
-    }
+    setAttribute(attribute);
     for (final Object value : values) {
       QueryValue queryValue;
       if (value instanceof QueryValue) {
@@ -41,20 +43,19 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    final JdbcAttribute jdbcAttribute = this.jdbcAttribute;
     for (final QueryValue queryValue : queryValues) {
+      JdbcAttribute jdbcAttribute = this.jdbcAttribute;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
-        final Object value = valueWrapper.getValue();
+        final Object value = valueWrapper.getQueryValue();
         if (jdbcAttribute == null) {
-          index = queryValue.appendParameters(index, statement);
-        } else {
-          try {
-            index = jdbcAttribute.setPreparedStatementValue(statement, index,
-              value);
-          } catch (final SQLException e) {
-            ExceptionUtil.throwIfUnchecked(e);
-          }
+          jdbcAttribute = JdbcAttribute.createAttribute(value);
+        }
+        try {
+          index = jdbcAttribute.setPreparedStatementValue(statement, index,
+            value);
+        } catch (final SQLException e) {
+          ExceptionUtil.throwIfUnchecked(e);
         }
       } else {
         index = queryValue.appendParameters(index, statement);
@@ -104,6 +105,10 @@ public class CollectionValue extends QueryValue {
     }
   }
 
+  public Attribute getAttribute() {
+    return attribute;
+  }
+
   @Override
   public List<QueryValue> getQueryValues() {
     return queryValues;
@@ -121,6 +126,12 @@ public class CollectionValue extends QueryValue {
   }
 
   public List<Object> getValues() {
+    CodeTable codeTable = null;
+    if (attribute != null) {
+      final DataObjectMetaData metaData = attribute.getMetaData();
+      final String fieldName = attribute.getName();
+      codeTable = metaData.getCodeTableByColumn(fieldName);
+    }
     final List<Object> values = new ArrayList<Object>();
     for (final QueryValue queryValue : getQueryValues()) {
       Object value;
@@ -130,9 +141,33 @@ public class CollectionValue extends QueryValue {
       } else {
         value = queryValue;
       }
-      values.add(value);
+      if (value != null) {
+        if (codeTable != null) {
+          value = codeTable.getId(value);
+        }
+        values.add(value);
+      }
     }
     return values;
+  }
+
+  public void setAttribute(final Attribute attribute) {
+    this.attribute = attribute;
+    if (attribute == null) {
+      this.jdbcAttribute = null;
+    } else {
+      if (attribute instanceof JdbcAttribute) {
+        this.jdbcAttribute = (JdbcAttribute)attribute;
+      } else {
+        this.jdbcAttribute = null;
+      }
+      for (final QueryValue queryValue : queryValues) {
+        if (queryValue instanceof Value) {
+          final Value value = (Value)queryValue;
+          value.setAttribute(attribute);
+        }
+      }
+    }
   }
 
   @Override

@@ -76,7 +76,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
     this(metaData.getDataStore(), displayAttributeName, new Query(
-      metaData, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(metaData, Conditions.likeUpper(
+      metaData, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(metaData, Conditions.iLike(
       displayAttributeName, "")));
   }
 
@@ -124,7 +124,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
     this(dataStore, displayAttributeName, new Query(typeName, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(
-      typeName, Conditions.likeUpper(displayAttributeName, "")));
+      typeName, Conditions.iLike(displayAttributeName, "")));
   }
 
   @Override

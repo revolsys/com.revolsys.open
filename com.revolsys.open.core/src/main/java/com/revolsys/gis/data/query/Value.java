@@ -9,6 +9,9 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -16,15 +19,17 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 public class Value extends QueryValue {
   private JdbcAttribute jdbcAttribute;
 
-  private Object value;
+  private Object queryValue;
+
+  private Object displayValue;
+
+  private Attribute attribute;
 
   public Value(final Attribute attribute, final Object value) {
-    if (attribute instanceof JdbcAttribute) {
-      jdbcAttribute = (JdbcAttribute)attribute;
-    } else {
-      jdbcAttribute = JdbcAttribute.createAttribute(value);
-    }
-    this.value = value;
+    this.queryValue = value;
+    this.displayValue = value;
+    setAttribute(attribute);
+
   }
 
   public Value(final Object value) {
@@ -34,9 +39,10 @@ public class Value extends QueryValue {
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     try {
-      return jdbcAttribute.setPreparedStatementValue(statement, index, value);
+      return jdbcAttribute.setPreparedStatementValue(statement, index,
+        this.queryValue);
     } catch (final SQLException e) {
-      throw new RuntimeException("Unable to set value: " + value, e);
+      throw new RuntimeException("Unable to set value: " + this.queryValue, e);
     }
   }
 
@@ -58,14 +64,15 @@ public class Value extends QueryValue {
   }
 
   public void convert(final DataType dataType) {
-    if (value != null) {
-      final Object newValue = StringConverterRegistry.toObject(dataType, value);
+    if (this.queryValue != null) {
+      final Object newValue = StringConverterRegistry.toObject(dataType,
+        this.queryValue);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
-        throw new IllegalArgumentException(value + " is not a valid "
+        throw new IllegalArgumentException(this.queryValue + " is not a valid "
           + typeClass);
       } else {
-        this.value = newValue;
+        this.queryValue = newValue;
       }
     }
   }
@@ -80,36 +87,85 @@ public class Value extends QueryValue {
     }
   }
 
+  public Object getDisplayValue() {
+    return displayValue;
+  }
+
+  public JdbcAttribute getJdbcAttribute() {
+    return jdbcAttribute;
+  }
+
+  public Object getQueryValue() {
+    return queryValue;
+  }
+
   public Object getValue() {
-    return value;
+    return this.queryValue;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final Map<String, Object> record) {
-    return (V)value;
+    return (V)this.queryValue;
+  }
+
+  public void setAttribute(final Attribute attribute) {
+    this.attribute = attribute;
+    if (attribute == null) {
+
+    } else {
+      if (attribute instanceof JdbcAttribute) {
+        jdbcAttribute = (JdbcAttribute)attribute;
+      } else {
+        jdbcAttribute = JdbcAttribute.createAttribute(this.queryValue);
+      }
+
+      CodeTable codeTable = null;
+      if (attribute != null) {
+        final DataObjectMetaData metaData = attribute.getMetaData();
+        if (metaData != null) {
+          final String fieldName = attribute.getName();
+          codeTable = metaData.getCodeTableByColumn(fieldName);
+          if (codeTable instanceof CodeTableProperty) {
+            final CodeTableProperty codeTableProperty = (CodeTableProperty)codeTable;
+            if (codeTableProperty.getMetaData() == metaData) {
+              codeTable = null;
+            }
+          }
+          if (codeTable != null) {
+            final Object id = codeTable.getId(this.queryValue);
+            if (id == null) {
+              this.displayValue = this.queryValue;
+            } else {
+              this.queryValue = id;
+              this.displayValue = codeTable.getValue(id);
+            }
+          }
+        }
+      }
+    }
   }
 
   public void setValue(final Object value) {
-    this.value = value;
+    this.queryValue = value;
   }
 
   @Override
   public String toString() {
-    if (value instanceof String) {
-      final String string = (String)value;
+    if (this.displayValue instanceof String) {
+      final String string = (String)this.displayValue;
       return "'" + string.replaceAll("'", "''") + "'";
-    } else if (value instanceof Date) {
-      final Date date = (Date)value;
+    } else if (this.displayValue instanceof Date) {
+      final Date date = (Date)this.displayValue;
       return "{d '" + date + "'}";
-    } else if (value instanceof Time) {
-      final Time time = (Time)value;
+    } else if (this.displayValue instanceof Time) {
+      final Time time = (Time)this.displayValue;
       return "{t '" + time + "'}";
-    } else if (value instanceof Timestamp) {
-      final Timestamp time = (Timestamp)value;
+    } else if (this.displayValue instanceof Timestamp) {
+      final Timestamp time = (Timestamp)this.displayValue;
       return "{ts '" + time + "'}";
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverterRegistry.toString(this.displayValue);
     }
   }
 

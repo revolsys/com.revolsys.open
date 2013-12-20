@@ -67,8 +67,8 @@ import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.Function;
+import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.In;
 import com.revolsys.gis.data.query.IsNotNull;
 import com.revolsys.gis.data.query.IsNull;
@@ -221,10 +221,10 @@ public class QueryWhereConditionField extends ValueField implements
     setPreferredSize(new Dimension(1000, Math.max(650,
       Math.min(attributeNames.size() * 15, 650))));
 
-    final Condition searchCondition = filterPanel.getSearchCondition();
-    setFieldValue(searchCondition);
-    if (searchCondition != null) {
-      whereTextField.setText(searchCondition.toFormattedString());
+    final Condition filter = filterPanel.getFilter();
+    setFieldValue(filter);
+    if (filter != null) {
+      whereTextField.setText(filter.toFormattedString());
     }
 
   }
@@ -325,7 +325,7 @@ public class QueryWhereConditionField extends ValueField implements
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
-    filterPanel.setSearchCondition(condition);
+    filterPanel.setFilter(condition);
   }
 
   @Override
@@ -464,8 +464,7 @@ public class QueryWhereConditionField extends ValueField implements
       if (attribute == null) {
         setInvalidMessage("Invalid column name " + columnName);
       } else {
-        final String attributeName = attribute.getName();
-        return (V)new Column(attributeName);
+        return (V)new Column(attribute);
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;
@@ -473,7 +472,7 @@ public class QueryWhereConditionField extends ValueField implements
       final ValueNode rightValueNode = likeEscapeOperatorNode.getLeftOperand();
       final QueryValue leftCondition = toQueryValue(leftValueNode);
       final QueryValue rightCondition = toQueryValue(rightValueNode);
-      return (V)Conditions.like(leftCondition, rightCondition);
+      return (V)new ILike(leftCondition, rightCondition);
     } else if (expression instanceof NotNode) {
       final NotNode notNode = (NotNode)expression;
       final ValueNode operand = notNode.getOperand();

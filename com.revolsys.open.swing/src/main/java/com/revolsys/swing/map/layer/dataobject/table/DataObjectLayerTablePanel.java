@@ -137,7 +137,10 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     toolBar.addButtonTitleIcon("search", "Advanced Filter", "filter_edits",
       attributeFilterPanel, "showAdvancedFilter");
 
-    toolBar.addButtonTitleIcon("search", "Clear Search", "filter_delete",
+    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(tableModel,
+      "hasFilter");
+
+    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
       attributeFilterPanel, "clear");
 
     // Filter buttons

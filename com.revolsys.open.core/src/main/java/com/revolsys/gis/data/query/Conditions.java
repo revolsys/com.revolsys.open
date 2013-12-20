@@ -5,22 +5,9 @@ import com.revolsys.gis.data.io.DataObjectStore;
 
 public class Conditions {
 
-  public static Condition like(final QueryValue left, final Object value) {
-    final Value valueCondition = new Value(value);
-    return like(left, valueCondition);
-  }
-
-  public static Condition like(final QueryValue left, final QueryValue right) {
-    return new BinaryCondition(left, "LIKE", right);
-  }
-
-  public static Condition like(final String left, final Condition right) {
-    return like(new Column(left), right);
-  }
-
-  public static Condition like(final String name, final Object value) {
-    final Value valueCondition = new Value(value);
-    return like(name, valueCondition);
+  public static Condition iLike(final String left, final String right) {
+    return Like.like(Function.upper(new Cast(left, "varchar(4000)")), ("%"
+      + right + "%").toUpperCase());
   }
 
   public static Condition likeRegEx(final DataObjectStore dataStore,
@@ -37,12 +24,7 @@ public class Conditions {
       + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-0]", "") + "%";
-    return like(left, right);
-  }
-
-  public static Condition likeUpper(final String left, final String right) {
-    return like(Function.upper(new Cast(left, "varchar(4000)")),
-      ("%" + right + "%").toUpperCase());
+    return Like.like(left, right);
   }
 
   public static void setValue(final int index, final Condition condition,

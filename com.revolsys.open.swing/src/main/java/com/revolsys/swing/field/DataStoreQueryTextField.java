@@ -93,7 +93,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String displayAttributeName) {
     this(metaData, displayAttributeName, new Query(metaData, new Equal(
       Function.upper(displayAttributeName), new Value(null))), new Query(
-      metaData, Conditions.likeUpper(displayAttributeName, "")));
+      metaData, Conditions.iLike(displayAttributeName, "")));
 
   }
 
@@ -154,7 +154,7 @@ public class DataStoreQueryTextField extends TextField implements
     this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
       typeName,
       new Equal(Function.upper(displayAttributeName), new Value(null))),
-      new Query(typeName, Conditions.likeUpper(displayAttributeName, "")));
+      new Query(typeName, Conditions.iLike(displayAttributeName, "")));
   }
 
   @Override
