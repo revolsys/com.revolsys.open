@@ -7,10 +7,13 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.revolsys.swing.parallel.Invoke;
 
 public class EnableComponentListener implements ItemListener,
   ListSelectionListener, PropertyChangeListener, DocumentListener {
@@ -50,7 +53,11 @@ public class EnableComponentListener implements ItemListener,
     final Object newValue = event.getNewValue();
     if (newValue instanceof Boolean) {
       final Boolean enabled = (Boolean)newValue;
-      this.component.setEnabled(enabled);
+      if (SwingUtilities.isEventDispatchThread()) {
+        this.component.setEnabled(enabled);
+      } else {
+        Invoke.later(component, "setEnabled", enabled);
+      }
 
     }
   }

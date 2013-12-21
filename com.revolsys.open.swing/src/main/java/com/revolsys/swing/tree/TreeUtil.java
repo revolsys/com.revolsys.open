@@ -9,9 +9,25 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.MenuElement;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.swing.tree.model.node.AbstractTreeNode;
+
 public final class TreeUtil {
+  public static void fireTreeNodeRemoved(final AbstractTreeNode node) {
+    final DefaultTreeModel treeModel = node.getTreeModel();
+    final TreeModelListener[] listeners = treeModel.getTreeModelListeners();
+    final JTree tree = node.getTree();
+    final TreePath treePath = node.getTreePath();
+    final TreeModelEvent event = new TreeModelEvent(tree, treePath);
+    for (final TreeModelListener listener : listeners) {
+      listener.treeNodesRemoved(event);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <L> L getFirstSelectedNode(final Object source,
     final Class<L> nodeClass) {

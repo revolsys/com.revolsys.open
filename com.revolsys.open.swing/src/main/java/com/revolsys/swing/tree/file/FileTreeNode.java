@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -28,6 +29,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -37,6 +39,7 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.datastore.FileDataObjectStoreTreeNode;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
@@ -69,6 +72,10 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   static {
     final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
     final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
+
+    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
+    MENU.addMenuItem("default", refresh);
 
     MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
       FileTreeNode.class, "addLayer");
@@ -252,9 +259,10 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return true;
     } else if (other instanceof FileTreeNode) {
       final FileTreeNode fileNode = (FileTreeNode)other;
-      final File file = getUserObject();
-      final File otherFile = fileNode.getUserObject();
-      return EqualsRegistry.equal(file, otherFile);
+      final File file = getFile();
+      final File otherFile = fileNode.getFile();
+      final boolean equal = EqualsRegistry.equal(file, otherFile);
+      return equal;
     }
     return false;
   }
@@ -331,6 +339,78 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return true;
     } else {
       return false;
+    }
+  }
+
+  @Override
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public void refresh() {
+    final File file = getFile();
+    if (file.exists()) {
+      if (file.isDirectory()) {
+        final List<FileTreeNode> oldNodes = (List)getChildren();
+        final ListIterator<FileTreeNode> oldIterator = oldNodes.listIterator();
+
+        final List<FileTreeNode> newNodes = (List)getFileNodes(this, file);
+        final ListIterator<FileTreeNode> newIterator = newNodes.listIterator();
+        int i = 0;
+
+        while (oldIterator.hasNext() && newIterator.hasNext()) {
+          FileTreeNode oldNode = oldIterator.next();
+          File oldFile = oldNode.getFile();
+
+          FileTreeNode newNode = newIterator.next();
+          File newFile = newNode.getFile();
+          while (oldFile != null && oldFile.compareTo(newFile) < 0) {
+            oldIterator.remove();
+            nodeRemoved(i, oldNode);
+            if (oldIterator.hasNext()) {
+              oldNode = oldIterator.next();
+              oldFile = oldNode.getFile();
+            } else {
+              oldFile = null;
+            }
+          }
+          if (oldFile != null) {
+            while (newFile != null && newFile.compareTo(oldFile) < 0) {
+              oldIterator.previous();
+              oldIterator.add(newNode);
+              oldIterator.next();
+              nodesInserted(i);
+              i++;
+              if (newIterator.hasNext()) {
+                newNode = newIterator.next();
+                newFile = newNode.getFile();
+              } else {
+                newFile = null;
+              }
+            }
+            if (newFile != null) {
+              i++;
+            }
+          }
+        }
+        while (oldIterator.hasNext()) {
+          oldIterator.next();
+          oldIterator.remove();
+
+        }
+
+        while (newIterator.hasNext()) {
+          final FileTreeNode newNode = newIterator.next();
+          oldIterator.add(newNode);
+          nodesInserted(i);
+          i++;
+        }
+      }
+    } else {
+      final TreeNode parent = getParent();
+      if (parent instanceof LazyLoadTreeNode) {
+        final LazyLoadTreeNode parentNode = (LazyLoadTreeNode)parent;
+        parentNode.removeNode(this);
+      }
     }
   }
 }

@@ -226,70 +226,90 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           if (orientation != 0) {
             graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
-          double dx = 0;
-          double dy = 0;
 
           final Measure<Length> textDx = style.getTextDx();
-
-          dx += Viewport2D.toDisplayValue(viewport, textDx);
+          final double dx = Viewport2D.toDisplayValue(viewport, textDx);
 
           final Measure<Length> textDy = style.getTextDy();
-          dy -= Viewport2D.toDisplayValue(viewport, textDy);
+          double dy = -Viewport2D.toDisplayValue(viewport, textDy);
 
           final FontMetrics fontMetrics = graphics.getFontMetrics();
-          final Rectangle2D bounds = fontMetrics.getStringBounds(label,
-            graphics);
-          final double width = bounds.getWidth();
-          final double height = bounds.getHeight();
-          dy -= fontMetrics.getDescent();
 
+          double maxWidth = 0;
+          final String[] lines = label.split("[\\r\\n]");
+          for (final String line : lines) {
+            final Rectangle2D bounds = fontMetrics.getStringBounds(line,
+              graphics);
+            final double width = bounds.getWidth();
+            maxWidth = Math.max(width, maxWidth);
+          }
+          final int descent = fontMetrics.getDescent();
+          final int ascent = fontMetrics.getAscent();
+          final int leading = fontMetrics.getLeading();
+          final double maxHeight = lines.length * (ascent + descent)
+            + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
-            dy += height;
           } else if ("middle".equals(verticalAlignment)) {
-            dy -= height / 2;
+            dy -= maxHeight / 2;
           } else if ("bottom".equals(verticalAlignment)) {
-            dy -= height;
-          }
-          final String horizontalAlignment = style.getTextHorizontalAlignment();
-          if ("right".equals(horizontalAlignment)) {
-            dx -= width;
-          } else if ("center".equals(horizontalAlignment)) {
-            dx -= width / 2;
+            dy -= maxHeight;
           }
           graphics.translate(dx, dy);
-          graphics.scale(1, 1);
-          if (Math.abs(orientation) > 90) {
-            graphics.rotate(Math.PI, width / 2, -height / 4);
-          }
-          graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-          final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
-            style.getTextHaloRadius());
-          if (textHaloRadius > 0) {
-            final Stroke savedStroke = graphics.getStroke();
-            final Stroke outlineStroke = new BasicStroke((float)textHaloRadius,
-              BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-            graphics.setColor(style.getTextHaloFill());
-            graphics.setStroke(outlineStroke);
-            final Font font = graphics.getFont();
-            final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-            final TextLayout textLayout = new TextLayout(label, font,
-              fontRenderContext);
-            final Shape outlineShape = textLayout.getOutline(NOOP_TRANSFORM);
-            graphics.draw(outlineShape);
-            graphics.setStroke(savedStroke);
-          }
 
-          final Color textBoxColor = style.getTextBoxColor();
-          if (textBoxColor != null) {
-            graphics.setColor(textBoxColor);
-            graphics.fill(new Rectangle2D.Double(bounds.getX() - 2,
-              bounds.getY() - 1, width + 4, height + 2));
-          }
+          for (int i = 0; i < lines.length; i++) {
+            final String line = lines[i];
+            graphics.translate(0, ascent);
+            final AffineTransform lineTransform = graphics.getTransform();
+            final Rectangle2D bounds = fontMetrics.getStringBounds(line,
+              graphics);
+            final double width = bounds.getWidth();
+            final double height = bounds.getHeight();
 
-          graphics.setColor(style.getTextFill());
-          graphics.drawString(label, (float)0, (float)0);
+            final String horizontalAlignment = style.getTextHorizontalAlignment();
+            if ("right".equals(horizontalAlignment)) {
+              graphics.translate(-width, 0);
+            } else if ("center".equals(horizontalAlignment)) {
+              graphics.translate(-width / 2, 0);
+            }
+            graphics.translate(dx, 0);
+
+            graphics.scale(1, 1);
+            if (Math.abs(orientation) > 90) {
+              graphics.rotate(Math.PI, maxWidth / 2, -height / 4);
+            }
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+              RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+            final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
+              style.getTextHaloRadius());
+            if (textHaloRadius > 0) {
+              final Stroke savedStroke = graphics.getStroke();
+              final Stroke outlineStroke = new BasicStroke(
+                (float)textHaloRadius, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_BEVEL);
+              graphics.setColor(style.getTextHaloFill());
+              graphics.setStroke(outlineStroke);
+              final Font font = graphics.getFont();
+              final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+              final TextLayout textLayout = new TextLayout(line, font,
+                fontRenderContext);
+              final Shape outlineShape = textLayout.getOutline(NOOP_TRANSFORM);
+              graphics.draw(outlineShape);
+              graphics.setStroke(savedStroke);
+            }
+
+            final Color textBoxColor = style.getTextBoxColor();
+            if (textBoxColor != null) {
+              graphics.setColor(textBoxColor);
+              graphics.fill(new Rectangle2D.Double(bounds.getX() - 2,
+                bounds.getY() - 1, width + 4, height + 2));
+            }
+
+            graphics.setColor(style.getTextFill());
+            graphics.drawString(line, (float)0, (float)0);
+            graphics.setTransform(lineTransform);
+            graphics.translate(0, (leading + descent));
+          }
           graphics.setTransform(savedTransform);
 
         } finally {

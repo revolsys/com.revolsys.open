@@ -39,7 +39,6 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
           dataStore = new CapiFileGdbDataObjectStore(file);
           dataStore.setCreateMissingDataStore(false);
           DATA_STORES.put(fileName, dataStore);
-          System.out.println("Create:" + fileName);
         }
         return dataStore;
       }
@@ -57,7 +56,6 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
           final CapiFileGdbDataObjectStore dataStore = DATA_STORES.remove(fileName);
           if (dataStore != null) {
             dataStore.doClose();
-            System.out.println("Close:" + fileName);
           }
           COUNTS.remove(fileName);
         }

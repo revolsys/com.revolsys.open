@@ -102,17 +102,27 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
     }
   }
 
-  protected void removeNode(final int index) {
+  public void refresh() {
+    loadChildren();
+  }
+
+  public void removeNode(final int index) {
     final List<TreeNode> children = this.children;
     if (children != LOADING_NODES) {
-      children.remove(index);
+      if (index > 0 && index < children.size()) {
+        final TreeNode node = children.remove(index);
+        nodeRemoved(index, node);
+      }
     }
   }
 
-  protected void removeNode(final TreeNode node) {
+  public void removeNode(final TreeNode node) {
     final List<TreeNode> children = this.children;
     if (children != LOADING_NODES) {
-      children.remove(node);
+      final int index = children.indexOf(node);
+      if (index != -1) {
+        nodeRemoved(index, node);
+      }
     }
   }
 

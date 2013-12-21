@@ -869,6 +869,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             final DataObjectLayerStylePanel stylePanel = panel.getTab("Style");
             stylePanel.setSelectedRenderer(renderer);
             panel.showDialog(window);
+            refresh();
           } finally {
             removeProperty("INTERNAL_PROPERTIES_VISIBLE");
           }
