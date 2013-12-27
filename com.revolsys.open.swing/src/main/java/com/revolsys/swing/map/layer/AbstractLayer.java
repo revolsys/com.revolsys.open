@@ -389,7 +389,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
-  protected void firePropertyChange(final String propertyName,
+  public void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
     if (this.propertyChangeSupport != null && isEventsEnabled()) {
       this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,

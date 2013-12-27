@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
 
 public abstract class AbstractTiledImageLayer extends AbstractLayer {
 
@@ -31,10 +32,6 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer {
     setSelectSupported(selectSupported);
     setQuerySupported(querySupported);
     setRenderer(new TiledImageLayerRenderer(this));
-  }
-
-  public TileLoaderProcess createTileLoaderProcess() {
-    return new TileLoaderProcess(this);
   }
 
   public abstract List<MapTile> getOverlappingMapTiles(final Viewport2D viewport);

@@ -51,16 +51,15 @@ public class GeoReferencedImageLayerRenderer extends
               final double screenX = location[0];
               final double screenY = location[1];
               graphics.translate(screenX, screenY);
-              final double imageScreenWidth = Viewport2D.toDisplayValue(
-                viewport, boundingBox.getWidthLength());
-              final double imageScreenHeight = Viewport2D.toDisplayValue(
-                viewport, boundingBox.getHeightLength());
+              final int imageScreenWidth = (int)Math.ceil(Viewport2D.toDisplayValue(
+                viewport, boundingBox.getWidthLength()));
+              final int imageScreenHeight = (int)Math.ceil(Viewport2D.toDisplayValue(
+                viewport, boundingBox.getHeightLength()));
               if (imageScreenWidth > 0 && imageScreenHeight > 0) {
                 graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                   RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                graphics.drawImage(image, 0, 0,
-                  (int)Math.ceil(imageScreenWidth),
-                  (int)Math.ceil(imageScreenHeight), null);
+                graphics.drawImage(image, 0, 0, imageScreenWidth,
+                  imageScreenHeight, null);
               }
             } catch (final NegativeArraySizeException e) {
             } catch (final OutOfMemoryError e) {

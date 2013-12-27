@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
@@ -12,9 +12,10 @@ import java.util.Map;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
-import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.map.layer.AbstractLayerRenderer;
+import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
@@ -22,11 +23,14 @@ public class TiledImageLayerRenderer extends
 
   private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
 
-  private TileLoaderProcess tileLoaderProcess;
+  private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
+    "Load Map Tiles");
 
   private GeometryFactory geometryFactory;
 
   private double resolution;
+
+  private final List<Runnable> loadingTasks = new ArrayList<Runnable>();
 
   public TiledImageLayerRenderer(final AbstractTiledImageLayer layer) {
     super("tiledImage", layer);
@@ -54,9 +58,9 @@ public class TiledImageLayerRenderer extends
     } else if (!"loading".equals(event.getPropertyName())) {
       synchronized (this.cachedTiles) {
         this.cachedTiles.clear();
-        if (this.tileLoaderProcess != null) {
-          this.tileLoaderProcess.cancel(true);
-        }
+        // if (this.tileLoaderProcess != null) {
+        // this.tileLoaderProcess.cancel(true);
+        // }
       }
     }
   }
@@ -72,9 +76,11 @@ public class TiledImageLayerRenderer extends
         this.resolution = resolution;
         this.geometryFactory = geometryFactory;
         this.cachedTiles.clear();
+        tileLoaderManager.removeTasks(loadingTasks);
+        loadingTasks.clear();
       }
     }
-    final List<MapTile> tilesToLoad = new ArrayList<MapTile>();
+    final List<Runnable> tasks = new ArrayList<Runnable>();
     final List<MapTile> mapTiles = layer.getOverlappingMapTiles(viewport);
     for (final MapTile mapTile : mapTiles) {
       if (mapTile != null) {
@@ -84,32 +90,23 @@ public class TiledImageLayerRenderer extends
           if (cachedTile == null) {
             cachedTile = mapTile;
             this.cachedTiles.put(cachedTile, cachedTile);
-            tilesToLoad.add(cachedTile);
+            final Runnable task = new TileLoadTask(this, geometryFactory,
+              cachedTile);
+            tasks.add(task);
           }
         }
         final GeoReferencedImage image = cachedTile.getImage(geometryFactory);
         GeoReferencedImageLayerRenderer.render(viewport, graphics, image);
       }
     }
-    if (!tilesToLoad.isEmpty()) {
-      boolean scheduled = false;
-      if (this.tileLoaderProcess != null) {
-        scheduled = this.tileLoaderProcess.addMapTiles(resolution,
-          geometryFactory, tilesToLoad);
-        if (!scheduled) {
-          this.tileLoaderProcess.cancel(true);
-        }
-      }
-      if (!scheduled) {
-        this.tileLoaderProcess = layer.createTileLoaderProcess();
-        this.tileLoaderProcess.addMapTiles(resolution, geometryFactory,
-          tilesToLoad);
-        Invoke.worker(this.tileLoaderProcess);
-      }
+    synchronized (loadingTasks) {
+      loadingTasks.addAll(tasks);
+      tileLoaderManager.addTasks(tasks);
     }
   }
 
-  public void setLoaded() {
+  public void setLoaded(final TileLoadTask tileLoadTask) {
+    loadingTasks.remove(tileLoadTask);
     getLayer().firePropertyChange("loading", false, true);
   }
 
