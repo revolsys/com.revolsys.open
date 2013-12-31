@@ -1,11 +1,14 @@
 package com.revolsys.gis.model.geometry.util;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -17,6 +20,25 @@ public class PointUtil {
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
     return factory.createPoint(coordinatesList);
+  }
+
+  public static Point getPointWithin(final Geometry geometry) {
+    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      final Geometry part = geometry.getGeometryN(i);
+      if (!part.isEmpty()) {
+        if (part instanceof Point) {
+          return (Point)part;
+        } else if (part instanceof LineString) {
+          return LineStringUtil.midPoint((LineString)geometry);
+        } else if (part instanceof Polygon) {
+          final Polygon polygon = (Polygon)part;
+          return getPointWithin(polygon);
+        } else {
+          return part.getCentroid();
+        }
+      }
+    }
+    return null;
   }
 
   public static Point getPointWithin(final Polygon polygon) {

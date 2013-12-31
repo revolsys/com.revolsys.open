@@ -2,6 +2,9 @@ package com.revolsys.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.HexConverter;
 
 public class MavenRepositoryCache extends MavenRepository {
   private static final Logger LOG = LoggerFactory.getLogger(MavenRepository.class);
@@ -44,15 +49,31 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   public boolean copyRepositoryResource(final Resource resource,
-    final MavenRepository repository, final String path) {
+    final MavenRepository repository, final String path, final String sha1Digest) {
     final Resource repositoryResource = SpringUtil.getResource(
       repository.getRoot(), path);
     if (repositoryResource.exists()) {
       try {
-        SpringUtil.copy(repositoryResource, resource);
+        if (StringUtils.hasText(sha1Digest)) {
+          final InputStream in = SpringUtil.getInputStream(repositoryResource);
+          final DigestInputStream digestIn = new DigestInputStream(in,
+            MessageDigest.getInstance("SHA-1"));
+          SpringUtil.copy(digestIn, resource);
+          final MessageDigest messageDigest = digestIn.getMessageDigest();
+          final byte[] digest = messageDigest.digest();
+          final String fileDigest = HexConverter.toHex(digest);
+          if (!sha1Digest.equals(fileDigest)) {
+            LoggerFactory.getLogger(getClass()).error(
+              ".sha1 digest is different for: " + repositoryResource);
+            SpringUtil.delete(resource);
+            return false;
+          }
+        } else {
+          SpringUtil.copy(repositoryResource, resource);
+        }
         return true;
       } catch (final Exception e) {
-        SpringUtil.delete(repositoryResource);
+        SpringUtil.delete(resource);
         LOG.warn("Unable to download " + repositoryResource, e);
       }
     }
@@ -66,7 +87,7 @@ public class MavenRepositoryCache extends MavenRepository {
   @Override
   protected Resource handleMissingResource(final Resource resource,
     final String groupId, final String artifactId, final String type,
-    final String classifier, final String version) {
+    final String classifier, final String version, final String algorithm) {
     if (version.endsWith("-SNAPSHOT")) {
       final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
 
@@ -85,14 +106,18 @@ public class MavenRepositoryCache extends MavenRepository {
         final String timestampVersion = entry.getKey();
 
         final String path = getPath(groupId, artifactId, version, type,
-          classifier, timestampVersion);
+          classifier, timestampVersion, algorithm);
         final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
         if (cachedResource.exists()) {
           return cachedResource;
         } else {
 
           final MavenRepository repository = entry.getValue();
-          if (copyRepositoryResource(cachedResource, repository, path)) {
+          final String sha1Digest = repository.getSha1(groupId, artifactId,
+            type, classifier, version, algorithm);
+
+          if (copyRepositoryResource(cachedResource, repository, path,
+            sha1Digest)) {
             return cachedResource;
           }
         }
@@ -100,9 +125,11 @@ public class MavenRepositoryCache extends MavenRepository {
       }
     }
     final String path = getPath(groupId, artifactId, version, type, classifier,
-      version);
+      version, algorithm);
     for (final MavenRepository repository : repositories) {
-      if (copyRepositoryResource(resource, repository, path)) {
+      final String sha1Digest = repository.getSha1(groupId, artifactId, type,
+        classifier, version, algorithm);
+      if (copyRepositoryResource(resource, repository, path, sha1Digest)) {
         return resource;
       }
     }

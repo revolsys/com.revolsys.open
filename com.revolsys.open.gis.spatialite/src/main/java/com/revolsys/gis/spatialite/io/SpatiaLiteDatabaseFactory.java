@@ -1,5 +1,8 @@
 package com.revolsys.gis.spatialite.io;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,18 +61,18 @@ public class SpatiaLiteDatabaseFactory implements JdbcDatabaseFactory {
       final SQLiteConfig sqliteConfig = new SQLiteConfig();
       sqliteConfig.enableLoadExtension(true);
 
-      // final Connection connection = DriverManager.getConnection(url,
-      // sqliteConfig.toProperties());
-      // try {
-      // final Statement statement = connection.createStatement();
-      // try {
-      // statement.execute("SELECT load_extension('/usr/local/lib/libspatialite.dylib')");
-      // } finally {
-      // statement.close();
-      // }
-      // } finally {
-      // connection.close();
-      // }
+      final Connection connection = DriverManager.getConnection(url,
+        sqliteConfig.toProperties());
+      try {
+        final Statement statement = connection.createStatement();
+        try {
+          statement.execute("SELECT load_extension('/usr/local/lib/libspatialite.dylib')");
+        } finally {
+          statement.close();
+        }
+      } finally {
+        connection.close();
+      }
       final SQLiteDataSource dataSource = new SQLiteDataSource();
       for (final Entry<String, Object> property : newConfig.entrySet()) {
         final String name = property.getKey();

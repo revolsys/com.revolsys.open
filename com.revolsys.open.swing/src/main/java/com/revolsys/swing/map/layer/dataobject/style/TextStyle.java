@@ -25,6 +25,8 @@ import com.revolsys.util.Property;
 
 public class TextStyle implements MapSerializer, Cloneable {
 
+  private static final String AUTO = "auto";
+
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
 
   private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
@@ -43,7 +45,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     addProperty("textFill", Color.class, WebColors.Black);
     addProperty("textHaloFill", Color.class, WebColors.White);
     addProperty("textHaloRadius", Measure.class, MarkerStyle.ZERO_PIXEL);
-    addProperty("textHorizontalAlignment", String.class, "auto");
+    addProperty("textHorizontalAlignment", String.class, AUTO);
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
     // addProperty("text-max-char-angle-delta",DataTypes.);
@@ -53,15 +55,15 @@ public class TextStyle implements MapSerializer, Cloneable {
     addProperty("textName", String.class, "");
     addProperty("textOpacity", Integer.class, 255);
     addProperty("textOrientation", Double.class, 0.0);
-    addProperty("textOrientationType", String.class, "auto");
+    addProperty("textOrientationType", String.class, AUTO);
     // addProperty("text-placement",DataTypes.);
-    addProperty("textPlacementType", String.class, "dummy");
+    addProperty("textPlacementType", String.class, AUTO);
     // addProperty("text-placements",DataTypes.);
     // addProperty("text-ratio",DataTypes.);
     addProperty("textSize", Measure.class, MarkerStyle.TEN_PIXELS);
     // addProperty("text-spacing",DataTypes.);
     // addProperty("text-transform",DataTypes.);
-    addProperty("textVerticalAlignment", String.class, "auto");
+    addProperty("textVerticalAlignment", String.class, AUTO);
     // addProperty("text-wrap-before",DataTypes.);
     // addProperty("text-wrap-character",DataTypes.);
     // addProperty("text-wrap-width", Double.class);
@@ -104,7 +106,7 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   private Measure<Length> textHaloRadius = GeometryStyle.ZERO_PIXEL;
 
-  private String textHorizontalAlignment = "auto";
+  private String textHorizontalAlignment = AUTO;
 
   private String textName = "";
 
@@ -113,13 +115,13 @@ public class TextStyle implements MapSerializer, Cloneable {
   /** The orientation of the text in a clockwise direction from the east axis. */
   private double textOrientation = 0;
 
-  private String textOrientationType = "auto";
+  private String textOrientationType = AUTO;
 
-  private String textPlacementType = "dummy";
+  private String textPlacementType = AUTO;
 
   private Measure<Length> textSizeMeasure = GeometryStyle.TEN_PIXELS;
 
-  private String textVerticalAlignment = "auto";
+  private String textVerticalAlignment = AUTO;
 
   private int textBoxOpacity = 255;
 
@@ -273,7 +275,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     if (StringUtils.hasText(textHorizontalAlignment)) {
       this.textHorizontalAlignment = textHorizontalAlignment;
     } else {
-      this.textHorizontalAlignment = "auto";
+      this.textHorizontalAlignment = AUTO;
     }
   }
 
@@ -309,7 +311,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     if (StringUtils.hasText(textPlacementType)) {
       this.textPlacementType = textPlacementType;
     } else {
-      this.textPlacementType = "dummy";
+      this.textPlacementType = AUTO;
     }
   }
 
@@ -347,7 +349,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     if (StringUtils.hasText(textVerticalAlignment)) {
       this.textVerticalAlignment = textVerticalAlignment;
     } else {
-      this.textVerticalAlignment = "auto";
+      this.textVerticalAlignment = AUTO;
     }
   }
 

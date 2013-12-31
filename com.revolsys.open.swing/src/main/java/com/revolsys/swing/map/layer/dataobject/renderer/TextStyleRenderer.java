@@ -37,6 +37,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.geometry.util.PointUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -47,6 +48,7 @@ import com.revolsys.swing.map.layer.dataobject.style.panel.TextStylePanel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
@@ -150,29 +152,53 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
                   viewportGeometryFactory);
                 p2 = ProjectionFactory.convert(p2, geometryFactory,
                   viewportGeometryFactory);
-                point = LineSegmentUtil.midPoint(viewportGeometryFactory, p1,
-                  p2);
+                point = LineSegmentUtil.project(geometryFactory, p1, p2,
+                  (centreLength - currentLength) / segmentLength);
+
                 final double angle = Math.toDegrees(p1.angle2d(p2));
                 orientation += angle;
               }
               currentLength += segmentLength;
             }
           }
-        } else {
-          if (geometry instanceof Point) {
-            point = CoordinatesUtil.get(geometry);
-          } else if (geometry instanceof LineString) {
-            point = CoordinatesUtil.get(geometry);
-          } else {
-            point = CoordinatesUtil.get(geometry.getCentroid());
-          }
-          if (point != null) {
-            point = ProjectionFactory.convert(point, geometryFactory,
-              viewportGeometryFactory);
+        }
+        if (point == null) {
+          PointUtil.getPointWithin(geometry);
+          point = CoordinatesUtil.get(geometryFactory.copy(geometry.getCentroid()));
+          if (!viewport.getBoundingBox().contains(point)) {
+            final Geometry clippedGeometry = viewport.getBoundingBox()
+              .toPolygon()
+              .intersection(geometry);
+            if (!clippedGeometry.isEmpty()) {
+              double maxArea = 0;
+              double maxLength = 0;
+              for (int i = 0; i < clippedGeometry.getNumGeometries(); i++) {
+                final Geometry part = clippedGeometry.getGeometryN(i);
+                if (part instanceof Polygon) {
+                  final double area = part.getArea();
+                  if (area > maxArea) {
+                    maxArea = area;
+                    point = CoordinatesUtil.get(part.getCentroid());
+                  }
+                } else if (part instanceof LineString) {
+                  if (maxArea == 0) {
+                    final double length = part.getLength();
+                    if (length > maxLength) {
+                      maxLength = length;
+                      point = CoordinatesUtil.get(part.getCentroid());
+                    }
+                  }
+                } else if (part instanceof Point) {
+                  if (maxArea == 0 && maxLength == 0) {
+                    point = CoordinatesUtil.get(part);
+                  }
+                }
+              }
+            }
           }
         }
 
-        if (point != null && viewport.getBoundingBox().contains(point)) {
+        if (point != null) {
           final String orientationType = style.getTextOrientationType();
           if ("none".equals(orientationType)) {
             orientation = 0;
@@ -217,18 +243,11 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
 
           final AffineTransform savedTransform = graphics.getTransform();
-          final double screenX = location[0];
-          final double screenY = location[1];
-          graphics.translate(screenX, screenY);
 
           style.setTextStyle(viewport, graphics);
 
-          if (orientation != 0) {
-            graphics.rotate(-Math.toRadians(orientation), 0, 0);
-          }
-
           final Measure<Length> textDx = style.getTextDx();
-          final double dx = Viewport2D.toDisplayValue(viewport, textDx);
+          double dx = Viewport2D.toDisplayValue(viewport, textDx);
 
           final Measure<Length> textDy = style.getTextDy();
           double dy = -Viewport2D.toDisplayValue(viewport, textDy);
@@ -251,9 +270,40 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
-            dy -= maxHeight / 2;
-          } else if ("bottom".equals(verticalAlignment)) {
+            dy -= maxHeight / 2 + 10;
+          } else {
             dy -= maxHeight;
+          }
+
+          String horizontalAlignment = style.getTextHorizontalAlignment();
+          double screenX = location[0];
+          double screenY = location[1];
+          final String textPlacementType = style.getTextPlacementType();
+          if ("auto".equals(textPlacementType)) {
+            if (screenX < 0) {
+              screenX = 1;
+              dx = 0;
+              horizontalAlignment = "left";
+            }
+            final int viewWidth = viewport.getViewWidthPixels();
+            if (screenX + maxWidth > viewWidth) {
+              screenX = (int)(viewWidth - maxWidth - 1);
+              dx = 0;
+              horizontalAlignment = "left";
+            }
+            if (screenY < maxHeight) {
+              screenY = 1;
+              dy = 0;
+            }
+            final int viewHeight = viewport.getViewHeightPixels();
+            if (screenY > viewHeight) {
+              screenY = viewHeight - 1 - maxHeight;
+              dy = 0;
+            }
+          }
+          graphics.translate(screenX, screenY);
+          if (orientation != 0) {
+            graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
           graphics.translate(dx, dy);
 
@@ -266,7 +316,6 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             final double width = bounds.getWidth();
             final double height = bounds.getHeight();
 
-            final String horizontalAlignment = style.getTextHorizontalAlignment();
             if ("right".equals(horizontalAlignment)) {
               graphics.translate(-width, 0);
             } else if ("center".equals(horizontalAlignment)) {

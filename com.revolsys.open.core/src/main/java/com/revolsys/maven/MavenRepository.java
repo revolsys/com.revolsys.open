@@ -32,7 +32,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public static String getPath(final String groupId, final String artifactId,
     final String pathVersion, final String type, final String classifier,
-    final String version) {
+    final String version, final String algorithm) {
     final StringBuffer path = new StringBuffer();
     path.append('/');
     path.append(groupId.replace('.', '/'));
@@ -50,6 +50,11 @@ public class MavenRepository implements URLStreamHandlerFactory {
     }
     path.append('.');
     path.append(type);
+    if (StringUtils.hasText(algorithm)) {
+      path.append('.');
+      path.append(algorithm);
+
+    }
     return path.toString();
   }
 
@@ -137,8 +142,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
       classifier = parts[3];
       version = parts[4];
     }
-
-    return getPath(groupId, artifactId, version, type, classifier, version);
+    return getPath(groupId, artifactId, version, type, classifier, version,
+      null);
   }
 
   public MavenPom getPom(final Resource resource) {
@@ -206,13 +211,19 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public Resource getResource(final String groupId, final String artifactId,
     final String type, final String classifier, final String version) {
+    return getResource(groupId, artifactId, type, classifier, version, null);
+  }
+
+  public Resource getResource(final String groupId, final String artifactId,
+    final String type, final String classifier, final String version,
+    final String algorithm) {
 
     final String path = getPath(groupId, artifactId, version, type, classifier,
-      version);
+      version, algorithm);
     final Resource artifactResource = SpringUtil.getResource(root, path);
     if (!artifactResource.exists()) {
       return handleMissingResource(artifactResource, groupId, artifactId, type,
-        classifier, version);
+        classifier, version, algorithm);
     }
     return artifactResource;
   }
@@ -221,6 +232,33 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return root;
   }
 
+  public String getSha1(final String groupId, final String artifactId,
+    final String type, final String classifier, final String version,
+    final String algorithm) {
+    if (!StringUtils.hasText(algorithm)) {
+      final Resource digestResource = getResource(groupId, artifactId, type,
+        classifier, version, "sha1");
+      if (digestResource.exists()) {
+        String digestContents = null;
+        try {
+          digestContents = SpringUtil.getContents(digestResource);
+          return digestContents.trim().substring(0, 40);
+        } catch (final Throwable e) {
+          if (digestContents == null) {
+            LoggerFactory.getLogger(getClass()).error(
+              "Error downloading: " + digestResource, e);
+          } else {
+            LoggerFactory.getLogger(getClass()).error(
+              "Error in SHA-1 checksum " + digestContents + " for "
+                + digestResource, e);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
   public String getSnapshotVersion(final Map<String, Object> mavenMetadata) {
     final Map<String, Object> versioning = (Map<String, Object>)mavenMetadata.get("versioning");
     if (versioning != null) {
@@ -252,7 +290,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   protected Resource handleMissingResource(final Resource resource,
     final String groupId, final String artifactId, final String type,
-    final String classifier, final String version) {
+    final String classifier, final String version, final String algorithm) {
     if (version.endsWith("-SNAPSHOT")) {
       final Map<String, Object> mavenMetadata = getMavenMetadata(groupId,
         artifactId, version);
@@ -261,7 +299,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
         final String timestampVersion = version.replaceAll("SNAPSHOT$",
           snapshotVersion);
         return getResource(groupId, artifactId, type, classifier,
-          timestampVersion);
+          timestampVersion, algorithm);
       }
     }
     return resource;

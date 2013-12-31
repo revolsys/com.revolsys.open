@@ -55,6 +55,10 @@ public class SpringUtil {
 
   public static void copy(final Resource source, final Resource target) {
     final InputStream in = getInputStream(source);
+    copy(in, target);
+  }
+
+  public static void copy(final InputStream in, final Resource target) {
     try {
       if (target instanceof FileSystemResource) {
         final FileSystemResource fileResource = (FileSystemResource)target;

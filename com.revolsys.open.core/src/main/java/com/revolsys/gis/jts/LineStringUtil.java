@@ -475,6 +475,17 @@ public final class LineStringUtil {
     return null;
   }
 
+  public static Coordinates getClosestEndsCoordinates(final LineString line,
+    final Coordinates coordinates) {
+    final Coordinates fromCoordinates = getFromCoordinates(line);
+    final Coordinates toCoordinates = getToCoordinates(line);
+    if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
+      return fromCoordinates;
+    } else {
+      return toCoordinates;
+    }
+  }
+
   public static Coordinates getCoordinates(final LineString line, final int i) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return points.get(i);
@@ -1037,6 +1048,37 @@ public final class LineStringUtil {
     return line;
   }
 
+  public static Point midPoint(final LineString line) {
+    if (line.isEmpty()) {
+      return null;
+    } else {
+      final int numPoints = line.getNumPoints();
+      if (numPoints > 1) {
+        final double totalLength = line.getLength();
+        final CoordinatesList points = CoordinatesListUtil.get(line);
+        final double midPointLength = totalLength / 2;
+        double currentLength = 0;
+        for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
+          final Coordinates p1 = points.get(i - 1);
+          final Coordinates p2 = points.get(i);
+          final double segmentLength = p1.distance(p2);
+          if (segmentLength + currentLength >= midPointLength) {
+            final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+            final Coordinates midPoint = LineSegmentUtil.project(
+              geometryFactory, p1, p2, (midPointLength - currentLength)
+                / segmentLength);
+            return geometryFactory.createPoint(midPoint);
+
+          }
+          currentLength += segmentLength;
+        }
+        return null;
+      } else {
+        return line.getPointN(0);
+      }
+    }
+  }
+
   public static LineString reverse(final LineString line) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
@@ -1260,17 +1302,6 @@ public final class LineStringUtil {
   public static LineString subLineString(final LineString line,
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
-  }
-
-  public static Coordinates getClosestEndsCoordinates(final LineString line,
-    final Coordinates coordinates) {
-    Coordinates fromCoordinates = getFromCoordinates(line);
-    Coordinates toCoordinates = getToCoordinates(line);
-    if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
-      return fromCoordinates;
-    } else {
-      return toCoordinates;
-    }
   }
 
 }
