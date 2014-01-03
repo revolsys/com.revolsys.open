@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.MathUtil;
 
 /**
  * The Attribute class defines the name, type and other properties about each
@@ -64,6 +65,8 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.required = attribute.isRequired();
     this.length = attribute.getLength();
     this.scale = attribute.getScale();
+    this.minValue = attribute.getMinValue();
+    this.maxValue = attribute.getMaxValue();
     final Map<String, Object> properties = attribute.getProperties();
     setProperties(properties);
   }
@@ -200,6 +203,8 @@ public class Attribute extends AbstractObjectWithProperties implements
       this.scale = scale;
     }
     this.description = description;
+    this.minValue = MathUtil.getMinValue(getTypeClass());
+    this.maxValue = MathUtil.getMaxValue(getTypeClass());
   }
 
   /**
@@ -229,6 +234,8 @@ public class Attribute extends AbstractObjectWithProperties implements
       this.scale = scale;
     }
     this.description = description;
+    this.minValue = MathUtil.getMinValue(getTypeClass());
+    this.maxValue = MathUtil.getMaxValue(getTypeClass());
     setProperties(properties);
   }
 

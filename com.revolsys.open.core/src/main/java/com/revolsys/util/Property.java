@@ -21,7 +21,9 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.io.ObjectWithProperties;
 
 public final class Property {
   public static void addListener(final Object object,
@@ -109,6 +111,54 @@ public final class Property {
     }
   }
 
+  public static Double getDouble(final ObjectWithProperties object,
+    final String key) {
+    if (object == null) {
+      return null;
+    } else {
+      final Object value = object.getProperty(key);
+      return StringConverterRegistry.toObject(Double.class, value);
+    }
+  }
+
+  public static double getDouble(final ObjectWithProperties object,
+    final String key, final double defaultValue) {
+    if (object == null) {
+      return defaultValue;
+    } else {
+      final Object value = object.getProperty(key);
+      if (value == null) {
+        return defaultValue;
+      } else {
+        return StringConverterRegistry.toObject(Double.class, value);
+      }
+    }
+  }
+
+  public static Integer getInteger(final ObjectWithProperties object,
+    final String key) {
+    if (object == null) {
+      return null;
+    } else {
+      final Object value = object.getProperty(key);
+      return StringConverterRegistry.toObject(Integer.class, value);
+    }
+  }
+
+  public static int getInteger(final ObjectWithProperties object,
+    final String key, final int defaultValue) {
+    if (object == null) {
+      return defaultValue;
+    } else {
+      final Object value = object.getProperty(key);
+      if (value == null) {
+        return defaultValue;
+      } else {
+        return StringConverterRegistry.toObject(Integer.class, value);
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getSimple(final Object object, final String key) {
     if (object == null) {
@@ -126,6 +176,30 @@ public final class Property {
       } else {
         final Object value = JavaBeanUtil.getProperty(object, key);
         return (T)value;
+      }
+    }
+  }
+
+  public static String getString(final ObjectWithProperties object,
+    final String key) {
+    if (object == null) {
+      return null;
+    } else {
+      final Object value = object.getProperty(key);
+      return StringConverterRegistry.toObject(String.class, value);
+    }
+  }
+
+  public static String getString(final ObjectWithProperties object,
+    final String key, final String defaultValue) {
+    if (object == null) {
+      return defaultValue;
+    } else {
+      final Object value = object.getProperty(key);
+      if (value == null) {
+        return defaultValue;
+      } else {
+        return StringConverterRegistry.toObject(String.class, value);
       }
     }
   }

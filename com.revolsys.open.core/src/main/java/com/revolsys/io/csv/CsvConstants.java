@@ -1,9 +1,8 @@
 package com.revolsys.io.csv;
 
-
 public interface CsvConstants {
 
-  String DESCRIPTION = "Comma Separated Variable";
+  String DESCRIPTION = "Comma-Separated Values";
 
   char FIELD_SEPARATOR = ',';
 

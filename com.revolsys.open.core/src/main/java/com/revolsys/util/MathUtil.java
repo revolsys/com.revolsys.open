@@ -406,6 +406,34 @@ public final class MathUtil {
     return getInteger(new BigDecimal((double)value));
   }
 
+  public static Object getMaxValue(final Class<?> dataType) {
+    if (dataType == Byte.class || dataType == Byte.TYPE) {
+      return Byte.MAX_VALUE;
+    } else if (dataType.equals(Short.class) || dataType.equals(Short.TYPE)) {
+      return Short.MAX_VALUE;
+    } else if (dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)) {
+      return Integer.MAX_VALUE;
+    } else if (dataType.equals(Long.class) || dataType.equals(Long.TYPE)) {
+      return Long.MAX_VALUE;
+    } else {
+      return null;
+    }
+  }
+
+  public static Object getMinValue(final Class<?> dataType) {
+    if (dataType == Byte.class || dataType == Byte.TYPE) {
+      return Byte.MIN_VALUE;
+    } else if (dataType.equals(Short.class) || dataType.equals(Short.TYPE)) {
+      return Short.MIN_VALUE;
+    } else if (dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)) {
+      return Integer.MIN_VALUE;
+    } else if (dataType.equals(Long.class) || dataType.equals(Long.TYPE)) {
+      return Long.MIN_VALUE;
+    } else {
+      return null;
+    }
+  }
+
   public static double getNorthClockwiseAngle(final double angle) {
     final double northAngle = (450 - angle) % 360;
     return northAngle;
