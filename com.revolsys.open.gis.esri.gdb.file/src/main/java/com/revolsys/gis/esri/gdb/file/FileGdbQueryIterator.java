@@ -150,6 +150,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
       } else {
         try {
           final DataObject object = dataObjectFactory.createDataObject(metaData);
+          dataStore.addStatistic("query", object);
           object.setState(DataObjectState.Initalizing);
           for (final Attribute attribute : metaData.getAttributes()) {
             final String name = attribute.getName();

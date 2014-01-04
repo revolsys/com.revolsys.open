@@ -75,7 +75,7 @@ public class CopyRecords extends AbstractProcess {
           if (hasSequence) {
             Object maxId = targetDataStore.createPrimaryIdValue(typePath);
             for (final DataObject sourceRecord : reader) {
-              final DataObject sourceId = sourceRecord.getIdValue();
+              final Object sourceId = sourceRecord.getIdValue();
               while (CompareUtil.compare(maxId, sourceId) < 0) {
                 maxId = targetDataStore.createPrimaryIdValue(typePath);
               }

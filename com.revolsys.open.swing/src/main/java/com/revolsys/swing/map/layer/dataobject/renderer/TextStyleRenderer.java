@@ -279,7 +279,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           double screenX = location[0];
           double screenY = location[1];
           final String textPlacementType = style.getTextPlacementType();
-          if ("auto".equals(textPlacementType)) {
+          if ("auto".equals(textPlacementType) && viewport != null) {
             if (screenX < 0) {
               screenX = 1;
               dx = 0;

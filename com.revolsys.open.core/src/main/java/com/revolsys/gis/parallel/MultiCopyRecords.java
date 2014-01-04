@@ -29,6 +29,8 @@ public class MultiCopyRecords implements Process {
 
   private ProcessNetwork processNetwork;
 
+  private Map<String, Object> processDefinition;
+
   @SuppressWarnings("unchecked")
   protected Process createProcess(final Map<String, Object> processDefinition) {
     if (processDefinition == null) {
@@ -110,6 +112,7 @@ public class MultiCopyRecords implements Process {
 
   @Override
   public void run() {
+    process = createProcess(processDefinition);
     if (process != null) {
       if (processNetwork != null) {
         processNetwork.addProcess(process);
@@ -125,10 +128,10 @@ public class MultiCopyRecords implements Process {
   }
 
   public void setProcessDefinition(final Map<String, Object> processDefinition) {
-    process = createProcess(processDefinition);
+    this.processDefinition = processDefinition;
   }
 
-  public void setProcessDefinition(final Resource resource) {
+  public void setProcessDefinitionResource(final Resource resource) {
     final Map<String, Object> processDefinition = JsonMapIoFactory.toMap(resource);
     setProcessDefinition(processDefinition);
   }

@@ -164,7 +164,10 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
           setSortable(false);
         }
       }
-      super.tableChanged(event);
+      try {
+        super.tableChanged(event);
+      } catch (final Throwable t) {
+      }
       if (this.tableHeader != null) {
         this.tableHeader.resizeAndRepaint();
       }
