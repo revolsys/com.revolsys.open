@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -73,14 +74,17 @@ public class CopyRecords extends AbstractProcess {
         final Writer<DataObject> targetWriter = targetDataStore.createWriter();
         try {
           if (hasSequence) {
+            final DataObjectMetaData targetMetaData = targetDataStore.getMetaData(typePath);
+            final String idAttributeName = targetMetaData.getIdAttributeName();
             Object maxId = targetDataStore.createPrimaryIdValue(typePath);
             for (final DataObject sourceRecord : reader) {
-              final Object sourceId = sourceRecord.getIdValue();
+              final Object sourceId = sourceRecord.getValue(idAttributeName);
               while (CompareUtil.compare(maxId, sourceId) < 0) {
                 maxId = targetDataStore.createPrimaryIdValue(typePath);
               }
               targetWriter.write(sourceRecord);
             }
+            System.out.println(typePath + "\t" + maxId);
           } else {
             for (final DataObject sourceRecord : reader) {
               targetWriter.write(sourceRecord);
