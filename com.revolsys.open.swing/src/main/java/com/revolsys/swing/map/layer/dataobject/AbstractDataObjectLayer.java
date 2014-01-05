@@ -637,7 +637,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
-  protected void deleteRecord(final LayerDataObject record) {
+  public void deleteRecord(final LayerDataObject record) {
     final boolean trackDeletions = true;
     deleteRecord(record, trackDeletions);
   }

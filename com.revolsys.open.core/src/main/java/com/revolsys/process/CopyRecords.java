@@ -3,6 +3,8 @@ package com.revolsys.process;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -73,21 +75,25 @@ public class CopyRecords extends AbstractProcess {
       try {
         final Writer<DataObject> targetWriter = targetDataStore.createWriter();
         try {
-          if (hasSequence) {
-            final DataObjectMetaData targetMetaData = targetDataStore.getMetaData(typePath);
-            final String idAttributeName = targetMetaData.getIdAttributeName();
-            Object maxId = targetDataStore.createPrimaryIdValue(typePath);
-            for (final DataObject sourceRecord : reader) {
-              final Object sourceId = sourceRecord.getValue(idAttributeName);
-              while (CompareUtil.compare(maxId, sourceId) < 0) {
-                maxId = targetDataStore.createPrimaryIdValue(typePath);
-              }
-              targetWriter.write(sourceRecord);
-            }
-            System.out.println(typePath + "\t" + maxId);
+          final DataObjectMetaData targetMetaData = targetDataStore.getMetaData(typePath);
+          if (targetMetaData == null) {
+            LoggerFactory.getLogger(getClass()).error(
+              "Cannot find target table: " + typePath);
           } else {
-            for (final DataObject sourceRecord : reader) {
-              targetWriter.write(sourceRecord);
+            if (hasSequence) {
+              final String idAttributeName = targetMetaData.getIdAttributeName();
+              Object maxId = targetDataStore.createPrimaryIdValue(typePath);
+              for (final DataObject sourceRecord : reader) {
+                final Object sourceId = sourceRecord.getValue(idAttributeName);
+                while (CompareUtil.compare(maxId, sourceId) < 0) {
+                  maxId = targetDataStore.createPrimaryIdValue(typePath);
+                }
+                targetWriter.write(sourceRecord);
+              }
+            } else {
+              for (final DataObject sourceRecord : reader) {
+                targetWriter.write(sourceRecord);
+              }
             }
           }
         } finally {

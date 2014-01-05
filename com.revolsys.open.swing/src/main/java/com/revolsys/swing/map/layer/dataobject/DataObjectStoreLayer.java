@@ -277,7 +277,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void deleteRecord(final LayerDataObject record) {
+  public void deleteRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
       unSelectRecords(record);
       final LayerDataObject cacheRecord = getCacheRecord(record);
