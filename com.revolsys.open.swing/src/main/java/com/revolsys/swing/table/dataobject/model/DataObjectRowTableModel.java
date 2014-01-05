@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.swing.SortOrder;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -20,7 +22,8 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class DataObjectRowTableModel extends
-  AbstractDataObjectTableModel implements SortableTableModel {
+  AbstractDataObjectTableModel implements SortableTableModel,
+  CellEditorListener {
   private static final long serialVersionUID = 1L;
 
   private List<String> attributeNames = new ArrayList<String>();
@@ -53,6 +56,14 @@ public abstract class DataObjectRowTableModel extends
   public void dispose() {
     super.dispose();
     this.sortedColumns = null;
+  }
+
+  @Override
+  public void editingCanceled(final ChangeEvent event) {
+  }
+
+  @Override
+  public void editingStopped(final ChangeEvent event) {
   }
 
   public int getAttributesOffset() {

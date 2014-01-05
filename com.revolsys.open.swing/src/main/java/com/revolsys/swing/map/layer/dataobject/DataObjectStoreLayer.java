@@ -307,6 +307,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       config.put("connection", connectionProperties);
       final DataObjectStore dataStore = DataObjectStoreConnectionManager.getDataStore(config);
 
+      final String typePath = getTypePath();
       if (dataStore == null) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to create data store for layer: " + getPath());
@@ -320,7 +321,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
         setDataStore(dataStore);
 
-        final String typePath = getTypePath();
         final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
 
         if (metaData == null) {

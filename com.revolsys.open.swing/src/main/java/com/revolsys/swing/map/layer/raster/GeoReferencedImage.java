@@ -134,6 +134,17 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     Property.addListener(tiePoints, this);
   }
 
+  private void addMapping(final List<MappedLocation> mappings,
+    final double imageX, final double imageY, final double modelX,
+    final double modelY) {
+    final DoubleCoordinates imagePoint = new DoubleCoordinates(imageX, imageY);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point modelPoint = geometryFactory.createPoint(modelX, modelY);
+    final MappedLocation mappedLocation = new MappedLocation(imagePoint,
+      modelPoint);
+    mappings.add(mappedLocation);
+  }
+
   public void cancelChanges() {
     if (this.imageResource != null) {
       loadImageMetaData();
@@ -322,11 +333,23 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
         this.warpFilter = new WarpAffineFilter(boundingBox, imageWidth,
           imageHeight);
       } else {
-        final List<MappedLocation> tiePoints = getTiePoints();
-        this.warpFilter = WarpFilter.createWarpFilter(boundingBox, tiePoints,
+        List<MappedLocation> mappings = getTiePoints();
+        if (mappings.isEmpty()) {
+          mappings = new ArrayList<MappedLocation>();
+          final double minX = boundingBox.getMinX();
+          final double maxX = boundingBox.getMaxX();
+          final double minY = boundingBox.getMinY();
+          final double maxY = boundingBox.getMaxY();
+          addMapping(mappings, 0, 0, minX, minY);
+          addMapping(mappings, imageWidth, 0, maxX, minY);
+          addMapping(mappings, imageWidth, imageHeight, maxX, maxY);
+          addMapping(mappings, 0, imageHeight, minX, maxY);
+        }
+        this.warpFilter = WarpFilter.createWarpFilter(boundingBox, mappings,
           this.degree, imageWidth, imageHeight);
       }
     }
+
     return warpFilter;
   }
 
@@ -359,7 +382,6 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       extension + ".aux.xml");
     if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
       loadWorldFileX();
-
       final int[] dpi = getDpi();
 
       try {
@@ -383,6 +405,17 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
               srid = DomUtil.getInteger(sridElement);
             }
           }
+          if (srid == 0) {
+            final NodeList srsList = doc.getElementsByTagName("SRS");
+            for (int i = 0; i < srsList.getLength() && srid == 0; i++) {
+              final Node srsNode = srsList.item(i);
+              final String srsWkt = srsNode.getTextContent();
+              final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(srsWkt);
+              if (coordinateSystem != null) {
+                srid = coordinateSystem.getId();
+              }
+            }
+          }
           final GeometryFactory geometryFactory = GeometryFactory.getFactory(
             srid, 2);
           setGeometryFactory(geometryFactory);
@@ -391,9 +424,10 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
             "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
             "TargetGCPs");
-          if (sourceControlPoints.size() == targetControlPoints.size()) {
+          if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
-            for (int i = 0; i < sourceControlPoints.size(); i += 2) {
+            for (int i = 0; i < sourceControlPoints.size()
+              && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Coordinates sourcePixel = new DoubleCoordinates(imageX,
@@ -658,5 +692,14 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     final List<MappedLocation> tiePoints = getTiePoints();
     MapSerializerUtil.add(map, "tiePoints", tiePoints);
     return map;
+  }
+
+  @Override
+  public String toString() {
+    if (imageResource == null) {
+      return super.toString();
+    } else {
+      return imageResource.toString();
+    }
   }
 }

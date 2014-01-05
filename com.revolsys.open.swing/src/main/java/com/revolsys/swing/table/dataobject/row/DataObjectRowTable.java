@@ -47,6 +47,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
 
     final TableColumnModel columnModel = getColumnModel();
     tableCellEditor = new DataObjectTableCellEditor(this);
+    tableCellEditor.addCellEditorListener(model);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
       if (columnIndex >= model.getAttributesOffset()) {

@@ -45,6 +45,8 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   private int rowIndex;
 
+  private Object oldValue;
+
   private int columnIndex;
 
   private PopupMenu popupMenu = null;
@@ -73,8 +75,20 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     return value;
   }
 
+  public int getColumnIndex() {
+    return columnIndex;
+  }
+
   public JComponent getEditorComponent() {
     return editorComponent;
+  }
+
+  public Object getOldValue() {
+    return oldValue;
+  }
+
+  public int getRowIndex() {
+    return rowIndex;
   }
 
   @Override
@@ -85,6 +99,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       rowIndex = jxTable.convertRowIndexToModel(rowIndex);
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
+    oldValue = value;
     final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
     this.attributeName = model.getFieldName(rowIndex, columnIndex);
     final DataObjectMetaData metaData = model.getMetaData();

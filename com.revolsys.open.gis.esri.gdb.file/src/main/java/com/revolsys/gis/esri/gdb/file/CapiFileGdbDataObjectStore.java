@@ -748,7 +748,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  void doClose() {
+  public void doClose() {
     try {
       synchronized (apiSync) {
         synchronized (API_SYNC) {

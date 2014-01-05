@@ -102,8 +102,6 @@ public class WarpAffineFilter extends WarpFilter {
   private static GeneralMatrix getXMatrix(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight,
     final List<MappedLocation> mappings) {
-    // TODO Auto-generated method stub
-
     final GeneralMatrix X = new GeneralMatrix(2 * mappings.size(), 1);
 
     final int numRow = X.getNumRow();
