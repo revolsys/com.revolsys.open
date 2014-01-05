@@ -77,7 +77,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     if (StringUtils.hasText(url)) {
       resource = SpringUtil.getResource(url);
       revert();
-      return true;
+      return isExists();
     } else {
       LoggerFactory.getLogger(getClass()).error(
         "Layer definition does not contain a 'url' property: " + getName());

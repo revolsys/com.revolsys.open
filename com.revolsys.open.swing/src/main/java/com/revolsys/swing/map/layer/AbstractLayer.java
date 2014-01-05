@@ -745,7 +745,16 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public void setName(final String name) {
     final Object oldValue = this.name;
+    final LayerGroup layerGroup = getLayerGroup();
     this.name = name;
+    if (layerGroup != null) {
+      final String originalName = name;
+      int i = 1;
+      while (layerGroup.hasLayerWithSameName(this)) {
+        this.name = originalName + i;
+        i++;
+      }
+    }
     firePropertyChange("name", this.name, oldValue);
   }
 

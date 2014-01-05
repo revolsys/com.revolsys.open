@@ -106,6 +106,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   public void add(final int index, final Layer layer) {
     synchronized (this.layers) {
       if (layer != null && !this.layers.contains(layer)) {
+        final String name = layer.getName();
+        int i = 1;
+        while (hasLayerWithSameName(layer)) {
+          layer.setName(name + i);
+          i++;
+        }
         this.layers.add(index, layer);
         layer.setLayerGroup(this);
         initialize(layer);
@@ -454,6 +460,19 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     return layers;
   }
 
+  public boolean hasLayerWithSameName(final Layer layer) {
+    final String name = layer.getName();
+    for (final Layer otherLayer : layers) {
+      if (layer != otherLayer) {
+        final String layerName = otherLayer.getName();
+        if (name.equals(layerName)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public int indexOf(final Layer layer) {
     return this.layers.indexOf(layer);
   }
@@ -574,7 +593,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("url", urlString);
-    String name = FileUtil.getBaseName(urlString);
+    String name = FileUtil.getFileName(urlString);
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {

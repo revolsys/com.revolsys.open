@@ -234,8 +234,9 @@ public class Attribute extends AbstractObjectWithProperties implements
       this.scale = scale;
     }
     this.description = description;
-    this.minValue = MathUtil.getMinValue(getTypeClass());
-    this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    final Class<?> typeClass = getTypeClass();
+    this.minValue = MathUtil.getMinValue(typeClass);
+    this.maxValue = MathUtil.getMaxValue(typeClass);
     setProperties(properties);
   }
 
@@ -390,7 +391,11 @@ public class Attribute extends AbstractObjectWithProperties implements
    * @return The data type of the attribute value.
    */
   public Class<?> getTypeClass() {
-    return type.getJavaClass();
+    if (type == null) {
+      return Object.class;
+    } else {
+      return type.getJavaClass();
+    }
   }
 
   /**
