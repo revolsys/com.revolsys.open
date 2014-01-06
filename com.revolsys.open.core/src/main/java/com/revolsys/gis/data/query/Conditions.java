@@ -2,8 +2,49 @@ package com.revolsys.gis.data.query;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.Attribute;
 
 public class Conditions {
+
+  public static Condition binary(final Attribute field, final String operator,
+    final Object value) {
+    if ("=".equals(operator)) {
+      return Equal.equal(field, value);
+    } else if ("<>".equals(operator)) {
+      return NotEqual.notEqual(field, value);
+    } else if ("<".equals(operator)) {
+      return LessThan.lessThan(field, value);
+    } else if ("<=".equals(operator)) {
+      return LessThanEqual.lessThanOrEqual(field, value);
+    } else if (">".equals(operator)) {
+      return GreaterThan.greaterThan(field, value);
+    } else if (">=".equals(operator)) {
+      return GreaterThanEqual.greaterThanOrEqual(field, value);
+    } else {
+      throw new IllegalArgumentException("Operator " + operator
+        + " not supported");
+    }
+  }
+
+  public static Condition binary(final String fieldName, final String operator,
+    final Object value) {
+    if ("=".equals(operator)) {
+      return Equal.equal(fieldName, value);
+    } else if ("<>".equals(operator)) {
+      return NotEqual.notEqual(fieldName, value);
+    } else if ("<".equals(operator)) {
+      return LessThan.lessThan(fieldName, value);
+    } else if ("<=".equals(operator)) {
+      return LessThanEqual.lessThanOrEqual(fieldName, value);
+    } else if (">".equals(operator)) {
+      return GreaterThan.greaterThan(fieldName, value);
+    } else if (">=".equals(operator)) {
+      return GreaterThanEqual.greaterThanOrEqual(fieldName, value);
+    } else {
+      throw new IllegalArgumentException("Operator " + operator
+        + " not supported");
+    }
+  }
 
   public static Condition iLike(final String left, final String right) {
     return Like.like(Function.upper(new Cast(left, "varchar(4000)")), ("%"

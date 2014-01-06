@@ -2,9 +2,16 @@ package com.revolsys.gis.data.query;
 
 import java.util.Map;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class NotEqual extends BinaryCondition {
+
+  public static NotEqual notEqual(final Attribute attribute, final Object value) {
+    final String name = attribute.getName();
+    final Value valueCondition = new Value(attribute, value);
+    return notEqual(name, valueCondition);
+  }
 
   public static NotEqual notEqual(final String name, final Object value) {
     return notEqual(name, new Value(value));

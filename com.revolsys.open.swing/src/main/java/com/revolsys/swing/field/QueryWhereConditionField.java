@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.akiban.sql.StandardException;
@@ -88,9 +88,6 @@ public class QueryWhereConditionField extends ValueField implements
   private static final Map<String, Map<String, String>> BUTTON_OPERATORS = new LinkedHashMap<String, Map<String, String>>();
 
   private static final long serialVersionUID = 1L;
-
-  private static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList(
-    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE");
 
   static {
     addButton("equality", "=");
@@ -418,7 +415,7 @@ public class QueryWhereConditionField extends ValueField implements
       final String operator = binaryOperatorNode.getOperator();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      if (SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
+      if (QueryValue.SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
         final QueryValue leftCondition = toQueryValue(leftValueNode);
         QueryValue rightCondition = toQueryValue(rightValueNode);
 
@@ -573,9 +570,9 @@ public class QueryWhereConditionField extends ValueField implements
           final int offset = e.getErrorPosition();
           setInvalidMessage(offset - sqlPrefix.length(), "Error parsing SQL: "
             + e.getMessage());
-
         } catch (final StandardException e) {
-          e.printStackTrace();
+          LoggerFactory.getLogger(getClass()).error(
+            "Error parsing SQL: " + whereClause, e);
         }
       } else {
         statusLabel.setForeground(WebColors.DarkGreen);

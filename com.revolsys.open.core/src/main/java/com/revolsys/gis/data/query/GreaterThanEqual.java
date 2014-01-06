@@ -15,6 +15,12 @@ public class GreaterThanEqual extends BinaryCondition {
   }
 
   public static GreaterThanEqual greaterThanOrEqual(final String name,
+    final Object value) {
+    final Value valueCondition = new Value(value);
+    return new GreaterThanEqual(name, valueCondition);
+  }
+
+  public static GreaterThanEqual greaterThanOrEqual(final String name,
     final QueryValue right) {
     final Column column = new Column(name);
     return new GreaterThanEqual(column, right);

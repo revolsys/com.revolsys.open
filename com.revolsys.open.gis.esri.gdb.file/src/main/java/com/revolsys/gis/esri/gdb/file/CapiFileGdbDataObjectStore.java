@@ -40,7 +40,9 @@ import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.LeftUnaryCondition;
+import com.revolsys.gis.data.query.Like;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.RightUnaryCondition;
@@ -253,7 +255,26 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private void appendQueryValue(final StringBuffer buffer,
     final QueryValue condition) {
-    if (condition instanceof LeftUnaryCondition) {
+    if (condition instanceof Like || condition instanceof ILike) {
+      final BinaryCondition like = (BinaryCondition)condition;
+      final QueryValue left = like.getLeft();
+      final QueryValue right = like.getRight();
+      buffer.append("UPPER(CAST(");
+      appendQueryValue(buffer, left);
+      buffer.append(" AS VARCHAR(4000))) LIKE ");
+      if (right instanceof Value) {
+        final Value valueCondition = (Value)right;
+        final Object value = valueCondition.getValue();
+        buffer.append("'");
+        if (value != null) {
+          final String string = StringConverterRegistry.toString(value);
+          buffer.append(string.toUpperCase());
+        }
+        buffer.append("'");
+      } else {
+        appendQueryValue(buffer, right);
+      }
+    } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
       final QueryValue right = unaryCondition.getQueryValue();
