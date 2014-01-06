@@ -43,6 +43,10 @@ public class ComboBox extends JComboBox implements Field {
     this(null, editable, items);
   }
 
+  public ComboBox(final Collection<?> items) {
+    this(null, false, items);
+  }
+
   public ComboBox(final ComboBoxModel model) {
     this("fieldValue", model);
   }
@@ -146,7 +150,8 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     final ComboBoxEditor editor = getEditor();
     final Component component = editor.getEditorComponent();
     component.setForeground(foregroundColor);

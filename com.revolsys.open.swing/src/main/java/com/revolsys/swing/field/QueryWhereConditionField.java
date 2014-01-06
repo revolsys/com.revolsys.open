@@ -4,31 +4,33 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
@@ -58,8 +60,10 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.And;
 import com.revolsys.gis.data.query.Between;
 import com.revolsys.gis.data.query.BinaryCondition;
@@ -77,53 +81,35 @@ import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
+import com.revolsys.swing.map.layer.dataobject.component.AttributeTitleStringConveter;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.CollectionUtil;
 
 public class QueryWhereConditionField extends ValueField implements
-  MouseListener, CaretListener {
-  private static final Map<String, Map<String, String>> BUTTON_OPERATORS = new LinkedHashMap<String, Map<String, String>>();
+  MouseListener, CaretListener, ItemListener {
+
+  private static final ImageIcon ICON = SilkIconLoader.getIcon("add");
 
   private static final long serialVersionUID = 1L;
 
-  static {
-    addButton("equality", "=");
-    addButton("equality", "<>");
-    addButton("equality", "<");
-    addButton("equality", "<=");
-    addButton("equality", ">");
-    addButton("equality", ">=");
-    addButton("relational", "AND");
-    addButton("relational", "OR");
-    addButton("relational", "NOT");
-    addButton("grouping", "( )");
-    addButton("comparison", "IS NULL");
-    addButton("comparison", "IS NOT NULL");
-    addButton("comparison", "BETWEEN ", "BETWEEN value1 AND value2");
-    addButton("comparison", "IN", "IN (value1, value2)");
-    addButton("comparison", "LIKE", "LIKE '%value%'");
-    addButton("math", "+");
-    addButton("math", "-");
-    addButton("math", "*");
-    addButton("math", "/");
+  private JComponent binaryConditionField;
 
-  }
+  private final ComboBox binaryConditionOperator;
 
-  private static void addButton(final String group, final String operator) {
-    addButton(group, operator, operator);
-  }
+  private final BasePanel binaryConditionPanel;
 
-  private static void addButton(final String group, final String label,
-    final String operator) {
-    CollectionUtil.addToMap(BUTTON_OPERATORS, group, label, operator);
-  }
+  private final ComboBox fieldNamesList;
 
-  private final JList fieldNamesList;
+  private final AttributeFilterPanel filterPanel;
 
   private final DataObjectMetaData metaData;
+
+  private final ComboBox rightUnaryConditionOperator;
 
   private final Color selectionColor;
 
@@ -137,7 +123,11 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final TextPane whereTextField;
 
-  private final AttributeFilterPanel filterPanel;
+  private CodeTable codeTable;
+
+  private final BasePanel likePanel;
+
+  private final TextField likeConditionField;
 
   public QueryWhereConditionField(final AttributeFilterPanel filterPanel) {
     super(new BorderLayout());
@@ -145,30 +135,65 @@ public class QueryWhereConditionField extends ValueField implements
     final AbstractDataObjectLayer layer = filterPanel.getLayer();
     this.filterPanel = filterPanel;
     metaData = layer.getMetaData();
-    final List<String> attributeNames = metaData.getAttributeNames();
+    final List<Attribute> attributes = metaData.getAttributes();
 
-    fieldNamesList = new JList(new Vector<String>(attributeNames));
-    fieldNamesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    final JPanel fieldNamesPanel = new JPanel(new BorderLayout());
-    fieldNamesPanel.add(new JScrollPane(fieldNamesList), BorderLayout.CENTER);
-    SwingUtil.setTitledBorder(fieldNamesPanel, "Field Names");
+    fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
+      false, attributes);
+    fieldNamesList.addItemListener(this);
     fieldNamesList.addMouseListener(this);
-    fieldNamesPanel.setMinimumSize(new Dimension(300, 100));
+
+    final BasePanel fieldNamePanel = new BasePanel(fieldNamesList);
+    GroupLayoutUtil.makeColumns(fieldNamePanel, 1, false);
+
+    binaryConditionOperator = new ComboBox("=", "<>", "<", "<=", ">", ">=");
+    final JButton binaryConditionAddButton = InvokeMethodAction.createButton(
+      "", "Add Binary Condition", ICON, this, "actionAddBinaryCondition");
+    binaryConditionPanel = new BasePanel(binaryConditionOperator,
+      binaryConditionAddButton);
+    setBinaryConditionField(null);
+
+    rightUnaryConditionOperator = new ComboBox("IS NULL", "IS NOT NULL");
+    final JButton rightUnaryConditionAddButton = InvokeMethodAction.createButton(
+      "", "Add Unary Condition", ICON, this, "actionAddRightUnaryCondition");
+    final BasePanel rightUnaryConditionPanel = new BasePanel(
+      rightUnaryConditionOperator, rightUnaryConditionAddButton);
+    GroupLayoutUtil.makeColumns(rightUnaryConditionPanel, false);
+
+    final JButton likeConditionAddButton = InvokeMethodAction.createButton("",
+      "Add Unary Condition", ICON, this, "actionAddLikeCondition");
+    likeConditionField = new TextField(20);
+    likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(" '%"),
+      likeConditionField, new JLabel("%' "), likeConditionAddButton);
+    GroupLayoutUtil.makeColumns(likePanel, false);
+
+    final BasePanel operatorPanel = new BasePanel(new VerticalLayout(),
+      binaryConditionPanel, rightUnaryConditionPanel, likePanel);
+
+    final BasePanel fieldConditions = new BasePanel(fieldNamePanel,
+      operatorPanel);
+    GroupLayoutUtil.makeColumns(fieldConditions, 2, false);
 
     final ToolBar buttonsPanel = new ToolBar();
-    buttonsPanel.setOpaque(false);
     buttonsPanel.setBorderPainted(true);
-    for (final Entry<String, Map<String, String>> group : BUTTON_OPERATORS.entrySet()) {
-      final String groupName = group.getKey();
-      final Map<String, String> buttonDefinitions = group.getValue();
-      for (final Entry<String, String> buttonDefinition : buttonDefinitions.entrySet()) {
-        final String title = buttonDefinition.getKey();
-        final String text = buttonDefinition.getValue();
-        final JButton button = buttonsPanel.addButton(groupName, title, this,
-          "insertText", text);
-        button.setBorderPainted(true);
-      }
-    }
+    buttonsPanel.addButton("relational", "AND", this, "insertText", "AND")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("relational", "OR", this, "insertText", "OR")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("math", "+", this, "insertText", "+")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("math", "-", this, "insertText", "-")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("math", "*", this, "insertText", "*")
+      .setBorderPainted(true);
+    buttonsPanel.addButton("math", "/", this, "insertText", "/")
+      .setBorderPainted(true);
+
+    final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
+      fieldConditions, buttonsPanel);
 
     whereTextField = new TextPane(5, 20);
     whereTextField.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -189,7 +214,6 @@ public class QueryWhereConditionField extends ValueField implements
 
     final ToolBar statusToolBar = new ToolBar();
     statusToolBar.setOpaque(false);
-    buttonsPanel.setBorderPainted(true);
     final JButton verifyButton = statusToolBar.addButton("default", "Verify",
       this, "verifyCondition");
     verifyButton.setBorderPainted(true);
@@ -197,33 +221,163 @@ public class QueryWhereConditionField extends ValueField implements
     final JPanel queryPanel = new JPanel(new BorderLayout());
     SwingUtil.setTitledBorder(queryPanel, "Query");
     queryPanel.setOpaque(false);
-    queryPanel.add(buttonsPanel, BorderLayout.NORTH);
+    queryPanel.add(widgetPanel, BorderLayout.NORTH);
     queryPanel.add(filterTextPanel, BorderLayout.CENTER);
     queryPanel.add(statusToolBar, BorderLayout.SOUTH);
     queryPanel.setPreferredSize(new Dimension(500, 400));
 
     statusLabel = new TextArea();
     statusLabel.setEditable(false);
-    final JScrollPane statusPanel = new JScrollPane(statusLabel);
-    statusPanel.setPreferredSize(new Dimension(500, 200));
+    final JScrollPane statusPane = new JScrollPane(statusLabel);
+    statusPane.setPreferredSize(new Dimension(500, 100));
+
+    final JPanel statusPanel = new JPanel(new BorderLayout());
+    SwingUtil.setTitledBorder(statusPanel, "Messages");
+    statusPanel.setOpaque(false);
+    statusPanel.add(statusPane, BorderLayout.CENTER);
 
     final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
       queryPanel, statusPanel);
     topBottom.setResizeWeight(0.7);
 
-    final JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-      true, fieldNamesPanel, topBottom);
-    add(leftRight, BorderLayout.CENTER);
+    add(topBottom, BorderLayout.CENTER);
 
-    setPreferredSize(new Dimension(1000, Math.max(650,
-      Math.min(attributeNames.size() * 15, 650))));
+    setPreferredSize(new Dimension(800, 500));
 
     final Condition filter = filterPanel.getFilter();
     setFieldValue(filter);
     if (filter != null) {
       whereTextField.setText(filter.toFormattedString());
     }
+    final String searchField = layer.getProperty("searchField");
+    final Attribute searchAttribute = metaData.getAttribute(searchField);
+    if (searchAttribute == null) {
+      fieldNamesList.setSelectedIndex(0);
+    } else {
+      fieldNamesList.setSelectedItem(searchAttribute);
+    }
+  }
 
+  public void actionAddBinaryCondition() {
+    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    if (attribute != null) {
+      final String operator = (String)binaryConditionOperator.getSelectedItem();
+      if (StringUtils.hasText(operator)) {
+        Object fieldValue = ((Field)binaryConditionField).getFieldValue();
+        if (fieldValue != null) {
+          final int position = whereTextField.getCaretPosition();
+          final Class<?> attributeClass = attribute.getTypeClass();
+          if (codeTable == null) {
+            try {
+              fieldValue = StringConverterRegistry.toObject(attributeClass,
+                fieldValue);
+            } catch (final Throwable e) {
+              setInvalidMessage(fieldValue + " is not a valid "
+                + attribute.getType());
+              return;
+            }
+          } else {
+            fieldValue = codeTable.getValue(fieldValue);
+          }
+          if (fieldValue != null) {
+            final String valueString = StringConverterRegistry.toString(
+              attributeClass, fieldValue);
+
+            final Document document = whereTextField.getDocument();
+            final StringBuffer text = new StringBuffer();
+            if (position > 0) {
+              text.append(" ");
+            }
+            text.append(attribute.getName());
+            text.append(" ");
+            text.append(operator);
+            text.append(" ");
+            if (Date.class.isAssignableFrom(attributeClass)) {
+              text.append("{d '" + valueString + "'}");
+            } else if (Time.class.isAssignableFrom(attributeClass)) {
+              text.append("{t '" + valueString + "'}");
+            } else if (Timestamp.class.isAssignableFrom(attributeClass)) {
+              text.append("{ts '" + valueString + "'}");
+            } else if (java.util.Date.class.isAssignableFrom(attributeClass)) {
+              text.append("{ts '" + valueString + "'}");
+            } else if (Number.class.isAssignableFrom(attributeClass)) {
+              text.append(valueString);
+            } else {
+              text.append("'");
+              text.append(valueString.replaceAll("'", "''"));
+              text.append("'");
+            }
+            text.append(" ");
+            try {
+              document.insertString(position, text.toString(), null);
+            } catch (final BadLocationException e) {
+              LoggerFactory.getLogger(getClass()).error(
+                "Error inserting text: " + text, e);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void actionAddLikeCondition() {
+    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    if (attribute != null) {
+      final Object fieldValue = ((Field)likeConditionField).getFieldValue();
+      if (fieldValue != null) {
+        if (codeTable == null) {
+          final int position = whereTextField.getCaretPosition();
+          final Class<?> attributeClass = attribute.getTypeClass();
+          if (fieldValue != null) {
+            final String valueString = StringConverterRegistry.toString(
+              attributeClass, fieldValue);
+
+            final Document document = whereTextField.getDocument();
+            final StringBuffer text = new StringBuffer();
+            if (position > 0) {
+              text.append(" ");
+            }
+            text.append(attribute.getName());
+            text.append(" LIKE '%");
+            text.append(valueString.replaceAll("'", "''"));
+            text.append("%' ");
+            try {
+              document.insertString(position, text.toString(), null);
+            } catch (final BadLocationException e) {
+              LoggerFactory.getLogger(getClass()).error(
+                "Error inserting text: " + text, e);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void actionAddRightUnaryCondition() {
+    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    if (attribute != null) {
+      final String operator = (String)rightUnaryConditionOperator.getSelectedItem();
+      if (StringUtils.hasText(operator)) {
+        final int position = whereTextField.getCaretPosition();
+
+        final Document document = whereTextField.getDocument();
+        final StringBuffer text = new StringBuffer();
+        if (position > 0) {
+          text.append(" ");
+        }
+        text.append(attribute.getName());
+        text.append(" ");
+        text.append(operator);
+        text.append(" ");
+
+        try {
+          document.insertString(position, text.toString(), null);
+        } catch (final BadLocationException e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Error inserting text: " + text, e);
+        }
+      }
+    }
   }
 
   @Override
@@ -265,10 +419,40 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   @Override
+  public void itemStateChanged(final ItemEvent event) {
+    if (event.getSource() == fieldNamesList) {
+      if (event.getStateChange() == ItemEvent.SELECTED) {
+        final Attribute attribute = (Attribute)event.getItem();
+        if (attribute.equals(metaData.getIdAttribute())) {
+          setBinaryConditionField(null);
+          likePanel.setVisible(true);
+        } else {
+          final String name = attribute.getName();
+          codeTable = metaData.getCodeTableByColumn(name);
+          if (codeTable == null) {
+            final Field field = SwingUtil.createField(metaData, name, true);
+            setBinaryConditionField((JComponent)field);
+            if (field instanceof DateField) {
+              likePanel.setVisible(false);
+            } else {
+              likePanel.setVisible(true);
+            }
+          } else {
+            final ComboBox codeTableField = SwingUtil.createComboBox(codeTable,
+              true);
+            setBinaryConditionField(codeTableField);
+            likePanel.setVisible(false);
+          }
+        }
+      }
+    }
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent event) {
     if (event.getSource() == fieldNamesList) {
       if (SwingUtilities.isLeftMouseButton(event) && event.getClickCount() == 2) {
-        final String fieldName = (String)fieldNamesList.getSelectedValue();
+        final String fieldName = (String)fieldNamesList.getSelectedItem();
         if (StringUtils.hasText(fieldName)) {
           int position = whereTextField.getCaretPosition();
           String previousText;
@@ -336,6 +520,18 @@ public class QueryWhereConditionField extends ValueField implements
         "<html><p>Cannot save the advanced query as the SQL is valid.<p></p>Fix the SQL or use the cancel button on the Advanced Filter window to cancel the changes.<p></html>",
         "SQL Invalid", JOptionPane.ERROR_MESSAGE);
     }
+  }
+
+  private void setBinaryConditionField(JComponent field) {
+    if (binaryConditionField != null) {
+      binaryConditionPanel.remove(binaryConditionField);
+    }
+    if (field == null) {
+      field = new TextField(20);
+    }
+    binaryConditionPanel.add(field, 1);
+    GroupLayoutUtil.makeColumns(binaryConditionPanel, false);
+    this.binaryConditionField = field;
   }
 
   @Override

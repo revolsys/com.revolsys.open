@@ -66,7 +66,7 @@ public class SpatiaLiteDatabaseFactory implements JdbcDatabaseFactory {
       try {
         final Statement statement = connection.createStatement();
         try {
-          statement.execute("SELECT load_extension('/usr/local/lib/libspatialite.dylib')");
+          statement.execute("SELECT load_extension('spatialite')");
         } finally {
           statement.close();
         }

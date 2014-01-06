@@ -26,6 +26,13 @@ public class GroupLayoutUtil {
   }
 
   public static void makeColumns(final Container container,
+    final boolean containerGaps) {
+    final GroupLayout groupLayout = getLayout(container, containerGaps);
+
+    makeColumns(container, groupLayout, container.getComponentCount());
+  }
+
+  public static void makeColumns(final Container container,
     final GroupLayout groupLayout, final int numColumns) {
     final int componentCount = container.getComponentCount();
     final int numRows = (int)Math.ceil(componentCount / (double)numColumns);

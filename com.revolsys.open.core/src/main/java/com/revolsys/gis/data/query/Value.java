@@ -15,6 +15,7 @@ import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.util.DateUtil;
 
 public class Value extends QueryValue {
   private JdbcAttribute jdbcAttribute;
@@ -151,21 +152,33 @@ public class Value extends QueryValue {
   }
 
   @Override
+  public String toFormattedString() {
+    return toString();
+  }
+
+  @Override
   public String toString() {
-    if (this.displayValue instanceof String) {
-      final String string = (String)this.displayValue;
-      return "'" + string.replaceAll("'", "''") + "'";
+    if (this.displayValue instanceof Number) {
+      return StringConverterRegistry.toString(this.displayValue);
     } else if (this.displayValue instanceof Date) {
       final Date date = (Date)this.displayValue;
-      return "{d '" + date + "'}";
+      final String stringValue = DateUtil.format("yyyy-MM-dd ", date);
+      return "{d '" + stringValue + "'}";
     } else if (this.displayValue instanceof Time) {
       final Time time = (Time)this.displayValue;
-      return "{t '" + time + "'}";
+      final String stringValue = DateUtil.format("HH:mm:ss", time);
+      return "{t '" + stringValue + "'}";
     } else if (this.displayValue instanceof Timestamp) {
       final Timestamp time = (Timestamp)this.displayValue;
-      return "{ts '" + time + "'}";
+      final String stringValue = DateUtil.format("yyyy-MM-dd HH:mm:ss.S", time);
+      return "{ts '" + stringValue + "'}";
+    } else if (this.displayValue instanceof java.util.Date) {
+      final java.util.Date time = (java.util.Date)this.displayValue;
+      final String stringValue = DateUtil.format("yyyy-MM-dd HH:mm:ss.S", time);
+      return "{ts '" + stringValue + "'}";
     } else {
-      return StringConverterRegistry.toString(this.displayValue);
+      final String string = StringConverterRegistry.toString(this.displayValue);
+      return "'" + string.replaceAll("'", "''") + "'";
     }
   }
 

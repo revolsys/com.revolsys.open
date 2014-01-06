@@ -17,6 +17,13 @@ public class BasePanel extends JXPanel {
     this(new VerticalLayout(), isDoubleBuffered);
   }
 
+  public BasePanel(final Component... components) {
+    this();
+    for (final Component component : components) {
+      add(component);
+    }
+  }
+
   public BasePanel(final LayoutManager layout) {
     this(layout, true);
   }
@@ -34,5 +41,4 @@ public class BasePanel extends JXPanel {
       add(component);
     }
   }
-
 }

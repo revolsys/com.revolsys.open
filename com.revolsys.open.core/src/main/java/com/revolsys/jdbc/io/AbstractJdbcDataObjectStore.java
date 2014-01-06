@@ -699,7 +699,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
-    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase();
+    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase()
+      .replaceAll("/+", "/");
     if (excludeTablePaths.contains(path)) {
       return true;
     } else {

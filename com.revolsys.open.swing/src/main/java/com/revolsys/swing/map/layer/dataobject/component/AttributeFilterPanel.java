@@ -46,6 +46,7 @@ import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreSearchTextField;
+import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextField;
@@ -81,6 +82,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private final ComboBox numericOperatorField = new ComboBox("=", "<>", "Like",
     "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
+
+  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL",
+    "IS NOT NULL", "<", "<=", ">", ">=");
 
   private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like",
     "IS NULL", "IS NOT NULL");
@@ -164,6 +168,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     } else if (component instanceof JComboBox) {
       final JComboBox comboField = (JComboBox)component;
       comboField.addActionListener(this);
+    } else if (component instanceof DateField) {
+      final DateField dateField = (DateField)component;
+      dateField.addActionListener(this);
     }
   }
 
@@ -230,7 +237,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         final CodeTable codeTable = this.metaData.getCodeTableByColumn(searchFieldName);
         if (codeTable == null
           || searchFieldName.equals(metaData.getIdAttributeName())) {
-          searchField = this.searchTextField;
+          if (Date.class.isAssignableFrom(attribute.getTypeClass())) {
+            searchField = SwingUtil.createDateField(searchFieldName);
+          } else {
+            searchField = this.searchTextField;
+          }
         } else {
           searchField = SwingUtil.createComboBox(codeTable, false);
         }
@@ -273,6 +284,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     } else if (component instanceof JComboBox) {
       final JComboBox comboField = (JComboBox)component;
       comboField.removeActionListener(this);
+    } else if (component instanceof DateField) {
+      final DateField dateField = (DateField)component;
+      dateField.removeActionListener(this);
     }
   }
 
@@ -326,7 +340,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           operatorField.setFieldValue(operator);
           final String text = StringConverterRegistry.toString(value.getValue());
           final Object oldValue = field.getFieldValue();
-          if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue.toString()))) {
+          if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue))) {
             field.setFieldValue(text);
           }
           simple = ((DefaultComboBoxModel)operatorField.getModel()).getIndexOf(operator) != -1;
@@ -436,9 +450,10 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           if (codeTable != null
             && !fieldName.equals(metaData.getIdAttributeName())) {
             operatorField = codeTableOperatorField;
-          } else if (Number.class.isAssignableFrom(attributeClass)
-            || Date.class.isAssignableFrom(attributeClass)) {
+          } else if (Number.class.isAssignableFrom(attributeClass)) {
             operatorField = numericOperatorField;
+          } else if (Date.class.isAssignableFrom(attributeClass)) {
+            operatorField = dateOperatorField;
           } else {
             operatorField = generalOperatorField;
           }

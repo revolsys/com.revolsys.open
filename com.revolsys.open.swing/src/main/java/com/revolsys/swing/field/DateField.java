@@ -10,6 +10,7 @@ import javax.swing.JFormattedTextField;
 import org.jdesktop.swingx.JXDatePicker;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
@@ -99,7 +100,8 @@ public class DateField extends JXDatePicker implements Field,
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     final JFormattedTextField editor = getEditor();
     editor.setForeground(foregroundColor);
     editor.setSelectedTextColor(foregroundColor);
@@ -131,15 +133,15 @@ public class DateField extends JXDatePicker implements Field,
   @Override
   public void setFieldValue(final Object value) {
     final Date oldValue = this.fieldValue;
-    final Date date = (Date)value;
-    if (!EqualsRegistry.equal(getDate(), value)) {
+    final Date date = StringConverterRegistry.toObject(Date.class, value);
+    if (!EqualsRegistry.equal(getDate(), date)) {
       setDate(date);
     }
-    if (!EqualsRegistry.equal(oldValue, value)) {
-      this.fieldValue = (Date)value;
-      firePropertyChange(this.fieldName, oldValue, value);
+    if (!EqualsRegistry.equal(oldValue, date)) {
+      this.fieldValue = date;
+      firePropertyChange(this.fieldName, oldValue, date);
       SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, value);
+        oldValue, date);
     }
   }
 

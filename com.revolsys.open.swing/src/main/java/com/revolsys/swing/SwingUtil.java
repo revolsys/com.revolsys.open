@@ -118,9 +118,8 @@ public class SwingUtil {
   }
 
   public static JLabel addLabel(final Container container, final String text) {
-    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(text)
-      + " ");
-    label.setFont(BOLD_FONT);
+    final String labelText = CaseConverter.toCapitalizedWords(text) + " ";
+    final JLabel label = createLabel(labelText);
     container.add(label);
     return label;
   }
@@ -336,6 +335,12 @@ public class SwingUtil {
       }
     }
     return fileChooser;
+  }
+
+  public static JLabel createLabel(final String text) {
+    final JLabel label = new JLabel(text);
+    label.setFont(BOLD_FONT);
+    return label;
   }
 
   public static TextArea createTextArea(final int rows, final int columns) {

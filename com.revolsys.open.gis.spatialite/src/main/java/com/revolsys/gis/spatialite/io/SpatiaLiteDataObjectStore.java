@@ -254,9 +254,10 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
   private void initSettings() {
     setExcludeTablePaths("/GEOMETRY_COLUMNS", "/GEOMETRY_COLUMNS_AUTH",
       "/GEOMETRY_COLUMNS_FIELD_INFOS", "/GEOMETRY_COLUMNS_STATISTICS",
-      "/GEOMETRY_COLUMNS_TIME", "/SPATIALINDEX", "/SPATIAL_REF_SYS",
-      "/SQL_STATEMENTS_LOG", "/VIEWS_GEOMETRY_COLUMNS",
-      "/VIEWS_GEOMETRY_COLUMNS_AUTH", "/VIEWS_GEOMETRY_COLUMNS_FIELD_INFOS",
+      "/GEOMETRY_COLUMNS_TIME", "/SPATIALITE_HISTORY", "/SPATIALINDEX",
+      "/SPATIAL_REF_SYS", "/SQL_STATEMENTS_LOG", "/SQLITE_SEQUENCE",
+      "/VIEWS_GEOMETRY_COLUMNS", "/VIEWS_GEOMETRY_COLUMNS_AUTH",
+      "/VIEWS_GEOMETRY_COLUMNS_FIELD_INFOS",
       "/VIEWS_GEOMETRY_COLUMNS_STATISTICS", "/VIRTS_GEOMETRY_COLUMNS",
       "/VIRTS_GEOMETRY_COLUMNS_AUTH", "/VIRTS_GEOMETRY_COLUMNS_FIELD_INFOS",
       "/VIRTS_GEOMETRY_COLUMNS_STATISTICS");
@@ -283,26 +284,29 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
     final Map<String, String> idColumnNames = new HashMap<String, String>();
     final Connection connection = getDbConnection();
     try {
-      for (final String tableName : schemaTableNames.get(dbSchemaName)) {
-        final PreparedStatement statement = connection.prepareStatement("PRAGMA table_info('"
-          + tableName + "')");
-        try {
-          statement.setString(1, dbSchemaName);
-          final ResultSet rs = statement.executeQuery();
+      for (final String dbTableName : schemaTableNames.get(dbSchemaName)) {
+        if (!isExcluded(dbSchemaName, dbTableName)) {
+          final String tableName = schemaName + "/"
+            + dbTableName.toUpperCase().replaceAll("/+", "/");
+          System.out.println(tableName);
+          final PreparedStatement statement = connection.prepareStatement("PRAGMA table_info('"
+            + dbTableName + "')");
           try {
-            while (rs.next()) {
-              final String idAttributeName = rs.getString("COLUMN_NAME");
-              final int pk = rs.getInt("PK");
-              if (pk == 1) {
-                idColumnNames.put(schemaName + "/" + tableName.toUpperCase(),
-                  idAttributeName);
+            final ResultSet rs = statement.executeQuery();
+            try {
+              while (rs.next()) {
+                final String idAttributeName = rs.getString("name");
+                final int pk = rs.getInt("PK");
+                if (pk == 1) {
+                  idColumnNames.put(tableName, idAttributeName);
+                }
               }
+            } finally {
+              JdbcUtils.close(rs);
             }
           } finally {
-            JdbcUtils.close(rs);
+            JdbcUtils.close(statement);
           }
-        } finally {
-          JdbcUtils.close(statement);
         }
       }
     } catch (final SQLException e) {
