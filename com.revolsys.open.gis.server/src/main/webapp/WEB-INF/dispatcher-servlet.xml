@@ -54,7 +54,6 @@
       <map>
         <entry key="html" value="text/html" />
         <entry key="wkt" value="text/x-wkt" />
-        <entry key="ecsv" value="text/x-ecsv" />
         <entry key="xml" value="text/xml" />
         <entry key="json" value="application/json" />
         <entry key="kml" value="application/vnd.google-earth.kml+xml" />

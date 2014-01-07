@@ -26,13 +26,6 @@
   		<groupId>com.revolsys.open</groupId>
 
 
-  		<artifactId>com.revolsys.open.gis.ecsv</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.revolsys.open</groupId>
-
-
   		<artifactId>com.revolsys.open.gis.oracle</artifactId>
   		<version>${project.version}</version>
   	</dependency>
