@@ -13,6 +13,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -80,6 +81,7 @@ import com.revolsys.gis.data.query.Not;
 import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
+import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BasePanel;
@@ -97,11 +99,36 @@ public class QueryWhereConditionField extends ValueField implements
 
   private static final long serialVersionUID = 1L;
 
+  public static JComponent createSearchField(final Attribute attribute,
+    final CodeTable codeTable) {
+    final String name = attribute.getName();
+    final Class<?> typeClass = attribute.getTypeClass();
+    final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
+    final DataObjectMetaData metaData = attribute.getMetaData();
+    if (attribute.equals(metaData.getIdAttribute())) {
+      return SwingUtil.createField(typeClass, name, null);
+    } else if (StringUtils.hasText(searchFieldFactory)) {
+      final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
+      return SpelUtil.getValue(searchFieldFactory, attribute,
+        searchFieldFactoryParameters);
+    } else {
+      if (codeTable == null) {
+        return SwingUtil.createField(typeClass, name, null);
+      } else {
+        return SwingUtil.createComboBox(codeTable, false);
+      }
+    }
+  }
+
   private JComponent binaryConditionField;
 
   private final ComboBox binaryConditionOperator;
 
   private final BasePanel binaryConditionPanel;
+
+  private final BasePanel inConditionPanel;
+
+  private JComponent inConditionField;
 
   private final ComboBox fieldNamesList;
 
@@ -166,8 +193,16 @@ public class QueryWhereConditionField extends ValueField implements
       likeConditionField, new JLabel("%' "), likeConditionAddButton);
     GroupLayoutUtil.makeColumns(likePanel, false);
 
+    final JButton inConditionAddButton = InvokeMethodAction.createButton("",
+      "Add Unary Condition", ICON, this, "actionAddInCondition");
+    inConditionField = new TextField(20);
+    inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"),
+      likeConditionField, inConditionAddButton);
+    setInConditionField(null);
+
     final BasePanel operatorPanel = new BasePanel(new VerticalLayout(),
-      binaryConditionPanel, rightUnaryConditionPanel, likePanel);
+      binaryConditionPanel, rightUnaryConditionPanel, likePanel,
+      inConditionPanel);
 
     final BasePanel fieldConditions = new BasePanel(fieldNamePanel,
       operatorPanel);
@@ -266,7 +301,7 @@ public class QueryWhereConditionField extends ValueField implements
         Object fieldValue = ((Field)binaryConditionField).getFieldValue();
         if (fieldValue != null) {
           final int position = whereTextField.getCaretPosition();
-          final Class<?> attributeClass = attribute.getTypeClass();
+          Class<?> attributeClass = attribute.getTypeClass();
           if (codeTable == null) {
             try {
               fieldValue = StringConverterRegistry.toObject(attributeClass,
@@ -278,10 +313,11 @@ public class QueryWhereConditionField extends ValueField implements
             }
           } else {
             fieldValue = codeTable.getValue(fieldValue);
+            if (fieldValue != null) {
+              attributeClass = fieldValue.getClass();
+            }
           }
           if (fieldValue != null) {
-            final String valueString = StringConverterRegistry.toString(
-              attributeClass, fieldValue);
 
             final Document document = whereTextField.getDocument();
             final StringBuffer text = new StringBuffer();
@@ -292,27 +328,68 @@ public class QueryWhereConditionField extends ValueField implements
             text.append(" ");
             text.append(operator);
             text.append(" ");
-            if (Date.class.isAssignableFrom(attributeClass)) {
-              text.append("{d '" + valueString + "'}");
-            } else if (Time.class.isAssignableFrom(attributeClass)) {
-              text.append("{t '" + valueString + "'}");
-            } else if (Timestamp.class.isAssignableFrom(attributeClass)) {
-              text.append("{ts '" + valueString + "'}");
-            } else if (java.util.Date.class.isAssignableFrom(attributeClass)) {
-              text.append("{ts '" + valueString + "'}");
-            } else if (Number.class.isAssignableFrom(attributeClass)) {
-              text.append(valueString);
-            } else {
-              text.append("'");
-              text.append(valueString.replaceAll("'", "''"));
-              text.append("'");
-            }
+            appendValue(text, attributeClass, fieldValue);
             text.append(" ");
             try {
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
               LoggerFactory.getLogger(getClass()).error(
                 "Error inserting text: " + text, e);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void actionAddInCondition() {
+    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    if (attribute != null) {
+      Object fieldValue = ((Field)inConditionField).getFieldValue();
+      if (fieldValue != null) {
+        int position = whereTextField.getCaretPosition();
+        Class<?> attributeClass = attribute.getTypeClass();
+        if (fieldValue != null) {
+          if (codeTable == null) {
+            try {
+              fieldValue = StringConverterRegistry.toObject(attributeClass,
+                fieldValue);
+            } catch (final Throwable e) {
+              setInvalidMessage(fieldValue + " is not a valid "
+                + attribute.getType());
+              return;
+            }
+          } else {
+            fieldValue = codeTable.getValue(fieldValue);
+            if (fieldValue != null) {
+              attributeClass = fieldValue.getClass();
+            }
+          }
+          if (fieldValue != null) {
+            final StringBuffer text = new StringBuffer();
+            try {
+              final Document document = whereTextField.getDocument();
+              final String currentText = document.getText(0, position);
+              final String endText = attribute.getName() + " IN (.+) $";
+              if (currentText.matches(endText)) {
+                position -= 2;
+                text.append(", ");
+                appendValue(text, attributeClass, fieldValue);
+              } else {
+
+                if (position > 0) {
+                  text.append(" ");
+                }
+                text.append(attribute.getName());
+                text.append(" IN (");
+                appendValue(text, attributeClass, fieldValue);
+                text.append(") ");
+              }
+              document.insertString(position, text.toString(), null);
+            } catch (final BadLocationException e) {
+              LoggerFactory.getLogger(getClass()).error(
+                "Error inserting text: " + text, e);
+
             }
           }
         }
@@ -380,6 +457,26 @@ public class QueryWhereConditionField extends ValueField implements
     }
   }
 
+  public void appendValue(final StringBuffer text, final Class<?> type,
+    final Object value) {
+    final String valueString = StringConverterRegistry.toString(type, value);
+    if (Date.class.isAssignableFrom(type)) {
+      text.append("{d '" + valueString + "'}");
+    } else if (Time.class.isAssignableFrom(type)) {
+      text.append("{t '" + valueString + "'}");
+    } else if (Timestamp.class.isAssignableFrom(type)) {
+      text.append("{ts '" + valueString + "'}");
+    } else if (java.util.Date.class.isAssignableFrom(type)) {
+      text.append("{ts '" + valueString + "'}");
+    } else if (Number.class.isAssignableFrom(type)) {
+      text.append(valueString);
+    } else {
+      text.append("'");
+      text.append(valueString.replaceAll("'", "''"));
+      text.append("'");
+    }
+  }
+
   @Override
   public void caretUpdate(final CaretEvent e) {
     if (!validating) {
@@ -423,27 +520,32 @@ public class QueryWhereConditionField extends ValueField implements
     if (event.getSource() == fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
         final Attribute attribute = (Attribute)event.getItem();
-        if (attribute.equals(metaData.getIdAttribute())) {
-          setBinaryConditionField(null);
-          likePanel.setVisible(true);
-        } else {
-          final String name = attribute.getName();
-          codeTable = metaData.getCodeTableByColumn(name);
-          if (codeTable == null) {
-            final Field field = SwingUtil.createField(metaData, name, true);
-            setBinaryConditionField((JComponent)field);
-            if (field instanceof DateField) {
-              likePanel.setVisible(false);
-            } else {
-              likePanel.setVisible(true);
-            }
-          } else {
-            final ComboBox codeTableField = SwingUtil.createComboBox(codeTable,
-              true);
-            setBinaryConditionField(codeTableField);
-            likePanel.setVisible(false);
-          }
+        final String name = attribute.getName();
+        codeTable = metaData.getCodeTableByColumn(name);
+        final JComponent binaryConditionField = createSearchField(attribute,
+          codeTable);
+        if (binaryConditionField instanceof DataStoreQueryTextField) {
+          final DataStoreQueryTextField queryField = (DataStoreQueryTextField)binaryConditionField;
+          queryField.setBelow(true);
         }
+        final JComponent inConditionField = createSearchField(attribute,
+          codeTable);
+        if (inConditionField instanceof DataStoreQueryTextField) {
+          final DataStoreQueryTextField queryField = (DataStoreQueryTextField)inConditionField;
+          queryField.setBelow(true);
+        }
+
+        if (codeTable == null) {
+          if (binaryConditionField instanceof DateField) {
+            likePanel.setVisible(false);
+          } else {
+            likePanel.setVisible(true);
+          }
+        } else {
+          likePanel.setVisible(false);
+        }
+        setBinaryConditionField(binaryConditionField);
+        setInConditionField(inConditionField);
       }
     }
   }
@@ -541,6 +643,18 @@ public class QueryWhereConditionField extends ValueField implements
     }
   }
 
+  private void setInConditionField(JComponent field) {
+    if (inConditionField != null) {
+      inConditionPanel.remove(inConditionField);
+    }
+    if (field == null) {
+      field = new TextField(20);
+    }
+    inConditionPanel.add(field, 1);
+    GroupLayoutUtil.makeColumns(inConditionPanel, false);
+    this.inConditionField = field;
+  }
+
   protected void setInvalidMessage(final int offset, final String message) {
     if (offset >= 0) {
       whereTextField.setSelectionColor(WebColors.Pink);
@@ -623,22 +737,35 @@ public class QueryWhereConditionField extends ValueField implements
                 + " use IS NULL or IS NOT NULL instead.");
             } else {
               final Column column = (Column)leftCondition;
-              final Attribute attribute = metaData.getAttribute(column.getName());
-              final Class<?> typeClass = attribute.getTypeClass();
-              try {
-                final Object convertedValue = StringConverterRegistry.toObject(
-                  typeClass, value);
-                if (convertedValue == null
-                  || !typeClass.isAssignableFrom(typeClass)) {
-                  setInvalidMessage(column.getName() + " requires a "
-                    + attribute.getType() + " not the value " + value);
-                  return null;
-                } else {
-                  rightCondition = new Value(convertedValue);
+
+              final String name = column.getName();
+              final Attribute attribute = metaData.getAttribute(name);
+              final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+              if (codeTable == null || attribute == metaData.getIdAttribute()) {
+                final Class<?> typeClass = attribute.getTypeClass();
+                try {
+                  final Object convertedValue = StringConverterRegistry.toObject(
+                    typeClass, value);
+                  if (convertedValue == null
+                    || !typeClass.isAssignableFrom(typeClass)) {
+                    setInvalidMessage(name + " requires a "
+                      + attribute.getType() + " not the value " + value);
+                    return null;
+                  } else {
+                    rightCondition = new Value(attribute, convertedValue);
+                  }
+                } catch (final Throwable t) {
+                  setInvalidMessage(name + " requires a " + attribute.getType()
+                    + " not the value " + value);
                 }
-              } catch (final Throwable t) {
-                setInvalidMessage(column.getName() + " requires a "
-                  + attribute.getType() + " not the value " + value);
+              } else {
+                final Object id = codeTable.getId(value);
+                if (id == null) {
+                  setInvalidMessage(name
+                    + " requires a valid code value that exists not " + value);
+                } else {
+                  rightCondition = new Value(attribute, id);
+                }
               }
             }
           }

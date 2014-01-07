@@ -3,6 +3,7 @@ package com.revolsys.swing.field;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.ItemSelectable;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -141,6 +142,7 @@ public class DataStoreQueryTextField extends TextField implements
 
     setEditable(true);
     PopupMenu.getPopupMenuFactory(this);
+    setPreferredSize(new Dimension(100, 22));
   }
 
   public DataStoreQueryTextField(final DataObjectMetaData metaData,

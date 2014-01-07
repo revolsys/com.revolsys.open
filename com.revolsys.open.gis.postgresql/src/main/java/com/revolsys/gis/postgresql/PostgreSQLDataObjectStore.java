@@ -94,7 +94,8 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
         sequenceName);
     } catch (final SQLException e) {
-      throw new IllegalArgumentException("Cannot create ID for " + sequenceName);
+      throw new IllegalArgumentException(
+        "Cannot create ID for " + sequenceName, e);
     }
   }
 

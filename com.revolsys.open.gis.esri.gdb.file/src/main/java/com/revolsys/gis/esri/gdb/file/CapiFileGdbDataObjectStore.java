@@ -919,15 +919,19 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           }
 
           final EnumRows rows = query(sql.toString(), false);
-          try {
-            int count = 0;
-            for (Row row = rows.next(); row != null; row = rows.next()) {
-              count++;
-              row.delete();
+          if (rows == null) {
+            return 0;
+          } else {
+            try {
+              int count = 0;
+              for (Row row = rows.next(); row != null; row = rows.next()) {
+                count++;
+                row.delete();
+              }
+              return count;
+            } finally {
+              closeEnumRows(rows);
             }
-            return count;
-          } finally {
-            closeEnumRows(rows);
           }
         } else {
           final GeometryAttribute geometryAttribute = (GeometryAttribute)metaData.getGeometryAttribute();
