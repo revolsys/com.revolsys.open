@@ -1,11 +1,10 @@
-package com.revolsys.swing.map.layer;
+package com.revolsys.io.map;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 
-import com.revolsys.io.map.AbstractMapObjectFactory;
 import com.revolsys.util.ExceptionUtil;
 
 public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory {

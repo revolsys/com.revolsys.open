@@ -9,11 +9,11 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
-import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {

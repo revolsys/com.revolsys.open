@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -42,7 +46,10 @@ import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
-  CoordinatesPrecisionModel {
+  CoordinatesPrecisionModel, MapSerializer {
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "geometryFactory", "Geometry Factory", GeometryFactory.class, "create");
 
   /** The cached geometry factories. */
   private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
@@ -55,6 +62,14 @@ public class GeometryFactory extends
 
   public static void clear() {
     factories.clear();
+  }
+
+  public static GeometryFactory create(final Map<String, Object> properties) {
+    final int srid = CollectionUtil.getInteger(properties, "srid", 0);
+    final int numAxis = CollectionUtil.getInteger(properties, "numAxis", 2);
+    final double scaleXY = CollectionUtil.getDouble(properties, "scaleXy", 0.0);
+    final double scaleZ = CollectionUtil.getDouble(properties, "scaleZ", 0.0);
+    return GeometryFactory.getFactory(srid, numAxis, scaleXY, scaleZ);
   }
 
   /**
@@ -995,6 +1010,26 @@ public class GeometryFactory extends
   }
 
   @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "geometryFactory");
+    map.put("srid", getSRID());
+    map.put("numAxis", getNumAxis());
+
+    final double scaleXY = getScaleXY();
+    if (scaleXY > 0) {
+      map.put("scaleXy", scaleXY);
+    }
+    if (numAxis > 2) {
+      final double scaleZ = getScaleZ();
+      if (scaleZ > 0) {
+        map.put("scaleZ", scaleZ);
+      }
+    }
+    return map;
+  }
+
+  @Override
   public String toString() {
     if (coordinateSystem == null) {
       return "Unknown coordinate system";
@@ -1024,5 +1059,4 @@ public class GeometryFactory extends
       return string.toString();
     }
   }
-
 }

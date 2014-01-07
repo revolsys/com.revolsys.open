@@ -3,13 +3,22 @@ package com.revolsys.gis.data.model;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -21,7 +30,15 @@ import com.revolsys.util.MathUtil;
  * @see DataObjectMetaData
  */
 public class Attribute extends AbstractObjectWithProperties implements
-  Cloneable {
+  Cloneable, MapSerializer {
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "field", "Data Record Field", Attribute.class, "create");
+
+  public static Attribute create(final Map<String, Object> properties) {
+    return new Attribute(properties);
+  }
+
   private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
 
   private Object defaultValue;
@@ -73,6 +90,31 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   public Attribute(final int index) {
     this.index = index;
+  }
+
+  public Attribute(final Map<String, Object> properties) {
+    this.name = CollectionUtil.getString(properties, "name");
+    this.title = CollectionUtil.getString(properties, "title");
+    if (!StringUtils.hasText(title)) {
+      this.title = CaseConverter.toCapitalizedWords(name);
+    }
+    this.description = CollectionUtil.getString(properties, "description");
+    this.type = DataTypes.getType(CollectionUtil.getString(properties,
+      "dataType"));
+    this.required = CollectionUtil.getBool(properties, "required");
+    this.length = CollectionUtil.getInteger(properties, "length", 0);
+    this.scale = CollectionUtil.getInteger(properties, "scale", 0);
+    this.minValue = properties.get("minValue");
+    if (minValue == null) {
+      this.minValue = MathUtil.getMinValue(getTypeClass());
+    } else {
+      this.minValue = StringConverterRegistry.toString(type, minValue);
+    }
+    if (maxValue == null) {
+      this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    } else {
+      this.maxValue = StringConverterRegistry.toString(type, maxValue);
+    }
   }
 
   /**
@@ -480,6 +522,25 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   public void setType(final DataType type) {
     this.type = type;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "field");
+    map.put("name", getName());
+    map.put("title", getTitle());
+    MapSerializerUtil.add(map, "description", getDescription(), "");
+    map.put("dataType", getType().getName());
+    map.put("length", getLength());
+    map.put("scale", getScale());
+    map.put("required", isRequired());
+    MapSerializerUtil.add(map, "minValue", getMinValue(), null);
+    MapSerializerUtil.add(map, "maxValue", getMaxValue(), null);
+    MapSerializerUtil.add(map, "defaultValue", getDefaultValue(), null);
+    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(),
+      Collections.emptyMap());
+    return map;
   }
 
   @Override

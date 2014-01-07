@@ -28,9 +28,10 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.io.map.MapSerializer;
 
 public interface DataObjectMetaData extends ObjectWithProperties,
-  Comparable<DataObjectMetaData> {
+  Comparable<DataObjectMetaData>, MapSerializer {
   void addDefaultValue(String attributeName, Object defaultValue);
 
   DataObjectMetaData clone();

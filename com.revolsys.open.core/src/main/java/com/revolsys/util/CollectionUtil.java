@@ -234,9 +234,18 @@ public final class CollectionUtil {
     }
   }
 
+  public static Object get(final Map<String, ? extends Object> map,
+    final String name) {
+    if (map == null) {
+      return null;
+    } else {
+      return map.get(name);
+    }
+  }
+
   public static boolean getBool(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return false;
     } else if (value instanceof Boolean) {
@@ -248,7 +257,7 @@ public final class CollectionUtil {
 
   public static Boolean getBoolean(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return null;
     } else if (value instanceof Boolean) {
@@ -260,7 +269,7 @@ public final class CollectionUtil {
 
   public static Double getDouble(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -292,7 +301,7 @@ public final class CollectionUtil {
 
   public static Double getDoubleValue(final Map<String, ? extends Object> map,
     final String name) {
-    final Number value = (Number)map.get(name);
+    final Number value = (Number)get(map, name);
     if (value == null) {
       return null;
     } else {
@@ -302,7 +311,7 @@ public final class CollectionUtil {
 
   public static Integer getInteger(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -343,7 +352,7 @@ public final class CollectionUtil {
 
   public static Long getLong(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -418,7 +427,7 @@ public final class CollectionUtil {
 
   public static String getString(final Map<String, ? extends Object> map,
     final String name) {
-    final Object value = map.get(name);
+    final Object value = get(map, name);
     if (value == null) {
       return null;
     } else {

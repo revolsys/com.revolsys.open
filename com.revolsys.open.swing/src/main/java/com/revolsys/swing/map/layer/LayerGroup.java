@@ -25,6 +25,7 @@ import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.spring.SpringUtil;

@@ -1,4 +1,4 @@
-package com.revolsys.io.ecsv;
+package com.revolsys.io.json;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,8 +14,9 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 
-public class EcsvResourceDataObjectMetaDataFactory extends
+public class JsonResourceDataObjectMetaDataFactory extends
   AbstractObjectWithProperties implements ApplicationContextAware,
   DataObjectMetaDataFactory {
 
@@ -38,7 +39,7 @@ public class EcsvResourceDataObjectMetaDataFactory extends
   public void init() {
     try {
       for (final Resource resource : applicationContext.getResources(locationPattern)) {
-        final DataObjectMetaData metaData = EcsvIoFactory.readSchema(resource);
+        final DataObjectMetaData metaData = MapObjectFactoryRegistry.toObject(resource);
         final String name = metaData.getPath();
         metaDataMap.put(name, metaData);
       }

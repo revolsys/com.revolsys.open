@@ -45,7 +45,6 @@
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.web</module>
     <module>com.revolsys.open.orm</module>
-    <module>com.revolsys.open.gis.ecsv</module>
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgresql</module>
     <module>com.revolsys.open.gis.spatialite</module>

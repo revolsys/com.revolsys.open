@@ -18,6 +18,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.SpringUtil;
@@ -25,7 +26,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.InvokeMethodMapObjectFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
