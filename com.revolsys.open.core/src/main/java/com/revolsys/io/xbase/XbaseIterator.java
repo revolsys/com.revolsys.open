@@ -267,7 +267,8 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   private String getString(final int startIndex, final int len) {
-    return new String(recordBuffer, startIndex, len, charset).trim();
+    String text = new String(recordBuffer, startIndex, len, charset);
+    return text.trim();
   }
 
   public boolean isCloseFile() {
