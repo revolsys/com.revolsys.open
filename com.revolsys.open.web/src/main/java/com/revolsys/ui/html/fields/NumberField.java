@@ -2,24 +2,27 @@ package com.revolsys.ui.html.fields;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.ui.html.HtmlUtil;
+
 public abstract class NumberField extends TextField {
 
   private Number minimumValue;
 
   private Number maximumValue;
 
-  public NumberField(String name, int size, boolean required) {
+  public NumberField(final String name, final int size, final boolean required) {
     this(name, size, -1, null, required, null, null);
   }
 
-  public NumberField(final String name, int size, int maxLength,
-    Object defaultValue, final boolean required) {
+  public NumberField(final String name, final int size, final int maxLength,
+    final Object defaultValue, final boolean required) {
     this(name, size, maxLength, defaultValue, required, null, null);
   }
 
-  public NumberField(final String name, int size, int maxLength,
-    Object defaultValue, final boolean required, Number minimumValue,
-    Number maximumValue) {
+  public NumberField(final String name, final int size, final int maxLength,
+    final Object defaultValue, final boolean required,
+    final Number minimumValue, final Number maximumValue) {
     super(name, size, maxLength, defaultValue, required);
     setValue(defaultValue);
     setMinimumValue(minimumValue);
@@ -39,6 +42,36 @@ public abstract class NumberField extends TextField {
    */
   public Number getMinimumValue() {
     return minimumValue;
+  }
+
+  public abstract Number getNumber(final String value);
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    super.serializeElement(out);
+    if (minimumValue != null || maximumValue != null) {
+      out.startTag(HtmlUtil.SCRIPT);
+      out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+      out.text("$(document).ready(function() {");
+      out.text("$('#");
+      out.text(getForm().getName());
+      out.text(" input[name=");
+      out.text(getName());
+      out.text("]').rules('add', {");
+      if (minimumValue != null) {
+        out.text("min:");
+        out.text(minimumValue);
+      }
+      if (maximumValue != null) {
+        if (minimumValue != null) {
+          out.text(",");
+        }
+        out.text("max:");
+        out.text(maximumValue);
+      }
+      out.text("});});");
+      out.endTag(HtmlUtil.SCRIPT);
+    }
   }
 
   /**
@@ -77,6 +110,4 @@ public abstract class NumberField extends TextField {
       super.setValue(null);
     }
   }
-
-  public abstract Number getNumber(final String value);
 }

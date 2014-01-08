@@ -2,6 +2,7 @@ package com.revolsys.gis.data.model;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -549,5 +551,86 @@ public class Attribute extends AbstractObjectWithProperties implements
     string.append(':');
     appendType(string);
     return string.toString();
+  }
+
+  public void validate(Object value) {
+    final String fieldName = getName();
+
+    if (isRequired()) {
+      if (value == null || value instanceof String
+        && !StringUtils.hasText((String)value)) {
+        throw new IllegalArgumentException(fieldName + " is required");
+      }
+    }
+    final DataType fieldType = getType();
+    if (value != null) {
+      final Class<?> fieldClass = fieldType.getJavaClass();
+      final Class<? extends Object> valueClass = value.getClass();
+      if (!fieldClass.isAssignableFrom(valueClass)) {
+        try {
+          value = StringConverterRegistry.toObject(fieldType, value);
+        } catch (final Throwable t) {
+          throw new IllegalArgumentException(fieldName + "=" + value
+            + " is not a valid " + fieldType);
+        }
+        if (value == null) {
+          throw new IllegalArgumentException(fieldName + "=" + value
+            + " is not a valid " + fieldType);
+        }
+      }
+      if (value != null) {
+        final int maxLength = getLength();
+        if (value instanceof Number) {
+          final Number number = (Number)value;
+          final BigDecimal bigNumber = new BigDecimal(number.toString());
+          final int length = bigNumber.precision();
+          if (maxLength > 0) {
+            if (length > maxLength) {
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " length " + length + " > " + maxLength);
+            }
+          }
+
+          final int scale = bigNumber.scale();
+          final int maxScale = getScale();
+          if (maxScale > 0) {
+            if (scale > maxScale) {
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " scale " + scale + " > " + maxScale);
+            }
+          }
+          final Number minValue = getMinValue();
+          if (minValue != null) {
+            if (NumericComparator.numericCompare(number, minValue) < 0) {
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " > " + minValue);
+            }
+          }
+          final Number maxValue = getMaxValue();
+          if (maxValue != null) {
+            if (NumericComparator.numericCompare(number, maxValue) > 0) {
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " < " + maxValue);
+            }
+          }
+        } else if (value instanceof String) {
+          final String string = (String)value;
+          final int length = string.length();
+          if (maxLength > 0) {
+            if (length > maxLength) {
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " length " + length + " > " + maxLength);
+            }
+          }
+        }
+        if (!allowedValues.isEmpty()) {
+          if (!allowedValues.containsKey(value)) {
+            throw new IllegalArgumentException(fieldName + "=" + value
+              + " not in (" + CollectionUtil.toString(",", allowedValues) + ")");
+          }
+        }
+      }
+    }
+
   }
 }
