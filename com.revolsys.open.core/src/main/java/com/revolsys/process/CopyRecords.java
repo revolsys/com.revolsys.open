@@ -71,7 +71,7 @@ public class CopyRecords extends AbstractProcess {
     try {
       final Query query = new Query(typePath);
       query.setOrderBy(orderBy);
-      final Reader<DataObject> reader = sourceDataStore.query(typePath);
+      final Reader<DataObject> reader = sourceDataStore.query(query);
       try {
         final Writer<DataObject> targetWriter = targetDataStore.createWriter();
         try {
