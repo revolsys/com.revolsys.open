@@ -155,4 +155,8 @@ public abstract class Field extends Element {
     this.value = value;
   }
 
+  @Override
+  public String toString() {
+    return getName() + "=" + getValue();
+  }
 }

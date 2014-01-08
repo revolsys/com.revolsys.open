@@ -229,6 +229,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
     final Reader<DataObject> reader = dataStore.query(query);
     try {
       final List<DataObject> codes = reader.read();
+      dataStore.getStatistics()
+        .getStatistics("query")
+        .add(typePath, -codes.size());
       Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
       addValues(codes);
     } finally {
@@ -262,7 +265,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
       query.setWhereCondition(and);
       final Reader<DataObject> reader = dataStore.query(query);
       try {
-        addValues(reader);
+        final List<DataObject> codes = reader.read();
+        dataStore.getStatistics()
+          .getStatistics("query")
+          .add(typePath, -codes.size());
+        addValues(codes);
         id = getIdByValue(values);
       } finally {
         reader.close();

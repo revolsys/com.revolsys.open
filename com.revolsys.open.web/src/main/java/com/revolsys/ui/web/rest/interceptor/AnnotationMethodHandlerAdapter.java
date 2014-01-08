@@ -920,8 +920,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
   private WebBindingInitializer webBindingInitializer;
 
-  private List<String> mediaTypeOrder = Arrays.asList("parameter", "fileName",
-    "pathExtension", "acceptHeader", "defaultMediaType");
+  private List<String> mediaTypeOrder = Arrays.asList("attribute", "parameter",
+    "fileName", "pathExtension", "acceptHeader", "defaultMediaType");
 
   public AnnotationMethodHandlerAdapter() {
     // no restriction of HTTP methods by default

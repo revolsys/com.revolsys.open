@@ -22,11 +22,11 @@ public class ValidateGeometryRange extends
 
   private double maxZ = Double.MAX_VALUE;
 
-  private double minX = Double.MIN_VALUE;
+  private double minX = -Double.MAX_VALUE;
 
-  private double minY = Double.MIN_VALUE;
+  private double minY = -Double.MAX_VALUE;
 
-  private double minZ = Double.MIN_VALUE;
+  private double minZ = -Double.MAX_VALUE;
 
   /**
    * @return the maxX

@@ -689,7 +689,7 @@ public final class ShapefileGeometryUtil {
   public void writeMCoordinatesRange(final EndianOutput out,
     final Geometry geometry) throws IOException {
     double minM = Double.MAX_VALUE;
-    double maxM = Double.MIN_VALUE;
+    double maxM = -Double.MAX_VALUE;
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
       final Geometry subGeometry = geometry.getGeometryN(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
@@ -703,7 +703,7 @@ public final class ShapefileGeometryUtil {
         }
       }
     }
-    if (minM == Double.MAX_VALUE && maxM == Double.MIN_VALUE) {
+    if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
@@ -715,7 +715,7 @@ public final class ShapefileGeometryUtil {
   public void writeMCoordinatesRange(final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     double minM = Double.MAX_VALUE;
-    double maxM = Double.MIN_VALUE;
+    double maxM = -Double.MAX_VALUE;
     for (final CoordinatesList ring : pointsList) {
       for (int i = 0; i < ring.size(); i++) {
         double m = ring.getOrdinate(i, 2);
@@ -726,7 +726,7 @@ public final class ShapefileGeometryUtil {
         maxM = Math.max(m, maxM);
       }
     }
-    if (minM == Double.MAX_VALUE && maxM == Double.MIN_VALUE) {
+    if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
@@ -1066,7 +1066,7 @@ public final class ShapefileGeometryUtil {
   public void writeZCoordinatesRange(final EndianOutput out,
     final Geometry geometry) throws IOException {
     double minZ = Double.MAX_VALUE;
-    double maxZ = Double.MIN_VALUE;
+    double maxZ = -Double.MAX_VALUE;
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
       final Geometry subGeometry = geometry.getGeometryN(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
@@ -1080,7 +1080,7 @@ public final class ShapefileGeometryUtil {
         }
       }
     }
-    if (minZ == Double.MAX_VALUE && maxZ == Double.MIN_VALUE) {
+    if (minZ == Double.MAX_VALUE && maxZ == -Double.MAX_VALUE) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
@@ -1092,7 +1092,7 @@ public final class ShapefileGeometryUtil {
   public void writeZCoordinatesRange(final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     double minZ = Double.MAX_VALUE;
-    double maxZ = Double.MIN_VALUE;
+    double maxZ = -Double.MAX_VALUE;
     for (final CoordinatesList ring : pointsList) {
       for (int i = 0; i < ring.size(); i++) {
         double z = ring.getOrdinate(i, 2);
@@ -1103,7 +1103,7 @@ public final class ShapefileGeometryUtil {
         maxZ = Math.max(z, maxZ);
       }
     }
-    if (minZ == Double.MAX_VALUE || maxZ == Double.MIN_VALUE) {
+    if (minZ == Double.MAX_VALUE || maxZ == -Double.MAX_VALUE) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {

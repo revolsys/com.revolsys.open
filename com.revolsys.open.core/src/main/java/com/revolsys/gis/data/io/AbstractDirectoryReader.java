@@ -47,7 +47,7 @@ import com.revolsys.io.filter.ExtensionFilenameFilter;
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   implements Iterator<T> {
   /** The list of base file names to read. */
-  private List<String> baseFileNames = new ArrayList<String>();
+  private final List<String> baseFileNames = new ArrayList<String>();
 
   /** The current directory being processed. */
   private File currentFile;
@@ -79,8 +79,8 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   private final Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
 
   /**
-   * Construct a new AbstractDirectoryReader.
-   */
+    * Construct a new AbstractDirectoryReader.
+    */
   public AbstractDirectoryReader() {
   }
 
@@ -151,7 +151,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
       fileList = new ArrayList<File>();
       final Map<String, File> fileBaseNameMap = new HashMap<String, File>();
       for (final File file : files) {
-        final String baseName = FileUtil.getBaseName(file);
+        final String baseName = FileUtil.getBaseName(file).toUpperCase();
         fileBaseNameMap.put(baseName, file);
       }
       for (final String baseName : baseFileNames) {
@@ -216,7 +216,8 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   @Override
   public T next() {
     if (hasNext()) {
-      return currentIterator.next();
+      final T record = currentIterator.next();
+      return record;
     } else {
       throw new NoSuchElementException();
     }
@@ -250,8 +251,11 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @param baseFileNames The list of base file names to read.
    */
-  public void setBaseFileNames(final List<String> baseFileNames) {
-    this.baseFileNames = baseFileNames;
+  public void setBaseFileNames(final Collection<String> baseFileNames) {
+    this.baseFileNames.clear();
+    for (final String name : baseFileNames) {
+      this.baseFileNames.add(name.toUpperCase());
+    }
   }
 
   /**

@@ -296,7 +296,7 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public Reader<DataObject> query(final List<Query> queries) {
+  public Reader<DataObject> query(final List<?> queries) {
     return dataStore.query(queries);
   }
 

@@ -8,7 +8,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class LeftUnaryCondition extends Condition {
 
-  private final QueryValue value;
+  private QueryValue value;
 
   private final String operator;
 
@@ -31,7 +31,9 @@ public class LeftUnaryCondition extends Condition {
 
   @Override
   public LeftUnaryCondition clone() {
-    return new LeftUnaryCondition(operator, value.clone());
+    final LeftUnaryCondition clone = (LeftUnaryCondition)super.clone();
+    clone.value = value.clone();
+    return clone;
   }
 
   @Override

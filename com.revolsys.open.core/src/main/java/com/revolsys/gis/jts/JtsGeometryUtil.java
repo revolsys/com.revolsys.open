@@ -903,7 +903,7 @@ public final class JtsGeometryUtil {
   public static double[] getOrdinateRange(final CoordinateSequence coordinates,
     final int ordinateIndex) {
     double min = Double.MAX_VALUE;
-    double max = Double.MIN_VALUE;
+    double max = -Double.MAX_VALUE;
     if (ordinateIndex < coordinates.getDimension()) {
       for (int i = 0; i < coordinates.size(); i++) {
         final double value = coordinates.getOrdinate(i, ordinateIndex);
@@ -938,7 +938,7 @@ public final class JtsGeometryUtil {
   public static double[] getOrdinateRange(final Geometry geometry,
     final int ordinateIndex) {
     final double[] range = {
-      Double.MAX_VALUE, Double.MIN_VALUE
+      Double.MAX_VALUE, -Double.MAX_VALUE
     };
     for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
       getOrdinateRange(range, points, ordinateIndex);

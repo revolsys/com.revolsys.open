@@ -8,6 +8,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -59,11 +60,14 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private XbaseIterator xbaseIterator;
 
+  private String typeName;
+
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
     this.dataObjectFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     name = baseName;
+    this.typeName = "/" + name;
     this.resource = resource;
   }
 
@@ -102,6 +106,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           xbaseIterator = new XbaseIterator(xbaseResource,
             this.dataObjectFactory, new InvokeMethodRunnable(this,
               "updateMetaData"));
+          xbaseIterator.setTypeName(typeName);
           xbaseIterator.setProperty("memoryMapped", memoryMapped);
           xbaseIterator.setCloseFile(closeFile);
         }
@@ -200,6 +205,10 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     return position;
   }
 
+  public String getTypeName() {
+    return this.typeName;
+  }
+
   public boolean isCloseFile() {
     return closeFile;
   }
@@ -260,6 +269,12 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     } else {
       throw new UnsupportedOperationException(
         "The position can only be set on files");
+    }
+  }
+
+  public void setTypeName(final String typeName) {
+    if (StringUtils.hasText(typeName)) {
+      this.typeName = typeName;
     }
   }
 

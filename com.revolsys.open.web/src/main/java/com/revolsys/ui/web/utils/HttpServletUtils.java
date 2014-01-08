@@ -27,8 +27,28 @@ public final class HttpServletUtils {
     RESPONSE_LOCAL.remove();
   }
 
+  public static String getAbsoluteUrl(final String url) {
+    if (url.startsWith("/")) {
+      final HttpServletRequest request = getRequest();
+      final String serverUrl = getServerUrl(request);
+      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
+      return serverUrl + contextPath + url;
+    } else {
+      return url;
+    }
+  }
+
+  public static boolean getBooleanParameter(final HttpServletRequest request,
+    final String paramName) {
+    final String value = request.getParameter(paramName);
+    if (StringUtils.hasText(value)) {
+      return Boolean.parseBoolean(value);
+    }
+    return false;
+  }
+
   public static String getFullRequestUrl() {
-    HttpServletRequest request = getRequest();
+    final HttpServletRequest request = getRequest();
     return getFullRequestUrl(request);
   }
 
@@ -38,45 +58,42 @@ public final class HttpServletUtils {
     return serverUrl + requestUri;
   }
 
-  public static HttpServletRequest getRequest() {
-    final HttpServletRequest request = REQUEST_LOCAL.get();
-    return request;
+  public static String getFullUrl(final String url) {
+    final String aliasUrl = PathAliasController.getPath(url);
+    return getAbsoluteUrl(aliasUrl);
   }
 
-  public static HttpServletResponse getResponse() {
-    final HttpServletResponse response = RESPONSE_LOCAL.get();
-    return response;
-  }
-
-  public static <T> T notFound() {
-    HttpServletResponse response = getResponse();
-    try {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not found");
-    } catch (IOException e) {
+  public static int getIntegerParameter(final HttpServletRequest request,
+    final String paramName) {
+    final String value = request.getParameter(paramName);
+    if (StringUtils.hasText(value)) {
+      try {
+        return Integer.parseInt(value);
+      } catch (final NumberFormatException e) {
+      }
     }
-    return null;
+    return 0;
   }
 
-  public static <T> T seeOther(String location) {
-    HttpServletResponse response = getResponse();
-    response.setStatus(HttpServletResponse.SC_SEE_OTHER);
-    response.setHeader("Location", location);
-    return null;
-  }
-
-  public static <T> T sendRedirect(String location) {
-    HttpServletResponse response = getResponse();
-    try {
-      response.sendRedirect(location);
-    } catch (IOException e) {
-    }
-    return null;
+  public static String getOriginatingContextPath() {
+    final HttpServletRequest request = getRequest();
+    return URL_PATH_HELPER.getOriginatingContextPath(request);
   }
 
   public static String getOriginatingRequestUri() {
     final HttpServletRequest request = getRequest();
     final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
     return originatingRequestUri;
+  }
+
+  public static String getParameter(final String name) {
+    final HttpServletRequest request = getRequest();
+    return request.getParameter(name);
+  }
+
+  public static String[] getParameterValues(final String name) {
+    final HttpServletRequest request = getRequest();
+    return request.getParameterValues(name);
   }
 
   public static String getPathVariable(final String name) {
@@ -96,6 +113,11 @@ public final class HttpServletUtils {
       return pathVariables;
     }
     return new HashMap<String, String>();
+  }
+
+  public static HttpServletRequest getRequest() {
+    final HttpServletRequest request = REQUEST_LOCAL.get();
+    return request;
   }
 
   @SuppressWarnings("unchecked")
@@ -118,6 +140,11 @@ public final class HttpServletUtils {
     final String originatingRequestUri = getOriginatingRequestUri();
     final String baseName = WebUtils.extractFullFilenameFromUrlPath(originatingRequestUri);
     return baseName;
+  }
+
+  public static HttpServletResponse getResponse() {
+    final HttpServletResponse response = RESPONSE_LOCAL.get();
+    return response;
   }
 
   public static String getServerUrl() {
@@ -146,14 +173,66 @@ public final class HttpServletUtils {
 
   }
 
-  public static void setRequestAndResponse(final HttpServletRequest request,
-    HttpServletResponse response) {
-    REQUEST_LOCAL.set(request);
-    RESPONSE_LOCAL.set(response);
+  public static boolean isApiCall() {
+    final HttpServletRequest request = getRequest();
+    return isApiCall(request);
   }
 
-  public static void setPathVariable(final String name, final String value) {
-    getPathVariables().put(name, value);
+  public static boolean isApiCall(final HttpServletRequest request) {
+    final String requestedWith = request.getHeader("x-requested-with");
+    if (StringUtils.hasText(requestedWith)) {
+      return true;
+    } else {
+      final String referrer = request.getHeader("referrer");
+      if (StringUtils.hasText(referrer)) {
+        return false;
+      } else {
+        final String accept = request.getHeader("accept");
+        if (accept == null) {
+          return true;
+        } else {
+          return !accept.contains("*/*");
+        }
+      }
+    }
+  }
+
+  public static <T> T notFound() {
+    final HttpServletResponse response = getResponse();
+    try {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not found");
+    } catch (final IOException e) {
+    }
+    return null;
+  }
+
+  public static void redirect(final String url) {
+    try {
+      final HttpServletResponse response = getResponse();
+      response.sendRedirect(url);
+    } catch (final IOException e) {
+    }
+  }
+
+  public static <T> T seeOther(final String location) {
+    final HttpServletResponse response = getResponse();
+    response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+    response.setHeader("Location", location);
+    return null;
+  }
+
+  public static <T> T sendRedirect(final String location) {
+    final HttpServletResponse response = getResponse();
+    try {
+      response.sendRedirect(location);
+    } catch (final IOException e) {
+    }
+    return null;
+  }
+
+  public static void setAttribute(final String name, final Object value) {
+    final HttpServletRequest request = getRequest();
+    request.setAttribute(name, value);
   }
 
   public static void setPathVariable(final String name, final Object value) {
@@ -164,72 +243,17 @@ public final class HttpServletUtils {
     }
   }
 
-  public static int getIntegerParameter(HttpServletRequest request,
-    String paramName) {
-    String value = request.getParameter(paramName);
-    if (StringUtils.hasText(value)) {
-      try {
-        return Integer.parseInt(value);
-      } catch (NumberFormatException e) {
-      }
-    }
-    return 0;
+  public static void setPathVariable(final String name, final String value) {
+    getPathVariables().put(name, value);
   }
 
-  public static boolean getBooleanParameter(HttpServletRequest request,
-    String paramName) {
-    String value = request.getParameter(paramName);
-    if (StringUtils.hasText(value)) {
-      return Boolean.parseBoolean(value);
-    }
-    return false;
+  public static void setRequestAndResponse(final HttpServletRequest request,
+    final HttpServletResponse response) {
+    REQUEST_LOCAL.set(request);
+    RESPONSE_LOCAL.set(response);
   }
 
   private HttpServletUtils() {
 
-  }
-
-  public static void setAttribute(String name, Object value) {
-    HttpServletRequest request = getRequest();
-    request.setAttribute(name, value);
-  }
-
-  public static void redirect(String url) {
-    try {
-      HttpServletResponse response = getResponse();
-      response.sendRedirect(url);
-    } catch (IOException e) {
-    }
-  }
-
-  public static String getParameter(String name) {
-    HttpServletRequest request = getRequest();
-    return request.getParameter(name);
-  }
-
-  public static String[] getParameterValues(String name) {
-    HttpServletRequest request = getRequest();
-    return request.getParameterValues(name);
-  }
-
-  public static String getOriginatingContextPath() {
-    HttpServletRequest request = getRequest();
-    return URL_PATH_HELPER.getOriginatingContextPath(request);
-  }
-
-  public static String getAbsoluteUrl(final String url) {
-    if (url.startsWith("/")) {
-      final HttpServletRequest request = getRequest();
-      final String serverUrl = getServerUrl(request);
-      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
-      return serverUrl + contextPath + url;
-    } else {
-      return url;
-    }
-  }
-
-  public static String getFullUrl(final String url) {
-    String aliasUrl = PathAliasController.getPath(url);
-    return getAbsoluteUrl(aliasUrl);
   }
 }

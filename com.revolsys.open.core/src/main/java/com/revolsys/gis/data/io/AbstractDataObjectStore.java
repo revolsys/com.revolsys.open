@@ -484,10 +484,12 @@ public abstract class AbstractDataObjectStore extends
     return types;
   }
 
+  @Override
   public String getUrl() {
     return (String)connectionProperties.get("url");
   }
 
+  @Override
   public String getUsername() {
     return (String)connectionProperties.get("username");
   }
@@ -604,9 +606,19 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
-  public Reader<DataObject> query(final List<Query> queries) {
+  public Reader<DataObject> query(final List<?> queries) {
+    final List<Query> queryObjects = new ArrayList<Query>();
+    for (final Object object : queries) {
+      if (object instanceof Query) {
+        final Query query = (Query)object;
+        queryObjects.add(query);
+      } else {
+        final Query query = new Query(object.toString());
+        queryObjects.add(query);
+      }
+    }
     final DataObjectStoreQueryReader reader = createReader();
-    reader.setQueries(queries);
+    reader.setQueries(queryObjects);
     return reader;
   }
 

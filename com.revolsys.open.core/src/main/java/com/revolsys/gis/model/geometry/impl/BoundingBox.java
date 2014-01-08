@@ -110,11 +110,11 @@ public class BoundingBox implements Serializable {
 
   private GeometryFactory geometryFactory;
 
-  private double maxX = Double.MIN_VALUE;
+  private double maxX = -Double.MAX_VALUE;
 
-  private double maxY = Double.MIN_VALUE;
+  private double maxY = -Double.MAX_VALUE;
 
-  private double maxZ = Double.MIN_VALUE;
+  private double maxZ = -Double.MAX_VALUE;
 
   private double minX = Double.MAX_VALUE;
 

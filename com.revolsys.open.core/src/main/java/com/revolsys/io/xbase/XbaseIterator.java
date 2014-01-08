@@ -92,9 +92,12 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private Charset charset = FileUtil.UTF8;
 
+  private String typeName;
+
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = FileUtil.getBaseName(resource.getFilename());
+    this.typeName = "/" + typeName;
     this.resource = resource;
 
     this.dataObjectFactory = dataObjectFactory;
@@ -267,8 +270,12 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   private String getString(final int startIndex, final int len) {
-    String text = new String(recordBuffer, startIndex, len, charset);
+    final String text = new String(recordBuffer, startIndex, len, charset);
     return text.trim();
+  }
+
+  public String getTypeName() {
+    return typeName;
   }
 
   public boolean isCloseFile() {
@@ -326,7 +333,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   private void readMetaData() throws IOException {
-    metaData = new DataObjectMetaDataImpl("/" + name);
+    metaData = new DataObjectMetaDataImpl(typeName);
     int b = in.read();
     while (b != 0x0D) {
       final StringBuffer fieldName = new StringBuffer();
@@ -386,6 +393,10 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       throw new UnsupportedOperationException(
         "The position can only be set on files");
     }
+  }
+
+  public void setTypeName(final String typeName) {
+    this.typeName = typeName;
   }
 
 }

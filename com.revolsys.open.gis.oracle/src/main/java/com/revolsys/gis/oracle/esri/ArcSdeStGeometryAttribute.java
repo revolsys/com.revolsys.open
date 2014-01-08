@@ -147,7 +147,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
         final double[] zRange = JtsGeometryUtil.getZRange(geometry);
         double minZ = zRange[0];
         double maxZ = zRange[1];
-        if (minZ == Double.MAX_VALUE && maxZ == Double.MIN_VALUE) {
+        if (minZ == Double.MAX_VALUE && maxZ == -Double.MAX_VALUE) {
           minZ = 0;
           maxZ = 0;
         }
@@ -161,7 +161,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
         final double[] mRange = JtsGeometryUtil.getMRange(geometry);
         double minM = mRange[0];
         double maxM = mRange[1];
-        if (minM == Double.MAX_VALUE && maxM == Double.MIN_VALUE) {
+        if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
           minM = 0;
           maxM = 0;
         }

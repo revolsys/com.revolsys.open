@@ -71,9 +71,13 @@ public class MediaTypeUtil {
     final HttpServletRequest request) {
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
-    if (request.getParameter("format") != null) {
-      final String parameterValue = request.getParameter("format");
-      addMediaType(mediaTypes, parameterValue);
+    String format = (String)request.getAttribute("format");
+    if (StringUtils.hasText(format)) {
+      addMediaType(mediaTypes, format);
+    }
+    format = request.getParameter("format");
+    if (StringUtils.hasText(format)) {
+      addMediaType(mediaTypes, format);
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
     final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
@@ -103,9 +107,18 @@ public class MediaTypeUtil {
         if (mediaType != null) {
           mediaTypes.add(mediaType);
         }
+      } else if (source.equals("attribute")) {
+        final String parameterValue = (String)request.getAttribute(parameterName);
+        if (StringUtils.hasText(parameterValue)) {
+          final MediaType mediaType = getMediaTypeFromParameter(
+            extensionToMediaTypeMap, parameterValue);
+          if (mediaType != null) {
+            mediaTypes.add(mediaType);
+          }
+        }
       } else if (source.equals("parameter")) {
-        if (request.getParameter(parameterName) != null) {
-          final String parameterValue = request.getParameter(parameterName);
+        final String parameterValue = request.getParameter(parameterName);
+        if (StringUtils.hasText(parameterValue)) {
           final MediaType mediaType = getMediaTypeFromParameter(
             extensionToMediaTypeMap, parameterValue);
           if (mediaType != null) {
@@ -185,6 +198,15 @@ public class MediaTypeUtil {
         if (mediaType != null) {
           return mediaType;
         }
+      } else if (source.equals("attribute")) {
+        final String parameterValue = (String)request.getAttribute(parameterName);
+        if (StringUtils.hasText(parameterValue)) {
+          final MediaType mediaType = getMediaTypeFromParameter(
+            extensionToMediaTypeMap, parameterValue);
+          if (mediaType != null) {
+            return mediaType;
+          }
+        }
       } else if (source.equals("parameter")) {
         if (request.getParameter(parameterName) != null) {
           final String parameterValue = request.getParameter(parameterName);
@@ -226,9 +248,13 @@ public class MediaTypeUtil {
     }
   }
 
+  public static boolean isContentType(final MediaType contentType) {
+    return contentType.equals(getContentType());
+  }
+
   public static boolean isHtmlPage() {
-    HttpServletRequest request = HttpServletUtils.getRequest();
-    String format = request.getParameter("format");
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    final String format = request.getParameter("format");
     if (StringUtils.hasText(format)) {
       return false;
     }
@@ -241,7 +267,7 @@ public class MediaTypeUtil {
 
     final String acceptHeader = request.getHeader(ACCEPT_HEADER);
     if (StringUtils.hasText(acceptHeader)) {
-      for (MediaType mediaType : MediaType.parseMediaTypes(acceptHeader)) {
+      for (final MediaType mediaType : MediaType.parseMediaTypes(acceptHeader)) {
         if (mediaType.includes(MediaType.TEXT_HTML)) {
           return true;
         }
@@ -252,17 +278,13 @@ public class MediaTypeUtil {
     }
   }
 
-  public static boolean isContentType(final MediaType contentType) {
-    return contentType.equals(getContentType());
-  }
-
   public static boolean isPreferedMediaType(final HttpServletRequest request,
     final MediaType mediaType) {
     final List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
     if (mediaTypes.isEmpty()) {
       return true;
     } else {
-      for (MediaType acceptedMediaType : mediaTypes) {
+      for (final MediaType acceptedMediaType : mediaTypes) {
         if (acceptedMediaType.includes(mediaType)) {
           return true;
         } else if (!acceptedMediaType.isWildcardType()

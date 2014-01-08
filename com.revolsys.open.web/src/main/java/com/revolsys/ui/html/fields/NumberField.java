@@ -11,6 +11,8 @@ public abstract class NumberField extends TextField {
 
   private Number maximumValue;
 
+  private String units;
+
   public NumberField(final String name, final int size, final boolean required) {
     this(name, size, -1, null, required, null, null);
   }
@@ -46,9 +48,20 @@ public abstract class NumberField extends TextField {
 
   public abstract Number getNumber(final String value);
 
+  public String getUnits() {
+    return units;
+  }
+
   @Override
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
+    if (StringUtils.hasText(units)) {
+      out.startTag(HtmlUtil.SPAN);
+      out.attribute(HtmlUtil.ATTR_CLASS, "units");
+      out.text(" ");
+      out.text(units);
+      out.endTag(HtmlUtil.SPAN);
+    }
     if (minimumValue != null || maximumValue != null) {
       out.startTag(HtmlUtil.SCRIPT);
       out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
@@ -109,5 +122,9 @@ public abstract class NumberField extends TextField {
     } else {
       super.setValue(null);
     }
+  }
+
+  public void setUnits(final String units) {
+    this.units = units;
   }
 }

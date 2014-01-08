@@ -126,6 +126,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
+    setEventRow(table, e);
   }
 
   @Override

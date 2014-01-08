@@ -160,7 +160,7 @@ public final class JsonWriterUtil {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
       if (Double.isInfinite(doubleValue)) {
-        out.print(Double.MIN_VALUE);
+        out.print(-Double.MAX_VALUE);
       } else if (Double.isInfinite(doubleValue)) {
         out.print("null");
       } else {
