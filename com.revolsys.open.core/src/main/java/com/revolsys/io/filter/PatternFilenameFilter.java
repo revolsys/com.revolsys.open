@@ -30,6 +30,8 @@ public class PatternFilenameFilter implements FilenameFilter {
   /** The regular expression pattern to match file names. */
   private final Pattern pattern;
 
+  private boolean ignoreCase;
+
   /**
    * Construct a new PatternFileNameFilter.
    * 
@@ -37,6 +39,14 @@ public class PatternFilenameFilter implements FilenameFilter {
    */
   public PatternFilenameFilter(final String regex) {
     pattern = Pattern.compile(regex);
+  }
+
+  public PatternFilenameFilter(String regex, final boolean ignoreCase) {
+    if (ignoreCase) {
+      regex = regex.toLowerCase();
+    }
+    pattern = Pattern.compile(regex);
+    this.ignoreCase = ignoreCase;
   }
 
   /**
@@ -47,7 +57,10 @@ public class PatternFilenameFilter implements FilenameFilter {
    * @return True if the file matched, false otherwise.
    */
   @Override
-  public boolean accept(final File directory, final String fileName) {
+  public boolean accept(final File directory, String fileName) {
+    if (ignoreCase) {
+      fileName = fileName.toLowerCase();
+    }
     final boolean matches = pattern.matcher(fileName).matches();
     return matches;
   }
