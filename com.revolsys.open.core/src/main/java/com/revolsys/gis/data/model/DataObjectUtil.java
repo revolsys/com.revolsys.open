@@ -164,6 +164,8 @@ public final class DataObjectUtil {
     final Number value = object.getValue(attributeIndex);
     if (value == null) {
       return null;
+    } else if (value instanceof Double) {
+      return (Double)value;
     } else {
       return value.doubleValue();
     }
@@ -174,6 +176,8 @@ public final class DataObjectUtil {
     final Number value = object.getValue(attributeName);
     if (value == null) {
       return null;
+    } else if (value instanceof Double) {
+      return (Double)value;
     } else {
       return value.doubleValue();
     }
@@ -187,6 +191,8 @@ public final class DataObjectUtil {
       final Number value = object.getValue(attributeName);
       if (value == null) {
         return null;
+      } else if (value instanceof Integer) {
+        return (Integer)value;
       } else {
         return value.intValue();
       }
@@ -201,6 +207,8 @@ public final class DataObjectUtil {
       final Number value = object.getValue(attributeName);
       if (value == null) {
         return defaultValue;
+      } else if (value instanceof Integer) {
+        return (Integer)value;
       } else {
         return value.intValue();
       }
@@ -211,6 +219,8 @@ public final class DataObjectUtil {
     final Number value = object.getValue(attributeName);
     if (value == null) {
       return null;
+    } else if (value instanceof Long) {
+      return (Long)value;
     } else {
       return value.longValue();
     }
