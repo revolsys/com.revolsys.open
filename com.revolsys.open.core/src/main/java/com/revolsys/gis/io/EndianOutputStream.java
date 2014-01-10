@@ -27,7 +27,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   private final OutputStream out;
 
-  private final byte writeBuffer[] = new byte[1024];
+  private final byte writeBuffer[] = new byte[8];
 
   private long written = 0;
 
