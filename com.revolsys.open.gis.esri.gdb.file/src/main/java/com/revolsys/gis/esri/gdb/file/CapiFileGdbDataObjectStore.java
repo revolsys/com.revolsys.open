@@ -442,23 +442,39 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  public void closeTable(final String typePath) {
+    synchronized (apiSync) {
+      synchronized (API_SYNC) {
+        final Table table = tablesToClose.remove(typePath);
+        if (table != null) {
+          closeTable(table);
+        }
+      }
+    }
+  }
+
+  private void closeTable(final Table table) {
+    try {
+      if (geodatabase != null) {
+        freeWriteLock(table);
+        geodatabase.closeTable(table);
+      }
+    } catch (final Throwable e) {
+    } finally {
+      try {
+        table.delete();
+      } catch (final Throwable t) {
+      }
+    }
+  }
+
   protected void closeTables() {
     synchronized (apiSync) {
       for (final Iterator<Entry<String, Table>> iterator = tablesToClose.entrySet()
         .iterator(); iterator.hasNext();) {
         final Entry<String, Table> entry = iterator.next();
         final Table table = entry.getValue();
-        try {
-          if (geodatabase != null) {
-            geodatabase.closeTable(table);
-          }
-        } catch (final Throwable e) {
-        } finally {
-          try {
-            table.delete();
-          } catch (final Throwable t) {
-          }
-        }
+        closeTable(table);
         iterator.remove();
       }
       tablesToClose.clear();
