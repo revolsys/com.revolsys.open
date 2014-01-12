@@ -248,6 +248,7 @@ public final class FileUtil {
    */
   public static long copy(final InputStream in, final File file) {
     try {
+      file.getParentFile().mkdirs();
       final FileOutputStream out = new FileOutputStream(file);
       try {
         return copy(in, out);
