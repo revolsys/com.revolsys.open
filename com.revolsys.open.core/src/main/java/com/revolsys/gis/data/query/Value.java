@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -15,6 +16,7 @@ import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 
 public class Value extends QueryValue {
@@ -139,7 +141,12 @@ public class Value extends QueryValue {
               this.displayValue = this.queryValue;
             } else {
               this.queryValue = id;
-              this.displayValue = codeTable.getValue(id);
+              final List<Object> values = codeTable.getValues(id);
+              if (values.size() == 1) {
+                this.displayValue = values.get(0);
+              } else {
+                this.displayValue = CollectionUtil.toString(":", values);
+              }
             }
           }
         }

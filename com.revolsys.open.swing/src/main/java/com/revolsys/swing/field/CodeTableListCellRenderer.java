@@ -32,7 +32,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
       if (values == null || values.isEmpty()) {
         value = "-";
       } else {
-        value = CollectionUtil.toString(values);
+        value = CollectionUtil.toString(":", values);
       }
     }
     return super.getListCellRendererComponent(list, value, index, isSelected,

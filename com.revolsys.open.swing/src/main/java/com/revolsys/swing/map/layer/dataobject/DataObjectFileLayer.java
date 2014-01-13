@@ -76,8 +76,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     url = getProperty("url");
     if (StringUtils.hasText(url)) {
       resource = SpringUtil.getResource(url);
-      revert();
-      return isExists();
+      return revert();
     } else {
       LoggerFactory.getLogger(getClass()).error(
         "Layer definition does not contain a 'url' property: " + getName());
@@ -90,16 +89,16 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     return this.url;
   }
 
-  public void revert() {
+  public boolean revert() {
     if (resource == null) {
-      setExists(false);
+      return false;
     } else {
       if (resource.exists()) {
         final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(this.resource);
         if (reader == null) {
           LoggerFactory.getLogger(getClass()).error(
             "Cannot find reader for: " + this.resource);
-          setExists(false);
+          return false;
         } else {
           try {
             final DataObjectMetaData metaData = reader.getMetaData();
@@ -118,7 +117,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
             }
             setRecords(records);
             setBoundingBox(boundingBox);
-            setExists(true);
+            return true;
           } catch (final Throwable e) {
             ExceptionUtil.log(getClass(), "Error reading: " + resource, e);
           } finally {
@@ -127,9 +126,9 @@ public class DataObjectFileLayer extends DataObjectListLayer {
         }
       } else {
         LoggerFactory.getLogger(getClass()).error("Cannot find: " + this.url);
-        setExists(false);
       }
     }
+    return false;
   }
 
   @Override

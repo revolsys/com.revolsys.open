@@ -91,6 +91,7 @@ import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeTitleStringConveter;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.CollectionUtil;
 
 public class QueryWhereConditionField extends ValueField implements
   MouseListener, CaretListener, ItemListener {
@@ -312,7 +313,12 @@ public class QueryWhereConditionField extends ValueField implements
               return;
             }
           } else {
-            fieldValue = codeTable.getValue(fieldValue);
+            final List<Object> values = codeTable.getValues(fieldValue);
+            if (values.size() == 1) {
+              fieldValue = values;
+            } else {
+              fieldValue = CollectionUtil.toString(":", values);
+            }
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();
             }
@@ -759,7 +765,15 @@ public class QueryWhereConditionField extends ValueField implements
                     + " not the value " + value);
                 }
               } else {
-                final Object id = codeTable.getId(value);
+                Object id;
+
+                if (value instanceof String) {
+                  final String string = (String)value;
+                  final String[] values = string.split(":");
+                  id = codeTable.getId((Object[])values);
+                } else {
+                  id = codeTable.getId(value);
+                }
                 if (id == null) {
                   setInvalidMessage(name
                     + " requires a valid code value that exists not " + value);

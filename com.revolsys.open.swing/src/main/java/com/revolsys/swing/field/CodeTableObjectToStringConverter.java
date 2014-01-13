@@ -24,7 +24,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
       if (values == null || values.isEmpty()) {
         return null;
       } else {
-        return CollectionUtil.toString(values);
+        return CollectionUtil.toString(":", values);
       }
     }
   }
