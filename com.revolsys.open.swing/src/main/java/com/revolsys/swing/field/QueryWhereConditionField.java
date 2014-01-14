@@ -102,22 +102,33 @@ public class QueryWhereConditionField extends ValueField implements
 
   public static JComponent createSearchField(final Attribute attribute,
     final CodeTable codeTable) {
-    final String name = attribute.getName();
-    final Class<?> typeClass = attribute.getTypeClass();
-    final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
-    final DataObjectMetaData metaData = attribute.getMetaData();
-    if (attribute.equals(metaData.getIdAttribute())) {
-      return SwingUtil.createField(typeClass, name, null);
-    } else if (StringUtils.hasText(searchFieldFactory)) {
-      final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
-      return SpelUtil.getValue(searchFieldFactory, attribute,
-        searchFieldFactoryParameters);
+    if (attribute == null) {
+      return new TextField(20);
     } else {
-      if (codeTable == null) {
-        return SwingUtil.createField(typeClass, name, null);
+      final String name = attribute.getName();
+      final Class<?> typeClass = attribute.getTypeClass();
+      final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
+      final DataObjectMetaData metaData = attribute.getMetaData();
+      JComponent field;
+      if (attribute.equals(metaData.getIdAttribute())) {
+        field = new TextField(20);
+      } else if (StringUtils.hasText(searchFieldFactory)) {
+        final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
+        field = SpelUtil.getValue(searchFieldFactory, attribute,
+          searchFieldFactoryParameters);
       } else {
-        return SwingUtil.createComboBox(codeTable, false);
+        if (codeTable == null) {
+          if (Number.class.isAssignableFrom(typeClass)
+            || String.class.isAssignableFrom(typeClass)) {
+            field = new TextField(20);
+          } else {
+            field = SwingUtil.createField(typeClass, name, null);
+          }
+        } else {
+          field = SwingUtil.createComboBox(codeTable, false, 30);
+        }
       }
+      return field;
     }
   }
 
@@ -198,7 +209,7 @@ public class QueryWhereConditionField extends ValueField implements
       "Add Unary Condition", ICON, this, "actionAddInCondition");
     inConditionField = new TextField(20);
     inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"),
-      likeConditionField, inConditionAddButton);
+      inConditionField, inConditionAddButton);
     setInConditionField(null);
 
     final BasePanel operatorPanel = new BasePanel(new VerticalLayout(),
@@ -315,7 +326,7 @@ public class QueryWhereConditionField extends ValueField implements
           } else {
             final List<Object> values = codeTable.getValues(fieldValue);
             if (values.size() == 1) {
-              fieldValue = values;
+              fieldValue = values.get(0);
             } else {
               fieldValue = CollectionUtil.toString(":", values);
             }
@@ -632,7 +643,7 @@ public class QueryWhereConditionField extends ValueField implements
 
   private void setBinaryConditionField(JComponent field) {
     if (binaryConditionField != null) {
-      binaryConditionPanel.remove(binaryConditionField);
+      binaryConditionPanel.remove(1);
     }
     if (field == null) {
       field = new TextField(20);
@@ -651,11 +662,12 @@ public class QueryWhereConditionField extends ValueField implements
 
   private void setInConditionField(JComponent field) {
     if (inConditionField != null) {
-      inConditionPanel.remove(inConditionField);
+      inConditionPanel.remove(1);
     }
     if (field == null) {
       field = new TextField(20);
     }
+
     inConditionPanel.add(field, 1);
     GroupLayoutUtil.makeColumns(inConditionPanel, false);
     this.inConditionField = field;

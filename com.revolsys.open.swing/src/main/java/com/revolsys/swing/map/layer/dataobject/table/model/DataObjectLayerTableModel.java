@@ -135,6 +135,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
+  private int refreshIndex = 0;
+
   public DataObjectLayerTableModel(final AbstractDataObjectLayer layer,
     final List<String> attributeNames) {
     super(layer.getMetaData(), attributeNames);
@@ -146,19 +148,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public String getAttributeFilterMode() {
     return this.attributeFilterMode;
-  }
-
-  protected int getCachedRowCount() {
-    if (!this.countLoaded) {
-      if (this.rowCountWorker == null) {
-        this.rowCountWorker = Invoke.background(
-          "Query row count " + this.layer.getName(), this, "updateRowCount");
-      }
-      return 0;
-    } else {
-      final int count = this.rowCount + getLayer().getNewObjectCount();
-      return count;
-    }
   }
 
   @Override
@@ -200,13 +189,26 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return this.layer.query(query);
   }
 
-  private Integer getNextPageNumber() {
+  protected int getLayerRowCount() {
+    final Query query = getFilterQuery();
+    if (query == null) {
+      return this.layer.getRowCount();
+    } else {
+      return this.layer.getRowCount(query);
+    }
+  }
+
+  private Integer getNextPageNumber(final int refreshIndex) {
     synchronized (getSync()) {
-      if (this.loadingPageNumbers.isEmpty()) {
-        this.loadObjectsWorker = null;
-        return null;
+      if (this.refreshIndex == refreshIndex) {
+        if (this.loadingPageNumbers.isEmpty()) {
+          this.loadObjectsWorker = null;
+          return null;
+        } else {
+          return CollectionUtil.get(this.loadingPageNumbers, 0);
+        }
       } else {
-        return CollectionUtil.get(this.loadingPageNumbers, 0);
+        return null;
       }
     }
   }
@@ -244,13 +246,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected LayerDataObject getPageRecord(final int pageNumber,
     final int recordNumber) {
-    synchronized (this.pageCache) {
+    synchronized (getSync()) {
       final List<LayerDataObject> page = this.pageCache.get(pageNumber);
       if (page == null) {
         this.loadingPageNumbers.add(pageNumber);
-        if (this.loadObjectsWorker == null) {
-          this.loadObjectsWorker = Invoke.background("Loading records "
-            + getTypeName(), this, "loadPages");
+        synchronized (getSync()) {
+          if (this.loadObjectsWorker == null) {
+            this.loadObjectsWorker = Invoke.background("Loading records "
+              + getTypeName(), this, "loadPages", refreshIndex);
+          }
         }
         return null;
       } else {
@@ -274,15 +278,32 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   @Override
-  public int getRowCount() {
+  public final int getRowCount() {
     synchronized (getSync()) {
-      if (this.attributeFilterMode.equals(MODE_SELECTED)) {
-        return this.layer.getSelectionCount();
-      } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
-        return this.layer.getChangeCount();
-      } else {
-        return getCachedRowCount();
+      synchronized (getSync()) {
+        if (this.countLoaded) {
+          final AbstractDataObjectLayer layer = getLayer();
+          final int newObjectCount = layer.getNewObjectCount();
+          final int count = this.rowCount + newObjectCount;
+          return count;
+        } else {
+          if (this.rowCountWorker == null) {
+            this.rowCountWorker = Invoke.background("Query row count "
+              + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
+          }
+          return 0;
+        }
       }
+    }
+  }
+
+  protected int getRowCountInternal() {
+    if (this.attributeFilterMode.equals(MODE_SELECTED)) {
+      return this.layer.getSelectionCount();
+    } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
+      return this.layer.getChangeCount();
+    } else {
+      return getLayerRowCount();
     }
   }
 
@@ -343,15 +364,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return getPageRecord(pageNumber, recordNumber);
   }
 
-  protected int loadLayerRowCount() {
-    final Query query = getFilterQuery();
-    if (query == null) {
-      return this.layer.getRowCount();
-    } else {
-      return this.layer.getRowCount(query);
-    }
-  }
-
   protected List<LayerDataObject> loadPage(final int pageNumber) {
     final Query query = getFilterQuery();
     query.setOrderBy(this.orderBy);
@@ -361,32 +373,26 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return objects;
   }
 
-  public void loadPages() {
+  public void loadPages(final int refreshIndex) {
     while (true) {
-      final Integer pageNumber = getNextPageNumber();
+      final Integer pageNumber = getNextPageNumber(refreshIndex);
       if (pageNumber == null) {
         return;
       } else {
-        final Map<Integer, List<LayerDataObject>> pageCache;
-        synchronized (getSync()) {
-          pageCache = this.pageCache;
-        }
         final List<LayerDataObject> records;
         if (getFilterQuery() == null) {
           records = Collections.emptyList();
         } else {
           records = loadPage(pageNumber);
         }
-        pageCache.put(pageNumber, records);
-        synchronized (getSync()) {
-          if (this.pageCache == pageCache) {
-            this.loadingPageNumbers.remove(pageNumber);
-          }
-        }
-        fireTableRowsUpdated(pageNumber * this.pageSize,
-          Math.min(getRowCount(), (pageNumber + 1) * this.pageSize - 1));
+        Invoke.later(this, "setRecords", refreshIndex, pageNumber, records);
       }
     }
+  }
+
+  public void loadRowCount(final int refreshIndex) {
+    final int rowCount = getRowCountInternal();
+    Invoke.later(this, "setRowCount", refreshIndex, rowCount);
   }
 
   @Override
@@ -405,18 +411,23 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public void refresh() {
-    synchronized (getSync()) {
-      final SwingWorker<?, ?> worker = this.loadObjectsWorker;
-      if (worker != null) {
-        worker.cancel(true);
-        this.loadObjectsWorker = null;
-      }
-      this.loadingPageNumbers.clear();
-      this.rowCount = 0;
-      this.pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
-      this.countLoaded = false;
-    }
     if (SwingUtilities.isEventDispatchThread()) {
+      synchronized (getSync()) {
+        this.refreshIndex++;
+        if (this.loadObjectsWorker != null) {
+          this.loadObjectsWorker.cancel(true);
+          this.loadObjectsWorker = null;
+        }
+        if (this.rowCountWorker != null) {
+          this.rowCountWorker.cancel(true);
+          this.rowCountWorker = null;
+        }
+        this.loadingPageNumbers.clear();
+        this.rowCount = 0;
+        this.pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
+        this.countLoaded = false;
+
+      }
       fireTableDataChanged();
     } else {
       Invoke.later(this, "refresh");
@@ -482,6 +493,33 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected void setModes(final String... modes) {
     this.attributeFilterModes = Arrays.asList(modes);
+  }
+
+  public void setRecords(final int refreshIndex, final Integer pageNumber,
+    final List<LayerDataObject> records) {
+    synchronized (getSync()) {
+      if (this.refreshIndex == refreshIndex) {
+        pageCache.put(pageNumber, records);
+        this.loadingPageNumbers.remove(pageNumber);
+        fireTableRowsUpdated(pageNumber * this.pageSize,
+          Math.min(getRowCount(), (pageNumber + 1) * this.pageSize - 1));
+      }
+    }
+  }
+
+  public void setRowCount(final int refreshIndex, final int rowCount) {
+    boolean updated = false;
+    synchronized (getSync()) {
+      if (refreshIndex == this.refreshIndex) {
+        this.rowCount = rowCount;
+        this.countLoaded = true;
+        this.rowCountWorker = null;
+        updated = true;
+      }
+    }
+    if (updated) {
+      fireTableDataChanged();
+    }
   }
 
   protected void setRowSorter(final Condition filter) {
@@ -578,15 +616,5 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       }
     }
     return super.toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
-  }
-
-  public void updateRowCount() {
-    final int rowCount = loadLayerRowCount();
-    synchronized (getSync()) {
-      this.rowCount = rowCount;
-      this.countLoaded = true;
-      this.rowCountWorker = null;
-    }
-    fireTableDataChanged();
   }
 }

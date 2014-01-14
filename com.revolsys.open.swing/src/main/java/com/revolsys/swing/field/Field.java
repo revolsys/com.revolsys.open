@@ -19,13 +19,17 @@ public interface Field {
 
   boolean isFieldValid();
 
+  void removePropertyChangeListener(String propertyName,
+    PropertyChangeListener listener);
+
   void setEnabled(boolean enabled);
 
   void setFieldBackgroundColor(Color color);
 
   void setFieldForegroundColor(Color color);
 
-  void setFieldInvalid(String message, Color foregroundColor, Color backgroundColor);
+  void setFieldInvalid(String message, Color foregroundColor,
+    Color backgroundColor);
 
   void setFieldToolTip(String toolTip);
 

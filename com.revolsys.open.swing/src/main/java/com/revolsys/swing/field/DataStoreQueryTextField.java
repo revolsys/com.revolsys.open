@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.ItemSelectable;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
@@ -453,7 +456,20 @@ public class DataStoreQueryTextField extends TextField implements
       int y;
       if (below) {
         x = 0;
-        y = this.getHeight();
+        final Insets screenInsets = Toolkit.getDefaultToolkit()
+          .getScreenInsets(getGraphicsConfiguration());
+
+        final Rectangle bounds = getGraphicsConfiguration().getBounds();
+        final int menuHeight = menu.getBounds().height;
+        final int screenY = getLocationOnScreen().y;
+        final int componentHeight = getHeight();
+        final int bottomOfMenu = screenY + menuHeight + componentHeight;
+        if (bottomOfMenu > bounds.height - screenInsets.bottom) {
+          y = -menuHeight;
+        } else {
+          y = componentHeight;
+
+        }
       } else {
         x = this.getWidth();
         y = 0;

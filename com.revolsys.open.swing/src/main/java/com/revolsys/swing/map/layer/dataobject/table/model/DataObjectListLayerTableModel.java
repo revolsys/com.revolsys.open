@@ -74,13 +74,14 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LayerDataObject getObject(final int row) {
+  public <V extends DataObject> V getObject(final int row) {
     final String attributeFilterMode = getAttributeFilterMode();
     if (attributeFilterMode.equals(MODE_SELECTED)) {
-      return super.getObject(row);
+      return (V)super.getObject(row);
     } else {
-      return this.layer.getRecord(row);
+      return (V)this.layer.getRecord(row);
     }
   }
 
@@ -93,7 +94,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public int getRowCount() {
+  public int getRowCountInternal() {
     final String attributeFilterMode = getAttributeFilterMode();
     if (attributeFilterMode.equals(MODE_SELECTED)) {
       return super.getRowCount();

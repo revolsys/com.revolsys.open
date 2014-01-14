@@ -5,13 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -37,6 +38,7 @@ import com.revolsys.gis.data.query.Conditions;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.IsNotNull;
 import com.revolsys.gis.data.query.IsNull;
+import com.revolsys.gis.data.query.Not;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.RightUnaryCondition;
 import com.revolsys.gis.data.query.Value;
@@ -44,7 +46,6 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreQueryTextField;
-import com.revolsys.swing.field.DataStoreSearchTextField;
 import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
@@ -57,7 +58,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.JavaBeanUtil;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
-  ItemListener, DocumentListener {
+  ItemListener, DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -95,13 +96,15 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private final DataObjectLayerTableModel tableModel;
 
-  private String previousSearchOperator = "";
-
-  private boolean eventsEnabled = true;
+  private final boolean eventsEnabled = true;
 
   private final JLabel whereLabel;
 
   private CodeTable codeTable;
+
+  private boolean settingFilter = false;
+
+  private Attribute attribute;
 
   public AttributeFilterPanel(final DataObjectLayerTablePanel tablePanel) {
     this.tableModel = tablePanel.getTableModel();
@@ -130,12 +133,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
     add(operatorFieldPanel);
 
-    this.searchTextField = new TextField(15);
+    this.searchTextField = new TextField(20);
     this.searchField = this.searchTextField;
     this.searchTextField.addActionListener(this);
     this.searchTextField.setPreferredSize(new Dimension(200, 22));
     add(this.searchFieldPanel);
-
     GroupLayoutUtil.makeColumns(this, 4, false);
     clear();
   }
@@ -148,7 +150,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         if (source == this.searchField) {
           updateCondition();
         } else if (source == this.nameField) {
-          updateCondition();
+          setSearchFieldName(getSearchFieldName());
         }
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to search", e);
@@ -157,10 +159,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   private void addListeners(final JComponent component) {
-    if (component instanceof DataStoreSearchTextField) {
-      final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)component;
-      dataStoreSearchTextField.addItemListener(this);
-    } else if (component instanceof DataStoreQueryTextField) {
+    if (component instanceof DataStoreQueryTextField) {
       final DataStoreQueryTextField queryField = (DataStoreQueryTextField)component;
       queryField.addItemListener(this);
     } else if (component instanceof JXSearchField) {
@@ -169,12 +168,14 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     } else if (component instanceof JTextComponent) {
       final JTextComponent searchTextField = (JTextComponent)component;
       searchTextField.getDocument().addDocumentListener(this);
-    } else if (component instanceof JComboBox) {
-      final JComboBox comboField = (JComboBox)component;
-      comboField.addActionListener(this);
     } else if (component instanceof DateField) {
       final DateField dateField = (DateField)component;
       dateField.addActionListener(this);
+    }
+    if (component instanceof Field) {
+      final Field field = (Field)component;
+      final String fieldName = field.getFieldName();
+      field.addPropertyChangeListener(fieldName, this);
     }
   }
 
@@ -184,10 +185,20 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public void clear() {
-    final String searchField = layer.getProperty("searchField");
-    setSearchField(searchField);
-
-    setFilter(null);
+    try {
+      this.settingFilter = true;
+      String searchField = previousSearchFieldName;
+      if (!StringUtils.hasText(searchField)) {
+        searchField = layer.getProperty("searchField");
+        if (!StringUtils.hasText(searchField)) {
+          searchField = metaData.getAttributeNames().get(0);
+        }
+      }
+      setSearchFieldName(searchField);
+      setFilter(null);
+    } finally {
+      this.settingFilter = false;
+    }
   }
 
   public void fireSearchChanged(final String propertyName,
@@ -216,28 +227,8 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     return this.layer;
   }
 
-  public String getSearchAttribute() {
+  public String getSearchFieldName() {
     return (String)this.nameField.getSelectedItem();
-  }
-
-  private JComponent getSearchField(final String searchFieldName,
-    final String searchOperator, final Object searchValue) {
-    JComponent searchField;
-    final Attribute attribute = this.metaData.getAttribute(searchFieldName);
-    codeTable = null;
-    if ("Like".equals(searchOperator)) {
-      searchField = this.searchTextField;
-    } else if ("IS NULL".equals(searchOperator)) {
-      return null;
-    } else if ("IS NOT NULL".equals(searchOperator)) {
-      return null;
-    } else {
-      codeTable = this.metaData.getCodeTableByColumn(searchFieldName);
-      searchField = QueryWhereConditionField.createSearchField(attribute,
-        codeTable);
-    }
-    ((Field)searchField).setFieldValue(searchValue);
-    return searchField;
   }
 
   public final String getSearchOperator() {
@@ -249,8 +240,13 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public Object getSearchValue() {
-    final Object value = SwingUtil.getValue(this.searchField);
-    return value;
+    if (searchField instanceof JTextComponent) {
+      final JTextComponent textComponent = (JTextComponent)searchField;
+      return textComponent.getText();
+    } else {
+      final Object value = SwingUtil.getValue(this.searchField);
+      return value;
+    }
   }
 
   @Override
@@ -260,14 +256,31 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    updateCondition();
+    if (!settingFilter) {
+      if (e.getStateChange() == ItemEvent.SELECTED) {
+        final Object source = e.getSource();
+        if (source == nameField) {
+          final String searchFieldName = getSearchFieldName();
+          setSearchFieldName(searchFieldName);
+        } else if (source == operatorField) {
+          final String searchOperator = getSearchOperator();
+          setSearchOperator(searchOperator);
+        } else {
+          updateCondition();
+        }
+      }
+    }
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == searchField) {
+      updateCondition();
+    }
   }
 
   private void removeListeners(final JComponent component) {
-    if (component instanceof DataStoreSearchTextField) {
-      final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)component;
-      dataStoreSearchTextField.removeItemListener(this);
-    } else if (component instanceof DataStoreQueryTextField) {
+    if (component instanceof DataStoreQueryTextField) {
       final DataStoreQueryTextField queryField = (DataStoreQueryTextField)component;
       queryField.removeItemListener(this);
     } else if (component instanceof JXSearchField) {
@@ -280,6 +293,11 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       final DateField dateField = (DateField)component;
       dateField.removeActionListener(this);
     }
+    if (component instanceof Field) {
+      final Field field = (Field)component;
+      final String fieldName = field.getFieldName();
+      field.removePropertyChangeListener(fieldName, this);
+    }
   }
 
   @Override
@@ -288,14 +306,26 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   public void setFilter(final Condition filter) {
-    final boolean eventsEnabled = this.eventsEnabled;
     try {
-      this.eventsEnabled = false;
-      this.tableModel.setFilter(filter);
-      boolean simple = filter == null;
-      final Field field = (Field)searchField;
+      this.settingFilter = true;
+      setSearchFilter(filter);
+      boolean simple = false;
       if (filter == null) {
-        field.setFieldValue(null);
+        setSearchOperator("=");
+        final Field searchField = (Field)this.searchField;
+        if (searchField != null) {
+          searchField.setFieldValue(null);
+        }
+        simple = true;
+      } else if (filter instanceof Not) {
+        final Not not = (Not)filter;
+        final QueryValue condition = not.getQueryValue();
+        if (condition instanceof IsNull) {
+          final IsNull isNull = (IsNull)condition;
+          final IsNotNull isNotNull = new IsNotNull(isNull.getValue());
+          setFilter(isNotNull);
+          return;
+        }
       } else if (filter instanceof ILike) {
         final ILike equal = (ILike)filter;
         final QueryValue leftCondition = equal.getLeft();
@@ -303,39 +333,51 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
         if (leftCondition instanceof Column && rightCondition instanceof Value) {
           final Column column = (Column)leftCondition;
-          final Value value = (Value)rightCondition;
-          nameField.setFieldValue(column.getName());
+          final String searchFieldName = column.getName();
+          setSearchFieldName(searchFieldName);
 
-          final String searchValue = StringConverterRegistry.toString(
-            value.getValue()).replaceAll("%", "");
-          final String fieldValue = StringConverterRegistry.toString(field.getFieldValue());
+          if (setSearchOperator("Like")) {
+            final Value value = (Value)rightCondition;
+            final Object searchValue = value.getValue();
+            String searchText = StringConverterRegistry.toString(searchValue);
+            if (StringUtils.hasText(searchText)) {
+              setSearchField(searchTextField);
+              searchText = searchText.replaceAll("%", "");
+              final String previousSearchText = searchTextField.getText();
 
-          if (searchValue == null || fieldValue == null
-            || !searchValue.equalsIgnoreCase(fieldValue)) {
-            field.setFieldValue(searchValue);
-          }
-          if (((DefaultComboBoxModel)operatorField.getModel()).getIndexOf("Like") != -1) {
-            simple = true;
-            operatorField.setFieldValue("Like");
+              if (!EqualsRegistry.equal(searchText, previousSearchText)) {
+                searchTextField.setFieldValue(searchText);
+              }
+              simple = true;
+            } else {
+              setSearchFilter(null);
+            }
           }
         }
       } else if (filter instanceof BinaryCondition) {
         final BinaryCondition condition = (BinaryCondition)filter;
-        final String operator = condition.getOperator();
         final QueryValue leftCondition = condition.getLeft();
         final QueryValue rightCondition = condition.getRight();
 
         if (leftCondition instanceof Column && rightCondition instanceof Value) {
           final Column column = (Column)leftCondition;
-          final Value value = (Value)rightCondition;
-          nameField.setFieldValue(column.getName());
-          operatorField.setFieldValue(operator);
-          final String text = StringConverterRegistry.toString(value.getValue());
-          final Object oldValue = field.getFieldValue();
-          if (!text.equalsIgnoreCase(StringConverterRegistry.toString(oldValue))) {
-            field.setFieldValue(text);
+          final String searchFieldName = column.getName();
+          setSearchFieldName(searchFieldName);
+
+          final String searchOperator = condition.getOperator();
+          if (setSearchOperator(searchOperator)) {
+            final Value value = (Value)rightCondition;
+            final Object searchValue = value.getValue();
+
+            final String searchText = StringConverterRegistry.toString(searchValue);
+
+            final Field searchField = (Field)this.searchField;
+            final Object oldValue = searchField.getFieldValue();
+            if (!searchText.equalsIgnoreCase(StringConverterRegistry.toString(oldValue))) {
+              searchField.setFieldValue(searchText);
+            }
+            simple = true;
           }
-          simple = ((DefaultComboBoxModel)operatorField.getModel()).getIndexOf(operator) != -1;
         }
       } else if (filter instanceof RightUnaryCondition) {
         final RightUnaryCondition condition = (RightUnaryCondition)filter;
@@ -344,12 +386,14 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           final QueryValue leftValue = condition.getValue();
           if (leftValue instanceof Column) {
             final Column column = (Column)leftValue;
-            nameField.setFieldValue(column.getName());
-            operatorField.setFieldValue(operator);
-            simple = ((DefaultComboBoxModel)operatorField.getModel()).getIndexOf(operator) != -1;
+            final String searchFieldName = column.getName();
+            setSearchFieldName(searchFieldName);
+
+            if (setSearchOperator(operator)) {
+              simple = true;
+            }
           }
         }
-
       }
       if (simple) {
         whereLabel.setVisible(false);
@@ -366,7 +410,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         searchFieldPanel.setVisible(false);
       }
     } finally {
-      this.eventsEnabled = eventsEnabled;
+      this.settingFilter = false;
     }
   }
 
@@ -394,12 +438,16 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.searchFieldPanel.removeAll();
     removeListeners(this.searchField);
     this.searchField = searchField;
-    if (searchField != null) {
+    if (searchField == null) {
+      searchFieldPanel.setVisible(false);
+    } else {
+      searchFieldPanel.setVisible(true);
       addListeners(searchField);
-      if (this.searchField instanceof DataStoreSearchTextField) {
-        final DataStoreSearchTextField dataStoreSearchTextField = (DataStoreSearchTextField)this.searchField;
-        dataStoreSearchTextField.setMaxResults(5);
+      if (this.searchField instanceof DataStoreQueryTextField) {
+        final DataStoreQueryTextField dataStoreSearchTextField = (DataStoreQueryTextField)this.searchField;
+        dataStoreSearchTextField.setMaxResults(100);
         dataStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
+        dataStoreSearchTextField.setBelow(true);
       } else if (this.searchField instanceof JXSearchField) {
         final JXSearchField searchTextField = (JXSearchField)this.searchField;
         searchTextField.setPreferredSize(new Dimension(200, 22));
@@ -409,11 +457,71 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     }
   }
 
-  public void setSearchField(final String searchField) {
-    if (StringUtils.hasText(searchField)) {
-      this.nameField.setSelectedItem(searchField);
+  private void setSearchFieldName(final String searchFieldName) {
+    if (!EqualsRegistry.equal(searchFieldName, previousSearchFieldName)) {
+      previousSearchFieldName = searchFieldName;
+      layer.setProperty("searchField", searchFieldName);
+      codeTable = this.metaData.getCodeTableByColumn(searchFieldName);
+      final DataObjectMetaData metaData = this.tableModel.getMetaData();
+      attribute = metaData.getAttribute(searchFieldName);
+      final Class<?> attributeClass = attribute.getTypeClass();
+      if (!EqualsRegistry.equal(searchFieldName, nameField.getSelectedItem())) {
+        nameField.setFieldValue(searchFieldName);
+      }
+
+      ComboBox operatorField;
+      if (codeTable != null
+        && !searchFieldName.equals(metaData.getIdAttributeName())) {
+        operatorField = codeTableOperatorField;
+      } else if (Number.class.isAssignableFrom(attributeClass)) {
+        operatorField = numericOperatorField;
+      } else if (Date.class.isAssignableFrom(attributeClass)) {
+        operatorField = dateOperatorField;
+      } else {
+        operatorField = generalOperatorField;
+      }
+      setOperatorField(operatorField);
+
+      setSearchOperator("=");
+      if (!settingFilter) {
+        setSearchFilter(null);
+      }
+    }
+  }
+
+  private boolean setSearchFilter(final Condition filter) {
+    return this.tableModel.setFilter(filter);
+  }
+
+  private boolean setSearchOperator(final String searchOperator) {
+    final Object currentSearchOperator = operatorField.getSelectedItem();
+    if (!EqualsRegistry.equal(searchOperator, currentSearchOperator)) {
+      operatorField.setSelectedItem(searchOperator);
+    }
+    if (operatorField.getSelectedIndex() < 0) {
+      return false;
     } else {
-      this.nameField.setSelectedIndex(0);
+      JComponent searchField = null;
+      if ("Like".equals(searchOperator)) {
+        codeTable = null;
+        searchField = this.searchTextField;
+      } else if ("IS NULL".equals(searchOperator)) {
+        if (!settingFilter) {
+          setFilter(IsNull.column(attribute));
+        }
+        codeTable = null;
+      } else if ("IS NOT NULL".equals(searchOperator)) {
+        if (!settingFilter) {
+          setFilter(IsNotNull.column(attribute));
+        }
+        codeTable = null;
+      } else {
+        searchField = QueryWhereConditionField.createSearchField(attribute,
+          codeTable);
+      }
+
+      setSearchField(searchField);
+      return true;
     }
   }
 
@@ -425,54 +533,25 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   public void updateCondition() {
     if (eventsEnabled) {
-      final String fieldName = getSearchAttribute();
-      String searchOperator = getSearchOperator();
       final Object searchValue = getSearchValue();
-      final DataObjectMetaData metaData = this.tableModel.getMetaData();
-      final Attribute attribute = metaData.getAttribute(fieldName);
-      final Class<?> attributeClass = attribute.getTypeClass();
-      final boolean fieldChanged = !EqualsRegistry.equal(fieldName,
-        previousSearchFieldName);
-      if (fieldChanged
-        || !EqualsRegistry.equal(searchOperator, previousSearchOperator)) {
-        if (fieldChanged) {
-          final CodeTable codeTable = this.metaData.getCodeTableByColumn(fieldName);
-
-          ComboBox operatorField;
-          if (codeTable != null
-            && !fieldName.equals(metaData.getIdAttributeName())) {
-            operatorField = codeTableOperatorField;
-          } else if (Number.class.isAssignableFrom(attributeClass)) {
-            operatorField = numericOperatorField;
-          } else if (Date.class.isAssignableFrom(attributeClass)) {
-            operatorField = dateOperatorField;
-          } else {
-            operatorField = generalOperatorField;
-          }
-          setOperatorField(operatorField);
-          searchOperator = getSearchOperator();
-        }
-        final JComponent searchField = getSearchField(fieldName,
-          searchOperator, searchValue);
-        setSearchField(searchField);
-      }
       Condition condition = null;
+      final String searchOperator = getSearchOperator();
       if ("IS NULL".equalsIgnoreCase(searchOperator)) {
-        condition = IsNull.column(fieldName);
+        condition = IsNull.column(attribute);
       } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
-        condition = IsNotNull.column(fieldName);
-      } else if (StringUtils.hasText(fieldName)) {
-        layer.setProperty("searchField", fieldName);
+        condition = IsNotNull.column(attribute);
+      } else if (attribute != null) {
         if (StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
           if ("Like".equalsIgnoreCase(searchOperator)) {
             final String searchText = StringConverterRegistry.toString(searchValue);
             if (StringUtils.hasText(searchText)) {
-              condition = ILike.iLike(fieldName, "%" + searchText + "%");
+              condition = ILike.iLike(attribute, "%" + searchText + "%");
             }
           } else {
             Object value = null;
             if (codeTable == null) {
               try {
+                final Class<?> attributeClass = attribute.getTypeClass();
                 value = StringConverterRegistry.toObject(attributeClass,
                   searchValue);
               } catch (final Throwable t) {
@@ -490,9 +569,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
           }
         }
       }
-      setFilter(condition);
-      this.previousSearchFieldName = fieldName;
-      this.previousSearchOperator = searchOperator;
+      setSearchFilter(condition);
     }
   }
 }
