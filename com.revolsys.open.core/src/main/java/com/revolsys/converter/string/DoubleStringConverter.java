@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 public class DoubleStringConverter extends
   AbstractNumberStringConverter<Double> {
   public DoubleStringConverter() {
-    super(DECIMAL_FORMAT);
+    super(getDecimalFormat());
   }
 
   @Override

@@ -26,8 +26,9 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "############.############");
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("############.############");
+  }
 
   private final Viewport2D viewport;
 
@@ -66,11 +67,11 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
       final double projectedX = mapPoint.getX();
       final double projectedY = mapPoint.getY();
       if (this.geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-        setText(this.title + ": " + FORMAT.format(projectedY) + ", "
-          + FORMAT.format(projectedX));
+        setText(this.title + ": " + getFormat().format(projectedY) + ", "
+          + getFormat().format(projectedX));
       } else {
-        setText(this.title + ": " + FORMAT.format(projectedX) + ", "
-          + FORMAT.format(projectedY));
+        setText(this.title + ": " + getFormat().format(projectedX) + ", "
+          + getFormat().format(projectedY));
       }
     }
   }

@@ -5,11 +5,12 @@ import java.text.NumberFormat;
 
 public class EpsgUtil {
 
-  private static NumberFormat FORMAT = new DecimalFormat(
-    "#0.00000##########################");
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#0.00000##########################");
+  }
 
   public static double toDecimalFromSexagesimalDegrees(final double sexagesimal) {
-    final String string = FORMAT.format(sexagesimal);
+    final String string = getFormat().format(sexagesimal);
     final int dotIndex = string.indexOf('.');
 
     final int degrees = Integer.parseInt(string.substring(0, dotIndex));

@@ -10,14 +10,18 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class NumberTableCellRenderer extends DefaultTableCellRenderer {
 
-  private final NumberFormat format;
+  private final String format;
 
   public NumberTableCellRenderer() {
     this("#,###");
   }
 
   public NumberTableCellRenderer(final String format) {
-    this.format = new DecimalFormat(format);
+    this.format = format;
+  }
+
+  private NumberFormat getFormat() {
+    return new DecimalFormat(format);
   }
 
   @Override
@@ -26,7 +30,7 @@ public class NumberTableCellRenderer extends DefaultTableCellRenderer {
     final int row, final int column) {
     if (value instanceof Number) {
       final Number number = (Number)value;
-      value = format.format(number);
+      value = getFormat().format(number);
     }
     final Component label = super.getTableCellRendererComponent(table, value,
       isSelected, hasFocus, row, column);

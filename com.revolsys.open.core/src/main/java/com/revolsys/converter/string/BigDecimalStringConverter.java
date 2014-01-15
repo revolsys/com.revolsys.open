@@ -27,7 +27,7 @@ public class BigDecimalStringConverter extends
   }
 
   public BigDecimalStringConverter() {
-    super(DECIMAL_FORMAT);
+    super(getDecimalFormat());
   }
 
   @Override

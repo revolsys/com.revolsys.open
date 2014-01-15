@@ -31,8 +31,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
  * @author Paul Austin
  */
 public final class MathUtil {
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
 
   public static final int BYTES_IN_DOUBLE = 8;
 
@@ -382,6 +380,10 @@ public final class MathUtil {
     return getCurrency(new BigDecimal(amount));
   }
 
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
+  }
+
   /**
    * Convert a BigDecimal into an ineteger BigDecimal.
    * 
@@ -695,7 +697,7 @@ public final class MathUtil {
   }
 
   public static String toString(final double value) {
-    return FORMAT.format(value);
+    return getFormat().format(value);
   }
 
   /**

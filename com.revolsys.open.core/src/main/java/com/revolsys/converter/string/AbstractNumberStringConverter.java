@@ -7,10 +7,13 @@ import java.text.NumberFormat;
 public abstract class AbstractNumberStringConverter<T> implements
   StringConverter<T> {
 
-  public static final NumberFormat INTEGER_FORMAT = new DecimalFormat("0");
+  public static NumberFormat getDecimalFormat() {
+    return new DecimalFormat("0.##########################");
+  }
 
-  public static final NumberFormat DECIMAL_FORMAT = new DecimalFormat(
-    "0.##########################");
+  public static NumberFormat getIntegerFormat() {
+    return new DecimalFormat("0");
+  }
 
   private final NumberFormat format;
 

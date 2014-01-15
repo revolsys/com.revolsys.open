@@ -88,7 +88,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     final DataObjectLayerTableModel tableModel) {
     final String attributeFilterMode = tableModel.getAttributeFilterMode();
     if (MODE_SELECTED.equals(attributeFilterMode)) {
-      tableModel.fireTableDataChanged();
+      tableModel.refresh();
     } else {
       table.repaint();
     }
@@ -223,7 +223,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (row < selectedObjects.size()) {
         return (V)selectedObjects.get(row);
       } else {
-        fireTableDataChanged();
         return null;
       }
     } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
@@ -232,7 +231,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (row < changes.size()) {
         return (V)changes.get(row);
       } else {
-        fireTableDataChanged();
         return null;
       }
     } else {

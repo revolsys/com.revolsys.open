@@ -16,6 +16,10 @@ import javax.swing.JComponent;
 import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractCodeTable implements CodeTable, Cloneable {
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
+  }
+
   private boolean capitalizeWords = false;
 
   private Map<Object, List<Object>> idValueCache = new LinkedHashMap<Object, List<Object>>();
@@ -29,9 +33,6 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
   private long maxId;
 
   private String name;
-
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
 
   public AbstractCodeTable() {
   }
@@ -188,7 +189,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
         normalizedValues.add(null);
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        normalizedValues.add(FORMAT.format(number));
+        normalizedValues.add(getFormat().format(number));
       } else {
         normalizedValues.add(value.toString().toLowerCase());
       }

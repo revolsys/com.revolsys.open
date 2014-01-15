@@ -116,8 +116,9 @@ public class XmlWriter extends Writer {
     }
   }
 
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
+  }
 
   /** True if an XML declaration can be written. */
   private boolean canWriteXmlDeclaration = true;
@@ -993,7 +994,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final double value) {
-    final String text = FORMAT.format(value);
+    final String text = getFormat().format(value);
     text(text);
   }
 
@@ -1005,7 +1006,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final float value) {
-    final String text = FORMAT.format(value);
+    final String text = getFormat().format(value);
     text(text);
   }
 
@@ -1042,7 +1043,7 @@ public class XmlWriter extends Writer {
     if (value != null) {
       if (value instanceof Number) {
         final Number number = (Number)value;
-        final String text = FORMAT.format(number);
+        final String text = getFormat().format(number);
         text(text);
       } else {
         text(value.toString());

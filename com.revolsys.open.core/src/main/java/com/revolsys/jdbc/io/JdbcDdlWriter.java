@@ -19,8 +19,10 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.util.CollectionUtil;
 
 public abstract class JdbcDdlWriter implements Cloneable {
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
+
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
+  }
 
   private PrintWriter out;
 
@@ -265,7 +267,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
         out.print("NULL");
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        out.print(FORMAT.format(number));
+        out.print(getFormat().format(number));
       } else {
         out.print("'");
         out.print(value.toString().replaceAll("'", "''"));

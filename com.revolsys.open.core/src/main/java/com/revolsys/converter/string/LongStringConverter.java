@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 
 public class LongStringConverter extends AbstractNumberStringConverter<Long> {
   public LongStringConverter() {
-    super(INTEGER_FORMAT);
+    super(getIntegerFormat());
   }
 
   @Override

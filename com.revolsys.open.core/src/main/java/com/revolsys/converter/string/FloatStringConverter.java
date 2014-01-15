@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 
 public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
   public FloatStringConverter() {
-    super(DECIMAL_FORMAT);
+    super(getDecimalFormat());
   }
 
   @Override

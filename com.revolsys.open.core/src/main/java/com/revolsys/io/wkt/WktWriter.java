@@ -51,8 +51,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class WktWriter {
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
 
   private static int getDimension(final Geometry geometry) {
     int numAxis = GeometryFactory.getFactory(geometry).getNumAxis();
@@ -63,6 +61,10 @@ public class WktWriter {
       numAxis = Math.max(numAxis, geometryDimension);
     }
     return numAxis;
+  }
+
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
   }
 
   public static String toString(final Geometry geometry) {
@@ -343,7 +345,7 @@ public class WktWriter {
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {
-        out.print(FORMAT.format(ordinate));
+        out.print(getFormat().format(ordinate));
       }
     }
   }

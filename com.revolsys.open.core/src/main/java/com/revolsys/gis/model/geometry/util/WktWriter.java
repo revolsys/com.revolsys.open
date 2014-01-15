@@ -19,8 +19,10 @@ import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 
 public class WktWriter {
-  private static final NumberFormat FORMAT = new DecimalFormat(
-    "#.#########################");
+
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#.#########################");
+  }
 
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
@@ -276,7 +278,7 @@ public class WktWriter {
       if (Double.isNaN(coordinate)) {
         out.print(0);
       } else {
-        out.print(FORMAT.format(coordinate));
+        out.print(getFormat().format(coordinate));
       }
     }
   }
@@ -290,7 +292,7 @@ public class WktWriter {
       if (Double.isNaN(coordinate)) {
         out.print(0);
       } else {
-        out.print(FORMAT.format(coordinate));
+        out.print(getFormat().format(coordinate));
       }
     }
   }

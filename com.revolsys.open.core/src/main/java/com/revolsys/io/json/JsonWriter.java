@@ -15,8 +15,10 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.util.CollectionUtil;
 
 public final class JsonWriter {
-  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
-    "#.#########################");
+
+  private static NumberFormat getNumberFormat() {
+    return new DecimalFormat("#.#########################");
+  }
 
   private int depth = 0;
 
@@ -168,7 +170,7 @@ public final class JsonWriter {
       if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
         out.print("null");
       } else {
-        out.print(NUMBER_FORMAT.format(value));
+        out.print(getNumberFormat().format(value));
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;

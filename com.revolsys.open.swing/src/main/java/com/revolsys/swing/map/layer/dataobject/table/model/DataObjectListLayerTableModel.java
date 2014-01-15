@@ -83,7 +83,6 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
       if (row < selectedObjects.size()) {
         return (V)selectedObjects.get(row);
       } else {
-        fireTableDataChanged();
         return null;
       }
     } else {

@@ -18,6 +18,10 @@ import com.revolsys.io.IoConstants;
 
 public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
 
+  private static NumberFormat getNumberFormat() {
+    return new DecimalFormat("#.#########################");
+  }
+
   private DataObjectMetaData metaData;
 
   private PrintWriter out;
@@ -31,9 +35,6 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
   private boolean singleObject;
 
   private boolean written;
-
-  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
-    "#.#########################");
 
   public JsonDataObjectWriter(final DataObjectMetaData metaData,
     final java.io.Writer out) {
@@ -196,7 +197,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {
-      out.print(NUMBER_FORMAT.format(value));
+      out.print(getNumberFormat().format(value));
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       list(list);

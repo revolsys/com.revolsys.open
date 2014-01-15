@@ -13,13 +13,15 @@ import com.revolsys.util.MathUtil;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("0.#");
+  }
+
   private GeometryFactory geometryFactory;
 
   private double tileHeight;
 
   private double tileWidth;
-
-  private static final NumberFormat FORMAT = new DecimalFormat("0.#");
 
   private double originX;
 
@@ -71,7 +73,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final double tileX = getGridValue(originX, tileWidth, x);
     final double tileY = getGridValue(originY, tileHeight, y);
 
-    return FORMAT.format(tileX) + "_" + FORMAT.format(tileY);
+    return getFormat().format(tileX) + "_" + getFormat().format(tileY);
   }
 
   public double getOriginX() {

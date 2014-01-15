@@ -2,8 +2,6 @@ package com.revolsys.io.html;
 
 import java.io.Writer;
 import java.net.URI;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 
 import org.springframework.util.StringUtils;
@@ -21,8 +19,6 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 
 public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
-  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
-    "#.#########################");
 
   private String cssClass;
 

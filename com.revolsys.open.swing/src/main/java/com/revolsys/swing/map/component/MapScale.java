@@ -17,14 +17,6 @@ import com.revolsys.swing.map.Viewport2D;
 public class MapScale extends JLabel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  public static final DecimalFormat FORMAT = new DecimalFormat("#,###");
-
-  static {
-    final DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
-    formatSymbols.setGroupingSeparator(' ');
-    FORMAT.setDecimalFormatSymbols(formatSymbols);
-  }
-
   public static String formatScale(final Object scale) {
     double scaleDouble;
     if (scale instanceof Number) {
@@ -48,7 +40,15 @@ public class MapScale extends JLabel implements PropertyChangeListener {
         }
       }
     }
-    return "1:" + FORMAT.format(scaleDouble);
+    return "1:" + getFormat().format(scaleDouble);
+  }
+
+  public static DecimalFormat getFormat() {
+    final DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+    formatSymbols.setGroupingSeparator(' ');
+    final DecimalFormat format = new DecimalFormat("#,###");
+    format.setDecimalFormatSymbols(formatSymbols);
+    return format;
   }
 
   private final Viewport2D viewport;
