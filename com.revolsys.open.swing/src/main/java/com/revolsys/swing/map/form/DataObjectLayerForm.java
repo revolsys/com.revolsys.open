@@ -778,7 +778,7 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   protected JLabel getLabel(final String fieldName) {
-    AbstractDataObjectLayer layer = getLayer();
+    final AbstractDataObjectLayer layer = getLayer();
     String title = layer.getFieldTitle(fieldName);
     title = title.replaceAll(" Code$", "");
     title = title.replaceAll(" Ind$", "");
@@ -1020,6 +1020,7 @@ public class DataObjectLayerForm extends JPanel implements
     final LayerDataObject object = getObject();
     if (object != null) {
       object.revertChanges();
+      setValues(object);
     }
   }
 

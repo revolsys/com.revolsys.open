@@ -11,10 +11,11 @@ public class Not extends LeftUnaryCondition {
   @Override
   public boolean accept(final Map<String, Object> object) {
     final Condition condition = getQueryValue();
-    if (!condition.accept(object)) {
+    if (condition.accept(object)) {
       return false;
+    } else {
+      return true;
     }
-    return true;
   }
 
   @Override

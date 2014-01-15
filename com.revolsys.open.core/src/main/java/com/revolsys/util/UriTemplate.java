@@ -189,6 +189,41 @@ public class UriTemplate implements Serializable {
     return encodeUri(buffer.toString());
   }
 
+  public String expandString(final Map<String, ?> uriVariables) {
+    Assert.notNull(uriVariables, "'uriVariables' must not be null");
+    final Object[] values = new Object[this.variableNames.size()];
+    for (int i = 0; i < this.variableNames.size(); i++) {
+      final String name = this.variableNames.get(i);
+      if (!uriVariables.containsKey(name)) {
+        throw new IllegalArgumentException(
+          "'uriVariables' Map has no value for '" + name + "'");
+      }
+      values[i] = uriVariables.get(name);
+    }
+    return expandString(values);
+  }
+
+  public String expandString(final Object... uriVariableValues) {
+    Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
+    if (uriVariableValues.length != this.variableNames.size()) {
+      throw new IllegalArgumentException(
+        "Invalid amount of variables values in [" + this.uriTemplate
+          + "]: expected " + this.variableNames.size() + "; got "
+          + uriVariableValues.length);
+    }
+    final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
+    final StringBuffer buffer = new StringBuffer();
+    int i = 0;
+    while (matcher.find()) {
+      final Object uriVariable = uriVariableValues[i++];
+      final String replacement = Matcher.quoteReplacement(uriVariable != null ? uriVariable.toString()
+        : "");
+      matcher.appendReplacement(buffer, replacement);
+    }
+    matcher.appendTail(buffer);
+    return buffer.toString();
+  }
+
   /**
    * Return the names of the variables in the template, in order.
    * @return the template variable names

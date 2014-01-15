@@ -32,12 +32,12 @@ public class Between extends Condition {
     } else {
       final QueryValue min = getMin();
       final Object minValue = min.getValue(record);
-      if (minValue == null || CompareUtil.compare(column, columnValue) < 0) {
+      if (minValue == null || CompareUtil.compare(minValue, columnValue) > 0) {
         return false;
       } else {
-        final QueryValue max = getMin();
+        final QueryValue max = getMax();
         final Object maxValue = max.getValue(record);
-        if (maxValue == null || CompareUtil.compare(column, columnValue) > 0) {
+        if (maxValue == null || CompareUtil.compare(maxValue, columnValue) < 0) {
           return false;
         } else {
           return true;

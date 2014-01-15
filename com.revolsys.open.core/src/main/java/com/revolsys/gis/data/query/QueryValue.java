@@ -53,7 +53,8 @@ public abstract class QueryValue implements Cloneable {
   public static Condition parseWhere(final DataObjectMetaData metaData,
     final String whereClause) {
     try {
-      final StatementNode statement = new SQLParser().parseStatement(whereClause);
+      final StatementNode statement = new SQLParser().parseStatement("SELECT * FROM "
+        + metaData.getTypeName() + " WHERE " + whereClause);
       if (statement instanceof CursorNode) {
         final CursorNode selectStatement = (CursorNode)statement;
         final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
@@ -153,8 +154,8 @@ public abstract class QueryValue implements Cloneable {
             }
           }
         }
-        final BinaryCondition binaryCondition = new BinaryCondition(
-          leftCondition, operator, rightCondition);
+        final Condition binaryCondition = F.binary(leftCondition, operator,
+          rightCondition);
         return (V)binaryCondition;
       } else {
         throw new IllegalArgumentException("Unsupported binary operator "
@@ -211,7 +212,7 @@ public abstract class QueryValue implements Cloneable {
       // ParenthesisCondition(
       // condition);
       // if (parenthesis.isNot()) {
-      // return (V)Conditions.not(parenthesisCondition);
+      // return (V)F.not(parenthesisCondition);
       // } else {
       // return (V)parenthesisCondition;
       // }
@@ -266,6 +267,11 @@ public abstract class QueryValue implements Cloneable {
 
   public List<QueryValue> getQueryValues() {
     return Collections.emptyList();
+  }
+
+  public String getStringValue(final Map<String, Object> record) {
+    final Object value = getValue(record);
+    return StringConverterRegistry.toString(value);
   }
 
   public abstract <V> V getValue(Map<String, Object> record);

@@ -18,8 +18,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.query.And;
-import com.revolsys.gis.data.query.Equal;
-import com.revolsys.gis.data.query.IsNull;
+import com.revolsys.gis.data.query.F;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -254,10 +253,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
         for (final String attributeName : valueAttributeNames) {
           final Object value = values.get(i);
           if (value == null) {
-            and.add(IsNull.column(attributeName));
+            and.add(F.isNull(attributeName));
           } else {
             final Attribute attribute = metaData.getAttribute(attributeName);
-            and.add(Equal.equal(attribute, value));
+            and.add(F.equal(attribute, value));
           }
           i++;
         }

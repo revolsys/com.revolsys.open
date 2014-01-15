@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.dataobject.renderer;
 import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
-import com.revolsys.gis.data.model.filter.SpringExpresssionLanguageFilter;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
@@ -27,6 +25,7 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.SqlLayerFilter;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -59,13 +58,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
 
-  private static final Map<String, Object> FILTER_VARIABLES = new HashMap<String, Object>();
-
-  public static void addFilterVariable(final String name, final Object value) {
-    FILTER_VARIABLES.put(name, value);
-  }
-
-  public static Filter<DataObject> getFilter(final Map<String, Object> style) {
+  public static Filter<DataObject> getFilter(
+    final AbstractDataObjectLayer layer, final Map<String, Object> style) {
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
     if (filterDefinition != null) {
@@ -74,8 +68,26 @@ public abstract class AbstractDataObjectLayerRenderer extends
       if ("valueFilter".equals(type)) {
         return new MultipleAttributeValuesFilter(filterDefinition);
       } else if ("queryFilter".equals(type)) {
+        String query = (String)filterDefinition.remove("query");
+        if (StringUtils.hasText(query)) {
+          query = query.replaceAll("!= null", "IS NOT NULL");
+          query = query.replaceAll("== null", "IS NULL");
+          query = query.replaceAll("==", "=");
+          query = query.replaceAll("!=", "<>");
+          query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)",
+            "$2 IN ($1)");
+          query = query.replaceAll("\\[(.*)\\]", "$1");
+          query = query.replaceAll("(.*).startsWith\\('(.*)'\\)",
+            "$1 LIKE '$2%'");
+          query = query.replaceAll("#systemProperties\\['user.name'\\]",
+            "'{gbaUsername}'");
+          return new SqlLayerFilter(layer, query);
+        }
+      } else if ("sqlFilter".equals(type)) {
         final String query = (String)filterDefinition.remove("query");
-        return new SpringExpresssionLanguageFilter(query, FILTER_VARIABLES);
+        if (StringUtils.hasText(query)) {
+          return new SqlLayerFilter(layer, query);
+        }
       } else {
         LoggerFactory.getLogger(AbstractDataObjectLayerRenderer.class).error(
           "Unknown filter type " + type);
@@ -122,7 +134,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final AbstractDataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     super(type, name, layer, parent, style);
-    this.filter = getFilter(style);
+    this.filter = getFilter(layer, style);
   }
 
   @Override
@@ -141,9 +153,9 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public String getQueryFilter() {
-    if (filter instanceof SpringExpresssionLanguageFilter) {
-      final SpringExpresssionLanguageFilter expressionFilter = (SpringExpresssionLanguageFilter)filter;
-      return expressionFilter.toString();
+    if (filter instanceof SqlLayerFilter) {
+      final SqlLayerFilter layerFilter = (SqlLayerFilter)filter;
+      return layerFilter.getQuery();
     } else {
       return null;
     }
@@ -203,12 +215,11 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
-  public void setQueryFilter(final String queryFilter) {
-    if (filter instanceof SpringExpresssionLanguageFilter
-      || filter instanceof AcceptAllFilter) {
-      if (StringUtils.hasText(queryFilter)) {
-        filter = new SpringExpresssionLanguageFilter(queryFilter,
-          FILTER_VARIABLES);
+  public void setQueryFilter(final String query) {
+    if (filter instanceof SqlLayerFilter || filter instanceof AcceptAllFilter) {
+      if (StringUtils.hasText(query)) {
+        final AbstractDataObjectLayer layer = getLayer();
+        filter = new SqlLayerFilter(layer, query);
       } else {
         filter = new AcceptAllFilter<DataObject>();
       }

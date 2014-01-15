@@ -319,16 +319,16 @@ public class CoordinatesListUtil {
     result.put(COORDINATE_INDEX, -1);
     result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
     result.put(SEGMENT_DISTANCE, Double.MAX_VALUE);
-    double closestDistance = Double.MAX_VALUE;
+    double closestSegmentDistance = Double.MAX_VALUE;
     final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
       points);
     if (iterator.hasNext()) {
       LineSegment segment = iterator.next();
-      final double previousCoordinateDistance = segment.get(0).distance(point);
-      if (previousCoordinateDistance == 0) {
+      double closestCoordinateDistance = segment.get(0).distance(point);
+      result.put(COORDINATE_INDEX, 0);
+      result.put(COORDINATE_DISTANCE, closestCoordinateDistance);
+      if (closestCoordinateDistance == 0) {
         result.put(SEGMENT_INDEX, 0);
-        result.put(COORDINATE_INDEX, 0);
-        result.put(COORDINATE_DISTANCE, 0.0);
         result.put(SEGMENT_DISTANCE, 0.0);
       } else {
         int i = 1;
@@ -342,30 +342,20 @@ public class CoordinatesListUtil {
             result.put(COORDINATE_DISTANCE, 0.0);
             result.put(SEGMENT_DISTANCE, 0.0);
             return result;
+          } else if (currentCoordinateDistance < closestCoordinateDistance) {
+            result.put(COORDINATE_INDEX, i);
+            result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
+            closestCoordinateDistance = currentCoordinateDistance;
           }
-          final double distance = segment.distance(point);
-          if (distance == 0) {
+          final double segmentCoordinateDistance = segment.distance(point);
+          if (segmentCoordinateDistance == 0) {
             result.put(SEGMENT_INDEX, i - 1);
             result.put(SEGMENT_DISTANCE, 0.0);
-            if (previousCoordinateDistance < currentCoordinateDistance) {
-              result.put(COORDINATE_INDEX, i - 1);
-              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
-            } else {
-              result.put(COORDINATE_INDEX, i);
-              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
-            }
             return result;
-          } else if (distance < closestDistance) {
-            result.put(SEGMENT_DISTANCE, distance);
-            closestDistance = distance;
+          } else if (segmentCoordinateDistance <= closestSegmentDistance) {
+            result.put(SEGMENT_DISTANCE, segmentCoordinateDistance);
             result.put(SEGMENT_INDEX, i - 1);
-            if (previousCoordinateDistance < currentCoordinateDistance) {
-              result.put(COORDINATE_INDEX, i - 1);
-              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
-            } else {
-              result.put(COORDINATE_INDEX, i);
-              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
-            }
+            closestSegmentDistance = segmentCoordinateDistance;
           }
           if (iterator.hasNext()) {
             i++;

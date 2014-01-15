@@ -8,6 +8,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -67,11 +69,11 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.And;
 import com.revolsys.gis.data.query.Between;
-import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.F;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.In;
@@ -88,7 +90,6 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.component.AttributeFilterPanel;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeTitleStringConveter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
@@ -144,7 +145,7 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final ComboBox fieldNamesList;
 
-  private final AttributeFilterPanel filterPanel;
+  private final PropertyChangeListener listener;
 
   private final DataObjectMetaData metaData;
 
@@ -168,11 +169,23 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final TextField likeConditionField;
 
-  public QueryWhereConditionField(final AttributeFilterPanel filterPanel) {
+  private final Condition originalFilter;
+
+  private final String originalQuery;
+
+  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+    final PropertyChangeListener listener, final Condition filter) {
+    this(layer, listener, filter, null);
+  }
+
+  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+    final PropertyChangeListener listener, final Condition filter,
+    final String query) {
     super(new BorderLayout());
     setTitle("Advanced Filter");
-    final AbstractDataObjectLayer layer = filterPanel.getLayer();
-    this.filterPanel = filterPanel;
+    this.originalFilter = filter;
+    this.originalQuery = query;
+    this.listener = listener;
     metaData = layer.getMetaData();
     final List<Attribute> attributes = metaData.getAttributes();
 
@@ -291,10 +304,12 @@ public class QueryWhereConditionField extends ValueField implements
 
     setPreferredSize(new Dimension(800, 500));
 
-    final Condition filter = filterPanel.getFilter();
     setFieldValue(filter);
     if (filter != null) {
       whereTextField.setText(filter.toFormattedString());
+    }
+    if (StringUtils.hasText(query)) {
+      whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
     final Attribute searchAttribute = metaData.getAttribute(searchField);
@@ -303,6 +318,11 @@ public class QueryWhereConditionField extends ValueField implements
     } else {
       fieldNamesList.setSelectedItem(searchAttribute);
     }
+  }
+
+  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+    final PropertyChangeListener listener, final String query) {
+    this(layer, listener, null, query);
   }
 
   public void actionAddBinaryCondition() {
@@ -625,7 +645,8 @@ public class QueryWhereConditionField extends ValueField implements
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
-    filterPanel.setFilter(condition);
+    listener.propertyChange(new PropertyChangeEvent(this, "filter",
+      originalFilter, condition));
   }
 
   @Override
@@ -796,8 +817,8 @@ public class QueryWhereConditionField extends ValueField implements
             }
           }
         }
-        final BinaryCondition binaryCondition = new BinaryCondition(
-          leftCondition, operator, rightCondition);
+        final Condition binaryCondition = F.binary(leftCondition, operator,
+          rightCondition);
         return (V)binaryCondition;
       } else {
         setInvalidMessage("Unsupported binary operator " + operator);
@@ -853,7 +874,7 @@ public class QueryWhereConditionField extends ValueField implements
       // ParenthesisCondition(
       // condition);
       // if (parenthesis.isNot()) {
-      // return (V)Conditions.not(parenthesisCondition);
+      // return (V)F.not(parenthesisCondition);
       // } else {
       // return (V)parenthesisCondition;
       // }
@@ -898,7 +919,7 @@ public class QueryWhereConditionField extends ValueField implements
     try {
       final String whereClause = whereTextField.getText();
       if (StringUtils.hasText(whereClause)) {
-        final String sql = sqlPrefix + "\n" + whereClause;
+        final String sql = "SELECT * FROM X WHERE " + "\n" + whereClause;
         try {
           final StatementNode statement = new SQLParser().parseStatement(sql);
           if (statement instanceof CursorNode) {

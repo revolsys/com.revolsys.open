@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class Cast extends Condition {
+public class Cast extends QueryValue {
   private final QueryValue value;
 
   private final String dataType;
@@ -17,11 +17,6 @@ public class Cast extends Condition {
 
   public Cast(final String name, final String dataType) {
     this(new Column(name), dataType);
-  }
-
-  @Override
-  public boolean accept(final Map<String, Object> record) {
-    return true;
   }
 
   @Override
@@ -55,8 +50,18 @@ public class Cast extends Condition {
     return dataType;
   }
 
+  @Override
+  public String getStringValue(final Map<String, Object> record) {
+    return value.getStringValue(record);
+  }
+
   public QueryValue getValue() {
     return value;
+  }
+
+  @Override
+  public <V> V getValue(final Map<String, Object> record) {
+    return value.getValue(record);
   }
 
   @Override

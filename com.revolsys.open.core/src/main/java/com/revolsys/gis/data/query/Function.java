@@ -6,13 +6,14 @@ import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
+//TODO accept (how?)
 public class Function extends AbstractMultiCondition {
 
   public static Function toChar(final String name, final String format) {
     return new Function("TO_CHAR", new Column(name), new Value(format));
   }
 
-  public static Function upper(final Condition condition) {
+  public static Function upper(final QueryValue condition) {
     return new Function("UPPER", condition);
   }
 

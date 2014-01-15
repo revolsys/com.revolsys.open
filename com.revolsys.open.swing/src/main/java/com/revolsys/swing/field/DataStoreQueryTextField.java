@@ -49,7 +49,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.F;
 import com.revolsys.gis.data.query.Equal;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
@@ -97,7 +97,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String displayAttributeName) {
     this(metaData, displayAttributeName, new Query(metaData, new Equal(
       Function.upper(displayAttributeName), new Value(null))), new Query(
-      metaData, Conditions.iLike(displayAttributeName, "")));
+      metaData, F.iLike(displayAttributeName, "")));
 
   }
 
@@ -159,7 +159,7 @@ public class DataStoreQueryTextField extends TextField implements
     this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
       typeName,
       new Equal(Function.upper(displayAttributeName), new Value(null))),
-      new Query(typeName, Conditions.iLike(displayAttributeName, "")));
+      new Query(typeName, F.iLike(displayAttributeName, "")));
   }
 
   @Override

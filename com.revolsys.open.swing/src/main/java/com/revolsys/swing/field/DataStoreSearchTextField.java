@@ -39,7 +39,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Conditions;
+import com.revolsys.gis.data.query.F;
 import com.revolsys.gis.data.query.Equal;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
@@ -76,7 +76,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
     this(metaData.getDataStore(), displayAttributeName, new Query(
-      metaData, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(metaData, Conditions.iLike(
+      metaData, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(metaData, F.iLike(
       displayAttributeName, "")));
   }
 
@@ -124,7 +124,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
     this(dataStore, displayAttributeName, new Query(typeName, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(
-      typeName, Conditions.iLike(displayAttributeName, "")));
+      typeName, F.iLike(displayAttributeName, "")));
   }
 
   @Override

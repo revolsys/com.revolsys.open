@@ -102,6 +102,17 @@ public class Value extends QueryValue {
     return queryValue;
   }
 
+  @Override
+  public String getStringValue(final Map<String, Object> record) {
+    final Object value = getValue(record);
+    if (attribute == null) {
+      return StringConverterRegistry.toString(value);
+    } else {
+      final Class<?> typeClass = attribute.getTypeClass();
+      return StringConverterRegistry.toString(typeClass, value);
+    }
+  }
+
   public Object getValue() {
     return this.queryValue;
   }

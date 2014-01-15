@@ -79,14 +79,16 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public <V extends DataObject> V getObject(final int row) {
     final String attributeFilterMode = getAttributeFilterMode();
     if (attributeFilterMode.equals(MODE_SELECTED)) {
-      return (V)super.getObject(row);
+      final List<LayerDataObject> selectedObjects = getSelectedObjects();
+      if (row < selectedObjects.size()) {
+        return (V)selectedObjects.get(row);
+      } else {
+        fireTableDataChanged();
+        return null;
+      }
     } else {
       return (V)this.layer.getRecord(row);
     }
-  }
-
-  public List<LayerDataObject> getObjects() {
-    return this.layer.getRecords();
   }
 
   public Set<PropertyChangeListener> getPropertyChangeListeners() {
@@ -97,7 +99,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public int getRowCountInternal() {
     final String attributeFilterMode = getAttributeFilterMode();
     if (attributeFilterMode.equals(MODE_SELECTED)) {
-      return super.getRowCount();
+      return this.layer.getSelectionCount();
     } else {
       return this.layer.getRowCount();
     }
@@ -121,7 +123,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
   @Override
   public void propertyChange(final PropertyChangeEvent evt) {
-    fireTableDataChanged();
+    super.propertyChange(evt);
   }
 
   @Override

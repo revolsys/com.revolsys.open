@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
+// TODO accept (how?)
 public class SqlCondition extends Condition {
   private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
 

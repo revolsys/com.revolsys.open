@@ -256,7 +256,7 @@ public class BaseStylePanel extends ValueField implements
       field = createLineJoinField((LineJoin)value);
     } else if (fieldName.equals("queryFilter")) {
       final AbstractDataObjectLayer layer = getLayer();
-      field = new QueryFilterField(layer, fieldName, value);
+      field = new QueryFilterField(layer, fieldName, (String)value);
       field.setFieldValue(value);
       field.addPropertyChangeListener(fieldName, this);
     } else if (fieldName.equals("marker")) {

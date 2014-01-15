@@ -3,10 +3,11 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.Map;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class Column extends Condition {
+public class Column extends QueryValue {
 
   private final String name;
 
@@ -55,10 +56,21 @@ public class Column extends Condition {
   }
 
   @Override
+  public String getStringValue(final Map<String, Object> record) {
+    final Object value = getValue(record);
+    if (attribute == null) {
+      return StringConverterRegistry.toString(value);
+    } else {
+      final Class<?> typeClass = attribute.getTypeClass();
+      return StringConverterRegistry.toString(typeClass, value);
+    }
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Map<String, Object> object) {
+  public <V> V getValue(final Map<String, Object> record) {
     final String name = getName();
-    return (V)object.get(name);
+    return (V)record.get(name);
   }
 
   @Override

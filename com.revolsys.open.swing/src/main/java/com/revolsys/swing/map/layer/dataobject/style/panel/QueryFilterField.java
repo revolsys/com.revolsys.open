@@ -1,137 +1,131 @@
 package com.revolsys.swing.map.layer.dataobject.style.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
+import org.jdesktop.swingx.VerticalLayout;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.action.InvokeMethodAction;
-import com.revolsys.swing.component.BasePanel;
+import com.revolsys.gis.data.query.Condition;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextArea;
-import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.component.AttributeTitleStringConveter;
+import com.revolsys.swing.toolbar.ToolBar;
 
-public class QueryFilterField extends ValueField {
+public class QueryFilterField extends ValueField implements
+  PropertyChangeListener {
 
-  private final TextArea filterField;
+  private final TextArea queryField;
 
-  private final ComboBox fieldNamesField;
+  private final JButton clearButton;
+
+  private final AbstractDataObjectLayer layer;
 
   public QueryFilterField(final AbstractDataObjectLayer layer,
-    final String fieldName, final Object fieldValue) {
-    super(new BorderLayout());
-    filterField = new TextArea(fieldName, fieldValue, 5, 30);
-    add(new JScrollPane(filterField), BorderLayout.NORTH);
+    final String fieldName, final String query) {
+    super(new VerticalLayout());
+    this.layer = layer;
+    queryField = new TextArea(fieldName, query, 5, 30);
+    queryField.addPropertyChangeListener(fieldName, this);
+    final ToolBar toolBar = new ToolBar();
 
-    final ArrayList<String> fieldNames = new ArrayList<String>(
-      layer.getColumnNames());
-    final DataObjectMetaData metaData = layer.getMetaData();
-    fieldNames.remove(metaData.getGeometryAttributeName());
-    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
-      layer);
-    this.fieldNamesField = new ComboBox(converter, false, fieldNames.toArray());
-    this.fieldNamesField.setRenderer(converter);
+    toolBar.addButtonTitleIcon("search", "Advanced Filter", "filter_edits",
+      this, "showAdvancedFilter");
 
-    final JButton addButton = InvokeMethodAction.createButton(null,
-      "Add field name", SilkIconLoader.getIcon("add"), this, "addFieldName");
-    addButton.setIcon(SilkIconLoader.getIcon("add"));
-    addButton.setToolTipText("Add field Name");
+    clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",
+      "filter_delete", queryField, "setFieldValue", "");
+    clearButton.setEnabled(StringUtils.hasText(queryField.getText()));
 
-    final BasePanel fieldNamesPanel = new BasePanel(new FlowLayout(
-      FlowLayout.LEFT), this.fieldNamesField, addButton);
-    GroupLayoutUtil.makeColumns(fieldNamesPanel, 2, false);
-    add(fieldNamesPanel, BorderLayout.SOUTH);
+    add(toolBar);
+    add(new JScrollPane(queryField));
 
-  }
-
-  public void addFieldName() {
-    final String selectedFieldName = (String)fieldNamesField.getSelectedItem();
-    if (StringUtils.hasText(selectedFieldName)) {
-      final int position = filterField.getCaretPosition();
-      final Document document = filterField.getDocument();
-      try {
-        document.insertString(position, " " + selectedFieldName + " ", null);
-      } catch (final BadLocationException e) {
-      }
-      ((JComponent)filterField).requestFocusInWindow();
-    }
   }
 
   @Override
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     super.addPropertyChangeListener(propertyName, listener);
-    filterField.addPropertyChangeListener(propertyName, listener);
+    queryField.addPropertyChangeListener(propertyName, listener);
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return filterField.getFieldValidationMessage();
+    return queryField.getFieldValidationMessage();
   }
 
   @Override
   public <T> T getFieldValue() {
-    return filterField.getFieldValue();
+    return queryField.getFieldValue();
   }
 
   @Override
   public boolean isFieldValid() {
-    return filterField.isFieldValid();
+    return queryField.isFieldValid();
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getPropertyName().equals("filter")) {
+      final Condition filter = (Condition)event.getNewValue();
+      if (filter == null) {
+        queryField.setFieldValue(null);
+      } else {
+        queryField.setFieldValue(filter.toFormattedString());
+      }
+    }
+    clearButton.setEnabled(StringUtils.hasText(queryField.getText()));
   }
 
   @Override
   public void setFieldBackgroundColor(final Color color) {
-    filterField.setFieldBackgroundColor(color);
+    queryField.setFieldBackgroundColor(color);
   }
 
   @Override
   public void setFieldForegroundColor(final Color color) {
-    filterField.setFieldForegroundColor(color);
+    queryField.setFieldForegroundColor(color);
   }
 
   @Override
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
-    filterField.setFieldInvalid(message, foregroundColor, backgroundColor);
+    queryField.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
   public void setFieldToolTip(final String toolTip) {
-    filterField.setFieldToolTip(toolTip);
+    queryField.setFieldToolTip(toolTip);
   }
 
   @Override
   public void setFieldValid() {
-    filterField.setFieldValid();
+    queryField.setFieldValid();
   }
 
   @Override
   public void setFieldValue(final Object value) {
-    filterField.setFieldValue(value);
+    queryField.setFieldValue(value);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    filterField.setToolTipText(text);
+    queryField.setToolTipText(text);
+  }
+
+  public void showAdvancedFilter() {
+    final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(
+      layer, this, queryField.getText());
+    advancedFilter.showDialog(this);
   }
 
   @Override
   public void updateFieldValue() {
-    filterField.updateFieldValue();
+    queryField.updateFieldValue();
   }
 
 }

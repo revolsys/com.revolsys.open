@@ -2,49 +2,44 @@ package com.revolsys.gis.data.query;
 
 import java.util.Map;
 
-import com.revolsys.gis.data.model.Attribute;
+import org.springframework.util.StringUtils;
+
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class ILike extends BinaryCondition {
-
-  public static ILike iLike(final Attribute attribute, final Object value) {
-    final String name = attribute.getName();
-    final Value valueCondition = new Value(attribute, value);
-    return iLike(name, valueCondition);
-  }
-
-  public static ILike iLike(final QueryValue left, final Object value) {
-    final Value valueCondition = new Value(value);
-    return new ILike(left, valueCondition);
-  }
-
-  public static ILike iLike(final String name, final Object value) {
-    final Value valueCondition = new Value(value);
-    return iLike(name, valueCondition);
-  }
-
-  public static ILike iLike(final String left, final QueryValue right) {
-    final Column leftCondition = new Column(left);
-    return new ILike(leftCondition, right);
-  }
 
   public ILike(final QueryValue left, final QueryValue right) {
     super(left, "LIKE", right);
   }
 
-  public ILike(final String name, final Object value) {
-    super(name, "LIKE", value);
-  }
-
   @Override
   public boolean accept(final Map<String, Object> record) {
-    // final QueryValue left = getLeft();
-    // final Object value1 = left.getValue(record);
-    //
-    // final QueryValue right = getRight();
-    // final Object value2 = right.getValue(record);
-    //
-    // return EqualsRegistry.equal(value1, value2);
-    return true;
+    final QueryValue left = getLeft();
+    String value1 = left.getStringValue(record);
+
+    final QueryValue right = getRight();
+    String value2 = right.getStringValue(record);
+
+    if (StringUtils.hasText(value1)) {
+      if (StringUtils.hasText(value2)) {
+        value1 = value1.toUpperCase();
+        value2 = value2.toUpperCase();
+        if (value2.contains("%")) {
+          value2 = Like.toPattern(value2);
+          if (value1.matches(value2)) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return EqualsRegistry.equal(value1, value2);
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return !StringUtils.hasText(value2);
+    }
   }
 
   @Override

@@ -80,9 +80,7 @@ public class In extends Condition {
     }
     buffer.append(" ");
     buffer.append(" IN ");
-    // buffer.append(" (");
     values.appendSql(buffer);
-    // buffer.append(")");
   }
 
   @Override
