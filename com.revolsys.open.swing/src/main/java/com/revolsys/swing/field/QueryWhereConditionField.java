@@ -39,6 +39,7 @@ import org.springframework.util.StringUtils;
 
 import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.BetweenOperatorNode;
+import com.akiban.sql.parser.BinaryArithmeticOperatorNode;
 import com.akiban.sql.parser.BinaryLogicalOperatorNode;
 import com.akiban.sql.parser.BinaryOperatorNode;
 import com.akiban.sql.parser.CastNode;
@@ -73,7 +74,7 @@ import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.F;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.In;
@@ -171,8 +172,6 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final Condition originalFilter;
 
-  private final String originalQuery;
-
   public QueryWhereConditionField(final AbstractDataObjectLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
     this(layer, listener, filter, null);
@@ -184,7 +183,6 @@ public class QueryWhereConditionField extends ValueField implements
     super(new BorderLayout());
     setTitle("Advanced Filter");
     this.originalFilter = filter;
-    this.originalQuery = query;
     this.listener = listener;
     metaData = layer.getMetaData();
     final List<Attribute> attributes = metaData.getAttributes();
@@ -817,9 +815,16 @@ public class QueryWhereConditionField extends ValueField implements
             }
           }
         }
-        final Condition binaryCondition = F.binary(leftCondition, operator,
-          rightCondition);
-        return (V)binaryCondition;
+        if (expression instanceof BinaryArithmeticOperatorNode) {
+          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition,
+            operator, rightCondition);
+          return (V)arithmaticCondition;
+        } else {
+          final Condition binaryCondition = Q.binary(leftCondition, operator,
+            rightCondition);
+          return (V)binaryCondition;
+        }
+
       } else {
         setInvalidMessage("Unsupported binary operator " + operator);
       }
@@ -874,7 +879,7 @@ public class QueryWhereConditionField extends ValueField implements
       // ParenthesisCondition(
       // condition);
       // if (parenthesis.isNot()) {
-      // return (V)F.not(parenthesisCondition);
+      // return (V)Q.not(parenthesisCondition);
       // } else {
       // return (V)parenthesisCondition;
       // }

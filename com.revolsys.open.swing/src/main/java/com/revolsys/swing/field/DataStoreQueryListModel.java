@@ -18,7 +18,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.F;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 
@@ -102,9 +102,9 @@ public class DataStoreQueryListModel implements ListModel {
           if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
             final String likeString = "%"
               + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
-            F.setValue(0, binaryCondition, likeString);
+            Q.setValue(0, binaryCondition, likeString);
           } else {
-            F.setValue(0, binaryCondition, searchParam);
+            Q.setValue(0, binaryCondition, searchParam);
           }
         }
         query.setLimit(this.maxResults);

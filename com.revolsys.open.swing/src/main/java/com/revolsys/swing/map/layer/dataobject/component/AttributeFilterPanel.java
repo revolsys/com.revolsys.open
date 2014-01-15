@@ -34,7 +34,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.F;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.IsNotNull;
 import com.revolsys.gis.data.query.IsNull;
@@ -510,12 +510,12 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         searchField = this.searchTextField;
       } else if ("IS NULL".equals(searchOperator)) {
         if (!settingFilter) {
-          setFilter(F.isNull(attribute));
+          setFilter(Q.isNull(attribute));
         }
         codeTable = null;
       } else if ("IS NOT NULL".equals(searchOperator)) {
         if (!settingFilter) {
-          setFilter(F.isNotNull(attribute));
+          setFilter(Q.isNotNull(attribute));
         }
         codeTable = null;
       } else {
@@ -541,15 +541,15 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       Condition condition = null;
       final String searchOperator = getSearchOperator();
       if ("IS NULL".equalsIgnoreCase(searchOperator)) {
-        condition = F.isNull(attribute);
+        condition = Q.isNull(attribute);
       } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
-        condition = F.isNotNull(attribute);
+        condition = Q.isNotNull(attribute);
       } else if (attribute != null) {
         if (StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
           if ("Like".equalsIgnoreCase(searchOperator)) {
             final String searchText = StringConverterRegistry.toString(searchValue);
             if (StringUtils.hasText(searchText)) {
-              condition = F.iLike(attribute, "%" + searchText + "%");
+              condition = Q.iLike(attribute, "%" + searchText + "%");
             }
           } else {
             Object value = null;
@@ -568,7 +568,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
               }
             }
             if (value != null) {
-              condition = F.binary(attribute, searchOperator, value);
+              condition = Q.binary(attribute, searchOperator, value);
             }
           }
         }

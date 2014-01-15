@@ -27,22 +27,22 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
         if (attribute == null) {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(F.isNull(name));
+            multipleCondition.add(Q.isNull(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
             multipleCondition.add(new In(name, values));
           } else {
-            multipleCondition.add(F.equal(name, value));
+            multipleCondition.add(Q.equal(name, value));
           }
         } else {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(F.isNull(name));
+            multipleCondition.add(Q.isNull(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
             multipleCondition.add(new In(attribute, values));
           } else {
-            multipleCondition.add(F.equal(attribute, value));
+            multipleCondition.add(Q.equal(attribute, value));
           }
         }
       }
@@ -67,7 +67,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     } else {
       final Query query = new Query(metaData);
       final Value valueCondition = new Value(attribute, value);
-      final BinaryCondition equal = F.equal(name, valueCondition);
+      final BinaryCondition equal = Q.equal(name, valueCondition);
       query.setWhereCondition(equal);
       return query;
     }
@@ -289,7 +289,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public void setSqlWhereCondition(final String whereCondition) {
-    setWhereCondition(F.sql(whereCondition));
+    setWhereCondition(Q.sql(whereCondition));
   }
 
   public void setTypeName(final String typeName) {

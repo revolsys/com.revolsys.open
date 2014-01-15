@@ -92,7 +92,7 @@ package com.revolsys.util;
  */
 public class Base64 {
 
-  /* P U B L I C F I E L D S */
+  /* P U B L I C Q I E L D S */
 
   /**
    * A {@link Base64.InputStream} will read data from another
@@ -679,7 +679,7 @@ public class Base64 {
     (byte)'8', (byte)'9', (byte)'-', (byte)'_'
   };
 
-  /* P R I V A T E F I E L D S */
+  /* P R I V A T E Q I E L D S */
 
   /**
    * Used in decoding URL- and Filename-safe dialects of Base64.
@@ -751,7 +751,7 @@ public class Base64 {
   /** Maximum line length (76) of Base64 output. */
   private final static int MAX_LINE_LENGTH = 76;
 
-  /* U R L S A F E B A S E 6 4 A L P H A B E T */
+  /* U R L S A Q E B A S E 6 4 A L P H A B E T */
 
   /** The new line character (\n) as a byte. */
   private final static byte NEW_LINE = (byte)'\n';

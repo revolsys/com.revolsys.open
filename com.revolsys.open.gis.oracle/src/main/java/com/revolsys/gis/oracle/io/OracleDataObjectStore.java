@@ -217,7 +217,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
         + "from ALL_TAB_PRIVS_RECD P "
-        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE')");
+        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
       setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
         + "from ALL_TAB_PRIVS_RECD P "
         + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "

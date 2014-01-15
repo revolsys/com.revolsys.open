@@ -8,7 +8,11 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 
-public class F {
+public class Q {
+
+  private static Add add(final QueryValue left, final QueryValue right) {
+    return new Add(left, right);
+  }
 
   public static And and(final Condition... conditions) {
     final List<Condition> list = Arrays.asList(conditions);
@@ -17,6 +21,39 @@ public class F {
 
   public static And and(final List<? extends Condition> conditions) {
     return new And(conditions);
+  }
+
+  public static QueryValue arithmatic(final Attribute field,
+    final String operator, final Object value) {
+    final Column column = new Column(field);
+    final Value queryValue = new Value(field, value);
+    return arithmatic(column, operator, queryValue);
+  }
+
+  public static QueryValue arithmatic(final QueryValue left,
+    final String operator, final QueryValue right) {
+    if ("+".equals(operator)) {
+      return Q.add(left, right);
+    } else if ("-".equals(operator)) {
+      return Q.subtract(left, right);
+    } else if ("*".equals(operator)) {
+      return Q.multiply(left, right);
+    } else if ("/".equals(operator)) {
+      return Q.divide(left, right);
+    } else if ("%".equals(operator) || "mod".equals(operator)) {
+      return Q.mod(left, right);
+    } else {
+      throw new IllegalArgumentException("Operator " + operator
+        + " not supported");
+    }
+  }
+
+  public static QueryValue arithmatic(final String fieldName,
+    final String operator, final Object value) {
+    final Column column = new Column(fieldName);
+    final Value queryValue = new Value(value);
+    return arithmatic(column, operator, queryValue);
+
   }
 
   public static Between between(final Attribute attribute, final Object min,
@@ -37,17 +74,17 @@ public class F {
   public static Condition binary(final QueryValue left, final String operator,
     final QueryValue right) {
     if ("=".equals(operator)) {
-      return F.equal(left, right);
+      return Q.equal(left, right);
     } else if ("<>".equals(operator) || "!=".equals(operator)) {
-      return F.notEqual(left, right);
+      return Q.notEqual(left, right);
     } else if ("<".equals(operator)) {
-      return F.lessThan(left, right);
+      return Q.lessThan(left, right);
     } else if ("<=".equals(operator)) {
-      return F.lessThanEqual(left, right);
+      return Q.lessThanEqual(left, right);
     } else if (">".equals(operator)) {
-      return F.greaterThan(left, right);
+      return Q.greaterThan(left, right);
     } else if (">=".equals(operator)) {
-      return F.greaterThanEqual(left, right);
+      return Q.greaterThanEqual(left, right);
     } else {
       throw new IllegalArgumentException("Operator " + operator
         + " not supported");
@@ -60,6 +97,10 @@ public class F {
     final Value queryValue = new Value(value);
     return binary(column, operator, queryValue);
 
+  }
+
+  private static Divide divide(final QueryValue left, final QueryValue right) {
+    return new Divide(left, right);
   }
 
   public static Equal equal(final Attribute attribute, final Object value) {
@@ -156,7 +197,7 @@ public class F {
   }
 
   public static Condition iLike(final String left, final String right) {
-    return F.like(Function.upper(new Cast(left, "varchar(4000)")),
+    return Q.like(Function.upper(new Cast(left, "varchar(4000)")),
       ("%" + right + "%").toUpperCase());
   }
 
@@ -269,7 +310,15 @@ public class F {
       + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-0]", "") + "%";
-    return F.like(left, right);
+    return Q.like(left, right);
+  }
+
+  private static Mod mod(final QueryValue left, final QueryValue right) {
+    return new Mod(left, right);
+  }
+
+  private static Multiply multiply(final QueryValue left, final QueryValue right) {
+    return new Multiply(left, right);
   }
 
   public static Not not(final Condition condition) {
@@ -335,5 +384,9 @@ public class F {
 
   public static SqlCondition sql(final String sql, final Object... parameters) {
     return new SqlCondition(sql, parameters);
+  }
+
+  private static Subtract subtract(final QueryValue left, final QueryValue right) {
+    return new Subtract(left, right);
   }
 }

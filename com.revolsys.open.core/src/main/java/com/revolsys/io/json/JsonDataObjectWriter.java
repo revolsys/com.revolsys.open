@@ -131,7 +131,10 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
   private void label(final String key) {
     indent();
     string(key);
-    out.print(": ");
+    out.print(":");
+    if (indent) {
+      out.print(" ");
+    }
     startAttribute = true;
   }
 

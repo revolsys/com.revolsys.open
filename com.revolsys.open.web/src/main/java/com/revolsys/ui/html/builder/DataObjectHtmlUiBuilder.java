@@ -16,7 +16,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.F;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -105,7 +105,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
         if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           final KeySerializer serializer = serializers.get(i);
           final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-          or.add(F.iLike("T." + columnName, search));
+          or.add(Q.iLike("T." + columnName, search));
         }
       }
       if (!or.isEmpty()) {

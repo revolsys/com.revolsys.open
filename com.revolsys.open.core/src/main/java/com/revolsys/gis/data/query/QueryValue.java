@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.akiban.sql.parser.BetweenOperatorNode;
+import com.akiban.sql.parser.BinaryArithmeticOperatorNode;
 import com.akiban.sql.parser.BinaryLogicalOperatorNode;
 import com.akiban.sql.parser.BinaryOperatorNode;
 import com.akiban.sql.parser.CastNode;
@@ -35,9 +36,10 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class QueryValue implements Cloneable {
-
+  /** Must be in upper case */
   public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList(
-    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE");
+    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
+    "+", "-", "/", "*", "%", "MOD");
 
   public static <V extends QueryValue> List<V> cloneQueryValues(
     final List<V> values) {
@@ -154,9 +156,15 @@ public abstract class QueryValue implements Cloneable {
             }
           }
         }
-        final Condition binaryCondition = F.binary(leftCondition, operator,
-          rightCondition);
-        return (V)binaryCondition;
+        if (expression instanceof BinaryArithmeticOperatorNode) {
+          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition,
+            operator, rightCondition);
+          return (V)arithmaticCondition;
+        } else {
+          final Condition binaryCondition = Q.binary(leftCondition, operator,
+            rightCondition);
+          return (V)binaryCondition;
+        }
       } else {
         throw new IllegalArgumentException("Unsupported binary operator "
           + operator);
@@ -212,7 +220,7 @@ public abstract class QueryValue implements Cloneable {
       // ParenthesisCondition(
       // condition);
       // if (parenthesis.isNot()) {
-      // return (V)F.not(parenthesisCondition);
+      // return (V)Q.not(parenthesisCondition);
       // } else {
       // return (V)parenthesisCondition;
       // }
