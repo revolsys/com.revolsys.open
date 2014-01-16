@@ -1,5 +1,6 @@
 package com.revolsys.io.kml;
 
+import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -58,7 +59,8 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   @Override
   public MapWriter getMapWriter(final OutputStream out) {
     final java.io.Writer writer = FileUtil.createUtf8Writer(out);
-    return getMapWriter(writer);
+    final BufferedWriter bufferedWriter = new BufferedWriter(writer);
+    return getMapWriter(bufferedWriter);
   }
 
   @Override

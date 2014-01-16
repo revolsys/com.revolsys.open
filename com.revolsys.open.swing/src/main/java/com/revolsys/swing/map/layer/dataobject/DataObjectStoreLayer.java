@@ -279,10 +279,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public void deleteRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
+      record.setState(DataObjectState.Deleted);
       unSelectRecords(record);
-      final LayerDataObject cacheRecord = getCacheRecord(record);
-      final String id = getId(cacheRecord);
+      final String id = getId(record);
       if (StringUtils.hasText(id)) {
+        final LayerDataObject cacheRecord = removeCacheRecord(id, record);
         this.deletedRecordIds.add(id);
         deleteRecord(cacheRecord, true);
         removeFromIndex(record);
@@ -704,6 +705,28 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       setIndex(null);
     }
     fireRecordsChanged();
+  }
+
+  private LayerDataObject removeCacheRecord(final String id,
+    final LayerDataObject record) {
+    if (StringUtils.hasText(id) && record != null && isLayerRecord(record)) {
+      if (record.getState() == DataObjectState.New) {
+        return record;
+      } else if (record.getState() == DataObjectState.Deleted) {
+        return record;
+      } else {
+        synchronized (this.cachedRecords) {
+          if (this.cachedRecords.containsKey(id)) {
+            final LayerDataObject cachedRecord = this.cachedRecords.remove(id);
+            if (cachedRecord.getState() == DataObjectState.Deleted) {
+              this.cachedRecords.remove(id);
+            }
+            return cachedRecord;
+          }
+        }
+      }
+    }
+    return record;
   }
 
   @Override

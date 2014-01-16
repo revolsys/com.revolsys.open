@@ -113,7 +113,9 @@ public class LayerDataObject extends ArrayDataObject {
       if (layer.isLayerRecord(record)) {
         final Object id = getIdValue();
         final Object otherId = record.getIdValue();
-        if (EqualsRegistry.equal(id, otherId)) {
+        if (id == null || otherId == null) {
+          return false;
+        } else if (EqualsRegistry.equal(id, otherId)) {
           return true;
         } else {
           return false;

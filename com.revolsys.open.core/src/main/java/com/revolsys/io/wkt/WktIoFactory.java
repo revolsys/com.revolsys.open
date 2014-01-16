@@ -41,7 +41,6 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-
     return new WktDataObjectWriter(metaData, writer);
   }
 }

@@ -19,7 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -203,6 +202,34 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  public static boolean containsSame(
+    final Collection<? extends LayerDataObject> records,
+    final LayerDataObject record) {
+    if (records != null) {
+      synchronized (records) {
+        for (final LayerDataObject queryRecord : records) {
+          if (queryRecord.isSame(record)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public static LayerDataObject getAndRemoveSame(
+    final Collection<? extends LayerDataObject> records,
+    final LayerDataObject record) {
+    for (final Iterator<? extends LayerDataObject> iterator = records.iterator(); iterator.hasNext();) {
+      final LayerDataObject queryRecord = iterator.next();
+      if (queryRecord.isSame(record)) {
+        iterator.remove();
+        return queryRecord;
+      }
+    }
+    return record;
+  }
+
   public static List<AbstractDataObjectLayer> getVisibleLayers(
     final LayerGroup group) {
     final List<AbstractDataObjectLayer> layers = new ArrayList<AbstractDataObjectLayer>();
@@ -328,7 +355,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void addHighlightedRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
       synchronized (highlightedRecords) {
-        if (!this.highlightedRecords.contains(record)) {
+        if (!containsSame(highlightedRecords, record)) {
           this.highlightedRecords.add(record);
         }
       }
@@ -347,7 +374,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void addModifiedRecord(final LayerDataObject record) {
     synchronized (this.modifiedRecords) {
-      if (!this.modifiedRecords.contains(record)) {
+      if (!containsSame(modifiedRecords, record)) {
         this.modifiedRecords.add(record);
       }
     }
@@ -373,7 +400,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void addSelectedRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
       synchronized (this.selectedRecords) {
-        if (!this.selectedRecords.contains(record)) {
+        if (!containsSame(selectedRecords, record)) {
           this.selectedRecords.add(record);
         }
       }
@@ -416,10 +443,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void addToIndex(final LayerDataObject record) {
-    final Geometry geometry = record.getGeometryValue();
-    if (geometry != null && !geometry.isEmpty()) {
-      final DataObjectQuadTree index = getIndex();
-      index.insert(record);
+    if (record != null) {
+      final Geometry geometry = record.getGeometryValue();
+      if (geometry != null && !geometry.isEmpty()) {
+        final DataObjectQuadTree index = getIndex();
+        index.insert(record);
+      }
     }
   }
 
@@ -567,22 +596,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public LayerDataObject createRecord() {
-    if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerDataObject record = createDataObject(getMetaData());
-      synchronized (this.newRecords) {
-        this.newRecords.add(record);
-      }
-      return record;
-    } else {
-      return null;
-    }
+    final Map<String, Object> values = Collections.emptyMap();
+    return createRecord(values);
   }
 
   public LayerDataObject createRecord(final Map<String, Object> values) {
-    final LayerDataObject record = createRecord();
-    if (record == null) {
-      return null;
-    } else {
+
+    if (!isReadOnly() && isEditable() && isCanAddRecords()) {
+      final LayerDataObject record = createDataObject(getMetaData());
       record.setState(DataObjectState.Initalizing);
       try {
         if (values != null && !values.isEmpty()) {
@@ -592,7 +613,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       } finally {
         record.setState(DataObjectState.New);
       }
+      synchronized (this.newRecords) {
+        this.newRecords.add(record);
+      }
       return record;
+    } else {
+      return null;
     }
   }
 
@@ -654,7 +680,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           }
           if (trackDeletions) {
             synchronized (this.deletedRecords) {
-              if (!deletedRecords.contains(record)) {
+              if (!containsSame(deletedRecords, record)) {
                 this.deletedRecords.add(record);
               }
             }
@@ -735,47 +761,44 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return false;
   }
 
-  protected void filter(final List<LayerDataObject> results,
-    final Collection<LayerDataObject> records, final Filter<DataObject> filter) {
-    for (final LayerDataObject record : records) {
-      if (filter.accept(record)) {
-        if (!results.contains(record)) {
-          results.add(record);
-        }
+  protected List<LayerDataObject> filterQueryResults(
+    final List<LayerDataObject> results,
+    final Filter<Map<String, Object>> filter) {
+    final List<LayerDataObject> modifiedRecords = new ArrayList<LayerDataObject>(
+      getModifiedRecords());
+    for (final ListIterator<LayerDataObject> iterator = results.listIterator(); iterator.hasNext();) {
+      final LayerDataObject record = iterator.next();
+      if (internalIsDeleted(record)) {
+        iterator.remove();
       } else {
-        results.remove(record);
-      }
-    }
-  }
-
-  public boolean filter(final Query query, final LayerDataObject record) {
-    boolean accept = true;
-    final Collection<LayerDataObject> deletedRecords = getDeletedRecords();
-    if (deletedRecords.contains(record)) {
-      accept = false;
-    } else {
-      final Condition whereCondition = query.getWhereCondition();
-      final Collection<LayerDataObject> modifiedRecords = getModifiedRecords();
-      if (whereCondition != null && modifiedRecords.contains(record)) {
-        if (!whereCondition.accept(record)) {
-          accept = false;
+        final LayerDataObject modifiedRecord = getAndRemoveSame(
+          modifiedRecords, record);
+        if (record != modifiedRecord) {
+          if (Condition.accept(filter, modifiedRecord)) {
+            iterator.set(modifiedRecord);
+          } else {
+            iterator.remove();
+          }
         }
       }
     }
-    return accept;
+    for (final LayerDataObject record : modifiedRecords) {
+      if (Condition.accept(filter, record)) {
+        results.add(record);
+      }
+    }
+    for (final LayerDataObject record : getNewRecords()) {
+      if (Condition.accept(filter, record)) {
+        results.add(record);
+      }
+    }
+    return results;
   }
 
-  protected void filterUpdates(final List<LayerDataObject> results,
-    final Filter<DataObject> filter) {
-    synchronized (this.deletedRecords) {
-      removeSame(results, deletedRecords);
-    }
-    synchronized (this.modifiedRecords) {
-      filter(results, this.modifiedRecords, filter);
-    }
-    synchronized (this.newRecords) {
-      filter(results, this.newRecords, filter);
-    }
+  protected List<LayerDataObject> filterQueryResults(
+    final List<LayerDataObject> results, final Query query) {
+    final Condition filter = query.getWhereCondition();
+    return filterQueryResults(results, filter);
   }
 
   protected void fireHighlighted() {
@@ -854,6 +877,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getMetaData().getDataStore();
   }
 
+  public int getDeletedRecordCount() {
+    synchronized (this.deletedRecords) {
+      return this.deletedRecords.size();
+    }
+  }
+
   public Collection<LayerDataObject> getDeletedRecords() {
     synchronized (this.deletedRecords) {
       return new ArrayList<LayerDataObject>(this.deletedRecords);
@@ -925,6 +954,57 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     return selectedRecords;
+  }
+
+  /**
+   * Get a record containing the values of the two records if they can be merged. The
+   * new record is not a layer data object so would need to be added, likewise the old records
+   * are not removed so they would need to be deleted.
+   * 
+   * @param point
+   * @param record1
+   * @param record2
+   * @return
+   */
+  public DataObject getMergedRecord(final Coordinates point,
+    final DataObject record1, final DataObject record2) {
+    if (record1 == record2) {
+      return record1;
+    } else {
+      final String sourceIdAttributeName = getIdAttributeName();
+      final Object id1 = record1.getValue(sourceIdAttributeName);
+      final Object id2 = record2.getValue(sourceIdAttributeName);
+      int compare = 0;
+      if (id1 == null) {
+        if (id2 != null) {
+          compare = 1;
+        }
+      } else if (id2 == null) {
+        compare = -1;
+      } else {
+        compare = CompareUtil.compare(id1, id2);
+      }
+      if (compare == 0) {
+        final Geometry geometry1 = record1.getGeometryValue();
+        final Geometry geometry2 = record2.getGeometryValue();
+        final double length1 = geometry1.getLength();
+        final double length2 = geometry2.getLength();
+        if (length1 > length2) {
+          compare = -1;
+        } else {
+          compare = 1;
+        }
+      }
+      if (compare > 0) {
+        return getMergedRecord(point, record2, record1);
+      } else {
+        final DirectionalAttributes property = DirectionalAttributes.getProperty(getMetaData());
+        final Map<String, Object> newValues = property.getMergedMap(point,
+          record1, record2);
+        newValues.remove(getIdAttributeName());
+        return new ArrayDataObject(getMetaData(), newValues);
+      }
+    }
   }
 
   public DataObjectMetaData getMetaData() {
@@ -1173,10 +1253,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return null;
   }
 
-  protected boolean internalIsDeleted(final LayerDataObject layerDataObject) {
-    synchronized (this.deletedRecords) {
-      return this.deletedRecords.contains(layerDataObject);
-    }
+  protected boolean internalIsDeleted(final LayerDataObject record) {
+    return containsSame(deletedRecords, record);
   }
 
   /**
@@ -1243,9 +1321,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public boolean isDeleted(final LayerDataObject record) {
-    synchronized (this.deletedRecords) {
-      return this.deletedRecords != null && internalIsDeleted(record);
-    }
+    return internalIsDeleted(record);
+  }
+
+  public boolean isEmpty() {
+    return getRowCount() <= 0;
   }
 
   @Override
@@ -1297,7 +1377,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public boolean isHighlighted(final LayerDataObject record) {
     synchronized (this.highlightedRecords) {
-      return highlightedRecords.contains(record);
+      return containsSame(highlightedRecords, record);
     }
   }
 
@@ -1313,7 +1393,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public boolean isModified(final LayerDataObject record) {
     synchronized (this.modifiedRecords) {
-      return this.modifiedRecords.contains(record);
+      return containsSame(this.modifiedRecords, record);
     }
   }
 
@@ -1345,7 +1425,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       return false;
     } else {
       synchronized (this.selectedRecords) {
-        return this.selectedRecords.contains(record);
+        return containsSame(this.selectedRecords, record);
       }
     }
   }
@@ -1366,56 +1446,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     return false;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends DataObject> V mergeRecord(final Coordinates point,
-    final DataObject record1, final DataObject record2) {
-    if (record1 == record2) {
-      return (V)record1;
-    } else {
-      final String sourceIdAttributeName = getIdAttributeName();
-      final Object id1 = record1.getValue(sourceIdAttributeName);
-      final Object id2 = record2.getValue(sourceIdAttributeName);
-      int compare = 0;
-      if (id1 == null) {
-        if (id2 != null) {
-          compare = 1;
-        }
-      } else if (id2 == null) {
-        compare = -1;
-      } else {
-        compare = CompareUtil.compare(id1, id2);
-      }
-      if (compare == 0) {
-        final Geometry geometry1 = record1.getGeometryValue();
-        final Geometry geometry2 = record2.getGeometryValue();
-        final double length1 = geometry1.getLength();
-        final double length2 = geometry2.getLength();
-        if (length1 > length2) {
-          compare = -1;
-        } else {
-          compare = 1;
-        }
-      }
-      if (compare > 0) {
-        return (V)mergeRecord(point, record2, record1);
-      } else {
-        final DirectionalAttributes property = DirectionalAttributes.getProperty(getMetaData());
-        final Map<String, Object> newValues = property.getMergedMap(point,
-          record1, record2);
-
-        if (record2 instanceof LayerDataObject) {
-          deleteRecords((LayerDataObject)record2);
-        }
-        for (final Entry<String, Object> entry : newValues.entrySet()) {
-          final String name = entry.getKey();
-          final Object value = entry.getValue();
-          record1.setValue(name, value);
-        }
-        return (V)record1;
-      }
-    }
   }
 
   public void mergeSelectedRecords() {
@@ -1565,54 +1595,41 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public final List<LayerDataObject> query(final BoundingBox boundingBox) {
     final List<LayerDataObject> results = doQuery(boundingBox);
-    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
-      boundingBox);
-    filterUpdates(results, filter);
-    return results;
+    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+    return filterQueryResults(results, filter);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public List<LayerDataObject> query(final Geometry geometry,
     final double maxDistance) {
     final List<LayerDataObject> results = doQuery(geometry, maxDistance);
-    final Filter<DataObject> filter = new DataObjectGeometryDistanceFilter(
-      geometry, maxDistance);
-    filterUpdates(results, filter);
-    return results;
+    final Filter filter = new DataObjectGeometryDistanceFilter(geometry,
+      maxDistance);
+    return filterQueryResults(results, filter);
   }
 
   public List<LayerDataObject> query(final Query query) {
-    // TODO sorting
     final List<LayerDataObject> results = doQuery(query);
-    for (final Iterator<LayerDataObject> iterator = results.iterator(); iterator.hasNext();) {
-      final LayerDataObject record = iterator.next();
-      final boolean accept = filter(query, record);
-      if (!accept) {
-        iterator.remove();
-      }
-    }
-    for (final LayerDataObject record : getModifiedRecords()) {
-      final boolean found = filter(query, record);
-      if (found && !results.contains(record)) {
-        results.add(record);
-      }
-    }
-    for (final LayerDataObject record : getNewRecords()) {
-      if (filter(query, record)) {
-        results.add(record);
-      }
-    }
-    return results;
+    final Condition condition = query.getWhereCondition();
+    // TODO sorting
+    return filterQueryResults(results, condition);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public final List<LayerDataObject> queryBackground(
     final BoundingBox boundingBox) {
     final List<LayerDataObject> results = doQueryBackground(boundingBox);
-    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
-      boundingBox);
-    filterUpdates(results, filter);
-    return results;
+    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+    return filterQueryResults(results, filter);
   }
 
   protected void removeForm(final LayerDataObject record) {
@@ -2169,26 +2186,47 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (line1 == null || line2 == null) {
         return Collections.singletonList(record);
       }
-      removeFromIndex(record);
 
-      unSelectRecords(record);
-
-      final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
-
-      final LayerDataObject record2 = copyRecord(record);
-      record.setGeometryValue(line1);
-      record2.setGeometryValue(line2);
-
-      property.setSplitAttributes(line, coordinates, record);
-      property.setSplitAttributes(line, coordinates, record2);
-
-      addToIndex(record);
-      addToIndex(record2);
-
-      addSelectedRecords(record, record2);
-      return Arrays.asList(record, record2);
+      return splitRecord(record, line, coordinates, line1, line2);
     }
     return Arrays.asList(record);
+  }
+
+  /** Perform the actual split. */
+  protected List<LayerDataObject> splitRecord(final LayerDataObject record,
+    final LineString line, final Coordinates point, final LineString line1,
+    final LineString line2) {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+
+    final LayerDataObject record1 = copyRecord(record);
+    final LayerDataObject record2 = copyRecord(record);
+    record1.setGeometryValue(line1);
+    record2.setGeometryValue(line2);
+
+    property.setSplitAttributes(line, point, record1);
+    property.setSplitAttributes(line, point, record2);
+    deleteRecord(record);
+    saveChanges(record);
+
+    saveChanges(record1);
+    saveChanges(record2);
+
+    addSelectedRecords(record1, record2);
+    return Arrays.asList(record1, record2);
+  }
+
+  public List<LayerDataObject> splitRecord(final LayerDataObject record,
+    final Point point) {
+    final LineString line = record.getGeometryValue();
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final List<LineString> lines = LineStringUtil.split(line, coordinates);
+    if (lines.size() == 2) {
+      final LineString line1 = lines.get(0);
+      final LineString line2 = lines.get(1);
+      return splitRecord(record, line, coordinates, line1, line2);
+    } else {
+      return Collections.singletonList(record);
+    }
   }
 
   @Override

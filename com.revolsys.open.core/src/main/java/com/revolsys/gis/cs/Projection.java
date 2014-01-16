@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class Projection implements Serializable {
+public class Projection implements Serializable, Comparable<Projection> {
   /**
    * 
    */
@@ -21,6 +21,11 @@ public class Projection implements Serializable {
   public Projection(final String name, final Authority authority) {
     this.name = name;
     this.authority = authority;
+  }
+
+  @Override
+  public int compareTo(final Projection projection) {
+    return name.compareTo(projection.getName());
   }
 
   @Override

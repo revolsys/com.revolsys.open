@@ -43,9 +43,9 @@ public final class EpsgCoordinateSystems {
 
   private static Map<CoordinateSystem, CoordinateSystem> coordinateSystemsByCoordinateSystem = new LinkedHashMap<CoordinateSystem, CoordinateSystem>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new LinkedHashMap<Integer, CoordinateSystem>();
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
 
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new LinkedHashMap<String, CoordinateSystem>();
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
 
   private static boolean initialized = false;
 
@@ -207,6 +207,17 @@ public final class EpsgCoordinateSystems {
     }
   }
 
+  public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems() {
+    final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
+    for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
+      if (coordinateSystem instanceof GeographicCoordinateSystem) {
+        final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
+        coordinateSystems.add(geographicCoordinateSystem);
+      }
+    }
+    return coordinateSystems;
+  }
+
   private static Integer getInteger(final String value) {
     if (value == null || value.equals("")) {
       return null;
@@ -229,6 +240,17 @@ public final class EpsgCoordinateSystems {
       }
     }
     return parameters;
+  }
+
+  public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems() {
+    final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
+    for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
+      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+        final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+        coordinateSystems.add(projectedCoordinateSystem);
+      }
+    }
+    return coordinateSystems;
   }
 
   private static String getString(final String string) {

@@ -1,5 +1,6 @@
 package com.revolsys.swing.tree.model.node;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public static void collapseDescendents(final TreeNode node) {
     final Enumeration children = node.children();
     while (children.hasMoreElements()) {
@@ -51,6 +53,7 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public static void expandChildren(final TreeNode node) {
     expand(node);
     final Enumeration children = node.children();
@@ -90,6 +93,8 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   private String type;
 
   private JTree tree;
+
+  private int columnCount = 0;
 
   public AbstractTreeNode(final Object userObject) {
     this(userObject, false);
@@ -202,7 +207,13 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     return size;
   }
 
-  public abstract List<TreeNode> getChildren();
+  public List<TreeNode> getChildren() {
+    return Collections.emptyList();
+  }
+
+  public int getColumnCount() {
+    return columnCount;
+  }
 
   public Icon getIcon() {
     return icon;
@@ -265,8 +276,12 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getUserObject() {
+  public <V> V getUserData() {
     return (V)userObject;
+  }
+
+  public Object getUserObject() {
+    return userObject;
   }
 
   @Override
@@ -339,6 +354,10 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
     this.allowsChildren = allowsChildren;
   }
 
+  protected void setColumnCount(final int columnCount) {
+    this.columnCount = columnCount;
+  }
+
   protected void setIcon(final Icon icon) {
     this.icon = icon;
   }
@@ -357,6 +376,10 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
   public void setType(final String type) {
     this.type = type;
+  }
+
+  public void setUserObject(final Object userObject) {
+    this.userObject = userObject;
   }
 
   @Override

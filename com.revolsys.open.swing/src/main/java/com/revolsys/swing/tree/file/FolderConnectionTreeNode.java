@@ -36,7 +36,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
 
   public static void deleteConnection() {
     final FolderConnectionTreeNode node = BaseTree.getMouseClickItem();
-    final FolderConnection connection = node.getUserObject();
+    final FolderConnection connection = node.getUserData();
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(),
       "Delete folder connection '" + connection.getName()
@@ -59,12 +59,12 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
 
   @Override
   protected List<TreeNode> doLoadChildren() {
-    final FolderConnection connection = getUserObject();
+    final FolderConnection connection = getUserData();
     return FileTreeNode.getFileNodes(this, connection.getFile());
   }
 
   protected File getFile() {
-    final FolderConnection connection = getUserObject();
+    final FolderConnection connection = getUserData();
     final File file = connection.getFile();
     return file;
   }
@@ -98,7 +98,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
   }
 
   public boolean isReadOnly() {
-    final FolderConnection connection = getUserObject();
+    final FolderConnection connection = getUserData();
     return connection.isReadOnly();
   }
 

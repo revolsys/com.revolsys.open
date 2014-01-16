@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,6 @@ import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -105,22 +102,18 @@ public class DataObjectFileLayer extends DataObjectListLayer {
             setMetaData(metaData);
             final GeometryFactory geometryFactory = metaData.getGeometryFactory();
             BoundingBox boundingBox = new BoundingBox(geometryFactory);
-            final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
-            for (final DataObject object : reader) {
-              final Geometry geometry = object.getGeometryValue();
+            for (final DataObject record : reader) {
+              final Geometry geometry = record.getGeometryValue();
               boundingBox = boundingBox.expandToInclude(geometry);
-              final LayerDataObject record = createDataObject(metaData);
-              record.setState(DataObjectState.Initalizing);
-              record.setValues(object);
-              record.setState(DataObjectState.Persisted);
-              records.add(record);
+
+              createRecordInternal(record);
             }
-            setRecords(records);
             setBoundingBox(boundingBox);
             return true;
           } catch (final Throwable e) {
             ExceptionUtil.log(getClass(), "Error reading: " + resource, e);
           } finally {
+            fireRecordsChanged();
             reader.close();
           }
         }

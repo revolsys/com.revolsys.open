@@ -47,15 +47,17 @@ public class TablePanel extends JPanel implements MouseListener {
   }
 
   protected static void setEventRow(final JTable table, final MouseEvent e) {
-    final Point point = e.getPoint();
-    eventTable = new WeakReference<JTable>(table);
-    eventRow = table.rowAtPoint(point);
-    eventColumn = table.columnAtPoint(point);
-    if (eventRow > -1) {
-      eventRow = table.convertRowIndexToModel(eventRow);
-    }
-    if (eventColumn > -1) {
-      eventColumn = table.convertColumnIndexToModel(eventColumn);
+    if (e.getSource() == table) {
+      final Point point = e.getPoint();
+      eventTable = new WeakReference<JTable>(table);
+      eventRow = table.rowAtPoint(point);
+      eventColumn = table.columnAtPoint(point);
+      if (eventRow > -1) {
+        eventRow = table.convertRowIndexToModel(eventRow);
+      }
+      if (eventColumn > -1) {
+        eventColumn = table.convertColumnIndexToModel(eventColumn);
+      }
     }
   }
 

@@ -87,7 +87,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   public FolderConnectionRegistry getRegistry() {
-    final FolderConnectionRegistry registry = getUserObject();
+    final FolderConnectionRegistry registry = getUserData();
     return registry;
   }
 
@@ -106,8 +106,8 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
             nodeRemoved(index, oldValue);
           }
         } else if (oldValue == null) {
-          FolderConnectionTreeNode node = new FolderConnectionTreeNode(this,
-            (FolderConnection)newValue);
+          final FolderConnectionTreeNode node = new FolderConnectionTreeNode(
+            this, (FolderConnection)newValue);
           addNode(index, node);
 
           nodesInserted(index);

@@ -1,5 +1,6 @@
 package com.revolsys.io.geojson;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -29,7 +30,6 @@ public class GeoJsonIoFactory extends
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-
     return new GeoJsonDataObjectWriter(writer);
   }
 

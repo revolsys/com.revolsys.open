@@ -28,7 +28,7 @@ import java.util.Vector;
  * Use the class like this:
  * <pre>
  * ImageInfo ii = new ImageInfo();
- * ii.setInput(in); // in can be InputStream or RandomAccessFile
+ * ii.setInput(in); // in can be Base64InputStream or RandomAccessFile
  * ii.setDetermineImageNumber(true); // default is false
  * ii.setCollectComments(true); // default is false
  * if (!ii.check()) {
@@ -456,7 +456,7 @@ public class ImageInfo {
 
   /**
    * Call this method after you have provided an input stream or file
-   * using {@link #setInput(InputStream)} or {@link #setInput(DataInput)}.
+   * using {@link #setInput(Base64InputStream)} or {@link #setInput(DataInput)}.
    * If true is returned, the file format was known and information
    * on the file's content can be retrieved using the various getXyz methods.
    * @return if information could be retrieved from input

@@ -49,7 +49,7 @@ public class DataObjectStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   protected DataObjectStoreConnectionRegistry getRegistry() {
-    final DataObjectStoreConnectionRegistry registry = getUserObject();
+    final DataObjectStoreConnectionRegistry registry = getUserData();
     return registry;
   }
 

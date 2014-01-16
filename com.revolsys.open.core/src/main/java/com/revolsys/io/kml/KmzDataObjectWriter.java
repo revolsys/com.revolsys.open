@@ -1,5 +1,6 @@
 package com.revolsys.io.kml;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -19,7 +20,9 @@ public class KmzDataObjectWriter extends AbstractWriter<DataObject> {
 
   public KmzDataObjectWriter(final OutputStream out, final Charset charset) {
     try {
-      zipOut = new ZipOutputStream(out);
+      final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
+        out);
+      zipOut = new ZipOutputStream(bufferedOutputStream);
       final ZipEntry entry = new ZipEntry("doc.kml");
       zipOut.putNextEntry(entry);
       final OutputStreamWriter writer = FileUtil.createUtf8Writer(zipOut);

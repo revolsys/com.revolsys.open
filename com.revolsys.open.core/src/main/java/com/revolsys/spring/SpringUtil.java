@@ -1,5 +1,6 @@
 package com.revolsys.spring;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,11 +54,6 @@ public class SpringUtil {
     }
   }
 
-  public static void copy(final Resource source, final Resource target) {
-    final InputStream in = getInputStream(source);
-    copy(in, target);
-  }
-
   public static void copy(final InputStream in, final Resource target) {
     try {
       if (target instanceof FileSystemResource) {
@@ -77,6 +73,11 @@ public class SpringUtil {
     } finally {
       FileUtil.closeSilent(in);
     }
+  }
+
+  public static void copy(final Resource source, final Resource target) {
+    final InputStream in = getInputStream(source);
+    copy(in, target);
   }
 
   public static boolean delete(final Resource resource) {
@@ -179,7 +180,7 @@ public class SpringUtil {
   public static OutputStream getFileOutputStream(final Resource resource)
     throws IOException, FileNotFoundException {
     final File file = resource.getFile();
-    return new FileOutputStream(file);
+    return new BufferedOutputStream(new FileOutputStream(file));
   }
 
   public static InputStream getInputStream(final Resource resource) {

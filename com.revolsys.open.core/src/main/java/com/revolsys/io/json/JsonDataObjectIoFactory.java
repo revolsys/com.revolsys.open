@@ -1,6 +1,7 @@
 package com.revolsys.io.json;
 
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -93,8 +94,8 @@ public class JsonDataObjectIoFactory extends
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new JsonDataObjectWriter(metaData,
-      FileUtil.createUtf8Writer(outputStream));
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+    return new JsonDataObjectWriter(metaData, writer);
   }
 
 }

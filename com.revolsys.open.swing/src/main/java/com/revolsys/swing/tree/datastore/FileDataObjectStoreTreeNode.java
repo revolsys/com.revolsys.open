@@ -43,7 +43,7 @@ public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
 
   public static void addDataStoreConnection() {
     final FileDataObjectStoreTreeNode node = BaseTree.getMouseClickItem();
-    final File file = node.getUserObject();
+    final File file = node.getUserData();
     final String fileName = FileUtil.getBaseName(file);
 
     final ValueField panel = new ValueField();
@@ -114,14 +114,14 @@ public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
   @Override
   @SuppressWarnings("unchecked")
   public <V extends DataObjectStore> V getDataStore() {
-    final File file = getUserObject();
+    final File file = getUserData();
     return (V)DataObjectStoreConnectionManager.getDataStore(file);
   }
 
   @Override
   public Map<String, Object> getDataStoreConnectionMap() {
     final TreeNode parent = getParent();
-    final File file = getUserObject();
+    final File file = getUserData();
     final URL url = FileTreeNode.getUrl(parent, file);
 
     return Collections.<String, Object> singletonMap("url", url.toString());

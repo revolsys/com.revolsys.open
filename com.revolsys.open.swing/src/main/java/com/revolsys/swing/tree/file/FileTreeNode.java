@@ -87,7 +87,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static void addFolderConnection() {
     final FileTreeNode node = BaseTree.getMouseClickItem();
     if (node.isDirectory()) {
-      final File directory = node.getUserObject();
+      final File directory = node.getUserData();
       final String fileName = node.getName();
 
       final ValueField panel = new ValueField();
@@ -245,7 +245,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   protected List<TreeNode> doLoadChildren() {
-    final File file = getUserObject();
+    final File file = getUserData();
     if (file.isDirectory()) {
       return getFileNodes(this, file);
     } else {
@@ -268,12 +268,12 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public File getFile() {
-    return getUserObject();
+    return getUserData();
   }
 
   @Override
   public Icon getIcon() {
-    final File file = getUserObject();
+    final File file = getUserData();
     return FileTreeNode.getIcon(file);
   }
 
@@ -284,7 +284,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public String getType() {
-    final File file = getUserObject();
+    final File file = getUserData();
     if (file.isDirectory()) {
       return "Folder";
     } else if (file.exists()) {
@@ -311,7 +311,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public int hashCode() {
-    final File file = getUserObject();
+    final File file = getUserData();
     if (file == null) {
       return 0;
     } else {
@@ -321,7 +321,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public boolean isAllowsChildren() {
-    final File file = getUserObject();
+    final File file = getUserData();
     return isAllowsChildren(file);
   }
 

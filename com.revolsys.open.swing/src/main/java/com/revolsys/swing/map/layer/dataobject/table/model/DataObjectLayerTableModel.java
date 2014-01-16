@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject.table.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -137,6 +138,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private int refreshIndex = 0;
 
+  private final Object selectedSync = new Object();
+
+  private List<LayerDataObject> selectedRecords = Collections.emptyList();
+
   public DataObjectLayerTableModel(final AbstractDataObjectLayer layer,
     final List<String> attributeNames) {
     super(layer.getMetaData(), attributeNames);
@@ -219,12 +224,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     if (row < 0) {
       return null;
     } else if (this.attributeFilterMode.equals(MODE_SELECTED)) {
-      final List<LayerDataObject> selectedObjects = getSelectedObjects();
-      if (row < selectedObjects.size()) {
-        return (V)selectedObjects.get(row);
-      } else {
-        return null;
-      }
+      return (V)getSelectedRecord(row);
     } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
       final AbstractDataObjectLayer layer = getLayer();
       final List<LayerDataObject> changes = layer.getChanges();
@@ -234,7 +234,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     } else {
-      return (V)loadLayerObjects(row);
+      return (V)loadLayerRecord(row);
     }
   }
 
@@ -297,7 +297,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected int getRowCountInternal() {
     if (this.attributeFilterMode.equals(MODE_SELECTED)) {
-      return this.layer.getSelectionCount();
+      synchronized (selectedSync) {
+        this.selectedRecords = new ArrayList<LayerDataObject>(
+          getLayerSelectedRecords());
+        return this.selectedRecords.size();
+      }
     } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
       return this.layer.getChangeCount();
     } else {
@@ -305,10 +309,19 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  protected List<LayerDataObject> getSelectedObjects() {
+  protected LayerDataObject getSelectedRecord(final int index) {
+    synchronized (selectedSync) {
+      if (index < selectedRecords.size()) {
+        return selectedRecords.get(index);
+      } else {
+        return null;
+      }
+    }
+  }
+
+  protected List<LayerDataObject> getLayerSelectedRecords() {
     final AbstractDataObjectLayer layer = getLayer();
-    final List<LayerDataObject> selectedObjects = layer.getSelectedRecords();
-    return selectedObjects;
+    return layer.getSelectedRecords();
   }
 
   public List<String> getSortableModes() {
@@ -348,7 +361,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     return layer.isSelected(object);
   }
 
-  protected LayerDataObject loadLayerObjects(int row) {
+  protected LayerDataObject loadLayerRecord(int row) {
     final AbstractDataObjectLayer layer = getLayer();
     final int newObjectCount = layer.getNewObjectCount();
     if (row < newObjectCount) {
@@ -445,7 +458,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         }
       }
     }
-
   }
 
   public void setAttributeFilterMode(final String mode) {
@@ -453,6 +465,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     if (MODE_SELECTED.equals(mode)) {
       table.setSelectionModel(this.highlightedModel);
     } else {
+      this.selectedRecords = Collections.emptyList();
       table.setSelectionModel(this.selectionModel);
     }
     if (this.attributeFilterModes.contains(mode)) {

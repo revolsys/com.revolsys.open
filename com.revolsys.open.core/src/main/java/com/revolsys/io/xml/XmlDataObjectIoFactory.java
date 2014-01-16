@@ -20,8 +20,9 @@ public class XmlDataObjectIoFactory extends
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
-    return new XmlDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
+    final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
+      charset);
+    return new XmlDataObjectWriter(metaData, writer);
   }
 
 }

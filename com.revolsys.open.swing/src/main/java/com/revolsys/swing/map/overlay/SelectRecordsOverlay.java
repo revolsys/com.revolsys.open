@@ -222,9 +222,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
             if (record != null && dataObjectLayer.isVisible(record)
               && !dataObjectLayer.isHighlighted(record)) {
-              final Geometry geometry = record.getGeometryValue();
-              SELECT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
-                graphics2d, geometry);
+              if (!dataObjectLayer.isDeleted(record)) {
+                final Geometry geometry = record.getGeometryValue();
+                SELECT_RENDERER.paintSelected(viewport,
+                  viewportGeometryFactory, graphics2d, geometry);
+              }
             }
           }
         }

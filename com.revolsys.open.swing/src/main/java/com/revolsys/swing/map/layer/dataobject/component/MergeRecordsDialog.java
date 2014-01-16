@@ -43,9 +43,9 @@ import com.revolsys.swing.map.layer.dataobject.table.model.MergedRecordsTableMod
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.model.DataObjectListTableModel;
+import com.revolsys.swing.undo.CreateRecordUndo;
 import com.revolsys.swing.undo.DeleteLayerRecordUndo;
 import com.revolsys.swing.undo.MultipleUndo;
-import com.revolsys.swing.undo.SetRecordValuesUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 
@@ -92,10 +92,9 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   public void finish() {
     final MultipleUndo multipleUndo = new MultipleUndo();
     for (final DataObject mergedRecord : mergedRecords.keySet()) {
-      final LayerDataObject originalRecord = mergeableToOiginalRecordMap.get(mergedRecord);
-      final SetRecordValuesUndo setValuesUndo = new SetRecordValuesUndo(
-        originalRecord, mergedRecord);
-      multipleUndo.addEdit(setValuesUndo);
+      final CreateRecordUndo createRecordUndo = new CreateRecordUndo(layer,
+        mergedRecord);
+      multipleUndo.addEdit(createRecordUndo);
     }
     for (final LayerDataObject record : replacedOriginalRecords) {
       final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(
@@ -178,25 +177,25 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
             final Edge<DataObject> edge2 = edges.get(1);
             final DataObject record2 = edge2.getObject();
             if (record1 != record2) {
-              final DataObject mergedRecord = layer.mergeRecord(node, record1,
-                record2);
+              final DataObject mergedRecord = layer.getMergedRecord(node,
+                record1, record2);
 
               graph.addEdge(mergedRecord);
               edge1.remove();
               edge2.remove();
 
-              final Set<LayerDataObject> sourceObjects = new LinkedHashSet<LayerDataObject>();
+              final Set<LayerDataObject> sourceRecords = new LinkedHashSet<LayerDataObject>();
               // TODO verify orientation to ensure they are in the correct order
               // and see if they are reversed
-              CollectionUtil.addIfNotNull(sourceObjects,
+              CollectionUtil.addIfNotNull(sourceRecords,
                 mergeableToOiginalRecordMap.get(record1));
-              CollectionUtil.addAllIfNotNull(sourceObjects,
+              CollectionUtil.addAllIfNotNull(sourceRecords,
                 mergedRecords.remove(record1));
-              CollectionUtil.addIfNotNull(sourceObjects,
+              CollectionUtil.addIfNotNull(sourceRecords,
                 mergeableToOiginalRecordMap.get(record2));
-              CollectionUtil.addAllIfNotNull(sourceObjects,
+              CollectionUtil.addAllIfNotNull(sourceRecords,
                 mergedRecords.remove(record2));
-              mergedRecords.put(mergedRecord, sourceObjects);
+              mergedRecords.put(mergedRecord, sourceRecords);
               replaceRecord(mergedRecord, record1);
               replaceRecord(mergedRecord, record2);
             }

@@ -73,7 +73,7 @@ public class DataObjectStoreConnectionTreeNode extends LazyLoadTreeNode
   }
 
   public DataObjectStoreConnection getConnection() {
-    final DataObjectStoreConnection connection = getUserObject();
+    final DataObjectStoreConnection connection = getUserData();
     return connection;
   }
 

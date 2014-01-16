@@ -12,7 +12,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.query.Condition;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -39,6 +39,8 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
+  private List<LayerDataObject> records = Collections.emptyList();
+
   public DataObjectListLayerTableModel(final DataObjectListLayer layer) {
     this(layer, layer.getMetaData().getAttributeNames());
   }
@@ -47,7 +49,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     final List<String> columnNames) {
     super(layer, columnNames);
     this.layer = layer;
-    layer.addPropertyChangeListener("records", this);
+    layer.addPropertyChangeListener("recordsChanged", this);
     setEditable(false);
     setSortableModes(MODE_SELECTED, MODE_ALL);
   }
@@ -74,33 +76,19 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     }
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends DataObject> V getObject(final int row) {
-    final String attributeFilterMode = getAttributeFilterMode();
-    if (attributeFilterMode.equals(MODE_SELECTED)) {
-      final List<LayerDataObject> selectedObjects = getSelectedObjects();
-      if (row < selectedObjects.size()) {
-        return (V)selectedObjects.get(row);
-      } else {
-        return null;
-      }
-    } else {
-      return (V)this.layer.getRecord(row);
-    }
-  }
-
   public Set<PropertyChangeListener> getPropertyChangeListeners() {
     return Collections.unmodifiableSet(this.propertyChangeListeners);
   }
 
   @Override
   public int getRowCountInternal() {
-    final String attributeFilterMode = getAttributeFilterMode();
-    if (attributeFilterMode.equals(MODE_SELECTED)) {
-      return this.layer.getSelectionCount();
+    if (getAttributeFilterMode().equals(MODE_ALL)) {
+      final Query query = getFilterQuery();
+      query.setOrderBy(getOrderBy());
+      this.records = layer.query(query);
+      return this.records.size();
     } else {
-      return this.layer.getRowCount();
+      return super.getRowCountInternal();
     }
   }
 
@@ -121,6 +109,11 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
+  protected LayerDataObject loadLayerRecord(final int row) {
+    return records.get(row);
+  }
+
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
     super.propertyChange(evt);
   }
@@ -129,16 +122,6 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeListeners.remove(propertyChangeListener);
-  }
-
-  @Override
-  public boolean setFilter(final Condition filter) {
-    if (super.setFilter(filter)) {
-      setRowSorter(filter);
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @Override
