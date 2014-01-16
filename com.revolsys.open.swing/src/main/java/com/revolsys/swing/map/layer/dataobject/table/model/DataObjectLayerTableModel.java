@@ -203,6 +203,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
+  protected List<LayerDataObject> getLayerSelectedRecords() {
+    final AbstractDataObjectLayer layer = getLayer();
+    return layer.getSelectedRecords();
+  }
+
   private Integer getNextPageNumber(final int refreshIndex) {
     synchronized (getSync()) {
       if (this.refreshIndex == refreshIndex) {
@@ -281,8 +286,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       synchronized (getSync()) {
         if (this.countLoaded) {
           final AbstractDataObjectLayer layer = getLayer();
-          final int newObjectCount = layer.getNewObjectCount();
-          final int count = this.rowCount + newObjectCount;
+          final int newRecordCount = layer.getNewRecordCount();
+          final int count = this.rowCount + newRecordCount;
           return count;
         } else {
           if (this.rowCountWorker == null) {
@@ -317,11 +322,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         return null;
       }
     }
-  }
-
-  protected List<LayerDataObject> getLayerSelectedRecords() {
-    final AbstractDataObjectLayer layer = getLayer();
-    return layer.getSelectedRecords();
   }
 
   public List<String> getSortableModes() {
@@ -363,7 +363,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected LayerDataObject loadLayerRecord(int row) {
     final AbstractDataObjectLayer layer = getLayer();
-    final int newObjectCount = layer.getNewObjectCount();
+    final int newObjectCount = layer.getNewRecordCount();
     if (row < newObjectCount) {
       return layer.getNewRecords().get(row);
     } else {
@@ -410,7 +410,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == this.layer) {
       final String propertyName = e.getPropertyName();
-      if (Arrays.asList("query", "objectsChanged", "editable").contains(
+      if (Arrays.asList("query", "recordsChanged", "editable").contains(
         propertyName)) {
         refresh();
       } else if (propertyName.equals("selectionCount")) {

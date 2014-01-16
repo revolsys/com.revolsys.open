@@ -114,11 +114,6 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent evt) {
-    super.propertyChange(evt);
-  }
-
-  @Override
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeListeners.remove(propertyChangeListener);
@@ -135,14 +130,4 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
       firePropertyChange(object, name, oldValue, value);
     }
   }
-
-  /*
-   * TODO @Override public SortOrder setSortOrder(int column) { SortOrder
-   * sortOrder = super.setSortOrder(column); final String attributeName =
-   * getAttributeName(column); final Comparator<DataObject> comparitor = new
-   * ObjectPropertyComparator( sortOrder == SortOrder.ASCENDING, attributeName);
-   * Collections.sort(objects, comparitor); fireTableDataChanged(); return
-   * sortOrder; }
-   */
-
 }

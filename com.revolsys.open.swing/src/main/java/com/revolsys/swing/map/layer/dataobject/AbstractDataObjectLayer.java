@@ -1015,7 +1015,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return new ArrayList<LayerDataObject>(this.modifiedRecords);
   }
 
-  public int getNewObjectCount() {
+  public int getNewRecordCount() {
     return this.newRecords.size();
   }
 
@@ -1325,7 +1325,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public boolean isEmpty() {
-    return getRowCount() <= 0;
+    return getRowCount() + getNewRecordCount() <= 0;
   }
 
   @Override

@@ -134,7 +134,8 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
       return new ArrayList<LayerDataObject>(records);
     } else {
       final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
-      for (final LayerDataObject record : getRecords()) {
+      for (final LayerDataObject record : new ArrayList<LayerDataObject>(
+        this.records)) {
         if (whereCondition.accept(record)) {
           records.add(record);
         }
@@ -153,12 +154,24 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  protected void fireRecordsChanged() {
+    super.fireRecordsChanged();
+    final boolean empty = isEmpty();
+    firePropertyChange("empty", !empty, empty);
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     BoundingBox boundingBox = new BoundingBox(getGeometryFactory());
     for (final LayerDataObject record : getRecords()) {
       boundingBox = boundingBox.expandToInclude(record);
     }
     return boundingBox;
+  }
+
+  @Override
+  public int getNewRecordCount() {
+    return 0;
   }
 
   @Override
@@ -175,7 +188,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   @Override
   public List<LayerDataObject> getRecords() {
     synchronized (this.records) {
-      return new ArrayList<LayerDataObject>(this.records);
+      final ArrayList<LayerDataObject> records = new ArrayList<LayerDataObject>(
+        this.records);
+      records.addAll(getNewRecords());
+      return records;
     }
   }
 
@@ -190,6 +206,11 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   public int getRowCount(final Query query) {
     final List<LayerDataObject> results = query(query);
     return results.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return getRowCount() + super.getNewRecordCount() <= 0;
   }
 
 }
