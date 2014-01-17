@@ -12,7 +12,9 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 
 public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
-  PropertyChangeSupportProxy, MapSerializer {
+  PropertyChangeSupportProxy, MapSerializer, Cloneable {
+
+  LayerRenderer<T> clone();
 
   ValueField createStylePanel();
 
@@ -30,6 +32,10 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
   boolean isVisible();
 
   void render(Viewport2D viewport, Graphics2D graphics);
+
+  void setEditing(boolean editing);
+
+  void setLayer(T layer);
 
   void setParent(LayerRenderer<?> parent);
 

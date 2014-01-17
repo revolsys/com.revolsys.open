@@ -74,8 +74,18 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
   }
 
   @Override
+  public boolean equals(final Object other) {
+    return other == this;
+  }
+
+  @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
+  }
+
+  @Override
+  public int hashCode() {
+    return propertyChangeSupport.hashCode();
   }
 
   @Override

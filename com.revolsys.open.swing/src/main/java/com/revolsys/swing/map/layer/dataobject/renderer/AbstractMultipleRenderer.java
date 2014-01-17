@@ -98,16 +98,21 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {
-    return addRenderer(this.renderers.size(), renderer);
+    return addRenderer(-1, renderer);
   }
 
-  public int addRenderer(final int index,
+  public int addRenderer(int index,
     final AbstractDataObjectLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
     } else {
       renderer.setParent(this);
-      this.renderers.add(index, renderer);
+      synchronized (renderers) {
+        if (index < 0) {
+          index = this.renderers.size();
+        }
+        this.renderers.add(index, renderer);
+      }
       firePropertyChange("renderers", index, null, renderer);
       return index;
     }
@@ -130,6 +135,9 @@ public abstract class AbstractMultipleRenderer extends
   public AbstractMultipleRenderer clone() {
     final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(renderers);
+    for (final AbstractDataObjectLayerRenderer renderer : clone.renderers) {
+      renderer.setParent(clone);
+    }
     return clone;
   }
 
@@ -141,19 +149,14 @@ public abstract class AbstractMultipleRenderer extends
     style.remove("styles");
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
       layer, parent, style);
-    newRenderer.setRenderers(renderers);
+    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Multiple Style")) {
       newRenderer.setName("Filter Style");
     } else if (name.equals("Scale Style")) {
       newRenderer.setName("Filter Style");
     }
-    if (parent == null) {
-      layer.setRenderer(newRenderer);
-    } else {
-      parent.removeRenderer(this);
-      parent.addRenderer(newRenderer);
-    }
+    replace(layer, parent, newRenderer);
     return newRenderer;
   }
 
@@ -165,19 +168,14 @@ public abstract class AbstractMultipleRenderer extends
     style.remove("styles");
     final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent,
       style);
-    newRenderer.setRenderers(renderers);
+    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
       newRenderer.setName("Multiple Style");
     } else if (name.equals("Scale Style")) {
       newRenderer.setName("Multiple Style");
     }
-    if (parent == null) {
-      layer.setRenderer(newRenderer);
-    } else {
-      parent.removeRenderer(this);
-      parent.addRenderer(newRenderer);
-    }
+    replace(layer, parent, newRenderer);
     return newRenderer;
   }
 
@@ -189,24 +187,21 @@ public abstract class AbstractMultipleRenderer extends
     style.remove("styles");
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
       parent, style);
-    newRenderer.setRenderers(renderers);
+    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
       newRenderer.setName("Scale Style");
     } else if (name.equals("Multiple Style")) {
       newRenderer.setName("Scale Style");
     }
-    if (parent == null) {
-      layer.setRenderer(newRenderer);
-    } else {
-      parent.removeRenderer(this);
-      parent.addRenderer(newRenderer);
-    }
+    replace(layer, parent, newRenderer);
     return newRenderer;
   }
 
   public List<AbstractDataObjectLayerRenderer> getRenderers() {
-    return this.renderers;
+    synchronized (renderers) {
+      return new ArrayList<AbstractDataObjectLayerRenderer>(this.renderers);
+    }
   }
 
   @Override
@@ -221,38 +216,46 @@ public abstract class AbstractMultipleRenderer extends
     return false;
   }
 
-  public void removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
-    final int index = renderers.indexOf(renderer);
-    if (index != -1) {
-      if (renderer.getParent() == this) {
-        renderer.setParent(null);
+  public int removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
+    boolean removed = false;
+    synchronized (renderers) {
+      final int index = renderers.indexOf(renderer);
+      if (index != -1) {
+        if (renderer.getParent() == this) {
+          renderer.setParent(null);
+        }
+        removed = this.renderers.remove(renderer);
       }
-      if (this.renderers.remove(renderer)) {
+      if (removed) {
         firePropertyChange("renderers", index, renderer, null);
       }
+      return index;
     }
   }
 
   public void setRenderers(
     final List<? extends AbstractDataObjectLayerRenderer> renderers) {
-    for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
-      renderer.setParent(null);
-    }
-    if (renderers == null) {
-      this.renderers.clear();
-    }
-    this.renderers = new ArrayList<AbstractDataObjectLayerRenderer>(renderers);
-    for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
-      renderer.setParent(this);
+    synchronized (this.renderers) {
+      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
+        renderer.setParent(null);
+      }
+      if (renderers == null) {
+        this.renderers.clear();
+      }
+      this.renderers = new ArrayList<AbstractDataObjectLayerRenderer>(renderers);
+      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
+        renderer.setParent(this);
+      }
     }
   }
 
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    if (!this.renderers.isEmpty()) {
+    final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
+    if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
-      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
+      for (final AbstractDataObjectLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());
       }
       MapSerializerUtil.add(map, "styles", rendererMaps);

@@ -174,37 +174,6 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addCatalogPanel() {
     catalogTree = LayerChooserPanel.createTree();
-
-    // final PropertyChangeArrayList<Object> connectionManagers = new
-    // PropertyChangeArrayList<Object>();
-    //
-    // connectionManagers.add(DataObjectStoreConnectionManager.get());
-    // connectionManagers.add(FileSystemConnectionManager.get());
-    // connectionManagers.add(FolderConnectionManager.get());
-    //
-    // final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
-    // new DataObjectStoreConnectionManagerModel(),
-    // new FileSystemConnectionManagerModel(),
-    // new FolderConnectionManagerModel());
-    // catalogPanel = new ObjectTreePanel(connectionManagers, listModel);
-    // final ObjectTree tree = catalogPanel.getTree();
-    // tree.setDragEnabled(false);
-    //
-    // for (final Object connectionManager : connectionManagers) {
-    // tree.expandPath(connectionManagers, connectionManager);
-    // if (connectionManager instanceof ConnectionRegistryManager) {
-    // final ConnectionRegistryManager<?> manager =
-    // (ConnectionRegistryManager<?>)connectionManager;
-    // for (final Object registry : manager.getVisibleConnectionRegistries()) {
-    // tree.expandPath(connectionManagers, connectionManager, registry);
-    // }
-    // }
-    // }
-    // connectionManagers.getPropertyChangeSupport().addPropertyChangeListener(
-    // "registries",
-    // new InvokeMethodPropertyChangeListener(true, this,
-    // "expandConnectionManagers", PropertyChangeEvent.class));
-
     final LayerGroup project = getProject();
 
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,

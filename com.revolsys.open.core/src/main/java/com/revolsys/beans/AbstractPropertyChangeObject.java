@@ -4,12 +4,27 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy {
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+import com.revolsys.util.ExceptionUtil;
+
+public class AbstractPropertyChangeObject implements
+  PropertyChangeSupportProxy, Cloneable {
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   public void addListener(final PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(listener);
+  }
+
+  @Override
+  protected AbstractPropertyChangeObject clone() {
+    try {
+      final AbstractPropertyChangeObject clone = (AbstractPropertyChangeObject)super.clone();
+      clone.propertyChangeSupport = new PropertyChangeSupport(clone);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      ExceptionUtil.throwUncheckedException(e);
+      return null;
+    }
   }
 
   protected void firePropertyChange(final PropertyChangeEvent event) {

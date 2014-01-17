@@ -3,7 +3,9 @@ package com.revolsys.swing.map.layer.dataobject.style;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ import org.jdesktop.swingx.color.ColorUtil;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.map.Viewport2D;
 
 public class GeometryStyle extends MarkerStyle {
@@ -25,6 +28,40 @@ public class GeometryStyle extends MarkerStyle {
     WebColors.Olive, WebColors.Green, WebColors.Teal, WebColors.Navy,
     WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
     WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
+
+  public static GeometryStyle line(final Color color) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(color);
+    return style;
+  }
+
+  public static GeometryStyle line(final Color color, final double lineWidth) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(color);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    return style;
+  }
+
+  public static GeometryStyle polygon(final Color lineColor,
+    final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(lineColor);
+    style.setPolygonFill(fillColor);
+    return style;
+  }
+
+  public static GeometryStyle polygon(final Color lineColor,
+    final int lineWidth, final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
+    style.setLineColor(lineColor);
+    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    style.setPolygonFill(fillColor);
+    return style;
+  }
+
+  private Measure<Length> lineDashOffset = ZERO_PIXEL;
+
+  private List<Measure<Length>> lineDashArray = Collections.emptyList();
 
   static {
     // addProperty("backgroundColor", Color.class);
@@ -42,8 +79,8 @@ public class GeometryStyle extends MarkerStyle {
     addProperty("lineColor", Color.class, new Color(128, 128, 128));
     addProperty("lineCompOp", CompositionOperation.class,
       CompositionOperation.src_over);
-    // addProperty("lineDashOffset", String.class);
-    // addProperty("lineDasharray", String.class);
+    addProperty("lineDashOffset", Measure.class, ZERO_PIXEL);
+    addProperty("lineDashArray", List.class, Collections.emptyList());
     addProperty("lineGamma", Double.class, 1.0);
     addProperty("lineGammaMethod", GammaMethod.class, GammaMethod.power);
     addProperty("lineJoin", LineJoin.class, LineJoin.ROUND);
@@ -137,36 +174,6 @@ public class GeometryStyle extends MarkerStyle {
     return style;
   }
 
-  public static GeometryStyle line(final Color color) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(color);
-    return style;
-  }
-
-  public static GeometryStyle line(final Color color, final double lineWidth) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(color);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
-    return style;
-  }
-
-  public static GeometryStyle polygon(final Color lineColor,
-    final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(lineColor);
-    style.setPolygonFill(fillColor);
-    return style;
-  }
-
-  public static GeometryStyle polygon(final Color lineColor,
-    final int lineWidth, final Color fillColor) {
-    final GeometryStyle style = new GeometryStyle();
-    style.setLineColor(lineColor);
-    style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
-    style.setPolygonFill(fillColor);
-    return style;
-  }
-
   private LineCap lineCap = LineCap.ROUND;
 
   private boolean lineClip = true;
@@ -229,6 +236,14 @@ public class GeometryStyle extends MarkerStyle {
 
   public CompositionOperation getLineCompOp() {
     return this.lineCompOp;
+  }
+
+  public List<Measure<Length>> getLineDashArray() {
+    return Collections.unmodifiableList(lineDashArray);
+  }
+
+  public Measure<Length> getLineDashOffset() {
+    return lineDashOffset;
   }
 
   public double getLineGamma() {
@@ -345,6 +360,25 @@ public class GeometryStyle extends MarkerStyle {
     }
   }
 
+  public void setLineDashArray(final List<?> lineDashArray) {
+    this.lineDashArray = new ArrayList<Measure<Length>>();
+    if (lineDashArray != null) {
+      for (final Object dashObject : lineDashArray) {
+        final Measure<Length> dash = StringConverterRegistry.toObject(
+          Measure.class, dashObject);
+        this.lineDashArray.add(dash);
+      }
+    }
+  }
+
+  public void setLineDashOffset(final Measure<Length> lineDashOffset) {
+    if (lineDashOffset == null) {
+      this.lineDashOffset = ZERO_PIXEL;
+    } else {
+      this.lineDashOffset = lineDashOffset;
+    }
+  }
+
   public void setLineGamma(final double gamma) {
     this.lineGamma = gamma;
   }
@@ -401,25 +435,27 @@ public class GeometryStyle extends MarkerStyle {
     final float width = (float)Viewport2D.toDisplayValue(viewport,
       this.lineWidth);
 
-    final float dashPhase = 0;
-    /*
-     * TODO final Measure<Length> strokeDashPhase = stroke.getDashOffset(); if
-     * (viewport == null) { dashPhase = strokeDashPhase.getValue().floatValue();
-     * } else { dashPhase = (float)viewport.toDisplayValue(strokeDashPhase); }
-     */
-    final float[] dashArray = null;
-    /*
-     * TODO final List<Measure<Length>> dashes = stroke.getDashArray(); if
-     * (dashes == null) { dashArray = null; } else { dashArray = new
-     * float[dashes.size()]; for (int i = 0; i < dashArray.length; i++) { final
-     * Measure<Length> dash = dashes.get(i); if (viewport == null) {
-     * dashArray[i] = dash.getValue().floatValue(); } else { dashArray[i] =
-     * (float)viewport.toDisplayValue(dash); } } }
-     */
+    final float dashOffset = (float)Viewport2D.toDisplayValue(viewport,
+      this.lineDashOffset);
+
+    final float[] dashArray;
+    final int dashArraySize = lineDashArray.size();
+    if (dashArraySize == 0) {
+      dashArray = null;
+    } else {
+      dashArray = new float[dashArraySize];
+      for (int i = 0; i < dashArray.length; i++) {
+        final Measure<Length> dashMeasure = lineDashArray.get(i);
+        final float dash = (float)Viewport2D.toDisplayValue(viewport,
+          dashMeasure);
+        dashArray[i] = dash;
+      }
+    }
+
     final int lineCap = this.lineCap.getAwtValue();
     final int lineJoin = this.lineJoin.getAwtValue();
     final BasicStroke basicStroke = new BasicStroke(width, lineCap, lineJoin,
-      this.lineMiterlimit, dashArray, dashPhase);
+      this.lineMiterlimit, dashArray, dashOffset);
     graphics.setStroke(basicStroke);
   }
 

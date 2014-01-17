@@ -127,7 +127,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private final long id = ID_GEN.incrementAndGet();
 
-  private LayerRenderer<?> renderer;
+  private LayerRenderer<AbstractLayer> renderer;
 
   private String type;
 
@@ -808,14 +808,22 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     this.readOnly = readOnly;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
-    final Object oldValue = this.renderer;
-    Property.removeListener(this.renderer, this);
-    this.renderer = renderer;
-    Property.addListener(this.renderer, this);
-    firePropertyChange("renderer", oldValue, this.renderer);
-    fireIndexedPropertyChange("renderer", 0, oldValue, this.renderer);
+    if (renderer != null) {
+      final LayerRenderer<?> oldValue = this.renderer;
+      if (oldValue != null) {
+        oldValue.setLayer(null);
+        Property.removeListener(renderer, this);
+      }
+      this.renderer = (LayerRenderer<AbstractLayer>)renderer;
+      ((AbstractLayerRenderer<?>)this.renderer).setEditing(false);
+      this.renderer.setLayer(this);
+      Property.addListener(renderer, this);
+      firePropertyChange("renderer", oldValue, this.renderer);
+      fireIndexedPropertyChange("renderer", 0, oldValue, this.renderer);
+    }
   }
 
   @Override

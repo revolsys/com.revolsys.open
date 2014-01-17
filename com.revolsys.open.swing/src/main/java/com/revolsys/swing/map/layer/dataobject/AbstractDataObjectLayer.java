@@ -304,8 +304,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private List<String> columnNameOrder = Collections.emptyList();
 
-  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<Boolean>();
-
   public AbstractDataObjectLayer() {
     this("");
   }
@@ -1328,11 +1326,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getRowCount() + getNewRecordCount() <= 0;
   }
 
-  @Override
-  public boolean isEventsEnabled() {
-    return eventsEnabled != null && this.eventsEnabled.get() != Boolean.FALSE;
-  }
-
   public boolean isFieldUserReadOnly(final String fieldName) {
     return getUserReadOnlyFieldNames().contains(fieldName);
   }
@@ -1846,13 +1839,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         setCanEditRecords(this.canEditRecords);
       }
     }
-  }
-
-  @Override
-  public boolean setEventsEnabled(final boolean enabled) {
-    final boolean oldValue = isEventsEnabled();
-    this.eventsEnabled.set(enabled);
-    return oldValue;
   }
 
   @Override

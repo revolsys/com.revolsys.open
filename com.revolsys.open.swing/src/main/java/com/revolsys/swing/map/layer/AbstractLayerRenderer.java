@@ -43,6 +43,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private boolean visible = true;
 
+  private boolean editing = true;
+
   public AbstractLayerRenderer(final String type, String name, final T layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     this(type, layer);
@@ -74,13 +76,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @SuppressWarnings("unchecked")
   @Override
-  protected AbstractLayerRenderer<T> clone() {
-    try {
-      final AbstractLayerRenderer<T> clone = (AbstractLayerRenderer<T>)super.clone();
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
+  public AbstractLayerRenderer<T> clone() {
+    final AbstractLayerRenderer<T> clone = (AbstractLayerRenderer<T>)super.clone();
+    clone.layer = new WeakReference<T>(this.layer.get());
+    clone.parent = null;
+    clone.editing = false;
+    return clone;
   }
 
   @Override
@@ -93,9 +94,19 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return this.icon;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public T getLayer() {
-    return this.layer.get();
+    final LayerRenderer<?> parent = getParent();
+    if (parent == null) {
+      if (this.layer == null) {
+        return null;
+      } else {
+        return this.layer.get();
+      }
+    } else {
+      return (T)parent.getLayer();
+    }
   }
 
   public long getMaximumScale() {
@@ -126,6 +137,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return (V)value;
   }
 
+  public boolean isEditing() {
+    return editing;
+  }
+
   @Override
   public boolean isVisible() {
     return this.visible;
@@ -149,20 +164,32 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   @Override
   public final void render(final Viewport2D viewport, final Graphics2D graphics) {
     final T layer = getLayer();
-    final double scale = viewport.getScale();
-    if (isVisible(scale)) {
-      render(viewport, graphics, layer);
+    if (layer != null) {
+      final double scale = viewport.getScale();
+      if (isVisible(scale)) {
+        render(viewport, graphics, layer);
+      }
     }
   }
 
   public abstract void render(Viewport2D viewport, Graphics2D graphics, T layer);
 
+  public void setEditing(final boolean editing) {
+    this.editing = editing;
+  }
+
   public void setIcon(final Icon icon) {
     this.icon = icon;
   }
 
+  @Override
   public void setLayer(final T layer) {
-    final Object oldValue = this.layer;
+    final Object oldValue;
+    if (this.layer == null) {
+      oldValue = null;
+    } else {
+      oldValue = this.layer.get();
+    }
     this.layer = new WeakReference<T>(layer);
     firePropertyChange("layer", oldValue, layer);
   }

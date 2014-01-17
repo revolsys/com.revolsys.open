@@ -26,22 +26,24 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.ObjectWithProperties;
 
 public final class Property {
-  public static void addListener(final Object object,
-    final PropertyChangeListener listener) {
-    if (listener != null) {
+  public static void addListener(final Object object, final Object listener) {
+    if (listener instanceof PropertyChangeListener) {
+      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
       if (propertyChangeSupport != null) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+        propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
       }
     }
   }
 
   public static void addListener(final Object object,
-    final String propertyName, final PropertyChangeListener listener) {
-    if (listener != null) {
+    final String propertyName, final Object listener) {
+    if (listener instanceof PropertyChangeListener) {
+      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
       if (propertyChangeSupport != null) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+        propertyChangeSupport.addPropertyChangeListener(propertyName,
+          propertyChangeListener);
       }
     }
   }
@@ -267,6 +269,24 @@ public final class Property {
     }
   }
 
+  public static void removeAllListeners(final Object object) {
+    if (object instanceof PropertyChangeSupportProxy) {
+      final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
+
+      final PropertyChangeSupport propertyChangeSupport = proxy.getPropertyChangeSupport();
+      for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
+        if (listener instanceof PropertyChangeListenerProxy) {
+          final PropertyChangeListenerProxy listenerProxy = (PropertyChangeListenerProxy)listener;
+          final String propertyName = listenerProxy.getPropertyName();
+          propertyChangeSupport.removePropertyChangeListener(propertyName,
+            listener);
+        }
+        propertyChangeSupport.removePropertyChangeListener(listener);
+      }
+    }
+
+  }
+
   public static void removeAllListeners(
     final PropertyChangeSupport propertyChangeSupport) {
     for (final PropertyChangeListener listener : propertyChangeSupport.getPropertyChangeListeners()) {
@@ -280,23 +300,24 @@ public final class Property {
     }
   }
 
-  public static void removeListener(final Object object,
-    final PropertyChangeListener listener) {
-    if (listener != null) {
+  public static void removeListener(final Object object, final Object listener) {
+    if (listener instanceof PropertyChangeListener) {
+      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
       if (propertyChangeSupport != null) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
+        propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
       }
     }
   }
 
   public static void removeListener(final Object object,
-    final String propertyName, final PropertyChangeListener listener) {
-    if (listener != null) {
+    final String propertyName, final Object listener) {
+    if (listener instanceof PropertyChangeListener) {
+      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
       if (propertyChangeSupport != null) {
         propertyChangeSupport.removePropertyChangeListener(propertyName,
-          listener);
+          propertyChangeListener);
       }
     }
   }

@@ -39,8 +39,9 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
-      "palette", "showProperties"));
+    // menu.addMenuItem("layer",
+    // TreeItemRunnable.createAction("View/Edit Style",
+    // "palette", "showProperties"));
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
       new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
 
@@ -215,6 +216,22 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
+  protected void replace(final AbstractDataObjectLayer layer,
+    final AbstractMultipleRenderer parent,
+    final AbstractMultipleRenderer newRenderer) {
+    if (parent == null) {
+      if (isEditing()) {
+        newRenderer.setEditing(true);
+        firePropertyChange("replaceRenderer", this, newRenderer);
+      } else {
+        layer.setRenderer(newRenderer);
+      }
+    } else {
+      final int index = parent.removeRenderer(this);
+      parent.addRenderer(index, newRenderer);
+    }
+  }
+
   public void setQueryFilter(final String query) {
     if (filter instanceof SqlLayerFilter || filter instanceof AcceptAllFilter) {
       if (StringUtils.hasText(query)) {
@@ -238,13 +255,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
   protected void wrap(final AbstractDataObjectLayer layer,
     final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
-    if (parent == null) {
-      layer.setRenderer(newRenderer);
-    } else {
-      parent.removeRenderer(this);
-      parent.addRenderer(newRenderer);
-    }
-    newRenderer.addRenderer(this);
+    newRenderer.addRenderer(this.clone());
+    replace(layer, parent, newRenderer);
   }
 
   public FilterMultipleRenderer wrapWithFilterStyle() {

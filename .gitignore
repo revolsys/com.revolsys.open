@@ -2,4 +2,15 @@
 .settings
 .classpath
 *.log
-target
+target/com.revolsys.open.core
+/com.revolsys.open.doclet
+/com.revolsys.open.gis.esri.gdb.file
+/com.revolsys.open.gis.google.fusiontables
+/com.revolsys.open.gis.oracle
+/com.revolsys.open.gis.postgresql
+/com.revolsys.open.gis.server
+/com.revolsys.open.gis.spatialite
+/com.revolsys.open.orm
+/com.revolsys.open.swing
+/com.revolsys.open.web
+/com.revolsys.open.core

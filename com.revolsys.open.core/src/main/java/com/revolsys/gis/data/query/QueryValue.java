@@ -33,6 +33,7 @@ import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class QueryValue implements Cloneable {
@@ -129,29 +130,47 @@ public abstract class QueryValue implements Cloneable {
 
         if (leftCondition instanceof Column) {
           if (rightCondition instanceof Value) {
+            final Column column = (Column)leftCondition;
+
+            final String name = column.getName();
+            final Attribute attribute = metaData.getAttribute(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException("Values can't be null for "
                 + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
-              final Column column = (Column)leftCondition;
-              final Attribute attribute = metaData.getAttribute(column.getName());
-              final Class<?> typeClass = attribute.getTypeClass();
-              try {
-                final Object convertedValue = StringConverterRegistry.toObject(
-                  typeClass, value);
-                if (convertedValue == null
-                  || !typeClass.isAssignableFrom(typeClass)) {
-                  throw new IllegalArgumentException(column.getName()
-                    + " requires a " + attribute.getType() + " not the value "
-                    + value);
-                } else {
-                  rightCondition = new Value(convertedValue);
+              final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+              if (codeTable == null || attribute == metaData.getIdAttribute()) {
+                final Class<?> typeClass = attribute.getTypeClass();
+                try {
+                  final Object convertedValue = StringConverterRegistry.toObject(
+                    typeClass, value);
+                  if (convertedValue == null
+                    || !typeClass.isAssignableFrom(typeClass)) {
+                    throw new IllegalArgumentException(name + " requires a "
+                      + attribute.getType() + " not the value " + value);
+                  } else {
+                    rightCondition = new Value(attribute, convertedValue);
+                  }
+                } catch (final Throwable t) {
+                  throw new IllegalArgumentException(name + " requires a "
+                    + attribute.getType() + " not the value " + value);
                 }
-              } catch (final Throwable t) {
-                throw new IllegalArgumentException(column.getName()
-                  + " requires a " + attribute.getType() + " not the value "
-                  + value);
+              } else {
+                Object id;
+                if (value instanceof String) {
+                  final String string = (String)value;
+                  final String[] values = string.split(":");
+                  id = codeTable.getId((Object[])values);
+                } else {
+                  id = codeTable.getId(value);
+                }
+                if (id == null) {
+                  throw new IllegalArgumentException(name
+                    + " requires a valid code value that exists not " + value);
+                } else {
+                  rightCondition = new Value(attribute, id);
+                }
               }
             }
           }

@@ -214,7 +214,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   /**
    * Remove any cached records that are currently not used.
    */
-  private void cleanCachedRecords() {
+  protected void cleanCachedRecords() {
     synchronized (this.cachedRecords) {
       final Set<String> ids = getIdsToCache();
       final Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
@@ -467,6 +467,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public BoundingBox getBoundingBox() {
     return getCoordinateSystem().getAreaBoundingBox();
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  protected <V extends LayerDataObject> List<V> getCachedRecords() {
+    synchronized (cachedRecords) {
+      final List<V> cachedRecords = new ArrayList(this.cachedRecords.values());
+      return cachedRecords;
+
+    }
   }
 
   protected <V extends LayerDataObject> List<V> getCachedRecords(

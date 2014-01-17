@@ -25,6 +25,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -76,6 +77,15 @@ public final class JavaBeanUtil {
         final Object clonedMapValue = clone(mapValue);
         entry.setValue(clonedMapValue);
       }
+      return (V)map;
+    } else if (value instanceof List) {
+      final List<?> list = (List<?>)value;
+      final List<Object> cloneList = new ArrayList<Object>();
+      for (final Object object : list) {
+        final Object clonedObject = clone(object);
+        cloneList.add(clonedObject);
+      }
+      return (V)cloneList;
     } else if (value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
