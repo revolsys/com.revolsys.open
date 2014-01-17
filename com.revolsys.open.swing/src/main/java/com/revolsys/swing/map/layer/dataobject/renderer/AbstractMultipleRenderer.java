@@ -7,7 +7,10 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -106,6 +109,14 @@ public abstract class AbstractMultipleRenderer extends
     if (renderer == null) {
       return -1;
     } else {
+      final String originalName = renderer.getName();
+      String name = originalName;
+      int i = 1;
+      while (hasRendererWithSameName(renderer, name)) {
+        name = originalName + i;
+        i++;
+      }
+      renderer.setName(name);
       renderer.setParent(this);
       synchronized (renderers) {
         if (index < 0) {
@@ -198,10 +209,59 @@ public abstract class AbstractMultipleRenderer extends
     return newRenderer;
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
+    LayerRenderer<?> renderer = this;
+    final int pathSize = path.size();
+    for (int i = 0; i < pathSize; i++) {
+      final String name = path.get(i);
+      final String rendererName = renderer.getName();
+      if (EqualsRegistry.equal(name, rendererName)) {
+        if (i < pathSize - 1) {
+          final String childName = path.get(i + 1);
+          if (renderer instanceof AbstractMultipleRenderer) {
+            final AbstractMultipleRenderer multipleRenderer = (AbstractMultipleRenderer)renderer;
+            renderer = multipleRenderer.getRenderer(childName);
+          }
+        }
+      } else {
+        return null;
+      }
+    }
+    return (V)renderer;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends LayerRenderer<?>> V getRenderer(final String name) {
+    if (StringUtils.hasText(name)) {
+      for (final LayerRenderer<?> renderer : this.renderers) {
+        final String rendererName = renderer.getName();
+        if (EqualsRegistry.equal(name, rendererName)) {
+          return (V)renderer;
+        }
+      }
+    }
+    return null;
+  }
+
   public List<AbstractDataObjectLayerRenderer> getRenderers() {
     synchronized (renderers) {
       return new ArrayList<AbstractDataObjectLayerRenderer>(this.renderers);
     }
+  }
+
+  public boolean hasRendererWithSameName(final LayerRenderer<?> renderer,
+    final String name) {
+    for (final AbstractDataObjectLayerRenderer otherRenderer : renderers) {
+      if (renderer != otherRenderer) {
+        final String layerName = otherRenderer.getName();
+        if (name.equals(layerName)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

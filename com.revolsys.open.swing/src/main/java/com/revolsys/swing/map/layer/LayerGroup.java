@@ -108,11 +108,13 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     synchronized (this.layers) {
       if (layer != null && !this.layers.contains(layer)) {
         final String name = layer.getName();
+        String newName = name;
         int i = 1;
-        while (hasLayerWithSameName(layer)) {
-          layer.setName(name + i);
+        while (hasLayerWithSameName(layer, newName)) {
+          newName = name + i;
           i++;
         }
+        layer.setName(newName);
         this.layers.add(index, layer);
         layer.setLayerGroup(this);
         initialize(layer);
@@ -461,8 +463,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     return layers;
   }
 
-  public boolean hasLayerWithSameName(final Layer layer) {
-    final String name = layer.getName();
+  public boolean hasLayerWithSameName(final Layer layer, final String name) {
     for (final Layer otherLayer : layers) {
       if (layer != otherLayer) {
         final String layerName = otherLayer.getName();

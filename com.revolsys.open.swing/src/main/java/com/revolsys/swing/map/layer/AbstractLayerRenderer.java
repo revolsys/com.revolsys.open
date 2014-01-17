@@ -6,6 +6,8 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -127,6 +129,39 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return this.parent;
   }
 
+  @Override
+  public List<String> getPathNames() {
+    final LinkedList<String> names = new LinkedList<String>();
+    final String name = getName();
+    names.add(name);
+    for (LayerRenderer<?> parent = getParent(); parent != null; parent = parent.getParent()) {
+      final String parentName = parent.getName();
+      names.addFirst(parentName);
+    }
+    return names;
+  }
+
+  @Override
+  public List<LayerRenderer<?>> getPathRenderers() {
+    final LinkedList<LayerRenderer<?>> renderers = new LinkedList<LayerRenderer<?>>();
+    renderers.add(this);
+    for (LayerRenderer<?> parent = getParent(); parent != null; parent = parent.getParent()) {
+      renderers.addFirst(parent);
+    }
+    return renderers;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
+    if (path.isEmpty()) {
+      return null;
+    } else if (path.get(0).equals(getName())) {
+      return (V)this;
+    }
+    return null;
+  }
+
   public String getType() {
     return this.type;
   }
@@ -137,8 +172,13 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return (V)value;
   }
 
+  @Override
   public boolean isEditing() {
-    return editing;
+    if (parent == null) {
+      return editing;
+    } else {
+      return parent.isEditing();
+    }
   }
 
   @Override
@@ -174,8 +214,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   public abstract void render(Viewport2D viewport, Graphics2D graphics, T layer);
 
+  @Override
   public void setEditing(final boolean editing) {
+    final boolean oldValue = this.editing;
     this.editing = editing;
+    firePropertyChange("editing", oldValue, layer);
   }
 
   public void setIcon(final Icon icon) {

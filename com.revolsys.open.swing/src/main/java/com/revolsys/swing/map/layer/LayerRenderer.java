@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.util.List;
 
 import javax.swing.Icon;
 
@@ -26,8 +26,13 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   LayerRenderer<?> getParent();
 
-  @Override
-  PropertyChangeSupport getPropertyChangeSupport();
+  List<String> getPathNames();
+
+  List<LayerRenderer<?>> getPathRenderers();
+
+  <V extends LayerRenderer<?>> V getRenderer(final List<String> path);
+
+  boolean isEditing();
 
   boolean isVisible();
 

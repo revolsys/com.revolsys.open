@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -114,6 +113,7 @@ public class DataObjectLayerStylePanel extends ValueField implements
   public void mouseReleased(final MouseEvent e) {
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     if ("replaceRenderer".equals(event.getPropertyName())) {
@@ -138,6 +138,7 @@ public class DataObjectLayerStylePanel extends ValueField implements
 
   public void setEditStylePanel(final LayerRenderer<? extends Layer> renderer) {
     final Component view = editStyleContainer.getViewport().getView();
+    editStyleContainer.setViewportView(null);
     if (view instanceof ValueField) {
       final ValueField valueField = (ValueField)view;
       valueField.save();
@@ -146,19 +147,21 @@ public class DataObjectLayerStylePanel extends ValueField implements
     editStyleContainer.setViewportView(stylePanel);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public void setSelectedRenderer(final LayerRenderer<?> renderer) {
-    final LinkedList<Object> path = new LinkedList<Object>();
-    LayerRenderer<?> parent = renderer;
-    while (parent != null) {
-      path.addFirst(parent);
-      parent = parent.getParent();
+    final List<String> pathNames = renderer.getPathNames();
+    final LayerRenderer<?> selectedRenderer = this.renderer.getRenderer(pathNames);
+    if (selectedRenderer != null) {
+      final List path = selectedRenderer.getPathRenderers();
+      if (!path.isEmpty()) {
+        path.add(0, renderers);
+        final TreePath treePath = ObjectTree.createTreePath(path);
+        tree.setSelectionPath(treePath);
+        tree.expandPath(treePath);
+        setEditStylePanel(selectedRenderer);
+      }
     }
-    path.addFirst(renderers);
-    if (!path.isEmpty()) {
-      final TreePath treePath = ObjectTree.createTreePath(path);
-      tree.setSelectionPath(treePath);
-      tree.expandPath(treePath);
-    }
-    setEditStylePanel(renderer);
   }
 }

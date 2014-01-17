@@ -39,9 +39,9 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
-    // menu.addMenuItem("layer",
-    // TreeItemRunnable.createAction("View/Edit Style",
-    // "palette", "showProperties"));
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
+      "palette", new TreeItemPropertyEnableCheck("editing", false),
+      "showProperties"));
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
       new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
 
@@ -230,6 +230,20 @@ public abstract class AbstractDataObjectLayerRenderer extends
       final int index = parent.removeRenderer(this);
       parent.addRenderer(index, newRenderer);
     }
+  }
+
+  @Override
+  public void setName(final String name) {
+    final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
+    String newName = name;
+    if (parent != null) {
+      int i = 1;
+      while (parent.hasRendererWithSameName(this, newName)) {
+        newName = name + i;
+        i++;
+      }
+    }
+    super.setName(newName);
   }
 
   public void setQueryFilter(final String query) {
