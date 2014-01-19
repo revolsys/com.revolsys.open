@@ -1,5 +1,7 @@
 package com.revolsys.util;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * <p>
  * Encodes and decodes to and from Base64 notation.
@@ -103,7 +105,6 @@ public class Base64 {
    * @since 1.3
    */
   public static class OutputStream extends java.io.FilterOutputStream {
-    private final byte[] alphabet; // Local copies to avoid extra method calls
 
     private final byte[] b4; // Scratch used in a few places
 
@@ -169,7 +170,6 @@ public class Base64 {
       this.suspendEncoding = false;
       this.b4 = new byte[4];
       this.options = options;
-      this.alphabet = getAlphabet(options);
       this.decodabet = getDecodabet(options);
     } // end constructor
 
@@ -710,6 +710,46 @@ public class Base64 {
     return bytes;
   } // end decode
 
+  static int decode4to3(final byte[] source, final int srcOffset,
+    final byte[] destination, final int destOffset) {
+    final byte[] decodeabet = _STANDARD_DECODABET;
+
+    if (source[srcOffset + 2] == EQUALS_SIGN) {
+      final int outBuff = ((decodeabet[source[srcOffset]] & 0xFF) << 18)
+        | ((decodeabet[source[srcOffset + 1]] & 0xFF) << 12);
+
+      destination[destOffset] = (byte)(outBuff >>> 16);
+      return 1;
+    }
+
+    else if (source[srcOffset + 3] == EQUALS_SIGN) {
+      final int outBuff = ((decodeabet[source[srcOffset]] & 0xFF) << 18)
+        | ((decodeabet[source[srcOffset + 1]] & 0xFF) << 12)
+        | ((decodeabet[source[srcOffset + 2]] & 0xFF) << 6);
+
+      destination[destOffset] = (byte)(outBuff >>> 16);
+      destination[destOffset + 1] = (byte)(outBuff >>> 8);
+      return 2;
+    }
+
+    else {
+      try {
+        final int outBuff = ((decodeabet[source[srcOffset]] & 0xFF) << 18)
+          | ((decodeabet[source[srcOffset + 1]] & 0xFF) << 12)
+          | ((decodeabet[source[srcOffset + 2]] & 0xFF) << 6)
+          | ((decodeabet[source[srcOffset + 3]] & 0xFF));
+
+        destination[destOffset] = (byte)(outBuff >> 16);
+        destination[destOffset + 1] = (byte)(outBuff >> 8);
+        destination[destOffset + 2] = (byte)(outBuff);
+
+        return 3;
+      } catch (final Exception e) {
+        return -1;
+      }
+    }
+  }
+
   /**
    * Decodes four bytes from array <var>source</var> and writes the resulting
    * bytes (up to three of them) to <var>destination</var>. The source and
@@ -796,6 +836,54 @@ public class Base64 {
       } // end catch
     }
   } // end decodeToBytes
+
+  public static byte[] decodeBytesNoWrap(final byte[] source) {
+    final byte[] DECODABET = _STANDARD_DECODABET;
+    final int len = source.length;
+    final int len34 = len * 3 / 4;
+    final byte[] outBuff = new byte[len34];
+    int outBuffPosn = 0;
+
+    final byte[] b4 = new byte[4];
+    int b4Posn = 0;
+    int i = 0;
+    byte sbiCrop = 0;
+    byte sbiDecode = 0;
+    for (i = 0; i < len; i++) {
+      sbiCrop = (byte)(source[i] & 0x7f);
+      sbiDecode = DECODABET[sbiCrop];
+
+      if (sbiDecode >= EQUALS_SIGN_ENC) {
+        b4[b4Posn++] = sbiCrop;
+        if (b4Posn > 3) {
+          outBuffPosn += decode4to3(b4, 0, outBuff, outBuffPosn);
+          b4Posn = 0;
+
+          if (sbiCrop == EQUALS_SIGN) {
+            break;
+          }
+        }
+      } else {
+        return null;
+      }
+    }
+
+    if (outBuffPosn == outBuff.length) {
+      return outBuff;
+    } else {
+      final byte[] out = new byte[outBuffPosn];
+      System.arraycopy(outBuff, 0, out, 0, outBuffPosn);
+      return out;
+    }
+  }
+
+  public static byte[] decodeBytesNoWrap(final String text) {
+    try {
+      return decodeBytesNoWrap(text.getBytes("UTF-8"));
+    } catch (final UnsupportedEncodingException e) {
+      return null;
+    }
+  }
 
   /* E N C O D I N G M E T H O D S */
 
@@ -993,6 +1081,41 @@ public class Base64 {
     encode3to4(threeBytes, 0, numSigBytes, b4, 0, options);
     return b4;
   } // end encode3to4
+
+  static byte[] encode3to4(final byte[] source, final int srcOffset,
+    final int numSigBytes, final byte[] destination, final int destOffset) {
+    final byte[] alhpabet = _STANDARD_ALPHABET;
+
+    final int inBuff = (numSigBytes > 0 ? ((source[srcOffset] << 24) >>> 8) : 0)
+      | (numSigBytes > 1 ? ((source[srcOffset + 1] << 24) >>> 16) : 0)
+      | (numSigBytes > 2 ? ((source[srcOffset + 2] << 24) >>> 24) : 0);
+
+    switch (numSigBytes) {
+      case 3:
+        destination[destOffset] = alhpabet[(inBuff >>> 18)];
+        destination[destOffset + 1] = alhpabet[(inBuff >>> 12) & 0x3f];
+        destination[destOffset + 2] = alhpabet[(inBuff >>> 6) & 0x3f];
+        destination[destOffset + 3] = alhpabet[(inBuff) & 0x3f];
+        return destination;
+
+      case 2:
+        destination[destOffset] = alhpabet[(inBuff >>> 18)];
+        destination[destOffset + 1] = alhpabet[(inBuff >>> 12) & 0x3f];
+        destination[destOffset + 2] = alhpabet[(inBuff >>> 6) & 0x3f];
+        destination[destOffset + 3] = EQUALS_SIGN;
+        return destination;
+
+      case 1:
+        destination[destOffset] = alhpabet[(inBuff >>> 18)];
+        destination[destOffset + 1] = alhpabet[(inBuff >>> 12) & 0x3f];
+        destination[destOffset + 2] = EQUALS_SIGN;
+        destination[destOffset + 3] = EQUALS_SIGN;
+        return destination;
+
+      default:
+        return destination;
+    }
+  }
 
   /**
    * <p>
@@ -1232,6 +1355,32 @@ public class Base64 {
     } // end else: don't compress
 
   } // end encodeBytes
+
+  public static String encodeBytesNoWrap(final byte[] source) {
+    final int len = source.length;
+
+    final int len43 = len * 4 / 3;
+    final byte[] outBuff = new byte[(len43) + ((len % 3) > 0 ? 4 : 0)];
+    int d = 0;
+    int e = 0;
+    final int len2 = len - 2;
+    for (; d < len2; d += 3, e += 4) {
+      encode3to4(source, d, 3, outBuff, e);
+    }
+
+    if (d < len) {
+      encode3to4(source, d, len - d, outBuff, e);
+      e += 4;
+    }
+
+    try {
+      return new String(outBuff, 0, e, PREFERRED_ENCODING);
+    } catch (final java.io.UnsupportedEncodingException uue) {
+      ExceptionUtil.throwUncheckedException(uue);
+      return null;
+    }
+
+  }
 
   /**
    * Reads <tt>infile</tt> and encodes it to <tt>outfile</tt>.

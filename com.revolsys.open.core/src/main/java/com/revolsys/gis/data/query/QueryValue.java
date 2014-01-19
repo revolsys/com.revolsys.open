@@ -34,6 +34,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.query.functions.Function;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class QueryValue implements Cloneable {

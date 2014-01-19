@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
@@ -306,11 +307,23 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public void setRoot(final Resource root) {
-    if (root != null) {
-      this.root = root;
-    } else {
+    if (root == null) {
       this.root = new FileSystemResource(System.getProperty("user.home")
         + "/.m2/repository/");
+
+    } else {
+      try {
+        String url = root.getURL().toExternalForm();
+        url = url.replaceAll("([^(:/{2,3)])//+", "$1/");
+
+        if (!url.endsWith("/")) {
+          url += '/';
+        }
+        this.root = new DefaultResourceLoader().getResource(url);
+      } catch (final IOException e) {
+        this.root = root;
+      }
     }
+
   }
 }

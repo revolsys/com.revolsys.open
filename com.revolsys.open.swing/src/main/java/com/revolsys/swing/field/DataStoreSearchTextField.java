@@ -41,9 +41,9 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Equal;
-import com.revolsys.gis.data.query.Function;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
@@ -76,7 +76,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
     this(metaData.getDataStore(), displayAttributeName, new Query(
-      metaData, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(metaData, Q.iLike(
+      metaData, new Equal(F.upper(displayAttributeName), new Value(null))), new Query(metaData, Q.iLike(
       displayAttributeName, "")));
   }
 
@@ -123,7 +123,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore, displayAttributeName, new Query(typeName, new Equal(Function.upper(displayAttributeName), new Value(null))), new Query(
+    this(dataStore, displayAttributeName, new Query(typeName, new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
       typeName, Q.iLike(displayAttributeName, "")));
   }
 

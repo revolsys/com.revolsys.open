@@ -7,6 +7,7 @@ import java.util.List;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.query.functions.F;
 
 public class Q {
 
@@ -197,7 +198,7 @@ public class Q {
   }
 
   public static Condition iLike(final String left, final String right) {
-    return Q.like(Function.upper(new Cast(left, "varchar(4000)")),
+    return Q.like(F.upper(new Cast(left, "varchar(4000)")),
       ("%" + right + "%").toUpperCase());
   }
 
@@ -298,18 +299,16 @@ public class Q {
 
   public static Condition likeRegEx(final DataObjectStore dataStore,
     final String fieldName, final Object value) {
-    Condition left;
+    QueryValue left;
     if (dataStore.getClass().getName().contains("Oracle")) {
-      left = new SqlCondition("regexp_replace(upper(" + fieldName
-        + "), '[^A-Z0-9]','')");
+      left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "");
     } else {
-      left = new SqlCondition("regexp_replace(upper(" + fieldName
-        + "), '[^A-Z0-9]','', 'g')");
+      left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
       + StringConverterRegistry.toString(value)
         .toUpperCase()
-        .replaceAll("[^A-Z0-0]", "") + "%";
+        .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);
   }
 

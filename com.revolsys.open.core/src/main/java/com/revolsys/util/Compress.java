@@ -38,7 +38,8 @@ public class Compress {
   }
 
   public static String deflateBase64(final String text) {
-    return Base64.encodeBytes(deflate(text));
+    final byte[] bytes = deflate(text);
+    return Base64.encodeBytesNoWrap(bytes);
   }
 
   public static String inflate(final byte[] bytes) {
@@ -62,7 +63,7 @@ public class Compress {
   }
 
   public static String inflateBase64(final String text) {
-    final byte[] bytes = Base64.decode(text);
+    final byte[] bytes = Base64.decodeBytesNoWrap(text);
     return inflate(bytes);
   }
 

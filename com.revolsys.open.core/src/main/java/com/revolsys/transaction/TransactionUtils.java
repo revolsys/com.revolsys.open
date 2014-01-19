@@ -2,8 +2,12 @@ package com.revolsys.transaction;
 
 import java.lang.reflect.Method;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -11,11 +15,39 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
 
 public class TransactionUtils {
+  private static final TransactionDefinition TRANSACTION_DEFINITION_NEW = new DefaultTransactionDefinition(
+    TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+  public static TransactionStatus createNewTransaction(
+    final PlatformTransactionManager transactionManager) {
+    return transactionManager.getTransaction(TRANSACTION_DEFINITION_NEW);
+  }
+
   public static Runnable createRunnable(
     final PlatformTransactionManager transactionManager,
     final int propagationBehavior, final Runnable runnable) {
     return new InvokeMethodRunnable(TransactionUtils.class, "invoke",
       transactionManager, propagationBehavior, runnable);
+  }
+
+  public static void handleException(
+    final PlatformTransactionManager transactionManager,
+    final TransactionStatus status, final Throwable e) {
+    try {
+      transactionManager.rollback(status);
+    } catch (final TransactionSystemException rollbackException) {
+      rollbackException.initApplicationException(e);
+      throw rollbackException;
+    } catch (final RuntimeException runtimeException) {
+      LoggerFactory.getLogger(TransactionUtils.class).error(
+        "Application exception overridden by rollback exception", e);
+      throw runtimeException;
+    } catch (final Error error) {
+      LoggerFactory.getLogger(TransactionUtils.class).error(
+        "Application exception overridden by rollback error", e);
+      throw error;
+    }
+    ExceptionUtil.throwUncheckedException(e);
   }
 
   public static <V> V invoke(
