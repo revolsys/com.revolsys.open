@@ -36,7 +36,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
     final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
     for (int i = index0; i <= index1; i++) {
       final int rowIndex = convertRowIndexToModel(i);
-      final LayerDataObject record = this.model.getObject(rowIndex);
+      final LayerDataObject record = this.model.getRecord(rowIndex);
       records.add(record);
     }
     return records;
@@ -45,7 +45,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
   @Override
   public boolean isSelectedIndex(final int index) {
     final int rowIndex = convertRowIndexToModel(index);
-    final LayerDataObject record = this.model.getObject(rowIndex);
+    final LayerDataObject record = this.model.getRecord(rowIndex);
     if (record != null) {
       final AbstractDataObjectLayer layer = this.model.getLayer();
       return layer.isHighlighted(record);

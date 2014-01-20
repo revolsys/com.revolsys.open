@@ -43,7 +43,7 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
       final int eventRow = TablePanel.getEventRow();
       if (eventRow != -1) {
         final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
-        final DataObject object = model.getObject(eventRow);
+        final DataObject object = model.getRecord(eventRow);
         return object;
       }
     }

@@ -35,7 +35,7 @@ public class DataObjectLayerListSelectionModel extends
     final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (int i = index0; i <= index1; i++) {
       final int rowIndex = convertRowIndexToModel(i);
-      final LayerDataObject object = this.model.getObject(rowIndex);
+      final LayerDataObject object = this.model.getRecord(rowIndex);
       objects.add(object);
     }
     return objects;
@@ -44,7 +44,7 @@ public class DataObjectLayerListSelectionModel extends
   @Override
   public boolean isSelectedIndex(final int index) {
     final int rowIndex = convertRowIndexToModel(index);
-    final LayerDataObject object = this.model.getObject(rowIndex);
+    final LayerDataObject object = this.model.getRecord(rowIndex);
     if (object != null) {
       final AbstractDataObjectLayer layer = this.model.getLayer();
       return layer.isSelected(object);

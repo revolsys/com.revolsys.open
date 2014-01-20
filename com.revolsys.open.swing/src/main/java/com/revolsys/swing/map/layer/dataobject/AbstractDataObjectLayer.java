@@ -205,11 +205,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public static boolean containsSame(
     final Collection<? extends LayerDataObject> records,
     final LayerDataObject record) {
-    if (records != null) {
-      synchronized (records) {
-        for (final LayerDataObject queryRecord : records) {
-          if (queryRecord.isSame(record)) {
-            return true;
+    if (record != null) {
+      if (records != null) {
+        synchronized (records) {
+          for (final LayerDataObject queryRecord : records) {
+            if (queryRecord.isSame(record)) {
+              return true;
+            }
           }
         }
       }
@@ -227,7 +229,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         return queryRecord;
       }
     }
-    return record;
+    return null;
   }
 
   public static List<AbstractDataObjectLayer> getVisibleLayers(
@@ -614,6 +616,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       synchronized (this.newRecords) {
         this.newRecords.add(record);
       }
+      fireRecordInserted(record);
       return record;
     } else {
       return null;
@@ -664,6 +667,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void deleteRecord(final LayerDataObject record) {
     final boolean trackDeletions = true;
     deleteRecord(record, trackDeletions);
+    fireRecordDeleted(record);
   }
 
   protected void deleteRecord(final LayerDataObject record,
@@ -699,7 +703,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           deleteRecord(record);
         }
       }
-      fireRecordsChanged();
     }
   }
 
@@ -759,19 +762,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return false;
   }
 
-  protected List<LayerDataObject> filterQueryResults(
-    final List<LayerDataObject> results,
-    final Filter<Map<String, Object>> filter) {
+  protected <V extends LayerDataObject> List<V> filterQueryResults(
+    final List<V> results, final Filter<Map<String, Object>> filter) {
     final List<LayerDataObject> modifiedRecords = new ArrayList<LayerDataObject>(
       getModifiedRecords());
-    for (final ListIterator<LayerDataObject> iterator = results.listIterator(); iterator.hasNext();) {
+    for (final ListIterator<V> iterator = results.listIterator(); iterator.hasNext();) {
       final LayerDataObject record = iterator.next();
       if (internalIsDeleted(record)) {
         iterator.remove();
       } else {
-        final LayerDataObject modifiedRecord = getAndRemoveSame(
-          modifiedRecords, record);
-        if (record != modifiedRecord) {
+        final V modifiedRecord = (V)getAndRemoveSame(modifiedRecords, record);
+        if (modifiedRecord != null) {
           if (Condition.accept(filter, modifiedRecord)) {
             iterator.set(modifiedRecord);
           } else {
@@ -782,19 +783,19 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
     for (final LayerDataObject record : modifiedRecords) {
       if (Condition.accept(filter, record)) {
-        results.add(record);
+        results.add((V)record);
       }
     }
     for (final LayerDataObject record : getNewRecords()) {
       if (Condition.accept(filter, record)) {
-        results.add(record);
+        results.add((V)record);
       }
     }
     return results;
   }
 
-  protected List<LayerDataObject> filterQueryResults(
-    final List<LayerDataObject> results, final Query query) {
+  protected <V extends LayerDataObject> List<V> filterQueryResults(
+    final List<V> results, final Query query) {
     final Condition filter = query.getWhereCondition();
     return filterQueryResults(results, filter);
   }
@@ -806,8 +807,20 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     firePropertyChange("highlightedCount", -1, highlightedCount);
   }
 
+  public void fireRecordDeleted(final LayerDataObject record) {
+    firePropertyChange("recordDeleted", null, record);
+  }
+
+  protected void fireRecordInserted(final LayerDataObject record) {
+    firePropertyChange("recordInserted", null, record);
+  }
+
   protected void fireRecordsChanged() {
     firePropertyChange("recordsChanged", false, true);
+  }
+
+  protected void fireRecordUpdated(final LayerDataObject record) {
+    firePropertyChange("recordUpdated", null, record);
   }
 
   protected void fireSelected() {
@@ -1185,6 +1198,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public Collection<String> getUserReadOnlyFieldNames() {
     return Collections.unmodifiableSet(userReadOnlyFieldNames);
+  }
+
+  public boolean hasGeometryAttribute() {
+    return getMetaData().getGeometryAttribute() != null;
   }
 
   protected boolean hasPermission(final String permission) {
@@ -1592,9 +1609,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     "rawtypes", "unchecked"
   })
   public final List<LayerDataObject> query(final BoundingBox boundingBox) {
-    final List<LayerDataObject> results = doQuery(boundingBox);
-    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
-    return filterQueryResults(results, filter);
+    if (hasGeometryAttribute()) {
+      final List<LayerDataObject> results = doQuery(boundingBox);
+      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+      return filterQueryResults(results, filter);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   @SuppressWarnings({
@@ -1602,10 +1623,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   })
   public List<LayerDataObject> query(final Geometry geometry,
     final double maxDistance) {
-    final List<LayerDataObject> results = doQuery(geometry, maxDistance);
-    final Filter filter = new DataObjectGeometryDistanceFilter(geometry,
-      maxDistance);
-    return filterQueryResults(results, filter);
+    if (hasGeometryAttribute()) {
+      final List<LayerDataObject> results = doQuery(geometry, maxDistance);
+      final Filter filter = new DataObjectGeometryDistanceFilter(geometry,
+        maxDistance);
+      return filterQueryResults(results, filter);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   public List<LayerDataObject> query(final Query query) {
@@ -1620,9 +1645,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   })
   public final List<LayerDataObject> queryBackground(
     final BoundingBox boundingBox) {
-    final List<LayerDataObject> results = doQueryBackground(boundingBox);
-    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
-    return filterQueryResults(results, filter);
+    if (hasGeometryAttribute()) {
+      final List<LayerDataObject> results = doQueryBackground(boundingBox);
+      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+      return filterQueryResults(results, filter);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   protected void removeForm(final LayerDataObject record) {
@@ -1763,7 +1792,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public final boolean saveChanges(final LayerDataObject record) {
     final boolean saved = internalSaveChanges(record);
-    fireRecordsChanged();
+    if (saved) {
+      fireRecordUpdated(record);
+    }
     if (!saved) {
       JOptionPane.showMessageDialog(MapPanel.get(this),
         "<html><p>There was an error saving changes to the record.</p>" + "<p>"
@@ -1873,6 +1904,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (metaData != null) {
       setGeometryFactory(metaData.getGeometryFactory());
       if (metaData.getGeometryAttributeIndex() == -1) {
+        setVisible(false);
         setSelectSupported(false);
         setRenderer(null);
       }

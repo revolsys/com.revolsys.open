@@ -40,7 +40,7 @@ public class MergedObjectPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = this.model.getObject(rowIndex);
+      final DataObject object = this.model.getRecord(rowIndex);
       if (object == model.getMergedObject()) {
         return true;
       } else {

@@ -56,7 +56,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   public LayerDataObject createRecord(final Map<String, Object> values) {
     final LayerDataObject record = super.createRecord(values);
     addToIndex(record);
-    fireRecordsChanged();
+    fireEmpty();
     return record;
   }
 
@@ -85,7 +85,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
     this.records.remove(record);
     super.deleteRecord(record);
     saveChanges(record);
-    fireRecordsChanged();
+    fireEmpty();
   }
 
   @Override
@@ -153,11 +153,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
     }
   }
 
+  public void fireEmpty() {
+    final boolean empty = isEmpty();
+    firePropertyChange("empty", !empty, empty);
+  }
+
   @Override
   protected void fireRecordsChanged() {
     super.fireRecordsChanged();
-    final boolean empty = isEmpty();
-    firePropertyChange("empty", !empty, empty);
+    fireEmpty();
   }
 
   @Override

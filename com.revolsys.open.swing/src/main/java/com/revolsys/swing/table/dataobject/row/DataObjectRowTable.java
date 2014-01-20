@@ -74,7 +74,7 @@ public class DataObjectRowTable extends BaseJxTable implements MouseListener {
       return null;
     } else {
       final DataObjectRowTableModel tableModel = getTableModel();
-      return tableModel.getObject(row);
+      return tableModel.getRecord(row);
     }
   }
 

@@ -63,6 +63,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     tableCellEditor = table.getTableCellEditor();
     tableCellEditor.setPopupMenu(getMenu());
     table.getTableCellEditor().addMouseListener(this);
+    table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     this.tableModel = getTableModel();
     final DataObjectMetaData metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
@@ -129,6 +130,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
+
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
+      "refresh");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       this);
@@ -225,7 +229,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final DataObjectRowTableModel model = getTableModel();
     final int row = getEventRow();
     if (row > -1) {
-      final LayerDataObject object = model.getObject(row);
+      final LayerDataObject object = model.getRecord(row);
       return object;
     } else {
       return null;
@@ -247,6 +251,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
     if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+      tableCellEditor.stopCellEditing();
       editRecord();
     }
   }
@@ -275,6 +280,10 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       }
       repaint();
     }
+  }
+
+  public void refresh() {
+    this.tableModel.refresh();
   }
 
   @Override

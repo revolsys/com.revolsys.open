@@ -49,7 +49,6 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     final List<String> columnNames) {
     super(layer, columnNames);
     this.layer = layer;
-    layer.addPropertyChangeListener("recordsChanged", this);
     setEditable(false);
     setSortableModes(MODE_SELECTED, MODE_ALL);
   }
@@ -110,7 +109,11 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
 
   @Override
   protected LayerDataObject loadLayerRecord(final int row) {
-    return records.get(row);
+    if (row >= 0 && row < this.records.size()) {
+      return records.get(row);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -122,12 +125,12 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final DataObject object = getObject(rowIndex);
-    if (object != null) {
+    final DataObject record = getRecord(rowIndex);
+    if (record != null) {
       final String name = getColumnName(columnIndex);
-      final Object oldValue = object.getValueByPath(name);
-      object.setValue(name, value);
-      firePropertyChange(object, name, oldValue, value);
+      final Object oldValue = record.getValueByPath(name);
+      record.setValue(name, value);
+      firePropertyChange(record, name, oldValue, value);
     }
   }
 }

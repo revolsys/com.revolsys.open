@@ -24,7 +24,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.setAutoCreateColumnsFromModel(false);
-
+    table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final SingleDataObjectTableCellRenderer cellRenderer = new SingleDataObjectTableCellRenderer();
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
       table);

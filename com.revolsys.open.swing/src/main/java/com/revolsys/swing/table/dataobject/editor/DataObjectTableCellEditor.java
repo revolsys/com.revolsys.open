@@ -16,7 +16,8 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 
 import org.jdesktop.swingx.JXTable;
@@ -33,7 +34,7 @@ import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 
 public class DataObjectTableCellEditor extends AbstractCellEditor implements
-  TableCellEditor, KeyListener, MouseListener {
+  TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -57,6 +58,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   public DataObjectTableCellEditor(final BaseJxTable table) {
     this.table = table;
+    table.getModel().addTableModelListener(this);
   }
 
   public synchronized void addMouseListener(final MouseListener l) {
@@ -139,7 +141,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     } else {
       if (event instanceof MouseEvent) {
         final MouseEvent mouseEvent = (MouseEvent)event;
-        if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
+        if (SwingUtil.isLeftButtonAndNoModifiers(mouseEvent)) {
           return true;
         }
       }
@@ -256,5 +258,14 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       }
     }
     return stopped;
+  }
+
+  @Override
+  public void tableChanged(final TableModelEvent e) {
+    if (e.getFirstRow() <= rowIndex && rowIndex <= e.getLastRow()) {
+      if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
+        cancelCellEditing();
+      }
+    }
   }
 }

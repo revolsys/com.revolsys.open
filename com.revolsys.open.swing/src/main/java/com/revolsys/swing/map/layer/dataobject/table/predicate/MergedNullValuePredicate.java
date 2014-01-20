@@ -33,7 +33,7 @@ public class MergedNullValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final DataObject object = model.getObject(rowIndex);
+      final DataObject object = model.getRecord(rowIndex);
       final DataObject mergedObject = model.getMergedObject();
 
       if (object != mergedObject) {

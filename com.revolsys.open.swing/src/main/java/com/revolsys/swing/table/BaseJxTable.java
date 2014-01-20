@@ -53,6 +53,8 @@ public class BaseJxTable extends JXTable {
       "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
       "enterPressed", this, "editRelativeCell", 1, 0);
+
+    putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
   }
 
   @Override

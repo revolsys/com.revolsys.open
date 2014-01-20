@@ -71,9 +71,11 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final AbstractDataObjectLayer layer) {
-    final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
-    if (renderer != null) {
-      renderer.render(viewport, graphics, layer);
+    if (layer.hasGeometryAttribute()) {
+      final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+      if (renderer != null) {
+        renderer.render(viewport, graphics, layer);
+      }
     }
   }
 

@@ -811,19 +811,19 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @SuppressWarnings("unchecked")
   @Override
   public void setRenderer(final LayerRenderer<? extends Layer> renderer) {
+    final LayerRenderer<?> oldValue = this.renderer;
+    if (oldValue != null) {
+      oldValue.setLayer(null);
+      Property.removeListener(renderer, this);
+    }
+    this.renderer = (LayerRenderer<AbstractLayer>)renderer;
     if (renderer != null) {
-      final LayerRenderer<?> oldValue = this.renderer;
-      if (oldValue != null) {
-        oldValue.setLayer(null);
-        Property.removeListener(renderer, this);
-      }
-      this.renderer = (LayerRenderer<AbstractLayer>)renderer;
       ((AbstractLayerRenderer<?>)this.renderer).setEditing(false);
       this.renderer.setLayer(this);
       Property.addListener(renderer, this);
-      firePropertyChange("renderer", oldValue, this.renderer);
-      fireIndexedPropertyChange("renderer", 0, oldValue, this.renderer);
     }
+    firePropertyChange("renderer", oldValue, this.renderer);
+    fireIndexedPropertyChange("renderer", 0, oldValue, this.renderer);
   }
 
   @Override

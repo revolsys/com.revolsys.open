@@ -26,6 +26,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.Column;
@@ -142,6 +143,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private List<LayerDataObject> selectedRecords = Collections.emptyList();
 
+  private final LayerDataObject loadingRecord;
+
   public DataObjectLayerTableModel(final AbstractDataObjectLayer layer,
     final List<String> attributeNames) {
     super(layer.getMetaData(), attributeNames);
@@ -149,6 +152,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     layer.addPropertyChangeListener(this);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
+    this.loadingRecord = new LayerDataObject(layer);
+    this.loadingRecord.setState(DataObjectState.Initalizing);
   }
 
   public String getAttributeFilterMode() {
@@ -223,26 +228,6 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends DataObject> V getObject(final int row) {
-    if (row < 0) {
-      return null;
-    } else if (this.attributeFilterMode.equals(MODE_SELECTED)) {
-      return (V)getSelectedRecord(row);
-    } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
-      final AbstractDataObjectLayer layer = getLayer();
-      final List<LayerDataObject> changes = layer.getChanges();
-      if (row < changes.size()) {
-        return (V)changes.get(row);
-      } else {
-        return null;
-      }
-    } else {
-      return (V)loadLayerRecord(row);
-    }
-  }
-
   public Map<String, Boolean> getOrderBy() {
     return this.orderBy;
   }
@@ -259,7 +244,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
               + getTypeName(), this, "loadPages", refreshIndex);
           }
         }
-        return null;
+        return loadingRecord;
       } else {
         if (recordNumber < page.size()) {
           final LayerDataObject object = page.get(recordNumber);
@@ -278,6 +263,26 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends DataObject> V getRecord(final int row) {
+    if (row < 0) {
+      return null;
+    } else if (this.attributeFilterMode.equals(MODE_SELECTED)) {
+      return (V)getSelectedRecord(row);
+    } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
+      final AbstractDataObjectLayer layer = getLayer();
+      final List<LayerDataObject> changes = layer.getChanges();
+      if (row < changes.size()) {
+        return (V)changes.get(row);
+      } else {
+        return null;
+      }
+    } else {
+      return (V)loadLayerRecord(row);
+    }
   }
 
   @Override
@@ -357,7 +362,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public boolean isSelected(final boolean selected, final int rowIndex,
     final int columnIndex) {
-    final LayerDataObject object = getObject(rowIndex);
+    final LayerDataObject object = getRecord(rowIndex);
     return layer.isSelected(object);
   }
 
@@ -410,9 +415,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == this.layer) {
       final String propertyName = e.getPropertyName();
-      if (Arrays.asList("query", "recordsChanged", "editable").contains(
-        propertyName)) {
+      if (Arrays.asList("query", "editable", "recordInserted", "recordDeleted",
+        "recordsChanged").contains(propertyName)) {
         refresh();
+      } else if ("recordUpdated".equals(propertyName)) {
+        repaint();
       } else if (propertyName.equals("selectionCount")) {
         if (MODE_SELECTED.equals(this.attributeFilterMode)) {
           refresh();
@@ -443,6 +450,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       Invoke.later(this, "refresh");
     }
+  }
+
+  protected void repaint() {
+    getTable().repaint();
   }
 
   protected void replaceCachedObject(final LayerDataObject oldObject,
@@ -605,9 +616,13 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       orderBy = Collections.emptyMap();
     }
-    synchronized (getSync()) {
+    if (sync == null) {
       this.orderBy = orderBy;
-      refresh();
+    } else {
+      synchronized (getSync()) {
+        this.orderBy = orderBy;
+        refresh();
+      }
     }
     return sortOrder;
   }

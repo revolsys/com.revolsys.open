@@ -43,7 +43,7 @@ public class NewPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final LayerDataObject object = this.model.getObject(rowIndex);
+      final LayerDataObject object = this.model.getRecord(rowIndex);
       if (object != null) {
         final DataObjectState state = object.getState();
         return state.equals(DataObjectState.New);

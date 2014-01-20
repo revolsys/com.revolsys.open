@@ -51,37 +51,37 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     return createPanel(metaData, objects, Arrays.asList(attributeNames));
   }
 
-  private final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+  private final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final Collection<LayerDataObject> objects,
     final Collection<String> columnNames) {
     super(metaData, columnNames);
     if (objects != null) {
-      this.objects.addAll(objects);
+      this.records.addAll(objects);
     }
     setEditable(true);
   }
 
   public void add(final int index, final LayerDataObject object) {
-    this.objects.add(index, object);
+    this.records.add(index, object);
     fireTableRowsInserted(index, index + 1);
   }
 
   public void add(final LayerDataObject... objects) {
     for (final LayerDataObject object : objects) {
-      this.objects.add(object);
-      fireTableRowsInserted(this.objects.size() - 1, this.objects.size());
+      this.records.add(object);
+      fireTableRowsInserted(this.records.size() - 1, this.records.size());
     }
   }
 
   public void addAll(final Collection<LayerDataObject> objects) {
-    this.objects.clear();
-    this.objects.addAll(objects);
+    this.records.clear();
+    this.records.addAll(objects);
   }
 
   public void clear() {
-    this.objects.clear();
+    this.records.clear();
     fireTableDataChanged();
   }
 
@@ -89,24 +89,29 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @PreDestroy
   public void dispose() {
     super.dispose();
-    this.objects.clear();
+    this.records.clear();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <V extends DataObject> V getObject(final int index) {
-    return (V)this.objects.get(index);
+  public <V extends DataObject> V getRecord(final int index) {
+    if (index >= 0 && index < this.records.size()) {
+      return (V)this.records.get(index);
+    } else {
+      return null;
+    }
   }
 
   /**
-   * @return the objects
+   * @return the records
    */
-  public List<LayerDataObject> getObjects() {
-    return this.objects;
+  public List<LayerDataObject> getRecords() {
+    return this.records;
   }
 
   @Override
   public int getRowCount() {
-    return this.objects.size();
+    return this.records.size();
   }
 
   @Override
@@ -132,15 +137,15 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public void remove(final int... rows) {
-    final List<LayerDataObject> rowsToRemove = getObjects(rows);
+    final List<LayerDataObject> rowsToRemove = getRecords(rows);
     removeAll(rowsToRemove);
   }
 
   public void removeAll(final Collection<LayerDataObject> objects) {
     for (final LayerDataObject object : objects) {
-      final int row = this.objects.indexOf(object);
+      final int row = this.records.indexOf(object);
       if (row != -1) {
-        this.objects.remove(row);
+        this.records.remove(row);
         fireTableRowsDeleted(row, row + 1);
       }
     }
@@ -155,7 +160,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     if (fromIndex < toIndex) {
       toIndex--;
     }
-    final DataObject object = getObject(fromIndex);
+    final DataObject object = getRecord(fromIndex);
     if (object instanceof LayerDataObject) {
       final LayerDataObject layerDataObject = (LayerDataObject)object;
       removeAll(layerDataObject);
@@ -166,12 +171,12 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   /**
-   * @param objects the objects to set
+   * @param records the records to set
    */
-  public void setObjects(final List<LayerDataObject> objects) {
-    this.objects.clear();
+  public void setRecords(final List<LayerDataObject> objects) {
+    this.records.clear();
     if (objects != null) {
-      this.objects.addAll(objects);
+      this.records.addAll(objects);
     }
     fireTableDataChanged();
   }
@@ -179,18 +184,20 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @Override
   public SortOrder setSortOrder(final int column) {
     final SortOrder sortOrder = super.setSortOrder(column);
-    final String attributeName = getFieldName(column);
-    final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
-      sortOrder == SortOrder.ASCENDING, attributeName);
-    Collections.sort(this.objects, comparitor);
-    fireTableDataChanged();
+    if (this.records != null) {
+      final String attributeName = getFieldName(column);
+      final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
+        sortOrder == SortOrder.ASCENDING, attributeName);
+      Collections.sort(this.records, comparitor);
+      fireTableDataChanged();
+    }
     return sortOrder;
   }
 
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final DataObject object = getObject(rowIndex);
+    final DataObject object = getRecord(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);
       final Object oldValue = object.getValueByPath(name);

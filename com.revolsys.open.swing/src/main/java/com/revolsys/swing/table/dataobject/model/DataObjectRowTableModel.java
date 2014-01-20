@@ -12,9 +12,12 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.SortableTableModel;
@@ -24,6 +27,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class DataObjectRowTableModel extends
   AbstractDataObjectTableModel implements SortableTableModel,
   CellEditorListener {
+
+  public static final String LOADING_VALUE = "\u2026";
+
   private static final long serialVersionUID = 1L;
 
   private List<String> attributeNames = new ArrayList<String>();
@@ -42,6 +48,8 @@ public abstract class DataObjectRowTableModel extends
     super(metaData);
     setAttributeNames(attributeNames);
     setAttributeTitles(Collections.<String> emptyList());
+    final String idAttributeName = metaData.getIdAttributeName();
+    setSortOrder(idAttributeName);
   }
 
   public void clearSortedColumns() {
@@ -140,14 +148,14 @@ public abstract class DataObjectRowTableModel extends
     return getFieldName(columnIndex);
   }
 
-  public abstract <V extends DataObject> V getObject(final int row);
+  public abstract <V extends DataObject> V getRecord(final int row);
 
-  public List<LayerDataObject> getObjects(final int[] rows) {
+  public List<LayerDataObject> getRecords(final int[] rows) {
     final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
     for (final int row : rows) {
-      final LayerDataObject object = getObject(row);
-      if (object != null) {
-        objects.add(object);
+      final LayerDataObject record = getRecord(row);
+      if (record != null) {
+        objects.add(record);
       }
     }
     return objects;
@@ -173,13 +181,14 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return null;
     } else {
-      final DataObject object = getObject(rowIndex);
-      if (object == null) {
-        return null;
+      final DataObject record = getRecord(rowIndex);
+      if (record == null) {
+        return LOADING_VALUE;
+      } else if (record.getState() == DataObjectState.Initalizing) {
+        return LOADING_VALUE;
       } else {
         final String name = getFieldName(columnIndex);
-
-        final Object value = object.getValue(name);
+        final Object value = record.getValue(name);
         return value;
       }
     }
@@ -188,13 +197,16 @@ public abstract class DataObjectRowTableModel extends
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final String attributeName = getFieldName(rowIndex, columnIndex);
-      if (attributeName != null) {
-        if (!isReadOnly(attributeName)) {
-          final Class<?> attributeClass = getMetaData().getAttributeClass(
-            attributeName);
-          if (!Geometry.class.isAssignableFrom(attributeClass)) {
-            return true;
+      final DataObject record = getRecord(rowIndex);
+      if (record != null && record.getState() != DataObjectState.Initalizing) {
+        final String attributeName = getFieldName(rowIndex, columnIndex);
+        if (attributeName != null) {
+          if (!isReadOnly(attributeName)) {
+            final Class<?> attributeClass = getMetaData().getAttributeClass(
+              attributeName);
+            if (!Geometry.class.isAssignableFrom(attributeClass)) {
+              return true;
+            }
           }
         }
       }
@@ -261,6 +273,15 @@ public abstract class DataObjectRowTableModel extends
     }
   }
 
+  public void setSortOrder(final String idAttributeName) {
+    if (StringUtils.hasText(idAttributeName)) {
+      final int index = this.attributeNames.indexOf(idAttributeName);
+      if (index != -1) {
+        setSortOrder(index);
+      }
+    }
+  }
+
   public void setTable(final DataObjectRowTable table) {
     this.table = table;
     addTableModelListener(table);
@@ -272,7 +293,7 @@ public abstract class DataObjectRowTableModel extends
     if (isCellEditable(rowIndex, columnIndex)) {
 
       if (columnIndex >= attributesOffset) {
-        final DataObject object = getObject(rowIndex);
+        final DataObject object = getRecord(rowIndex);
         if (object != null) {
           final String name = getFieldName(columnIndex);
           final Object objectValue = toObjectValue(columnIndex, value);
@@ -286,11 +307,24 @@ public abstract class DataObjectRowTableModel extends
   @Override
   public final String toDisplayValue(final int rowIndex,
     final int attributeIndex, final Object objectValue) {
-    if (getObject(rowIndex) == null) {
-      return "\u2026";
+    int rowHeight = table.getRowHeight();
+    String displayValue;
+    final DataObject record = getRecord(rowIndex);
+    if (record == null) {
+      rowHeight = 1;
+      displayValue = null;
     } else {
-      return toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
+      if (record.getState() == DataObjectState.Initalizing) {
+        displayValue = LOADING_VALUE;
+      } else {
+        displayValue = toDisplayValueInternal(rowIndex, attributeIndex,
+          objectValue);
+      }
     }
+    if (rowHeight != table.getRowHeight(rowIndex)) {
+      table.setRowHeight(rowIndex, rowHeight);
+    }
+    return displayValue;
   }
 
   protected String toDisplayValueInternal(final int rowIndex,

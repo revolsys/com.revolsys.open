@@ -91,6 +91,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       final DataObjectMetaData metaData = getMetaData(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Unable to  find table " + typePath);
+      } else if (metaData.getGeometryAttribute() == null) {
+        return query;
       } else {
         query = query.clone();
         final Attribute geometryAttribute = metaData.getGeometryAttribute();

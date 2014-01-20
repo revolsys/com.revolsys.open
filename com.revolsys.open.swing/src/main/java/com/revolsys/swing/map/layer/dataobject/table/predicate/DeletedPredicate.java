@@ -42,9 +42,9 @@ public class DeletedPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final LayerDataObject object = this.model.getObject(rowIndex);
-      if (object != null) {
-        return object.isDeleted();
+      final LayerDataObject record = this.model.getRecord(rowIndex);
+      if (record != null) {
+        return record.isDeleted();
       }
     } catch (final Throwable e) {
     }

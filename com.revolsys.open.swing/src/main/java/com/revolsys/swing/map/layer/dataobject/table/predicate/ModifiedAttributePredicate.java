@@ -52,7 +52,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = this.model.getObject(rowIndex);
+      final DataObject object = this.model.getRecord(rowIndex);
       if (object instanceof LayerDataObject) {
         final LayerDataObject layerObject = (LayerDataObject)object;
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);

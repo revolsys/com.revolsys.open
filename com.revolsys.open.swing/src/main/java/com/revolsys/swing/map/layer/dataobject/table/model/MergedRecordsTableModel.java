@@ -62,11 +62,11 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends DataObject> V getObject(final int index) {
+  public <V extends DataObject> V getRecord(final int index) {
     if (index == super.getRowCount()) {
       return (V)mergedObject;
     } else {
-      return (V)super.getObject(index);
+      return (V)super.getRecord(index);
     }
   }
 
@@ -102,7 +102,7 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final Map<String, Object> object = getObject(rowIndex);
+    final Map<String, Object> object = getRecord(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);
       object.put(name, value);
