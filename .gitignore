@@ -2,7 +2,4 @@
 .settings
 .classpath
 *.log
-target/
-/com.revolsys.open.core
-/com.revolsys.open.web
-/com.revolsys.open.swing
+target
