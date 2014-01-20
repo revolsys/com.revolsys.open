@@ -18,6 +18,14 @@ public class TransactionUtils {
   private static final TransactionDefinition TRANSACTION_DEFINITION_NEW = new DefaultTransactionDefinition(
     TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
+  private static final TransactionDefinition TRANSACTION_DEFINITION_DEFAULT = new DefaultTransactionDefinition(
+    TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+  public static TransactionStatus createDefaultTransaction(
+    final PlatformTransactionManager transactionManager) {
+    return transactionManager.getTransaction(TRANSACTION_DEFINITION_DEFAULT);
+  }
+
   public static TransactionStatus createNewTransaction(
     final PlatformTransactionManager transactionManager) {
     return transactionManager.getTransaction(TRANSACTION_DEFINITION_NEW);
