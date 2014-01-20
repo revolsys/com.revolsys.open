@@ -3,5 +3,3 @@
 .classpath
 *.log
 target/
-
-/com.revolsys.open.core
