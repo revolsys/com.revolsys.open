@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
+import org.jdesktop.swingx.color.ColorUtil;
+
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 
@@ -20,7 +22,7 @@ public class ToolTipOverlay extends AbstractOverlay {
     setLayout(null);
     this.label.setOpaque(true);
     this.label.setBorder(BorderFactory.createLineBorder(WebColors.Black));
-    this.label.setBackground(WebColors.Yellow);
+    this.label.setBackground(ColorUtil.setAlpha(WebColors.Yellow, 111));
     add(this.label);
     clearText();
   }

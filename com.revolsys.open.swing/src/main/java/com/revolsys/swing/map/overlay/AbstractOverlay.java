@@ -125,10 +125,11 @@ public class AbstractOverlay extends JComponent implements
         text.append("<b><i>");
         text.append(typePath);
         text.append("</i></b>\n");
-        text.append("<table cellspacing=\"0\" cellpadding=\"1\"style=\"border: solid #999999 1px;margin: 3px 0px 3px 0px;width: 100%\"><thead style=\"background-color:#dddddd\"><tr><th style=\"border-right: solid #999999 1px\">"
+        text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
+          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
           + idAttributeName + "</th><th>INDEX</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
-          text.append("<tr style=\"border-top: solid #999999 1px\"><td style=\"border-right: solid #999999 1px\">");
+          text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
           text.append("</td></td>");
           text.append(location.getIndexString());
@@ -534,7 +535,7 @@ public class AbstractOverlay extends JComponent implements
       for (final Entry<Point, Set<CloseLocation>> entry : this.snapPointLocationMap.entrySet()) {
         final Point snapPoint = entry.getKey();
         if (this.snapPointIndex == i) {
-          text.append("<li style=\"border: 1px solid red; padding: 2px; background-color:#FFC0CB\">");
+          text.append("<li style=\"border: 3px solid maroon; padding: 2px\">");
         } else {
           text.append("<li style=\"padding: 3px\">");
         }
