@@ -452,6 +452,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     }
   }
 
+  public void addUserReadOnlyFieldNames(
+    final Collection<String> userReadOnlyFieldNames) {
+    if (userReadOnlyFieldNames != null) {
+      this.userReadOnlyFieldNames.addAll(userReadOnlyFieldNames);
+    }
+  }
+
   public void cancelChanges() {
     synchronized (this.getEditSync()) {
       final boolean eventsEnabled = setEventsEnabled(false);
@@ -1378,7 +1385,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public boolean isHidden(final LayerDataObject record) {
     if (isCanDeleteRecords() && isDeleted(record)) {
       return true;
-    } else if (isSelected(record)) {
+    } else if (isSelectable() && isSelected(record)) {
       return true;
     } else {
       return false;
@@ -1640,15 +1647,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return filterQueryResults(results, condition);
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   public final List<LayerDataObject> queryBackground(
     final BoundingBox boundingBox) {
     if (hasGeometryAttribute()) {
       final List<LayerDataObject> results = doQueryBackground(boundingBox);
-      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
-      return filterQueryResults(results, filter);
+      return results;
     } else {
       return Collections.emptyList();
     }

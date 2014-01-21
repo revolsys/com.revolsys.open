@@ -129,6 +129,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Reader<DataObject> query(String typePath);
 
+  Reader<DataObject> query(String typePath, Geometry geometry);
+
+  Reader<DataObject> query(String typePath, Geometry geometry, double distance);
+
   DataObject queryFirst(Query query);
 
   void setDataObjectFactory(DataObjectFactory dataObjectFactory);

@@ -79,16 +79,16 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     }
   }
 
-  @Override
   // NOTE: Needed for filter styles
-  protected void renderObject(final Viewport2D viewport,
+  @Override
+  public void renderRecord(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
     final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
         try {
-          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+          renderer.renderRecord(viewport, graphics, visibleArea, layer, object);
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
             + " #" + object.getIdString(), e);
@@ -99,7 +99,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   // NOTE: Needed for multiple styles
-  protected void renderObjects(final Viewport2D viewport,
+  protected void renderRecords(final Viewport2D viewport,
     final Graphics2D graphics, final AbstractDataObjectLayer layer,
     final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
@@ -107,7 +107,24 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     if (renderer != null) {
       for (final LayerDataObject object : objects) {
         if (isVisible(object)) {
-          renderer.renderObject(viewport, graphics, visibleArea, layer, object);
+          renderer.renderRecord(viewport, graphics, visibleArea, layer, object);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void renderSelectedRecord(final Viewport2D viewport,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
+    final LayerDataObject object) {
+    final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
+    if (renderer != null) {
+      if (isVisible(object)) {
+        try {
+          renderer.renderSelectedRecord(viewport, graphics, layer, object);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
+            + " #" + object.getIdString(), e);
         }
       }
     }

@@ -162,9 +162,9 @@ public abstract class AbstractDataObjectLayerRenderer extends
     }
   }
 
-  protected boolean isFilterAccept(final LayerDataObject object) {
+  protected boolean isFilterAccept(final LayerDataObject record) {
     try {
-      return this.filter.accept(object);
+      return this.filter.accept(record);
     } catch (final Throwable e) {
       return false;
     }
@@ -186,35 +186,44 @@ public abstract class AbstractDataObjectLayerRenderer extends
       try {
         final BoundingBox boundingBox = viewport.getBoundingBox();
         final List<LayerDataObject> dataObjects = layer.queryBackground(boundingBox);
-        renderObjects(viewport, graphics, layer, dataObjects);
+        renderRecords(viewport, graphics, layer, dataObjects);
       } finally {
         viewport.setUseModelCoordinates(saved, graphics);
       }
     }
   }
 
-  protected void renderObject(final Viewport2D viewport,
+  public void renderRecord(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject record) {
   }
 
-  protected void renderObjects(final Viewport2D viewport,
+  protected void renderRecords(final Viewport2D viewport,
     final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final List<LayerDataObject> objects) {
+    final List<LayerDataObject> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
-    for (final LayerDataObject object : objects) {
-      if (object != null) {
-        if (isVisible(object) && !layer.isHidden(object)) {
+    for (final LayerDataObject record : records) {
+      if (record != null) {
+        if (isVisible(record) && !layer.isHidden(record)) {
           try {
-            renderObject(viewport, graphics, visibleArea, layer, object);
+            renderRecord(viewport, graphics, visibleArea, layer, record);
           } catch (final Throwable e) {
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + object.getIdString(), e);
+                + record.getIdString(), e);
           }
         }
       }
+    }
+  }
+
+  public void renderSelectedRecord(final Viewport2D viewport,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
+    final LayerDataObject record) {
+    final BoundingBox boundingBox = viewport.getBoundingBox();
+    if (isVisible(record)) {
+      renderRecord(viewport, graphics, boundingBox, layer, record);
     }
   }
 

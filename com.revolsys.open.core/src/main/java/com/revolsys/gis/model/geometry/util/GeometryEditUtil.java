@@ -11,6 +11,7 @@ import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -912,5 +913,46 @@ public class GeometryEditUtil {
     System.arraycopy(index, 0, newIndex, 0, lastIndex);
     newIndex[lastIndex] = vertexIndex;
     return newIndex;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <G extends Geometry> G toCounterClockwise(final G geometry) {
+    if (geometry instanceof Point) {
+      return geometry;
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      if (LineStringUtil.isCCW(line)) {
+        return geometry;
+      } else {
+        return (G)LineStringUtil.reverse(line);
+      }
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      boolean changed = false;
+      final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
+      for (int i = 0; i < pointsList.size(); i++) {
+        CoordinatesList points = pointsList.get(i);
+        final boolean counterClockwise = CoordinatesListUtil.isCCW(points);
+        boolean pointsChanged;
+        if (i == 0) {
+          pointsChanged = !counterClockwise;
+        } else {
+          pointsChanged = counterClockwise;
+        }
+        if (pointsChanged) {
+          changed = true;
+          points = points.reverse();
+          pointsList.set(i, points);
+        }
+      }
+      if (changed) {
+        return (G)GeometryFactory.getFactory(geometry)
+          .createPolygon(pointsList);
+      } else {
+        return geometry;
+      }
+    } else {
+      return geometry;
+    }
   }
 }

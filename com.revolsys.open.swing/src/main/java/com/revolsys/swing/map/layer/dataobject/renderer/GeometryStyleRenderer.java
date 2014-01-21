@@ -243,7 +243,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   @Override
-  protected void renderObject(final Viewport2D viewport,
+  public void renderRecord(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
     final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();

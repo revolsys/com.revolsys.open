@@ -33,23 +33,50 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderObject(final Viewport2D viewport,
+  public void renderRecord(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
-    if (isVisible(object)) {
+    final AbstractDataObjectLayer layer, final LayerDataObject record) {
+    if (isVisible(record)) {
       final double scale = viewport.getScale();
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
-        if (renderer.isFilterAccept(object)) {
-          if (renderer.isVisible(object) && !layer.isHidden(object)) {
+        if (renderer.isFilterAccept(record)) {
+          if (renderer.isVisible(record) && !layer.isHidden(record)) {
             if (renderer.isVisible(scale)) {
               try {
-                renderer.renderObject(viewport, graphics, visibleArea, layer,
-                  object);
+                renderer.renderRecord(viewport, graphics, visibleArea, layer,
+                  record);
               } catch (final Throwable e) {
                 ExceptionUtil.log(
                   getClass(),
                   "Unabled to render " + layer.getName() + " #"
-                    + object.getIdString(), e);
+                    + record.getIdString(), e);
+              }
+            }
+          }
+          // Only render using the first match
+          return;
+        }
+      }
+    }
+  }
+
+  @Override
+  public void renderSelectedRecord(final Viewport2D viewport,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
+    final LayerDataObject record) {
+    if (isVisible(record)) {
+      final double scale = viewport.getScale();
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        if (renderer.isFilterAccept(record)) {
+          if (renderer.isVisible(record)) {
+            if (renderer.isVisible(scale)) {
+              try {
+                renderer.renderSelectedRecord(viewport, graphics, layer, record);
+              } catch (final Throwable e) {
+                ExceptionUtil.log(
+                  getClass(),
+                  "Unabled to render " + layer.getName() + " #"
+                    + record.getIdString(), e);
               }
             }
           }

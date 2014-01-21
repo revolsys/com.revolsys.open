@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -28,6 +30,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathUtil;
@@ -446,7 +449,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
       final DataObjectQuadTree index = getIndex();
 
-      final List records = index.queryIntersects(polygon);
+      final List<LayerDataObject> records = (List)index.queryIntersects(polygon);
+
+      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+      for (final ListIterator<LayerDataObject> iterator = records.listIterator(); iterator.hasNext();) {
+        final LayerDataObject record = iterator.next();
+        final LayerDataObject cachedRecord = getCacheRecord(record);
+        if (filter.accept(cachedRecord)) {
+          iterator.set(cachedRecord);
+        } else {
+          iterator.remove();
+        }
+      }
       return records;
     }
   }

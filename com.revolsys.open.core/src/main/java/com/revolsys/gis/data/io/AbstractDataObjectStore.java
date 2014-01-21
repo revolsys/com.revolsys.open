@@ -643,6 +643,19 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
+  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
+    final DataObjectFactory dataObjectFactory = getDataObjectFactory();
+    return query(dataObjectFactory, typePath, geometry);
+  }
+
+  @Override
+  public Reader<DataObject> query(final String typePath,
+    final Geometry geometry, final double distance) {
+    final DataObjectFactory dataObjectFactory = getDataObjectFactory();
+    return query(dataObjectFactory, typePath, geometry, distance);
+  }
+
+  @Override
   public DataObject queryFirst(final Query query) {
     final Reader<DataObject> reader = query(query);
     try {

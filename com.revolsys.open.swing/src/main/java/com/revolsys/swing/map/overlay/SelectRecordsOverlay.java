@@ -26,6 +26,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -190,6 +191,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         for (final LayerDataObject record : dataObjectLayer.getHighlightedRecords()) {
           if (record != null && dataObjectLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
+            final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
+            layerRenderer.renderSelectedRecord(viewport, graphics2d,
+              dataObjectLayer, record);
             HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
               graphics2d, geometry);
           }
@@ -218,14 +222,18 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         paintSelected(graphics2d, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+        final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
         if (dataObjectLayer.isSelectable()) {
           for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
-            if (record != null && dataObjectLayer.isVisible(record)
-              && !dataObjectLayer.isHighlighted(record)) {
-              if (!dataObjectLayer.isDeleted(record)) {
-                final Geometry geometry = record.getGeometryValue();
-                SELECT_RENDERER.paintSelected(viewport,
-                  viewportGeometryFactory, graphics2d, geometry);
+            if (record != null && dataObjectLayer.isVisible(record)) {
+              if (!dataObjectLayer.isHighlighted(record)) {
+                if (!dataObjectLayer.isDeleted(record)) {
+                  final Geometry geometry = record.getGeometryValue();
+                  layerRenderer.renderSelectedRecord(viewport, graphics2d,
+                    dataObjectLayer, record);
+                  SELECT_RENDERER.paintSelected(viewport,
+                    viewportGeometryFactory, graphics2d, geometry);
+                }
               }
             }
           }

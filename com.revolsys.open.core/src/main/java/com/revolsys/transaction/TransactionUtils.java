@@ -14,6 +14,17 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.util.ExceptionUtil;
 
+//final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)applicationContext.getBean("transactionManager");
+//final TransactionStatus status = TransactionUtils.createDefaultTransaction(transactionManager);
+//try {
+
+//  transactionManager.commit(status);
+//} catch (final Throwable e) {
+//  HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request,
+//    e);
+//  TransactionUtils.handleException(transactionManager, status, e);
+//}
+
 public class TransactionUtils {
   private static final TransactionDefinition TRANSACTION_DEFINITION_NEW = new DefaultTransactionDefinition(
     TransactionDefinition.PROPAGATION_REQUIRES_NEW);

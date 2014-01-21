@@ -41,23 +41,23 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     addRenderer(renderer);
   }
 
-  @Override
   // Needed for filter styles
-  protected void renderObject(final Viewport2D viewport,
+  @Override
+  public void renderRecord(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
-    if (isVisible(object)) {
+    final AbstractDataObjectLayer layer, final LayerDataObject record) {
+    if (isVisible(record)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
           try {
-            renderer.renderObject(viewport, graphics, visibleArea, layer,
-              object);
+            renderer.renderRecord(viewport, graphics, visibleArea, layer,
+              record);
           } catch (final Throwable e) {
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + object.getIdString(), e);
+                + record.getIdString(), e);
           }
         }
       }
@@ -65,24 +65,46 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  protected void renderObjects(final Viewport2D viewport,
+  protected void renderRecords(final Viewport2D viewport,
     final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final List<LayerDataObject> objects) {
+    final List<LayerDataObject> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
       final long scale = (long)viewport.getScale();
       if (renderer.isVisible(scale)) {
-        for (final LayerDataObject object : objects) {
-          if (isVisible(object) && renderer.isVisible(object)) {
+        for (final LayerDataObject record : records) {
+          if (isVisible(record) && renderer.isVisible(record)
+            && !layer.isHidden(record)) {
             try {
-              renderer.renderObject(viewport, graphics, visibleArea, layer,
-                object);
+              renderer.renderRecord(viewport, graphics, visibleArea, layer,
+                record);
             } catch (final Throwable e) {
               ExceptionUtil.log(
                 getClass(),
                 "Unabled to render " + layer.getName() + " #"
-                  + object.getIdString(), e);
+                  + record.getIdString(), e);
             }
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public void renderSelectedRecord(final Viewport2D viewport,
+    final Graphics2D graphics, final AbstractDataObjectLayer layer,
+    final LayerDataObject object) {
+    if (isVisible(object)) {
+      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+        final long scale = (long)viewport.getScale();
+        if (renderer.isVisible(scale)) {
+          try {
+            renderer.renderSelectedRecord(viewport, graphics, layer, object);
+          } catch (final Throwable e) {
+            ExceptionUtil.log(
+              getClass(),
+              "Unabled to render " + layer.getName() + " #"
+                + object.getIdString(), e);
           }
         }
       }
