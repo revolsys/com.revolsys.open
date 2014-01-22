@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
 
@@ -178,7 +179,7 @@ public class LayerDataObject extends ArrayDataObject {
     final String attributeName = metaData.getAttributeName(index);
 
     final Object oldValue = getValue(index);
-    if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
+    if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
       final AbstractDataObjectLayer layer = getLayer();
       final DataObjectState state = getState();
       if (DataObjectState.Initalizing.equals(state)) {

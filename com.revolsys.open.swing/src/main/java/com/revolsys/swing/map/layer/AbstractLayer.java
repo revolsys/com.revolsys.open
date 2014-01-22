@@ -38,7 +38,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -777,7 +777,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       setMaximumScale(((Number)value).longValue());
     } else {
       final Object oldValue = getProperty(name);
-      if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
+      if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
           this, "property", oldValue, value, name);
         if (propertyChangeSupport != null) {

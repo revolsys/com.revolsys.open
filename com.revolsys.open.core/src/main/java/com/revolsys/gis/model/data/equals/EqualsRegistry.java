@@ -17,17 +17,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class EqualsRegistry implements Equals<Object> {
 
-  private static final ObjectEquals DEFAULT_EQUALS = new ObjectEquals();
-
-  public static final EqualsRegistry INSTANCE = new EqualsRegistry();
-
   public static boolean equal(final Object object1, final Object object2) {
-    return INSTANCE.equals(object1, object2);
+    return EqualsInstance.INSTANCE.equals(object1, object2);
   }
 
   public static boolean equal(final Object object1, final Object object2,
     final Collection<String> exclude) {
-    return INSTANCE.equals(object1, object2, exclude);
+    return EqualsInstance.INSTANCE.equals(object1, object2, exclude);
   }
 
   public static boolean equal(final Object object1, final Object object2,
@@ -38,20 +34,24 @@ public class EqualsRegistry implements Equals<Object> {
   private final Map<Class<?>, Equals<?>> classEqualsMap = new HashMap<Class<?>, Equals<?>>();
 
   public EqualsRegistry() {
-    register(Object.class, DEFAULT_EQUALS);
-    register(String.class, DEFAULT_EQUALS);
+    final ObjectEquals defaultEquals = new ObjectEquals();
+    register(Object.class, defaultEquals);
+    register(String.class, defaultEquals);
+
     register(Boolean.class, new BooleanEquals());
-    register(Number.class, new NumberEquals());
-    register(BigDecimal.class, new NumberEquals());
-    register(BigInteger.class, new NumberEquals());
-    register(Long.class, new NumberEquals());
-    register(Byte.class, new NumberEquals());
-    register(Integer.class, new NumberEquals());
-    register(Short.class, new NumberEquals());
+    final NumberEquals numberEquals = new NumberEquals();
+    register(Number.class, numberEquals);
+    register(BigDecimal.class, numberEquals);
+    register(BigInteger.class, numberEquals);
+    register(Long.class, numberEquals);
+    register(Byte.class, numberEquals);
+    register(Integer.class, numberEquals);
+    register(Short.class, numberEquals);
     register(Geometry.class, new Geometry3DExactEquals());
-    register(Date.class, new DateEquals());
-    register(java.sql.Date.class, new DateEquals());
-    register(Timestamp.class, new DateEquals());
+    final DateEquals dateEquals = new DateEquals();
+    register(Date.class, dateEquals);
+    register(java.sql.Date.class, dateEquals);
+    register(Timestamp.class, dateEquals);
     register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
     register(DataObject.class, new DataObjectEquals());
@@ -85,7 +85,7 @@ public class EqualsRegistry implements Equals<Object> {
 
   public Equals<Object> getEquals(final Class<?> clazz) {
     if (clazz == null) {
-      return DEFAULT_EQUALS;
+      return EqualsInstance.DEFAULT_EQUALS;
     } else {
       @SuppressWarnings("unchecked")
       Equals<Object> equals = (Equals<Object>)classEqualsMap.get(clazz);
@@ -94,7 +94,7 @@ public class EqualsRegistry implements Equals<Object> {
         if (interfaces != null) {
           for (final Class<?> inter : interfaces) {
             equals = getEquals(inter);
-            if (equals != null && equals != DEFAULT_EQUALS) {
+            if (equals != null && equals != EqualsInstance.DEFAULT_EQUALS) {
               return equals;
             }
           }

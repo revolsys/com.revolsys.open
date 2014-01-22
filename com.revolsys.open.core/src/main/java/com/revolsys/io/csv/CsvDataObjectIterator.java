@@ -87,7 +87,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
         geometryType, true);
       attributes.add(geometryAttribute);
       if (geometryFactory == null) {
-        geometryFactory = GeometryFactory.WGS84;
+        geometryFactory = GeometryFactory.wgs84();
       }
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);

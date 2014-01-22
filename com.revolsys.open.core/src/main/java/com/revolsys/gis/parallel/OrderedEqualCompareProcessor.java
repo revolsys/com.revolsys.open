@@ -10,7 +10,7 @@ import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
@@ -118,7 +118,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         && !attributeName.equals(geometryAttributeName)) {
         final Object value1 = object1.getValue(attributeName);
         final Object value2 = object2.getValue(attributeName);
-        if (!EqualsRegistry.INSTANCE.equals(value1, value2)) {
+        if (!EqualsInstance.INSTANCE.equals(value1, value2)) {
           notEqualAttributeNames.add(attributeName);
         }
       }
@@ -223,7 +223,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         final DataObject readObject = readObject(channel);
         if (readObject != null) {
           if (previousEqualObject != null
-            && EqualsRegistry.INSTANCE.equals(previousEqualObject, readObject)) {
+            && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
             if (index == 0) {
               DataObjectLog.error(getClass(), "Duplicate in " + sourceName,
                 readObject);

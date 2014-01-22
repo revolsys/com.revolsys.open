@@ -19,7 +19,7 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.Reader;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
@@ -190,7 +190,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
         for (final Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
           final DataObject matchedObject = iterator.next();
           final Object matchedId = matchedObject.getIdValue();
-          if (EqualsRegistry.INSTANCE.equals(id, matchedId)) {
+          if (EqualsInstance.INSTANCE.equals(id, matchedId)) {
             iterator.remove();
           }
         }

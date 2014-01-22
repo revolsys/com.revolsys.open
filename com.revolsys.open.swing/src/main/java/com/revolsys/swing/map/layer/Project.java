@@ -68,7 +68,7 @@ public class Project extends LayerGroup {
   public Project(final String name) {
     super(name);
     this.baseMapLayers.setLayerGroup(this);
-    setGeometryFactory(GeometryFactory.WORLD_MERCATOR);
+    setGeometryFactory(GeometryFactory.worldMercator());
   }
 
   private void addChangedLayers(final LayerGroup group,

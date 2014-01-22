@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.util.CompareUtil;
 
 /**
@@ -53,12 +53,12 @@ public class EqualAttributeCountComparator implements Comparator<DataObject> {
         final Object value = object.getValue(attributeName);
 
         final Object value1 = object1.getValue(attributeName);
-        if (EqualsRegistry.INSTANCE.equals(value, value1)) {
+        if (EqualsInstance.INSTANCE.equals(value, value1)) {
           count1++;
         }
 
         final Object value2 = object1.getValue(attributeName);
-        if (EqualsRegistry.INSTANCE.equals(value, value2)) {
+        if (EqualsInstance.INSTANCE.equals(value, value2)) {
           count2++;
         }
       }

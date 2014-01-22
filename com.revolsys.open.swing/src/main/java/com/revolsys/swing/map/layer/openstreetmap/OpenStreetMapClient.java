@@ -34,7 +34,7 @@ public class OpenStreetMapClient {
     final double y1 = getLatitude(zoomLevel, tileY);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
     final double y2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBox(GeometryFactory.WGS84, x1, y1, x2, y2).convert(GeometryFactory.WORLD_MERCATOR);
+    return new BoundingBox(GeometryFactory.wgs84(), x1, y1, x2, y2).convert(GeometryFactory.worldMercator());
   }
 
   protected BufferedImage getImage(final String url) {

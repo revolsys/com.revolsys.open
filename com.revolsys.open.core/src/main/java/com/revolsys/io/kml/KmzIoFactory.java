@@ -43,7 +43,7 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
 
   @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
-    return Collections.singleton(EpsgCoordinateSystems.WGS_84);
+    return Collections.singleton(EpsgCoordinateSystems.wgs84());
   }
 
   @Override
@@ -75,7 +75,7 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
-    return EpsgCoordinateSystems.WGS_84.equals(coordinateSystem);
+    return EpsgCoordinateSystems.wgs84().equals(coordinateSystem);
   }
 
   @Override

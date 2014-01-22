@@ -2,7 +2,7 @@ package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.AttributedObject;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 public class AttributeFilter<T extends AttributedObject> implements Filter<T> {
   private final String attributeName;
@@ -27,7 +27,7 @@ public class AttributeFilter<T extends AttributedObject> implements Filter<T> {
   @Override
   public boolean accept(final T object) {
     final Object value = object.getAttribute(attributeName);
-    final boolean equal = EqualsRegistry.INSTANCE.equals(this.value, value);
+    final boolean equal = EqualsInstance.INSTANCE.equals(this.value, value);
     if (inverse) {
       return !equal;
     } else {

@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 /**
  * Filter DataObjects by the value of the attributeName.
@@ -83,7 +83,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
       }
     } else {
       for (final Object value : values) {
-        if (EqualsRegistry.INSTANCE.equals(value, propertyValue)) {
+        if (EqualsInstance.INSTANCE.equals(value, propertyValue)) {
           return true;
         }
       }

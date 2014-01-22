@@ -34,7 +34,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -289,7 +289,7 @@ public final class DataObjectUtil {
       if (!ignoreAttributeNames.contains(attributeName)) {
         final Object oldValue = target.getValue(attributeName);
         Object newValue = source.getValue(attributeName);
-        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+        if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
           newValue = JavaBeanUtil.clone(newValue);
           target.setValue(attributeName, newValue);
         }

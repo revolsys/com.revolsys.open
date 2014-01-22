@@ -6,7 +6,7 @@ import java.util.Collections;
 import com.revolsys.filter.Filter;
 
 public class EqualsFilter<T> implements Filter<T> {
-  private Equals<Object> equals = EqualsRegistry.INSTANCE;
+  private Equals<Object> equals = EqualsInstance.INSTANCE;
 
   private Collection<String> excludeAttributes = Collections.emptyList();
 

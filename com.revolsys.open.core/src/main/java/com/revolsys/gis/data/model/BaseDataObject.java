@@ -24,6 +24,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -568,7 +569,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     for (final String attributeName : attributesNames) {
       final Object oldValue = getValue(attributeName);
       Object newValue = object.getValue(attributeName);
-      if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+      if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
         newValue = JavaBeanUtil.clone(newValue);
         setValue(attributeName, newValue);
       }

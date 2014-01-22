@@ -66,7 +66,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     } else {
       final Object value1 = object1.getValue(attributeName);
       final Object value2 = object2.getValue(attributeName);
-      return EqualsRegistry.INSTANCE.equals(value1, value2);
+      return EqualsInstance.INSTANCE.equals(value1, value2);
     }
   }
 
@@ -74,7 +74,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     final DataObject object2, final String attributeName) {
     final Object value1 = object1.getValue(attributeName);
     final Object value2 = object2.getValue(attributeName);
-    return EqualsRegistry.INSTANCE.equals(value1, value2);
+    return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 
   public static boolean isAttributeIgnored(final DataObjectMetaData metaData,

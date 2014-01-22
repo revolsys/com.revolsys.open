@@ -64,7 +64,7 @@ public class BingClient {
     final double y2 = getLatitude(zoomLevel, tileY + 1);
     final double x1 = getLongitude(zoomLevel, tileX);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
-    return new BoundingBox(GeometryFactory.WGS84, x1, y1, x2, y2).convert(GeometryFactory.WORLD_MERCATOR);
+    return new BoundingBox(GeometryFactory.wgs84(), x1, y1, x2, y2).convert(GeometryFactory.worldMercator());
   }
 
   public Map<String, Object> getImageryMetadata(final ImagerySet imagerySet) {

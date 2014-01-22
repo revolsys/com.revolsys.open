@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.Geometry2DEquals;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -39,7 +39,7 @@ public class DataObjectEquals2DFilter implements Filter<DataObject> {
     final Geometry geometry = object.getGeometryValue();
 
     if (Geometry2DEquals.INSTANCE.equals(serachGeometry, geometry, equalExclude)) {
-      if (EqualsRegistry.INSTANCE.equals(searchObject, object, equalExclude)) {
+      if (EqualsInstance.INSTANCE.equals(searchObject, object, equalExclude)) {
         return true;
       }
     }

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 /**
  * The ArrayDataObject is an implementation of {@link DataObject} which uses an
@@ -107,7 +107,7 @@ public class ArrayDataObject extends BaseDataObject {
   public void setValue(final int index, final Object value) {
     if (index >= 0) {
       final Object oldValue = attributes[index];
-      if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
+      if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         updateState();
       }
       attributes[index] = value;

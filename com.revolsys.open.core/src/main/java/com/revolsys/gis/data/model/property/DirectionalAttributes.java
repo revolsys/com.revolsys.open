@@ -26,7 +26,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -299,7 +299,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
           final Object value1 = object1.getValue(attributeName);
           final Object value2 = getDirectionalAttributeValue(object2,
             attributeName);
-          if (EqualsRegistry.INSTANCE.equals(value1, value2,
+          if (EqualsInstance.INSTANCE.equals(value1, value2,
             equalExcludeAttributes)) {
             return true;
           } else {
@@ -420,7 +420,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final Collection<String> equalExcludeAttributes) {
     final Object value1 = object1.getValue(name1);
     final Object value2 = object2.getValue(name2);
-    if (EqualsRegistry.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
+    if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
       return true;
     } else {
       if (LOG.isDebugEnabled()) {
@@ -470,7 +470,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     if (hasDirectionalAttributeValues(attributeName)) {
       final Object value1 = object1.getValue(attributeName);
       final Object value2 = getDirectionalAttributeValue(object2, attributeName);
-      if (EqualsRegistry.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
+      if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeAttributes)) {
         return true;
       } else {
         if (LOG.isDebugEnabled()) {

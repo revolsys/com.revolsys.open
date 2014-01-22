@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 public class AttributesEqualOrSourceNullFilter implements Filter<DataObject> {
   public static boolean accept(final DataObject object1,
@@ -17,7 +17,7 @@ public class AttributesEqualOrSourceNullFilter implements Filter<DataObject> {
       final Object value2 = DataObjectUtil.getAttributeByPath(object2,
         attributeName);
 
-      if (value1 != null && !EqualsRegistry.INSTANCE.equals(value1, value2)) {
+      if (value1 != null && !EqualsInstance.INSTANCE.equals(value1, value2)) {
         return false;
       }
     }

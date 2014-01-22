@@ -82,7 +82,7 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
-    return EpsgCoordinateSystems.WGS_84.equals(coordinateSystem);
+    return EpsgCoordinateSystems.wgs84().equals(coordinateSystem);
   }
 
   @Override

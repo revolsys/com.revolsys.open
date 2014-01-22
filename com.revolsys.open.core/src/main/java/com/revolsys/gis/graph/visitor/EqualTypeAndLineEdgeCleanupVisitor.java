@@ -26,7 +26,7 @@ import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 import com.vividsolutions.jts.geom.LineString;
@@ -140,7 +140,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     final DataObject object1 = edge1.getObject();
     final DataObject object2 = edge2.getObject();
 
-    final boolean equalAttributes = EqualsRegistry.INSTANCE.equals(object1,
+    final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1,
       object2, equalExcludeAttributes);
 
     final LineString line1 = edge1.getLine();

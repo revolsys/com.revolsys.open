@@ -8,6 +8,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -32,14 +33,14 @@ public class TransactionUtils {
   private static final TransactionDefinition TRANSACTION_DEFINITION_DEFAULT = new DefaultTransactionDefinition(
     TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
-  public static TransactionStatus createDefaultTransaction(
+  public static DefaultTransactionStatus createDefaultTransaction(
     final PlatformTransactionManager transactionManager) {
-    return transactionManager.getTransaction(TRANSACTION_DEFINITION_DEFAULT);
+    return createTransaction(transactionManager, TRANSACTION_DEFINITION_DEFAULT);
   }
 
-  public static TransactionStatus createNewTransaction(
+  public static DefaultTransactionStatus createNewTransaction(
     final PlatformTransactionManager transactionManager) {
-    return transactionManager.getTransaction(TRANSACTION_DEFINITION_NEW);
+    return createTransaction(transactionManager, TRANSACTION_DEFINITION_NEW);
   }
 
   public static Runnable createRunnable(
@@ -49,11 +50,17 @@ public class TransactionUtils {
       transactionManager, propagationBehavior, runnable);
   }
 
+  public static DefaultTransactionStatus createTransaction(
+    final PlatformTransactionManager transactionManager,
+    final TransactionDefinition transactionDefinition) {
+    return (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
+  }
+
   public static void handleException(
     final PlatformTransactionManager transactionManager,
-    final TransactionStatus status, final Throwable e) {
+    final TransactionStatus transaction, final Throwable e) {
     try {
-      transactionManager.rollback(status);
+      transactionManager.rollback(transaction);
     } catch (final TransactionSystemException rollbackException) {
       rollbackException.initApplicationException(e);
       throw rollbackException;
@@ -114,5 +121,18 @@ public class TransactionUtils {
     return (T)invoke(transactionManager,
       TransactionDefinition.PROPAGATION_REQUIRES_NEW, false, object, method,
       parameters);
+  }
+
+  public static boolean rollback(
+    final PlatformTransactionManager transactionManager,
+    final TransactionStatus transaction) {
+    try {
+      transactionManager.rollback(transaction);
+      return true;
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(TransactionUtils.class).error(
+        "Exception rolling back", e);
+      return false;
+    }
   }
 }

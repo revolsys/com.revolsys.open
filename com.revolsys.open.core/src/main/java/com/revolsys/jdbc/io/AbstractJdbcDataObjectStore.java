@@ -19,10 +19,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +58,6 @@ import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.transaction.DataSourceTransactionManagerFactory;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -111,6 +112,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   private String tablePermissionsSql;
 
   private Set<String> excludeTablePaths = new HashSet<String>();
+
+  private DataSourceTransactionManager transactionManager;
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -190,6 +193,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     } finally {
       allSchemaNames.clear();
       attributeAdders.clear();
+      transactionManager = null;
       connection = null;
       databaseFactory = null;
       dataSource = null;
@@ -622,8 +626,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public PlatformTransactionManager getTransactionManager() {
-    final DataSource dataSource = getDataSource();
-    return DataSourceTransactionManagerFactory.getTransactionManager(dataSource);
+    return transactionManager;
   }
 
   @Override
@@ -656,6 +659,16 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
     }
     return writer;
+  }
+
+  @Override
+  @PostConstruct
+  public void initialize() {
+    super.initialize();
+    final DataSource dataSource = getDataSource();
+    if (dataSource != null) {
+      transactionManager = new DataSourceTransactionManager(dataSource);
+    }
   }
 
   @Override

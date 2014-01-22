@@ -28,7 +28,7 @@ public class MapEquals implements Equals<Map<String, Object>> {
     final Map<String, Object> map2, final String attributeName) {
     final Object value1 = map1.get(attributeName);
     final Object value2 = map2.get(attributeName);
-    return EqualsRegistry.INSTANCE.equals(value1, value2);
+    return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 
   private EqualsRegistry equalsRegistry;

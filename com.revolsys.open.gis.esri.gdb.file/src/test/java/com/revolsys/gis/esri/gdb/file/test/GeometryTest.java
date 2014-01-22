@@ -16,7 +16,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -59,7 +59,7 @@ public class GeometryTest {
     dataStore.insert(object);
 
     final DataObject object2 = dataStore.load(name, 1);
-    if (!EqualsRegistry.INSTANCE.equals(object, object2)) {
+    if (!EqualsInstance.INSTANCE.equals(object, object2)) {
       System.out.println("Not Equal");
       System.out.println(object);
       System.out.println(object2);

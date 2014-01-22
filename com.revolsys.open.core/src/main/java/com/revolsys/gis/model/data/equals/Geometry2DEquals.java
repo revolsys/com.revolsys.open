@@ -11,7 +11,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
   private EqualsRegistry equalsRegistry;
 
   public Geometry2DEquals() {
-    this(EqualsRegistry.INSTANCE);
+    this(EqualsInstance.INSTANCE);
   }
 
   public Geometry2DEquals(final EqualsRegistry equalsRegistry) {

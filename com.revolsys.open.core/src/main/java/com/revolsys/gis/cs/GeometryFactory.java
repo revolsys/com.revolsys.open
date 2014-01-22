@@ -56,10 +56,6 @@ public class GeometryFactory extends
 
   private static final long serialVersionUID = 4328651897279304108L;
 
-  public static final GeometryFactory WORLD_MERCATOR = getFactory(3857);
-
-  public static final GeometryFactory WGS84 = getFactory(4326);
-
   public static void clear() {
     factories.clear();
   }
@@ -1058,5 +1054,13 @@ public class GeometryFactory extends
       }
       return string.toString();
     }
+  }
+
+  public static GeometryFactory wgs84() {
+    return getFactory(4326);
+  }
+
+  public static GeometryFactory worldMercator() {
+    return getFactory(3857);
   }
 }

@@ -11,7 +11,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
 
@@ -113,7 +113,7 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
         if (edge1 != edge2) {
           final DataObject object1 = edge1.getObject();
           final DataObject object2 = edge2.getObject();
-          if (EqualsRegistry.INSTANCE.equals(object1, object2,
+          if (EqualsInstance.INSTANCE.equals(object1, object2,
             excludedAttributes)) {
             if (edge1.isForwards(node) == edge2.isForwards(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {
