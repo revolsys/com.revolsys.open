@@ -145,8 +145,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           xbaseIterator.hasNext();
         }
         if (metaData == null) {
-          metaData = new DataObjectMetaDataImpl(
-            DataObjectUtil.GEOMETRY_META_DATA);
+          metaData = DataObjectUtil.createGeometryMetaData();
         }
         metaData.setGeometryFactory(geometryFactory);
       } catch (final IOException e) {

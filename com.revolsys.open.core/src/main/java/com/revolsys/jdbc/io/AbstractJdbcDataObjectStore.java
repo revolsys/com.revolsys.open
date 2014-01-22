@@ -100,9 +100,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private final Set<String> allSchemaNames = new TreeSet<String>();
 
-  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
-    AbstractJdbcDataObjectStore.class, "createJdbcIterator");
-
   public static final AbstractIterator<DataObject> createJdbcIterator(
     final AbstractJdbcDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
@@ -121,7 +118,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
-    setIteratorFactory(ITERATOR_FACTORY);
+    setIteratorFactory(new DataStoreIteratorFactory(
+      AbstractJdbcDataObjectStore.class, "createJdbcIterator"));
     addDataStoreExtension(this);
   }
 

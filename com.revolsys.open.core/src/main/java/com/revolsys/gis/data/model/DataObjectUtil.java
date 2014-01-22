@@ -40,9 +40,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public final class DataObjectUtil {
 
-  public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
-    "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
-
   public static DataObject copy(final DataObjectMetaData metaData,
     final DataObject object) {
     final DataObject copy = new ArrayDataObject(metaData);
@@ -298,6 +295,12 @@ public final class DataObjectUtil {
   }
 
   private DataObjectUtil() {
+  }
+
+  public static DataObjectMetaData createGeometryMetaData() {
+    Attribute geometryAttribute = new Attribute("geometry", DataTypes.GEOMETRY, true);
+    return new DataObjectMetaDataImpl(
+      "Feature", geometryAttribute);
   }
 
 }

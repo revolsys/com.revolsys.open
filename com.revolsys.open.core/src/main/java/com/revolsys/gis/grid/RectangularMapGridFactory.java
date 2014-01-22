@@ -2,35 +2,57 @@ package com.revolsys.gis.grid;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-public class RectangularMapGridFactory {
-  public static final String[] GRID_NAMES;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
-  private static final Map<String, RectangularMapGrid> GRIDS_BY_NAME = new LinkedHashMap<String, RectangularMapGrid>();
+public class RectangularMapGridFactory {
+  public static final List<String> gridNames;
+
+  public static final Map<String, String> gridClassNamesByName = new LinkedHashMap<String, String>();
 
   static {
-    GRIDS_BY_NAME.put("NTS 1:1 000 000", new Nts1000000RectangularMapGrid());
-    GRIDS_BY_NAME.put("NTS 1:500 000", new Nts500000RectangularMapGrid());
-    GRIDS_BY_NAME.put("NTS 1:250 000", new Nts250000RectangularMapGrid());
-    GRIDS_BY_NAME.put("NTS 1:125 000", new Nts125000RectangularMapGrid());
-    GRIDS_BY_NAME.put("NTS 1:50 000", new Nts50000RectangularMapGrid());
-    GRIDS_BY_NAME.put("NTS 1:25 000", new Nts25000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:20 000", new Bcgs20000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:10 000", new Bcgs10000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:5 000", new Bcgs5000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:2 500", new Bcgs2500RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:2 000", new Bcgs2000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:1 250", new Bcgs1250RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:1 000", new Bcgs1000RectangularMapGrid());
-    GRIDS_BY_NAME.put("BCGS 1:500", new Bcgs500RectangularMapGrid());
-    GRIDS_BY_NAME.put("MTO", new MtoRectangularMapGrid());
-    GRID_NAMES = new ArrayList<String>(GRIDS_BY_NAME.keySet()).toArray(new String[0]);
+    addGrid("NTS 1:1 000 000", Nts1000000RectangularMapGrid.class);
+    addGrid("NTS 1:500 000", Nts500000RectangularMapGrid.class);
+    addGrid("NTS 1:250 000", Nts250000RectangularMapGrid.class);
+    addGrid("NTS 1:125 000", Nts125000RectangularMapGrid.class);
+    addGrid("NTS 1:50 000", Nts50000RectangularMapGrid.class);
+    addGrid("NTS 1:25 000", Nts25000RectangularMapGrid.class);
+    addGrid("BCGS 1:20 000", Bcgs20000RectangularMapGrid.class);
+    addGrid("BCGS 1:10 000", Bcgs10000RectangularMapGrid.class);
+    addGrid("BCGS 1:5 000", Bcgs5000RectangularMapGrid.class);
+    addGrid("BCGS 1:2 500", Bcgs2500RectangularMapGrid.class);
+    addGrid("BCGS 1:2 000", Bcgs2000RectangularMapGrid.class);
+    addGrid("BCGS 1:1 250", Bcgs1250RectangularMapGrid.class);
+    addGrid("BCGS 1:1 000", Bcgs1000RectangularMapGrid.class);
+    addGrid("BCGS 1:500", Bcgs500RectangularMapGrid.class);
+    addGrid("MTO", MtoRectangularMapGrid.class);
+    gridNames = Collections.unmodifiableList(new ArrayList<String>(
+      gridClassNamesByName.keySet()));
+  }
+
+  private static void addGrid(final String name,
+    final Class<? extends RectangularMapGrid> gridClass) {
+    final String className = gridClass.getName();
+    gridClassNamesByName.put(name, className);
+
   }
 
   public static RectangularMapGrid getGrid(final String name) {
-    return GRIDS_BY_NAME.get(name);
+    try {
+      final String className = gridClassNamesByName.get(name);
+      if (StringUtils.hasText(className)) {
+        return (RectangularMapGrid)Class.forName(className).newInstance();
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(RectangularMapGridFactory.class).error(
+        "Unable to create grid for " + name, e);
+    }
+    return null;
   }
 
   public static RectangularMapGrid getGrid(final String name,
@@ -85,6 +107,6 @@ public class RectangularMapGridFactory {
   }
 
   public static Collection<String> getGridNames() {
-    return GRIDS_BY_NAME.keySet();
+    return gridNames;
   }
 }

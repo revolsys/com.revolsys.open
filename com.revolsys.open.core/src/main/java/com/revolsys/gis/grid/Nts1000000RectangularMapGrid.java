@@ -11,14 +11,11 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
-  private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
-
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
+  private final GeometryFactory geometryFactory = GeometryFactory.wgs84();
 
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
     + NtsConstants.REGEX_1000000 + ".*");
@@ -52,7 +49,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public CoordinateSystem getCoordinateSystem() {
-    return COORDINATE_SYSTEM;
+    return geometryFactory.getCoordinateSystem();
   }
 
   @Override
@@ -62,7 +59,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return GEOMETRY_FACTORY;
+    return geometryFactory;
   }
 
   public double getLatitude(final int block) {

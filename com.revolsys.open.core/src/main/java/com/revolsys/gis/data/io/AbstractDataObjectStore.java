@@ -203,7 +203,7 @@ public abstract class AbstractDataObjectStore extends
       columnToTableMap.clear();
       commonMetaDataProperties.clear();
       connectionProperties.clear();
-      dataObjectFactory = ArrayDataObjectFactory.getInstance();
+      dataObjectFactory = null;
       dataStoreExtensions.clear();
       iteratorFactory = null;
       label = "deleted";
@@ -216,7 +216,8 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public DataObject create(final DataObjectMetaData objectMetaData) {
     final DataObjectMetaData metaData = getMetaData(objectMetaData);
-    if (metaData == null) {
+    final DataObjectFactory dataObjectFactory = this.dataObjectFactory;
+    if (metaData == null || dataObjectFactory == null) {
       return null;
     } else {
       final DataObject object = dataObjectFactory.createDataObject(metaData);

@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.Writer;
@@ -21,24 +22,27 @@ public abstract class AbstractDataObjectAndGeometryWriterFactory extends
 
   @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
+    DataObjectMetaData metaData = DataObjectUtil.createGeometryMetaData();
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      DataObjectUtil.GEOMETRY_META_DATA, resource);
+      metaData, resource);
     return createGeometryWriter(dataObjectWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
+    DataObjectMetaData metaData = DataObjectUtil.createGeometryMetaData();
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
+      baseName, metaData, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out, final Charset charset) {
+    DataObjectMetaData metaData = DataObjectUtil.createGeometryMetaData();
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
+      baseName, metaData, out, charset);
     return createGeometryWriter(dataObjectWriter);
   }
 

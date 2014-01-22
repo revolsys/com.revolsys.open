@@ -26,8 +26,11 @@ import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 public class GeometryGraph extends Graph<LineSegment> {
 
@@ -56,6 +59,12 @@ public class GeometryGraph extends Graph<LineSegment> {
     } else {
       maxDistance = 0;
     }
+  }
+
+  public void addEdge(final Node<LineSegment> fromNode,
+    final Node<LineSegment> toNode) {
+    final LineSegment lineSegment = new LineSegment(fromNode, toNode);
+    addEdge(lineSegment, fromNode, toNode);
   }
 
   private void addEdges(final CoordinatesList points,
@@ -122,8 +131,10 @@ public class GeometryGraph extends Graph<LineSegment> {
    * @param line
    * @return
    */
+  @SuppressWarnings("rawtypes")
   public Geometry getBoundaryIntersection(final LineString line) {
-    final List<Geometry> intersections = new ArrayList<Geometry>();
+    final List<Point> pointIntersections = new ArrayList<Point>();
+    final List<LineString> lineIntersections = new ArrayList<LineString>();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
@@ -149,7 +160,7 @@ public class GeometryGraph extends Graph<LineSegment> {
               // Point intersection, make sure it's not at the start
               final Node<LineSegment> node = findNode(intersection);
               if (node == null) {
-                intersections.add(geometryFactory.createPoint(intersection));
+                pointIntersections.add(geometryFactory.createPoint(intersection));
               } else {
                 final int degree = node.getDegree();
                 if (isStartPoint(node)) {
@@ -157,19 +168,19 @@ public class GeometryGraph extends Graph<LineSegment> {
                     // Intersection not at the start/end of the other line,
                     // taking
                     // into account loops
-                    intersections.add(geometryFactory.createPoint(intersection));
+                    pointIntersections.add(geometryFactory.createPoint(intersection));
                   }
                 } else if (degree > 1) {
                   // Intersection not at the start/end of the other line
-                  intersections.add(geometryFactory.createPoint(intersection));
+                  pointIntersections.add(geometryFactory.createPoint(intersection));
                 }
               }
             } else {
               // Intersection not at the start/end of the line
-              intersections.add(geometryFactory.createPoint(intersection));
+              pointIntersections.add(geometryFactory.createPoint(intersection));
             }
           } else if (numIntersections == 2) {
-            intersections.add(geometryFactory.createLineString(segmentIntersection));
+            lineIntersections.add(geometryFactory.createLineString(segmentIntersection));
           }
           for (final Coordinates point : line1) {
             if (line2.distance(point) < maxDistance) {
@@ -183,16 +194,16 @@ public class GeometryGraph extends Graph<LineSegment> {
                       // Intersection not at the start/end of the other line,
                       // taking
                       // into account loops
-                      intersections.add(geometryFactory.createPoint(point));
+                      pointIntersections.add(geometryFactory.createPoint(point));
                     }
                   } else if (degree > 1) {
                     // Intersection not at the start/end of the other line
-                    intersections.add(geometryFactory.createPoint(point));
+                    pointIntersections.add(geometryFactory.createPoint(point));
                   }
                 }
               } else {
                 // Intersection not at the start/end of the line
-                intersections.add(geometryFactory.createPoint(point));
+                pointIntersections.add(geometryFactory.createPoint(point));
               }
             }
           }
@@ -201,7 +212,20 @@ public class GeometryGraph extends Graph<LineSegment> {
         previousPoint = nextPoint;
       }
     }
-    return geometryFactory.createGeometry(intersections).union();
+    if (lineIntersections.isEmpty()) {
+      return geometryFactory.createMultiPoint(pointIntersections);
+    } else {
+      final LineMerger merger = new LineMerger();
+      merger.add(lineIntersections);
+      final Collection mergedLineStrings = merger.getMergedLineStrings();
+      final MultiLineString multiLine = geometryFactory.createMultiLineString(mergedLineStrings);
+      if (pointIntersections.isEmpty()) {
+        return multiLine;
+      } else {
+        final MultiPoint multiPoint = geometryFactory.createMultiPoint(pointIntersections);
+        return multiPoint.union(multiLine);
+      }
+    }
   }
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
@@ -398,11 +422,6 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
     return true;
-  }
-
-  public void addEdge(Node<LineSegment> fromNode, Node<LineSegment> toNode) {
-    LineSegment lineSegment = new LineSegment(fromNode, toNode);
-    addEdge(lineSegment, fromNode, toNode);
   }
 
 }

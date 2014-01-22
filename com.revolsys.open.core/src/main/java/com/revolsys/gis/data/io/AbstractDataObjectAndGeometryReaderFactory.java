@@ -49,6 +49,8 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     return readerFactory;
   }
 
+  private final ArrayDataObjectFactory dataObjectFactory = new ArrayDataObjectFactory();
+
   private boolean singleFile = true;
 
   private boolean customAttributionSupported = true;
@@ -67,8 +69,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    */
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource) {
-    return createDataObjectReader(resource,
-      ArrayDataObjectFactory.getInstance());
+    return createDataObjectReader(resource, dataObjectFactory);
 
   }
 
@@ -93,9 +94,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    */
   @Override
   public Reader<DataObject> createDirectoryDataObjectReader(final File directory) {
-    return createDirectoryDataObjectReader(directory,
-      ArrayDataObjectFactory.getInstance());
-
+    return createDirectoryDataObjectReader(directory, dataObjectFactory);
   }
 
   /**

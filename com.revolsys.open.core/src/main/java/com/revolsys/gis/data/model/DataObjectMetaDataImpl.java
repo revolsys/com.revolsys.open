@@ -304,7 +304,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public DataObject createDataObject() {
-    return dataObjectFactory.createDataObject(this);
+    final DataObjectFactory dataObjectFactory = this.dataObjectFactory;
+    if (dataObjectFactory == null) {
+      return null;
+    } else {
+      return dataObjectFactory.createDataObject(this);
+    }
   }
 
   @Override
@@ -327,7 +332,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     attributeNames.clear();
     attributes.clear();
     codeTableByColumnMap.clear();
-    dataObjectFactory = ArrayDataObjectFactory.getInstance();
+    dataObjectFactory = null;
     dataObjectMetaDataFactory = new DataObjectMetaDataFactoryImpl();
     dataStore = null;
     defaultValues.clear();

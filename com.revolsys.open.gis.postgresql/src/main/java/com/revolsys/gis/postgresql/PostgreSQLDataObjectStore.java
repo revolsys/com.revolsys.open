@@ -34,9 +34,6 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
     "information_schema", "pg_catalog", "pg_toast_temp_1");
 
-  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
-    PostgreSQLDataObjectStore.class, "createPostgreSQLIterator");
-
   public static final AbstractIterator<DataObject> createPostgreSQLIterator(
     final PostgreSQLDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
@@ -51,7 +48,12 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
-    setIteratorFactory(ITERATOR_FACTORY);
+    initSettings();
+  }
+
+  protected void initSettings() {
+    setIteratorFactory(new DataStoreIteratorFactory(
+      PostgreSQLDataObjectStore.class, "createPostgreSQLIterator"));
   }
 
   public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory,
@@ -62,7 +64,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public PostgreSQLDataObjectStore(final DataSource dataSource) {
     super(dataSource);
-    setIteratorFactory(ITERATOR_FACTORY);
+    initSettings();
   }
 
   public PostgreSQLDataObjectStore(
@@ -71,7 +73,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     super(databaseFactory);
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
-    setIteratorFactory(ITERATOR_FACTORY);
+    initSettings();
     setConnectionProperties(connectionProperties);
   }
 

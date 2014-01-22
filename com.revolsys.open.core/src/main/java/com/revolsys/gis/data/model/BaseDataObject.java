@@ -153,7 +153,12 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
    */
   @Override
   public DataObjectFactory getFactory() {
-    return ArrayDataObjectFactory.getInstance();
+    final DataObjectMetaData metaData = getMetaData();
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.getDataObjectFactory();
+    }
   }
 
   @Override

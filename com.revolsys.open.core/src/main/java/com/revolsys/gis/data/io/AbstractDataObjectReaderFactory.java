@@ -14,7 +14,6 @@ import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectReaderFactory extends
   AbstractMapReaderFactory implements DataObjectReaderFactory {
-
   public static DataObjectReader dataObjectReader(final Resource resource) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
@@ -61,6 +60,8 @@ public abstract class AbstractDataObjectReaderFactory extends
     return getDataObjectReaderFactory(fileName) != null;
   }
 
+  private final DataObjectFactory dataObjectFactory = new ArrayDataObjectFactory();
+
   private final boolean binary;
 
   public AbstractDataObjectReaderFactory(final String name, final boolean binary) {
@@ -77,8 +78,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    */
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource) {
-    return createDataObjectReader(resource,
-      ArrayDataObjectFactory.getInstance());
+    return createDataObjectReader(resource, dataObjectFactory);
 
   }
 
@@ -103,8 +103,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    */
   @Override
   public Reader<DataObject> createDirectoryDataObjectReader(final File directory) {
-    return createDirectoryDataObjectReader(directory,
-      ArrayDataObjectFactory.getInstance());
+    return createDirectoryDataObjectReader(directory, dataObjectFactory);
 
   }
 

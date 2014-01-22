@@ -35,7 +35,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     this.factory = factory;
     this.in = new BufferedReader(
       FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.metaData = DataObjectUtil.GEOMETRY_META_DATA.clone();
+    this.metaData = DataObjectUtil.createGeometryMetaData();
   }
 
   @Override

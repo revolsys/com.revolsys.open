@@ -36,21 +36,12 @@ import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
 
-  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
-    OracleDataObjectStore.class, "createOracleIterator");
-
   public static final List<String> ORACLE_INTERNAL_SCHEMAS = Arrays.asList(
     "ANONYMOUS", "APEX_030200", "AURORA$JIS$UTILITY$",
     "AURORA$ORB$UNAUTHENTICATED", "AWR_STAGE", "CSMIG", "CTXSYS", "DBSNMP",
     "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "LBACSYS", "MDSYS", "OLAPSYS",
     "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN",
     "PERFSTAT", "SDE", "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
-
-  public static AbstractIterator<DataObject> createOracleIterator(
-    final OracleDataObjectStore dataStore, final Query query,
-    final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(dataStore, query, properties);
-  }
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -124,6 +115,12 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       }
     }
     return query;
+  }
+
+  public AbstractIterator<DataObject> createOracleIterator(
+    final OracleDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(dataStore, query, properties);
   }
 
   @Override
@@ -235,7 +232,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
-    setIteratorFactory(ITERATOR_FACTORY);
+    setIteratorFactory(new DataStoreIteratorFactory(this,
+      "createOracleIterator"));
   }
 
   @Override

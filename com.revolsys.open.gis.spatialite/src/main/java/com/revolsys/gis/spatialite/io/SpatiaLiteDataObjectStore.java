@@ -43,9 +43,6 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
 
   private boolean initialized;
 
-  private static final DataStoreIteratorFactory ITERATOR_FACTORY = new DataStoreIteratorFactory(
-    SpatiaLiteDataObjectStore.class, "createOracleIterator");
-
   private boolean useSchemaSequencePrefix = true;
 
   private final Map<String, Set<String>> schemaTableNames = new TreeMap<String, Set<String>>();
@@ -264,7 +261,8 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
     setExcludeTablePatterns("^/SPATIALITE_.*");
     setExcludeTablePatterns("^/SQLITE_.*");
     setExcludeTablePatterns("^/IDX_.*");
-    setIteratorFactory(ITERATOR_FACTORY);
+    setIteratorFactory(new DataStoreIteratorFactory(
+      SpatiaLiteDataObjectStore.class, "createOracleIterator"));
   }
 
   @Override

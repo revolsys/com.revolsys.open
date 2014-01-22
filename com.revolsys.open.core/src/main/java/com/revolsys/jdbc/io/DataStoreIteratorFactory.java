@@ -1,5 +1,7 @@
 package com.revolsys.jdbc.io;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import org.springframework.util.StringUtils;
@@ -12,7 +14,7 @@ import com.revolsys.util.Property;
 
 public class DataStoreIteratorFactory {
 
-  private Object factory;
+  private Reference<Object> factory;
 
   private String methodName;
 
@@ -20,14 +22,14 @@ public class DataStoreIteratorFactory {
   }
 
   public DataStoreIteratorFactory(final Object factory, final String methodName) {
-    this.factory = factory;
+    this.factory = new WeakReference<Object>(factory);
     this.methodName = methodName;
   }
 
   public AbstractIterator<DataObject> createIterator(
     final DataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
-
+    final Object factory = this.factory.get();
     if (factory != null && StringUtils.hasText(methodName)) {
       return Property.invoke(factory, methodName, dataStore, query, properties);
     } else {
