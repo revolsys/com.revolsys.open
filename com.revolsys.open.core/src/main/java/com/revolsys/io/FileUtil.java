@@ -42,6 +42,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -84,74 +85,41 @@ public final class FileUtil {
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
-  public static void closeSilent(final EndianInput in) {
-    if (in != null) {
-      try {
-        in.close();
-      } catch (final IOException e) {
-      }
-    }
-  }
+  public static final ExtensionFilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "gif", "jpg", "png", "tif", "tiff", "bmp"
+    }));
+
+  public static final ExtensionFilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "avi", "wmv", "flv", "mpg"
+    }));
 
   /**
-   * Close the input stream without throwing an I/O exception if the close
-   * failed. The error will be logged instead.
-   * 
-   * @param in The input stream to close.
-   */
-  public static void closeSilent(final InputStream in) {
-    if (in != null) {
-      try {
-        in.close();
-      } catch (final IOException e) {
-      }
-    }
-  }
-
-  /**
-   * Close the output stream without throwing an I/O exception if the close
-   * failed. The error will be logged instead.
-   * 
-   * @param out The output stream to close.
-   */
-  public static void closeSilent(final OutputStream out) {
-    if (out != null) {
-      try {
-        out.close();
-      } catch (final IOException e) {
-        LOG.error(e.getMessage(), e);
-      }
-    }
-  }
-
-  /**
-   * Close the reader without throwing an I/O exception if the close failed. The
+   * Close the writer without throwing an I/O exception if the close failed. The
    * error will be logged instead.
    * 
-   * @param in The reader to close.
+   * @param closeables The closables to close.
    */
-  public static void closeSilent(final Reader in) {
-    if (in != null) {
-      try {
-        in.close();
-      } catch (final IOException e) {
-        LOG.error(e.getMessage(), e);
-      }
-    }
+  public static void closeSilent(final AutoCloseable... closeables) {
+    closeSilent(Arrays.asList(closeables));
   }
 
   /**
    * Close the writer without throwing an I/O exception if the close failed. The
    * error will be logged instead.
    * 
-   * @param out The writer to close.
+   * @param closeables The closables to close.
    */
-  public static void closeSilent(final Writer out) {
-    if (out != null) {
-      try {
-        out.close();
-      } catch (final IOException e) {
-        LOG.error(e.getMessage(), e);
+  public static void closeSilent(
+    final Collection<? extends AutoCloseable> closeables) {
+    for (final AutoCloseable closeable : closeables) {
+      if (closeable != null) {
+        try {
+          closeable.close();
+        } catch (final Exception e) {
+          LOG.error(e.getMessage(), e);
+        }
       }
     }
   }
@@ -405,7 +373,6 @@ public final class FileUtil {
   public static File createTempFile(final String prefix, final String suffix) {
     try {
       final File file = File.createTempFile(prefix, suffix);
-      deleteFileOnExit(file);
       return file;
     } catch (final IOException e) {
       throw new RuntimeException(e);
@@ -490,6 +457,8 @@ public final class FileUtil {
   /**
    * Add the file to be deleted on exit. If the file is a directory the
    * directory and it's contents will be deleted.
+   * 
+   * DON'T use in web applications
    * 
    * @param file The file or directory to delete.
    */

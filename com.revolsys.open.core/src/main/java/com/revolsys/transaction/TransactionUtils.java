@@ -30,8 +30,7 @@ public class TransactionUtils {
   private static final TransactionDefinition TRANSACTION_DEFINITION_NEW = new DefaultTransactionDefinition(
     TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
-  private static final TransactionDefinition TRANSACTION_DEFINITION_DEFAULT = new DefaultTransactionDefinition(
-    TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+  private static final TransactionDefinition TRANSACTION_DEFINITION_DEFAULT = new DefaultTransactionDefinition();
 
   public static DefaultTransactionStatus createDefaultTransaction(
     final PlatformTransactionManager transactionManager) {
@@ -48,6 +47,19 @@ public class TransactionUtils {
     final int propagationBehavior, final Runnable runnable) {
     return new InvokeMethodRunnable(TransactionUtils.class, "invoke",
       transactionManager, propagationBehavior, runnable);
+  }
+
+  public static DefaultTransactionStatus createTransaction(
+    final PlatformTransactionManager transactionManager,
+    final Propagation propagation) {
+    if (transactionManager == null) {
+      return null;
+    } else {
+      final int propagationValue = propagation.value();
+      final DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
+        propagationValue);
+      return (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
+    }
   }
 
   public static DefaultTransactionStatus createTransaction(

@@ -1,11 +1,9 @@
 package com.revolsys.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface EndianInput {
-
-  void close() throws IOException;
-
+public interface EndianInput extends Closeable {
   /**
    * Read a byte.
    * 

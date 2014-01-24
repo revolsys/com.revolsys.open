@@ -55,11 +55,16 @@ import org.springframework.util.StringUtils;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
-  public static final PropertyUtilsBean PROPERTY_UTILS_BEAN = new PropertyUtilsBean();
+  private static PropertyUtilsBean propertiesUtilBean;
 
-  public static final ConvertUtilsBean CONVERT_UTILS_BEAN = new ConvertUtilsBean();
+  private static ConvertUtilsBean convertUtilsBean;
 
   static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+
+  public static void clearCache() {
+    propertiesUtilBean = null;
+    convertUtilsBean = null;
+  }
 
   /**
    * Clone the value if it has a clone method.
@@ -119,7 +124,7 @@ public final class JavaBeanUtil {
 
   @SuppressWarnings("rawtypes")
   public static Object convert(final Object value, final Class type) {
-    final Converter converter = CONVERT_UTILS_BEAN.lookup(type);
+    final Converter converter = getConvertutilsbean().lookup(type);
     if (converter == null) {
       return value;
     } else {
@@ -162,6 +167,13 @@ public final class JavaBeanUtil {
         }
       }
     }
+  }
+
+  public static ConvertUtilsBean getConvertutilsbean() {
+    if (convertUtilsBean == null) {
+      convertUtilsBean = new ConvertUtilsBean();
+    }
+    return convertUtilsBean;
   }
 
   public static String getFirstName(final String name) {
@@ -243,6 +255,13 @@ public final class JavaBeanUtil {
         + methodName.substring(4);
     }
     return propertyName;
+  }
+
+  public static PropertyUtilsBean getPropertyUtilsBean() {
+    if (propertiesUtilBean == null) {
+      propertiesUtilBean = new PropertyUtilsBean();
+    }
+    return propertiesUtilBean;
   }
 
   /**
@@ -457,10 +476,10 @@ public final class JavaBeanUtil {
     } else {
       try {
         Object target = object;
-        final Resolver resolver = PROPERTY_UTILS_BEAN.getResolver();
+        final Resolver resolver = getPropertyUtilsBean().getResolver();
         while (resolver.hasNested(propertyName)) {
           try {
-            target = PROPERTY_UTILS_BEAN.getProperty(target,
+            target = getPropertyUtilsBean().getProperty(target,
               resolver.next(propertyName));
             propertyName = resolver.remove(propertyName);
           } catch (final NoSuchMethodException e) {
@@ -489,7 +508,7 @@ public final class JavaBeanUtil {
         } else {
           PropertyDescriptor descriptor = null;
           try {
-            descriptor = PROPERTY_UTILS_BEAN.getPropertyDescriptor(target,
+            descriptor = getPropertyUtilsBean().getPropertyDescriptor(target,
               propertyName);
 
             if (descriptor == null) {
@@ -541,35 +560,35 @@ public final class JavaBeanUtil {
           if (value == null) {
             final String[] values = new String[1];
             values[0] = null;
-            newValue = CONVERT_UTILS_BEAN.convert(values, type);
+            newValue = getConvertutilsbean().convert(values, type);
           } else if (value instanceof String) {
-            newValue = CONVERT_UTILS_BEAN.convert(value, type);
+            newValue = getConvertutilsbean().convert(value, type);
           } else if (value instanceof String[]) {
-            newValue = CONVERT_UTILS_BEAN.convert((String[])value, type);
+            newValue = getConvertutilsbean().convert((String[])value, type);
           } else {
             newValue = convert(value, type);
           }
         } else if (type.isArray()) {
           if ((value instanceof String) || (value == null)) {
-            newValue = CONVERT_UTILS_BEAN.convert((String)value,
+            newValue = getConvertutilsbean().convert((String)value,
               type.getComponentType());
           } else if (value instanceof String[]) {
-            newValue = CONVERT_UTILS_BEAN.convert(((String[])value)[0],
+            newValue = getConvertutilsbean().convert(((String[])value)[0],
               type.getComponentType());
           } else {
             newValue = convert(value, type.getComponentType());
           }
         } else if (value instanceof String) {
-          newValue = CONVERT_UTILS_BEAN.convert((String)value, type);
+          newValue = getConvertutilsbean().convert((String)value, type);
         } else if (value instanceof String[]) {
-          newValue = CONVERT_UTILS_BEAN.convert(((String[])value)[0], type);
+          newValue = getConvertutilsbean().convert(((String[])value)[0], type);
         } else {
           newValue = convert(value, type);
 
         }
 
         try {
-          PROPERTY_UTILS_BEAN.setProperty(target, propertyName, newValue);
+          getPropertyUtilsBean().setProperty(target, propertyName, newValue);
           return true;
         } catch (final NoSuchMethodException e) {
           return false;

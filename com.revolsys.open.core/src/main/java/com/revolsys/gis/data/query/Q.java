@@ -212,6 +212,13 @@ public class Q {
     return new In(attribute, list);
   }
 
+  public static In in(final String name,
+    final Collection<? extends Object> values) {
+    final Column left = new Column(name);
+    final CollectionValue collectionValue = new CollectionValue(values);
+    return new In(left, collectionValue);
+  }
+
   public static IsNotNull isNotNull(final Attribute attribute) {
     final String name = attribute.getName();
     return isNotNull(name);

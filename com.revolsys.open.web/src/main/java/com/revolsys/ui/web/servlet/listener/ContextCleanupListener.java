@@ -7,15 +7,19 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.log4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.ClearCachedIntrospectionResults;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.web.util.Log4jWebConfigurer;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jdbc.io.JdbcFactoryRegistry;
+import com.revolsys.util.JavaBeanUtil;
 
 public class ContextCleanupListener implements ServletContextListener {
 
@@ -40,6 +44,7 @@ public class ContextCleanupListener implements ServletContextListener {
     }
   }
 
+  @Override
   public void contextDestroyed(final ServletContextEvent event) {
     final ClassLoader contextClassLoader = Thread.currentThread()
       .getContextClassLoader();
@@ -50,14 +55,20 @@ public class ContextCleanupListener implements ServletContextListener {
     EpsgCoordinateSystems.clear();
     cleanupAttributes(event.getServletContext());
 
+    JavaBeanUtil.clearCache();
+    BeanUtilsBean.setInstance(null);
     CachedIntrospectionResults.clearClassLoader(contextClassLoader);
     CachedIntrospectionResults.clearClassLoader(CachedIntrospectionResults.class.getClassLoader());
     CachedIntrospectionResults.clearClassLoader(ClassLoader.getSystemClassLoader());
     ClearCachedIntrospectionResults.clearCache();
     Introspector.flushCaches();
+    Logger.getRootLogger().removeAllAppenders();
+    Log4jWebConfigurer.shutdownLogging(event.getServletContext());
   }
 
+  @Override
   public void contextInitialized(final ServletContextEvent event) {
+    Log4jWebConfigurer.initLogging(event.getServletContext());
     CachedIntrospectionResults.acceptClassLoader(Thread.currentThread()
       .getContextClassLoader());
   }

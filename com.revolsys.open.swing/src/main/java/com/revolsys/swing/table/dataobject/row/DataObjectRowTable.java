@@ -30,8 +30,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
-  private final ListSelectionModel defaultSeletionModel = getSelectionModel();
-
   private final DataObjectTableCellEditor tableCellEditor;
 
   public DataObjectRowTable(final DataObjectRowTableModel model) {

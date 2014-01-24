@@ -45,6 +45,8 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -213,6 +215,19 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public DataObject copy(final DataObject record) {
+    final DataObjectMetaData metaData = getMetaData(record.getMetaData());
+    final DataObjectFactory dataObjectFactory = this.dataObjectFactory;
+    if (metaData == null || dataObjectFactory == null) {
+      return null;
+    } else {
+      final DataObject copy = dataObjectFactory.createDataObject(metaData);
+      copy.setValues(record);
+      copy.setIdValue(null);
+      return copy;
+    }
+  }
+
   @Override
   public DataObject create(final DataObjectMetaData objectMetaData) {
     final DataObjectMetaData metaData = getMetaData(objectMetaData);
@@ -273,6 +288,12 @@ public abstract class AbstractDataObjectStore extends
     final DataObjectStoreQueryReader reader = new DataObjectStoreQueryReader(
       this);
     return reader;
+  }
+
+  @Override
+  public Transaction createTransaction(final Propagation propagation) {
+    final PlatformTransactionManager transactionManager = getTransactionManager();
+    return new Transaction(transactionManager, propagation);
   }
 
   @Override

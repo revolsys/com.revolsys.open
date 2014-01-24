@@ -26,8 +26,6 @@ import javax.sql.DataSource;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.collection.AbstractIterator;
@@ -58,6 +56,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -65,6 +64,12 @@ public abstract class AbstractJdbcDataObjectStore extends
   AbstractDataObjectStore implements JdbcDataObjectStore,
   DataObjectStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
+
+  public static final AbstractIterator<DataObject> createJdbcIterator(
+    final AbstractJdbcDataObjectStore dataStore, final Query query,
+    final Map<String, Object> properties) {
+    return new JdbcQueryIterator(dataStore, query, properties);
+  }
 
   private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
@@ -96,15 +101,11 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private final Object writerKey = new Object();
 
+  private final Object exceptionWriterKey = new Object();
+
   private String primaryKeySql;
 
   private final Set<String> allSchemaNames = new TreeSet<String>();
-
-  public static final AbstractIterator<DataObject> createJdbcIterator(
-    final AbstractJdbcDataObjectStore dataStore, final Query query,
-    final Map<String, Object> properties) {
-    return new JdbcQueryIterator(dataStore, query, properties);
-  }
 
   private String tablePermissionsSql;
 
@@ -241,22 +242,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     return writer;
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void delete(final DataObject object) {
-    if (object.getState() == DataObjectState.Persisted
-      || object.getState() == DataObjectState.Modified) {
-      object.setState(DataObjectState.Deleted);
-      final JdbcWriter writer = getWriter();
-      try {
-        writer.write(object);
-      } finally {
-        writer.close();
-      }
-    }
+  public void delete(final DataObject record) {
+    final DataObjectState state = DataObjectState.Deleted;
+    write(record, state);
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public int delete(final Query query) {
     final String typeName = query.getTypeName();
@@ -268,56 +259,62 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
     }
     final String sql = JdbcUtils.getDeleteSql(query);
-
-    Connection connection = getConnection();
-    final DataSource dataSource = getDataSource();
-    try {
-      if (dataSource != null) {
-        try {
-          connection = JdbcUtils.getConnection(dataSource);
-          boolean autoCommit = false;
-          if (BooleanStringConverter.getBoolean(getProperties().get(
-            "autoCommit"))) {
-            autoCommit = true;
-          }
-          connection.setAutoCommit(autoCommit);
-        } catch (final SQLException e) {
-          throw new IllegalArgumentException("Unable to create connection", e);
-        }
-      }
-
-      final PreparedStatement statement = connection.prepareStatement(sql);
+    try (
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
       try {
+        Connection connection = getConnection();
+        final DataSource dataSource = getDataSource();
+        try {
+          if (dataSource != null) {
+            try {
+              connection = JdbcUtils.getConnection(dataSource);
+              boolean autoCommit = false;
+              if (BooleanStringConverter.getBoolean(getProperties().get(
+                "autoCommit"))) {
+                autoCommit = true;
+              }
+              connection.setAutoCommit(autoCommit);
+            } catch (final SQLException e) {
+              throw new IllegalArgumentException("Unable to create connection",
+                e);
+            }
+          }
 
-        JdbcUtils.setPreparedStatementParameters(statement, query);
-        return statement.executeUpdate();
-      } finally {
-        JdbcUtils.close(statement);
-      }
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to delete : " + sql, e);
-    } finally {
-      if (dataSource != null) {
-        JdbcUtils.release(connection, dataSource);
+          final PreparedStatement statement = connection.prepareStatement(sql);
+          try {
+
+            JdbcUtils.setPreparedStatementParameters(statement, query);
+            return statement.executeUpdate();
+          } finally {
+            JdbcUtils.close(statement);
+          }
+        } catch (final SQLException e) {
+          throw new RuntimeException("Unable to delete : " + sql, e);
+        } finally {
+          if (dataSource != null) {
+            JdbcUtils.release(connection, dataSource);
+          }
+        }
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
       }
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void deleteAll(final Collection<DataObject> objects) {
-    final JdbcWriter writer = getWriter();
-    try {
-      for (final DataObject object : objects) {
-        if (object.getState() == DataObjectState.Persisted
-          || object.getState() == DataObjectState.Modified) {
-          object.setState(DataObjectState.Deleted);
-          writer.write(object);
-        }
-      }
-    } finally {
-      writer.close();
-    }
+  public void deleteAll(final Collection<DataObject> records) {
+    writeAll(records, DataObjectState.Deleted);
+  }
+
+  public Set<String> getAllSchemaNames() {
+    return allSchemaNames;
   }
 
   // protected Set<String> getDatabaseSchemaNames() {
@@ -345,8 +342,16 @@ public abstract class AbstractJdbcDataObjectStore extends
   // return databaseSchemaNames;
   // }
 
-  public Set<String> getAllSchemaNames() {
-    return allSchemaNames;
+  public JdbcAttribute getAttribute(final String schemaName,
+    final String tableName, final String columnName) {
+    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      final Attribute attribute = metaData.getAttribute(columnName);
+      return (JdbcAttribute)attribute;
+    }
   }
 
   // protected Set<String> getDatabaseTableNames(final String dbSchemaName)
@@ -376,18 +381,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   // releaseConnection(connection);
   // }
   // }
-
-  public JdbcAttribute getAttribute(final String schemaName,
-    final String tableName, final String columnName) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      return null;
-    } else {
-      final Attribute attribute = metaData.getAttribute(columnName);
-      return (JdbcAttribute)attribute;
-    }
-  }
 
   public int getBatchSize() {
     return batchSize;
@@ -629,6 +622,16 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public JdbcWriter getWriter() {
+    return getWriter(false);
+  }
+
+  protected JdbcWriter getWriter(final boolean throwExceptions) {
+    Object writerKey;
+    if (throwExceptions) {
+      writerKey = exceptionWriterKey;
+    } else {
+      writerKey = this.writerKey;
+    }
     final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
     if (resourceHolder != null
       && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
@@ -637,9 +640,11 @@ public abstract class AbstractJdbcDataObjectStore extends
         final JdbcWriter writer = createWriter(1);
         resourceHolder.setWriter(writer);
       }
-      return resourceHolder.getWriter();
+      final JdbcWriter writer = resourceHolder.getWriter();
+      return writer;
     }
     final JdbcWriter writer = createWriter(1);
+    writer.setThrowExceptions(throwExceptions);
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       JdbcWriterResourceHolder holderToUse = resourceHolder;
       if (holderToUse == null) {
@@ -674,28 +679,14 @@ public abstract class AbstractJdbcDataObjectStore extends
     final Map<String, Object> connectionProperties) {
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void insert(final DataObject object) {
-    final JdbcWriter writer = getWriter();
-    try {
-      writer.write(object);
-    } finally {
-      writer.close();
-    }
+  public void insert(final DataObject record) {
+    write(record, DataObjectState.New);
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void insertAll(final Collection<DataObject> objects) {
-    final JdbcWriter writer = getWriter();
-    try {
-      for (final DataObject object : objects) {
-        writer.write(object);
-      }
-    } finally {
-      writer.close();
-    }
+  public void insertAll(final Collection<DataObject> records) {
+    writeAll(records, DataObjectState.New);
   }
 
   @Override
@@ -1005,27 +996,74 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.tablePermissionsSql = tablePermissionsSql;
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public void update(final DataObject object) {
-    final JdbcWriter writer = getWriter();
-    try {
-      writer.write(object);
-    } finally {
-      writer.close();
+  public void update(final DataObject record) {
+    write(record, null);
+  }
+
+  @Override
+  public void updateAll(final Collection<DataObject> records) {
+    writeAll(records, null);
+  }
+
+  protected void write(final DataObject record, final DataObjectState state) {
+    try (
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        JdbcWriter writer = getWriter(true)) {
+        write(writer, record, state);
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRED)
-  @Override
-  public void updateAll(final Collection<DataObject> objects) {
-    final JdbcWriter writer = getWriter();
-    try {
-      for (final DataObject object : objects) {
-        writer.write(object);
+  protected DataObject write(final JdbcWriter writer, DataObject record,
+    final DataObjectState state) {
+    if (state == DataObjectState.New) {
+      if (record.getState() != state) {
+        record = copy(record);
       }
-    } finally {
-      writer.close();
+    } else if (state == DataObjectState.Deleted) {
+      final DataObjectState recordState = record.getState();
+      if (recordState == DataObjectState.Deleted) {
+        return record;
+      } else {
+        record.setState(state);
+      }
+    } else if (state != null) {
+      record.setState(state);
+    }
+    writer.write(record);
+    return record;
+  }
+
+  protected void writeAll(final Collection<DataObject> records,
+    final DataObjectState state) {
+    try (
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        final JdbcWriter writer = getWriter(true)) {
+        for (final DataObject record : records) {
+          write(writer, record, state);
+        }
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
     }
   }
 }

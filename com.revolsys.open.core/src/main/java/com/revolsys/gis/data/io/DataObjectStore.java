@@ -17,9 +17,12 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface DataObjectStore extends DataObjectMetaDataFactory {
+public interface DataObjectStore extends DataObjectMetaDataFactory,
+  AutoCloseable {
   void addCodeTable(CodeTable codeTable);
 
   void addCodeTables(Collection<CodeTable> codeTables);
@@ -28,7 +31,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   void addStatistic(String name, String typePath, int count);
 
+  @Override
   void close();
+
+  DataObject copy(DataObject record);
 
   DataObject create(DataObjectMetaData metaData);
 
@@ -38,6 +44,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Query createQuery(final String typePath, String whereClause,
     final BoundingBox boundingBox);
+
+  Transaction createTransaction(Propagation propagation);
 
   DataObject createWithId(DataObjectMetaData objectMetaData);
 

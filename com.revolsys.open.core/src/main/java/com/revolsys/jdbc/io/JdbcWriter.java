@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
@@ -78,6 +79,8 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private StatisticsMap statistics;
 
+  private boolean throwExceptions = false;
+
   public JdbcWriter(final JdbcDataObjectStore dataStore) {
     this(dataStore, dataStore.getStatistics());
   }
@@ -119,8 +122,12 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       final String sql = sqlMap.get(typePath);
       try {
         processCurrentBatch(typePath, sql, statement, batchCountMap);
-      } catch (final SQLException e) {
-        LOG.error("Unable to process batch: " + sql, e);
+      } catch (final DataAccessException e) {
+        if (throwExceptions) {
+          throw e;
+        } else {
+          LOG.error("Error commiting records", e);
+        }
       }
       JdbcUtils.close(statement);
     }
@@ -223,14 +230,20 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   private void flush(final Map<String, String> sqlMap,
     final Map<String, PreparedStatement> statementMap,
     final Map<String, Integer> batchCountMap) {
-    for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
-      final String typePath = entry.getKey();
-      final PreparedStatement statement = entry.getValue();
-      final String sql = sqlMap.get(typePath);
-      try {
-        processCurrentBatch(typePath, sql, statement, batchCountMap);
-      } catch (final SQLException e) {
-        LOG.error("Unable to process batch: " + sql, e);
+    if (statementMap != null) {
+      for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
+        final String typePath = entry.getKey();
+        final PreparedStatement statement = entry.getValue();
+        final String sql = sqlMap.get(typePath);
+        try {
+          processCurrentBatch(typePath, sql, statement, batchCountMap);
+        } catch (final DataAccessException e) {
+          if (throwExceptions) {
+            throw e;
+          } else {
+            LOG.error("Error writing to database", e);
+          }
+        }
       }
     }
   }
@@ -532,9 +545,12 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return quoteColumnNames;
   }
 
+  public boolean isThrowExceptions() {
+    return throwExceptions;
+  }
+
   private void processCurrentBatch(final String typePath, final String sql,
-    final PreparedStatement statement, final Map<String, Integer> batchCountMap)
-    throws SQLException {
+    final PreparedStatement statement, final Map<String, Integer> batchCountMap) {
     Integer batchCount = batchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 0;
@@ -548,13 +564,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       typeCountMap.put(typePath, typeCount);
       statement.executeBatch();
-
-    } catch (final BatchUpdateException be) {
-      LOG.error(be.getNextException() + " " + sql);
-      throw be;
     } catch (final SQLException e) {
-      LOG.error(sql, e);
-      throw e;
+      throw JdbcUtils.getException(getDataSource(), connection,
+        "Process Batch", sql, e);
     } catch (final RuntimeException e) {
       LOG.error(sql, e);
       throw e;
@@ -606,6 +618,10 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   public void setSqlSuffix(final String sqlSuffix) {
     this.sqlSuffix = sqlSuffix;
+  }
+
+  public void setThrowExceptions(final boolean throwExceptions) {
+    this.throwExceptions = throwExceptions;
   }
 
   @Override

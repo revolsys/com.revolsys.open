@@ -31,17 +31,6 @@ import java.util.Set;
  */
 
 public class ExtensionFilenameFilter implements FilenameFilter {
-  /** An instance of the filter to match gif, jpg, png, tif and tiff files. */
-  public static final ExtensionFilenameFilter IMAGE_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "gif", "jpg", "png", "tif", "tiff", "bmp"
-    }));
-
-  public static final ExtensionFilenameFilter VIDEO_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "avi", "wmv", "flv", "mpg"
-    }));
-
   /** The list of extensions to match. */
   private final Set<String> extensions = new HashSet<String>();
 

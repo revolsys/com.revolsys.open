@@ -129,23 +129,30 @@ public class LayerDataObject extends ArrayDataObject {
 
   @Override
   public boolean isValid(final int index) {
-    final DataObjectMetaData metaData = getMetaData();
-    final String name = metaData.getAttributeName(index);
-    return isValid(name);
-
+    if (getState() == DataObjectState.Initalizing) {
+      return true;
+    } else {
+      final DataObjectMetaData metaData = getMetaData();
+      final String name = metaData.getAttributeName(index);
+      return isValid(name);
+    }
   }
 
   @Override
   public boolean isValid(final String name) {
-    final Attribute attribute = getMetaData().getAttribute(name);
-    if (attribute.isRequired()) {
-      final Object value = getValue(name);
-      if (value == null || value instanceof String
-        && !StringUtils.hasText((String)value)) {
-        return false;
+    if (getState() == DataObjectState.Initalizing) {
+      return true;
+    } else {
+      final Attribute attribute = getMetaData().getAttribute(name);
+      if (attribute.isRequired()) {
+        final Object value = getValue(name);
+        if (value == null || value instanceof String
+          && !StringUtils.hasText((String)value)) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
   }
 
   public LayerDataObject revertChanges() {
