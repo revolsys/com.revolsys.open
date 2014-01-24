@@ -3,13 +3,20 @@ package com.revolsys.jdbc.io;
 import org.springframework.transaction.support.ResourceHolderSupport;
 
 public class JdbcWriterResourceHolder extends ResourceHolderSupport {
-  private JdbcWriter writer;
+  private JdbcWriterImpl writer;
 
-  public JdbcWriterResourceHolder(final JdbcWriter writer) {
+  public JdbcWriterResourceHolder(final JdbcWriterImpl writer) {
     this.writer = writer;
   }
 
-  public JdbcWriter getWriter() {
+  protected void close() {
+    if (writer != null) {
+      writer.close();
+      writer = null;
+    }
+  }
+
+  public JdbcWriterImpl getWriter() {
     return writer;
   }
 
@@ -20,21 +27,16 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
   @Override
   public void released() {
     super.released();
-    if (!isOpen() && writer != null) {
-      writer.flush();
-      writer = null;
+    if (!isOpen()) {
+      close();
     }
   }
 
-  public void setWriter(final JdbcWriter writer) {
+  public void setWriter(final JdbcWriterImpl writer) {
     this.writer = writer;
   }
 
-  public boolean writerEquals(final JdbcWriter writer) {
-    if (hasWriter()) {
-      return this.writer == writer || this.equals(writer);
-    } else {
-      return false;
-    }
+  public boolean writerEquals(final JdbcWriterImpl writer) {
+    return this.writer == writer;
   }
 }

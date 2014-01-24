@@ -1,9 +1,11 @@
 package com.revolsys.transaction;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.ClosedException;
 
 public class SendToChannelAfterCommit<T> extends
   TransactionSynchronizationAdapter {
@@ -28,6 +30,10 @@ public class SendToChannelAfterCommit<T> extends
 
   @Override
   public void afterCommit() {
-    channel.write(object);
+    try {
+      channel.write(object);
+    } catch (final ClosedException e) {
+      LoggerFactory.getLogger(getClass()).error("Channel closed " + channel, e);
+    }
   }
 }

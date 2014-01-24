@@ -215,6 +215,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public DataObject copy(final DataObject record) {
     final DataObjectMetaData metaData = getMetaData(record.getMetaData());
     final DataObjectFactory dataObjectFactory = this.dataObjectFactory;
@@ -519,6 +520,11 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public Writer<DataObject> getWriter() {
     return createWriter();
+  }
+
+  @Override
+  public Writer<DataObject> getWriter(final boolean throwExceptions) {
+    return getWriter();
   }
 
   @Override

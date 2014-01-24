@@ -19,10 +19,11 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   Connection getConnection();
 
-  String getDatabaseTableName(final String typePath);
   String getDatabaseQualifiedTableName(final String typePath);
 
   String getDatabaseSchemaName(final String schemaName);
+
+  String getDatabaseTableName(final String typePath);
 
   DataSource getDataSource();
 
@@ -42,8 +43,6 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   @Override
   void initialize();
-
-  void releaseWriter(final JdbcWriter writer);
 
   void setDataSource(DataSource dataSource);
 

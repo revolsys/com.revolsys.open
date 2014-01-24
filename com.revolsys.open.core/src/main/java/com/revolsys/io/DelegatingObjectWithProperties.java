@@ -34,8 +34,9 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     object = null;
   }
 
-  public ObjectWithProperties getObject() {
-    return object;
+  @SuppressWarnings("unchecked")
+  public <V extends ObjectWithProperties> V getObject() {
+    return (V)object;
   }
 
   @Override
@@ -87,6 +88,10 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     }
   }
 
+  protected void setObject(final ObjectWithProperties object) {
+    this.object = object;
+  }
+
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (getObject() == null) {
@@ -118,4 +123,12 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     properties.put(name, new WeakReference<Object>(value));
   }
 
+  @Override
+  public String toString() {
+    if (object == null) {
+      return super.toString();
+    } else {
+      return object.toString();
+    }
+  }
 }

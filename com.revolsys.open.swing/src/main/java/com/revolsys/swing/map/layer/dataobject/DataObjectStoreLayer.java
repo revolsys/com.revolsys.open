@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +17,6 @@ import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -46,7 +44,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.transaction.TransactionUtils;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -70,8 +69,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
 
-  private Method saveRecordChangesMethod;
-
   private final Object sync = new Object();
 
   private String typePath;
@@ -86,9 +83,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     setExists(exists);
     setType("dataStore");
 
-    this.saveRecordChangesMethod = ReflectionUtils.findMethod(getClass(),
-      "transactionSaveRecordChanges", LayerDataObject.class);
-    this.saveRecordChangesMethod.setAccessible(true);
     setMetaData(dataStore.getMetaData(typePath));
     setTypePath(typePath);
   }
@@ -96,10 +90,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   public DataObjectStoreLayer(final Map<String, ? extends Object> properties) {
     super(properties);
     setType("dataStore");
-
-    this.saveRecordChangesMethod = ReflectionUtils.findMethod(getClass(),
-      "transactionSaveRecordChanges", LayerDataObject.class);
-    this.saveRecordChangesMethod.setAccessible(true);
   }
 
   @SuppressWarnings("unchecked")
@@ -271,7 +261,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.cachedRecords = new HashMap<String, LayerDataObject>();
     this.loadingBoundingBox = new BoundingBox();
     this.loadingWorker = null;
-    this.saveRecordChangesMethod = null;
     this.typePath = null;
     super.delete();
     if (loadingWorker != null) {
@@ -468,14 +457,48 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   protected boolean doSaveChanges(final LayerDataObject record) {
     final boolean deleted = isDeleted(record);
-    final boolean saved = invokeInTransaction(this.saveRecordChangesMethod,
-      record);
-    if (saved) {
-      if (!deleted) {
-        record.setState(DataObjectState.Persisted);
+    final PlatformTransactionManager transactionManager = getDataStore().getTransactionManager();
+    try (
+      Transaction transaction = new Transaction(transactionManager,
+        Propagation.REQUIRES_NEW)) {
+      try {
+
+        if (isExists()) {
+          final DataObjectStore dataStore = getDataStore();
+          if (dataStore != null) {
+            final Writer<DataObject> writer = dataStore.createWriter();
+            try {
+              final String idAttributeName = getMetaData().getIdAttributeName();
+              final String idString = record.getIdString();
+              if (this.deletedRecordIds.contains(idString)
+                || super.isDeleted(record)) {
+                record.setState(DataObjectState.Deleted);
+                writer.write(record);
+              } else if (super.isModified(record)) {
+                writer.write(record);
+              } else if (isNew(record)) {
+                Object id = record.getIdValue();
+                if (id == null && StringUtils.hasText(idAttributeName)) {
+                  id = dataStore.createPrimaryIdValue(typePath);
+                  record.setValue(idAttributeName, id);
+                }
+
+                writer.write(record);
+              }
+            } finally {
+              writer.close();
+            }
+            if (!deleted) {
+              record.setState(DataObjectState.Persisted);
+            }
+            return true;
+          }
+        }
+        return false;
+      } catch (final Throwable e) {
+        throw transaction.setRollbackOnly(e);
       }
     }
-    return saved;
   }
 
   @Override
@@ -674,14 +697,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return super.internalCancelChanges(record);
   }
 
-  protected boolean invokeInTransaction(final Method method,
-    final Object... args) {
-    final DataObjectStore dataStore = getDataStore();
-    final PlatformTransactionManager transactionManager = dataStore.getTransactionManager();
-    return (Boolean)TransactionUtils.invoke(transactionManager, this, method,
-      args);
-  }
-
   @Override
   public boolean isLayerRecord(final DataObject record) {
     if (record instanceof LayerDataObject) {
@@ -866,39 +881,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Map<String, Object> map = super.toMap();
     MapSerializerUtil.add(map, "typePath", this.typePath);
     return map;
-  }
-
-  protected synchronized boolean transactionSaveRecordChanges(
-    final LayerDataObject record) {
-    if (isExists()) {
-      final DataObjectStore dataStore = getDataStore();
-      if (dataStore != null) {
-        final Writer<DataObject> writer = dataStore.createWriter();
-        try {
-          final String idAttributeName = getMetaData().getIdAttributeName();
-          final String idString = record.getIdString();
-          if (this.deletedRecordIds.contains(idString)
-            || super.isDeleted(record)) {
-            record.setState(DataObjectState.Deleted);
-            writer.write(record);
-          } else if (super.isModified(record)) {
-            writer.write(record);
-          } else if (isNew(record)) {
-            Object id = record.getIdValue();
-            if (id == null && StringUtils.hasText(idAttributeName)) {
-              id = dataStore.createPrimaryIdValue(typePath);
-              record.setValue(idAttributeName, id);
-            }
-
-            writer.write(record);
-          }
-        } finally {
-          writer.close();
-        }
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override

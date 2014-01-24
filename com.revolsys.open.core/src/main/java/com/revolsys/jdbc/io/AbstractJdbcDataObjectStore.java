@@ -231,7 +231,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public JdbcWriter createWriter(final int batchSize) {
-    final JdbcWriter writer = new JdbcWriter(this);
+    final JdbcWriterImpl writer = new JdbcWriterImpl(this);
     writer.setSqlPrefix(sqlPrefix);
     writer.setSqlSuffix(sqlSuffix);
     writer.setBatchSize(batchSize);
@@ -625,43 +625,46 @@ public abstract class AbstractJdbcDataObjectStore extends
     return getWriter(false);
   }
 
-  protected JdbcWriter getWriter(final boolean throwExceptions) {
+  @Override
+  public JdbcWriter getWriter(final boolean throwExceptions) {
     Object writerKey;
     if (throwExceptions) {
       writerKey = exceptionWriterKey;
     } else {
       writerKey = this.writerKey;
     }
+    JdbcWriterImpl writer;
     final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
     if (resourceHolder != null
       && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
       resourceHolder.requested();
-      if (!resourceHolder.hasWriter()) {
-        final JdbcWriter writer = createWriter(1);
+      if (resourceHolder.hasWriter()) {
+        writer = resourceHolder.getWriter();
+      } else {
+        writer = (JdbcWriterImpl)createWriter(1);
         resourceHolder.setWriter(writer);
       }
-      final JdbcWriter writer = resourceHolder.getWriter();
-      return writer;
-    }
-    final JdbcWriter writer = createWriter(1);
-    writer.setThrowExceptions(throwExceptions);
-    if (TransactionSynchronizationManager.isSynchronizationActive()) {
-      JdbcWriterResourceHolder holderToUse = resourceHolder;
-      if (holderToUse == null) {
-        holderToUse = new JdbcWriterResourceHolder(writer);
-      } else {
-        holderToUse.setWriter(writer);
+    } else {
+      writer = (JdbcWriterImpl)createWriter(1);
+      writer.setThrowExceptions(throwExceptions);
+      if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        JdbcWriterResourceHolder holderToUse = resourceHolder;
+        if (holderToUse == null) {
+          holderToUse = new JdbcWriterResourceHolder(writer);
+        } else {
+          holderToUse.setWriter(writer);
+        }
+        holderToUse.requested();
+        final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(
+          this, holderToUse, writerKey);
+        TransactionSynchronizationManager.registerSynchronization(synchronization);
+        holderToUse.setSynchronizedWithTransaction(true);
+        if (holderToUse != resourceHolder) {
+          TransactionSynchronizationManager.bindResource(writerKey, holderToUse);
+        }
       }
-      holderToUse.requested();
-      final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(
-        this, holderToUse, writerKey);
-      TransactionSynchronizationManager.registerSynchronization(synchronization);
-      holderToUse.setSynchronizedWithTransaction(true);
-      if (holderToUse != resourceHolder) {
-        TransactionSynchronizationManager.bindResource(writerKey, holderToUse);
-      }
     }
-    return writer;
+    return new JdbcWriterWrapper(writer);
   }
 
   @Override
@@ -922,18 +925,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   public void releaseSqlConnection(final Connection connection) {
     final DataSource dataSource = getDataSource();
     JdbcUtils.release(connection, dataSource);
-  }
-
-  @Override
-  public void releaseWriter(final JdbcWriter writer) {
-    if (writer != null) {
-      final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
-      if (resourceHolder != null && resourceHolder.writerEquals(writer)) {
-        resourceHolder.released();
-      } else {
-        writer.doClose();
-      }
-    }
   }
 
   public void setBatchSize(final int batchSize) {

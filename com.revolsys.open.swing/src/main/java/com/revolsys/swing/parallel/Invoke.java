@@ -21,7 +21,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.revolsys.beans.MethodInvoker;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
-import com.revolsys.transaction.TransactionUtils;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -121,6 +122,14 @@ public class Invoke {
     worker(new RunnableSwingWorker(description, backgroundTask));
   }
 
+  public static void backgroundTransaction(final String description,
+    final PlatformTransactionManager transactionManager,
+    final Propagation propagation, final Runnable runnable) {
+    background(
+      description,
+      Transaction.runnable(runnable, transactionManager, propagation));
+  }
+
   public static PropertyChangeSupport getPropertyChangeSupport() {
     return PROPERTY_CHANGE_SUPPORT;
   }
@@ -184,13 +193,6 @@ public class Invoke {
     } else {
       SwingUtilities.invokeLater(runnable);
     }
-  }
-
-  public static void transactionExecute(
-    final PlatformTransactionManager transactionManager,
-    final int propagationBehavior, final Runnable runnable) {
-    background(TransactionUtils.createRunnable(transactionManager,
-      propagationBehavior, runnable));
   }
 
   public static SwingWorker<?, ?> worker(final String description,

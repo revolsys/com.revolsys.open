@@ -26,11 +26,7 @@ public class JdbcWriterSynchronization extends
     if (holderActive) {
       TransactionSynchronizationManager.unbindResourceIfPossible(key);
       holderActive = false;
-      if (writerHolder.hasWriter()) {
-        final JdbcWriter writer = writerHolder.getWriter();
-        dataStore.releaseWriter(writer);
-        writerHolder.setWriter(null);
-      }
+      writerHolder.close();
     }
     writerHolder.reset();
   }
@@ -40,10 +36,7 @@ public class JdbcWriterSynchronization extends
     if (!writerHolder.isOpen()) {
       TransactionSynchronizationManager.unbindResource(key);
       holderActive = false;
-      if (writerHolder.hasWriter()) {
-        final JdbcWriter writer = writerHolder.getWriter();
-        dataStore.releaseWriter(writer);
-      }
+      writerHolder.close();
     }
   }
 
@@ -63,10 +56,8 @@ public class JdbcWriterSynchronization extends
   public void suspend() {
     if (holderActive) {
       TransactionSynchronizationManager.unbindResource(key);
-      if (writerHolder.hasWriter() && !writerHolder.isOpen()) {
-        final JdbcWriter writer = writerHolder.getWriter();
-        dataStore.releaseWriter(writer);
-        writerHolder.setWriter(null);
+      if (!writerHolder.isOpen()) {
+        writerHolder.close();
       }
     }
   }

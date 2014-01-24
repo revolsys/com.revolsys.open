@@ -109,6 +109,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   Writer<DataObject> getWriter();
 
+  Writer<DataObject> getWriter(boolean throwExceptions);
+
   boolean hasSchema(String name);
 
   void initialize();
