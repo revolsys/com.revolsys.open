@@ -1,5 +1,7 @@
 package com.revolsys.jdbc;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,7 +35,13 @@ public class LocalBlob implements Blob {
     if (resource == null) {
       return null;
     } else {
-      return SpringUtil.getInputStream(resource);
+      final InputStream in = SpringUtil.getInputStream(resource);
+      if (in instanceof FileInputStream) {
+        final FileInputStream fileIn = (FileInputStream)in;
+        return new BufferedInputStream(fileIn);
+      } else {
+        return in;
+      }
     }
   }
 

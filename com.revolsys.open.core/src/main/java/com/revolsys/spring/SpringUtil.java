@@ -185,7 +185,8 @@ public class SpringUtil {
 
   public static InputStream getInputStream(final Resource resource) {
     try {
-      return resource.getInputStream();
+      final InputStream in = resource.getInputStream();
+      return in;
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open stream to resource "
         + resource, e);

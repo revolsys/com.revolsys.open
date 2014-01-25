@@ -193,7 +193,18 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     } else {
       reader = new StringReader(in.toString());
     }
-    return (V)read(reader);
+    try {
+      return (V)read(reader);
+    } finally {
+      if (in instanceof Clob) {
+        try {
+          final Clob clob = (Clob)in;
+          clob.free();
+        } catch (final SQLException e) {
+          throw new RuntimeException("Unable to free clob resources", e);
+        }
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")
