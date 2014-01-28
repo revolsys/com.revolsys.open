@@ -74,13 +74,13 @@ import com.revolsys.gis.data.query.Cast;
 import com.revolsys.gis.data.query.CollectionValue;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.In;
 import com.revolsys.gis.data.query.IsNotNull;
 import com.revolsys.gis.data.query.IsNull;
 import com.revolsys.gis.data.query.Not;
 import com.revolsys.gis.data.query.Or;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.data.query.functions.Function;
@@ -181,7 +181,7 @@ public class QueryWhereConditionField extends ValueField implements
     final PropertyChangeListener listener, final Condition filter,
     final String query) {
     super(new BorderLayout());
-    setTitle("Advanced Filter");
+    setTitle("Advanced Search");
     this.originalFilter = filter;
     this.listener = listener;
     metaData = layer.getMetaData();
@@ -655,7 +655,7 @@ public class QueryWhereConditionField extends ValueField implements
     } else {
       JOptionPane.showMessageDialog(
         this,
-        "<html><p>Cannot save the advanced query as the SQL is valid.<p></p>Fix the SQL or use the cancel button on the Advanced Filter window to cancel the changes.<p></html>",
+        "<html><p>Cannot save the advanced query as the SQL is valid.<p></p>Fix the SQL or use the cancel button on the Advanced Search window to cancel the changes.<p></html>",
         "SQL Invalid", JOptionPane.ERROR_MESSAGE);
     }
   }

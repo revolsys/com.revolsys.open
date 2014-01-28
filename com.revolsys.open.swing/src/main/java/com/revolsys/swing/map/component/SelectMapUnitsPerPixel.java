@@ -65,7 +65,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
     final Dimension size = new Dimension(120, 22);
     setPreferredSize(size);
     setMaximumSize(size);
-    setToolTipText("m/pixel");
+    setToolTipText("Resolution (m/pixel)");
   }
 
   @Override
@@ -135,7 +135,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
         final BoundingBox boundingBox = map.getBoundingBox();
         ComboBoxModel model = PROJECTED_MODEL;
         if (boundingBox == null) {
-          setToolTipText("m/pixel");
+          setToolTipText("Resolution (m/pixel)");
         } else {
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -146,7 +146,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
           }
           final Unit<Quantity> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
-          setToolTipText(unit + "/pixel");
+          setToolTipText("Resolution (" + unit + "/pixel)");
         }
         if (model != getModel()) {
           setModel(model);

@@ -170,7 +170,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         hasSelectedRecords, canDelete), "deleteSelectedRecords"));
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction(
-      "Merged Selected Records", "shape_group", canMergeRecords,
+      "Merge Selected Records", "shape_group", canMergeRecords,
       "mergeSelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction(

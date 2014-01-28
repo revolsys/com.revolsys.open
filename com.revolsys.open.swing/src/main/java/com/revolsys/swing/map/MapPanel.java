@@ -237,7 +237,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (this.baseMapLayers.size() > 0) {
       comboBox.setSelectedIndex(1);
     }
-    comboBox.setToolTipText("Select the base layerOverlay layer");
+    comboBox.setToolTipText("Base Map");
     this.toolBar.addComponent("layers", comboBox);
     this.baseMapOverlay.addPropertyChangeListener("layer",
       new PropertyChangeListener() {

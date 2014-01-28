@@ -351,11 +351,15 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected Point getPoint(final MouseEvent event) {
-    final java.awt.Point eventPoint = event.getPoint();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point point = this.viewport.toModelPointRounded(geometryFactory,
-      eventPoint);
-    return point;
+    if (event == null) {
+      return null;
+    } else {
+      final java.awt.Point eventPoint = event.getPoint();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point point = this.viewport.toModelPointRounded(geometryFactory,
+        eventPoint);
+      return point;
+    }
   }
 
   public Project getProject() {
@@ -388,8 +392,12 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected Point getViewportPoint(final MouseEvent event) {
-    final java.awt.Point eventPoint = event.getPoint();
-    return getViewportPoint(eventPoint);
+    if (event == null) {
+      return null;
+    } else {
+      final java.awt.Point eventPoint = event.getPoint();
+      return getViewportPoint(eventPoint);
+    }
   }
 
   public Geometry getXorGeometry() {

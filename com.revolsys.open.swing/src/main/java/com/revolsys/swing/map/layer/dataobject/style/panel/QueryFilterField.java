@@ -34,7 +34,7 @@ public class QueryFilterField extends ValueField implements
     queryField.addPropertyChangeListener(fieldName, this);
     final ToolBar toolBar = new ToolBar();
 
-    toolBar.addButtonTitleIcon("search", "Advanced Filter", "filter_edits",
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
       this, "showAdvancedFilter");
 
     clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",

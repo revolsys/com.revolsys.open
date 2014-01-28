@@ -39,6 +39,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     map.addPropertyChangeListener("geometryFactory", this);
     final Dimension size = new Dimension(200, 22);
     setMaximumSize(size);
+    setToolTipText("Coordinate System");
   }
 
   public String formatCoordinateSystem(final Object value) {

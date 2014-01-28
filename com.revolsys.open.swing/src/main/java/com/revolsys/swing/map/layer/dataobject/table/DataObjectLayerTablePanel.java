@@ -138,7 +138,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       this);
     toolBar.addComponent("search", attributeFilterPanel);
 
-    toolBar.addButtonTitleIcon("search", "Advanced Filter", "filter_edits",
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
       attributeFilterPanel, "showAdvancedFilter");
 
     final EnableCheck hasFilter = new ObjectPropertyEnableCheck(tableModel,
