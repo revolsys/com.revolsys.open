@@ -315,6 +315,10 @@ public final class MathUtil {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
   }
 
+  public static String format(final String pattern, final Number number) {
+    return new DecimalFormat(pattern).format(number);
+  }
+
   /**
    * Code taken from DRA FME scripts to calculate angles.
    * 

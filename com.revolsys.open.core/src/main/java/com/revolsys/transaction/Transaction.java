@@ -9,6 +9,12 @@ import com.revolsys.util.ExceptionUtil;
 
 public class Transaction implements AutoCloseable {
 
+  private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
+
+  public static Transaction getCurrentTransaction() {
+    return currentTransaction.get();
+  }
+
   public static Runnable runnable(final Runnable runnable,
     final PlatformTransactionManager transactionManager,
     final Propagation propagation) {
@@ -18,6 +24,13 @@ public class Transaction implements AutoCloseable {
       final DefaultTransactionDefinition transactionDefinition = Transaction.transactionDefinition(propagation);
       return new TransactionRunnable(transactionManager, transactionDefinition,
         runnable);
+    }
+  }
+
+  public static void setCurrentRollbackOnly() {
+    final Transaction transaction = currentTransaction.get();
+    if (transaction != null) {
+      transaction.setRollbackOnly();
     }
   }
 
@@ -54,9 +67,11 @@ public class Transaction implements AutoCloseable {
     }
   }
 
-  private final PlatformTransactionManager transactionManager;
+  private Transaction previousTransaction;
 
-  private final DefaultTransactionStatus transactionStatus;
+  private PlatformTransactionManager transactionManager;
+
+  private DefaultTransactionStatus transactionStatus;
 
   public Transaction(final PlatformTransactionManager transactionManager) {
     this(transactionManager, Propagation.REQUIRES_NEW);
@@ -70,6 +85,8 @@ public class Transaction implements AutoCloseable {
     } else {
       this.transactionStatus = transactionStatus;
     }
+    this.previousTransaction = getCurrentTransaction();
+    currentTransaction.set(this);
   }
 
   public Transaction(final PlatformTransactionManager transactionManager,
@@ -80,18 +97,17 @@ public class Transaction implements AutoCloseable {
 
   public Transaction(final PlatformTransactionManager transactionManager,
     final TransactionDefinition transactionDefinition) {
-    if (transactionManager == null || transactionDefinition == null) {
-      this.transactionManager = null;
-      this.transactionStatus = null;
-    } else {
-      this.transactionManager = transactionManager;
-      this.transactionStatus = (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
-    }
+    this(transactionManager, transactionStatus(transactionManager,
+      transactionDefinition));
   }
 
   @Override
   public void close() throws RuntimeException {
     commit();
+    currentTransaction.set(previousTransaction);
+    this.transactionManager = null;
+    this.previousTransaction = null;
+    this.transactionStatus = null;
   }
 
   protected void commit() {

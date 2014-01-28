@@ -1421,6 +1421,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     synchronized (apiSync) {
       if (isOpen(table)) {
         table.setWriteLock();
+        table.setLoadOnlyMode(true);
       }
     }
   }

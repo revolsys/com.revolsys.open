@@ -1,6 +1,7 @@
 package com.revolsys.io.json;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -190,6 +191,9 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
       }
     } else if (in instanceof Reader) {
       reader = (Reader)in;
+    } else if (in instanceof File) {
+      final File file = (File)in;
+      reader = FileUtil.getReader(file);
     } else {
       reader = new StringReader(in.toString());
     }

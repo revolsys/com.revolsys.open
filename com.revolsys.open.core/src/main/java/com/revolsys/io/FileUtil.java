@@ -198,7 +198,7 @@ public final class FileUtil {
    * @throws IOException If an I/O error occurs.
    */
   public static long copy(final File file, final Writer out) throws IOException {
-    final FileReader in = new FileReader(file);
+    final FileReader in = getReader(file);
     try {
       return copy(in, out);
     } finally {
@@ -809,6 +809,14 @@ public final class FileUtil {
     }
   }
 
+  public static FileReader getReader(final File file) {
+    try {
+      return new FileReader(file);
+    } catch (final FileNotFoundException e) {
+      throw new IllegalArgumentException("File not found: " + file, e);
+    }
+  }
+
   /**
    * Return the relative path of the file from the parentDirectory. For example
    * the relative path of c:\Data\Files\file1.txt and c:\Data would be
@@ -837,6 +845,15 @@ public final class FileUtil {
 
   public static String getSafeFileName(final String name) {
     return name.replaceAll("[^a-zA-Z0-9\\-_ \\.]", "_");
+  }
+
+  public static String getString(final File file) {
+    if (file.exists()) {
+      final FileReader in = getReader(file);
+      return getString(in);
+    } else {
+      return null;
+    }
   }
 
   public static String getString(final InputStream in) {

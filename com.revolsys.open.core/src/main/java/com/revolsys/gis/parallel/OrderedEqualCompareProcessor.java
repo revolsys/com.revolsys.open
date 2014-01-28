@@ -118,12 +118,16 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         && !attributeName.equals(geometryAttributeName)) {
         final Object value1 = object1.getValue(attributeName);
         final Object value2 = object2.getValue(attributeName);
-        if (!EqualsInstance.INSTANCE.equals(value1, value2)) {
+        if (!valueEquals(value1, value2)) {
           notEqualAttributeNames.add(attributeName);
         }
       }
     }
     return notEqualAttributeNames;
+  }
+
+  protected boolean valueEquals(final Object value1, final Object value2) {
+    return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 
   /**

@@ -85,73 +85,70 @@ public class RayCrossingCounter {
     return counter.getLocation();
   }
 
-  private final Coordinates coordinates;
-
   private int crossingCount = 0;
 
   // true if the test point lies on an input segment
   private boolean isPointOnSegment = false;
 
-  public RayCrossingCounter(final Coordinates p) {
-    this.coordinates = p;
+  private final double x;
+
+  private final double y;
+
+  public RayCrossingCounter(final Coordinates point) {
+    this.x = point.getX();
+    this.y = point.getY();
   }
 
   /**
-   * Counts a segment
-   * 
+    * For each segment, check if it crosses a horizontal ray running from the
+     * test point in the positive x direction.
+    * 
    * @param p1 an endpoint of the segment
    * @param p2 another endpoint of the segment
    */
   public void countSegment(final Coordinates p1, final Coordinates p2) {
-    /**
-     * For each segment, check if it crosses a horizontal ray running from the
-     * test point in the positive x direction.
-     */
 
-    // check if the segment is strictly to the left of the test point
-    if (p1.getX() < coordinates.getX() && p2.getX() < coordinates.getX()) {
-      return;
-    }
+    final double p1X = p1.getX();
+    final double p1Y = p1.getY();
+    final double p2X = p2.getX();
+    final double p2Y = p2.getY();
 
-    // check if the point is equal to the current ring vertex
-    if (coordinates.getX() == p2.getX() && coordinates.getY() == p2.getY()) {
+    if (p1X < x && p2X < x) {
+      // check if the segment is strictly to the left of the test point
+    } else if (x == p2X && y == p2Y) {
+      // check if the point is equal to the current ring vertex
       isPointOnSegment = true;
-      return;
-    }
-    /**
-     * For horizontal segments, check if the point is on the segment. Otherwise,
-     * horizontal segments are not counted.
-     */
-    if (p1.getY() == coordinates.getY() && p2.getY() == coordinates.getY()) {
-      double minx = p1.getX();
-      double maxx = p2.getX();
+    } else if (p1Y == y && p2Y == y) {
+      /**
+       * For horizontal segments, check if the point is on the segment. Otherwise,
+       * horizontal segments are not counted.
+       */
+      double minx = p1X;
+      double maxx = p2X;
       if (minx > maxx) {
-        minx = p2.getX();
-        maxx = p1.getX();
+        minx = p2X;
+        maxx = p1X;
       }
-      if (coordinates.getX() >= minx && coordinates.getX() <= maxx) {
+      if (x >= minx && x <= maxx) {
         isPointOnSegment = true;
       }
-      return;
-    }
-    /**
-     * Evaluate all non-horizontal segments which cross a horizontal ray to the
-     * right of the test pt. To avoid double-counting shared vertices, we use
-     * the convention that
-     * <ul>
-     * <li>an upward edge includes its starting endpoint, and excludes its final
-     * endpoint
-     * <li>a downward edge excludes its starting endpoint, and includes its
-     * final endpoint
-     * </ul>
-     */
-    if (((p1.getY() > coordinates.getY()) && (p2.getY() <= coordinates.getY()))
-      || ((p2.getY() > coordinates.getY()) && (p1.getY() <= coordinates.getY()))) {
+    } else if (((p1Y > y) && (p2Y <= y)) || ((p2Y > y) && (p1Y <= y))) {
+      /**
+       * Evaluate all non-horizontal segments which cross a horizontal ray to the
+       * right of the test pt. To avoid double-counting shared vertices, we use
+       * the convention that
+       * <ul>
+       * <li>an upward edge includes its starting endpoint, and excludes its final
+       * endpoint
+       * <li>a downward edge excludes its starting endpoint, and includes its
+       * final endpoint
+       * </ul>
+       */
       // translate the segment so that the test point lies on the origin
-      final double x1 = p1.getX() - coordinates.getX();
-      final double y1 = p1.getY() - coordinates.getY();
-      final double x2 = p2.getX() - coordinates.getX();
-      final double y2 = p2.getY() - coordinates.getY();
+      final double x1 = p1X - x;
+      final double y1 = p1Y - y;
+      final double x2 = p2X - x;
+      final double y2 = p2Y - y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
@@ -164,18 +161,19 @@ public class RayCrossingCounter {
       double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2);
       if (xIntSign == 0.0) {
         isPointOnSegment = true;
-        return;
-      }
-      if (y2 < y1) {
-        xIntSign = -xIntSign;
-        // xsave = xInt;
-      }
+      } else {
+        if (y2 < y1) {
+          xIntSign = -xIntSign;
+          // xsave = xInt;
+        }
 
-      // System.out.println("xIntSign(" + x1 + ", " + y1 + ", " + x2 + ", " + y2
-      // + " = " + xIntSign);
-      // The segment crosses the ray if the sign is strictly positive.
-      if (xIntSign > 0.0) {
-        crossingCount++;
+        // System.out.println("xIntSign(" + x1 + ", " + y1 + ", " + x2 + ", " +
+        // y2
+        // + " = " + xIntSign);
+        // The segment crosses the ray if the sign is strictly positive.
+        if (xIntSign > 0.0) {
+          crossingCount++;
+        }
       }
     }
   }
@@ -191,14 +189,13 @@ public class RayCrossingCounter {
   public int getLocation() {
     if (isPointOnSegment) {
       return Location.BOUNDARY;
-    }
-
-    // The point is in the interior of the ring if the number of X-crossings is
-    // odd.
-    if ((crossingCount % 2) == 1) {
+    } else if ((crossingCount % 2) == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is odd.
       return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
-    return Location.EXTERIOR;
   }
 
   /**
