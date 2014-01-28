@@ -121,7 +121,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   boolean isEditable(String typePath);
 
-  DataObject load(String typePath, Object id);
+  DataObject load(String typePath, Object... id);
 
   DataObject lock(String typePath, Object id);
 

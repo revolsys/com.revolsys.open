@@ -265,7 +265,7 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public DataObject load(final String typePath, final Object id) {
+  public DataObject load(final String typePath, final Object... id) {
     return dataStore.load(typePath, id);
   }
 

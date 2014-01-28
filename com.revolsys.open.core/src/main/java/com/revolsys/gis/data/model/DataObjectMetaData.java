@@ -167,11 +167,27 @@ public interface DataObjectMetaData extends ObjectWithProperties,
   int getIdAttributeIndex();
 
   /**
+   * Get the index of all ID attributes.
+   * 
+   * @return The ID indexes.
+   */
+  List<Integer> getIdAttributeIndexes();
+
+  /**
    * Get the name of the Unique identifier attribute.
    * 
    * @return The unique id name.
    */
   String getIdAttributeName();
+
+  /**
+   * Get the name of the all ID attributes.
+   * 
+   * @return The id names.
+   */
+  List<String> getIdAttributeNames();
+
+  List<Attribute> getIdAttributes();
 
   int getInstanceId();
 

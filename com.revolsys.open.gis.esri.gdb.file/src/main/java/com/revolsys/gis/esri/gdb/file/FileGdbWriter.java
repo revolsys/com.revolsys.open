@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -24,8 +23,6 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
 import com.revolsys.io.AbstractWriter;
 
 public class FileGdbWriter extends AbstractWriter<DataObject> {
-  private static final Logger LOG = LoggerFactory.getLogger(FileGdbWriter.class);
-
   private Map<String, Table> tables = new HashMap<String, Table>();
 
   private CapiFileGdbDataObjectStore dataStore;
@@ -44,7 +41,8 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
           try {
             dataStore.freeWriteLock(table);
           } catch (final Throwable e) {
-            LOG.error("Unable to close table", e);
+            LoggerFactory.getLogger(FileGdbWriter.class).error(
+              "Unable to close table", e);
           }
         }
       }
@@ -131,8 +129,9 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       throw new RuntimeException("Unable to insert row " + e.getMessage()
         + "\n" + object.toString(), e);
     } catch (final RuntimeException e) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Unable to insert row \n:" + object.toString());
+      if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
+        LoggerFactory.getLogger(FileGdbWriter.class).debug(
+          "Unable to insert row \n:" + object.toString());
       }
       throw new RuntimeException("Unable to insert row", e);
     }
@@ -169,11 +168,15 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
                 dataStore.addStatistic("Update", object);
               }
             } catch (final IllegalArgumentException e) {
-              LOG.error("Unable to insert row " + e.getMessage() + "\n"
-                + object.toString(), e);
+              LoggerFactory.getLogger(FileGdbWriter.class).error(
+                "Unable to update row " + e.getMessage() + "\n"
+                  + object.toString(), e);
             } catch (final RuntimeException e) {
-              if (LOG.isDebugEnabled()) {
-                LOG.debug("Unable to insert row \n:" + object.toString());
+              LoggerFactory.getLogger(FileGdbWriter.class).error(
+                "Unable to update row \n:" + object.toString());
+              if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
+                LoggerFactory.getLogger(FileGdbWriter.class).debug(
+                  "Unable to update row \n:" + object.toString());
               }
               throw new RuntimeException("Unable to update row", e);
             } finally {

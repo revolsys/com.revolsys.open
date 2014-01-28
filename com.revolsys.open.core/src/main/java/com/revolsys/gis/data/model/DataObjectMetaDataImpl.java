@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -85,6 +86,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
   private final List<String> geometryAttributeNames = new ArrayList<String>();
+
+  private final List<Integer> idAttributeIndexes = new ArrayList<Integer>();
+
+  private final List<String> idAttributeNames = new ArrayList<String>();
+
+  private final List<Attribute> idAttributes = new ArrayList<Attribute>();
 
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
@@ -550,7 +557,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public List<Integer> getGeometryAttributeIndexes() {
-    return geometryAttributeIndexes;
+    return Collections.unmodifiableList(geometryAttributeIndexes);
   }
 
   @Override
@@ -560,7 +567,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public List<String> getGeometryAttributeNames() {
-    return geometryAttributeNames;
+    return Collections.unmodifiableList(geometryAttributeNames);
   }
 
   @Override
@@ -589,8 +596,23 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public List<Integer> getIdAttributeIndexes() {
+    return Collections.unmodifiableList(idAttributeIndexes);
+  }
+
+  @Override
   public String getIdAttributeName() {
     return getAttributeName(idAttributeIndex);
+  }
+
+  @Override
+  public List<String> getIdAttributeNames() {
+    return Collections.unmodifiableList(idAttributeNames);
+  }
+
+  @Override
+  public List<Attribute> getIdAttributes() {
+    return Collections.unmodifiableList(idAttributes);
   }
 
   @Override
@@ -725,11 +747,42 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
    */
   public void setIdAttributeIndex(final int idAttributeIndex) {
     this.idAttributeIndex = idAttributeIndex;
+    this.idAttributeIndexes.clear();
+    this.idAttributeIndexes.add(idAttributeIndex);
+    this.idAttributeNames.clear();
+    this.idAttributeNames.add(getIdAttributeName());
+    this.idAttributes.clear();
+    this.idAttributes.add(getIdAttribute());
   }
 
   public void setIdAttributeName(final String name) {
     final int id = getAttributeIndex(name);
     setIdAttributeIndex(id);
+  }
+
+  public void setIdAttributeNames(final Collection<String> names) {
+    if (names != null) {
+      if (names.size() == 1) {
+        final String name = CollectionUtil.get(names, 0);
+        setIdAttributeName(name);
+      } else {
+        for (final String name : names) {
+          final int index = getAttributeIndex(name);
+          if (index == -1) {
+            LoggerFactory.getLogger(getClass()).error(
+              "Cannot set ID " + getPath() + "." + name + " does not exist");
+          } else {
+            idAttributeIndexes.add(index);
+            idAttributeNames.add(name);
+            idAttributes.add(getAttribute(index));
+          }
+        }
+      }
+    }
+  }
+
+  public void setIdAttributeNames(final String... names) {
+    setIdAttributeNames(Arrays.asList(names));
   }
 
   @Override

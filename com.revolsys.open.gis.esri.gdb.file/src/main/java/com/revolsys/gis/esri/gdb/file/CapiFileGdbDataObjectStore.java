@@ -780,6 +780,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected void deletedRow(final Table table, final Row row) {
     synchronized (apiSync) {
       if (isOpen(table)) {
+        table.setLoadOnlyMode(false);
         table.deleteRow(row);
       }
     }
@@ -1184,14 +1185,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public DataObject load(final String typePath, final Object id) {
+  public DataObject load(final String typePath, final Object... id) {
     synchronized (apiSync) {
       final DataObjectMetaData metaData = getMetaData(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Unknown type " + typePath);
       } else {
         final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-          typePath, metaData.getIdAttributeName() + " = " + id);
+          typePath, metaData.getIdAttributeName() + " = " + id[0]);
         try {
           if (iterator.hasNext()) {
             return iterator.next();
@@ -1441,6 +1442,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected void updateRow(final Table table, final Row row) {
     synchronized (apiSync) {
       if (isOpen(table)) {
+        table.setLoadOnlyMode(false);
         table.updateRow(row);
       }
     }

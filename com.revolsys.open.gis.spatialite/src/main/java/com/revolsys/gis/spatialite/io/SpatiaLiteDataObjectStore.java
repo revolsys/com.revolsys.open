@@ -275,11 +275,11 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  protected synchronized Map<String, String> loadIdColumnNames(
+  protected synchronized Map<String, List<String>> loadIdColumnNames(
     final String dbSchemaName) {
     final String schemaName = "/" + dbSchemaName.toUpperCase();
 
-    final Map<String, String> idColumnNames = new HashMap<String, String>();
+    final Map<String, List<String>> idColumnNames = new HashMap<>();
     final Connection connection = getDbConnection();
     try {
       for (final String dbTableName : schemaTableNames.get(dbSchemaName)) {
@@ -296,7 +296,8 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
                 final String idAttributeName = rs.getString("name");
                 final int pk = rs.getInt("PK");
                 if (pk == 1) {
-                  idColumnNames.put(tableName, idAttributeName);
+                  CollectionUtil.addToList(idColumnNames, tableName,
+                    idAttributeName);
                 }
               }
             } finally {

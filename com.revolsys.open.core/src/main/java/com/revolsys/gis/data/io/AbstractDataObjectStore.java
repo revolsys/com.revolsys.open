@@ -28,6 +28,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -36,6 +37,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
@@ -556,17 +558,26 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
-  public DataObject load(final String typePath, final Object id) {
+  public DataObject load(final String typePath, final Object... id) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
-      final String idAttributeName = metaData.getIdAttributeName();
-      if (idAttributeName == null) {
+      final List<String> idAttributeNames = metaData.getIdAttributeNames();
+      if (idAttributeNames.isEmpty()) {
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
+      } else if (id.length != idAttributeNames.size()) {
+        throw new IllegalArgumentException(Arrays.toString(id)
+          + " not a valid id for " + typePath + " requires " + idAttributeNames);
       } else {
-        final Query query = Query.equal(metaData, idAttributeName, id);
+        final Query query = new Query(metaData);
+        for (int i = 0; i < idAttributeNames.size(); i++) {
+          final String name = idAttributeNames.get(i);
+          final Object value = id[i];
+          final Attribute attribute = metaData.getAttribute(name);
+          query.and(Q.equal(attribute, value));
+        }
         return queryFirst(query);
       }
     }

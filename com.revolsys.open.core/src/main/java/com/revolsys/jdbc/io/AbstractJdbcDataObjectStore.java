@@ -724,10 +724,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public abstract boolean isSchemaExcluded(String schemaName);
 
-  protected synchronized Map<String, String> loadIdColumnNames(
+  protected synchronized Map<String, List<String>> loadIdColumnNames(
     final String dbSchemaName) {
     final String schemaName = "/" + dbSchemaName.toUpperCase();
-    final Map<String, String> idColumnNames = new HashMap<String, String>();
+    final Map<String, List<String>> idColumnNames = new HashMap<String, List<String>>();
     final Connection connection = getDbConnection();
     try {
       final PreparedStatement statement = connection.prepareStatement(primaryKeySql);
@@ -738,7 +738,8 @@ public abstract class AbstractJdbcDataObjectStore extends
           while (rs.next()) {
             final String tableName = rs.getString("TABLE_NAME").toUpperCase();
             final String idAttributeName = rs.getString("COLUMN_NAME");
-            idColumnNames.put(schemaName + "/" + tableName, idAttributeName);
+            CollectionUtil.addToList(idColumnNames, schemaName + "/"
+              + tableName, idAttributeName);
           }
         } finally {
           JdbcUtils.close(rs);
@@ -771,7 +772,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-      final Map<String, String> idAttributeNames = loadIdColumnNames(dbSchemaName);
+      final Map<String, List<String>> idAttributeNameMap = loadIdColumnNames(dbSchemaName);
       final Set<String> tableNames = tablePermissionsMap.keySet();
       for (final String dbTableName : tableNames) {
         final String tableName = dbTableName.toUpperCase();
@@ -815,8 +816,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
         for (final DataObjectMetaData metaData : schema.getTypes()) {
           final String typePath = metaData.getPath();
-          final String idAttributeName = idAttributeNames.get(typePath);
-          ((DataObjectMetaDataImpl)metaData).setIdAttributeName(idAttributeName);
+          final List<String> idAttributeNames = idAttributeNameMap.get(typePath);
+          ((DataObjectMetaDataImpl)metaData).setIdAttributeNames(idAttributeNames);
         }
 
       } finally {

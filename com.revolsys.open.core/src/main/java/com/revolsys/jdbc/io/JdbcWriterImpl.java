@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -416,22 +417,30 @@ public class JdbcWriterImpl extends AbstractWriter<DataObject> implements
       }
       sqlBuffer.append(tableName);
       sqlBuffer.append(" set ");
+      final List<Attribute> idAttributes = type.getIdAttributes();
       boolean first = true;
-      for (int i = 0; i < type.getAttributeCount(); i++) {
-        if (i != type.getIdAttributeIndex()) {
+      for (final Attribute attribute : type.getAttributes()) {
+        if (!idAttributes.contains(attribute)) {
+          final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
           if (first) {
             first = false;
           } else {
             sqlBuffer.append(", ");
           }
-          final JdbcAttribute attribute = (JdbcAttribute)type.getAttribute(i);
-          addSqlColumEqualsPlaceholder(sqlBuffer, attribute);
-
+          addSqlColumEqualsPlaceholder(sqlBuffer, jdbcAttribute);
         }
       }
       sqlBuffer.append(" where ");
-      final JdbcAttribute idAttribute = (JdbcAttribute)type.getIdAttribute();
-      addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
+      first = true;
+      for (final Attribute idAttribute : idAttributes) {
+        if (first) {
+          first = false;
+        } else {
+          sqlBuffer.append(" AND ");
+        }
+        final JdbcAttribute idJdbcAttribute = (JdbcAttribute)idAttribute;
+        addSqlColumEqualsPlaceholder(sqlBuffer, idJdbcAttribute);
+      }
 
       sqlBuffer.append(" ");
       if (sqlSuffix != null) {
@@ -654,16 +663,20 @@ public class JdbcWriterImpl extends AbstractWriter<DataObject> implements
       }
     }
     int parameterIndex = 1;
-    final JdbcAttribute idAttribute = (JdbcAttribute)metaData.getIdAttribute();
+    final List<Attribute> idAttributes = metaData.getIdAttributes();
     for (final Attribute attribute : metaData.getAttributes()) {
-      if (attribute != idAttribute) {
+      if (!idAttributes.contains(attribute)) {
         final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
         parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(
           statement, parameterIndex, object);
       }
     }
-    parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
-      parameterIndex, object);
+    for (final Attribute idAttribute : idAttributes) {
+      final JdbcAttribute jdbcAttribute = (JdbcAttribute)idAttribute;
+      parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement,
+        parameterIndex, object);
+
+    }
     statement.addBatch();
     Integer batchCount = typeUpdateBatchCountMap.get(typePath);
     if (batchCount == null) {
