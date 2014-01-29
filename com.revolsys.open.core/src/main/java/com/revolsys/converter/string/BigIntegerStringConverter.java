@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 public class BigIntegerStringConverter extends
   AbstractNumberStringConverter<BigInteger> {
   public BigIntegerStringConverter() {
-    super(getIntegerFormat());
+    super();
   }
 
   @Override

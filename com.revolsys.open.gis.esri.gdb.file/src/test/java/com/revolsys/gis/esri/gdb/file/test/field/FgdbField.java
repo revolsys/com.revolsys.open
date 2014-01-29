@@ -23,10 +23,11 @@ public class FgdbField extends Attribute {
     throw new UnsupportedOperationException();
   }
 
-  public void setValue(final DataObject record, final EndianInput in)
+  public boolean setValue(final DataObject record, final EndianInput in)
     throws IOException {
     final Object value = read(in);
     final String name = getName();
     record.setValue(name, value);
+    return true;
   }
 }

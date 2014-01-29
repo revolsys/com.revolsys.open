@@ -1,7 +1,5 @@
 package com.revolsys.gis.grid;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +10,6 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.util.MathUtil;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
-
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("0.#");
-  }
 
   private GeometryFactory geometryFactory;
 
@@ -73,7 +67,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final double tileX = getGridValue(originX, tileWidth, x);
     final double tileY = getGridValue(originY, tileHeight, y);
 
-    return getFormat().format(tileX) + "_" + getFormat().format(tileY);
+    return MathUtil.toString(tileX, 1) + "_" + MathUtil.toString(tileY, 1);
   }
 
   public double getOriginX() {

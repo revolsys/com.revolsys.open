@@ -1,8 +1,6 @@
 package com.revolsys.io.json;
 
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +13,9 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.util.MathUtil;
 
 public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
-
-  private static NumberFormat getNumberFormat() {
-    return new DecimalFormat("#.#########################");
-  }
 
   private DataObjectMetaData metaData;
 
@@ -197,7 +192,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {
-      out.print(getNumberFormat().format(value));
+      out.print(MathUtil.toString((Number)value));
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       list(list);

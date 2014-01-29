@@ -17,7 +17,8 @@ public class ObjectIdField extends FgdbField {
   }
 
   @Override
-  public void setValue(final DataObject record, final EndianInput in)
+  public boolean setValue(final DataObject record, final EndianInput in)
     throws IOException {
+    return false;
   }
 }

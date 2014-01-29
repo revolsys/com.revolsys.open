@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +15,9 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.io.PathUtil;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 public abstract class JdbcDdlWriter implements Cloneable {
-
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
-  }
-
   private PrintWriter out;
 
   public JdbcDdlWriter() {
@@ -267,7 +261,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
         out.print("NULL");
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        out.print(getFormat().format(number));
+        out.print(MathUtil.toString(number));
       } else {
         out.print("'");
         out.print(value.toString().replaceAll("'", "''"));

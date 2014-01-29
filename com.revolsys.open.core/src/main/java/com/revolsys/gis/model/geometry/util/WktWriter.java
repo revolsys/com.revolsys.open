@@ -2,8 +2,6 @@ package com.revolsys.gis.model.geometry.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -17,13 +15,9 @@ import com.revolsys.gis.model.geometry.MultiPoint;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class WktWriter {
-
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
-  }
-
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
     final PrintWriter writer = new PrintWriter(out);
@@ -278,7 +272,7 @@ public class WktWriter {
       if (Double.isNaN(coordinate)) {
         out.print(0);
       } else {
-        out.print(getFormat().format(coordinate));
+        out.print(MathUtil.toString(coordinate));
       }
     }
   }
@@ -292,7 +286,7 @@ public class WktWriter {
       if (Double.isNaN(coordinate)) {
         out.print(0);
       } else {
-        out.print(getFormat().format(coordinate));
+        out.print(MathUtil.toString(coordinate));
       }
     }
   }

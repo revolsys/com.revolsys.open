@@ -1,7 +1,5 @@
 package com.revolsys.gis.data.model.codes;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,11 +12,9 @@ import java.util.Map.Entry;
 import javax.swing.JComponent;
 
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCodeTable implements CodeTable, Cloneable {
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
-  }
 
   private boolean capitalizeWords = false;
 
@@ -189,7 +185,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
         normalizedValues.add(null);
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        normalizedValues.add(getFormat().format(number));
+        normalizedValues.add(MathUtil.toString(number));
       } else {
         normalizedValues.add(value.toString().toLowerCase());
       }

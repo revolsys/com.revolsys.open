@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +34,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.MathUtil;
 
 /**
  * <p>
@@ -114,10 +113,6 @@ public class XmlWriter extends Writer {
     public String toString() {
       return element.toString();
     }
-  }
-
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
   }
 
   /** True if an XML declaration can be written. */
@@ -994,7 +989,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final double value) {
-    final String text = getFormat().format(value);
+    final String text = MathUtil.toString(value);
     text(text);
   }
 
@@ -1006,7 +1001,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final float value) {
-    final String text = getFormat().format(value);
+    final String text = MathUtil.toString(value);
     text(text);
   }
 
@@ -1043,7 +1038,7 @@ public class XmlWriter extends Writer {
     if (value != null) {
       if (value instanceof Number) {
         final Number number = (Number)value;
-        final String text = getFormat().format(number);
+        final String text = MathUtil.toString(number);
         text(text);
       } else {
         text(value.toString());

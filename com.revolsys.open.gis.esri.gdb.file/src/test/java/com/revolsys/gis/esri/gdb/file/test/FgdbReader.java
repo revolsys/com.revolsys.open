@@ -16,13 +16,16 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.esri.gdb.file.test.field.BinaryField;
 import com.revolsys.gis.esri.gdb.file.test.field.DoubleField;
 import com.revolsys.gis.esri.gdb.file.test.field.FgdbField;
 import com.revolsys.gis.esri.gdb.file.test.field.FloatField;
+import com.revolsys.gis.esri.gdb.file.test.field.GeometryField;
 import com.revolsys.gis.esri.gdb.file.test.field.IntField;
 import com.revolsys.gis.esri.gdb.file.test.field.ObjectIdField;
 import com.revolsys.gis.esri.gdb.file.test.field.ShortField;
 import com.revolsys.gis.esri.gdb.file.test.field.StringField;
+import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.EndianInput;
 
@@ -83,10 +86,22 @@ public class FgdbReader {
     try {
       in = new EndianInputStream(
         new FileInputStream(
-          "/apps/gba/data/exports/2014/201401-January/locality_poly.gdb/a00000003.gdbtable"));
+          "/apps/gba/data/exports/2014/201401-January/locality_poly.gdb/a00000009.gdbtable"));
     } catch (final FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+    }
+  }
+
+  private boolean isNull(final byte[] nullFields, final int fieldIndex) {
+    final int flagByte = fieldIndex / 8;
+    if (flagByte < nullFields.length) {
+      final byte flags = nullFields[flagByte];
+      final int bit = fieldIndex % 8;
+
+      return (flags & (1 << bit)) != 0;
+    } else {
+      return false;
     }
   }
 
@@ -98,13 +113,22 @@ public class FgdbReader {
     }
     for (int i = 0; i < numValidRows; i++) {
       final int recordSize = in.readLEInt();
-      final byte[] nullFields = new byte[(int)Math.ceil(optionalFieldCount / 8.0)];
+      final double opt = Math.ceil(optionalFieldCount / 8.0);
+      final byte[] nullFields = new byte[(int)opt];
       in.read(nullFields);
       final DataObject record = new ArrayDataObject(metaData);
       record.setIdValue(objectId++);
+      int fieldIndex = 0;
+      int optionalFieldIndex = 0;
+      final int idIndex = metaData.getIdAttributeIndex();
       for (final Attribute field : metaData.getAttributes()) {
-        final FgdbField fgdbField = (FgdbField)field;
-        fgdbField.setValue(record, in);
+        if (fieldIndex != idIndex) {
+          if (field.isRequired() || !isNull(nullFields, optionalFieldIndex++)) {
+            final FgdbField fgdbField = (FgdbField)field;
+            fgdbField.setValue(record, in);
+          }
+        }
+        fieldIndex++;
       }
       System.out.println(record);
     }
@@ -241,13 +265,13 @@ public class FgdbReader {
         // Read a float64 value
         // Goto 1
         // End
-        // TODO add geometry factory
-        field = new FgdbField(fieldName, geometryType, required);
+        field = new GeometryField(fieldName, geometryType, required,
+          geometryFactory);
       break;
       case 8:
         in.read();
         required = readFlags();
-        field = new FgdbField(fieldName, DataTypes.BLOB, required);
+        field = new BinaryField(fieldName, length, required);
       break;
       case 9:
         // Raster
@@ -266,7 +290,7 @@ public class FgdbReader {
       break;
       case 12:
         // XML
-        field = new FgdbField(fieldName, DataTypes.STRING, required);
+        field = new XmlField(fieldName, length, required);
       break;
       default:
         LoggerFactory.getLogger(getClass()).error(
@@ -315,10 +339,9 @@ public class FgdbReader {
           final String fieldName = field.getName();
           metaData.setIdAttributeName(fieldName);
         }
-        if (field.isRequired()) {
+        if (!field.isRequired()) {
           optionalFieldCount++;
         }
-        System.out.println(field);
       }
     }
     metaData.setProperty("optionalFieldCount", optionalFieldCount);

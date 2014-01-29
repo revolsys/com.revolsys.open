@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 
 public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
   public ByteStringConverter() {
-    super(getIntegerFormat());
+    super();
   }
 
   @Override

@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 
 public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
   public ShortStringConverter() {
-    super(getIntegerFormat());
+    super();
   }
 
   @Override

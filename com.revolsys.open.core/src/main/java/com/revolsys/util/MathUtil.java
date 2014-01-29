@@ -16,8 +16,8 @@
 package com.revolsys.util;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Random;
 
@@ -384,10 +384,6 @@ public final class MathUtil {
     return getCurrency(new BigDecimal(amount));
   }
 
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
-  }
-
   /**
    * Convert a BigDecimal into an ineteger BigDecimal.
    * 
@@ -700,8 +696,77 @@ public final class MathUtil {
     return toDoubleArray(value.split(regex));
   }
 
-  public static String toString(final double value) {
-    return getFormat().format(value);
+  public static String toString(final BigDecimal number) {
+    return number.toPlainString();
+  }
+
+  public static String toString(final BigInteger number) {
+    return number.toString();
+  }
+
+  public static String toString(final byte number) {
+    return String.valueOf(number);
+  }
+
+  public static String toString(final double number) {
+    final StringBuffer string = new StringBuffer();
+    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
+    return string.toString();
+  }
+
+  public static String toString(final double number, final int precision) {
+    final StringBuffer string = new StringBuffer();
+    DoubleFormatUtil.formatDoublePrecise(number, 1, precision, string);
+    return string.toString();
+  }
+
+  public static String toString(final float number) {
+    final StringBuffer string = new StringBuffer();
+    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
+    return string.toString();
+  }
+
+  public static String toString(final int number) {
+    return String.valueOf(number);
+  }
+
+  public static String toString(final long number) {
+    return String.valueOf(number);
+  }
+
+  public static String toString(final Number number) {
+    if (number instanceof Byte) {
+      final byte b = (Byte)number;
+      return toString(b);
+    } else if (number instanceof Short) {
+      final short s = (Short)number;
+      return toString(s);
+    } else if (number instanceof Integer) {
+      final int i = (Integer)number;
+      return toString(i);
+    } else if (number instanceof Long) {
+      final long l = (Long)number;
+      return toString(l);
+    } else if (number instanceof Float) {
+      final float f = (Float)number;
+      return toString(f);
+    } else if (number instanceof Double) {
+      final double d = (Double)number;
+      return toString(d);
+    } else if (number instanceof BigInteger) {
+      final BigInteger i = (BigInteger)number;
+      return toString(i);
+    } else if (number instanceof BigDecimal) {
+      final BigDecimal i = (BigDecimal)number;
+      return toString(i);
+    } else {
+      final double d = number.doubleValue();
+      return toString(d);
+    }
+  }
+
+  public static String toString(final short number) {
+    return String.valueOf(number);
   }
 
   /**

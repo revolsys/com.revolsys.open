@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 public class IntegerStringConverter extends
   AbstractNumberStringConverter<Integer> {
   public IntegerStringConverter() {
-    super(getIntegerFormat());
+    super();
   }
 
   @Override

@@ -34,12 +34,13 @@ package com.revolsys.io.wkt;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DecimalFormat;
+import java.lang.ref.Reference;
 import java.text.NumberFormat;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -52,6 +53,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class WktWriter {
 
+  private static final ThreadLocal<Reference<NumberFormat>> FORMAT = new ThreadLocal<>();
+
   private static int getDimension(final Geometry geometry) {
     int numAxis = GeometryFactory.getFactory(geometry).getNumAxis();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
@@ -61,10 +64,6 @@ public class WktWriter {
       numAxis = Math.max(numAxis, geometryDimension);
     }
     return numAxis;
-  }
-
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("#.#########################");
   }
 
   public static String toString(final Geometry geometry) {
@@ -345,7 +344,7 @@ public class WktWriter {
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {
-        out.print(getFormat().format(ordinate));
+        out.print(MathUtil.toString(ordinate));
       }
     }
   }

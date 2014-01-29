@@ -2,8 +2,6 @@ package com.revolsys.io.json;
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -13,12 +11,9 @@ import java.util.Set;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 public final class JsonWriter {
-
-  private static NumberFormat getNumberFormat() {
-    return new DecimalFormat("#.#########################");
-  }
 
   private int depth = 0;
 
@@ -170,7 +165,7 @@ public final class JsonWriter {
       if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
         out.print("null");
       } else {
-        out.print(getNumberFormat().format(value));
+        out.print(MathUtil.toString(doubleValue));
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;

@@ -2,7 +2,6 @@ package com.revolsys.gis.cs.epsg;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
 import com.revolsys.gis.cs.AngularUnit;
@@ -15,6 +14,7 @@ import com.revolsys.gis.cs.PrimeMeridian;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.Spheroid;
+import com.revolsys.util.MathUtil;
 
 public class EpsgCsWktWriter {
 
@@ -102,7 +102,7 @@ public class EpsgCsWktWriter {
   }
 
   private static void write(final PrintWriter out, final Number number) {
-    out.print(new DecimalFormat("#0.################").format(number));
+    out.print(MathUtil.toString(number));
 
   }
 
