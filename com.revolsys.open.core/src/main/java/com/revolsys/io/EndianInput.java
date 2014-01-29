@@ -44,6 +44,8 @@ public interface EndianInput extends Closeable {
    */
   double readLEDouble() throws IOException;
 
+  float readLEFloat() throws IOException;
+
   /**
    * Read a little endian int.
    * 

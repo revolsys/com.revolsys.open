@@ -52,6 +52,12 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
     return Double.longBitsToDouble(value);
   }
 
+  @Override
+  public float readLEFloat() throws IOException {
+    final int value = readLEInt();
+    return Float.intBitsToFloat(value);
+  }
+
   /*
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEInt()

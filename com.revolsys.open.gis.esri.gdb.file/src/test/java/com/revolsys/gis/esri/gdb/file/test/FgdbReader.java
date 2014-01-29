@@ -10,15 +10,61 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.esri.gdb.file.test.field.DoubleField;
+import com.revolsys.gis.esri.gdb.file.test.field.FgdbField;
+import com.revolsys.gis.esri.gdb.file.test.field.FloatField;
+import com.revolsys.gis.esri.gdb.file.test.field.IntField;
+import com.revolsys.gis.esri.gdb.file.test.field.ObjectIdField;
+import com.revolsys.gis.esri.gdb.file.test.field.ShortField;
+import com.revolsys.gis.esri.gdb.file.test.field.StringField;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.EndianInput;
 
 public class FgdbReader {
 
   public static void main(final String[] args) {
     new FgdbReader().run();
+  }
+
+  public static long readVarInt(final EndianInput in) throws IOException {
+    long value = 0;
+    int shift = 0;
+    int b;
+    int next;
+    do {
+      b = in.read();
+      if (shift == 0) {
+        value += (b & 0x3f) << shift;
+        shift = 6;
+      } else {
+        value += (b & 0x7f) << shift;
+        shift += 7;
+      }
+      next = b & 0x80;
+    } while (next == 0x80);
+    return value;
+
+  }
+
+  public static long readVarUInt(final EndianInput in) throws IOException {
+    long value = 0;
+    int shift = 0;
+    int b;
+    int next;
+    do {
+      b = in.read();
+      value += (b & 0x7f) << shift;
+      shift += 7;
+      next = b & 0x80;
+    } while (next == 0x80);
+    return value;
+
   }
 
   private EndianInputStream in;
@@ -27,75 +73,104 @@ public class FgdbReader {
 
   private DataType geometryType;
 
+  private final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl();
+
+  private int numValidRows;
+
+  private int optionalFieldCount;
+
   public FgdbReader() {
     try {
       in = new EndianInputStream(
         new FileInputStream(
-          "/apps/gba/data/exports/GBA/ACRD/transport_line_acrd.gdb/a00000014.gdbtable"));
+          "/apps/gba/data/exports/2014/201401-January/locality_poly.gdb/a00000003.gdbtable"));
     } catch (final FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  protected void readFieldDescription() throws IOException {
+  private void readData() throws IOException {
+    int objectId = 1;
+    final int x = in.readLEInt();
+    if (x != -272716322) {
+      throw new RuntimeException("Cannot find data section");
+    }
+    for (int i = 0; i < numValidRows; i++) {
+      final int recordSize = in.readLEInt();
+      final byte[] nullFields = new byte[(int)Math.ceil(optionalFieldCount / 8.0)];
+      in.read(nullFields);
+      final DataObject record = new ArrayDataObject(metaData);
+      record.setIdValue(objectId++);
+      for (final Attribute field : metaData.getAttributes()) {
+        final FgdbField fgdbField = (FgdbField)field;
+        fgdbField.setValue(record, in);
+      }
+      System.out.println(record);
+    }
+    // final int rowLength = in.readLEInt();
+    // final byte[] b = new byte[rowLength];
+    // final int read = in.read(b);
+    // System.out.println(Arrays.toString(b));
+
+  }
+
+  protected FgdbField readFieldDescription() throws IOException {
     final String fieldName = readUtf16String();
     final String fieldAlias = readUtf16String();
     final int fieldType = in.read();
-    DataType fieldDataType = null;
     int length = -1;
+    FgdbField field;
+    boolean required = false;
     switch (fieldType) {
       case 0:
-        fieldDataType = DataTypes.SHORT;
         in.read(); // length
-        readFlags();
-
-      // ubyte: ldf = length of default value in byte if (flag&4) != 0
-      // followed by ldf bytes
+        required = readFlags();
+        // ubyte: ldf = length of default value in byte if (flag&4) != 0
+        // followed by ldf bytes
+        field = new ShortField(fieldName, required);
       break;
       case 1:
-        fieldDataType = DataTypes.INT;
         in.read(); // length
-        readFlags();
+        required = readFlags();
 
-      // ubyte: ldf = length of default value in byte if (flag&4) != 0
-      // followed by ldf bytes
+        // ubyte: ldf = length of default value in byte if (flag&4) != 0
+        // followed by ldf bytes
+        field = new IntField(fieldName, required);
       break;
       case 2:
-        fieldDataType = DataTypes.FLOAT;
         in.read(); // length
-        readFlags();
-      // ubyte: ldf = length of default value in byte if (flag&4) != 0
-      // followed by ldf bytes
+        required = readFlags();
+        // ubyte: ldf = length of default value in byte if (flag&4) != 0
+        // followed by ldf bytes
+        field = new FloatField(fieldName, required);
       break;
       case 3:
-        fieldDataType = DataTypes.DOUBLE;
         in.read(); // length
-        readFlags();
-      // ubyte: ldf = length of default value in byte if (flag&4) != 0
-      // followed by ldf bytes
+        required = readFlags();
+        // ubyte: ldf = length of default value in byte if (flag&4) != 0
+        // followed by ldf bytes
+        field = new DoubleField(fieldName, required);
       break;
       case 4:
-        fieldDataType = DataTypes.STRING;
         length = in.readLEInt();
-        readFlags();
-
+        required = readFlags();
+        field = new StringField(fieldName, length, required);
       break;
       case 5:
-        fieldDataType = DataTypes.DATE_TIME;
         in.read(); // length
-        readFlags();
-      // ubyte: ldf = length of default value in byte if (flag&4) != 0
-      // followed by ldf bytes
+        required = readFlags();
+        // ubyte: ldf = length of default value in byte if (flag&4) != 0
+        // followed by ldf bytes
+        field = new FgdbField(fieldName, DataTypes.DATE_TIME, required);
       break;
       case 6:
         // OBJECTID
-        fieldDataType = DataTypes.INT;
         in.read();
-        readFlags();
+        required = readFlags();
+        field = new ObjectIdField(fieldName, true);
       break;
       case 7:
-        fieldDataType = this.geometryType;
         final int geometryFlag1 = in.read();
         final int geometryFlag2 = in.read();
         final String wkt = readUtf8String();
@@ -152,51 +227,54 @@ public class FgdbReader {
             for (int i = 0; i < v2; i++) {
               in.readLEDouble();
             }
-            run = false;
+            run = required;
           } else {
             in.read();
             in.read();
             in.read();
           }
         }
-      // Read 5 bytes
-      // If those bytes are 0x00 XXX 0x00 0x00 0x00 where XXX=0x01, 0x02 or
-      // 0x03, then read XXX * float64 values and go to 6.
-      // Otherwise, rewind those 5 bytes
-      // Read a float64 value
-      // Goto 1
-      // End
+        // Read 5 bytes
+        // If those bytes are 0x00 XXX 0x00 0x00 0x00 where XXX=0x01, 0x02 or
+        // 0x03, then read XXX * float64 values and go to 6.
+        // Otherwise, rewind those 5 bytes
+        // Read a float64 value
+        // Goto 1
+        // End
+        // TODO add geometry factory
+        field = new FgdbField(fieldName, geometryType, required);
       break;
       case 8:
-        fieldDataType = DataTypes.BLOB;
         in.read();
-        readFlags();
+        required = readFlags();
+        field = new FgdbField(fieldName, DataTypes.BLOB, required);
       break;
       case 9:
         // Raster
-        fieldDataType = DataTypes.BLOB;
+        field = new FgdbField(fieldName, DataTypes.BLOB, required);
       break;
       case 10:
         // UUID
-        fieldDataType = DataTypes.STRING;
         in.read();
-        readFlags();
+        required = readFlags();
+        field = new FgdbField(fieldName, DataTypes.STRING, required);
       break;
       case 11:// UUID
-        fieldDataType = DataTypes.STRING;
         in.read();
-        readFlags();
+        required = readFlags();
+        field = new FgdbField(fieldName, DataTypes.STRING, required);
       break;
       case 12:
         // XML
-        fieldDataType = DataTypes.STRING;
+        field = new FgdbField(fieldName, DataTypes.STRING, required);
       break;
       default:
         LoggerFactory.getLogger(getClass()).error(
           "Unknown field type " + fieldName + " " + fieldType);
-      break;
+        return null;
     }
-    System.out.println(new Attribute(fieldName, fieldDataType, length, false));
+    field.setProperty("ALIAS", fieldAlias);
+    return field;
   }
 
   private void readFieldDescriptions() throws IOException {
@@ -228,14 +306,25 @@ public class FgdbReader {
     final int unknown2 = in.read();
     final int unknown3 = in.read();
     final short numFields = in.readLEShort();
+    optionalFieldCount = 0;
     for (int i = 0; i < numFields; i++) {
-      readFieldDescription();
+      final FgdbField field = readFieldDescription();
+      if (field != null) {
+        metaData.addAttribute(field);
+        if (field instanceof ObjectIdField) {
+          final String fieldName = field.getName();
+          metaData.setIdAttributeName(fieldName);
+        }
+        if (field.isRequired()) {
+          optionalFieldCount++;
+        }
+        System.out.println(field);
+      }
     }
-    System.out.println();
-
+    metaData.setProperty("optionalFieldCount", optionalFieldCount);
   }
 
-  protected void readFlags() throws IOException {
+  protected boolean readFlags() throws IOException {
     final int flag = in.read();
     if ((flag & 4) != 0) {
       final int defaultBytes = in.read();
@@ -243,11 +332,13 @@ public class FgdbReader {
         in.read();
       }
     }
+    final int i = flag & 1;
+    return i == 0;
   }
 
   private void readHeader() throws IOException {
     final int signature = in.readLEInt();
-    final int numValidRows = in.readLEInt();
+    numValidRows = in.readLEInt();
     final int unknown1 = in.readLEInt();
     final int unknown2 = in.readLEInt();
     final int unknown3 = in.readLEInt();
@@ -284,6 +375,7 @@ public class FgdbReader {
     try {
       readHeader();
       readFieldDescriptions();
+      readData();
     } catch (final IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

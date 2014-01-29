@@ -101,6 +101,12 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
+  public float readLEFloat() throws IOException {
+    final int value = readLEInt();
+    return Float.intBitsToFloat(value);
+  }
+
+  @Override
   public int readLEInt() throws IOException {
     buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
