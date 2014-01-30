@@ -22,7 +22,8 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 
-public class JsonParser implements Iterator<JsonParser.EventType> {
+public class JsonParser implements Iterator<JsonParser.EventType>,
+  AutoCloseable {
   public enum EventType {
     booleanValue, colon, comma, endArray, endDocument, endObject, nullValue, number, startArray, startDocument, startObject, string, unknown
   }
@@ -309,6 +310,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     this(in.getInputStream());
   }
 
+  @Override
   public void close() {
     FileUtil.closeSilent(reader);
   }

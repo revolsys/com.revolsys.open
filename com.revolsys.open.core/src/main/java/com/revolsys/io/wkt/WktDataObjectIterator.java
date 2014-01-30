@@ -22,13 +22,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class WktDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
 
-  private final DataObjectFactory factory;
+  private DataObjectFactory factory;
 
-  private final BufferedReader in;
+  private BufferedReader in;
 
   private WktParser wktParser;
 
-  private final DataObjectMetaData metaData;
+  private DataObjectMetaData metaData;
 
   public WktDataObjectIterator(final DataObjectFactory factory,
     final Resource resource) throws IOException {
@@ -41,6 +41,10 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
   @Override
   protected void doClose() {
     FileUtil.closeSilent(in);
+    factory = null;
+    in = null;
+    wktParser = null;
+    metaData = null;
   }
 
   @Override

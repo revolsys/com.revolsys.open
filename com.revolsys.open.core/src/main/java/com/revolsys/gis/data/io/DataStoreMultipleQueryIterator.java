@@ -9,7 +9,7 @@ import com.revolsys.gis.data.model.DataObject;
 public class DataStoreMultipleQueryIterator extends
   AbstractMultipleIterator<DataObject> {
 
-  final DataObjectStoreQueryReader reader;
+  private DataObjectStoreQueryReader reader;
 
   private int queryIndex = 0;
 
@@ -18,11 +18,21 @@ public class DataStoreMultipleQueryIterator extends
   }
 
   @Override
+  public void doClose() {
+    super.doClose();
+    reader = null;
+  }
+
+  @Override
   public AbstractIterator<DataObject> getNextIterator()
     throws NoSuchElementException {
-    final AbstractIterator<DataObject> iterator = reader.createQueryIterator(queryIndex);
-    queryIndex++;
-    return iterator;
+    if (reader == null) {
+      throw new NoSuchElementException();
+    } else {
+      final AbstractIterator<DataObject> iterator = reader.createQueryIterator(queryIndex);
+      queryIndex++;
+      return iterator;
+    }
   }
 
 }

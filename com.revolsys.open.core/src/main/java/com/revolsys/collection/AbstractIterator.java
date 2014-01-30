@@ -8,7 +8,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
-  implements Iterator<T>, Iterable<T> {
+  implements Iterator<T>, Iterable<T>, AutoCloseable {
 
   private boolean hasNext = true;
 

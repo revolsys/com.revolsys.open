@@ -38,7 +38,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private boolean closeFile = true;
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
   private GeometryFactory geometryFactory;
 
@@ -54,7 +54,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private int position;
 
-  private final Resource resource;
+  private Resource resource;
 
   private int shapeType;
 
@@ -156,11 +156,17 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   }
 
   public void forceClose() {
-    FileUtil.closeSilent(in);
-    FileUtil.closeSilent(indexIn);
+    FileUtil.closeSilent(in, indexIn);
     if (xbaseIterator != null) {
       xbaseIterator.forceClose();
     }
+    dataObjectFactory = null;
+    geometryFactory = null;
+    in = null;
+    indexIn = null;
+    metaData = null;
+    resource = null;
+    xbaseIterator = null;
   }
 
   public DataObjectFactory getDataObjectFactory() {

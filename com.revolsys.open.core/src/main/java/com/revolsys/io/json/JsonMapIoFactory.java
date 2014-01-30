@@ -56,20 +56,14 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
       return new LinkedHashMap<String, Object>();
     } else {
       try {
-        try {
-          final java.io.Reader reader = FileUtil.createUtf8Reader(in);
-          final JsonMapIterator iterator = new JsonMapIterator(reader, true);
-          try {
-            if (iterator.hasNext()) {
-              return iterator.next();
-            } else {
-              return null;
-            }
-          } finally {
-            iterator.close();
+        final java.io.Reader reader = FileUtil.createUtf8Reader(in);
+        try (
+          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
+          if (iterator.hasNext()) {
+            return iterator.next();
+          } else {
+            return null;
           }
-        } finally {
-          FileUtil.closeSilent(in);
         }
       } catch (final IOException e) {
         throw new RuntimeException("Unable to read JSON map", e);

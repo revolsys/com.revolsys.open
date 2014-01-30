@@ -6,10 +6,16 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class ReferenceIterator<V> extends AbstractIterator<V> {
-  private final Iterator<Reference<V>> iterator;
+  private Iterator<Reference<V>> iterator;
 
   public ReferenceIterator(final Collection<Reference<V>> collection) {
     this.iterator = collection.iterator();
+  }
+
+  @Override
+  protected void doClose() {
+    super.doClose();
+    iterator = null;
   }
 
   @Override

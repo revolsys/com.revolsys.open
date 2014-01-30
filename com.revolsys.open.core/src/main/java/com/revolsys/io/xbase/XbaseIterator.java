@@ -64,15 +64,13 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private int currentDeletedCount = 0;
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
   private int deletedCount = 0;
 
   private EndianInput in;
 
   private DataObjectMetaDataImpl metaData;
-
-  private final String name;
 
   private byte[] recordBuffer;
 
@@ -88,7 +86,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private boolean mappedFile;
 
-  private final Resource resource;
+  private Resource resource;
 
   private Charset charset = FileUtil.UTF8;
 
@@ -96,7 +94,6 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
-    this.name = FileUtil.getBaseName(resource.getFilename());
     this.typeName = "/" + typeName;
     this.resource = resource;
 
@@ -161,6 +158,12 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   public void forceClose() {
     FileUtil.closeSilent(in);
+    dataObjectFactory = null;
+    in = null;
+    initCallback = null;
+    metaData = null;
+    recordBuffer = null;
+    resource = null;
   }
 
   private Boolean getBoolean(final int startIndex) {
@@ -397,6 +400,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   public void setTypeName(final String typeName) {
     this.typeName = typeName;
+  }
+
+  @Override
+  public String toString() {
+    if (resource == null) {
+      return super.toString();
+    } else {
+      return resource.toString();
+    }
   }
 
 }

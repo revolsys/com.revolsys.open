@@ -4,14 +4,16 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
+import com.revolsys.io.FileUtil;
+
 public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
   private AbstractIterator<T> iterator;
 
   @Override
   @PreDestroy
-  public final void doClose() {
+  public void doClose() {
     if (iterator != null) {
-      iterator.close();
+      FileUtil.closeSilent(iterator);
       iterator = null;
     }
   }

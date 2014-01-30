@@ -20,7 +20,7 @@ import com.revolsys.io.FileUtil;
 public class JsonDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
 
-  private final DataObjectMetaData metaData;
+  private DataObjectMetaData metaData;
 
   private JsonMapIterator iterator;
 
@@ -46,9 +46,9 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
 
   @Override
   protected void doClose() {
-    if (iterator != null) {
-      iterator.close();
-    }
+    FileUtil.closeSilent(iterator);
+    iterator = null;
+    metaData = null;
   }
 
   @Override

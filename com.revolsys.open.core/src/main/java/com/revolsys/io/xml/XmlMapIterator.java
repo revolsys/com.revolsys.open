@@ -23,7 +23,7 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   private final boolean single;
 
-  private final Resource resource;
+  private Resource resource;
 
   public XmlMapIterator(final Resource resource) {
     this(resource, false);
@@ -37,7 +37,11 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   @Override
   protected void doClose() {
     super.doClose();
-    StaxUtils.closeSilent(in);
+    if (in != null) {
+      StaxUtils.closeSilent(in);
+      in = null;
+    }
+    resource = null;
   }
 
   @Override

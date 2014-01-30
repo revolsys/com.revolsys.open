@@ -41,7 +41,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private GeometryFactory geometryFactory;
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
   /** The reader to */
   private BufferedReader in;
@@ -49,7 +49,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   /** The metadata for the data being read by this iterator. */
   private DataObjectMetaData metaData;
 
-  private final Resource resource;
+  private Resource resource;
 
   private boolean hasPointFields;
 
@@ -102,6 +102,11 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   @Override
   protected void doClose() {
     FileUtil.closeSilent(in);
+    dataObjectFactory = null;
+    geometryFactory = null;
+    in = null;
+    metaData = null;
+    resource = null;
   }
 
   @Override

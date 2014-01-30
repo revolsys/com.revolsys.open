@@ -43,6 +43,8 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   @Override
   protected void doClose() {
     StaxUtils.closeSilent(in);
+    geometryFactory = null;
+    in = null;
   }
 
   @Override

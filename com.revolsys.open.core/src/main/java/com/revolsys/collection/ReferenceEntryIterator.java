@@ -8,11 +8,17 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 public class ReferenceEntryIterator<K, V> extends AbstractIterator<Entry<K, V>> {
-  private final Iterator<Entry<K, Reference<V>>> iterator;
+  private Iterator<Entry<K, Reference<V>>> iterator;
 
   public ReferenceEntryIterator(
     final Collection<Entry<K, Reference<V>>> collection) {
     this.iterator = collection.iterator();
+  }
+
+  @Override
+  protected void doClose() {
+    super.doClose();
+    iterator = null;
   }
 
   @Override

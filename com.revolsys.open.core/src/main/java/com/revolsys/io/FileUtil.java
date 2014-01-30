@@ -117,6 +117,7 @@ public final class FileUtil {
       if (closeable != null) {
         try {
           closeable.close();
+        } catch (final IOException e) {
         } catch (final Exception e) {
           LOG.error(e.getMessage(), e);
         }

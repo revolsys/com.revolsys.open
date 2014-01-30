@@ -49,7 +49,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   private Statistics statistics;
 
-  private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
+  private ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
   public ArcSdeBinaryGeometryQueryIterator(
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil,
@@ -68,8 +68,14 @@ public class ArcSdeBinaryGeometryQueryIterator extends
   @Override
   @PreDestroy
   public void doClose() {
-    this.seQuery = sdeUtil.close(seQuery);
-    this.connection = sdeUtil.close(connection);
+    if (sdeUtil != null) {
+      try {
+        this.seQuery = sdeUtil.close(seQuery);
+      } finally {
+        this.connection = sdeUtil.close(connection);
+      }
+    }
+    this.sdeUtil = null;
     this.attributes = null;
     this.dataObjectFactory = null;
     this.dataStore = null;

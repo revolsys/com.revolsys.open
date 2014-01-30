@@ -24,9 +24,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   Kml22Constants {
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(COORDINATE_SYSTEM_ID);
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory(COORDINATE_SYSTEM_ID);
 
-  private final XMLStreamReader in;
+  private XMLStreamReader in;
 
   public KmlGeometryIterator(final InputStream in) {
     this.in = StaxUtils.createXmlReader(in);
@@ -39,6 +39,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   @Override
   protected void doClose() {
     StaxUtils.closeSilent(in);
+    geometryFactory = null;
+    in = null;
   }
 
   @Override

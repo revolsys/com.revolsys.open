@@ -12,6 +12,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.json.JsonParser.EventType;
@@ -25,7 +26,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private GeometryFactory geometryFactory;
 
-  private final JsonParser in;
+  private JsonParser in;
 
   public GeoJsonGeometryIterator(final Resource resource) throws IOException {
     this.in = new JsonParser(resource);
@@ -33,7 +34,9 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   protected void doClose() {
-    in.close();
+    FileUtil.closeSilent(in);
+    geometryFactory = null;
+    in = null;
   }
 
   @Override

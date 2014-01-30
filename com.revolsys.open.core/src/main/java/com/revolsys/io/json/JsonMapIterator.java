@@ -8,7 +8,8 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.io.json.JsonParser.EventType;
 
-public class JsonMapIterator implements Iterator<Map<String, Object>> {
+public class JsonMapIterator implements Iterator<Map<String, Object>>,
+  AutoCloseable {
 
   /** The current record. */
   private Map<String, Object> currentRecord;
@@ -59,6 +60,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
     }
   }
 
+  @Override
   public void close() {
     parser.close();
   }

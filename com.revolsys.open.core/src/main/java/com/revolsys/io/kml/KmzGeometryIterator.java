@@ -17,7 +17,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
 
   private KmlGeometryIterator kmlIterator;
 
-  private final ZipInputStream zipIn;
+  private ZipInputStream zipIn;
 
   public KmzGeometryIterator(final Resource resource) {
     try {
@@ -30,8 +30,9 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
 
   @Override
   protected void doClose() {
-    kmlIterator.close();
-    FileUtil.closeSilent(zipIn);
+    FileUtil.closeSilent(kmlIterator, zipIn);
+    kmlIterator = null;
+    zipIn = null;
   }
 
   @Override
