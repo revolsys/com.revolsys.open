@@ -23,6 +23,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
 
       final ArcSdeObjectIdJdbcAttribute newObjectIdAttribute = new ArcSdeObjectIdJdbcAttribute(
         name, description, properties, schemaName, registrationId);
+      newObjectIdAttribute.setMetaData(metaData);
       final DataObjectMetaDataImpl metaDataImpl = (DataObjectMetaDataImpl)metaData;
       metaDataImpl.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
       if (metaData.getIdAttributeName() == null

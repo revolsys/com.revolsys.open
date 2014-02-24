@@ -111,26 +111,30 @@ public class QueryWhereConditionField extends ValueField implements
       final Class<?> typeClass = attribute.getTypeClass();
       final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
       final DataObjectMetaData metaData = attribute.getMetaData();
-      JComponent field;
-      if (attribute.equals(metaData.getIdAttribute())) {
-        field = new TextField(20);
-      } else if (StringUtils.hasText(searchFieldFactory)) {
-        final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
-        field = SpelUtil.getValue(searchFieldFactory, attribute,
-          searchFieldFactoryParameters);
+      if (metaData == null) {
+        return new TextField(20);
       } else {
-        if (codeTable == null) {
-          if (Number.class.isAssignableFrom(typeClass)
-            || String.class.isAssignableFrom(typeClass)) {
-            field = new TextField(20);
-          } else {
-            field = SwingUtil.createField(typeClass, name, null);
-          }
+        JComponent field;
+        if (attribute.equals(metaData.getIdAttribute())) {
+          field = new TextField(20);
+        } else if (StringUtils.hasText(searchFieldFactory)) {
+          final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
+          field = SpelUtil.getValue(searchFieldFactory, attribute,
+            searchFieldFactoryParameters);
         } else {
-          field = SwingUtil.createComboBox(codeTable, false, 30);
+          if (codeTable == null) {
+            if (Number.class.isAssignableFrom(typeClass)
+              || String.class.isAssignableFrom(typeClass)) {
+              field = new TextField(20);
+            } else {
+              field = SwingUtil.createField(typeClass, name, null);
+            }
+          } else {
+            field = SwingUtil.createComboBox(codeTable, false, 30);
+          }
         }
+        return field;
       }
-      return field;
     }
   }
 
