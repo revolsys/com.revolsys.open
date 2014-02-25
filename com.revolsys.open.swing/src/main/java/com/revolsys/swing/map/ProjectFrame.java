@@ -1,5 +1,8 @@
 package com.revolsys.swing.map;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -15,6 +18,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -22,6 +26,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
@@ -77,7 +82,9 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.ObjectTreePanel;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class ProjectFrame extends BaseFrame {
@@ -266,9 +273,10 @@ public class ProjectFrame extends BaseFrame {
     setJMenuBar(menuBar);
 
     addMenu(menuBar, createMenuFile());
+    final MenuFactory tools = createMenuTools();
+    addMenu(menuBar, tools);
 
     if (OS.isWindows()) {
-      final MenuFactory tools = new MenuFactory("Tools");
       tools.addMenuItem("options", "Options...", "Options...", null, null,
         PreferencesDialog.get(), "showPanel");
       addMenu(menuBar, tools);
@@ -284,6 +292,14 @@ public class ProjectFrame extends BaseFrame {
       SilkIconLoader.getIcon("layout_save"), this.project, "saveAllSettings");
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
+  }
+
+  protected MenuFactory createMenuTools() {
+    final MenuFactory tools = new MenuFactory("Tools");
+
+    tools.addMenuItem("script", "Run Script...", "Run Script",
+      SilkIconLoader.getIcon("script_go"), this, "runScript");
+    return tools;
   }
 
   @Override
@@ -353,23 +369,6 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
-
   public void expandLayers(final Layer layer) {
     if (SwingUtilities.isEventDispatchThread()) {
       final List<Layer> pathList = layer.getPathList();
@@ -389,6 +388,23 @@ public class ProjectFrame extends BaseFrame {
       Invoke.later(this, "expandLayers", layer);
     }
   }
+
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
 
   public void expandLayers(final PropertyChangeEvent event) {
     final Object source = event.getSource();
@@ -451,6 +467,30 @@ public class ProjectFrame extends BaseFrame {
     if (!BoundingBox.isEmpty(initialBoundingBox)) {
       project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
       project.setViewBoundingBox(initialBoundingBox);
+    }
+  }
+
+  public void runScript() {
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(
+      "Select Script", "com.revolsys.swing.tools.script", "directory");
+    final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter(
+      "Groovy Script", "groovy");
+    fileChooser.addChoosableFileFilter(groovyFilter);
+    fileChooser.setMultiSelectionEnabled(false);
+    final int returnVal = fileChooser.showOpenDialog(this);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+      final Binding binding = new Binding();
+      final GroovyShell shell = new GroovyShell(binding);
+      final File scriptFile = fileChooser.getSelectedFile();
+      final String[] args = new String[0];
+      try {
+        PreferencesUtil.setUserString("com.revolsys.swing.tools.script",
+          "directory", scriptFile.getParent());
+        shell.run(scriptFile, args);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
+      }
     }
   }
 

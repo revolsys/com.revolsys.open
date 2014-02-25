@@ -35,9 +35,10 @@ public class Statistics {
   }
 
   public void add(final DataObject object) {
-    final DataObjectMetaData type = object.getMetaData();
-    add(type);
-
+    if (object != null) {
+      final DataObjectMetaData type = object.getMetaData();
+      add(type);
+    }
   }
 
   public void add(final DataObject object, final long count) {

@@ -198,7 +198,10 @@ public class DataObjectConverterProcess extends
   }
 
   public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
+    if (this.statistics != statistics) {
+      this.statistics = statistics;
+      statistics.connect();
+    }
   }
 
   public void setTargetMetaDataFactory(

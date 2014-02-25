@@ -29,15 +29,25 @@ public class PreferencesUtil {
   }
 
   public static Preferences getPreferences(final Class<?> preferencesClass) {
-    final Preferences userRoot = Preferences.userRoot();
     final String preferenceGroup = preferencesClass.getName();
-    final Preferences preferences = userRoot.node(preferenceGroup);
-    return preferences;
+    return getUserPreferences(preferenceGroup);
   }
 
   public static String getString(final Class<?> preferencesClass,
     final String preferenceName) {
     final Preferences preferences = getPreferences(preferencesClass);
+    return preferences.get(preferenceName, "");
+  }
+
+  public static Preferences getUserPreferences(final String preferenceGroup) {
+    final Preferences userRoot = Preferences.userRoot();
+    final Preferences preferences = userRoot.node(preferenceGroup);
+    return preferences;
+  }
+
+  public static String getUserString(final String preferencesGroup,
+    final String preferenceName) {
+    final Preferences preferences = getUserPreferences(preferencesGroup);
     return preferences.get(preferenceName, "");
   }
 
@@ -68,6 +78,12 @@ public class PreferencesUtil {
   public static void setString(final Class<?> preferencesClass,
     final String preferenceName, final String value) {
     final Preferences preferences = getPreferences(preferencesClass);
+    preferences.put(preferenceName, value);
+  }
+
+  public static void setUserString(final String preferencesGroup,
+    final String preferenceName, final String value) {
+    final Preferences preferences = getUserPreferences(preferencesGroup);
     preferences.put(preferenceName, value);
   }
 }

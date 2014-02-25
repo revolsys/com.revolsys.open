@@ -75,10 +75,10 @@ public final class Delta<T> extends AbstractInProcess<T> {
     running = true;
     try {
       while (running) {
-        final T object = in.read();
-        if (object != null) {
+        final T record = in.read();
+        if (record != null) {
           for (final ChannelOutput<T> out : this.out) {
-            final T clonedObject = clone(object);
+            final T clonedObject = clone(record);
             out.write(clonedObject);
           }
         }

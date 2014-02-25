@@ -14,6 +14,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -48,6 +49,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
   Transaction createTransaction(Propagation propagation);
 
   DataObject createWithId(DataObjectMetaData objectMetaData);
+
+  DataObject createWithId(String typePath, Map<String, ? extends Object> values);
 
   Writer<DataObject> createWriter();
 
@@ -90,6 +93,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
   List<DataObjectStoreSchema> getSchemas();
 
   StatisticsMap getStatistics();
+
+  Statistics getStatistics(String string);
 
   PlatformTransactionManager getTransactionManager();
 

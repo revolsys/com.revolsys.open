@@ -62,6 +62,8 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private String typeName;
 
+  private DataObjectMetaData returnMetaData;
+
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
     this.dataObjectFactory = factory;
@@ -180,11 +182,11 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   @Override
   protected DataObject getNext() {
-    DataObject object;
+    DataObject record;
     try {
       if (xbaseIterator != null) {
         if (xbaseIterator.hasNext()) {
-          object = xbaseIterator.next();
+          record = xbaseIterator.next();
           for (int i = 0; i < xbaseIterator.getDeletedCount(); i++) {
             position++;
             readGeometry();
@@ -193,17 +195,23 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           throw new NoSuchElementException();
         }
       } else {
-        object = dataObjectFactory.createDataObject(metaData);
+        record = dataObjectFactory.createDataObject(metaData);
       }
 
       final Geometry geometry = readGeometry();
-      object.setGeometryValue(geometry);
+      record.setGeometryValue(geometry);
     } catch (final EOFException e) {
       throw new NoSuchElementException();
     } catch (final IOException e) {
       throw new RuntimeException("Error reading geometry " + resource, e);
     }
-    return object;
+    if (returnMetaData == null) {
+      return record;
+    } else {
+      final DataObject copy = dataObjectFactory.createDataObject(returnMetaData);
+      copy.setValues(record);
+      return copy;
+    }
   }
 
   public int getPosition() {
@@ -254,6 +262,10 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     if (xbaseIterator != null) {
       xbaseIterator.setCloseFile(closeFile);
     }
+  }
+
+  public void setMetaData(final DataObjectMetaData metaData) {
+    this.returnMetaData = metaData;
   }
 
   public void setPosition(final int position) {

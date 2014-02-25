@@ -146,6 +146,13 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     this.nameSuffix = nameSuffix;
   }
 
+  public void setStatistics(final Statistics statistics) {
+    if (this.statistics != statistics) {
+      this.statistics = statistics;
+      statistics.connect();
+    }
+  }
+
   public void setUseNamespaceAsSubDirectory(
     final boolean useNamespaceAsSubDirectory) {
     this.useNamespaceAsSubDirectory = useNamespaceAsSubDirectory;

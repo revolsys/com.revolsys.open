@@ -314,6 +314,21 @@ public abstract class AbstractDataObjectStore extends
   }
 
   @Override
+  public DataObject createWithId(final String typePath,
+    final Map<String, ? extends Object> values) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath
+        + " for " + this);
+    } else {
+      final DataObject record = createWithId(metaData);
+      record.setValues(values);
+      return record;
+    }
+
+  }
+
+  @Override
   public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }

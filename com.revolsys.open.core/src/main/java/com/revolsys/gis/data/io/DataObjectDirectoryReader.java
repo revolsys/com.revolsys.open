@@ -19,7 +19,7 @@ public class DataObjectDirectoryReader extends
 
   private final Map<String, DataObjectMetaData> typePathMetaDataMap = new HashMap<String, DataObjectMetaData>();
 
-  private final Statistics statistics = new Statistics();
+  private Statistics statistics = new Statistics();
 
   public DataObjectDirectoryReader() {
   }
@@ -65,6 +65,13 @@ public class DataObjectDirectoryReader extends
     final DataObject record = super.next();
     statistics.add(record);
     return record;
+  }
+
+  public void setStatistics(final Statistics statistics) {
+    if (this.statistics != statistics) {
+      this.statistics = statistics;
+      statistics.connect();
+    }
   }
 
 }

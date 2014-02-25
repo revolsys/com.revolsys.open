@@ -348,6 +348,21 @@ public class SwingUtil {
     return fileChooser;
   }
 
+  public static JFileChooser createFileChooser(final String title,
+    final String preferencesGroup, final String preferenceName) {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle(title);
+    final String currentDirectoryName = PreferencesUtil.getUserString(
+      preferencesGroup, preferenceName);
+    if (StringUtils.hasText(currentDirectoryName)) {
+      final File directory = new File(currentDirectoryName);
+      if (directory.exists() && directory.canRead()) {
+        fileChooser.setCurrentDirectory(directory);
+      }
+    }
+    return fileChooser;
+  }
+
   public static JLabel createLabel(final String text) {
     final JLabel label = new JLabel(text);
     label.setFont(BOLD_FONT);

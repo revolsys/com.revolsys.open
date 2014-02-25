@@ -13,6 +13,7 @@ import com.revolsys.gis.data.io.DataObjectDirectoryReader;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 
@@ -32,6 +33,8 @@ import com.revolsys.spring.SpringUtil;
  */
 public class ShapeDirectoryReader extends DataObjectDirectoryReader {
   private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
+
+  private Map<String, DataObjectMetaData> typeNameMetaDataMap = new HashMap<String, DataObjectMetaData>();
 
   public ShapeDirectoryReader() {
     setFileExtensions(ShapefileConstants.FILE_EXTENSION);
@@ -55,6 +58,7 @@ public class ShapeDirectoryReader extends DataObjectDirectoryReader {
         factory);
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
       iterator.setTypeName(fileNameTypeMap.get(baseName));
+      iterator.setMetaData(typeNameMetaDataMap.get(iterator.getTypeName()));
       return new DataObjectIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
@@ -65,6 +69,10 @@ public class ShapeDirectoryReader extends DataObjectDirectoryReader {
     return fileNameTypeMap;
   }
 
+  public Map<String, DataObjectMetaData> getTypeNameMetaDataMap() {
+    return typeNameMetaDataMap;
+  }
+
   public void setFileNameTypeMap(final Map<String, String> fileNameTypeMap) {
     this.fileNameTypeMap.clear();
     for (final Entry<String, String> entry : fileNameTypeMap.entrySet()) {
@@ -73,6 +81,11 @@ public class ShapeDirectoryReader extends DataObjectDirectoryReader {
       this.fileNameTypeMap.put(fileName.toUpperCase(), typeName);
     }
     setBaseFileNames(fileNameTypeMap.keySet());
+  }
+
+  public void setTypeNameMetaDataMap(
+    final Map<String, DataObjectMetaData> typeNameMetaDataMap) {
+    this.typeNameMetaDataMap = typeNameMetaDataMap;
   }
 
 }
