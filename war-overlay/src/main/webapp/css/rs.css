@@ -147,7 +147,7 @@ div.bodyContent {
 
 div.header {
   background: #d7ebf9
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
     50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
@@ -204,7 +204,7 @@ div.breadcrumb ul li a:hover {
 div.footer {
   clear: both;
   background: #d7ebf9
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
     50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
@@ -356,7 +356,7 @@ div.sideMenu div.title {
   border-top-left-radius: 0.4em;
   border-top-right-radius: 0.4em;
   background: #3baae3
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
     50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;

@@ -33,7 +33,8 @@ public class BasicCorsFilter extends OncePerRequestFilter {
 
   public BasicCorsFilter() {
     setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PUT"));
-    setAllowedHeaders(Collections.<String> emptyList());
+    setAllowedHeaders(Arrays.asList("Accept-Encoding", "Accept",
+      "Accept-Language"));
     setMaxAge(3600);
   }
 
