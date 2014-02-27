@@ -48,7 +48,11 @@ public class Element implements Cloneable {
   }
 
   public Form getForm() {
-    return container.getForm();
+    if (container == null) {
+      return null;
+    } else {
+      return container.getForm();
+    }
   }
 
   public void initialize(final HttpServletRequest request) {

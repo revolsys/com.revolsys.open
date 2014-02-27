@@ -49,7 +49,7 @@ $(document).ready(function() {
     var source = $('<div id="' + id +'-source"/>');
     source.append(pre);
     $(tabDiv).append(source);
-    $(tabDiv).tabs();
+    $(tabDiv).tabs({ heightStyle: "content" });
   });
 
   $('div.simpleDataTable table').dataTable({

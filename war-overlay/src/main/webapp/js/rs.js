@@ -258,7 +258,8 @@ $(document).ready(
       },
       beforeActivate: function (event, ui) {
         window.location.hash = ui.newPanel.selector;
-      }
+      },
+      heightStyle: "content"
     });
  
     $(window).bind('hashchange', function() {
