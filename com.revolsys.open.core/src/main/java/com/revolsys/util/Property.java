@@ -324,14 +324,16 @@ public final class Property {
 
   public static void set(final Object object,
     final Map<String, ? extends Object> properties) {
-    for (final Entry<String, ? extends Object> property : properties.entrySet()) {
-      final String propertyName = property.getKey();
-      final Object value = property.getValue();
-      try {
-        set(object, propertyName, value);
-      } catch (final Throwable e) {
-        ExceptionUtil.log(Property.class, "Unable to set property "
-          + propertyName, e);
+    if (properties != null) {
+      for (final Entry<String, ? extends Object> property : properties.entrySet()) {
+        final String propertyName = property.getKey();
+        final Object value = property.getValue();
+        try {
+          set(object, propertyName, value);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(Property.class, "Unable to set property "
+            + propertyName, e);
+        }
       }
     }
   }

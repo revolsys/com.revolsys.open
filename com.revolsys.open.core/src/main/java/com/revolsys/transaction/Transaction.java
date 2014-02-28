@@ -119,7 +119,6 @@ public class Transaction implements AutoCloseable {
           try {
             transactionManager.commit(transactionStatus);
           } catch (final Throwable e) {
-            e.printStackTrace();
             ExceptionUtil.throwUncheckedException(e);
           }
         }

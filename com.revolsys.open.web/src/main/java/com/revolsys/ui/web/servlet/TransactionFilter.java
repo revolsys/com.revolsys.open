@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,13 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.filter.GenericFilterBean;
 
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class TransactionFilter extends OncePerRequestFilter {
+public class TransactionFilter extends GenericFilterBean {
   private static final Logger log = LoggerFactory.getLogger(TransactionFilter.class);
 
   private WebApplicationContext applicationContext;
@@ -30,10 +32,11 @@ public class TransactionFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(final HttpServletRequest request,
-    final HttpServletResponse response, final FilterChain filterChain)
-    throws ServletException, IOException {
-
+  public void doFilter(final ServletRequest servletRequest,
+    final ServletResponse servletResponse, final FilterChain filterChain)
+    throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest)servletRequest;
+    final HttpServletResponse response = (HttpServletResponse)servletResponse;
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
     final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
 

@@ -735,7 +735,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           final String viewName = getName(prefix, "view");
           final String url = getPageUrl(viewName, parameters);
           redirectAfterCommit(url);
-          return new Element();
+          return null;
         }
       }
     }

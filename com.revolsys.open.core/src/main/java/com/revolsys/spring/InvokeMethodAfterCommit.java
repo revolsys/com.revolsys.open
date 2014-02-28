@@ -43,4 +43,9 @@ public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
       LOG.error("Error invoking " + runnable, e);
     }
   }
+
+  @Override
+  public String toString() {
+    return runnable.toString();
+  }
 }

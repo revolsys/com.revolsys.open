@@ -747,3 +747,6 @@ div.pageNavigation td.next {
   width: 45%;
 }
 
+pre.prettyprint {
+  background-color: white;
+}
