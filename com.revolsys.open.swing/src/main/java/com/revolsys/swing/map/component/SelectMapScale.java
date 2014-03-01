@@ -84,10 +84,16 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     final MapPanel map = getMap();
     if (map != null) {
       final String propertyName = event.getPropertyName();
+
       if ("scale".equals(propertyName)) {
         final double scale = map.getScale();
+        final Number currentScale = (Number)getSelectedItem();
+        final Number newValue = (Number)event.getNewValue();
+
         if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
-          setSelectedItem(scale);
+          if (currentScale.doubleValue() != newValue.doubleValue()) {
+            setSelectedItem(scale);
+          }
         }
       }
     }

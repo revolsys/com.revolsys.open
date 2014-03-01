@@ -10,12 +10,8 @@ import javax.swing.ComboBoxModel;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
-public class CodeTableComboBoxModel extends AbstractListModel implements
-  ComboBoxModel {
-
-  /**
-   * 
-   */
+public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
+  ComboBoxModel<Object> {
   private static final long serialVersionUID = 1L;
 
   public static final Object NULL = new Object();

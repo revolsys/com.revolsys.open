@@ -61,6 +61,16 @@ public class OS {
     return (T)Property.get(preferences, propertyName);
   }
 
+  public static <T> T getPreference(final String applicationName,
+    final String path, final String propertyName, final T defaultValue) {
+    final T value = getPreference(applicationName, path, propertyName);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   public static File getPreferenceFile(final String applicationName,
     final String path) {
     if (path.contains("..")) {

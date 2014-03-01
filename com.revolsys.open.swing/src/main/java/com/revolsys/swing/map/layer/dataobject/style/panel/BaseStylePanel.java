@@ -195,6 +195,8 @@ public class BaseStylePanel extends ValueField implements
     addLengthMeasureField(panel, geometryStyle, "lineWidth");
     addField(panel, geometryStyle, "lineJoin");
     addField(panel, geometryStyle, "lineCap");
+    addField(panel, geometryStyle, "lineDashArray");
+    addField(panel, geometryStyle, "lineDashOffset");
     GroupLayoutUtil.makeColumns(panel, 2, true);
     stylePanels.add(panel);
   }
@@ -254,6 +256,8 @@ public class BaseStylePanel extends ValueField implements
       field = createLineCapField((LineCap)value);
     } else if (fieldName.equals("lineJoin")) {
       field = createLineJoinField((LineJoin)value);
+    } else if (fieldName.equals("lineDashArray")) {
+      field = new DashField(fieldName, (List<Measure<Length>>)value);
     } else if (fieldName.equals("queryFilter")) {
       final AbstractDataObjectLayer layer = getLayer();
       field = new QueryFilterField(layer, fieldName, (String)value);

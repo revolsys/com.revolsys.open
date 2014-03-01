@@ -14,22 +14,20 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
 public class DashListCellRenderer extends DefaultListCellRenderer {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 3249988648052455831L;
 
   private List<Measure<Length>> dash;
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Component getListCellRendererComponent(final JList list,
+  public Component getListCellRendererComponent(final JList<?> list,
     final Object value, final int index, final boolean isSelected,
     final boolean cellHasFocus) {
     super.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);
     setText(null);
     this.dash = (List<Measure<Length>>)value;
-    setPreferredSize(new Dimension(100, 20));
+    setPreferredSize(new Dimension(100, 10));
     return this;
   }
 

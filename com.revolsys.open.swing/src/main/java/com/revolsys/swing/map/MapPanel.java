@@ -64,6 +64,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
@@ -82,6 +83,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public static final String MAP_PANEL = "mapPanel";
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
+
+  private static final PrecisionModel SCALE_PRECISION_MODEL = new PrecisionModel(
+    10);
 
   public static MapPanel get(final Layer layer) {
     if (layer == null) {
@@ -143,6 +147,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private JPanel statusBarPanel;
 
   private boolean settingBoundingBox = false;
+
+  private boolean settingScale;
 
   public MapPanel() {
     this(new Project());
@@ -689,18 +695,29 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public void setScale(final double scale) {
-    final double oldValue = this.scale;
-    final double oldUnitsPerPixel = getUnitsPerPixel();
-    if (scale != oldValue) {
-      this.viewport.setScale(scale);
-      this.scale = scale;
-      firePropertyChange("scale", oldValue, scale);
-      final double unitsPerPixel = getUnitsPerPixel();
-      if (Math.abs(unitsPerPixel - oldUnitsPerPixel) > 0.0001) {
-        firePropertyChange("unitsPerPixel", oldUnitsPerPixel, unitsPerPixel);
+  public synchronized void setScale(double scale) {
+    if (!settingScale && !Double.isNaN(scale) && !Double.isInfinite(scale)) {
+      try {
+        settingScale = true;
+        scale = SCALE_PRECISION_MODEL.makePrecise(scale);
+        if (scale >= 0.1) {
+          final double oldValue = this.scale;
+          final double oldUnitsPerPixel = getUnitsPerPixel();
+          if (scale != oldValue) {
+            this.viewport.setScale(scale);
+            this.scale = scale;
+            firePropertyChange("scale", oldValue, scale);
+            final double unitsPerPixel = getUnitsPerPixel();
+            if (Math.abs(unitsPerPixel - oldUnitsPerPixel) > 0.0001) {
+              firePropertyChange("unitsPerPixel", oldUnitsPerPixel,
+                unitsPerPixel);
+            }
+            repaint();
+          }
+        }
+      } finally {
+        settingScale = false;
       }
-      repaint();
     }
   }
 

@@ -1,9 +1,8 @@
 package com.revolsys.converter.string;
 
-import java.math.BigDecimal;
-
 import javax.measure.Measure;
 import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
 
 import org.springframework.util.StringUtils;
 
@@ -26,7 +25,7 @@ public class MeasureStringConverter implements StringConverter<Measure> {
       return (Measure)value;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      return Measure.valueOf(new BigDecimal(number.toString()), NonSI.PIXEL);
+      return Measure.valueOf(number.doubleValue(), NonSI.PIXEL);
     } else {
       return toObject(value.toString());
     }
@@ -35,7 +34,10 @@ public class MeasureStringConverter implements StringConverter<Measure> {
   @Override
   public Measure toObject(final String string) {
     if (StringUtils.hasText(string)) {
-      return Measure.valueOf(string);
+      final Measure<?> measure = Measure.valueOf(string);
+      final Number value = measure.getValue();
+      final Unit<?> unit = measure.getUnit();
+      return Measure.valueOf(value.doubleValue(), unit);
     } else {
       return null;
     }

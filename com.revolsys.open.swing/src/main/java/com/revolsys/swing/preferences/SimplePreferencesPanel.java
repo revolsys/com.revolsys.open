@@ -3,6 +3,8 @@ package com.revolsys.swing.preferences;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.revolsys.swing.field.Field;
+
 public class SimplePreferencesPanel extends AbstractPreferencesPanel {
   private static final long serialVersionUID = 1L;
 
@@ -21,7 +23,17 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
       preferences.add(preference);
       addField(preference.getField());
     }
+  }
 
+  public void addPreference(final String applicationName, final String path,
+    final String propertyName, final Class<?> valueClass,
+    final Object defaultValue, final Field field) {
+    final Preference preference = new Preference(applicationName, path,
+      propertyName, valueClass, defaultValue, field);
+    if (!preferences.contains(preference)) {
+      preferences.add(preference);
+      addField(preference.getField());
+    }
   }
 
   @Override
