@@ -27,6 +27,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.parallel.Invoke;
 
 public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
@@ -129,13 +130,14 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
         final double unitsPerPixel = map.getUnitsPerPixel();
         if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
           && !Double.isNaN(unitsPerPixel)) {
-          setSelectedItem(unitsPerPixel);
+          Invoke.later(this, "setSelectedItem", unitsPerPixel);
         }
       } else if ("boundingBox".equals(propertyName)) {
+        String toolTip;
         final BoundingBox boundingBox = map.getBoundingBox();
         ComboBoxModel model = PROJECTED_MODEL;
         if (boundingBox == null) {
-          setToolTipText("Resolution (m/pixel)");
+          toolTip = "Resolution (m/pixel)";
         } else {
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -146,10 +148,12 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
           }
           final Unit<Quantity> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
-          setToolTipText("Resolution (" + unit + "/pixel)");
+          toolTip = "Resolution (" + unit + "/pixel)";
         }
+        Invoke.later(this, "setToolTipText", toolTip);
+
         if (model != getModel()) {
-          setModel(model);
+          Invoke.later(this, "setModel", model);
         }
       }
     }

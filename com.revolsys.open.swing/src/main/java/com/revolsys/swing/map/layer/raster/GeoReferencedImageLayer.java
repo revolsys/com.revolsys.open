@@ -330,9 +330,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
               public void visibilityChanged(final CDockable dockable) {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
-                  dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
+                  dockable.getControl().removeDockable(
+                    (SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }

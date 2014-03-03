@@ -498,6 +498,17 @@ public final class MathUtil {
     return dotprod > 0;
   }
 
+  public static double makePrecise(final double value, final double scale) {
+    if (Double.isNaN(value) || Double.isInfinite(value)) {
+      return value;
+    } else {
+      final double multiply = value * scale;
+      final long rounded = Math.round(multiply);
+      final double precise = rounded / scale;
+      return precise;
+    }
+  }
+
   public static double midpoint(final double d1, final double d2) {
     return d1 + (d2 - d1) / 2;
   }
@@ -585,6 +596,26 @@ public final class MathUtil {
 
     return Math.abs(s)
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
+  }
+
+  public static boolean precisionEqual(final double value1,
+    final double value2, final double scale) {
+    if (Double.isNaN(value1) && Double.isNaN(value2)) {
+      return true;
+    } else if (Double.isInfinite(value1) || Double.isInfinite(value2)) {
+      return true;
+    } else {
+      final double multiply1 = value1 * scale;
+      final long rounded1 = Math.round(multiply1);
+
+      final double multiply2 = value2 * scale;
+      final long rounded2 = Math.round(multiply2);
+      if (rounded1 == rounded2) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   public static double randomGaussian(final double mean, final double variance) {

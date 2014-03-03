@@ -111,6 +111,8 @@ public class Viewport2D {
 
   private List<Long> scales = new ArrayList<Long>();
 
+  private boolean initialized = false;
+
   public Viewport2D() {
   }
 
@@ -410,7 +412,7 @@ public class Viewport2D {
           viewWidthPixels, viewHeightPixels);
         this.scale = getScale(viewWidthLength, modelWidthLength);
       }
-      this.boundingBox = boundingBox;
+      setBoundingBoxInternal(boundingBox);
     }
     this.propertyChangeSupport.firePropertyChange("boundingBox",
       oldBoundingBox, boundingBox);
@@ -418,6 +420,10 @@ public class Viewport2D {
       this.propertyChangeSupport.firePropertyChange("scale", oldScale,
         this.scale);
     }
+  }
+
+  public boolean isInitialized() {
+    return initialized;
   }
 
   public boolean isUseModelCoordinates() {
@@ -541,6 +547,10 @@ public class Viewport2D {
     return newBoundingBox;
   }
 
+  protected void setBoundingBoxInternal(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
   /**
    * Set the coordinate system the project is displayed in.
    * 
@@ -551,6 +561,10 @@ public class Viewport2D {
     this.geometryFactory = geometryFactory;
     this.propertyChangeSupport.firePropertyChange("geometryFactory",
       oldGeometryFactory, geometryFactory);
+  }
+
+  public void setInitialized(final boolean initialized) {
+    this.initialized = initialized;
   }
 
   public void setScale(final double scale) {

@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.parallel.Invoke;
 
 public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
@@ -92,7 +93,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
 
         if (scale > 0 && !Double.isInfinite(scale) && !Double.isNaN(scale)) {
           if (currentScale.doubleValue() != newValue.doubleValue()) {
-            setSelectedItem(scale);
+            Invoke.later(this, "setSelectedItem", scale);
           }
         }
       }

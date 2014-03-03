@@ -120,7 +120,7 @@ public class DockingFramesUtil {
       OBJECT_WORKING_AREAS.put(object, workingAreas);
     }
     workingAreas.put(name, workingArea);
-    final CControl control = workingArea.getControl().getOwner();
+    final CControl control = workingArea.getControl();
     setCControl(object, control);
 
   }

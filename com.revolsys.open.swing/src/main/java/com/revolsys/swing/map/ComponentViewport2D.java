@@ -4,6 +4,8 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.measure.Measurable;
 import javax.measure.quantity.Length;
@@ -14,11 +16,13 @@ import javax.swing.JComponent;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
-public class ComponentViewport2D extends Viewport2D {
+public class ComponentViewport2D extends Viewport2D implements
+  PropertyChangeListener {
 
   private final JComponent component;
 
@@ -29,13 +33,14 @@ public class ComponentViewport2D extends Viewport2D {
   public ComponentViewport2D(final Project project, final JComponent component) {
     super(project);
     this.component = component;
-    project.getPropertyChangeSupport().addPropertyChangeListener(
-      new InvokeMethodPropertyChangeListener(this, "updateCachedFields"));
-    updateCachedFields();
+    Property.addListener(project, "geometryFactory", this);
+    Property.addListener(project, "viewBoundingBox", this);
     component.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(final ComponentEvent e) {
-        updateCachedFields();
+        if (isInitialized()) {
+          updateCachedFields();
+        }
       }
     });
   }
@@ -215,6 +220,22 @@ public class ComponentViewport2D extends Viewport2D {
     return validBoundingBox;
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (isInitialized() && event.getSource() == getProject()) {
+      if (event.getPropertyName().equals("viewBoundingBox")) {
+        // final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
+        // if (isInitialized()) {
+        // updateCachedFields();
+        // } else {
+        // setBoundingBoxInternal(boundingBox);
+        // }
+      } else {
+        Invoke.later(this, "updateCachedFields");
+      }
+    }
+  }
+
   public void repaint() {
     this.component.repaint();
   }
@@ -258,6 +279,14 @@ public class ComponentViewport2D extends Viewport2D {
     }
   }
 
+  @Override
+  public void setInitialized(final boolean initialized) {
+    if (initialized && !isInitialized()) {
+      updateCachedFields();
+    }
+    super.setInitialized(initialized);
+  }
+
   public void translate(final double dx, final double dy) {
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox newBoundingBox = new BoundingBox(
@@ -279,13 +308,16 @@ public class ComponentViewport2D extends Viewport2D {
     if (geometryFactory != null) {
       if (geometryFactory != getGeometryFactory()) {
         setGeometryFactory(geometryFactory);
-
       }
-
       final Insets insets = this.component.getInsets();
 
-      setViewWidth(this.component.getWidth() - insets.left - insets.right);
-      setViewHeight(this.component.getHeight() - insets.top - insets.bottom);
+      final int viewWidth = this.component.getWidth() - insets.left
+        - insets.right;
+      final int viewHeight = this.component.getHeight() - insets.top
+        - insets.bottom;
+
+      setViewWidth(viewWidth);
+      setViewHeight(viewHeight);
       setBoundingBox(getBoundingBox());
 
       this.component.repaint();

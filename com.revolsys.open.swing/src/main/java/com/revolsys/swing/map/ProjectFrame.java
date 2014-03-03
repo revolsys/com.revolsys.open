@@ -165,6 +165,7 @@ public class ProjectFrame extends BaseFrame {
     this.project = project;
     Project.set(project);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
+    setLocationByPlatform(true);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
@@ -468,6 +469,7 @@ public class ProjectFrame extends BaseFrame {
       project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
       project.setViewBoundingBox(initialBoundingBox);
     }
+    getMapPanel().getViewport().setInitialized(true);
   }
 
   public void runScript() {

@@ -62,6 +62,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -706,6 +707,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           if (scale != oldValue) {
             this.viewport.setScale(scale);
             this.scale = scale;
+            System.out.println(scale);
             firePropertyChange("scale", oldValue, scale);
             final double unitsPerPixel = getUnitsPerPixel();
             if (Math.abs(unitsPerPixel - oldUnitsPerPixel) > 0.0001) {
@@ -734,7 +736,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void setUnitsPerPixel(final double unitsPerPixel) {
     if (viewport != null) {
-      setScale(viewport.getScaleForUnitsPerPixel(unitsPerPixel));
+      double scale = viewport.getScaleForUnitsPerPixel(unitsPerPixel);
+      scale = SCALE_PRECISION_MODEL.makePrecise(scale);
+      final double oldUnitsPerPixel = getUnitsPerPixel();
+      if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
+        setScale(scale);
+      }
     }
   }
 
