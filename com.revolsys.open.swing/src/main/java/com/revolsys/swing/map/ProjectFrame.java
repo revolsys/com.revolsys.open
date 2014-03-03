@@ -444,12 +444,12 @@ public class ProjectFrame extends BaseFrame {
 
     final DefaultSingleCDockable toc = addTableOfContents();
     addCatalogPanel();
-    toc.toFront();
 
     addTasksPanel();
     addLogPanel();
 
     createMenuBar();
+    toc.toFront();
   }
 
   public void loadProject(final File projectDirectory) {

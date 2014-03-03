@@ -2146,8 +2146,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               public void visibilityChanged(final CDockable dockable) {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
-                  dockable.getControl().removeDockable(
-                    (SingleCDockable)dockable);
+                  dockable.getControl()
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }

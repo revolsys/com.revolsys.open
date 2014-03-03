@@ -707,7 +707,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           if (scale != oldValue) {
             this.viewport.setScale(scale);
             this.scale = scale;
-            System.out.println(scale);
             firePropertyChange("scale", oldValue, scale);
             final double unitsPerPixel = getUnitsPerPixel();
             if (Math.abs(unitsPerPixel - oldUnitsPerPixel) > 0.0001) {
