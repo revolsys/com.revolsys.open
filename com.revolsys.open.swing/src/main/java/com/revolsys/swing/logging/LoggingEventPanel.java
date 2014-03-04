@@ -97,11 +97,19 @@ public class LoggingEventPanel extends JPanel {
     if (!StringUtils.hasText(stringValue)) {
       stringValue = "-";
     }
-    final TextField field = SwingUtil.createTextField(Math.min(80,
-      stringValue.length()));
-    field.setEditable(false);
-    field.setText(stringValue);
-    add(field);
+    if (fieldName.equals("message")) {
+      final TextArea textArea = SwingUtil.createTextArea(
+        Math.min(20, value.toString().split("\n").length), 80);
+      textArea.setEditable(false);
+      textArea.append(value.toString());
+      add(textArea);
+    } else {
+      final TextField field = SwingUtil.createTextField(Math.min(80,
+        stringValue.length()));
+      field.setEditable(false);
+      field.setText(stringValue);
+      add(field);
+    }
   }
 
   private void addLabel(final String fieldName) {

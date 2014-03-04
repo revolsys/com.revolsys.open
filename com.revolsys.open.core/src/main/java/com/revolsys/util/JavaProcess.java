@@ -1,7 +1,6 @@
 package com.revolsys.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +17,19 @@ public final class JavaProcess {
 
   public static Process exec(final List<String> javaArguments,
     final Class<?> klass, final List<String> programArguments) {
+    final ProcessBuilder builder = processBuilder(javaArguments, klass,
+      programArguments);
+
+    try {
+      return builder.start();
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unable to start " + builder.command(), e);
+    }
+  }
+
+  protected static ProcessBuilder processBuilder(
+    final List<String> javaArguments, final Class<?> klass,
+    final List<String> programArguments) {
     final String javaHome = System.getProperty("java.home");
     final String javaBin = javaHome + File.separator + "bin" + File.separator
       + "java";
@@ -36,12 +48,7 @@ public final class JavaProcess {
       params.addAll(programArguments);
     }
     final ProcessBuilder builder = new ProcessBuilder(params);
-
-    try {
-      return builder.start();
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to start " + params, e);
-    }
+    return builder;
   }
 
   public static Process exec(final List<String> javaArguments,
