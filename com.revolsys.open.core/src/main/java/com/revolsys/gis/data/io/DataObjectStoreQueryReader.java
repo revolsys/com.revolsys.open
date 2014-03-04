@@ -16,7 +16,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.SqlCondition;
-import com.revolsys.gis.io.Statistics;
 
 public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   implements DataObjectReader {
@@ -30,8 +29,6 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   private List<String> typePaths;
 
   private String whereClause;
-
-  private Statistics statistics;
 
   public DataObjectStoreQueryReader() {
     setIterator(new DataStoreMultipleQueryIterator(this));
@@ -55,10 +52,6 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     queries = null;
     typePaths = null;
     whereClause = null;
-    if (statistics != null) {
-      statistics.disconnect();
-    }
-    statistics = null;
   }
 
   protected AbstractIterator<DataObject> createQueryIterator(final int i) {
@@ -144,14 +137,6 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     for (final Query query : queries) {
       addQuery(query);
     }
-  }
-
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
-    if (statistics != null) {
-      statistics.connect();
-    }
-    setProperty(Statistics.class.getName(), statistics);
   }
 
   /**

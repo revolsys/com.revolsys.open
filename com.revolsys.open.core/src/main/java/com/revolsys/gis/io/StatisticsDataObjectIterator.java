@@ -2,15 +2,15 @@ package com.revolsys.gis.io;
 
 import com.revolsys.gis.data.model.DataObject;
 
-public class StatisticsReader implements DataObjectIterator {
+public class StatisticsDataObjectIterator implements DataObjectIterator {
   private DataObjectIterator reader;
 
   private Statistics statistics;
 
-  public StatisticsReader() {
+  public StatisticsDataObjectIterator() {
   }
 
-  public StatisticsReader(final DataObjectIterator reader) {
+  public StatisticsDataObjectIterator(final DataObjectIterator reader) {
     setReader(reader);
   }
 
