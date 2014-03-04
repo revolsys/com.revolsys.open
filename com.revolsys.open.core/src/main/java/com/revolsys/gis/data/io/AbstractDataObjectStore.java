@@ -253,6 +253,30 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
+  public DataObject create(final String typePath,
+    final Map<String, ? extends Object> values) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Cannot find table " + typePath
+        + " for " + this);
+    } else {
+      final DataObject record = create(metaData);
+      if (record != null) {
+        final String idAttributeName = metaData.getIdAttributeName();
+        if (StringUtils.hasText(idAttributeName)) {
+          if (values.get(idAttributeName) == null) {
+            final Object id = createPrimaryIdValue(typePath);
+            record.setIdValue(id);
+          }
+        }
+        record.setValues(values);
+      }
+      return record;
+    }
+
+  }
+
   public AbstractIterator<DataObject> createIterator(final Query query,
     Map<String, Object> properties) {
     if (properties == null) {
@@ -301,31 +325,16 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public DataObject createWithId(final DataObjectMetaData metaData) {
-    final DataObject object = create(metaData);
-    if (object != null) {
+    final DataObject record = create(metaData);
+    if (record != null) {
       final String idAttributeName = metaData.getIdAttributeName();
       if (StringUtils.hasText(idAttributeName)) {
         final String typePath = metaData.getPath();
         final Object id = createPrimaryIdValue(typePath);
-        object.setIdValue(id);
+        record.setIdValue(id);
       }
     }
-    return object;
-  }
-
-  @Override
-  public DataObject createWithId(final String typePath,
-    final Map<String, ? extends Object> values) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Cannot find table " + typePath
-        + " for " + this);
-    } else {
-      final DataObject record = createWithId(metaData);
-      record.setValues(values);
-      return record;
-    }
-
+    return record;
   }
 
   @Override
@@ -488,6 +497,7 @@ public abstract class AbstractDataObjectStore extends
     return statistics;
   }
 
+  @Override
   public Statistics getStatistics(final String name) {
     return statistics.getStatistics(name);
   }

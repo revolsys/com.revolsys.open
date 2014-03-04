@@ -16,7 +16,7 @@ import com.revolsys.util.Property;
  * 
  * @author Paul Austin
  */
-public class InvokeMethodRunnable extends AbstractRunnable {
+public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
   public static void run(final Object object, final String methodName,
     final List<Object> parameters) {
@@ -32,6 +32,10 @@ public class InvokeMethodRunnable extends AbstractRunnable {
 
   /** The name of the method to invoke. */
   private final String methodName;
+
+  private String beanName;
+
+  private ProcessNetwork processNetwork;
 
   /**
    * Construct a new InvokeMethodRunnable.
@@ -74,12 +78,32 @@ public class InvokeMethodRunnable extends AbstractRunnable {
     }
   }
 
+  @Override
+  public String getBeanName() {
+    return beanName;
+  }
+
   public Object getObject() {
     return object.get();
   }
 
+  @Override
+  public ProcessNetwork getProcessNetwork() {
+    return processNetwork;
+  }
+
+  @Override
+  public void setBeanName(final String beanName) {
+    this.beanName = beanName;
+  }
+
   protected void setObject(final Object object) {
     this.object = new WeakReference<Object>(object);
+  }
+
+  @Override
+  public void setProcessNetwork(final ProcessNetwork processNetwork) {
+    this.processNetwork = processNetwork;
   }
 
   @Override
@@ -113,4 +137,5 @@ public class InvokeMethodRunnable extends AbstractRunnable {
 
     return string.toString();
   }
+
 }

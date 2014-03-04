@@ -50,7 +50,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   DataObject createWithId(DataObjectMetaData objectMetaData);
 
-  DataObject createWithId(String typePath, Map<String, ? extends Object> values);
+  DataObject create(String typePath, Map<String, ? extends Object> values);
 
   Writer<DataObject> createWriter();
 

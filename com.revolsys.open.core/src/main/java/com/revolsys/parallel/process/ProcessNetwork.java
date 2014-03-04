@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +27,11 @@ import com.revolsys.spring.TargetBeanProcess;
 public class ProcessNetwork implements BeanPostProcessor,
   ApplicationListener<ContextRefreshedEvent> {
 
+  public static void startAndWait(final Process... processes) {
+    final ProcessNetwork processNetwork = new ProcessNetwork(processes);
+    processNetwork.startAndWait();
+  }
+
   private int count = 0;
 
   private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
@@ -45,6 +51,16 @@ public class ProcessNetwork implements BeanPostProcessor,
   private boolean stopping = false;
 
   public ProcessNetwork() {
+  }
+
+  public ProcessNetwork(final List<Process> processes) {
+    for (final Process process : processes) {
+      addProcess(process);
+    }
+  }
+
+  public ProcessNetwork(final Process... processes) {
+    this(Arrays.asList(processes));
   }
 
   public void addProcess(final Process process) {
