@@ -27,6 +27,22 @@ public final class JavaProcess {
     }
   }
 
+  public static Process exec(final List<String> javaArguments,
+    final Class<?> klass, final String... programArguments) {
+    return exec(javaArguments, klass, Arrays.asList(programArguments));
+  }
+
+  public static int execAndWait(final List<String> javaArguments,
+    final Class<?> klass, final List<String> programArguments) {
+    final Process process = exec(javaArguments, klass, programArguments);
+    try {
+      process.waitFor();
+    } catch (final InterruptedException e) {
+      throw new ThreadInterruptedException(e);
+    }
+    return process.exitValue();
+  }
+
   protected static ProcessBuilder processBuilder(
     final List<String> javaArguments, final Class<?> klass,
     final List<String> programArguments) {
@@ -49,22 +65,6 @@ public final class JavaProcess {
     }
     final ProcessBuilder builder = new ProcessBuilder(params);
     return builder;
-  }
-
-  public static Process exec(final List<String> javaArguments,
-    final Class<?> klass, final String... programArguments) {
-    return exec(javaArguments, klass, Arrays.asList(programArguments));
-  }
-
-  public static int execAndWait(final List<String> javaArguments,
-    final Class<?> klass, final List<String> programArguments) {
-    final Process process = exec(javaArguments, klass, programArguments);
-    try {
-      process.waitFor();
-    } catch (final InterruptedException e) {
-      throw new ThreadInterruptedException(e);
-    }
-    return process.exitValue();
   }
 
   private JavaProcess() {
