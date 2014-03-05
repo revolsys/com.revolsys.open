@@ -6,10 +6,12 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.MenuContainer;
 import java.awt.MenuItem;
+import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
@@ -709,6 +711,21 @@ public class SwingUtil {
         component.setVisible(visible);
       } else {
         Invoke.later(component, "setVisible", visible);
+      }
+    }
+  }
+
+  public static void setSplashTitle(final String title) {
+    final SplashScreen splash = SplashScreen.getSplashScreen();
+    if (splash != null) {
+      final Graphics2D graphics = splash.createGraphics();
+      if (graphics != null) {
+        graphics.setColor(WebColors.Black);
+        graphics.setFont(new Font("sans-serif", Font.BOLD, 14));
+        graphics.drawString("Starting application: ", 100, 100);
+        graphics.setFont(new Font("sans-serif", Font.PLAIN, 12));
+        graphics.drawString(title, 100, 130);
+        splash.update();
       }
     }
   }
