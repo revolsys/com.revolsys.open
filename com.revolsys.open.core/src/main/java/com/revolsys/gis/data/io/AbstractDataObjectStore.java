@@ -263,6 +263,7 @@ public abstract class AbstractDataObjectStore extends
     } else {
       final DataObject record = create(metaData);
       if (record != null) {
+        record.setValues(values);
         final String idAttributeName = metaData.getIdAttributeName();
         if (StringUtils.hasText(idAttributeName)) {
           if (values.get(idAttributeName) == null) {
@@ -270,7 +271,6 @@ public abstract class AbstractDataObjectStore extends
             record.setIdValue(id);
           }
         }
-        record.setValues(values);
       }
       return record;
     }

@@ -645,14 +645,14 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (this.forms != null) {
       for (final Window window : this.formWindows.values()) {
         if (window != null) {
-          window.dispose();
+          Invoke.later(window, "dispose");
         }
       }
       for (final Component form : this.forms.values()) {
         if (form != null) {
           if (form instanceof DataObjectLayerForm) {
             final DataObjectLayerForm recordForm = (DataObjectLayerForm)form;
-            recordForm.destroy();
+            Invoke.later(recordForm, "destroy");
           }
         }
       }
@@ -708,6 +708,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         unSelectRecords(records);
         for (final LayerDataObject record : records) {
           deleteRecord(record);
+        }
+      }
+    } else {
+      synchronized (this.getEditSync()) {
+        for (final LayerDataObject record : records) {
+          synchronized (this.newRecords) {
+            if (removeSame(this.newRecords, record)) {
+              unSelectRecords(record);
+              record.setState(DataObjectState.Deleted);
+            }
+          }
         }
       }
     }
@@ -769,6 +780,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   protected <V extends LayerDataObject> List<V> filterQueryResults(
     final List<V> results, final Filter<Map<String, Object>> filter) {
     final List<LayerDataObject> modifiedRecords = new ArrayList<LayerDataObject>(

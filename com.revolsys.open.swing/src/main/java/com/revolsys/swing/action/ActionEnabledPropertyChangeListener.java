@@ -5,6 +5,8 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 
+import com.revolsys.swing.parallel.Invoke;
+
 public class ActionEnabledPropertyChangeListener implements
   PropertyChangeListener {
 
@@ -16,10 +18,12 @@ public class ActionEnabledPropertyChangeListener implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
+    boolean enabled;
     if (Boolean.TRUE == event.getNewValue()) {
-      this.action.setEnabled(true);
+      enabled = true;
     } else {
-      this.action.setEnabled(false);
+      enabled = false;
     }
+    Invoke.later(this.action, "setEnabled", enabled);
   }
 }

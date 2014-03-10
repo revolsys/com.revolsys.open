@@ -741,13 +741,13 @@ public final class MathUtil {
 
   public static String toString(final double number) {
     final StringBuffer string = new StringBuffer();
-    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
+    DoubleFormatUtil.formatDoublePrecise(number, 15, 15, string);
     return string.toString();
   }
 
   public static String toString(final double number, final int precision) {
     final StringBuffer string = new StringBuffer();
-    DoubleFormatUtil.formatDoublePrecise(number, 1, precision, string);
+    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
     return string.toString();
   }
 

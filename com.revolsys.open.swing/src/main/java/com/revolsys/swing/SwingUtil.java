@@ -328,7 +328,6 @@ public class SwingUtil {
       final int preferedWidth = textField.getPreferredSize().width;
       textField.setMinimumSize(new Dimension(preferedWidth, 0));
       textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-
     }
 
     ((JComponent)field).setFont(FONT);
@@ -696,6 +695,21 @@ public class SwingUtil {
     frame.pack();
   }
 
+  public static void setSplashTitle(final String title) {
+    final SplashScreen splash = SplashScreen.getSplashScreen();
+    if (splash != null) {
+      final Graphics2D graphics = splash.createGraphics();
+      if (graphics != null) {
+        graphics.setColor(WebColors.Black);
+        graphics.setFont(new Font("sans-serif", Font.BOLD, 14));
+        graphics.drawString("Starting application: ", 100, 100);
+        graphics.setFont(new Font("sans-serif", Font.PLAIN, 12));
+        graphics.drawString(title, 100, 130);
+        splash.update();
+      }
+    }
+  }
+
   public static void setTitledBorder(final JComponent component,
     final String title) {
     if (component != null) {
@@ -711,21 +725,6 @@ public class SwingUtil {
         component.setVisible(visible);
       } else {
         Invoke.later(component, "setVisible", visible);
-      }
-    }
-  }
-
-  public static void setSplashTitle(final String title) {
-    final SplashScreen splash = SplashScreen.getSplashScreen();
-    if (splash != null) {
-      final Graphics2D graphics = splash.createGraphics();
-      if (graphics != null) {
-        graphics.setColor(WebColors.Black);
-        graphics.setFont(new Font("sans-serif", Font.BOLD, 14));
-        graphics.drawString("Starting application: ", 100, 100);
-        graphics.setFont(new Font("sans-serif", Font.PLAIN, 12));
-        graphics.drawString(title, 100, 130);
-        splash.update();
       }
     }
   }

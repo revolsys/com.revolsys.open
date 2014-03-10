@@ -9,6 +9,7 @@ import javax.swing.Icon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
@@ -89,6 +90,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
       if (isVisible(object)) {
         try {
           renderer.renderRecord(viewport, graphics, visibleArea, layer, object);
+        } catch (final TopologyException e) {
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
             + " #" + object.getIdString(), e);
@@ -107,7 +109,11 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     if (renderer != null) {
       for (final LayerDataObject object : objects) {
         if (isVisible(object)) {
-          renderer.renderRecord(viewport, graphics, visibleArea, layer, object);
+          try {
+            renderer.renderRecord(viewport, graphics, visibleArea, layer,
+              object);
+          } catch (final TopologyException e) {
+          }
         }
       }
     }

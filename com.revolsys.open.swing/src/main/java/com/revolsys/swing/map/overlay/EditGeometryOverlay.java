@@ -662,9 +662,18 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected boolean modeAddMouseClick(final MouseEvent event) {
+    System.out.println(event);
     if (SwingUtilities.isLeftMouseButton(event)) {
       if (isModeAddGeometry()) {
-        if (getMouseOverLocations().isEmpty()) {
+        if (event.getClickCount() == 2) {
+          setXorGeometry(null);
+          event.consume();
+          if (isGeometryValid(this.addGeometry)) {
+            actionGeometryCompleted();
+            repaint();
+          }
+          return true;
+        } else if (getMouseOverLocations().isEmpty()) {
           Point point;
           if (getSnapPoint() == null) {
             point = getPoint(event);
@@ -687,10 +696,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           setXorGeometry(null);
           event.consume();
           if (DataTypes.POINT.equals(this.addGeometryDataType)) {
-            actionGeometryCompleted();
-            repaint();
-          }
-          if (event.getClickCount() == 2 && isGeometryValid(this.addGeometry)) {
             actionGeometryCompleted();
             repaint();
           }

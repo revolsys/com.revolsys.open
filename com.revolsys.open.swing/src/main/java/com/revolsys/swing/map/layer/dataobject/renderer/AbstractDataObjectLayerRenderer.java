@@ -18,6 +18,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
@@ -207,6 +208,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
         if (isVisible(record) && !layer.isHidden(record)) {
           try {
             renderRecord(viewport, graphics, visibleArea, layer, record);
+          } catch (final TopologyException e) {
           } catch (final Throwable e) {
             ExceptionUtil.log(
               getClass(),
@@ -223,7 +225,10 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final LayerDataObject record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
-      renderRecord(viewport, graphics, boundingBox, layer, record);
+      try {
+        renderRecord(viewport, graphics, boundingBox, layer, record);
+      } catch (final TopologyException e) {
+      }
     }
   }
 

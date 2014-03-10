@@ -13,6 +13,8 @@ public interface GeoJsonConstants {
 
   String DESCRIPTION = "GeoJSON";
 
+  String COGO_DESCRIPTION = "CogoJSON";
+
   String FEATURE = "Feature";
 
   String FEATURE_COLLECTION = "FeatureCollection";
@@ -20,6 +22,8 @@ public interface GeoJsonConstants {
   String FEATURES = "features";
 
   String FILE_EXTENSION = "geojson";
+
+  String COGO_FILE_EXTENSION = "cogojson";
 
   String GEOMETRY = "geometry";
 
@@ -30,6 +34,8 @@ public interface GeoJsonConstants {
   String LINE_STRING = "LineString";
 
   String MEDIA_TYPE = "application/x-geo+json";
+
+  String COGO_MEDIA_TYPE = "application/x-cogo+json";
 
   String MULTI_LINE_STRING = "MultiLineString";
 

@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,11 +106,16 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   }
 
   public List<DataObject> queryIntersects(final BoundingBox boundingBox) {
-    final Geometry geometry = boundingBox.convert(getGeometryFactory())
-      .toPolygon(1, 1);
-    final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
-      geometry);
-    return queryList(geometry, filter);
+
+    final BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+    if (convertedBoundingBox.isEmpty()) {
+      return Arrays.asList();
+    } else {
+      final Geometry geometry = convertedBoundingBox.toPolygon(1, 1);
+      final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
+        geometry);
+      return queryList(geometry, filter);
+    }
   }
 
   public List<DataObject> queryIntersects(Geometry geometry) {

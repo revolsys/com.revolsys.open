@@ -4,8 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -28,6 +26,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.StringField;
 import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.EndianInput;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 
 public class FgdbReader {
 
@@ -84,9 +83,8 @@ public class FgdbReader {
 
   public FgdbReader() {
     try {
-      in = new EndianInputStream(
-        new FileInputStream(
-          "/apps/gba/data/exports/2014/201401-January/locality_poly.gdb/a00000009.gdbtable"));
+      in = new EndianInputStream(new FileInputStream(
+        "/Users/paustin/Downloads/KSRD_20140306.gdb/a0000000d.gdbtable"));
     } catch (final FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -109,7 +107,7 @@ public class FgdbReader {
     int objectId = 1;
     final int x = in.readLEInt();
     if (x != -272716322) {
-      throw new RuntimeException("Cannot find data section");
+      return;
     }
     for (int i = 0; i < numValidRows; i++) {
       final int recordSize = in.readLEInt();
@@ -130,7 +128,6 @@ public class FgdbReader {
         }
         fieldIndex++;
       }
-      System.out.println(record);
     }
     // final int rowLength = in.readLEInt();
     // final byte[] b = new byte[rowLength];
@@ -238,8 +235,8 @@ public class FgdbReader {
         final double maxY = in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           coordinateSystem, numAxis, xyScale, zScale);
-        System.out.println(new BoundingBox(geometryFactory, minX, minY, maxX,
-          maxY));
+        final BoundingBox boundingBox = new BoundingBox(geometryFactory, minX,
+          minY, maxX, maxY);
         boolean run = true;
         while (run) {
           final int v1 = in.read();
@@ -293,8 +290,7 @@ public class FgdbReader {
         field = new XmlField(fieldName, length, required);
       break;
       default:
-        LoggerFactory.getLogger(getClass()).error(
-          "Unknown field type " + fieldName + " " + fieldType);
+        System.out.println("Unknown field type " + fieldName + " " + fieldType);
         return null;
     }
     field.setProperty("ALIAS", fieldAlias);
@@ -322,8 +318,7 @@ public class FgdbReader {
       break;
 
       default:
-        LoggerFactory.getLogger(getClass()).error(
-          "Unknown geometry type " + geometryType);
+        System.out.println("Unknown geometry type " + geometryType);
       break;
     }
     final int unknown1 = in.read();
@@ -345,6 +340,7 @@ public class FgdbReader {
       }
     }
     metaData.setProperty("optionalFieldCount", optionalFieldCount);
+    System.out.println(MapObjectFactoryRegistry.toString(metaData));
   }
 
   protected boolean readFlags() throws IOException {

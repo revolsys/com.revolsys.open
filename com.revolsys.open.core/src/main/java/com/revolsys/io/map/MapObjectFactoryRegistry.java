@@ -74,6 +74,11 @@ public class MapObjectFactoryRegistry {
     }
   }
 
+  public static String toString(final MapSerializer serializer) {
+    final Map<String, Object> properties = serializer.toMap();
+    return JsonMapIoFactory.toString(properties);
+  }
+
   public static void write(final File file, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
     JsonMapIoFactory.write(properties, file, true);

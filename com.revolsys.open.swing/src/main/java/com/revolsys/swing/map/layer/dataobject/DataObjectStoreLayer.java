@@ -432,9 +432,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           Invoke.worker(this.loadingWorker);
         }
       }
-      Polygon polygon = boundingBox.toPolygon();
       final GeometryFactory geometryFactory = getGeometryFactory();
-      polygon = geometryFactory.project(polygon);
+      final Polygon polygon = boundingBox.toPolygon(geometryFactory, 10, 10);
 
       final DataObjectQuadTree index = getIndex();
 

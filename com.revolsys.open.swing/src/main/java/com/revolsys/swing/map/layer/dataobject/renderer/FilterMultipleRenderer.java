@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
@@ -45,6 +46,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
               try {
                 renderer.renderRecord(viewport, graphics, visibleArea, layer,
                   record);
+              } catch (final TopologyException e) {
               } catch (final Throwable e) {
                 ExceptionUtil.log(
                   getClass(),

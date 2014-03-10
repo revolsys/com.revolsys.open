@@ -440,11 +440,10 @@ public class Project extends LayerGroup {
 
   public void setViewBoundingBox(BoundingBox viewBoundingBox) {
     if (!BoundingBox.isEmpty(viewBoundingBox)) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
       // TODO really should be min scale
       double minDimension;
-      if (geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-        minDimension = 0.0000045;
+      if (viewBoundingBox.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+        minDimension = 0.000005;
       } else {
         minDimension = 0.5;
       }

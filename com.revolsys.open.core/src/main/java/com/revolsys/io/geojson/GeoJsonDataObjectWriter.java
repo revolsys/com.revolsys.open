@@ -31,9 +31,16 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
 
   private boolean singleObject;
 
+  private final boolean cogo;
+
   public GeoJsonDataObjectWriter(final Writer out) {
+    this(out, false);
+  }
+
+  public GeoJsonDataObjectWriter(final Writer out, final boolean cogo) {
     this.out = new JsonWriter(new BufferedWriter(out));
     this.out.setIndent(true);
+    this.cogo = cogo;
   }
 
   /**
@@ -132,6 +139,10 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       multiPolygon(multiPolygon);
     }
     out.endObject();
+  }
+
+  public boolean isCogo() {
+    return cogo;
   }
 
   private void line(final LineString line) {

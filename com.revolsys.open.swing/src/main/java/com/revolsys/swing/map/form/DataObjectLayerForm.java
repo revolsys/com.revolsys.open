@@ -261,6 +261,7 @@ public class DataObjectLayerForm extends JPanel implements
     final DataObjectStore dataStore = getDataStore();
     final CodeTable codeTable = dataStore.getCodeTableByColumn(fieldName);
     final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
+    field.setFont(SwingUtil.FONT);
     addField(fieldName, field);
     return field;
   }
