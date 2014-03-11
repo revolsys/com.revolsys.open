@@ -1672,10 +1672,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void removeForm(final LayerDataObject record) {
     if (record != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final Window window = this.formWindows.remove(record);
-        if (window != null) {
-          window.dispose();
-        }
         final Component form = this.forms.remove(record);
         if (form != null) {
           if (form instanceof DataObjectLayerForm) {
@@ -1683,6 +1679,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
             recordForm.destroy();
           }
         }
+        final Window window = this.formWindows.remove(record);
+        if (window != null) {
+          window.dispose();
+        }
+
       } else {
         Invoke.later(this, "removeForm", record);
       }

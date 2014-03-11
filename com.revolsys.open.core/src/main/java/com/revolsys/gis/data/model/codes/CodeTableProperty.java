@@ -22,6 +22,7 @@ import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements
   DataObjectMetaDataProperty {
@@ -80,6 +81,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     for (final DataObject code : allCodes) {
       addValue(code);
     }
+    Property.firePropertyChange(this, "valuesChanged", false, true);
   }
 
   @Override
@@ -225,16 +227,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
     for (final String order : orderBy) {
       query.addOrderBy(order, true);
     }
-    final Reader<DataObject> reader = dataStore.query(query);
-    try {
+    try (
+      Reader<DataObject> reader = dataStore.query(query)) {
       final List<DataObject> codes = reader.read();
       dataStore.getStatistics()
         .getStatistics("query")
         .add(typePath, -codes.size());
       Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
       addValues(codes);
-    } finally {
-      reader.close();
     }
   }
 
@@ -295,6 +295,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
       }
     }
     return values;
+  }
+
+  @Override
+  public synchronized void refresh() {
+    super.refresh();
+    if (isLoadAll()) {
+      loadAll();
+    }
   }
 
   public void setAttributeAliases(final List<String> columnAliases) {

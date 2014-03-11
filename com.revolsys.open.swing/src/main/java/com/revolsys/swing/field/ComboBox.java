@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
@@ -100,6 +101,15 @@ public class ComboBox extends JComboBox implements Field {
       AutoCompleteDecorator.decorate(this, converter);
     }
     this.undoManager.addKeyMap(getEditor().getEditorComponent());
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    final ComboBoxModel model = getModel();
+    if (model instanceof Closeable) {
+      ((Closeable)model).close();
+    }
+    super.finalize();
   }
 
   @Override

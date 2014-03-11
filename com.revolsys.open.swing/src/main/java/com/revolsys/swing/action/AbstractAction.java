@@ -57,12 +57,12 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   public void setEnableCheck(final EnableCheck enableCheck) {
     if (this.enableCheck != null) {
-      this.enableCheck.removePropertyChangeListener("enabled",
+      this.enableCheck.removeListener("enabled",
         this.enabledListener);
     }
     this.enableCheck = enableCheck;
     if (this.enableCheck != null) {
-      this.enableCheck.addPropertyChangeListener("enabled",
+      this.enableCheck.addListener("enabled",
         this.enabledListener);
       enableCheck.isEnabled();
     }

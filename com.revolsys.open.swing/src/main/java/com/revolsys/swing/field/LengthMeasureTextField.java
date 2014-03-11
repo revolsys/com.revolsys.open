@@ -15,6 +15,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.listener.WeakFocusListener;
 
 public class LengthMeasureTextField extends ValueField implements ItemListener {
 
@@ -67,7 +68,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.valueField.setFieldValue(this.number);
     final InvokeMethodListener updateNumberListener = new InvokeMethodListener(
       this, "updateNumber");
-    this.valueField.addFocusListener(updateNumberListener);
+    this.valueField.addFocusListener(new WeakFocusListener(updateNumberListener));
     add(this.valueField);
     this.valueField.addActionListener(updateNumberListener);
 

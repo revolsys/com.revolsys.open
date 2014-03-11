@@ -11,6 +11,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import com.revolsys.swing.component.ColorAlphaPanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.util.Property;
 
 public class ColorChooserField extends ValueField {
   private static final long serialVersionUID = 1L;
@@ -19,7 +20,7 @@ public class ColorChooserField extends ValueField {
 
   public ColorChooserField(final String fieldName, final Color color) {
     super(fieldName, color);
-    this.colorButton.addPropertyChangeListener("background",
+    Property.addListener(this.colorButton, "background",
       new InvokeMethodListener(this, "updateFieldValue"));
     setLayout(new VerticalLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 0));
@@ -37,6 +38,7 @@ public class ColorChooserField extends ValueField {
     }
   }
 
+  @Override
   public void updateFieldValue() {
     setFieldValue(this.colorButton.getBackground());
   }

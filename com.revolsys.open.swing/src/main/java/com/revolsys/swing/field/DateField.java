@@ -14,6 +14,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class DateField extends JXDatePicker implements Field,
   PropertyChangeListener {
@@ -35,7 +36,7 @@ public class DateField extends JXDatePicker implements Field,
 
   public DateField(final String fieldName) {
     this.fieldName = fieldName;
-    addPropertyChangeListener("date", this);
+    Property.addListener(this, "date", this);
     this.undoManager.addKeyMap(getEditor());
   }
 

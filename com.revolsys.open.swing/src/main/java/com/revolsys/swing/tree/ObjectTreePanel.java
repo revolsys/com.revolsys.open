@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.util.Property;
@@ -46,12 +46,12 @@ public class ObjectTreePanel extends JPanel {
       this.propertyChangeSupport = propertyChangeSupportProxy.getPropertyChangeSupport();
 
       this.listeners.add(model);
-      final InvokeMethodPropertyChangeListener repaintListener = new InvokeMethodPropertyChangeListener(
+      final InvokeMethodListener repaintListener = new InvokeMethodListener(
         this.tree, "repaint");
       this.listeners.add(repaintListener);
 
       for (final PropertyChangeListener listener : this.listeners) {
-        this.propertyChangeSupport.addPropertyChangeListener(listener);
+        Property.addListener(object, listener);
       }
     }
   }
@@ -65,7 +65,7 @@ public class ObjectTreePanel extends JPanel {
     if (propertyChangeSupport != null) {
       Property.removeAllListeners(propertyChangeSupport);
       for (final PropertyChangeListener listener : this.listeners) {
-        this.propertyChangeSupport.removePropertyChangeListener(listener);
+        Property.removeListener(this.propertyChangeSupport, listener);
       }
       propertyChangeSupport = null;
     }
@@ -76,7 +76,7 @@ public class ObjectTreePanel extends JPanel {
   @Override
   protected void finalize() throws Throwable {
     for (final PropertyChangeListener listener : this.listeners) {
-      this.propertyChangeSupport.removePropertyChangeListener(listener);
+      Property.removeListener(this.propertyChangeSupport, listener);
     }
   }
 

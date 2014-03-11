@@ -2,6 +2,8 @@ package com.revolsys.swing.map.layer.dataobject.table.predicate;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import javax.swing.JComponent;
 
@@ -39,11 +41,11 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
 
   private final DataObjectLayerAttributesTableModel model;
 
-  private final DataObjectLayerForm form;
+  private final Reference<DataObjectLayerForm> form;
 
   public FormAllFieldsErrorPredicate(final DataObjectLayerForm form,
     final DataObjectLayerAttributesTableModel model) {
-    this.form = form;
+    this.form = new WeakReference<>(form);
     this.model = model;
   }
 
@@ -54,8 +56,9 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final String fieldName = model.getFieldName(rowIndex);
       if (fieldName != null) {
+        final DataObjectLayerForm form = this.form.get();
         if (!form.isFieldValid(fieldName)) {
-          JComponent jcomponent = (JComponent)renderer;
+          final JComponent jcomponent = (JComponent)renderer;
           form.setFieldInvalidToolTip(fieldName, jcomponent);
           return true;
         }

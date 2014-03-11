@@ -13,6 +13,7 @@ import javax.swing.border.BevelBorder;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.Property;
 
 public class MapScale extends JLabel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
@@ -58,7 +59,7 @@ public class MapScale extends JLabel implements PropertyChangeListener {
     setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
     setPreferredSize(new Dimension(100, 20));
-    viewport.addPropertyChangeListener("scale", this);
+    Property.addListener(viewport, "scale", this);
     setToolTipText("Map Scale");
   }
 

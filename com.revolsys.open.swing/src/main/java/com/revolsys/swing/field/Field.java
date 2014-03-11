@@ -1,13 +1,10 @@
 package com.revolsys.swing.field;
 
 import java.awt.Color;
-import java.beans.PropertyChangeListener;
 
 import com.revolsys.swing.undo.UndoManager;
 
 public interface Field {
-  void addPropertyChangeListener(String propertyName,
-    PropertyChangeListener listener);
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
 
@@ -18,9 +15,6 @@ public interface Field {
   <T> T getFieldValue();
 
   boolean isFieldValid();
-
-  void removePropertyChangeListener(String propertyName,
-    PropertyChangeListener listener);
 
   void setEnabled(boolean enabled);
 

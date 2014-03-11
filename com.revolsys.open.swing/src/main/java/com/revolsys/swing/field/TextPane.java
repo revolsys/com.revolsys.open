@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
@@ -58,7 +59,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setDocument(new PropertyChangeStyledDocument(this));
     setText(this.fieldValue);
-    addFocusListener(this);
+    addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
     this.undoManager.addKeyMap(this);
   }
@@ -131,7 +132,8 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);

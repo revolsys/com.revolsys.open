@@ -16,6 +16,7 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
+import com.revolsys.util.Property;
 
 public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
@@ -34,7 +35,7 @@ public class TiledImageLayerRenderer extends
 
   public TiledImageLayerRenderer(final AbstractTiledImageLayer layer) {
     super("tiledImage", layer);
-    layer.addPropertyChangeListener(this);
+    Property.addListener(layer, this);
   }
 
   @Override

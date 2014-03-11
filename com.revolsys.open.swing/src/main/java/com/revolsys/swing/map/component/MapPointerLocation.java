@@ -20,6 +20,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Point;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
@@ -46,7 +47,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
     this.geographics = geographics;
     setGeometryFactory(map.getGeometryFactory());
 
-    map.addPropertyChangeListener("geometryFactory", this);
+    Property.addListener(map, "geometryFactory", this);
     map.getMouseOverlay().addMouseMotionListener(this);
 
     setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));

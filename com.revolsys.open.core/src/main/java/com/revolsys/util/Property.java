@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.beans.PropertyChangeSupport;
@@ -16,32 +17,47 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JComponent;
+
 import org.apache.commons.beanutils.MethodUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.ObjectWithProperties;
 
 public final class Property {
-  public static void addListener(final Object object, final Object listener) {
-    if (listener instanceof PropertyChangeListener) {
-      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
-      if (propertyChangeSupport != null) {
+  public static void addListener(final Object source, final Object listener) {
+    final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
+    if (propertyChangeListener != null) {
+      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+      if (propertyChangeSupport == null) {
+        if (source instanceof JComponent) {
+          final JComponent component = (JComponent)source;
+          component.addPropertyChangeListener(propertyChangeListener);
+        }
+      } else {
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
       }
     }
   }
 
-  public static void addListener(final Object object,
+  public static void addListener(final Object source,
     final String propertyName, final Object listener) {
-    if (listener instanceof PropertyChangeListener) {
-      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
-      if (propertyChangeSupport != null) {
+    final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
+    if (propertyChangeListener != null) {
+      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+      if (propertyChangeSupport == null) {
+        if (source instanceof JComponent) {
+          final JComponent component = (JComponent)source;
+          component.addPropertyChangeListener(propertyName,
+            propertyChangeListener);
+        }
+      } else {
         propertyChangeSupport.addPropertyChangeListener(propertyName,
           propertyChangeListener);
       }
@@ -65,6 +81,32 @@ public final class Property {
       }
     }
     return null;
+  }
+
+  public static void firePropertyChange(final Object source,
+    final PropertyChangeEvent event) {
+    final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(event);
+    }
+  }
+
+  public static void firePropertyChange(final Object source,
+    final String propertyName, final int index, final Object oldValue,
+    final Object newValue) {
+    final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
+        oldValue, newValue);
+    }
+  }
+
+  public static void firePropertyChange(final Object source,
+    final String propertyName, final Object oldValue, final Object newValue) {
+    final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -161,6 +203,22 @@ public final class Property {
     }
   }
 
+  public static PropertyChangeListener getPropertyChangeListener(
+    final Object listener) {
+    if (listener instanceof PropertyChangeListener) {
+      final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
+      if (propertyChangeListener instanceof NonWeakListener) {
+        return propertyChangeListener;
+      } else {
+        final WeakPropertyChangeListener weakListener = new WeakPropertyChangeListener(
+          propertyChangeListener);
+        return weakListener;
+      }
+    } else {
+      return null;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getSimple(final Object object, final String key) {
     if (object == null) {
@@ -237,7 +295,9 @@ public final class Property {
   }
 
   public static PropertyChangeSupport propertyChangeSupport(final Object object) {
-    if (object instanceof PropertyChangeSupportProxy) {
+    if (object instanceof PropertyChangeSupport) {
+      return (PropertyChangeSupport)object;
+    } else if (object instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
       return proxy.getPropertyChangeSupport();
     } else {
@@ -270,6 +330,10 @@ public final class Property {
   }
 
   public static void removeAllListeners(final Object object) {
+    if (object instanceof Component) {
+      final Component component = (Component)object;
+      removeAllListeners(component);
+    }
     if (object instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)object;
 
@@ -300,24 +364,79 @@ public final class Property {
     }
   }
 
-  public static void removeListener(final Object object, final Object listener) {
+  public static void removeListener(final Object source, final Object listener) {
     if (listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
+      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {
-        propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+        for (final PropertyChangeListener otherListener : propertyChangeSupport.getPropertyChangeListeners()) {
+          if (otherListener == propertyChangeListener) {
+            propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+          } else if (otherListener instanceof WeakPropertyChangeListener) {
+            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
+            final PropertyChangeListener listenerReference = weakListener.getListener();
+            if (listenerReference == null
+              || listenerReference == propertyChangeListener) {
+              propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+            }
+          }
+        }
+      }
+      if (source instanceof Component) {
+        final Component component = (Component)source;
+        for (final PropertyChangeListener otherListener : component.getPropertyChangeListeners()) {
+          if (otherListener == propertyChangeListener) {
+            component.removePropertyChangeListener(propertyChangeListener);
+          } else if (otherListener instanceof WeakPropertyChangeListener) {
+            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
+            final PropertyChangeListener listenerReference = weakListener.getListener();
+            if (listenerReference == null
+              || listenerReference == propertyChangeListener) {
+              component.removePropertyChangeListener(propertyChangeListener);
+            }
+          }
+        }
       }
     }
   }
 
-  public static void removeListener(final Object object,
+  public static void removeListener(final Object source,
     final String propertyName, final Object listener) {
     if (listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(object);
+      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName,
-          propertyChangeListener);
+        for (final PropertyChangeListener otherListener : propertyChangeSupport.getPropertyChangeListeners()) {
+          if (otherListener == propertyChangeListener) {
+            propertyChangeSupport.removePropertyChangeListener(propertyName,
+              propertyChangeListener);
+          } else if (otherListener instanceof WeakPropertyChangeListener) {
+            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
+            final PropertyChangeListener listenerReference = weakListener.getListener();
+            if (listenerReference == null
+              || listenerReference == propertyChangeListener) {
+              propertyChangeSupport.removePropertyChangeListener(propertyName,
+                propertyChangeListener);
+            }
+          }
+        }
+      }
+      if (source instanceof Component) {
+        final Component component = (Component)source;
+        for (final PropertyChangeListener otherListener : component.getPropertyChangeListeners()) {
+          if (otherListener == propertyChangeListener) {
+            component.removePropertyChangeListener(propertyName,
+              propertyChangeListener);
+          } else if (otherListener instanceof WeakPropertyChangeListener) {
+            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
+            final PropertyChangeListener listenerReference = weakListener.getListener();
+            if (listenerReference == null
+              || listenerReference == propertyChangeListener) {
+              component.removePropertyChangeListener(propertyName,
+                propertyChangeListener);
+            }
+          }
+        }
       }
     }
   }

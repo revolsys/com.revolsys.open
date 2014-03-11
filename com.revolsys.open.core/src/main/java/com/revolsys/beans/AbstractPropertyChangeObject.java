@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class AbstractPropertyChangeObject implements
   PropertyChangeSupportProxy, Cloneable {
@@ -12,7 +13,12 @@ public class AbstractPropertyChangeObject implements
     this);
 
   public void addListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(listener);
+    Property.addListener(this, listener);
+  }
+
+  public void addListener(final String propertyName,
+    final PropertyChangeListener listener) {
+    Property.addListener(this, propertyName, listener);
   }
 
   @Override
@@ -48,6 +54,11 @@ public class AbstractPropertyChangeObject implements
   }
 
   public void removeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(listener);
+    Property.removeListener(this, listener);
+  }
+
+  public void removeListener(final String propertyName,
+    final PropertyChangeListener listener) {
+    Property.removeListener(this, propertyName, listener);
   }
 }

@@ -16,6 +16,7 @@ import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.Property;
 
 public class QueryFilterField extends ValueField implements
   PropertyChangeListener {
@@ -31,7 +32,7 @@ public class QueryFilterField extends ValueField implements
     super(new VerticalLayout());
     this.layer = layer;
     queryField = new TextArea(fieldName, query, 5, 30);
-    queryField.addPropertyChangeListener(fieldName, this);
+    Property.addListener(queryField, fieldName, this);
     final ToolBar toolBar = new ToolBar();
 
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
@@ -50,7 +51,7 @@ public class QueryFilterField extends ValueField implements
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     super.addPropertyChangeListener(propertyName, listener);
-    queryField.addPropertyChangeListener(propertyName, listener);
+    Property.addListener(queryField, propertyName, listener);
   }
 
   @Override

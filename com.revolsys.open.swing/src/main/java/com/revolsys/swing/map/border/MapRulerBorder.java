@@ -32,6 +32,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.Property;
 
 public class MapRulerBorder extends AbstractBorder implements
   PropertyChangeListener {
@@ -118,7 +119,7 @@ public class MapRulerBorder extends AbstractBorder implements
     this.viewport = viewport;
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     setRulerGeometryFactory(geometryFactory);
-    viewport.addPropertyChangeListener("geometryFactory", this);
+    Property.addListener(viewport, "geometryFactory", this);
   }
 
   private <Q extends Quantity> void drawLabel(final Graphics2D graphics,

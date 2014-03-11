@@ -1,5 +1,7 @@
 package com.revolsys.swing.table.geometry;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,7 +48,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private int numIndexItems;
 
-  private DataObjectLayerForm form;
+  private Reference<DataObjectLayerForm> form;
 
   private int vertexIndexColumn;
 
@@ -85,7 +87,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   public DataObjectLayerForm getForm() {
-    return this.form;
+    return this.form.get();
   }
 
   public Geometry getGeometry() {
@@ -138,7 +140,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   public void setForm(final DataObjectLayerForm form) {
-    this.form = form;
+    this.form = new WeakReference<DataObjectLayerForm>(form);
   }
 
   public void setGeometry(final Geometry geometry) {

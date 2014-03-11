@@ -13,10 +13,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
@@ -28,9 +29,8 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
       layer);
     final DataObjectLayerTable table = new DataObjectLayerTable(model);
 
-    layer.addPropertyChangeListener("hasSelectedRecords",
-      new InvokeMethodPropertyChangeListener(DataObjectLayerTableModel.class,
-        "selectionChanged", table, model));
+    Property.addListener(layer, "hasSelectedRecords", new InvokeMethodListener(
+      DataObjectLayerTableModel.class, "selectionChanged", table, model));
 
     return table;
   }

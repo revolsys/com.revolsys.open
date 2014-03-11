@@ -39,13 +39,14 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Equal;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
@@ -75,9 +76,9 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   public DataStoreSearchTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
-    this(metaData.getDataStore(), displayAttributeName, new Query(
-      metaData, new Equal(F.upper(displayAttributeName), new Value(null))), new Query(metaData, Q.iLike(
-      displayAttributeName, "")));
+    this(metaData.getDataStore(), displayAttributeName, new Query(metaData,
+      new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
+      metaData, Q.iLike(displayAttributeName, "")));
   }
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
@@ -86,7 +87,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
     final Document document = getDocument();
     document.addDocumentListener(this);
-    addFocusListener(this);
+    addFocusListener(new WeakFocusListener(this));
     addKeyListener(this);
     addMouseListener(this);
 
@@ -123,8 +124,9 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   public DataStoreSearchTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore, displayAttributeName, new Query(typeName, new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
-      typeName, Q.iLike(displayAttributeName, "")));
+    this(dataStore, displayAttributeName, new Query(typeName, new Equal(
+      F.upper(displayAttributeName), new Value(null))), new Query(typeName,
+      Q.iLike(displayAttributeName, "")));
   }
 
   @Override
@@ -392,7 +394,8 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);

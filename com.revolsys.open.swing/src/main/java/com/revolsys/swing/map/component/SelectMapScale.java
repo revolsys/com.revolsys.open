@@ -18,6 +18,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 public class SelectMapScale extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
@@ -39,7 +40,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     setRenderer(renderer);
     addItemListener(this);
     addActionListener(this);
-    map.addPropertyChangeListener("scale", this);
+    Property.addListener(map, "scale", this);
     final Dimension size = new Dimension(140, 22);
     setPreferredSize(size);
     setMaximumSize(size);

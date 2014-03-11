@@ -36,7 +36,7 @@ import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.data.query.functions.Function;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -51,6 +51,7 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.filter.ContainsFilter;
 import com.revolsys.swing.table.filter.EqualFilter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class DataObjectLayerTableModel extends DataObjectRowTableModel
   implements SortableTableModel, PropertyChangeListener,
@@ -79,8 +80,8 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      layer.addPropertyChangeListener("hasSelectedRecords",
-        new InvokeMethodPropertyChangeListener(DataObjectLayerTableModel.class,
+      Property.addListener(layer, "hasSelectedRecords",
+        new InvokeMethodListener(DataObjectLayerTableModel.class,
           "selectionChanged", table, model));
       return table;
     }
@@ -149,7 +150,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     final List<String> attributeNames) {
     super(layer.getMetaData(), attributeNames);
     this.layer = layer;
-    layer.addPropertyChangeListener(this);
+    Property.addListener(layer, this);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
     this.loadingRecord = new LayerDataObject(layer);

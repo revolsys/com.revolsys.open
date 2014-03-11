@@ -79,6 +79,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -99,6 +100,7 @@ import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
 import com.revolsys.swing.undo.ReverseDataObjectUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class DataObjectLayerForm extends JPanel implements
   PropertyChangeListener, CellEditorListener, FocusListener,
@@ -154,7 +156,7 @@ public class DataObjectLayerForm extends JPanel implements
 
   private LayerDataObject object;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
@@ -163,40 +165,11 @@ public class DataObjectLayerForm extends JPanel implements
 
   private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<Integer, Set<String>>();
 
-  private final JTabbedPane tabs = new JTabbedPane();
+  private JTabbedPane tabs = new JTabbedPane();
 
   private ToolBar toolBar;
 
-  private final UndoManager undoManager = new UndoManager() {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void redo() {
-      final boolean validationEnabled = setFieldValidationEnabled(false);
-      try {
-        super.redo();
-      } finally {
-        if (validationEnabled) {
-          validateFields(DataObjectLayerForm.this.fieldsToValidate.get());
-        }
-        setFieldValidationEnabled(validationEnabled);
-      }
-    }
-
-    @Override
-    public void undo() {
-      final boolean validationEnabled = setFieldValidationEnabled(false);
-      try {
-        super.undo();
-      } finally {
-        if (validationEnabled) {
-          validateFields(DataObjectLayerForm.this.fieldsToValidate.get());
-        }
-        setFieldValidationEnabled(validationEnabled);
-      }
-    }
-
-  };
+  private UndoManager undoManager = new DataObjectLayerFormUndoManager(this);
 
   private String focussedFieldName;
 
@@ -225,7 +198,7 @@ public class DataObjectLayerForm extends JPanel implements
     if (metaData.getGeometryAttributeName() != null) {
       addTabGeometry();
     }
-    layer.addPropertyChangeListener(this);
+    Property.addListener(layer, this);
     this.undoManager.setLimit(100);
     this.undoManager.addKeyMap(this);
   }
@@ -300,13 +273,15 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public Field addField(final String fieldName, final Field field) {
-    field.addPropertyChangeListener(fieldName, this);
+    Property.addListener(field, fieldName, this);
     field.setUndoManager(this.undoManager);
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
-      comboBox.getEditor().getEditorComponent().addFocusListener(this);
+      comboBox.getEditor()
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
-      ((JComponent)field).addFocusListener(this);
+      ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
     this.fields.put(fieldName, field);
     this.fieldToNameMap.put(field, fieldName);
@@ -606,15 +581,45 @@ public class DataObjectLayerForm extends JPanel implements
   }
 
   public void destroy() {
+    addOkButton = null;
+    allAttributes = null;
+    dataStore = null;
+    fieldInValidMessage.clear();
+    for (final Field field : fields.values()) {
+      Property.removeAllListeners(field);
+    }
+    fields.clear();
+    fieldTabIndex.clear();
+    fieldToNameMap.clear();
+    fieldValidMap.clear();
+    geometryCoordinatesPanel = null;
+    metaData = null;
+    object = null;
+    propertyChangeSupport = null;
+    readOnlyFieldNames.clear();
+    tabInvalidFieldMap.clear();
+    tabs = null;
+    toolBar = null;
+    undoManager = null;
+    final Container parent = getParent();
+    if (parent != null) {
+      parent.remove(this);
+    }
+
     final AbstractDataObjectLayer layer = getLayer();
     if (layer != null) {
       this.layer = null;
       if (this.allAttributes != null) {
-        layer.removePropertyChangeListener(this.allAttributes);
+        Property.removeListener(layer, this.allAttributes);
         this.allAttributes = null;
       }
-      layer.removePropertyChangeListener(this);
+      Property.removeListener(layer, this);
     }
+    final Window window = SwingUtil.getWindowAncestor(this);
+    if (window != null) {
+      window.removeWindowListener(this);
+    }
+    removeAll();
   }
 
   @Override
@@ -744,6 +749,10 @@ public class DataObjectLayerForm extends JPanel implements
 
   public Collection<Field> getFields() {
     return this.fields.values();
+  }
+
+  public Set<String> getFieldsToValidate() {
+    return fieldsToValidate.get();
   }
 
   protected Map<String, Integer> getFieldTabIndex() {

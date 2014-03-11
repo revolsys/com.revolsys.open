@@ -260,7 +260,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final ValueField panel = new ValueField(this);
     SwingUtil.setTitledBorder(panel, "General");
     final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
-    nameField.addPropertyChangeListener("name", this.beanPropertyListener);
+    Property.addListener(nameField, "name", this.beanPropertyListener);
 
     final Field typeField = (Field)SwingUtil.addObjectField(panel, this, "type");
     typeField.setEnabled(false);
@@ -277,17 +277,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
     parent.add(panel);
     return panel;
-  }
-
-  @Override
-  public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    this.propertyChangeSupport.addPropertyChangeListener(listener);
-  }
-
-  @Override
-  public void addPropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   public boolean canSaveSettings(final File directory) {
@@ -646,22 +635,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    if (this.propertyChangeSupport != null) {
-      this.propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-  }
-
-  @Override
-  public void removePropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    if (this.propertyChangeSupport != null) {
-      this.propertyChangeSupport.removePropertyChangeListener(propertyName,
-        listener);
-    }
-  }
-
-  @Override
   public boolean saveChanges() {
     boolean saved = true;
     if (isHasChanges()) {
@@ -724,10 +697,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final LayerGroup old = getLayerGroup();
     if (old != layerGroup) {
       if (old != null) {
-        removePropertyChangeListener(old);
+        Property.removeListener(this, old);
       }
       this.layerGroup = new WeakReference<LayerGroup>(layerGroup);
-      addPropertyChangeListener(layerGroup);
+      Property.addListener(this, layerGroup);
       firePropertyChange("layerGroup", old, layerGroup);
     }
   }

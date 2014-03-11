@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.AbstractListModel;
 
-import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.util.Property;
 
 public class ExternalListModel<T> extends AbstractListModel implements
   Serializable, PropertyChangeListener {
@@ -17,10 +17,7 @@ public class ExternalListModel<T> extends AbstractListModel implements
 
   public ExternalListModel(final List<T> list) {
     this.list = list;
-    if (list instanceof PropertyChangeSupportProxy) {
-      final PropertyChangeSupportProxy proxy = (PropertyChangeSupportProxy)list;
-      proxy.getPropertyChangeSupport().addPropertyChangeListener(this);
-    }
+    Property.addListener(list, this);
   }
 
   @Override

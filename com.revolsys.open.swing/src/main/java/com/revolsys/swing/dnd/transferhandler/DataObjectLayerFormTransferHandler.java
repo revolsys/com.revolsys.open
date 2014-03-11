@@ -2,6 +2,8 @@ package com.revolsys.swing.dnd.transferhandler;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -17,10 +19,10 @@ import com.revolsys.swing.map.form.DataObjectLayerForm;
 public class DataObjectLayerFormTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
-  private final DataObjectLayerForm form;
+  private final Reference<DataObjectLayerForm> form;
 
   public DataObjectLayerFormTransferHandler(final DataObjectLayerForm form) {
-    this.form = form;
+    this.form = new WeakReference<>(form);
   }
 
   @Override
@@ -38,9 +40,13 @@ public class DataObjectLayerFormTransferHandler extends TransferHandler {
 
   @Override
   protected Transferable createTransferable(final JComponent component) {
-    final Map<String, Object> values = this.form.getValues();
+    final Map<String, Object> values = getForm().getValues();
     final Transferable transferable = new MapTransferable(values);
     return transferable;
+  }
+
+  public DataObjectLayerForm getForm() {
+    return this.form.get();
   }
 
   @Override
@@ -66,7 +72,7 @@ public class DataObjectLayerFormTransferHandler extends TransferHandler {
     if (transferable.isDataFlavorSupported(dataFlavor)) {
       try {
         final Map<String, Object> map = (Map<String, Object>)transferable.getTransferData(dataFlavor);
-        this.form.pasteValues(map);
+        getForm().pasteValues(map);
         return true;
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to paste data",

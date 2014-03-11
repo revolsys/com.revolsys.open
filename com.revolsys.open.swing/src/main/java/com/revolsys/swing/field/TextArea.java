@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
@@ -55,7 +56,7 @@ public class TextArea extends JTextArea implements Field, FocusListener {
     this.fieldValue = StringConverterRegistry.toString(fieldValue);
     setDocument(new PropertyChangeDocument(this));
     setText(this.fieldValue);
-    addFocusListener(this);
+    addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
     this.undoManager.addKeyMap(this);
     setRows(rows);

@@ -19,6 +19,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel
@@ -45,7 +46,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
 
   public void addPropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+    Property.addListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
   public void addReadOnlyFieldNames(final String... readOnlyFieldNames) {
@@ -107,7 +108,7 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
 
   public void removePropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+    Property.removeListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
   public void setEditable(final boolean editable) {

@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
 
@@ -51,11 +51,10 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   private final List<String> columnTitles = Arrays.asList("Description",
     "Status");
 
-  private final InvokeMethodPropertyChangeListener listener;
+  private final InvokeMethodListener listener;
 
   public SwingWorkerTableModel() {
-    this.listener = new InvokeMethodPropertyChangeListener(this,
-      "fireTableDataChanged");
+    this.listener = new InvokeMethodListener(this, "fireTableDataChanged");
     final PropertyChangeSupport propertyChangeSupport = Invoke.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(this.listener);
   }

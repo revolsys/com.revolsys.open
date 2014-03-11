@@ -34,11 +34,11 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.ILike;
 import com.revolsys.gis.data.query.IsNotNull;
 import com.revolsys.gis.data.query.IsNull;
 import com.revolsys.gis.data.query.Not;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.RightUnaryCondition;
 import com.revolsys.gis.data.query.Value;
@@ -56,6 +56,7 @@ import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
   ItemListener, DocumentListener, PropertyChangeListener {
@@ -175,7 +176,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     if (component instanceof Field) {
       final Field field = (Field)component;
       final String fieldName = field.getFieldName();
-      field.addPropertyChangeListener(fieldName, this);
+      Property.addListener(field, fieldName, this);
     }
   }
 
@@ -299,7 +300,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     if (component instanceof Field) {
       final Field field = (Field)component;
       final String fieldName = field.getFieldName();
-      field.removePropertyChangeListener(fieldName, this);
+      Property.removeListener(field, fieldName, this);
     }
   }
 

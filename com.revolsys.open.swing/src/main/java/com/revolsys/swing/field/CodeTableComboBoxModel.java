@@ -1,5 +1,8 @@
 package com.revolsys.swing.field;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,9 +12,10 @@ import javax.swing.ComboBoxModel;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
-  ComboBoxModel<Object> {
+  ComboBoxModel<Object>, PropertyChangeListener, Closeable {
   private static final long serialVersionUID = 1L;
 
   public static final Object NULL = new Object();
@@ -32,7 +36,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
 
   private Object selectedItem;
 
-  private final CodeTable codeTable;
+  private CodeTable codeTable;
 
   private final boolean allowNull;
 
@@ -44,6 +48,14 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
     final boolean allowNull) {
     this.codeTable = codeTable;
     this.allowNull = allowNull;
+    Property.addListener(codeTable, "valuesChanged", this);
+  }
+
+  @Override
+  public void close() {
+    Property.removeListener(codeTable, "valuesChanged", this);
+    codeTable = null;
+    selectedItem = null;
   }
 
   @Override
@@ -79,6 +91,14 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
       size++;
     }
     return size;
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getPropertyName().equals("valuesChanged")) {
+      final int size = getSize();
+      fireContentsChanged(this, 0, size);
+    }
   }
 
   @Override

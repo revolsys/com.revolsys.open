@@ -24,6 +24,7 @@ import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.component.AttributeTitleStringConveter;
+import com.revolsys.util.Property;
 
 public class TextNameField extends ValueField {
 
@@ -75,7 +76,7 @@ public class TextNameField extends ValueField {
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     super.addPropertyChangeListener(propertyName, listener);
-    textNameField.addPropertyChangeListener(propertyName, listener);
+    Property.addListener(textNameField, propertyName, listener);
   }
 
   @Override

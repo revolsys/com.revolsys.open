@@ -662,7 +662,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected boolean modeAddMouseClick(final MouseEvent event) {
-    System.out.println(event);
     if (SwingUtilities.isLeftMouseButton(event)) {
       if (isModeAddGeometry()) {
         if (event.getClickCount() == 2) {

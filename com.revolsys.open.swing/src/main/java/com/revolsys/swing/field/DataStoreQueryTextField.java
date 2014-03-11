@@ -49,14 +49,15 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Equal;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 
@@ -96,8 +97,8 @@ public class DataStoreQueryTextField extends TextField implements
   public DataStoreQueryTextField(final DataObjectMetaData metaData,
     final String displayAttributeName) {
     this(metaData, displayAttributeName, new Query(metaData, new Equal(
-      F.upper(displayAttributeName), new Value(null))), new Query(
-      metaData, Q.iLike(displayAttributeName, "")));
+      F.upper(displayAttributeName), new Value(null))), new Query(metaData,
+      Q.iLike(displayAttributeName, "")));
 
   }
 
@@ -111,7 +112,7 @@ public class DataStoreQueryTextField extends TextField implements
 
     final Document document = getDocument();
     document.addDocumentListener(this);
-    addFocusListener(this);
+    addFocusListener(new WeakFocusListener(this));
     addKeyListener(this);
     addMouseListener(this);
 
@@ -157,8 +158,7 @@ public class DataStoreQueryTextField extends TextField implements
   public DataStoreQueryTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
     this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
-      typeName,
-      new Equal(F.upper(displayAttributeName), new Value(null))),
+      typeName, new Equal(F.upper(displayAttributeName), new Value(null))),
       new Query(typeName, Q.iLike(displayAttributeName, "")));
   }
 

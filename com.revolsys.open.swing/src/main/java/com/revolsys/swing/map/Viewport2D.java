@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -21,6 +20,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
@@ -32,7 +32,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-public class Viewport2D {
+public class Viewport2D implements PropertyChangeSupportProxy {
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
     .createEmptyGeometry();
@@ -128,26 +128,6 @@ public class Viewport2D {
     this.viewHeight = height;
     setBoundingBox(boundingBox);
     setGeometryFactory(boundingBox.getGeometryFactory());
-  }
-
-  /**
-   * Add the property change listener.
-   * 
-   * @param listener The listener.
-   */
-  public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    this.propertyChangeSupport.addPropertyChangeListener(listener);
-  }
-
-  /**
-   * Remove the property change listener from the specified property.
-   * 
-   * @param propertyName The property name.
-   * @param listener The listener.
-   */
-  public void addPropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   public AffineTransform createModelToScreenTransform(
@@ -268,7 +248,8 @@ public class Viewport2D {
    * 
    * @return The property change support.
    */
-  protected PropertyChangeSupport getPropertyChangeSupport() {
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
     return this.propertyChangeSupport;
   }
 
@@ -428,27 +409,6 @@ public class Viewport2D {
 
   public boolean isUseModelCoordinates() {
     return this.savedTransform.get() != null;
-  }
-
-  /**
-   * Remove the property change listener.
-   * 
-   * @param listener The listener.
-   */
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    this.propertyChangeSupport.removePropertyChangeListener(listener);
-  }
-
-  /**
-   * Remove the property change listener from the specified property.
-   * 
-   * @param propertyName The property name.
-   * @param listener The listener.
-   */
-  public void removePropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    this.propertyChangeSupport.removePropertyChangeListener(propertyName,
-      listener);
   }
 
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {

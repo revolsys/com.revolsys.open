@@ -1,7 +1,5 @@
 package com.revolsys.i18n;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Locale;
@@ -9,7 +7,9 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public final class I18n {
+import com.revolsys.beans.AbstractPropertyChangeObject;
+
+public final class I18n extends AbstractPropertyChangeObject {
   private static final I18n NULL_INSTANCE = new I18n();
 
   /** The map from category names to I18n instances. */
@@ -93,8 +93,7 @@ public final class I18n {
         final I18n i18n = reference.get();
         if (i18n != null) {
           i18n.loadResourceBundle();
-          i18n.propertyChangeSupport.firePropertyChange("locale", oldLocale,
-            locale);
+          i18n.firePropertyChange("locale", oldLocale, locale);
         }
       }
     }
@@ -105,9 +104,6 @@ public final class I18n {
   private String resourcePath;
 
   private WeakReference<ClassLoader> classLoaderReference;
-
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
 
   private I18n() {
   }
@@ -121,15 +117,6 @@ public final class I18n {
     this.classLoaderReference = new WeakReference<ClassLoader>(classLoader);
     this.resourcePath = resourcePath;
     loadResourceBundle();
-  }
-
-  public void addPropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(listener);
-  }
-
-  public void addPropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   public CharSequence getCharSequence(final String key) {
@@ -160,15 +147,6 @@ public final class I18n {
     final ClassLoader classLoader = classLoaderReference.get();
     resourceBundle = ResourceBundle.getBundle(resourcePath,
       Locale.getDefault(), classLoader);
-  }
-
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(listener);
-  }
-
-  public void removePropertyChangeListener(final String propertyName,
-    final PropertyChangeListener listener) {
-    propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
 
   @Override

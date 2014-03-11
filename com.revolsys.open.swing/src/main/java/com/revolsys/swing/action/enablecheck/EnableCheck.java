@@ -3,18 +3,19 @@ package com.revolsys.swing.action.enablecheck;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public interface EnableCheck {
-  void addPropertyChangeListener(PropertyChangeListener listener);
+import com.revolsys.beans.PropertyChangeSupportProxy;
 
-  void addPropertyChangeListener(String propertyName,
-    final PropertyChangeListener listener);
+public interface EnableCheck extends PropertyChangeSupportProxy {
+  void addListener(PropertyChangeListener listener);
 
+  void addListener(String propertyName, final PropertyChangeListener listener);
+
+  @Override
   PropertyChangeSupport getPropertyChangeSupport();
 
   boolean isEnabled();
 
-  void removePropertyChangeListener(PropertyChangeListener listener);
+  void removeListener(PropertyChangeListener listener);
 
-  void removePropertyChangeListener(String propertyName,
-    PropertyChangeListener listener);
+  void removeListener(String propertyName, PropertyChangeListener listener);
 }

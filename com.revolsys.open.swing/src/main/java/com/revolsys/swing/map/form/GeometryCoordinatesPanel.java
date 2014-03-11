@@ -2,6 +2,8 @@ package com.revolsys.swing.map.form;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
@@ -24,14 +26,14 @@ public class GeometryCoordinatesPanel extends ValueField implements
 
   private final TablePanel tablePanel;
 
-  private final DataObjectLayerForm form;
+  private final Reference<DataObjectLayerForm> form;
 
   public GeometryCoordinatesPanel(final DataObjectLayerForm form,
     final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
 
-    this.form = form;
+    this.form = new WeakReference<>(form);
     this.model.addTableModelListener(this);
     this.model.setForm(form);
     this.table = new BaseJxTable(this.model);
@@ -43,7 +45,7 @@ public class GeometryCoordinatesPanel extends ValueField implements
   }
 
   public DataObjectLayerForm getForm() {
-    return this.form;
+    return this.form.get();
   }
 
   public BaseJxTable getTable() {

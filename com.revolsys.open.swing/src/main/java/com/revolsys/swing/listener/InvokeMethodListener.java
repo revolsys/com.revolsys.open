@@ -14,12 +14,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.beans.InvokeMethodPropertyChangeListener;
+import com.revolsys.beans.NonWeakListener;
 import com.revolsys.swing.parallel.Invoke;
 
-public class InvokeMethodListener extends InvokeMethodRunnable implements
-  ActionListener, DocumentListener, ListSelectionListener, ItemListener,
-  PropertyChangeListener, FocusListener {
+public class InvokeMethodListener extends InvokeMethodPropertyChangeListener
+  implements ActionListener, DocumentListener, ListSelectionListener,
+  ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
 
   private final boolean invokeLater;
 
@@ -42,7 +43,7 @@ public class InvokeMethodListener extends InvokeMethodRunnable implements
 
   public InvokeMethodListener(final Object object, final String methodName,
     final Object... parameters) {
-    this(false, object, methodName, parameters);
+    this(true, object, methodName, parameters);
   }
 
   @Override

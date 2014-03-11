@@ -17,6 +17,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
+import com.revolsys.util.Property;
 
 public class MarkerField extends ValueField implements PropertyChangeListener {
 
@@ -44,7 +45,7 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
     super(fieldName, fieldValue);
     setLayout(new VerticalLayout());
     add(comboBox);
-    comboBox.addPropertyChangeListener("marker", this);
+    Property.addListener(comboBox, "marker", this);
     comboBox.setSelectedItem(fieldValue);
   }
 

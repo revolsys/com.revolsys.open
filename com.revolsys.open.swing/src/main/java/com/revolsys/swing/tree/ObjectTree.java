@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -25,6 +24,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.swing.tree.renderer.ObjectModelTreeCellRenderer;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ObjectTree extends BaseTree implements PropertyChangeListener {
 
@@ -55,11 +55,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     setToggleClickCount(0);
     setRowHeight(0);
     final Object root = model.getRoot();
-    if (root instanceof PropertyChangeSupportProxy) {
-      final PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
-      propProxy.getPropertyChangeSupport().addPropertyChangeListener(this);
-
-    }
+    Property.addListener(root, this);
     final ObjectTreeNodeModel<Object, Object> rootModel = model.getNodeModel(root);
     final TreePath rootPath = new TreePath(root);
     model.initializeNode(rootPath, rootModel, root);
@@ -73,7 +69,6 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     setTransferHandler(new ObjectTreeTransferHandler(model));
     setDragEnabled(true);
     setDropMode(DropMode.ON_OR_INSERT);
-
   }
 
   @Override

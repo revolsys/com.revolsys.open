@@ -151,6 +151,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private boolean settingScale;
 
+  private ComboBox baseMapLayerField;
+
   public MapPanel() {
     this(new Project());
   }
@@ -169,7 +171,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     add(this.layeredPane, BorderLayout.CENTER);
 
     this.viewport = new ComponentViewport2D(project, this.layeredPane);
-    this.viewport.addPropertyChangeListener(this);
+    Property.addListener(this.viewport, this);
 
     createScales();
     this.viewport.setScales(getScales());
@@ -179,30 +181,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.baseMapOverlay = new LayerRendererOverlay(this);
     baseMapOverlay.setLayer(NullLayer.INSTANCE);
     this.layeredPane.add(this.baseMapOverlay, new Integer(0));
-    this.baseMapOverlay.addPropertyChangeListener("layer", this);
+    Property.addListener(this.baseMapOverlay, "layer", this);
 
     this.layerOverlay = new LayerRendererOverlay(this, project);
     this.layeredPane.add(this.layerOverlay, new Integer(1));
 
-    project.addPropertyChangeListener("viewBoundingBox",
-      new PropertyChangeListener() {
-
-        @Override
-        public void propertyChange(final PropertyChangeEvent event) {
-          final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
-          setBoundingBox(boundingBox);
-        }
-      });
-    project.addPropertyChangeListener("srid", new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(final PropertyChangeEvent event) {
-        final Integer srid = (Integer)event.getNewValue();
-        setGeometryFactory(GeometryFactory.getFactory(srid));
-      }
-    });
-    this.baseMapLayers.addPropertyChangeListener(this);
-    project.addPropertyChangeListener(this);
+    Property.addListener(this.baseMapLayers, this);
+    Property.addListener(project, this);
 
     addMapOverlays();
 
@@ -237,26 +222,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
       this.baseMapLayers, true);
-    final ComboBox comboBox = new ComboBox(baseMapLayersModel);
-    comboBox.setMaximumSize(new Dimension(200, 22));
-    comboBox.addItemListener(new InvokeMethodSelectedItemListener(this,
-      "setBaseMapLayer"));
+    baseMapLayerField = new ComboBox(baseMapLayersModel);
+    baseMapLayerField.setMaximumSize(new Dimension(200, 22));
+    baseMapLayerField.addItemListener(new InvokeMethodSelectedItemListener(
+      this, "setBaseMapLayer"));
     if (this.baseMapLayers.size() > 0) {
-      comboBox.setSelectedIndex(1);
+      baseMapLayerField.setSelectedIndex(1);
     }
-    comboBox.setToolTipText("Base Map");
-    this.toolBar.addComponent("layers", comboBox);
-    this.baseMapOverlay.addPropertyChangeListener("layer",
-      new PropertyChangeListener() {
-
-        @Override
-        public void propertyChange(final PropertyChangeEvent event) {
-          final Layer layer = (Layer)event.getNewValue();
-          if (layer != null) {
-            comboBox.setSelectedItem(layer);
-          }
-        }
-      });
+    baseMapLayerField.setToolTipText("Base Map");
+    this.toolBar.addComponent("layers", baseMapLayerField);
+    Property.addListener(this.baseMapOverlay, "layer", this);
     this.toolBar.addButtonTitleIcon("layers", "Refresh Base Map",
       "map_refresh", baseMapOverlay, "refresh");
   }
@@ -265,11 +240,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.layeredPane.add(overlay, new Integer(zIndex));
     if (overlay instanceof PropertyChangeListener) {
       final PropertyChangeListener listener = (PropertyChangeListener)overlay;
-      addPropertyChangeListener(listener);
-      this.project.addPropertyChangeListener(listener);
-      this.baseMapLayers.addPropertyChangeListener(listener);
+      Property.addListener(this, listener);
+      Property.addListener(this.project, listener);
+      Property.addListener(this.baseMapLayers, listener);
     }
-    overlay.addPropertyChangeListener(this);
+    Property.addListener(overlay, this);
   }
 
   public void addMapOverlay(final JComponent overlay) {
@@ -361,13 +336,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final JButton zoomPreviousButton = this.toolBar.addButtonTitleIcon("zoom",
       "Zoom Previous", "magnifier_zoom_left", this, "zoomPrevious");
     zoomPreviousButton.setEnabled(false);
-    addPropertyChangeListener("zoomPreviousEnabled",
+    Property.addListener(this, "zoomPreviousEnabled",
       new EnableComponentListener(zoomPreviousButton));
 
     final JButton zoomNextButton = this.toolBar.addButtonTitleIcon("zoom",
       "Zoom Next", "magnifier_zoom_right", this, "zoomNext");
     zoomNextButton.setEnabled(false);
-    addPropertyChangeListener("zoomNextEnabled", new EnableComponentListener(
+    Property.addListener(this, "zoomNextEnabled", new EnableComponentListener(
       zoomNextButton));
 
     this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
@@ -588,10 +563,23 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     final String propertyName = event.getPropertyName();
-    if (source == this.viewport) {
+    if ("srid".equals(propertyName)) {
+      final Integer srid = (Integer)event.getNewValue();
+      setGeometryFactory(GeometryFactory.getFactory(srid));
+    } else if ("viewBoundingBox".equals(propertyName)) {
+      final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
+      setBoundingBox(boundingBox);
+    } else if (source == this.viewport) {
       if ("scale".equals(propertyName)) {
         final double scale = this.viewport.getScale();
         setScale(scale);
+      }
+    } else if (source == this.baseMapOverlay) {
+      if ("layer".equals(propertyName)) {
+        final Layer layer = (Layer)event.getNewValue();
+        if (layer != null && baseMapLayerField != null) {
+          baseMapLayerField.setSelectedItem(layer);
+        }
       }
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {

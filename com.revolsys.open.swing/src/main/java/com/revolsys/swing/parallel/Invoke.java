@@ -25,6 +25,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class Invoke {
   private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
@@ -125,8 +126,7 @@ public class Invoke {
   public static void backgroundTransaction(final String description,
     final PlatformTransactionManager transactionManager,
     final Propagation propagation, final Runnable runnable) {
-    background(
-      description,
+    background(description,
       Transaction.runnable(runnable, transactionManager, propagation));
   }
 

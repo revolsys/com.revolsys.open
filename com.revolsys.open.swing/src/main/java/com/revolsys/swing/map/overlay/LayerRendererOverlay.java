@@ -45,13 +45,13 @@ public class LayerRendererOverlay extends JComponent implements
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
     setLayer(layer);
-    this.viewport.addPropertyChangeListener(this);
-    addPropertyChangeListener(mapPanel);
+    Property.addListener(this.viewport, this);
+    Property.addListener(this, mapPanel);
   }
 
   public void dispose() {
     if (this.layer != null) {
-      this.layer.removePropertyChangeListener(this);
+      Property.removeListener(this.layer, this);
       this.layer = null;
     }
     Property.removeAllListeners(this);
@@ -145,11 +145,11 @@ public class LayerRendererOverlay extends JComponent implements
     if (old != layer) {
       if (old != null) {
         old.setVisible(false);
-        old.removePropertyChangeListener(this);
+        Property.addListener(old, this);
       }
       this.layer = layer;
       if (layer != null) {
-        layer.addPropertyChangeListener(this);
+        Property.addListener(layer, this);
         layer.refresh();
         layer.setVisible(true);
       }

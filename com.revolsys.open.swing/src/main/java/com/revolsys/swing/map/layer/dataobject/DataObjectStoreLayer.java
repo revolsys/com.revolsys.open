@@ -28,6 +28,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
@@ -742,6 +743,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       this.boundingBox = new BoundingBox();
       this.loadingBoundingBox = this.boundingBox;
       setIndex(null);
+      cleanCachedRecords();
+    }
+    final DataObjectStore dataStore = getDataStore();
+    final String typePath = getTypePath();
+    final CodeTable codeTable = dataStore.getCodeTable(typePath);
+    if (codeTable != null) {
+      codeTable.refresh();
     }
     fireRecordsChanged();
   }

@@ -2,6 +2,8 @@ package com.revolsys.swing.map.layer.dataobject.table.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -9,6 +11,7 @@ import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
+import com.revolsys.util.Property;
 
 public class DataObjectLayerAttributesTableModel extends
   AbstractSingleDataObjectTableModel implements PropertyChangeListener {
@@ -19,14 +22,14 @@ public class DataObjectLayerAttributesTableModel extends
 
   private final AbstractDataObjectLayer layer;
 
-  private final DataObjectLayerForm form;
+  private final Reference<DataObjectLayerForm> form;
 
   public DataObjectLayerAttributesTableModel(final DataObjectLayerForm form) {
     super(form.getMetaData(), true);
-    this.form = form;
+    this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
     this.object = form.getObject();
-    this.layer.addPropertyChangeListener(this);
+    Property.addListener(this.layer, this);
   }
 
   @Override
@@ -76,13 +79,13 @@ public class DataObjectLayerAttributesTableModel extends
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
-      if (this.form.isEditable()) {
+      if (this.form.get().isEditable()) {
         final String idAttributeName = getMetaData().getIdAttributeName();
         final String attributeName = getFieldName(rowIndex);
         if (attributeName.equals(idAttributeName)) {
           return false;
         } else {
-          return this.form.isEditable(attributeName);
+          return this.form.get().isEditable(attributeName);
         }
       } else {
         return false;
@@ -116,7 +119,7 @@ public class DataObjectLayerAttributesTableModel extends
   }
 
   public void removeListener() {
-    this.layer.removePropertyChangeListener(this);
+    Property.removeListener(this.layer, this);
   }
 
   public void setObject(final LayerDataObject object) {

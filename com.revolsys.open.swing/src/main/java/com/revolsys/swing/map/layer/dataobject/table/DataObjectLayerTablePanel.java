@@ -38,6 +38,7 @@ import com.revolsys.swing.table.dataobject.row.DataObjectRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectLayerTablePanel extends TablePanel implements
@@ -173,7 +174,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         "Show Records on Map", "map_filter", this.tableModel,
         "setFilterByBoundingBox", true);
     }
-    layer.addPropertyChangeListener(this);
+    Property.addListener(layer, this);
   }
 
   public boolean canPasteRecordGeometry() {
@@ -289,7 +290,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   @Override
   public void removeNotify() {
     super.removeNotify();
-    this.layer.removePropertyChangeListener(this);
+    Property.removeListener(this.layer, this);
   }
 
   public void setAttributeFilterMode(final String mode) {

@@ -17,6 +17,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.util.Property;
 
 public class SelectMapCoordinateSystem extends ComboBox implements
   ItemListener, PropertyChangeListener {
@@ -36,7 +37,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     setRenderer(renderer);
     AutoCompleteDecorator.decorate(this, renderer);
     addItemListener(this);
-    map.addPropertyChangeListener("geometryFactory", this);
+    Property.addListener(map, "geometryFactory", this);
     final Dimension size = new Dimension(200, 22);
     setMaximumSize(size);
     setToolTipText("Coordinate System");

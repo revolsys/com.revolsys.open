@@ -234,8 +234,7 @@ public class ProjectFrame extends BaseFrame {
     final ObjectTree tree = this.tocPanel.getTree();
     tree.setRootVisible(true);
 
-    this.project.getPropertyChangeSupport().addPropertyChangeListener(
-      "layers",
+    Property.addListener(this.project, "layers",
       new InvokeMethodPropertyChangeListener(true, this, "expandLayers",
         PropertyChangeEvent.class));
     panel.add(this.tocPanel, BorderLayout.CENTER);

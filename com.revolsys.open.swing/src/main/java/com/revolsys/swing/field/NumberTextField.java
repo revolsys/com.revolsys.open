@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.CascadingUndoManager;
@@ -185,7 +186,6 @@ public class NumberTextField extends JXTextField implements Field,
     } else {
       this.fieldName = "fieldValue";
     }
-    addFocusListener(this);
 
     this.dataType = dataType;
     this.length = length;
@@ -195,7 +195,7 @@ public class NumberTextField extends JXTextField implements Field,
     setColumns(getLength(dataType, length, scale, this.minimumValue));
     setHorizontalAlignment(RIGHT);
     getDocument().addDocumentListener(this);
-    addFocusListener(this);
+    addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
     this.undoManager.addKeyMap(this);
   }
@@ -220,11 +220,6 @@ public class NumberTextField extends JXTextField implements Field,
   public void focusLost(final FocusEvent e) {
     updateFieldValue();
     this.undoManager.discardAllEdits();
-  }
-
-  public void updateFieldValue() {
-    final String text = getText();
-    setFieldValue(text);
   }
 
   @Override
@@ -304,7 +299,8 @@ public class NumberTextField extends JXTextField implements Field,
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);
@@ -394,6 +390,12 @@ public class NumberTextField extends JXTextField implements Field,
   @Override
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
+  }
+
+  @Override
+  public void updateFieldValue() {
+    final String text = getText();
+    setFieldValue(text);
   }
 
   private void validateField() {

@@ -40,6 +40,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements List<Layer>,
   Parent<Layer> {
@@ -281,7 +282,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         final Layer layer = iterator.next();
         iterator.remove();
         layer.setLayerGroup(null);
-        layer.removePropertyChangeListener(this);
+        Property.removeListener(layer, this);
         layer.delete();
       }
       super.delete();
@@ -628,7 +629,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   public Layer remove(final int index) {
     synchronized (this.layers) {
       final Layer layer = this.layers.remove(index);
-      layer.removePropertyChangeListener(this);
+      Property.removeListener(layer, this);
       fireIndexedPropertyChange("layers", index, layer, null);
       if (layer.getLayerGroup() == this) {
         layer.setLayerGroup(null);

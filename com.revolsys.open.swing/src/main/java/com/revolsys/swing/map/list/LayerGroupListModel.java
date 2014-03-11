@@ -10,6 +10,7 @@ import javax.swing.ComboBoxModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
+import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class LayerGroupListModel extends AbstractListModel implements
@@ -28,7 +29,7 @@ public class LayerGroupListModel extends AbstractListModel implements
 
   public LayerGroupListModel(final LayerGroup group, final boolean allowNull) {
     this.group = group;
-    group.addPropertyChangeListener(this);
+    Property.addListener(group, this);
     this.allowNull = allowNull;
   }
 

@@ -123,7 +123,7 @@ public class BaseStylePanel extends ValueField implements
     final CheckBox field = new CheckBox(fieldName);
     final Object value = Property.get(object, fieldName);
     field.setFieldValue(value);
-    field.addPropertyChangeListener(fieldName, this);
+    Property.addListener(field, fieldName, this);
     container.add(field);
   }
 
@@ -132,7 +132,7 @@ public class BaseStylePanel extends ValueField implements
     SwingUtil.addLabel(container, fieldName);
     final Color value = Property.get(object, fieldName);
     final ColorChooserField field = new ColorChooserField(fieldName, value);
-    field.addPropertyChangeListener(fieldName, this);
+    Property.addListener(field, fieldName, this);
     container.add(field);
   }
 
@@ -153,8 +153,8 @@ public class BaseStylePanel extends ValueField implements
       } else {
         container.add((Component)field);
       }
-      field.addPropertyChangeListener("fieldValue", this);
-      field.addPropertyChangeListener(fieldName, this);
+      Property.addListener(field, "fieldValue", this);
+      Property.addListener(field, fieldName, this);
       if (object instanceof LayerRenderer) {
         rendererFieldNames.add(fieldName);
         rendererFieldValues.put(fieldName, value);
@@ -182,7 +182,7 @@ public class BaseStylePanel extends ValueField implements
     }
     final LengthMeasureTextField field = new LengthMeasureTextField(fieldName,
       value, unit);
-    field.addPropertyChangeListener(fieldName, this);
+    Property.addListener(field, fieldName, this);
     container.add(field);
   }
 
@@ -238,7 +238,7 @@ public class BaseStylePanel extends ValueField implements
     SwingUtil.addLabel(container, fieldName);
     final TextField field = new TextField(fieldName, columns);
     field.setFieldValue(Property.get(object, fieldName));
-    field.addPropertyChangeListener(fieldName, this);
+    Property.addListener(field, fieldName, this);
     container.add(field);
   }
 
@@ -262,7 +262,7 @@ public class BaseStylePanel extends ValueField implements
       final AbstractDataObjectLayer layer = getLayer();
       field = new QueryFilterField(layer, fieldName, (String)value);
       field.setFieldValue(value);
-      field.addPropertyChangeListener(fieldName, this);
+      Property.addListener(field, fieldName, this);
     } else if (fieldName.equals("marker")) {
       field = new MarkerField(fieldName, value);
     } else if (fieldName.endsWith("Scale")) {

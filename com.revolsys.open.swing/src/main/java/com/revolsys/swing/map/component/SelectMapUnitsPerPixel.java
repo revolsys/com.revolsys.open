@@ -28,6 +28,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
   PropertyChangeListener, ActionListener {
@@ -62,7 +63,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
     setRenderer(renderer);
     addItemListener(this);
     addActionListener(this);
-    map.addPropertyChangeListener(this);
+    Property.addListener(map, this);
     final Dimension size = new Dimension(120, 22);
     setPreferredSize(size);
     setMaximumSize(size);

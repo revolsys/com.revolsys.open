@@ -19,6 +19,7 @@ import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class TextStylePanel extends BaseStylePanel implements
   PropertyChangeListener {
@@ -76,7 +77,7 @@ public class TextStylePanel extends BaseStylePanel implements
       final AbstractDataObjectLayer layer = getLayer();
       final TextNameField textNameField = new TextNameField(layer, fieldName,
         value);
-      textNameField.addPropertyChangeListener(fieldName, this);
+      Property.addListener(textNameField, fieldName, this);
       return textNameField;
     } else {
       return super.createField(fieldName, fieldClass, value);

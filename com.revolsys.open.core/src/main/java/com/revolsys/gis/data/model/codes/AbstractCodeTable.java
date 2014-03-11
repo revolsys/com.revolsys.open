@@ -1,5 +1,7 @@
 package com.revolsys.gis.data.model.codes;
 
+import java.beans.PropertyChangeSupport;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,14 +11,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 
-public abstract class AbstractCodeTable implements CodeTable, Cloneable {
+public abstract class AbstractCodeTable implements Closeable,
+  PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
+
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
 
   private Map<Object, List<Object>> idValueCache = new LinkedHashMap<Object, List<Object>>();
 
@@ -77,6 +85,16 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  @PreDestroy
+  public void close() {
+    propertyChangeSupport = null;
+    idValueCache.clear();
+    stringIdMap.clear();
+    valueIdCache.clear();
+    swingEditor = null;
   }
 
   @Override
@@ -191,6 +209,11 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
       }
     }
     return normalizedValues;
+  }
+
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
   }
 
   @Override
