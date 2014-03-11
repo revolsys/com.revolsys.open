@@ -11,7 +11,9 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -59,11 +61,20 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void coordinate(final CoordinatesList coordinates, final int i) {
-    final double x = coordinates.getX(i);
+    double x = coordinates.getX(i);
+    double y = coordinates.getY(i);
+
+    if (cogo && i > 0) {
+      final double currentX = x;
+      final double previousX = coordinates.getX(i - 1);
+      final double previousY = coordinates.getY(i - 1);
+      x = MathUtil.distance(previousX, previousY, currentX, y);
+      y = MathUtil.angleNorthDegrees(previousX, previousY, currentX, y);
+    }
+
     out.print('[');
     out.value(x);
 
-    final double y = coordinates.getY(i);
     out.print(',');
     out.value(y);
 
@@ -76,7 +87,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void coordinates(final CoordinatesList coordinates) {
-    out.startList();
+    out.startList(false);
     out.indent();
     coordinate(coordinates, 0);
     for (int i = 1; i < coordinates.size(); i++) {
@@ -98,7 +109,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   public void coordinates(final Polygon polygon) {
-    out.startList();
+    out.startList(false);
     out.indent();
 
     final LineString exteriorRing = polygon.getExteriorRing();
@@ -106,6 +117,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       final LineString interiorRing = polygon.getInteriorRingN(i);
       out.endAttribute();
+      out.indent();
       coordinates(interiorRing);
     }
 
@@ -137,8 +149,29 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     } else if (geometry instanceof MultiPolygon) {
       final MultiPolygon multiPolygon = (MultiPolygon)geometry;
       multiPolygon(multiPolygon);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+      geometryCollection(geometryCollection);
     }
     out.endObject();
+  }
+
+  private void geometryCollection(final GeometryCollection geometryCollection) {
+    type(GEOMETRY_COLLECTION);
+
+    out.endAttribute();
+    out.label(GEOMETRIES);
+    out.startList();
+    final int numGeometries = geometryCollection.getNumGeometries();
+    if (numGeometries > 0) {
+      geometry(geometryCollection.getGeometryN(0));
+      for (int i = 1; i < numGeometries; i++) {
+        final Geometry geometry = geometryCollection.getGeometryN(i);
+        out.endAttribute();
+        geometry(geometry);
+      }
+    }
+    out.endList();
   }
 
   public boolean isCogo() {
@@ -146,14 +179,22 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void line(final LineString line) {
-    type(LINE_STRING);
+    if (cogo) {
+      type(COGO_LINE_STRING);
+    } else {
+      type(LINE_STRING);
+    }
     out.endAttribute();
     out.label(COORDINATES);
     coordinates(line);
   }
 
   private void multiLineString(final MultiLineString multiLineString) {
-    type(MULTI_LINE_STRING);
+    if (cogo) {
+      type(COGO_LINE_STRING);
+    } else {
+      type(MULTI_LINE_STRING);
+    }
 
     out.endAttribute();
     out.label(COORDINATES);
@@ -165,6 +206,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       for (int i = 1; i < numGeometries; i++) {
         final LineString lineString = (LineString)multiLineString.getGeometryN(i);
         out.endAttribute();
+        out.indent();
         coordinates(lineString);
       }
     }
@@ -184,6 +226,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       for (int i = 1; i < numGeometries; i++) {
         final Point point = (Point)multiPoint.getGeometryN(i);
         out.endAttribute();
+        out.indent();
         coordinates(point);
       }
     }
@@ -191,7 +234,11 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void multiPolygon(final MultiPolygon multiPolygon) {
-    type(MULTI_POLYGON);
+    if (cogo) {
+      type(COGO_MULTI_POLYGON);
+    } else {
+      type(MULTI_POLYGON);
+    }
 
     out.endAttribute();
     out.label(COORDINATES);
@@ -203,6 +250,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       for (int i = 1; i < numGeometries; i++) {
         final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
         out.endAttribute();
+        out.indent();
         coordinates(polygon);
       }
     }
@@ -217,7 +265,11 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void polygon(final Polygon polygon) {
-    type(POLYGON);
+    if (cogo) {
+      type(COGO_POLYGON);
+    } else {
+      type(POLYGON);
+    }
 
     out.endAttribute();
     out.label(COORDINATES);

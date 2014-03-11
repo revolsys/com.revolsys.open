@@ -39,6 +39,14 @@ public interface GeoJsonConstants {
 
   String MULTI_LINE_STRING = "MultiLineString";
 
+  String COGO_MULTI_LINE_STRING = "CogoMultiLineString";
+
+  String COGO_LINE_STRING = "CogoLineString";
+
+  String COGO_MULTI_POLYGON = "CogoMultiPolygon";
+
+  String COGO_POLYGON = "CogoPolygon";
+
   String MULTI_POINT = "MultiPoint";
 
   String MULTI_POLYGON = "MultiPolygon";
@@ -59,7 +67,8 @@ public interface GeoJsonConstants {
 
   Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<String>(Arrays.asList(
     POINT, LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON,
-    GEOMETRY_COLLECTION));
+    GEOMETRY_COLLECTION, COGO_LINE_STRING, COGO_MULTI_LINE_STRING,
+    COGO_POLYGON, COGO_MULTI_POLYGON));
 
   public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
 

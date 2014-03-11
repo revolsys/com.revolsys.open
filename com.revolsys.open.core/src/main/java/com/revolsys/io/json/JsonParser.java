@@ -233,6 +233,20 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
     return (V)read(new StringReader(in));
   }
 
+  /** Skip to next attribute in any object.*/
+  public static String skipToAttribute(final JsonParser parser) {
+    while (parser.hasNext()) {
+      final EventType eventType = parser.next();
+      if (eventType == EventType.string) {
+        final String key = getString(parser);
+        if (parser.hasNext() && parser.next() == EventType.colon) {
+          return key;
+        }
+      }
+    }
+    return null;
+  }
+
   /**
    * Skip through the document until the specified object attribute name is
    * found.
@@ -257,6 +271,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
     }
   }
 
+  /** Skip to next attribute in the same object.*/
   public static String skipToNextAttribute(final JsonParser parser) {
     int objectCount = 0;
     while (parser.hasNext()) {

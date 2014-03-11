@@ -21,7 +21,7 @@ public final class JsonWriter {
 
   private PrintWriter out;
 
-  boolean startAttribute;
+  private boolean startAttribute;
 
   public JsonWriter(final Writer out) {
     this(out, true);
@@ -134,7 +134,12 @@ public final class JsonWriter {
   }
 
   public void startList() {
-    if (!startAttribute) {
+    final boolean indent = true;
+    startList(indent);
+  }
+
+  public void startList(final boolean indent) {
+    if (indent && !startAttribute) {
       indent();
     }
     out.print("[");
