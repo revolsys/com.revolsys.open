@@ -26,6 +26,7 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.transaction.Transaction;
 
 public class JdbcWriterImpl extends AbstractWriter<DataObject> implements
   JdbcWriter {
@@ -207,7 +208,9 @@ public class JdbcWriterImpl extends AbstractWriter<DataObject> implements
         dataStore = null;
         if (dataSource != null) {
           try {
-            connection.commit();
+            if (!Transaction.isHasCurrentTransaction()) {
+              connection.commit();
+            }
           } catch (final SQLException e) {
             throw new RuntimeException("Failed to commit data:", e);
           } finally {

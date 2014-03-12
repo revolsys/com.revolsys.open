@@ -15,6 +15,10 @@ public class Transaction implements AutoCloseable {
     return currentTransaction.get();
   }
 
+  public static boolean isHasCurrentTransaction() {
+    return getCurrentTransaction() != null;
+  }
+
   public static Runnable runnable(final Runnable runnable,
     final PlatformTransactionManager transactionManager,
     final Propagation propagation) {
@@ -132,6 +136,10 @@ public class Transaction implements AutoCloseable {
 
   public DefaultTransactionStatus getTransactionStatus() {
     return transactionStatus;
+  }
+
+  public boolean isRollbackOnly() {
+    return transactionStatus.isRollbackOnly();
   }
 
   protected void rollback() {
