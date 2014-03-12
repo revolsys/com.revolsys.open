@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.io.File;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -14,6 +15,11 @@ import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectReaderFactory extends
   AbstractMapReaderFactory implements DataObjectReaderFactory {
+  public static DataObjectReader dataObjectReader(final File file) {
+    final FileSystemResource resource = new FileSystemResource(file);
+    return dataObjectReader(resource);
+  }
+
   public static DataObjectReader dataObjectReader(final Resource resource) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {

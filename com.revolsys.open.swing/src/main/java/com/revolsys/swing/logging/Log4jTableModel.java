@@ -97,12 +97,13 @@ public class Log4jTableModel extends AbstractTableModel {
   }
 
   public LoggingEvent getLoggingEvent(final int rowIndex) {
-    LoggingEvent event;
-    final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
-    if (rowIndex < loggingEvents.size()) {
-      event = loggingEvents.get(rowIndex);
-    } else {
-      return null;
+    LoggingEvent event = null;
+    try {
+      final List<LoggingEvent> loggingEvents = this.appender.getLoggingEvents();
+      if (rowIndex < loggingEvents.size()) {
+        event = loggingEvents.get(rowIndex);
+      }
+    } catch (final Throwable e) {
     }
     return event;
   }

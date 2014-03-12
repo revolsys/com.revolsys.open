@@ -405,7 +405,10 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         operatorField.setVisible(true);
         searchFieldPanel.setVisible(true);
       } else {
-        final String filterText = filter.toString();
+        String filterText = filter.toString();
+        if (filterText.length() > 40) {
+          filterText = filterText.substring(0, 40) + "...";
+        }
         whereLabel.setText(filterText);
         whereLabel.setToolTipText(filterText);
         whereLabel.setVisible(true);
