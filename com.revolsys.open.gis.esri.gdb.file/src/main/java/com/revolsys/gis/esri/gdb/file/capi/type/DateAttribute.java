@@ -63,7 +63,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
     } else {
       if (value instanceof String) {
         try {
-          value = DateUtil.parse("yyyy-MM-dd", (String)value);
+          value = DateUtil.getDate("yyyy-MM-dd", (String)value);
         } catch (final Exception e) {
           throw new IllegalArgumentException(
             "Data must be in the format YYYY-MM-DD " + value);

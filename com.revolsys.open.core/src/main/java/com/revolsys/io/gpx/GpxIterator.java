@@ -168,7 +168,7 @@ public class GpxIterator implements DataObjectIterator {
     if (stringValue == null) {
       value = null;
     } else if (attributeName.equals("time")) {
-      value = DateUtil.parse("yyyy-MM-dd'T'HH:mm:ss'Z'", stringValue);
+      value = DateUtil.getDate("yyyy-MM-dd'T'HH:mm:ss'Z'", stringValue);
     } else {
       value = stringValue;
     }

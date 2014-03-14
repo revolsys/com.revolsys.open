@@ -32,7 +32,7 @@ public class DateTimeStringConverter implements StringConverter<Date> {
 
   @Override
   public Date toObject(final String string) {
-    return DateUtil.parseDate(string);
+    return DateUtil.getDate(string);
   }
 
   @Override

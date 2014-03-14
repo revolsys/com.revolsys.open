@@ -87,10 +87,10 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
         final String[] versionFields = text.split(" ");
 
         final String dateString = versionFields[2];
-        submissionDate = new Date(DateUtil.parse("yyyyMMdd", dateString)
+        submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString)
           .getTime());
         revisionKey = versionFields[3];
-        integrationDate = new Date(DateUtil.parse("yyyyMMdd", versionFields[4])
+        integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4])
           .getTime());
         specificationsRelease = versionFields[5];
       }

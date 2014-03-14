@@ -42,7 +42,7 @@ public class TimestampStringConverter implements StringConverter<Timestamp> {
   @Override
   public Timestamp toObject(final String string) {
     if (StringUtils.hasText(string)) {
-      return DateUtil.parseTimestamp(string);
+      return DateUtil.getTimestamp(string);
     } else {
       return null;
     }

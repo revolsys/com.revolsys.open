@@ -35,7 +35,7 @@ public class DateStringConverter implements StringConverter<Date> {
 
   @Override
   public Date toObject(final String string) {
-    return DateUtil.parseSqlDate(string);
+    return DateUtil.getSqlDate(string);
   }
 
   @Override

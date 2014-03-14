@@ -52,7 +52,7 @@ public class DateField extends Field {
 
       if (valid) {
         try {
-          final Date date = new Date(DateUtil.parse("yyyy-MM-dd", inputValue)
+          final Date date = new Date(DateUtil.getDate("yyyy-MM-dd", inputValue)
             .getTime());
           setValue(date);
         } catch (final Throwable e) {

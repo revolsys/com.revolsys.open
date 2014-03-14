@@ -51,46 +51,7 @@ public class DateUtil {
     }
   }
 
-  public static int getInteger(final Matcher matcher, final int groupIndex,
-    final int defaultValue) {
-    final String group = matcher.group(groupIndex);
-    if (StringUtils.hasText(group)) {
-      return Integer.parseInt(group);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  public static int getYear() {
-    final Calendar calendar = Calendar.getInstance();
-    return calendar.get(Calendar.YEAR);
-  }
-
-  public static Date parse(final DateFormat format, final String dateString) {
-    if (!StringUtils.hasText(dateString)) {
-      return null;
-    } else {
-      try {
-        return format.parse(dateString);
-      } catch (final ParseException e) {
-        if (format instanceof SimpleDateFormat) {
-          final SimpleDateFormat simpleFormat = (SimpleDateFormat)format;
-          throw new IllegalArgumentException("Invalid date '" + dateString
-            + "'. Must match pattern '" + simpleFormat.toPattern() + "'.", e);
-        } else {
-          throw new IllegalArgumentException("Invalid date  '" + dateString
-            + "'.", e);
-        }
-      }
-    }
-  }
-
-  public static Date parse(final String pattern, final String dateString) {
-    final DateFormat format = new SimpleDateFormat(pattern);
-    return parse(format, dateString);
-  }
-
-  public static Calendar parseCalendar(final String dateString) {
+  public static Calendar getCalendar(final String dateString) {
     if (StringUtils.hasText(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -119,7 +80,30 @@ public class DateUtil {
     }
   }
 
-  public static Date parseDate(final String dateString) {
+  public static Date getDate() {
+    return new Date(System.currentTimeMillis());
+  }
+
+  public static Date getDate(final DateFormat format, final String dateString) {
+    if (!StringUtils.hasText(dateString)) {
+      return null;
+    } else {
+      try {
+        return format.parse(dateString);
+      } catch (final ParseException e) {
+        if (format instanceof SimpleDateFormat) {
+          final SimpleDateFormat simpleFormat = (SimpleDateFormat)format;
+          throw new IllegalArgumentException("Invalid date '" + dateString
+            + "'. Must match pattern '" + simpleFormat.toPattern() + "'.", e);
+        } else {
+          throw new IllegalArgumentException("Invalid date  '" + dateString
+            + "'.", e);
+        }
+      }
+    }
+  }
+
+  public static Date getDate(final String dateString) {
     if (StringUtils.hasText(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -149,7 +133,26 @@ public class DateUtil {
     }
   }
 
-  public static java.sql.Date parseSqlDate(final String dateString) {
+  public static Date getDate(final String pattern, final String dateString) {
+    final DateFormat format = new SimpleDateFormat(pattern);
+    return getDate(format, dateString);
+  }
+
+  public static int getInteger(final Matcher matcher, final int groupIndex,
+    final int defaultValue) {
+    final String group = matcher.group(groupIndex);
+    if (StringUtils.hasText(group)) {
+      return Integer.parseInt(group);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  public static java.sql.Date getSqlDate() {
+    return new java.sql.Date(System.currentTimeMillis());
+  }
+
+  public static java.sql.Date getSqlDate(final String dateString) {
     if (StringUtils.hasText(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -176,9 +179,9 @@ public class DateUtil {
     }
   }
 
-  public static java.sql.Date parseSqlDate(final String pattern,
+  public static java.sql.Date getSqlDate(final String pattern,
     final String dateString) {
-    final Date date = parse(pattern, dateString);
+    final Date date = getDate(pattern, dateString);
     if (date == null) {
       return null;
     } else {
@@ -187,7 +190,11 @@ public class DateUtil {
     }
   }
 
-  public static Timestamp parseTimestamp(final String dateString) {
+  public static Timestamp getTimestamp() {
+    return new Timestamp(System.currentTimeMillis());
+  }
+
+  public static Timestamp getTimestamp(final String dateString) {
     if (StringUtils.hasText(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -219,15 +226,20 @@ public class DateUtil {
     }
   }
 
-  public static Timestamp parseTimestamp(final String pattern,
+  public static Timestamp getTimestamp(final String pattern,
     final String dateString) {
 
-    final Date date = parse(pattern, dateString);
+    final Date date = getDate(pattern, dateString);
     if (date == null) {
       return null;
     } else {
       final long time = date.getTime();
       return new Timestamp(time);
     }
+  }
+
+  public static int getYear() {
+    final Calendar calendar = Calendar.getInstance();
+    return calendar.get(Calendar.YEAR);
   }
 }

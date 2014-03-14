@@ -44,7 +44,7 @@ public class TimestampField extends Field {
 
       if (valid) {
         try {
-          final Date date = DateUtil.parseDate(inputValue);
+          final Date date = DateUtil.getDate(inputValue);
           setValue(date);
         } catch (final Throwable e) {
           addValidationError("Invalid Timestamp");

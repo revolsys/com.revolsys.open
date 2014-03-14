@@ -190,7 +190,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      return new java.sql.Date(DateUtil.parse("yyyyMMdd", dateString).getTime());
+      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
     }
   }
 

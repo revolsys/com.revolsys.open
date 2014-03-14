@@ -16,8 +16,8 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Or;
+import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.Reader;
@@ -84,9 +84,11 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     final HttpServletRequest request, final String pageName,
     final Map<String, Object> parameters) {
     final DataObjectMetaData metaData = getMetaData();
-    final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
-    final Query query = Query.and(metaData, filter);
-
+    Query query = (Query)parameters.get("query");
+    if (query == null) {
+      final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
+      query = Query.and(metaData, filter);
+    }
     final String fromClause = (String)parameters.get("fromClause");
     query.setFromClause(fromClause);
 
