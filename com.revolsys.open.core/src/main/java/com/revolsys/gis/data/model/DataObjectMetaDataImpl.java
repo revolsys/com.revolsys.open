@@ -714,7 +714,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public void setDefaultValues(final Map<String, ? extends Object> defaultValues) {
-    this.defaultValues = new HashMap<String, Object>(defaultValues);
+    if (defaultValues == null) {
+      this.defaultValues = new HashMap<>();
+    } else {
+      this.defaultValues = new HashMap<>(defaultValues);
+    }
   }
 
   public void setDescription(final String description) {
