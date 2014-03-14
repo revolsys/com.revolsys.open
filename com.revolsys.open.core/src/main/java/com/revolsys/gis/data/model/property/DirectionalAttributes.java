@@ -846,8 +846,12 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   protected Geometry getReverseLine(final Map<String, Object> object) {
     final String geometryAttributeName = getMetaData().getGeometryAttributeName();
     final LineString line = (LineString)object.get(geometryAttributeName);
-    final LineString reverseLine = LineStringUtil.reverse(line);
-    return reverseLine;
+    if (line == null) {
+      return null;
+    } else {
+      final LineString reverseLine = LineStringUtil.reverse(line);
+      return reverseLine;
+    }
   }
 
   public Map<String, String> getSideAttributeNamePairs() {

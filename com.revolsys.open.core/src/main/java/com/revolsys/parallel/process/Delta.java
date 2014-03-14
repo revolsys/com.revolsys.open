@@ -55,9 +55,13 @@ public final class Delta<T> extends AbstractInProcess<T> {
   @Override
   protected void destroy() {
     super.destroy();
-    if (out != null) {
-      for (final ChannelOutput<T> out : this.out) {
-        out.writeDisconnect();
+    disconnectOut();
+  }
+
+  private void disconnectOut() {
+    for (final ChannelOutput<T> channel : this.out) {
+      if (channel != null) {
+        channel.writeDisconnect();
       }
     }
   }
@@ -97,7 +101,14 @@ public final class Delta<T> extends AbstractInProcess<T> {
   }
 
   public void setOut(final List<ChannelOutput<T>> out) {
-    this.out = out;
+    disconnectOut();
+    this.out = new ArrayList<>();
+    for (final ChannelOutput<T> channel : out) {
+      if (channel != null) {
+        channel.writeConnect();
+        this.out.add(channel);
+      }
+    }
   }
 
 }

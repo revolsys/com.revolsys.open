@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -138,8 +137,12 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static List<TreeNode> getFileNodes(final TreeNode parent,
     final File file) {
-    final File[] files = file.listFiles();
-    return getFileNodes(parent, files);
+    if (file.isDirectory()) {
+      final File[] files = file.listFiles();
+      return getFileNodes(parent, files);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   public static List<TreeNode> getFileNodes(final TreeNode parent,
@@ -245,12 +248,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   protected List<TreeNode> doLoadChildren() {
-    final File file = getUserData();
-    if (file.isDirectory()) {
-      return getFileNodes(this, file);
-    } else {
-      return Collections.emptyList();
-    }
+    final File file = getFile();
+    return getFileNodes(this, file);
   }
 
   @Override
@@ -339,78 +338,6 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return true;
     } else {
       return false;
-    }
-  }
-
-  @Override
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public void refresh() {
-    final File file = getFile();
-    if (file.exists()) {
-      if (file.isDirectory()) {
-        final List<FileTreeNode> oldNodes = (List)getChildren();
-        final ListIterator<FileTreeNode> oldIterator = oldNodes.listIterator();
-
-        final List<FileTreeNode> newNodes = (List)getFileNodes(this, file);
-        final ListIterator<FileTreeNode> newIterator = newNodes.listIterator();
-        int i = 0;
-
-        while (oldIterator.hasNext() && newIterator.hasNext()) {
-          FileTreeNode oldNode = oldIterator.next();
-          File oldFile = oldNode.getFile();
-
-          FileTreeNode newNode = newIterator.next();
-          File newFile = newNode.getFile();
-          while (oldFile != null && oldFile.compareTo(newFile) < 0) {
-            oldIterator.remove();
-            nodeRemoved(i, oldNode);
-            if (oldIterator.hasNext()) {
-              oldNode = oldIterator.next();
-              oldFile = oldNode.getFile();
-            } else {
-              oldFile = null;
-            }
-          }
-          if (oldFile != null) {
-            while (newFile != null && newFile.compareTo(oldFile) < 0) {
-              oldIterator.previous();
-              oldIterator.add(newNode);
-              oldIterator.next();
-              nodesInserted(i);
-              i++;
-              if (newIterator.hasNext()) {
-                newNode = newIterator.next();
-                newFile = newNode.getFile();
-              } else {
-                newFile = null;
-              }
-            }
-            if (newFile != null) {
-              i++;
-            }
-          }
-        }
-        while (oldIterator.hasNext()) {
-          oldIterator.next();
-          oldIterator.remove();
-
-        }
-
-        while (newIterator.hasNext()) {
-          final FileTreeNode newNode = newIterator.next();
-          oldIterator.add(newNode);
-          nodesInserted(i);
-          i++;
-        }
-      }
-    } else {
-      final TreeNode parent = getParent();
-      if (parent instanceof LazyLoadTreeNode) {
-        final LazyLoadTreeNode parentNode = (LazyLoadTreeNode)parent;
-        parentNode.removeNode(this);
-      }
     }
   }
 }

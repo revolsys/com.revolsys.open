@@ -35,6 +35,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -64,6 +65,12 @@ public final class DataObjectUtil {
     newObject.setGeometryValue(geometry);
     JtsGeometryUtil.copyUserData(oldGeometry, geometry);
     return newObject;
+  }
+
+  public static DataObjectMetaData createGeometryMetaData() {
+    final Attribute geometryAttribute = new Attribute("geometry",
+      DataTypes.GEOMETRY, true);
+    return new DataObjectMetaDataImpl("Feature", geometryAttribute);
   }
 
   public static <D extends DataObject> List<D> filter(
@@ -273,6 +280,8 @@ public final class DataObjectUtil {
       value = value2;
     } else if (!StringUtils.hasText(value2)) {
       value = value1;
+    } else if (EqualsRegistry.equal(value1, value2)) {
+      value = value1;
     } else {
       value = value1 + separator + value2;
     }
@@ -295,12 +304,6 @@ public final class DataObjectUtil {
   }
 
   private DataObjectUtil() {
-  }
-
-  public static DataObjectMetaData createGeometryMetaData() {
-    Attribute geometryAttribute = new Attribute("geometry", DataTypes.GEOMETRY, true);
-    return new DataObjectMetaDataImpl(
-      "Feature", geometryAttribute);
   }
 
 }

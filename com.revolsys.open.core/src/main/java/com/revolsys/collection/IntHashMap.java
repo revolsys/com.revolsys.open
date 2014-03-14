@@ -771,36 +771,9 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     return new ValueIterator();
   }
 
-  /**
-   * Associates the specified value with the specified key in this map. If the
-   * map previously contained a mapping for this key, the old value is replaced.
-   * 
-   * @param key key with which the specified value is to be associated.
-   * @param value value to be associated with the specified key.
-   * @return previous value associated with specified key, or <tt>null</tt> if
-   *         there was no mapping for key. A <tt>null</tt> return can also
-   *         indicate that the HashMap previously associated <tt>null</tt> with
-   *         the specified key.
-   */
-  public T put(final int key, final T value) {
-    final int i = indexFor(key, table.length);
-
-    for (Entry<T> e = table[i]; e != null; e = e.next) {
-      if (key == e.key) {
-        final T oldValue = e.value;
-        e.value = value;
-        return oldValue;
-      }
-    }
-
-    modCount++;
-    addEntry(key, value, i);
-    return null;
-  }
-
   @Override
   public T put(final Integer key, final T value) {
-    return put(key.intValue(), value);
+    return putInt(key.intValue(), value);
   }
 
   /**
@@ -901,6 +874,33 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     }
 
     createEntry(key, value, i);
+  }
+
+  /**
+   * Associates the specified value with the specified key in this map. If the
+   * map previously contained a mapping for this key, the old value is replaced.
+   * 
+   * @param key key with which the specified value is to be associated.
+   * @param value value to be associated with the specified key.
+   * @return previous value associated with specified key, or <tt>null</tt> if
+   *         there was no mapping for key. A <tt>null</tt> return can also
+   *         indicate that the HashMap previously associated <tt>null</tt> with
+   *         the specified key.
+   */
+  public T putInt(final int key, final T value) {
+    final int i = indexFor(key, table.length);
+
+    for (Entry<T> e = table[i]; e != null; e = e.next) {
+      if (key == e.key) {
+        final T oldValue = e.value;
+        e.value = value;
+        return oldValue;
+      }
+    }
+
+    modCount++;
+    addEntry(key, value, i);
+    return null;
   }
 
   /**

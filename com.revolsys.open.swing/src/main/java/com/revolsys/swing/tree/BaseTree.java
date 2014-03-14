@@ -137,7 +137,7 @@ public class BaseTree extends JTree implements MouseListener,
 
   private void popup(final MouseEvent e) {
     if (this.menuEnabled) {
-      final int x = e.getX();
+      final int x = e.getX() + 5;
       final int y = e.getY();
       final TreePath path = getPathForLocation(x, y);
       if (path != null) {

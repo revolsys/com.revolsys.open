@@ -288,7 +288,13 @@ public class SwingUtil {
     } else {
       final boolean required = attribute.isRequired();
       final int length = attribute.getLength();
-      final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
+      CodeTable codeTable;
+      if (metaData.getIdAttributeNames().contains(fieldName)) {
+        codeTable = null;
+      } else {
+        codeTable = metaData.getCodeTableByColumn(fieldName);
+      }
+
       final DataType type = attribute.getType();
       int columns = length;
       if (columns == 0) {

@@ -1,8 +1,7 @@
 package com.revolsys.gis.model.data.equals;
 
+import java.math.BigDecimal;
 import java.util.Collection;
-
-import com.revolsys.converter.string.StringConverterRegistry;
 
 public class NumberEquals implements Equals<Object> {
   public static boolean equal(final double number1, final double number2) {
@@ -11,7 +10,11 @@ public class NumberEquals implements Equals<Object> {
     } else if (Double.isInfinite(number1)) {
       return Double.isInfinite(number2);
     } else {
-      return Double.compare(number1, number2) == 0;
+      if (Double.compare(number1, number2) == 0) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -24,11 +27,14 @@ public class NumberEquals implements Equals<Object> {
       } else if (object2 == null) {
         return false;
       } else {
-        final Double number1 = StringConverterRegistry.toObject(Double.class,
-          object1);
-        final Double number2 = StringConverterRegistry.toObject(Double.class,
-          object2);
-        return equal(number1, number2);
+        final Double number1 = new BigDecimal(object1.toString()).doubleValue();
+        final Double number2 = new BigDecimal(object2.toString()).doubleValue();
+        final boolean equal = equal(number1, number2);
+        if (equal) {
+          return true;
+        } else {
+          return false;
+        }
       }
     } catch (final Throwable e) {
       return false;

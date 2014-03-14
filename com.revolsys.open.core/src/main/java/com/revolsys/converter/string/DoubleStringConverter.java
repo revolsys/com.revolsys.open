@@ -21,8 +21,8 @@ public class DoubleStringConverter extends
   @Override
   public Double toObject(final Object value) {
     if (value instanceof Double) {
-      final Double integer = (Double)value;
-      return integer;
+      final Double number = (Double)value;
+      return number;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       return number.doubleValue();

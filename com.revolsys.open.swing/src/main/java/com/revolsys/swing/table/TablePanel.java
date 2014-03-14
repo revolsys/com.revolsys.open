@@ -89,7 +89,7 @@ public class TablePanel extends JPanel implements MouseListener {
       final int y = e.getY();
       final JPopupMenu popupMenu = this.menu.createJPopupMenu();
       final Component component = e.getComponent();
-      popupMenu.show(component, x, y);
+      popupMenu.show(component, x + 5, y);
     }
   }
 

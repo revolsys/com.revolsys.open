@@ -103,7 +103,32 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
   }
 
   public void refresh() {
-    loadChildren();
+    final List<TreeNode> oldNodes = getChildren();
+
+    final List<TreeNode> newNodes = doLoadChildren();
+    for (int i = 0; i < oldNodes.size();) {
+      final TreeNode oldNode = oldNodes.get(i);
+      if (newNodes.contains(oldNode)) {
+        i++;
+      } else {
+        oldNodes.remove(i);
+        nodeRemoved(i, oldNode);
+      }
+    }
+    for (int i = 0; i < newNodes.size();) {
+      final TreeNode oldNode;
+      if (i < oldNodes.size()) {
+        oldNode = oldNodes.get(i);
+      } else {
+        oldNode = null;
+      }
+      final TreeNode newNode = newNodes.get(i);
+      if (!newNode.equals(oldNode)) {
+        oldNodes.add(i, newNode);
+        nodesInserted(i);
+      }
+      i++;
+    }
   }
 
   public void removeNode(final int index) {

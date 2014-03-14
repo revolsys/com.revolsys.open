@@ -34,7 +34,9 @@ public class StatisticsDataObjectIterableProcess extends
 
   @Override
   protected void write(final Channel<DataObject> out, final DataObject record) {
-    statistics.add(record);
-    out.write(record);
+    if (record != null) {
+      statistics.add(record);
+      out.write(record);
+    }
   }
 }

@@ -14,6 +14,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianOutput;
@@ -118,11 +119,12 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getDataStore().isNull(row, name)) {
+    CapiFileGdbDataObjectStore dataStore = getDataStore();
+    if (dataStore.isNull(row, name)) {
       return null;
     } else {
       final byte[] buffer;
-      synchronized (getDataStore()) {
+      synchronized (dataStore) {
         buffer = row.getGeometry();
       }
       final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);

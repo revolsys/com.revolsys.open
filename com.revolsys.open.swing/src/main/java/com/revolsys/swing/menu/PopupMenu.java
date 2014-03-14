@@ -142,7 +142,7 @@ public class PopupMenu implements MouseListener {
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
-      show(component, x, y);
+      show(component, x + 5, y);
     }
   }
 

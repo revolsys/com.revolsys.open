@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -126,10 +128,6 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     return notEqualAttributeNames;
   }
 
-  protected boolean valueEquals(final Object value1, final Object value2) {
-    return EqualsInstance.INSTANCE.equals(value1, value2);
-  }
-
   /**
    * @return the in
    */
@@ -197,7 +195,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     return channel.read();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   @Override
   protected void run(final Channel<DataObject> in) {
     running = true;
@@ -255,8 +255,20 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
               guard[index] = false;
               guard[oppositeIndex] = true;
             } else {
-              final Comparable<Object> sourceComparator = sourceObject.getValue(attributeName);
-              final Object otherValue = otherObject.getValue(attributeName);
+              final Object sourceValue = sourceObject.getValue(attributeName);
+              final Comparable<Object> sourceComparator;
+              if (sourceValue instanceof Number) {
+                final Number number = (Number)sourceValue;
+                final Double doubleValue = number.doubleValue();
+                sourceComparator = (Comparable)doubleValue;
+              } else {
+                sourceComparator = (Comparable<Object>)sourceValue;
+              }
+              Object otherValue = otherObject.getValue(attributeName);
+              if (otherValue instanceof Number) {
+                final Number number = (Number)otherValue;
+                otherValue = number.doubleValue();
+              }
               // TODO duplicates
               final int compare = sourceComparator.compareTo(otherValue);
               if (compare == 0) {
@@ -327,5 +339,29 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
   public void setSourceName(final String sourceName) {
     this.sourceName = sourceName;
+  }
+
+  protected boolean valueEquals(final Object value1, final Object value2) {
+    if (value1 == null) {
+      if (value2 == null) {
+        return true;
+      } else if (value2 instanceof String) {
+        final String string2 = (String)value2;
+        return !StringUtils.hasText(string2);
+      }
+    } else if (value2 == null) {
+      if (value1 instanceof String) {
+        final String string1 = (String)value1;
+        return !StringUtils.hasText(string1);
+      } else {
+        return false;
+      }
+    } else if (value1 instanceof String && value2 instanceof String) {
+      if (!StringUtils.hasText((String)value1)
+        && !StringUtils.hasText((String)value2)) {
+        return true;
+      }
+    }
+    return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 }

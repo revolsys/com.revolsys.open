@@ -111,6 +111,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     Writer<DataObject> writer = writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(metaData);
+      directory.mkdirs();
       final File file = new File(directory, getFileName(metaData) + nameSuffix
         + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,

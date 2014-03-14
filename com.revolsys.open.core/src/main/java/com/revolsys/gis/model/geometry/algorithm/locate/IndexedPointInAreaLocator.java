@@ -22,10 +22,11 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
       final int size = points.size();
       if (size > 1) {
         for (int i = 1; i < size; i++) {
-          final LineSegment seg = new LineSegment(points.get(i - 1),
-            points.get(i));
-          final double y1 = seg.getY(0);
-          final double y2 = seg.getY(1);
+          final double x1 = points.getX(i - 1);
+          final double x2 = points.getX(i);
+          final double y1 = points.getY(i - 1);
+          final double y2 = points.getY(i);
+          final LineSegment seg = new LineSegment(x1, y1, x2, y2);
           final double min = Math.min(y1, y2);
           final double max = Math.max(y1, y2);
           index.insert(min, max, seg);

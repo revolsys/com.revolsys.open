@@ -29,9 +29,8 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.file.FileTreeNode;
-import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
-public class FileDataObjectStoreTreeNode extends LazyLoadTreeNode implements
+public class FileDataObjectStoreTreeNode extends FileTreeNode implements
   DataObjectStoreProxy, DataObjectStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory();
 

@@ -6,6 +6,7 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 import com.revolsys.util.DateUtil;
@@ -34,10 +35,11 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getDataStore().isNull(row, name)) {
+    CapiFileGdbDataObjectStore dataStore = getDataStore();
+    if (dataStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (getDataStore()) {
+      synchronized (dataStore) {
         long time;
         synchronized (LOCK) {
           time = row.getDate(name) * 1000;
