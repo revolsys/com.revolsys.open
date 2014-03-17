@@ -86,11 +86,15 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
 
   @Override
   public int getSize() {
-    int size = this.codeTable.getCodes().size();
-    if (this.allowNull) {
-      size++;
+    if (codeTable == null) {
+      return 0;
+    } else {
+      int size = this.codeTable.getCodes().size();
+      if (this.allowNull) {
+        size++;
+      }
+      return size;
     }
-    return size;
   }
 
   @Override

@@ -172,47 +172,50 @@ public class SwingUtil {
 
   public static ComboBox createComboBox(final String fieldName,
     final CodeTable codeTable, final boolean required, final int maxLength) {
-
-    final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName,
-      codeTable, !required);
-    if (comboBox.getModel().getSize() > 0) {
-      comboBox.setSelectedIndex(0);
-    }
-    int longestLength = -1;
-    for (final Entry<Object, List<Object>> codes : codeTable.getCodes()
-      .entrySet()) {
-      final List<Object> values = codes.getValue();
-      if (values != null && !values.isEmpty()) {
-        final String text = CollectionUtil.toString(values);
-        final int length = text.length();
-        if (length > longestLength) {
-          longestLength = length;
+    if (codeTable == null) {
+      return null;
+    } else {
+      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName,
+        codeTable, !required);
+      if (comboBox.getModel().getSize() > 0) {
+        comboBox.setSelectedIndex(0);
+      }
+      int longestLength = -1;
+      for (final Entry<Object, List<Object>> codes : codeTable.getCodes()
+        .entrySet()) {
+        final List<Object> values = codes.getValue();
+        if (values != null && !values.isEmpty()) {
+          final String text = CollectionUtil.toString(values);
+          final int length = text.length();
+          if (length > longestLength) {
+            longestLength = length;
+          }
         }
       }
-    }
-    if (longestLength == -1) {
-      longestLength = 10;
-    }
-    if (maxLength > 0 && longestLength > maxLength) {
-      longestLength = maxLength;
-    }
-    final StringBuffer value = new StringBuffer();
-    for (int i = 0; i < longestLength; i++) {
-      value.append("W");
-    }
-    comboBox.setPrototypeDisplayValue(value.toString());
+      if (longestLength == -1) {
+        longestLength = 10;
+      }
+      if (maxLength > 0 && longestLength > maxLength) {
+        longestLength = maxLength;
+      }
+      final StringBuffer value = new StringBuffer();
+      for (int i = 0; i < longestLength; i++) {
+        value.append("W");
+      }
+      comboBox.setPrototypeDisplayValue(value.toString());
 
-    final ComboBoxEditor editor = comboBox.getEditor();
-    final Component editorComponent = editor.getEditorComponent();
-    if (editorComponent instanceof JTextComponent) {
-      final JTextField textComponent = (JTextField)editorComponent;
-      textComponent.setColumns((int)(longestLength * 0.8));
-      final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
-      menu.addToComponent(comboBox);
-    } else {
-      PopupMenu.getPopupMenuFactory(comboBox);
+      final ComboBoxEditor editor = comboBox.getEditor();
+      final Component editorComponent = editor.getEditorComponent();
+      if (editorComponent instanceof JTextComponent) {
+        final JTextField textComponent = (JTextField)editorComponent;
+        textComponent.setColumns((int)(longestLength * 0.8));
+        final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
+        menu.addToComponent(comboBox);
+      } else {
+        PopupMenu.getPopupMenuFactory(comboBox);
+      }
+      return comboBox;
     }
-    return comboBox;
   }
 
   public static DataFlavor createDataFlavor(final String mimeType) {
