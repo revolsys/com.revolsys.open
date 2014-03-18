@@ -169,7 +169,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void mouseMoved(final MouseEvent event) {
     if (event.getButton() == 0) {
       if (SwingUtil.isControlOrMetaDown(event)) {
-        setMapCursor(CURSOR_SELECT_BOX);
+        setSelectCursor(event);
         event.consume();
       }
     }
