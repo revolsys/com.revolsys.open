@@ -146,12 +146,29 @@ public class AbstractOverlay extends JComponent implements
     setMapCursor(Cursor.getDefaultCursor());
   }
 
+  protected void clearMapCursor(final Cursor cursor) {
+    if (getMapCursor() == cursor) {
+      clearMapCursor();
+    }
+  }
+
   public void clearMouseOverGeometry() {
-    clearMapCursor();
+    if (!hasOverlayAction()) {
+      clearMapCursor();
+    }
     this.mouseOverLocations = Collections.emptyList();
     this.snapPointLocationMap = Collections.emptyMap();
     this.snapPoint = null;
     this.snapEventPoint = null;
+  }
+
+  public boolean clearOverlayAction(final String overlayAction) {
+    if (this.map == null) {
+      return false;
+    } else {
+      return this.map.clearOverlayAction(overlayAction);
+    }
+
   }
 
   protected void clearUndoHistory() {
@@ -342,6 +359,14 @@ public class AbstractOverlay extends JComponent implements
     return this.map;
   }
 
+  protected Cursor getMapCursor() {
+    if (this.map == null) {
+      return null;
+    } else {
+      return this.map.getCursor();
+    }
+  }
+
   private double getMaxDistance(final BoundingBox boundingBox) {
     return Math.max(boundingBox.getWidth() / 2, boundingBox.getHeight()) / 2;
   }
@@ -404,6 +429,14 @@ public class AbstractOverlay extends JComponent implements
     return this.xorGeometry;
   }
 
+  public boolean hasOverlayAction() {
+    if (this.map == null) {
+      return false;
+    } else {
+      return this.map.hasOverlayAction();
+    }
+  }
+
   protected boolean hasSnapPoint(final MouseEvent event,
     final BoundingBox boundingBox) {
 
@@ -443,6 +476,14 @@ public class AbstractOverlay extends JComponent implements
     snapPointIndex = 0;
     return setSnapLocations(snapLocations);
 
+  }
+
+  public boolean isOverlayAction(final String overlayAction) {
+    if (this.map == null) {
+      return false;
+    } else {
+      return this.map.getOverlayAction() == overlayAction;
+    }
   }
 
   @Override
@@ -516,7 +557,9 @@ public class AbstractOverlay extends JComponent implements
     final List<CloseLocation> mouseOverLocations) {
     this.mouseOverLocations = mouseOverLocations;
     if (this.mouseOverLocations.isEmpty()) {
-      clearMapCursor();
+      if (!hasOverlayAction()) {
+        clearMapCursor();
+      }
       return false;
     } else {
       this.snapPoint = null;
@@ -525,12 +568,22 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
+  public boolean setOverlayAction(final String overlayAction) {
+    if (this.map == null) {
+      return false;
+    } else {
+      return this.map.setOverlayAction(overlayAction);
+    }
+  }
+
   protected boolean setSnapLocations(
     final Map<Point, Set<CloseLocation>> snapLocations) {
     this.snapPointLocationMap = snapLocations;
     if (this.snapPointLocationMap.isEmpty()) {
       this.snapPoint = null;
-      clearMapCursor();
+      if (!hasOverlayAction()) {
+        clearMapCursor();
+      }
       return false;
     } else {
       this.snapPoint = CollectionUtil.get(snapLocations.keySet(),

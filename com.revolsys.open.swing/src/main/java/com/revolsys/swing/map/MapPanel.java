@@ -16,16 +16,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -62,6 +66,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.vividsolutions.jts.geom.Geometry;
@@ -100,6 +105,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
   }
+
+  private String overlayAction;
 
   private List<Long> scales = new ArrayList<Long>();
 
@@ -152,6 +159,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private boolean settingScale;
 
   private ComboBox baseMapLayerField;
+
+  private JLabel overlayActionLabel;
 
   public MapPanel() {
     this(new Project());
@@ -276,6 +285,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     addPointerLocation(false);
     addPointerLocation(true);
+
+    overlayActionLabel = new JLabel();
+    overlayActionLabel.setBorder(BorderFactory.createCompoundBorder(
+      BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+      BorderFactory.createEmptyBorder(1, 3, 1, 3)));
+    overlayActionLabel.setMinimumSize(new Dimension(20, 30));
+    overlayActionLabel.setVisible(false);
+    overlayActionLabel.setForeground(WebColors.Green);
+    this.leftStatusBar.add(overlayActionLabel);
+
     this.progressBar = new SwingWorkerProgressBar();
     this.rightStatusBar.add(progressBar);
   }
@@ -353,6 +372,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     this.toolBar.addComponent("zoom", new SelectMapScale(this));
     this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
+  }
+
+  public boolean clearOverlayAction(final String overlayAction) {
+    if (this.overlayAction == overlayAction) {
+      this.overlayAction = null;
+      overlayActionLabel.setText("");
+      overlayActionLabel.setVisible(false);
+      return true;
+    }
+    return false;
   }
 
   public void clearToolTipText() {
@@ -483,6 +512,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return this.mouseOverlay;
   }
 
+  public String getOverlayAction() {
+    return overlayAction;
+  }
+
   public SwingWorkerProgressBar getProgressBar() {
     return progressBar;
   }
@@ -545,6 +578,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
     return scales.get(0);
+  }
+
+  public boolean hasOverlayAction() {
+    return overlayAction != null;
   }
 
   public boolean isZoomNextEnabled() {
@@ -682,6 +719,20 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (component != null) {
       component.setEnabled(enabled);
     }
+  }
+
+  public boolean setOverlayAction(final String overlayAction) {
+    if (this.overlayAction == null) {
+      this.overlayAction = overlayAction;
+      if (overlayAction == null) {
+        overlayActionLabel.setText("");
+        overlayActionLabel.setVisible(false);
+      } else {
+        overlayActionLabel.setText(CaseConverter.toCapitalizedWords(overlayAction));
+        overlayActionLabel.setVisible(true);
+      }
+    }
+    return this.overlayAction == overlayAction;
   }
 
   public synchronized void setScale(double scale) {

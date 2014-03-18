@@ -44,7 +44,7 @@ public class PathBreadcrumbView extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     String path = this.path.substring(contextPath.length());
-    final String pathPrefix = HttpServletUtils.getRequestAttribute(PathAliasController.PATH_PREFIX);
+    final String pathPrefix = HttpServletUtils.getAttribute(PathAliasController.PATH_PREFIX);
     String crumbPath = contextPath;
     if (pathPrefix != null && path.startsWith(pathPrefix)) {
       path = path.substring(pathPrefix.length());

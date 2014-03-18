@@ -62,8 +62,7 @@ public class HtmlUiBuilderObjectForm extends Form {
   }
 
   @Override
-  public Object getInitialValue(
-    final Field field,
+  public Object getInitialValue(final Field field,
     final HttpServletRequest request) {
     if (object != null) {
       final String propertyName = field.getName();
@@ -92,8 +91,7 @@ public class HtmlUiBuilderObjectForm extends Form {
         }
         if (field != null) {
           if (!getElements().contains(field)) {
-            final Decorator label = builder.getFieldLabel(key,
-              (field instanceof Field));
+            final Decorator label = builder.getFieldLabel(key, field);
 
             add(field, label);
           }

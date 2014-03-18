@@ -9,6 +9,7 @@ import javax.measure.unit.Unit;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -350,13 +351,15 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public BoundingBox(final GeometryFactory geometryFactory,
     final Coordinates point) {
-    this(geometryFactory, point.getX(), point.getY());
+    this(geometryFactory, CoordinatesUtil.getX(point),
+      CoordinatesUtil.getY(point));
   }
 
   public BoundingBox(final GeometryFactory geometryFactory,
     final Coordinates point1, final Coordinates point2) {
-    this(geometryFactory, point1.getX(), point1.getY(), point2.getX(),
-      point2.getY());
+    this(geometryFactory, CoordinatesUtil.getX(point1),
+      CoordinatesUtil.getY(point1), CoordinatesUtil.getX(point2),
+      CoordinatesUtil.getY(point2));
   }
 
   /**
@@ -894,6 +897,20 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
+  @Override
+  public void init(final double x1, final double x2, final double y1,
+    final double y2) {
+    if (MathUtil.isNanOrInfinite(x1, y1)) {
+      if (!MathUtil.isNanOrInfinite(x2, y2)) {
+        super.init(x2, x2, y2, y2);
+      }
+    } else if (MathUtil.isNanOrInfinite(x2, y2)) {
+      super.init(x1, x1, y1, y1);
+    } else {
+      super.init(x1, x2, y1, y2);
+    }
+  }
+
   public BoundingBox intersection(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty()
@@ -1017,80 +1034,100 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (isEmpty()) {
       return geometryFactory.createPolygon();
     } else {
-      double minStep;
-      if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
-        minStep = 1;
-      } else {
-        minStep = 0.00001;
-      }
+      try {
+        double minStep;
+        if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
+          minStep = 1;
+        } else {
+          minStep = 0.00001;
+        }
 
-      double xStep = getWidth() / numX;
-      if (xStep < minStep) {
-        xStep = minStep;
-      }
-      numX = (int)Math.ceil(getWidth() / xStep);
+        double xStep;
+        final double width = getWidth();
+        if (numX <= 1) {
+          numX = 1;
+          xStep = width;
+        } else {
+          xStep = width / numX;
+          if (xStep < minStep) {
+            xStep = minStep;
+          }
+          numX = Math.max(1, (int)Math.ceil(width / xStep));
+        }
 
-      double yStep = getHeight() / numY;
-      if (yStep < minStep) {
-        yStep = minStep;
-      }
-      numY = (int)Math.ceil(getHeight() / yStep);
+        double yStep;
+        if (numY <= 1) {
+          numY = 1;
+          yStep = getHeight();
+        } else {
+          yStep = getHeight() / numY;
+          if (yStep < minStep) {
+            yStep = minStep;
+          }
+          numY = Math.max(1, (int)Math.ceil(getHeight() / yStep));
+        }
 
-      final double minX = getMinX();
-      final double maxX = getMaxX();
-      final double minY = getMinY();
-      final double maxY = getMaxY();
-      final int numCoordinates = 5 + 2 * (numX + numY);
-      CoordinatesList coordinates = new DoubleCoordinatesList(numCoordinates, 2);
-      int i = 0;
+        final double minX = getMinX();
+        final double maxX = getMaxX();
+        final double minY = getMinY();
+        final double maxY = getMaxY();
+        final int numCoordinates = 1 + 2 * (numX + numY);
+        CoordinatesList coordinates = new DoubleCoordinatesList(numCoordinates,
+          2);
+        int i = 0;
 
-      coordinates.setX(i, maxX);
-      coordinates.setY(i, minY);
-      i++;
-      for (int j = 0; j < numX; j++) {
-        coordinates.setX(i, maxX - j * xStep);
+        coordinates.setX(i, maxX);
         coordinates.setY(i, minY);
         i++;
-      }
-      coordinates.setX(i, minX);
-      coordinates.setY(i, minY);
-      i++;
-
-      for (int j = 0; j < numY; j++) {
+        for (int j = 0; j < numX - 1; j++) {
+          coordinates.setX(i, maxX - j * xStep);
+          coordinates.setY(i, minY);
+          i++;
+        }
         coordinates.setX(i, minX);
-        coordinates.setY(i, minY + j * yStep);
+        coordinates.setY(i, minY);
         i++;
-      }
-      coordinates.setX(i, minX);
-      coordinates.setY(i, maxY);
-      i++;
 
-      for (int j = 0; j < numX; j++) {
-        coordinates.setX(i, minX + j * xStep);
+        for (int j = 0; j < numY - 1; j++) {
+          coordinates.setX(i, minX);
+          coordinates.setY(i, minY + j * yStep);
+          i++;
+        }
+        coordinates.setX(i, minX);
         coordinates.setY(i, maxY);
         i++;
-      }
 
-      coordinates.setX(i, maxX);
-      coordinates.setY(i, maxY);
-      i++;
+        for (int j = 0; j < numX - 1; j++) {
+          coordinates.setX(i, minX + j * xStep);
+          coordinates.setY(i, maxY);
+          i++;
+        }
 
-      for (int j = 0; j < numY; j++) {
         coordinates.setX(i, maxX);
-        coordinates.setY(i, minY + (numY - j) * yStep);
+        coordinates.setY(i, maxY);
         i++;
-      }
-      coordinates.setX(i, maxX);
-      coordinates.setY(i, minY);
 
-      if (geometryFactory != this.geometryFactory) {
-        coordinates = CoordinatesListProjectionUtil.perform(coordinates,
-          this.geometryFactory.getCoordinateSystem(),
-          geometryFactory.getCoordinateSystem());
-      }
+        for (int j = 0; j < numY - 1; j++) {
+          coordinates.setX(i, maxX);
+          coordinates.setY(i, minY + (numY - j) * yStep);
+          i++;
+        }
+        coordinates.setX(i, maxX);
+        coordinates.setY(i, minY);
 
-      final Polygon polygon = geometryFactory.createPolygon(coordinates);
-      return polygon;
+        if (geometryFactory != this.geometryFactory) {
+          coordinates = CoordinatesListProjectionUtil.perform(coordinates,
+            this.geometryFactory.getCoordinateSystem(),
+            geometryFactory.getCoordinateSystem());
+        }
+
+        final Polygon polygon = geometryFactory.createPolygon(coordinates);
+        return polygon;
+      } catch (final IllegalArgumentException e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to convert to polygon: " + this, e);
+        return geometryFactory.createPolygon();
+      }
     }
   }
 

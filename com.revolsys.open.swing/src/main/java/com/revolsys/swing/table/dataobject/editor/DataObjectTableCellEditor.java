@@ -150,22 +150,22 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   }
 
   @Override
-  public void keyPressed(final KeyEvent e) {
-    final int keyCode = e.getKeyCode();
+  public void keyPressed(final KeyEvent event) {
+    final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ENTER) {
-      if (e.isShiftDown()) {
+      if (SwingUtil.isShiftDown(event)) {
         table.editCell(rowIndex - 1, columnIndex);
       } else {
         table.editCell(rowIndex + 1, columnIndex);
       }
-      e.consume();
+      event.consume();
     } else if (keyCode == KeyEvent.VK_TAB) {
-      if (e.isShiftDown()) {
+      if (SwingUtil.isShiftDown(event)) {
         table.editCell(rowIndex, columnIndex - 1);
       } else {
         table.editCell(rowIndex, columnIndex + 1);
       }
-      e.consume();
+      event.consume();
     }
   }
 

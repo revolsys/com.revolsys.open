@@ -66,7 +66,7 @@ public class PathAliasController implements Controller {
   }
 
   public static String getAlias() {
-    return (String)HttpServletUtils.getRequestAttribute(PATH_PREFIX);
+    return (String)HttpServletUtils.getAttribute(PATH_PREFIX);
   }
 
   public static String getOriginalPrefix() {

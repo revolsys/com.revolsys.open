@@ -60,6 +60,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private boolean createMissingCodes = true;
 
+  private boolean loading = false;
+
   public CodeTableProperty() {
   }
 
@@ -221,77 +223,95 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-    final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
-    final Query query = new Query(typePath);
-    query.setAttributeNames(metaData.getAttributeNames());
-    for (final String order : orderBy) {
-      query.addOrderBy(order, true);
-    }
-    try (
-      Reader<DataObject> reader = dataStore.query(query)) {
-      final List<DataObject> codes = reader.read();
-      dataStore.getStatistics()
-        .getStatistics("query")
-        .add(typePath, -codes.size());
-      Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
-      addValues(codes);
+    if (!loading) {
+      loading = true;
+      try {
+        final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+        final Query query = new Query(typePath);
+        query.setAttributeNames(metaData.getAttributeNames());
+        for (final String order : orderBy) {
+          query.addOrderBy(order, true);
+        }
+        try (
+          Reader<DataObject> reader = dataStore.query(query)) {
+          final List<DataObject> codes = reader.read();
+          dataStore.getStatistics()
+            .getStatistics("query")
+            .add(typePath, -codes.size());
+          Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
+          addValues(codes);
+        }
+      } finally {
+        loading = false;
+      }
     }
   }
 
   @Override
   protected synchronized Object loadId(final List<Object> values,
     final boolean createId) {
-    Object id = null;
-    if (createId && loadAll) {
-      loadAll();
-      id = getId(values, false);
-    } else {
-      final Query query = new Query(typePath);
-      final And and = new And();
-      if (!values.isEmpty()) {
-        int i = 0;
-        for (final String attributeName : valueAttributeNames) {
-          final Object value = values.get(i);
-          if (value == null) {
-            and.add(Q.isNull(attributeName));
-          } else {
-            final Attribute attribute = metaData.getAttribute(attributeName);
-            and.add(Q.equal(attribute, value));
+    try {
+      Object id = null;
+      if (createId && loadAll) {
+        loadAll();
+        id = getId(values, false);
+      } else {
+        final Query query = new Query(typePath);
+        final And and = new And();
+        if (!values.isEmpty()) {
+          int i = 0;
+          for (final String attributeName : valueAttributeNames) {
+            final Object value = values.get(i);
+            if (value == null) {
+              and.add(Q.isNull(attributeName));
+            } else {
+              final Attribute attribute = metaData.getAttribute(attributeName);
+              and.add(Q.equal(attribute, value));
+            }
+            i++;
           }
-          i++;
+        }
+        query.setWhereCondition(and);
+        final Reader<DataObject> reader = dataStore.query(query);
+        try {
+          final List<DataObject> codes = reader.read();
+          dataStore.getStatistics()
+            .getStatistics("query")
+            .add(typePath, -codes.size());
+          addValues(codes);
+          id = getIdByValue(values);
+        } finally {
+          reader.close();
         }
       }
-      query.setWhereCondition(and);
-      final Reader<DataObject> reader = dataStore.query(query);
-      try {
-        final List<DataObject> codes = reader.read();
-        dataStore.getStatistics()
-          .getStatistics("query")
-          .add(typePath, -codes.size());
-        addValues(codes);
-        id = getIdByValue(values);
-      } finally {
-        reader.close();
+      if (createId && id == null) {
+        return createId(values);
+      } else {
+        return id;
       }
-    }
-    if (createId && id == null) {
-      return createId(values);
-    } else {
-      return id;
+    } finally {
+      loading = false;
     }
   }
 
   @Override
   protected List<Object> loadValues(final Object id) {
     List<Object> values = null;
-    if (loadAll) {
-      loadAll();
-      values = getValueById(id);
-    } else {
-      final DataObject code = dataStore.load(typePath, id);
-      if (code != null) {
-        addValue(code);
-        values = getValueById(id);
+    if (!loading) {
+      loading = true;
+      try {
+        if (loadAll) {
+          loadAll();
+          values = getValueById(id);
+        } else {
+          final DataObject code = dataStore.load(typePath, id);
+          if (code != null) {
+            addValue(code);
+            values = getValueById(id);
+          }
+        }
+      } finally {
+        loading = false;
       }
     }
     return values;

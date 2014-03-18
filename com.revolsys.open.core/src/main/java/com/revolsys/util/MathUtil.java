@@ -498,6 +498,17 @@ public final class MathUtil {
     return dotprod > 0;
   }
 
+  public static boolean isNanOrInfinite(final double... values) {
+    for (final double value : values) {
+      if (Double.isNaN(value)) {
+        return true;
+      } else if (Double.isInfinite(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static double makePrecise(final double value, final double scale) {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;

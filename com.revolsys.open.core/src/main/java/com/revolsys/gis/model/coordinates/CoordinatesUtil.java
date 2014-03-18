@@ -180,6 +180,22 @@ public class CoordinatesUtil {
     return z;
   }
 
+  public static double getX(final Coordinates point) {
+    if (point == null) {
+      return Double.NaN;
+    } else {
+      return point.getX();
+    }
+  }
+
+  public static double getY(final Coordinates point) {
+    if (point == null) {
+      return Double.NaN;
+    } else {
+      return point.getY();
+    }
+  }
+
   public static boolean isAcute(final Coordinates point1,
     final Coordinates point2, final Coordinates point3) {
     final double x1 = point1.getX();

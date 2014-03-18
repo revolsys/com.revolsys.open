@@ -38,18 +38,18 @@ public class CheckBox01Field extends Field {
     final String inputValue = request.getParameter(getName());
     if (inputValue != null) {
       selected = inputValue.equals(selectedValue);
-      if (selected ) {
+      if (selected) {
         setValue(1);
       } else {
         setValue(0);
       }
     } else if (request.getMethod() == "GET" || !getForm().isMainFormTask()) {
       setValue(getInitialValue(request));
-      Object value = getValue();
+      final Object value = getValue();
       if (getValue() != null) {
         if (value instanceof Number) {
-          Integer number = ((Number)value).intValue();
-          if (number.compareTo(Integer.parseInt(value.toString())) == 0) {
+          final Integer number = ((Number)value).intValue();
+          if (number.intValue() == 1) {
             selected = true;
           } else {
             selected = false;
@@ -58,7 +58,7 @@ public class CheckBox01Field extends Field {
 
           selected = (Boolean)value;
         } else {
-          String string = value.toString();
+          final String string = value.toString();
           if (string.equals("1")) {
             selected = true;
           } else if (string.equals("Y")) {

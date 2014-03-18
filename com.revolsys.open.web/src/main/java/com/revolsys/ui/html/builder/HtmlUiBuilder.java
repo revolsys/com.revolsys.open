@@ -51,6 +51,7 @@ import com.revolsys.ui.html.decorator.CollapsibleBox;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
 import com.revolsys.ui.html.decorator.TableHeadingDecorator;
+import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.fields.LongField;
 import com.revolsys.ui.html.fields.TextField;
 import com.revolsys.ui.html.form.Form;
@@ -774,17 +775,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
       form.initialize(request);
 
-      final String viewName = getName(prefix, "view");
       if (form.isPosted() && form.isMainFormTask()) {
         if (form.isValid() && preUpdate(form, object)) {
           updateObject(object);
           postUpdate(object);
 
           final Map<String, Object> parameters = new HashMap<String, Object>();
+          // Get after object has changed
           final Object id = Property.get(object, getIdPropertyName());
           parameters.put(getIdParameterName(), id);
 
-          final String url = getPageUrl(viewName, parameters);
+          final Page viewPage = getPage(prefix, "view");
+          final String url = viewPage.getFullUrl(parameters);
           redirectAfterCommit(url);
           return new Element();
         } else {
@@ -794,8 +796,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         setRollbackOnly(object);
       }
 
-      final Page page = getPage(pageName);
-
+      final Page page = getPage(prefix, "edit");
       final String title = page.getExpandedTitle();
       request.setAttribute("title", title);
 
@@ -1022,13 +1023,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return fieldInstructions;
   }
 
-  public Decorator getFieldLabel(final String key, final boolean field) {
+  public Decorator getFieldLabel(final String key, final Element element) {
     final Map<String, Decorator> fieldLabels = getFieldLabels();
     Decorator fieldLabel = fieldLabels.get(key);
     if (fieldLabel == null) {
-      final String label = getLabel(key);
+      final String label = getLabel(key, element);
       final String instructions = getFieldInstruction(key);
-      if (field) {
+      if (element instanceof Field) {
         fieldLabel = new FieldLabelDecorator(label, instructions);
       } else {
         fieldLabel = new ElementLabel(label, instructions);
@@ -1046,8 +1047,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return fields;
   }
 
-  public Decorator getFieldTableLabel(final String key) {
-    final String label = getLabel(key);
+  public Decorator getFieldTableLabel(final String key, final Element element) {
+    final String label = getLabel(key, element);
     final String instructions = getFieldInstruction(key);
     final TableHeadingDecorator decorator = new TableHeadingDecorator(label,
       instructions);
@@ -1170,6 +1171,22 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return label;
   }
 
+  public String getLabel(final String key, final Element element) {
+    String label = getLabels().get(key);
+    if (label == null) {
+      if (element instanceof Field) {
+        final Field field = (Field)element;
+        label = field.getLabel();
+      }
+      if (label == null) {
+        return getLabel(key);
+      } else {
+        getLabels().put(key, label);
+      }
+    }
+    return label;
+  }
+
   public Map<String, String> getLabels() {
     return labels;
   }
@@ -1256,10 +1273,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return linkPage;
   }
 
-  public Page getPage(final String prefix, final String name) {
+  protected Page getPage(final String prefix, final String name) {
     final String pageName = getName(prefix, name);
-    final Page page = getPage(pageName);
-    return page;
+    Page viewPage = getPage(pageName);
+    if (viewPage == null) {
+      viewPage = getPage(name);
+    }
+    return viewPage;
   }
 
   public Map<String, Page> getPagesByName() {

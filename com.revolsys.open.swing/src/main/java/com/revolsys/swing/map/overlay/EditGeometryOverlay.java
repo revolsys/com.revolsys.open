@@ -1,12 +1,10 @@
 package com.revolsys.swing.map.overlay;
 
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -149,6 +147,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   private java.awt.Point moveGeometryStart;
 
   private int vertexDragModifiers;
+
+  private static final String ACTION_MOVE_GEOMETRY = "moveGeometry";
+
+  private List<CloseLocation> moveGeometryLocations;
+
+  private int moveGeometryButton;
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -345,18 +349,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   protected void clearMouseOverLocations() {
     setXorGeometry(null);
     clearMouseOverGeometry();
+    getMap().clearToolTipText();
     repaint();
-  }
-
-  protected boolean clearMoveGeometry() {
-    if (this.moveGeometryStart == null) {
-      return false;
-    } else {
-      clearMouseOverGeometry();
-      this.moveGeometryStart = null;
-      repaint();
-      return true;
-    }
   }
 
   protected LineString createXorLine(final GeometryFactory geometryFactory,
@@ -593,10 +587,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    final int keyCode = e.getKeyCode();
-    if (keyCode == KeyEvent.VK_ALT) {
-      mouseMoved(e);
-    }
   }
 
   @Override
@@ -622,7 +612,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       }
     } else if (keyCode == KeyEvent.VK_ESCAPE) {
       clearMouseOverLocations();
-      clearMoveGeometry();
+      modeMoveGeometryClear();
       if (this.addCompleteAction != null) {
         this.addCompleteAction.addComplete(this, null);
       }
@@ -630,7 +620,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
     } else if (keyCode == KeyEvent.VK_F2 || keyCode == KeyEvent.VK_F) {
       clearMouseOverLocations();
-      clearMoveGeometry();
+      modeMoveGeometryClear();
       if (this.addCompleteAction != null) {
         this.addCompleteAction.addComplete(this, addGeometry);
       }
@@ -638,10 +628,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     } else if (keyCode == KeyEvent.VK_CONTROL) {
       if (!isModeAddGeometry()) {
         clearMouseOverLocations();
-      }
-    } else if (keyCode == KeyEvent.VK_ALT) {
-      if (this.moveGeometryStart != null) {
-        mouseMoved(e);
       }
     } else if (splitLineKeyPress(e)) {
     }
@@ -713,7 +699,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       Point point = getPoint(event);
       // TODO make work with multi-part
       final Point fromPoint = JtsGeometryUtil.getFromPoint(this.addGeometry);
-      final boolean snapToFirst = !event.isControlDown()
+      final boolean snapToFirst = !SwingUtil.isControlDown(event)
         && boundingBox.contains(fromPoint);
       if (snapToFirst
         || !updateAddMouseOverGeometry(event.getPoint(), boundingBox)) {
@@ -763,6 +749,66 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
+  protected void modeMoveGeometryClear() {
+    clearOverlayAction(ACTION_MOVE_GEOMETRY);
+    clearMapCursor(CURSOR_MOVE);
+    this.moveGeometryStart = null;
+    this.moveGeometryLocations = null;
+    clearMouseOverGeometry();
+  }
+
+  protected boolean modeMoveGeometryDrag(final MouseEvent event) {
+    if (event.getButton() == moveGeometryButton) {
+      if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+        repaint();
+        event.consume();
+      }
+    }
+    return false;
+  }
+
+  protected boolean modeMoveGeometryFinish(final MouseEvent event) {
+    if (event.getButton() == moveGeometryButton) {
+      if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
+        for (final CloseLocation location : moveGeometryLocations) {
+          final GeometryFactory geometryFactory = location.getGeometryFactory();
+          final Point startPoint = geometryFactory.copy(getViewportPoint(this.moveGeometryStart));
+          final Point endPoint = geometryFactory.copy(getViewportPoint(event));
+
+          final double deltaX = endPoint.getX() - startPoint.getX();
+          final double deltaY = endPoint.getY() - startPoint.getY();
+          if (deltaX != 0 || deltaY != 0) {
+            final Geometry newGeometry = GeometryEditUtil.moveGeometry(
+              location.getGeometry(), deltaX, deltaY);
+            final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+            addUndo(geometryEdit);
+          }
+        }
+        modeMoveGeometryClear();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected boolean modeMoveGeometryStart(final MouseEvent event) {
+    if (SwingUtil.isLeftButtonAndAltDown(event)) {
+      moveGeometryButton = event.getButton();
+      final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
+      if (!mouseOverLocations.isEmpty()) {
+        if (setOverlayAction(ACTION_MOVE_GEOMETRY)) {
+          setMapCursor(CURSOR_MOVE);
+          this.moveGeometryStart = event.getPoint();
+          this.moveGeometryLocations = mouseOverLocations;
+          clearMouseOverLocations();
+          event.consume();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public void mouseClicked(final MouseEvent event) {
     if (modeAddMouseClick(event)) {
@@ -797,19 +843,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (!SwingUtilities.isMiddleMouseButton(event)) {
-      if (this.moveGeometryStart != null) {
-        repaint();
-        return;
-      } else if (event.isShiftDown() || event.isControlDown()
-        || event.isMetaDown()) {
+    if (modeMoveGeometryDrag(event)) {
+    } else if (!SwingUtilities.isMiddleMouseButton(event)) {
+      if (SwingUtil.isShiftDown(event) || SwingUtil.isControlOrMetaDown(event)) {
         return;
       } else if (SwingUtilities.isLeftMouseButton(event)) {
         this.dragged = true;
-        if (event.isAltDown() && !getMouseOverLocations().isEmpty()) {
-          this.moveGeometryStart = event.getPoint();
-          return;
-        }
       }
 
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
@@ -834,40 +873,18 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  protected void mouseMoved(final KeyEvent e) {
-    int modifiers;
-    if (e.getID() == KeyEvent.KEY_PRESSED) {
-      modifiers = InputEvent.ALT_MASK;
-    } else {
-      modifiers = 0;
-    }
-
-    final java.awt.Point mousePosition = getMap().getMapMousePosition();
-    if (mousePosition != null) {
-      final MouseEvent event = new MouseEvent((Component)e.getSource(),
-        MouseEvent.MOUSE_MOVED, e.getWhen(), modifiers, mousePosition.x,
-        mousePosition.y, 0, false);
-      mouseMoved(event);
-    }
-  }
-
   @Override
   public void mouseMoved(final MouseEvent event) {
     if (!SwingUtilities.isMiddleMouseButton(event)) {
       final java.awt.Point point = event.getPoint();
       if (modeAddMouseMoved(event)) {
-      } else if (!(event.isMetaDown() || event.isShiftDown() || event.isControlDown())) {
+      } else if (!(SwingUtil.isControlOrMetaDown(event) || SwingUtil.isShiftDown(event))) {
         final Graphics2D graphics = getGraphics();
         final BoundingBox boundingBox = getHotspotBoundingBox(event);
         if (updateMouseOverGeometry(point, graphics, boundingBox)) {
 
-        } else {
+        } else if (!hasOverlayAction()) {
           clearMapCursor();
-        }
-      }
-      if (event.isAltDown()) {
-        if (!getMouseOverLocations().isEmpty()) {
-          setMapCursor(CURSOR_MOVE);
         }
       }
     }
@@ -875,26 +892,29 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   @Override
   public void mousePressed(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
-      this.dragged = false;
-    }
-    if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
-      if (!getMouseOverLocations().isEmpty()) {
-        this.vertexDragModifiers = event.getModifiers();
-      }
-      if (!getMouseOverLocations().isEmpty()) {
+    if (modeMoveGeometryStart(event)) {
 
-        repaint();
-        event.consume();
-        return;
+    } else {
+      if (SwingUtilities.isLeftMouseButton(event)) {
+        this.dragged = false;
+      }
+      if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
+        if (!getMouseOverLocations().isEmpty()) {
+          this.vertexDragModifiers = event.getModifiers();
+        }
+        if (!getMouseOverLocations().isEmpty()) {
+
+          repaint();
+          event.consume();
+          return;
+        }
       }
     }
   }
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (this.moveGeometryStart != null) {
-      moveGeometryFinish(event);
+    if (modeMoveGeometryFinish(event)) {
     } else if (this.dragged && !getMouseOverLocations().isEmpty()) {
       vertexDragFinish(event);
       return;
@@ -904,28 +924,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  protected void moveGeometryFinish(final MouseEvent event) {
-    for (final CloseLocation location : getMouseOverLocations()) {
-      final GeometryFactory geometryFactory = location.getGeometryFactory();
-      final Point startPoint = geometryFactory.copy(getViewportPoint(this.moveGeometryStart));
-      final Point endPoint = geometryFactory.copy(getViewportPoint(event));
-
-      final double deltaX = endPoint.getX() - startPoint.getX();
-      final double deltaY = endPoint.getY() - startPoint.getY();
-      final Geometry newGeometry = GeometryEditUtil.moveGeometry(
-        location.getGeometry(), deltaX, deltaY);
-      final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-      addUndo(geometryEdit);
-      clearMoveGeometry();
-    }
-  }
-
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
 
-    if (this.moveGeometryStart != null) {
+    if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final AffineTransform transform = graphics.getTransform();
       try {
         final java.awt.Point mousePoint = getMap().getMapMousePosition();
@@ -933,8 +937,11 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final int deltaX = mousePoint.x - this.moveGeometryStart.x;
           final int deltaY = mousePoint.y - this.moveGeometryStart.y;
           graphics.translate(deltaX, deltaY);
-          SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
-            viewportGeometryFactory, graphics, this.addGeometry);
+          for (final CloseLocation location : moveGeometryLocations) {
+            final Geometry geometry = location.getGeometry();
+            SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
+              viewportGeometryFactory, graphics, geometry);
+          }
         }
       } finally {
         graphics.setTransform(transform);

@@ -121,7 +121,7 @@ public final class HttpServletUtils {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getRequestAttribute(final String name) {
+  public static <T> T getAttribute(final String name) {
     final HttpServletRequest request = getRequest();
     if (request == null) {
       return null;

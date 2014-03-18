@@ -532,6 +532,25 @@ public class SwingUtil {
     }
   }
 
+  public static boolean isAltDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.ALT_DOWN_MASK;
+    return flag != 0;
+  }
+
+  public static boolean isControlDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.CTRL_DOWN_MASK;
+    return flag != 0;
+  }
+
+  public static boolean isControlOrMetaDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx
+      & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+    return flag != 0;
+  }
+
   public static boolean isEventDispatchThread() {
     try {
       return SwingUtilities.isEventDispatchThread();
@@ -540,10 +559,54 @@ public class SwingUtil {
     }
   }
 
+  /**
+   * Check to see if the event is for the left mouse button and the Alt key is pressed.
+   * Also allows the right mouse button with the control key down. This is so it can
+   * work via Citrix Receiver.
+   * 
+   * @param event
+   * @return
+   */
+  public static boolean isLeftButtonAndAltDown(final MouseEvent event) {
+    if (event.getButton() == MouseEvent.BUTTON1) {
+      return isAltDown(event);
+    } else if (event.getButton() == MouseEvent.BUTTON3) {
+      return isControlDown(event);
+    } else {
+      return false;
+    }
+  }
+
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
       && InputEvent.BUTTON1_MASK == modifiers;
+  }
+
+  public static boolean isMetaDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.META_DOWN_MASK;
+    return flag != 0;
+  }
+
+  public static boolean isMiddleDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.BUTTON2_DOWN_MASK;
+    return flag != 0;
+  }
+
+  public static boolean isModifierKeyDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx
+      & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK
+        | InputEvent.ALT_GRAPH_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+    return flag != 0;
+  }
+
+  public static boolean isRightDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.BUTTON3_DOWN_MASK;
+    return flag != 0;
   }
 
   public static boolean isScrollReversed() {
@@ -595,6 +658,12 @@ public class SwingUtil {
       return true;
     }
     return false;
+  }
+
+  public static boolean isShiftDown(final InputEvent event) {
+    final int modifiersEx = event.getModifiersEx();
+    final int flag = modifiersEx & InputEvent.SHIFT_DOWN_MASK;
+    return flag != 0;
   }
 
   public static void saveFileChooserDirectory(final Class<?> preferencesClass,

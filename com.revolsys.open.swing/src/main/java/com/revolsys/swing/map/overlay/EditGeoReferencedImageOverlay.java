@@ -156,7 +156,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private boolean addTiePointStart(final MouseEvent event) {
     if (this.layer != null) {
       if (addTiePointFinish(event)) {
-      } else if (SwingUtilities.isLeftMouseButton(event) && event.isAltDown()) {
+      } else if (SwingUtil.isLeftButtonAndAltDown(event)) {
         final Point mousePoint = getViewportPoint(event);
         if (getImageBoundingBox().contains(mousePoint)) {
           this.addTiePointFirstPoint = mousePoint;
@@ -351,13 +351,13 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void keyPressed(final KeyEvent e) {
+  public void keyPressed(final KeyEvent event) {
     if (this.layer != null) {
       if (this.moveCornerPoint != null) {
-        if (e.isShiftDown()) {
+        if (SwingUtil.isShiftDown(event)) {
           adjustBoundingBoxAspectRatio();
           repaint();
-          e.consume();
+          event.consume();
         }
       }
     }
@@ -441,7 +441,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       } else if (moveTiePointMove(event)) {
       } else if (moveCornerMove(event)) {
       } else if (moveImageMove(event)) {
-      } else {
+      } else if (!hasOverlayAction()) {
         clearMapCursor();
       }
     }
@@ -452,7 +452,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     if (this.layer != null) {
       if (isApplicable(event)) {
         if (moveTiePointStart(event)) {
-        } else if (SwingUtilities.isLeftMouseButton(event) && event.isAltDown()) {
+        } else if (SwingUtil.isLeftButtonAndAltDown(event)) {
           event.consume();
         } else if (moveCornerStart(event)) {
         } else if (moveImageStart(event)) {
@@ -483,7 +483,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       moveImageBoundingBox = new BoundingBox(geometryFactory, mousePoint,
         this.moveCornerOppositePoint);
 
-      if (event.isShiftDown()) {
+      if (SwingUtil.isShiftDown(event)) {
         adjustBoundingBoxAspectRatio();
       }
       setMapCursor(moveCornerCursor);
@@ -634,7 +634,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private boolean moveImageStart(final MouseEvent event) {
     if (this.layer != null) {
       if (SwingUtilities.isLeftMouseButton(event)
-        && (event.isControlDown() || event.isMetaDown())) {
+        && SwingUtil.isControlOrMetaDown(event)) {
         final Point mousePoint = getViewportPoint(event);
         if (getImageBoundingBox().contains(mousePoint)) {
           setMapCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -713,7 +713,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       if (!tiePoints.isEmpty()) {
         if (!closeSourcePixelIndexes.isEmpty()
           && !closeTargetPointIndexes.isEmpty()) {
-          clearMapCursor();
+          clearMapCursor(CURSOR_NODE_EDIT);
         }
         closeSourcePixelIndexes.clear();
         closeTargetPointIndexes.clear();

@@ -21,9 +21,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.CaseConverter;
 
 public abstract class Field extends Element {
   private String name = "";
@@ -39,6 +42,8 @@ public abstract class Field extends Element {
   private Object initialValue;
 
   private String defaultInstructions;
+
+  private String label;
 
   public Field() {
   }
@@ -78,6 +83,14 @@ public abstract class Field extends Element {
       } else {
         return value;
       }
+    }
+  }
+
+  public String getLabel() {
+    if (StringUtils.hasText(label)) {
+      return label;
+    } else {
+      return CaseConverter.toCapitalizedWords(name);
     }
   }
 
@@ -134,6 +147,10 @@ public abstract class Field extends Element {
    */
   public void setInitialValue(final Object initialValue) {
     this.initialValue = initialValue;
+  }
+
+  public void setLabel(final String label) {
+    this.label = label;
   }
 
   public void setName(final String name) {

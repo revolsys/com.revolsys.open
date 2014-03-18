@@ -28,6 +28,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.swing.map.layer.Project;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -517,10 +518,12 @@ public class Viewport2D implements PropertyChangeSupportProxy {
    * @param coordinateSystem The coordinate system the project is displayed in.
    */
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    final GeometryFactory oldGeometryFactory = this.geometryFactory;
-    this.geometryFactory = geometryFactory;
-    this.propertyChangeSupport.firePropertyChange("geometryFactory",
-      oldGeometryFactory, geometryFactory);
+    if (!EqualsRegistry.equal(this.geometryFactory, geometryFactory)) {
+      final GeometryFactory oldGeometryFactory = this.geometryFactory;
+      this.geometryFactory = geometryFactory;
+      this.propertyChangeSupport.firePropertyChange("geometryFactory",
+        oldGeometryFactory, geometryFactory);
+    }
   }
 
   public void setInitialized(final boolean initialized) {
@@ -612,8 +615,13 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   public Point toModelPoint(final GeometryFactory geometryFactory,
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
-    final Point point = this.geometryFactory.createPoint(coordinates);
-    return geometryFactory.copy(point);
+    if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
+      || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
+      return geometryFactory.createPoint();
+    } else {
+      final Point point = this.geometryFactory.createPoint(coordinates);
+      return geometryFactory.copy(point);
+    }
   }
 
   public Point toModelPoint(final GeometryFactory geometryFactory,

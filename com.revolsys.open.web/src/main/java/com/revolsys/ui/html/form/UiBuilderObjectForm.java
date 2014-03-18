@@ -77,10 +77,10 @@ public class UiBuilderObjectForm extends Form {
         if (field != null) {
           if (!getElements().contains(field)) {
             if (field instanceof HiddenField) {
-              HiddenField hiddenField = (HiddenField)field;
+              final HiddenField hiddenField = (HiddenField)field;
               add(hiddenField);
             } else {
-              final Decorator label = builder.getFieldTableLabel(key);
+              final Decorator label = builder.getFieldTableLabel(key, field);
               final TableRow row = new TableRow();
               row.add(field, label);
               fieldContainer.add(row);
