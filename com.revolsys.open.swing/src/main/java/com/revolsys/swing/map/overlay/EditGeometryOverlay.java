@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -153,6 +154,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   private List<CloseLocation> moveGeometryLocations;
 
   private int moveGeometryButton;
+
+  public static final SelectedRecordsRenderer MOVE_GEOMETRY_RENDERER = new SelectedRecordsRenderer(
+    WebColors.Black, WebColors.Aqua);
 
   public EditGeometryOverlay(final MapPanel map) {
     super(map);
@@ -760,8 +764,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   protected boolean modeMoveGeometryDrag(final MouseEvent event) {
     if (event.getButton() == moveGeometryButton) {
       if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
-        repaint();
         event.consume();
+        repaint();
+        return true;
       }
     }
     return false;
@@ -793,11 +798,11 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   protected boolean modeMoveGeometryStart(final MouseEvent event) {
     if (SwingUtil.isLeftButtonAndAltDown(event)) {
-      moveGeometryButton = event.getButton();
       final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
       if (!mouseOverLocations.isEmpty()) {
         if (setOverlayAction(ACTION_MOVE_GEOMETRY)) {
           setMapCursor(CURSOR_MOVE);
+          this.moveGeometryButton = event.getButton();
           this.moveGeometryStart = event.getPoint();
           this.moveGeometryLocations = mouseOverLocations;
           clearMouseOverLocations();
@@ -939,7 +944,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           graphics.translate(deltaX, deltaY);
           for (final CloseLocation location : moveGeometryLocations) {
             final Geometry geometry = location.getGeometry();
-            SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
+            MOVE_GEOMETRY_RENDERER.paintSelected(viewport,
               viewportGeometryFactory, graphics, geometry);
           }
         }

@@ -375,15 +375,29 @@ public class AbstractOverlay extends JComponent implements
     return mouseOverLocations;
   }
 
+  protected Point getMousePoint() {
+    final java.awt.Point mousePosition = getMap().getMapMousePosition();
+    final Point mousePoint = getPoint(mousePosition);
+    return mousePoint;
+  }
+
+  protected Point getPoint(final java.awt.Point eventPoint) {
+    if (eventPoint == null) {
+      return null;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point point = this.viewport.toModelPointRounded(geometryFactory,
+        eventPoint);
+      return point;
+    }
+  }
+
   protected Point getPoint(final MouseEvent event) {
     if (event == null) {
       return null;
     } else {
       final java.awt.Point eventPoint = event.getPoint();
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point point = this.viewport.toModelPointRounded(geometryFactory,
-        eventPoint);
-      return point;
+      return getPoint(eventPoint);
     }
   }
 

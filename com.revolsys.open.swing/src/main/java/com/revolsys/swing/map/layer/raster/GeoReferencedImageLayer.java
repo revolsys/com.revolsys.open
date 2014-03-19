@@ -299,6 +299,14 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     firePropertyChange("showOriginalImage", oldValue, showOriginalImage);
   }
 
+  @Override
+  public void setVisible(final boolean visible) {
+    super.setVisible(visible);
+    if (!visible) {
+      setEditable(false);
+    }
+  }
+
   public void showTiePointsTable() {
     if (SwingUtilities.isEventDispatchThread()) {
       final Object tableView = getProperty("TableView");

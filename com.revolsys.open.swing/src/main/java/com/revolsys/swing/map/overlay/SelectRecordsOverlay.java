@@ -65,6 +65,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private java.awt.Point selectBoxFirstPoint;
 
+  private Cursor selectCursor;
+
+  private int selectBoxButton;
+
+  private Cursor selectBoxCursor;
+
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
   }
@@ -95,6 +101,19 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  protected void doSelectRecords(final Cursor selectBoxCursor,
+    final BoundingBox boundingBox) {
+    String methodName;
+    if (selectBoxCursor == CURSOR_SELECT_BOX_ADD) {
+      methodName = "addSelectedRecords";
+    } else if (selectBoxCursor == CURSOR_SELECT_BOX_DELETE) {
+      methodName = "unSelectRecords";
+    } else {
+      methodName = "selectRecords";
+    }
+    Invoke.background("Select records", this, methodName, boundingBox);
+  }
+
   protected boolean isSelectable(final AbstractDataObjectLayer dataObjectLayer) {
     return dataObjectLayer.isSelectable();
   }
@@ -111,10 +130,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ESCAPE) {
-      clearOverlayAction(ACTION_SELECT_RECORDS);
-      setSelectCursor(event);
-      this.selectBox = null;
-      this.selectBoxFirstPoint = null;
+      selectBoxClear(event);
       repaint();
     } else if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_META) {
       if (!hasOverlayAction()) {
@@ -145,7 +161,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if (event.getClickCount() == 1 && isSelectEvent(event)) {
+    if (event.getClickCount() == 1 && selectCursor != null) {
       final int x = event.getX();
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
@@ -154,7 +170,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-      Invoke.background("Select records", this, "selectRecords", boundingBox);
+      doSelectRecords(selectCursor, boundingBox);
       event.consume();
     }
   }
@@ -277,6 +293,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  private void selectBoxClear(final InputEvent event) {
+    clearOverlayAction(ACTION_SELECT_RECORDS);
+    this.selectBox = null;
+    this.selectBoxCursor = null;
+    this.selectBoxFirstPoint = null;
+    setSelectCursor(event);
+  }
+
   public boolean selectBoxDrag(final MouseEvent event) {
     if (isOverlayAction(ACTION_SELECT_RECORDS)) {
       final double width = Math.abs(event.getX()
@@ -304,8 +328,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public boolean selectBoxFinish(final MouseEvent event) {
-    if (event.getButton() == MouseEvent.BUTTON1
-      && this.selectBoxFirstPoint != null) {
+    if (event.getButton() == selectBoxButton) {
       if (clearOverlayAction(ACTION_SELECT_RECORDS)) {
         // Convert first point to envelope top left in map coords.
         final int minX = (int)this.selectBox.getMinX();
@@ -322,20 +345,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           topLeft.getX(), topLeft.getY(), bottomRight.getX(),
           bottomRight.getY());
 
-        this.selectBoxFirstPoint = null;
-        this.selectBox = null;
-        clearMapCursor(CURSOR_SELECT_BOX);
         if (!boundingBox.isEmpty()) {
-          String methodName;
-          if (SwingUtil.isShiftDown(event)) {
-            methodName = "addSelectedRecords";
-          } else if (SwingUtil.isLeftButtonAndAltDown(event)) {
-            methodName = "unSelectRecords";
-          } else {
-            methodName = "selectRecords";
-          }
-          Invoke.background("Select records", this, methodName, boundingBox);
+          doSelectRecords(selectBoxCursor, boundingBox);
         }
+        selectBoxClear(event);
         repaint();
         event.consume();
         return true;
@@ -345,9 +358,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public boolean selectBoxStart(final MouseEvent event) {
-    if (isSelectEvent(event)) {
+    if (selectCursor != null) {
       if (setOverlayAction(ACTION_SELECT_RECORDS)) {
-        setMapCursor(CURSOR_SELECT_BOX);
+        this.selectBoxCursor = selectCursor;
+        this.selectBoxButton = event.getButton();
         this.selectBoxFirstPoint = event.getPoint();
         this.selectBox = new Rectangle2D.Double();
         event.consume();
@@ -386,20 +400,27 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   protected void setSelectCursor(final InputEvent event) {
+    Cursor cursor = null;
     if (SwingUtil.isControlOrMetaDown(event)
       || isOverlayAction(ACTION_SELECT_RECORDS)) {
       if (SwingUtil.isShiftDown(event)) {
-        setMapCursor(CURSOR_SELECT_BOX_ADD);
+        cursor = CURSOR_SELECT_BOX_ADD;
       } else if (SwingUtil.isAltDown(event)) {
-        setMapCursor(CURSOR_SELECT_BOX_DELETE);
+        cursor = CURSOR_SELECT_BOX_DELETE;
       } else {
-        setMapCursor(CURSOR_SELECT_BOX);
+        cursor = CURSOR_SELECT_BOX;
       }
     } else {
-      clearMapCursor(CURSOR_SELECT_BOX);
-      clearMapCursor(CURSOR_SELECT_BOX_ADD);
-      clearMapCursor(CURSOR_SELECT_BOX_DELETE);
+      cursor = null;
     }
+    if (this.selectBoxCursor == null) {
+      if (cursor == null) {
+        clearMapCursor(this.selectCursor);
+      } else {
+        setMapCursor(cursor);
+      }
+    }
+    this.selectCursor = cursor;
   }
 
   public void unSelectRecords(final BoundingBox boundingBox) {
