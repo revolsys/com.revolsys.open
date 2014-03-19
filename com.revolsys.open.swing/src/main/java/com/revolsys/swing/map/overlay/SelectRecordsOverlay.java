@@ -101,12 +101,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  protected void doSelectRecords(final Cursor selectBoxCursor,
+  protected void doSelectRecords(final InputEvent event,
     final BoundingBox boundingBox) {
     String methodName;
-    if (selectBoxCursor == CURSOR_SELECT_BOX_ADD) {
+    if (SwingUtil.isShiftDown(event)) {
       methodName = "addSelectedRecords";
-    } else if (selectBoxCursor == CURSOR_SELECT_BOX_DELETE) {
+    } else if (SwingUtil.isAltDown(event)) {
       methodName = "unSelectRecords";
     } else {
       methodName = "selectRecords";
@@ -170,7 +170,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
-      doSelectRecords(selectCursor, boundingBox);
+      doSelectRecords(event, boundingBox);
       event.consume();
     }
   }
@@ -321,6 +321,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       }
       this.selectBox.setRect(topLeft.getX(), topLeft.getY(), width, height);
       event.consume();
+      setSelectCursor(event);
       repaint();
       return true;
     }
@@ -346,7 +347,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           bottomRight.getY());
 
         if (!boundingBox.isEmpty()) {
-          doSelectRecords(selectBoxCursor, boundingBox);
+          doSelectRecords(event, boundingBox);
         }
         selectBoxClear(event);
         repaint();
@@ -413,12 +414,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     } else {
       cursor = null;
     }
-    if (this.selectBoxCursor == null) {
-      if (cursor == null) {
-        clearMapCursor(this.selectCursor);
-      } else {
-        setMapCursor(cursor);
-      }
+    if (cursor == null) {
+      clearMapCursor(this.selectCursor);
+    } else {
+      setMapCursor(cursor);
     }
     this.selectCursor = cursor;
   }

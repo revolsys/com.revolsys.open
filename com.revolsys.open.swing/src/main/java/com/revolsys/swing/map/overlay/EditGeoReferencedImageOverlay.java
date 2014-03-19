@@ -112,6 +112,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   private static final String ACTION_MOVE_IMAGE_CORNER = "moveImageCorner";
 
+  private boolean moveImageEnabled;
+
   public EditGeoReferencedImageOverlay(final MapPanel map) {
     super(map);
   }
@@ -681,25 +683,29 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       if (SwingUtil.isControlOrMetaDown(event)) {
         setMapCursor(CURSOR_MOVE_IMAGE);
         event.consume();
+        this.moveImageEnabled = true;
         return true;
       }
     }
+    this.moveImageEnabled = false;
     clearMapCursor(CURSOR_MOVE_IMAGE);
     return false;
   }
 
   private boolean moveImageStart(final MouseEvent event) {
     if (this.layer != null) {
-      if (event.getButton() == MouseEvent.BUTTON1
-        && SwingUtil.isControlOrMetaDown(event)) {
-        if (setOverlayAction(ACTION_MOVE_IMAGE)) {
-          final Point mousePoint = getViewportPoint(event);
-          final boolean inImage = isInImage(mousePoint);
-          if (inImage) {
-            setMapCursor(CURSOR_MOVE_IMAGE);
-            this.moveImageFirstPoint = mousePoint;
-            event.consume();
-            return true;
+      if (moveImageEnabled) {
+        if (event.getButton() == MouseEvent.BUTTON1
+          && SwingUtil.isControlOrMetaDown(event)) {
+          if (setOverlayAction(ACTION_MOVE_IMAGE)) {
+            final Point mousePoint = getViewportPoint(event);
+            final boolean inImage = isInImage(mousePoint);
+            if (inImage) {
+              setMapCursor(CURSOR_MOVE_IMAGE);
+              this.moveImageFirstPoint = mousePoint;
+              event.consume();
+              return true;
+            }
           }
         }
       }
