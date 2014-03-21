@@ -35,8 +35,8 @@ package com.revolsys.gis.model.geometry.algorithm;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Polygonal;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
-import com.vividsolutions.jts.geom.Location;
 
 /**
  * Counts the number of segments crossed by a horizontal ray extending to the
@@ -70,7 +70,7 @@ public class RayCrossingCounter {
    * @param ring an array of Coordinates forming a ring
    * @return the location of the point in the ring
    */
-  public static int locatePointInRing(final Coordinates coordinates,
+  public static Location locatePointInRing(final Coordinates coordinates,
     final CoordinatesList ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
 
@@ -95,8 +95,12 @@ public class RayCrossingCounter {
   private final double y;
 
   public RayCrossingCounter(final Coordinates point) {
-    this.x = point.getX();
-    this.y = point.getY();
+    this(point.getX(), point.getY());
+  }
+
+  public RayCrossingCounter(final double x, final double y) {
+    this.x = x;
+    this.y = y;
   }
 
   /**
@@ -108,31 +112,36 @@ public class RayCrossingCounter {
    */
   public void countSegment(final Coordinates p1, final Coordinates p2) {
 
-    final double p1X = p1.getX();
-    final double p1Y = p1.getY();
-    final double p2X = p2.getX();
-    final double p2Y = p2.getY();
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
 
-    if (p1X < x && p2X < x) {
+    countSegment(x1, y1, x2, y2);
+  }
+
+  public void countSegment(final double x1, final double y1, final double x2,
+    final double y2) {
+    if (x1 < x && x2 < x) {
       // check if the segment is strictly to the left of the test point
-    } else if (x == p2X && y == p2Y) {
+    } else if (x == x2 && y == y2) {
       // check if the point is equal to the current ring vertex
       isPointOnSegment = true;
-    } else if (p1Y == y && p2Y == y) {
+    } else if (y1 == y && y2 == y) {
       /**
        * For horizontal segments, check if the point is on the segment. Otherwise,
        * horizontal segments are not counted.
        */
-      double minx = p1X;
-      double maxx = p2X;
-      if (minx > maxx) {
-        minx = p2X;
-        maxx = p1X;
+      double minX = x1;
+      double maxX = x2;
+      if (minX > maxX) {
+        minX = x2;
+        maxX = x1;
       }
-      if (x >= minx && x <= maxx) {
+      if (x >= minX && x <= maxX) {
         isPointOnSegment = true;
       }
-    } else if (((p1Y > y) && (p2Y <= y)) || ((p2Y > y) && (p1Y <= y))) {
+    } else if ((y1 > y && y2 <= y) || (y2 > y && y1 <= y)) {
       /**
        * Evaluate all non-horizontal segments which cross a horizontal ray to the
        * right of the test pt. To avoid double-counting shared vertices, we use
@@ -145,10 +154,10 @@ public class RayCrossingCounter {
        * </ul>
        */
       // translate the segment so that the test point lies on the origin
-      final double x1 = p1X - x;
-      final double y1 = p1Y - y;
-      final double x2 = p2X - x;
-      final double y2 = p2Y - y;
+      final double deltaX1 = x1 - x;
+      final double deltaY1 = y1 - y;
+      final double deltaX2 = x2 - x;
+      final double deltaY2 = y2 - y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
@@ -158,11 +167,12 @@ public class RayCrossingCounter {
       // double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2
       // - y1);
       // MD - faster & more robust computation?
-      double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2);
+      double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1,
+        deltaX2, deltaY2);
       if (xIntSign == 0.0) {
         isPointOnSegment = true;
       } else {
-        if (y2 < y1) {
+        if (deltaY2 < deltaY1) {
           xIntSign = -xIntSign;
           // xsave = xInt;
         }
@@ -186,7 +196,7 @@ public class RayCrossingCounter {
    * 
    * @return the Location of the point
    */
-  public int getLocation() {
+  public Location getLocation() {
     if (isPointOnSegment) {
       return Location.BOUNDARY;
     } else if ((crossingCount % 2) == 1) {
@@ -196,6 +206,14 @@ public class RayCrossingCounter {
     } else {
       return Location.EXTERIOR;
     }
+  }
+
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
   }
 
   /**

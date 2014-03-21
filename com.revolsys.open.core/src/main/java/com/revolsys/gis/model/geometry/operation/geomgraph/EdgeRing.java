@@ -11,9 +11,9 @@ import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.util.Assert;
 
 public abstract class EdgeRing {
@@ -30,8 +30,10 @@ public abstract class EdgeRing {
 
   private final List<Coordinates> pts = new ArrayList<Coordinates>();
 
-  private final Label label = new Label(Location.NONE); // label stores the
-                                                        // locations
+  private final Label label = new Label(Location.NONE.getIndex()); // label
+                                                                   // stores the
+
+  // locations
 
   // of each geometry on the
   // face surrounded by this
@@ -236,11 +238,11 @@ public abstract class EdgeRing {
   protected void mergeLabel(final Label deLabel, final int geomIndex) {
     final int loc = deLabel.getLocation(geomIndex, Position.RIGHT);
     // no information to be had from this label
-    if (loc == Location.NONE) {
+    if (loc == Location.NONE.getIndex()) {
       return;
     }
     // if there is no current RHS value, set it
-    if (label.getLocation(geomIndex) == Location.NONE) {
+    if (label.getLocation(geomIndex) == Location.NONE.getIndex()) {
       label.setLocation(geomIndex, loc);
       return;
     }

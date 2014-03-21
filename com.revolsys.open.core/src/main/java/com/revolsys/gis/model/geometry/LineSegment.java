@@ -361,7 +361,23 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public boolean intersects(final BoundingBox boundingBox) {
-    return (boundingBox.contains(getCoordinates1()) || boundingBox.contains(getCoordinates2()));
+    final Coordinates p1 = getCoordinates1();
+    final Coordinates p2 = getCoordinates2();
+    if (boundingBox.intersects(p1)) {
+      return true;
+    } else if (boundingBox.intersects(p2)) {
+      return true;
+    } else {
+      final CoordinatesList cornerPoints = boundingBox.getCornerPoints();
+      for (int i = 0; i < 4; i++) {
+        final Coordinates bp1 = cornerPoints.get(i);
+        final Coordinates bp2 = cornerPoints.get((i + 1) % 4);
+        if (LineSegmentUtil.intersects(p1, p2, bp1, bp2)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public boolean intersects(final Coordinates point, final double maxDistance) {
@@ -465,8 +481,8 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public Coordinates project(final Coordinates p) {
     final double projectionFactor = projectionFactor(p);
-    return LineSegmentUtil.project(getCoordinates1(), getCoordinates2(),
-      projectionFactor);
+    return LineSegmentUtil.project(getGeometryFactory(), getCoordinates1(),
+      getCoordinates2(), projectionFactor);
   }
 
   public double projectionFactor(final Coordinates p) {

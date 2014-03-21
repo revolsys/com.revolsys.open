@@ -11,6 +11,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
+import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 
@@ -378,6 +380,14 @@ public class LineSegmentUtil {
       pointCoordinates);
   }
 
+  public static boolean intersects(final Coordinates line1p1,
+    final Coordinates line1p2, final Coordinates line2p1,
+    final Coordinates line2p2) {
+    final LineIntersector li = new RobustLineIntersector();
+    li.computeIntersection(line1p1, line1p2, line2p1, line2p2);
+    return li.hasIntersection();
+  }
+
   public static boolean isPointOnLine(final Coordinates lineStart,
     final Coordinates lineEnd, final Coordinates point, final double maxDistance) {
     if (lineStart.equals2d(point)) {
@@ -575,7 +585,9 @@ public class LineSegmentUtil {
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     final Coordinates point = project(lineStart, lineEnd, r);
-    precisionModel.makePrecise(point);
+    if (precisionModel != null) {
+      precisionModel.makePrecise(point);
+    }
     return point;
   }
 

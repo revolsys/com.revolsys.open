@@ -222,7 +222,7 @@ public class PointLocator {
   private int locateInPolygonRing(final Coordinates p, final LinearRing ring) {
     final BoundingBox boundingBox = ring.getBoundingBox();
     if (boundingBox.intersects(p)) {
-      return RayCrossingCounter.locatePointInRing(p, ring);
+      return RayCrossingCounter.locatePointInRing(p, ring).getIndex();
     } else {
       return Location.EXTERIOR;
     }

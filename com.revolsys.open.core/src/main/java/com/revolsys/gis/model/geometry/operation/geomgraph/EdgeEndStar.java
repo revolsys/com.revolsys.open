@@ -208,7 +208,7 @@ abstract public class EdgeEndStar {
     // compute location only on demand
     if (ptInAreaLocation[geomIndex] == Location.NONE) {
       ptInAreaLocation[geomIndex] = SimplePointInAreaLocator.locate(p,
-        geom[geomIndex].getGeometry());
+        geom[geomIndex].getGeometry()).getIndex();
     }
     return ptInAreaLocation[geomIndex];
   }

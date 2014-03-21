@@ -1,18 +1,17 @@
 package com.revolsys.gis.model.geometry.algorithm.locate;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.Polygonal;
-import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
-import com.vividsolutions.jts.index.ItemVisitor;
-import com.vividsolutions.jts.index.intervalrtree.SortedPackedIntervalRTree;
+import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
 
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   private static class IntervalIndexedGeometry {
-    private final SortedPackedIntervalRTree index = new SortedPackedIntervalRTree();
+    private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<LineSegment>();
 
     public IntervalIndexedGeometry(final Geometry geom) {
       init(geom);
@@ -41,22 +40,8 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
 
     public void query(final double min, final double max,
-      final ItemVisitor visitor) {
+      final Visitor<LineSegment> visitor) {
       index.query(min, max, visitor);
-    }
-  }
-
-  private static class SegmentVisitor implements ItemVisitor {
-    private final RayCrossingCounter counter;
-
-    public SegmentVisitor(final RayCrossingCounter counter) {
-      this.counter = counter;
-    }
-
-    @Override
-    public void visitItem(final Object item) {
-      final LineSegment seg = (LineSegment)item;
-      counter.countSegment(seg.get(0), seg.get(1));
     }
   }
 
@@ -71,7 +56,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return locator;
   }
 
-  private IntervalIndexedGeometry index;
+  private final IntervalIndexedGeometry index;
 
   /**
    * Creates a new locator for a given {@link Geometry}
@@ -82,21 +67,24 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     if (!(geometry instanceof Polygonal)) {
       throw new IllegalArgumentException("Argument must be Polygonal");
     }
-    buildIndex(geometry);
+    this.index = new IntervalIndexedGeometry(geometry);
   }
 
-  private void buildIndex(final Geometry geometry) {
-    index = new IntervalIndexedGeometry(geometry);
+  public IntervalIndexedGeometry getIndex() {
+    return index;
   }
 
   @Override
-  public int locate(final Coordinates coordinates) {
-    final RayCrossingCounter rcc = new RayCrossingCounter(coordinates);
+  public Location locate(final Coordinates coordinates) {
+    return locate(coordinates.getX(), coordinates.getY());
+  }
 
-    final SegmentVisitor visitor = new SegmentVisitor(rcc);
-    index.query(coordinates.getY(), coordinates.getY(), visitor);
+  @Override
+  public Location locate(final double x, final double y) {
+    final PointInArea visitor = new PointInArea(x, y);
+    index.query(y, y, visitor);
 
-    return rcc.getLocation();
+    return visitor.getLocation();
   }
 
 }

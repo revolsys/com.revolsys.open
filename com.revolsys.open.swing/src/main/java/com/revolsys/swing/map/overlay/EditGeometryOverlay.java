@@ -678,7 +678,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
             final Coordinates previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
             if (!CoordinatesUtil.get(point).equals(previousPoint)) {
-              setAddGeometry(appendVertex(point));
+              Geometry newGeometry = appendVertex(point);
+              setAddGeometry(newGeometry);
             }
           }
 

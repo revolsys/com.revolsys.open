@@ -30,12 +30,12 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -738,7 +738,7 @@ public class CoordinatesListUtil {
    *          first point identical to last point)
    * @return the {@link Location} of p relative to the ring
    */
-  public static int locatePointInRing(final Coordinates p,
+  public static Location locatePointInRing(final Coordinates p,
     final CoordinatesList ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }

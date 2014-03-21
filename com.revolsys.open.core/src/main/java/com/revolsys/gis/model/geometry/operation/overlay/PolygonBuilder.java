@@ -42,12 +42,12 @@ import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
 import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.util.Assert;
 
 /**

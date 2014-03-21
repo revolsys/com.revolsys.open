@@ -8,9 +8,9 @@ import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.algorithm.locate.SimplePointInAreaLocator;
-import com.vividsolutions.jts.geom.Location;
 
 public class PolygonUtil {
 
@@ -20,7 +20,7 @@ public class PolygonUtil {
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
-        final int loc = targetPointLocator.locate(point);
+        final Location loc = targetPointLocator.locate(point);
         if (loc == Location.EXTERIOR) {
           return false;
         }
@@ -36,7 +36,7 @@ public class PolygonUtil {
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
-        final int loc = targetPointLocator.locate(point);
+        final Location loc = targetPointLocator.locate(point);
         if (loc != Location.INTERIOR) {
           return false;
         }
@@ -51,7 +51,7 @@ public class PolygonUtil {
       geometry);
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
-        final int loc = locator.locate(point);
+        final Location loc = locator.locate(point);
         if (loc != Location.EXTERIOR) {
           return true;
         }
@@ -66,7 +66,7 @@ public class PolygonUtil {
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
-        final int loc = targetPointLocator.locate(point);
+        final Location loc = targetPointLocator.locate(point);
         if (loc != Location.EXTERIOR) {
           return true;
         }
@@ -81,7 +81,7 @@ public class PolygonUtil {
     final List<CoordinatesList> pointsList = geometry.getCoordinatesLists();
     for (final CoordinatesList points : pointsList) {
       for (final Coordinates point : new InPlaceIterator(points)) {
-        final int loc = targetPointLocator.locate(point);
+        final Location loc = targetPointLocator.locate(point);
         if (loc == Location.INTERIOR) {
           return true;
         }

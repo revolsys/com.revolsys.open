@@ -33,6 +33,7 @@
 package com.revolsys.gis.model.geometry.algorithm.locate;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.LinearRing;
@@ -40,7 +41,6 @@ import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.vividsolutions.jts.geom.Location;
 
 /**
  * Computes the location of points relative to a {@link Polygonal}
@@ -115,7 +115,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @param geometry the areal geometry to test
    * @return the Location of the point in the geometry
    */
-  public static int locate(final Coordinates point, final Geometry geometry) {
+  public static Location locate(final Coordinates point, final Geometry geometry) {
     if (geometry.isEmpty()) {
       return Location.EXTERIOR;
     } else if (containsPoint(point, geometry)) {
@@ -132,8 +132,13 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
   }
 
   @Override
-  public int locate(final Coordinates point) {
+  public Location locate(final Coordinates point) {
     return SimplePointInAreaLocator.locate(point, geometry);
+  }
+
+  @Override
+  public Location locate(final double x, final double y) {
+    return locate(new DoubleCoordinates(x, y));
   }
 
 }

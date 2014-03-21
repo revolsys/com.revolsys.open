@@ -46,16 +46,16 @@ public class ToolTipOverlay extends AbstractOverlay {
     final int overlayHeight = getHeight() - offset;
     int x = (int)point.getX();
     int y = (int)point.getY();
-    if (x > 20) {
+    if (x > offset) {
       x += offset;
     }
     if (x + width > overlayWidth) {
       if (x > width + offset) {
-        x = x - 20 - width;
+        x = x - offset * 2 - width;
       }
     }
 
-    if (y > 20) {
+    if (y > offset) {
       y -= offset;
     }
     if (y + height > overlayHeight) {

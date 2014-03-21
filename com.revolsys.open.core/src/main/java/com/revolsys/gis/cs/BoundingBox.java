@@ -931,6 +931,16 @@ public class BoundingBox extends Envelope implements Cloneable {
     return intersects((Envelope)convertedBoundingBox);
   }
 
+  public boolean intersects(final Coordinates point) {
+    if (point == null) {
+      return false;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return super.intersects(x, y);
+    }
+  }
+
   public boolean intersects(final DataObject record) {
     final BoundingBox boundingBox = getBoundingBox(record);
     return intersects(boundingBox);

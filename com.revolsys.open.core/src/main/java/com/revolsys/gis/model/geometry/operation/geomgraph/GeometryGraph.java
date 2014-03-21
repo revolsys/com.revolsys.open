@@ -440,7 +440,7 @@ public class GeometryGraph extends PlanarGraph {
       if (areaPtLocator == null) {
         areaPtLocator = new IndexedPointInAreaLocator(parentGeom);
       }
-      return areaPtLocator.locate(pt);
+      return areaPtLocator.locate(pt).getIndex();
     }
     return ptLocator.locate(pt, parentGeom);
   }

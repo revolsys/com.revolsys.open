@@ -139,6 +139,14 @@ public class GeometryEditUtil {
     return geometryFactory.createPolygon(rings);
   }
 
+  public static int[] createVertexIndex(final int[] index, final int vertexIndex) {
+    final int length = index.length + 1;
+    final int[] newIndex = new int[length];
+    System.arraycopy(index, 0, newIndex, 0, index.length);
+    newIndex[index.length] = vertexIndex;
+    return newIndex;
+  }
+
   public static CoordinatesList deleteVertex(final CoordinatesList points,
     final int pointIndex) {
     if (pointIndex >= 0 && pointIndex < points.size()) {
