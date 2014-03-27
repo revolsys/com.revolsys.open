@@ -23,3 +23,4 @@ if [ -n "$STATUS" ]; then
 else
   echo Checkin changes before creating site
 fi
+
