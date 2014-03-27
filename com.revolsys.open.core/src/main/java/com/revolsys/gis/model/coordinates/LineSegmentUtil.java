@@ -372,14 +372,6 @@ public class LineSegmentUtil {
     return geometryFactory.createCoordinatesList(0);
   }
 
-  public static PointLineProjection getPointLineProjection(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart, final Coordinates lineEnd,
-    final Coordinates pointCoordinates) {
-    return new PointLineProjection(precisionModel, lineStart, lineEnd,
-      pointCoordinates);
-  }
-
   public static boolean intersects(final Coordinates line1p1,
     final Coordinates line1p2, final Coordinates line2p1,
     final Coordinates line2p2) {
@@ -430,7 +422,7 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd,
         point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        final Coordinates projectedPoint = project(lineStart, lineEnd,
+        final Coordinates projectedPoint = project(2, lineStart, lineEnd,
           projectionFactor);
         if (precisionModel != null) {
           precisionModel.makePrecise(projectedPoint);
@@ -479,7 +471,7 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd,
         point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        final Coordinates projectedPoint = project(lineStart, lineEnd,
+        final Coordinates projectedPoint = project(2, lineStart, lineEnd,
           projectionFactor);
         precisionModel.makePrecise(projectedPoint);
         if (projectedPoint.equals2d(point)) {
@@ -488,6 +480,11 @@ public class LineSegmentUtil {
       }
       return false;
     }
+  }
+
+  public static Coordinates midPoint(final Coordinates lineStart,
+    final Coordinates lineEnd) {
+    return midPoint(null, lineStart, lineEnd);
   }
 
   public static Coordinates midPoint(
@@ -534,8 +531,49 @@ public class LineSegmentUtil {
     }
   }
 
-  public static Coordinates project(final Coordinates lineStart,
-    final Coordinates lineEnd, final double r) {
+  public static Coordinates project(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart, final Coordinates lineEnd,
+    final Coordinates point) {
+    if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
+      return point.cloneCoordinates();
+    } else {
+      final double r = projectionFactor(lineStart, lineEnd, point);
+      final int numAxis = CoordinatesUtil.getNumAxis(point, lineStart, lineEnd);
+      final Coordinates projectedCoordinate = project(numAxis, lineStart,
+        lineEnd, r);
+      precisionModel.makePrecise(projectedCoordinate);
+      if (projectedCoordinate.equals2d(lineStart)) {
+        return lineStart;
+      } else if (projectedCoordinate.equals2d(lineEnd)) {
+        return lineEnd;
+      } else {
+        if (numAxis > 2) {
+          final double z = projectedCoordinate.getZ();
+          if (MathUtil.isNanOrInfinite(z) || z == 0) {
+            projectedCoordinate.setZ(point.getZ());
+          }
+        }
+
+        return projectedCoordinate;
+      }
+    }
+  }
+
+  public static Coordinates project(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart, final Coordinates lineEnd, final double r) {
+    final int numAxis = CoordinatesUtil.getNumAxis(lineStart, lineEnd);
+    final Coordinates point = project(numAxis, lineStart, lineEnd, r);
+    if (precisionModel != null) {
+      precisionModel.makePrecise(point);
+    }
+
+    return point;
+  }
+
+  public static Coordinates project(final int numAxis,
+    final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double z1 = lineStart.getZ();
@@ -547,48 +585,17 @@ public class LineSegmentUtil {
     final double x = x1 + r * (x2 - x1);
     final double y = y1 + r * (y2 - y1);
 
-    if (Double.isNaN(z1)) {
-      if (Double.isNaN(z2)) {
-        return new DoubleCoordinates(x, y);
-      } else {
-        return new DoubleCoordinates(x, y, z2);
-      }
-    } else if (Double.isNaN(z2)) {
-      return new DoubleCoordinates(x, y, z1);
+    if (numAxis == 2) {
+      return new DoubleCoordinates(x, y);
     } else {
-      final double z = z1 + r * (z2 - z1);
-      return new DoubleCoordinates(x, y, z);
-    }
-  }
-
-  public static Coordinates project(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart, final Coordinates lineEnd,
-    final Coordinates point) {
-    if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
-      return point.cloneCoordinates();
-    } else {
-      final double r = projectionFactor(lineStart, lineEnd, point);
-      final Coordinates projectedCoordinate = project(lineStart, lineEnd, r);
-      precisionModel.makePrecise(projectedCoordinate);
-      if (projectedCoordinate.equals2d(lineStart)) {
-        return lineStart;
-      } else if (projectedCoordinate.equals2d(lineEnd)) {
-        return lineEnd;
+      double z;
+      if (MathUtil.isNanOrInfinite(z1, z2)) {
+        z = Double.NaN;
       } else {
-        return projectedCoordinate;
+        z = z1 + r * (z2 - z1);
       }
+      return new DoubleCoordinates(numAxis, x, y, z);
     }
-  }
-
-  public static Coordinates project(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart, final Coordinates lineEnd, final double r) {
-    final Coordinates point = project(lineStart, lineEnd, r);
-    if (precisionModel != null) {
-      precisionModel.makePrecise(point);
-    }
-    return point;
   }
 
   /**

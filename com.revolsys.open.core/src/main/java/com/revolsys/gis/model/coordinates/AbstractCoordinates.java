@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinates implements Coordinates {
@@ -21,7 +21,8 @@ public abstract class AbstractCoordinates implements Coordinates {
   public double angle2d(final Coordinates other) {
     final double dx = other.getX() - getX();
     final double dy = other.getY() - getY();
-    return Math.atan2(dy, dx);
+    final double angle = Math.atan2(dy, dx);
+    return angle;
   }
 
   @Override
@@ -94,9 +95,9 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public boolean equals3d(final Coordinates coordinates) {
-    if (EqualsRegistry.equal(getX(), coordinates.getX())) {
-      if (EqualsRegistry.equal(getY(), coordinates.getY())) {
-        if (EqualsRegistry.equal(getZ(), coordinates.getZ())) {
+    if (NumberEquals.equal(getX(), coordinates.getX())) {
+      if (NumberEquals.equal(getY(), coordinates.getY())) {
+        if (NumberEquals.equal(getZ(), coordinates.getZ())) {
           return true;
         }
       }

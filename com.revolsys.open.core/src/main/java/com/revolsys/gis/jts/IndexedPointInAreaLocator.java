@@ -1,12 +1,15 @@
-package com.revolsys.gis.model.geometry.algorithm.locate;
+package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.model.geometry.algorithm.locate.Location;
+import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
@@ -34,7 +37,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
 
     private void init(final Geometry geometry) {
-      for (final CoordinatesList points : geometry.getCoordinatesLists()) {
+      for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
         addLine(points);
       }
     }
@@ -48,10 +51,11 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   private static final String KEY = IndexedPointInAreaLocator.class.getName();
 
   public static PointOnGeometryLocator get(final Geometry geometry) {
-    PointOnGeometryLocator locator = geometry.getProperty(KEY);
+    PointOnGeometryLocator locator = JtsGeometryUtil.getGeometryProperty(
+      geometry, KEY);
     if (locator == null) {
       locator = new IndexedPointInAreaLocator(geometry);
-      geometry.setProperty(KEY, locator);
+      JtsGeometryUtil.setGeometryProperty(geometry, KEY, locator);
     }
     return locator;
   }
@@ -61,7 +65,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   private final Geometry geometry;
 
   /**
-   * Creates a netor for a given {@link Geometry}
+   * Creates a new locator for a given {@link Geometry}
    * 
    * @param geometry the Geometry to locate in
    */
@@ -75,7 +79,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometry.getGeometryFactory();
+    return GeometryFactory.getFactory(geometry);
   }
 
   public IntervalIndexedGeometry getIndex() {

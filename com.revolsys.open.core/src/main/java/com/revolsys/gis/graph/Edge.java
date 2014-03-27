@@ -558,7 +558,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     if (isRemoved()) {
       return "Removed Edge";
     } else {
-      sb.append(getTypeName().toString());
+      final String typeName = getTypeName();
+      if (typeName != null) {
+        sb.append(typeName.toString());
+      }
       sb.append(id);
       sb.append('{');
       sb.append(fromNodeId);

@@ -47,6 +47,6 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return this.object + "." + this.propertyName + "=" + this.value;
+    return this.object.toString() + "." + this.propertyName + "=" + this.value;
   }
 }

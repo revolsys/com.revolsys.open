@@ -565,10 +565,22 @@ public class BoundingBox extends Envelope implements Cloneable {
     boundingBox.expandToInclude(newX, newY);
   }
 
+  /**
+   * Return a new bounding box expanded by delta.
+   * 
+   * @param delta
+   * @return
+   */
   public BoundingBox expand(final double delta) {
     return expand(delta, delta);
   }
 
+  /**
+   * Return a new bounding box expanded by deltaX, deltaY.
+   * 
+   * @param delta
+   * @return
+   */
   public BoundingBox expand(final double deltaX, final double deltaY) {
     if (isEmpty() || (deltaX == 0 && deltaY == 0)) {
       return this;

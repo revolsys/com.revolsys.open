@@ -652,7 +652,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected boolean modeAddMouseClick(final MouseEvent event) {
-    if (SwingUtilities.isLeftMouseButton(event)) {
+    if (event.getButton() == 1) {
       if (isModeAddGeometry()) {
         if (event.getClickCount() == 2) {
           setXorGeometry(null);
@@ -678,7 +678,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
             final Coordinates previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
             if (!CoordinatesUtil.get(point).equals(previousPoint)) {
-              Geometry newGeometry = appendVertex(point);
+              final Geometry newGeometry = appendVertex(point);
               setAddGeometry(newGeometry);
             }
           }

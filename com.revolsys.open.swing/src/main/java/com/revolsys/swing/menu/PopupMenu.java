@@ -134,6 +134,7 @@ public class PopupMenu implements MouseListener {
 
   public void show(final Component component, final int x, final int y) {
     final JPopupMenu popupMenu = this.menu.createJPopupMenu();
+    popupMenu.pack();
     popupMenu.show(component, x, y);
   }
 

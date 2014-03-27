@@ -694,11 +694,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               }
             }
           }
-          unSelectRecords(record);
         }
       }
-      removeFromIndex(record);
       record.setState(DataObjectState.Deleted);
+      unSelectRecords(record);
+      removeFromIndex(record);
     }
   }
 
@@ -1491,74 +1491,80 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public void pasteRecords() {
-    DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
-    if (reader == null) {
-      final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-      if (StringUtils.hasText(string)) {
-        final Resource resource = new ByteArrayResource("t.csv", string);
-        reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+    final boolean eventsEnabled = setEventsEnabled(false);
+    try {
+      DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+      if (reader == null) {
+        final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+        if (StringUtils.hasText(string)) {
+          final Resource resource = new ByteArrayResource("t.csv", string);
+          reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+        }
       }
-    }
-    final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();
-    final List<DataObject> regectedRecords = new ArrayList<DataObject>();
-    if (reader != null) {
-      final DataObjectMetaData metaData = getMetaData();
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
-      DataType geometryDataType = null;
-      Class<?> layerGeometryClass = null;
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (geometryAttribute != null) {
-        geometryDataType = geometryAttribute.getType();
-        layerGeometryClass = geometryDataType.getJavaClass();
-      }
-      Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
-      if (ignorePasteFields == null) {
-        ignorePasteFields = Collections.emptySet();
-      }
-      for (final DataObject sourceRecord : reader) {
-        final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          sourceRecord);
+      final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();
+      final List<DataObject> regectedRecords = new ArrayList<DataObject>();
+      if (reader != null) {
+        final DataObjectMetaData metaData = getMetaData();
+        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        DataType geometryDataType = null;
+        Class<?> layerGeometryClass = null;
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (geometryAttribute != null) {
+          geometryDataType = geometryAttribute.getType();
+          layerGeometryClass = geometryDataType.getJavaClass();
+        }
+        Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
+        if (ignorePasteFields == null) {
+          ignorePasteFields = Collections.emptySet();
+        }
+        for (final DataObject sourceRecord : reader) {
+          final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
+            sourceRecord);
 
-        Geometry sourceGeometry = sourceRecord.getGeometryValue();
-        for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
-          final String attributeName = iterator.next();
-          final Attribute attribute = metaData.getAttribute(attributeName);
-          if (attribute == null) {
-            iterator.remove();
-          } else if (ignorePasteFields != null) {
-            if (ignorePasteFields.contains(attribute.getName())) {
+          Geometry sourceGeometry = sourceRecord.getGeometryValue();
+          for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
+            final String attributeName = iterator.next();
+            final Attribute attribute = metaData.getAttribute(attributeName);
+            if (attribute == null) {
               iterator.remove();
+            } else if (ignorePasteFields != null) {
+              if (ignorePasteFields.contains(attribute.getName())) {
+                iterator.remove();
+              }
             }
           }
-        }
-        if (geometryDataType != null) {
-          if (sourceGeometry == null) {
-            final Object value = sourceRecord.getValue(geometryAttribute.getName());
-            sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
-              value);
+          if (geometryDataType != null) {
+            if (sourceGeometry == null) {
+              final Object value = sourceRecord.getValue(geometryAttribute.getName());
+              sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
+                value);
+            }
+            final Geometry geometry = geometryFactory.createGeometry(
+              layerGeometryClass, sourceGeometry);
+            if (geometry == null) {
+              newValues.clear();
+            } else {
+              final String geometryAttributeName = geometryAttribute.getName();
+              newValues.put(geometryAttributeName, geometry);
+            }
           }
-          final Geometry geometry = geometryFactory.createGeometry(
-            layerGeometryClass, sourceGeometry);
-          if (geometry == null) {
-            newValues.clear();
+          LayerDataObject newRecord = null;
+          if (newValues.isEmpty()) {
+            regectedRecords.add(sourceRecord);
           } else {
-            final String geometryAttributeName = geometryAttribute.getName();
-            newValues.put(geometryAttributeName, geometry);
+            newRecord = createRecord(newValues);
           }
-        }
-        LayerDataObject newRecord = null;
-        if (newValues.isEmpty()) {
-          regectedRecords.add(sourceRecord);
-        } else {
-          newRecord = createRecord(newValues);
-        }
-        if (newRecord == null) {
-          regectedRecords.add(sourceRecord);
-        } else {
-          newRecords.add(newRecord);
+          if (newRecord == null) {
+            regectedRecords.add(sourceRecord);
+          } else {
+            newRecords.add(newRecord);
+          }
         }
       }
+    } finally {
+      setEventsEnabled(eventsEnabled);
     }
+    firePropertyChange("recordsInserted", null, newRecords);
     addSelectedRecords(newRecords);
   }
 

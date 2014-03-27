@@ -239,4 +239,8 @@ public class RayCrossingCounter {
   public boolean isPointInPolygon() {
     return getLocation() != Location.EXTERIOR;
   }
+
+  protected void setPointOnSegment(final boolean isPointOnSegment) {
+    this.isPointOnSegment = isPointOnSegment;
+  }
 }

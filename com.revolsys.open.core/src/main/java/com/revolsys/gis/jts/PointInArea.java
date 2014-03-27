@@ -1,8 +1,8 @@
-package com.revolsys.gis.model.geometry.algorithm.locate;
+package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 

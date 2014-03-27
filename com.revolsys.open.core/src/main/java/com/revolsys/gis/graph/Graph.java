@@ -765,17 +765,16 @@ public class Graph<T> {
       final Map<String, Object> attributes2 = edge2.getAttributes();
       final T object1 = edge1.getObject();
       final LineString line1 = edge1.getLine();
-      remove(edge1);
-
       final LineString line2 = edge2.getLine();
-      remove(edge2);
 
-      final LineString newLine = LineStringUtil.merge(line1, line2);
+      final LineString newLine = LineStringUtil.merge(node, line1, line2);
 
       final T mergedObject = clone(object1, newLine);
       final Edge<T> newEdge = addEdge(mergedObject, newLine);
       newEdge.setAttributes(attributes2);
       newEdge.setAttributes(attributes1);
+      remove(edge1);
+      remove(edge2);
       return newEdge;
     } else {
       return null;

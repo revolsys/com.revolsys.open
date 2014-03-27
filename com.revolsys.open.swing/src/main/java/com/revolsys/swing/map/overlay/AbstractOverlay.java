@@ -127,12 +127,15 @@ public class AbstractOverlay extends JComponent implements
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
           + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-          + idAttributeName + "</th><th>INDEX</th></tr></th><tbody>");
+          + idAttributeName
+          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
-          text.append("</td></td>");
+          text.append("</td><td style=\"border-right: solid black 1px\">");
           text.append(location.getIndexString());
+          text.append("</td></td>");
+          text.append(CoordinatesUtil.get(location.getPoint()));
           text.append("</td></tr>");
         }
         text.append("</tbody></table>");

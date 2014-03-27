@@ -112,7 +112,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
               final Coordinates p2 = points.get(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
-                point = LineSegmentUtil.project(p1, p2,
+                point = LineSegmentUtil.project(2, p1, p2,
                   (centreLength - currentLength) / segmentLength);
                 // TODO parameter to use orientation or not
                 orientation = Math.toDegrees(-p1.angle2d(p2));

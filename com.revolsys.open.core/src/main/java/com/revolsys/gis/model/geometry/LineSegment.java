@@ -12,14 +12,13 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
-import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class LineSegment extends AbstractCoordinatesList {
+public class LineSegment extends AbstractCoordinatesList implements
+  Comparable<LineSegment> {
   private static final long serialVersionUID = 3905321662159212931L;
 
   private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
@@ -169,6 +168,15 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   @Override
+  public int compareTo(final LineSegment other) {
+    int compare = get(0).compareTo(other.get(0));
+    if (compare == 0) {
+      compare = get(1).compareTo(other.get(1));
+    }
+    return compare;
+  }
+
+  @Override
   public boolean contains(final Coordinates coordinate) {
     if (get(0).equals(coordinate)) {
       return true;
@@ -299,6 +307,13 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
+  public CoordinatesList getIntersection(final Coordinates point1,
+    final Coordinates point2) {
+    final CoordinatesList intersection = LineSegmentUtil.getIntersection(
+      geometryFactory, getCoordinates1(), getCoordinates2(), point1, point2);
+    return intersection;
+  }
+
   public CoordinatesList getIntersection(
     final CoordinatesPrecisionModel precisionModel,
     final LineSegment lineSegment2) {
@@ -351,12 +366,11 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates intersection(final LineSegment line) {
-    final LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(get(0), get(1), line.get(0), line.get(1));
-    if (li.hasIntersection()) {
-      return li.getIntersection(0);
-    } else {
+    final CoordinatesList intersection = getIntersection(line);
+    if (intersection.size() == 0) {
       return null;
+    } else {
+      return intersection.get(0);
     }
   }
 
@@ -480,9 +494,9 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates project(final Coordinates p) {
-    final double projectionFactor = projectionFactor(p);
-    return LineSegmentUtil.project(getGeometryFactory(), getCoordinates1(),
-      getCoordinates2(), projectionFactor);
+    final Coordinates newPoint = LineSegmentUtil.project(getGeometryFactory(),
+      getCoordinates1(), getCoordinates2(), p);
+    return newPoint;
   }
 
   public double projectionFactor(final Coordinates p) {
@@ -516,5 +530,23 @@ public class LineSegment extends AbstractCoordinatesList {
   @Override
   public int size() {
     return 2;
+  }
+
+  @Override
+  public String toString() {
+    if (geometryFactory == null) {
+      return super.toString();
+    } else {
+      return "SRID=" + geometryFactory.getSRID() + ";" + super.toString();
+    }
+  }
+
+  public boolean touchesEnd(final LineSegment closestSegment) {
+    if (contains(closestSegment.get(0))) {
+      return true;
+    } else if (contains(closestSegment.get(1))) {
+      return true;
+    }
+    return false;
   }
 }

@@ -4,6 +4,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Trig;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.algorithm.HCoordinate;
 import com.vividsolutions.jts.algorithm.NotRepresentableException;
@@ -178,6 +179,14 @@ public class CoordinatesUtil {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * (fraction);
     return z;
+  }
+
+  public static int getNumAxis(final Coordinates... points) {
+    int numAxis = 2;
+    for (final Coordinates point : points) {
+      numAxis = Math.max(numAxis, point.getNumAxis());
+    }
+    return numAxis;
   }
 
   public static double getX(final Coordinates point) {
@@ -375,5 +384,17 @@ public class CoordinatesUtil {
       }
     }
     return coordinates;
+  }
+
+  public static Coordinates translate(final Coordinates point,
+    final Double angle, final double length) {
+    final double x = point.getX();
+    final double y = point.getY();
+  
+    final double newX = Trig.adjacent(x, angle, length);
+    final double newY = Trig.opposite(y, angle, length);
+  
+    final Coordinates newPoint = new DoubleCoordinates(newX, newY);
+    return newPoint;
   }
 }

@@ -16,7 +16,7 @@ public class TitledBorder extends AbstractBorder {
   private final String title;
 
   public TitledBorder(final String title) {
-    this.title = title;
+    this.title = title.replaceAll("</[^>]+>", "").replaceAll("<[^>]+>", "");
   }
 
   @Override

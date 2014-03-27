@@ -182,6 +182,16 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   @Override
+  public void mouseEntered(final MouseEvent event) {
+    setSelectCursor(event);
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent event) {
+    selectCursor = null;
+  }
+
+  @Override
   public void mouseMoved(final MouseEvent event) {
     if (event.getButton() == 0) {
       if (SwingUtil.isControlOrMetaDown(event)) {
@@ -359,8 +369,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public boolean selectBoxStart(final MouseEvent event) {
-    if (selectCursor != null) {
+    if (selectCursor != null || SwingUtil.isControlOrMetaDown(event)) {
       if (setOverlayAction(ACTION_SELECT_RECORDS)) {
+        if (selectBoxCursor == null) {
+          selectCursor = CURSOR_SELECT_BOX;
+        }
         this.selectBoxCursor = selectCursor;
         this.selectBoxButton = event.getButton();
         this.selectBoxFirstPoint = event.getPoint();

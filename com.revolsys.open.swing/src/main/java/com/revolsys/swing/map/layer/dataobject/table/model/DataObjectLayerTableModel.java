@@ -291,10 +291,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     synchronized (getSync()) {
       synchronized (getSync()) {
         if (this.countLoaded) {
-          final AbstractDataObjectLayer layer = getLayer();
-          final int newRecordCount = layer.getNewRecordCount();
-          final int count = this.rowCount + newRecordCount;
+          int count = this.rowCount;
+          if (!this.attributeFilterMode.equals(MODE_SELECTED)
+            && !this.attributeFilterMode.equals(MODE_EDITS)) {
+            final AbstractDataObjectLayer layer = getLayer();
+            final int newRecordCount = layer.getNewRecordCount();
+            count += newRecordCount;
+          }
           return count;
+
         } else {
           if (this.rowCountWorker == null) {
             this.rowCountWorker = Invoke.background("Query row count "
@@ -416,8 +421,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public void propertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == this.layer) {
       final String propertyName = e.getPropertyName();
-      if (Arrays.asList("query", "editable", "recordInserted", "recordDeleted",
-        "recordsChanged").contains(propertyName)) {
+      if (Arrays.asList("query", "editable", "recordInserted",
+        "recordsInserted", "recordDeleted", "recordsChanged").contains(
+        propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();
