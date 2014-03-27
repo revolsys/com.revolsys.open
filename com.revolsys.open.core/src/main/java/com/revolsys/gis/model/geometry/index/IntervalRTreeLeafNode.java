@@ -17,5 +17,4 @@ public class IntervalRTreeLeafNode<V> extends IntervalRTreeNode<V> {
       visitor.visit(item);
     }
   }
-
 }

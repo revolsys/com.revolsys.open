@@ -132,8 +132,8 @@ public class SortedPackedIntervalRTree<V> {
   }
 
   private void printNode(final IntervalRTreeNode node) {
-    System.out.println(WKTWriter.toLineString(new Coordinate(node.min, level),
-      new Coordinate(node.max, level)));
+    System.out.println(WKTWriter.toLineString(new Coordinate(node.getMin(), level),
+      new Coordinate(node.getMax(), level)));
   }
 
   /**

@@ -41,7 +41,7 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
 
   public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1,
     final IntervalRTreeNode<V> node2) {
-    super(Math.min(node1.min, node2.min), Math.max(node1.max, node2.max));
+    super(Math.min(node1.getMin(), node2.getMin()), Math.max(node1.getMax(), node2.getMax()));
     this.node1 = node1;
     this.node2 = node2;
   }
@@ -58,5 +58,4 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
       }
     }
   }
-
 }

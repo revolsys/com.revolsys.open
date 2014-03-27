@@ -6,16 +6,16 @@ import com.vividsolutions.jts.io.WKTWriter;
 
 public abstract class IntervalRTreeNode<V> {
 
-  protected double min = Double.POSITIVE_INFINITY;
+  private double min = Double.POSITIVE_INFINITY;
 
-  protected double max = Double.NEGATIVE_INFINITY;
+  private double max = Double.NEGATIVE_INFINITY;
 
   public IntervalRTreeNode() {
   }
 
   public IntervalRTreeNode(final double min, final double max) {
-    this.min = min;
-    this.max = max;
+    this.setMin(min);
+    this.setMax(max);
   }
 
   public double getMax() {
@@ -27,7 +27,7 @@ public abstract class IntervalRTreeNode<V> {
   }
 
   protected boolean intersects(final double queryMin, final double queryMax) {
-    if (min > queryMax || max < queryMin) {
+    if (getMin() > queryMax || getMax() < queryMin) {
       return false;
     }
     return true;
@@ -36,10 +36,17 @@ public abstract class IntervalRTreeNode<V> {
   public abstract void query(double queryMin, double queryMax,
     Visitor<V> visitor);
 
-  @Override
-  public String toString() {
-    return WKTWriter.toLineString(new Coordinate(min, 0),
-      new Coordinate(max, 0));
+  protected void setMax(final double max) {
+    this.max = max;
   }
 
+  protected void setMin(final double min) {
+    this.min = min;
+  }
+
+  @Override
+  public String toString() {
+    return WKTWriter.toLineString(new Coordinate(getMin(), 0), new Coordinate(
+      getMax(), 0));
+  }
 }
