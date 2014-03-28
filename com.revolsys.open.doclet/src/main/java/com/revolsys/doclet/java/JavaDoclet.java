@@ -182,7 +182,8 @@ public class JavaDoclet {
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
     if (optionName.equals("-d") || optionName.equals("-doctitle")
-      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
+      || optionName.equals("-docid") || optionName.equals("-htmlfooter")
+      || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
@@ -279,6 +280,8 @@ public class JavaDoclet {
     return flag;
   }
 
+  private String docId;
+
   private String docTitle;
 
   private final RootDoc root;
@@ -339,6 +342,8 @@ public class JavaDoclet {
 
       } else if (optionName.equals("-doctitle")) {
         docTitle = option[1];
+      } else if (optionName.equals("-docid")) {
+        docId = option[1];
       } else if (optionName.equals("-htmlheader")) {
         header = FileUtil.getFileAsString(option[1]);
       } else if (optionName.equals("-htmlfooter")) {
@@ -377,6 +382,7 @@ public class JavaDoclet {
         writer.startTag(HtmlUtil.BODY);
       } else {
         header = header.replaceAll("\\$\\{docTitle\\}", docTitle);
+        header = header.replaceAll("\\$\\{docId\\}", docId);
         writer.write(header);
       }
 
@@ -388,6 +394,7 @@ public class JavaDoclet {
         writer.endTagLn(HtmlUtil.HTML);
       } else {
         footer = footer.replaceAll("\\$\\{docTitle\\}", docTitle);
+        footer = footer.replaceAll("\\$\\{docId\\}", docId);
         writer.write(footer);
       }
       writer.endDocument();

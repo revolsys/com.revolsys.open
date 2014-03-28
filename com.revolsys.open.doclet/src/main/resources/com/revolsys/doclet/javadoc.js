@@ -58,7 +58,8 @@ $(document).ready(function() {
     "bPaginate" : false,
     "bSort" : false,
     "bFilter" : false,
-    "bAutoWidth": false
+    "bAutoWidth": false,
+    "bRetrieve": true
   });
   
   createAccordion('div.javaMethod');

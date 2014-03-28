@@ -26,6 +26,10 @@ h2 {
   margin-bottom: 0.5em;
 }
 
+section {
+  display:block;
+}
+
 h3 {
   color: #003399;
   font-weight: bold;
@@ -374,6 +378,10 @@ div.sideMenu ul {
   padding: 0px;
 }
 
+div.sideMenu ul ul {
+  padding-left: 1em;
+}
+
 div.sideMenu ul li:nth-of-type(even) {
   background-color: #eeeeee;
 }
@@ -386,6 +394,14 @@ div.sideMenu ul li:last-child {
 div.sideMenu ul li {
   padding: 0.2em 0.4em 0.2em 0.4em;
   margin-left: 0px;
+}
+
+div.sideMenu ul li.selected > a {
+  display:block;
+  font-weight: bold;
+  background-color: #d7ebf9;
+  border: 1px solid #aed0ea;
+  padding: 1px 2px 1px;
 }
 
 div.sideMenu ul li a {
@@ -749,4 +765,43 @@ div.pageNavigation td.next {
 
 pre.prettyprint {
   background-color: white;
+}
+
+
+div.tocMenu {
+  overflow:auto;
+}
+
+div.tocMenu div.title {
+  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+}
+
+div.tocMenu ol {
+  margin:0px;
+  margin-bottom: 3px;
+  padding: 3px 5px 3px 2em;
+}
+
+div.tocMenu ol ol {
+  padding: 0px 0px 0px 1em;
+}
+
+div.tocMenu ol li {
+  color: #000000;
+}
+
+li.closed {
+  display: none;
+}
+
+div.tocMenu ol li a {
+  color: #000000;
+  text-decoration: none;
+}
+
+div.tocMenu ol li a:hover {
+  text-decoration: underline;
 }

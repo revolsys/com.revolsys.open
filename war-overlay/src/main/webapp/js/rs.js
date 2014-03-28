@@ -208,6 +208,9 @@ function validateDecimalNumber(element, value, min, max) {
 
 $(document).ready(
   function() {
+    $('html.lt-ie9').each(function() {
+      document.createElement('section');
+    });
     addConfirmButton({
       selector : 'button.delete',
       icon : 'trash',
@@ -350,3 +353,65 @@ $(document).ready(
       }, "Please enter a valid double number.");
     }
   });
+
+function setPageId(pageId) {
+  if (pageId) {
+    var sideMenu =  $('.sideMenu');
+    $('li > ul', sideMenu).hide(0);
+    var menuLi =  $('#' + pageId + 'Menu');
+    if (menuLi.length > 0) {
+      menuLi.parent('.sideMenu ul').show(0);
+      menuLi.addClass('selected');
+      menuLi.find('ul').show(0);
+    }
+  }
+}
+
+function createToc() {
+  var tocDiv =  $('<div class="tocMenu"/>');
+  $('.sideMenu').after(tocDiv);
+  tocDiv.append('<div class="title">Table of Contents</div>');
+  var tocMenu = $('<ol />');
+  tocDiv.append(tocMenu);
+  var indices = [0];
+  $(':header').each( function() {
+    var menuDepth = tocMenu.parents('.tocMenu ol').length + 1;
+    var headingType = $(this).get(0).tagName;
+    var headingDepth = headingType.substr(1,2);
+    while (headingDepth > menuDepth) {
+      var li = tocMenu.last();
+      if (li.length == 0) {
+        li = $('<li/>');
+      }
+      tocMenu.append(li);
+      tocMenu = $('<ol/>');
+      li.append(tocMenu);
+      indices.push(0);
+      menuDepth++;
+    }
+    while(headingDepth < menuDepth) {
+      console.log('Up');
+      tocMenu = tocMenu.parent();
+      menuDepth--;
+      indices.pop();
+    }
+    var count = indices[indices.length - 1] + 1;
+    indices[indices.length - 1] = count;
+    var id = $(this).attr('id');
+    if (!id) {
+      id = 'heading_' + indices.join('_');
+      $(this).attr('id', id);
+    }
+    var title = $(this).attr('title');
+    if (!title) {
+      title = $(this).text();
+    }
+    var link = $('<a href="#' + id + '"/>').text(title);
+    $(this).prepend(indices.join('.') + '. ');
+    var cssClass='';
+    if (menuDepth > 3) {
+      cssClass = 'class="closed"';
+    }
+    tocMenu.append($('<li id="tocMenu_' + indices.join('_') + '" ' + cssClass +' />').append(link));
+  });
+}

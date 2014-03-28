@@ -36,8 +36,8 @@ public class ClientDoclet {
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
     if (optionName.equals("-d") || optionName.equals("-doctitle")
-      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")
-      || optionName.equals("-packagesOpen")) {
+      || optionName.equals("-docid") || optionName.equals("-htmlfooter")
+      || optionName.equals("-htmlheader") || optionName.equals("-packagesOpen")) {
       return 2;
     }
     return -1;
@@ -94,6 +94,8 @@ public class ClientDoclet {
 
   private String docTitle;
 
+  private String docId;
+
   private final RootDoc root;
 
   private XmlWriter writer;
@@ -141,8 +143,8 @@ public class ClientDoclet {
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = annotationDoc.name();
 
-    String anchor = DocletUtil.qualifiedName(annotationDoc);
-    DocletUtil.title(writer, anchor, name);
+    final String anchor = DocletUtil.qualifiedName(annotationDoc);
+    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2, anchor, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -182,7 +184,7 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "default");
-        AnnotationValue defaultValue = element.defaultValue();
+        final AnnotationValue defaultValue = element.defaultValue();
         if (defaultValue == null) {
           writer.text("-");
         } else {
@@ -206,12 +208,70 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
+  public void documentationAnnotations(final PackageDoc packageDoc) {
+    final Map<String, AnnotationTypeDoc> annotations = new TreeMap<String, AnnotationTypeDoc>();
+    for (final AnnotationTypeDoc annotationDoc : packageDoc.annotationTypes()) {
+      annotations.put(annotationDoc.name(), annotationDoc);
+    }
+    if (!annotations.isEmpty()) {
+      DocletUtil.title(writer, "Annotations");
+      for (final AnnotationTypeDoc annotationDoc : annotations.values()) {
+        documentationAnnotation(annotationDoc);
+      }
+    }
+  }
+
+  public void documentationClass(final ClassDoc classDoc) {
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
+    final String name = classDoc.name();
+
+    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
+      DocletUtil.qualifiedName(classDoc), name);
+
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "content");
+    DocletUtil.description(writer, classDoc, classDoc);
+
+    final ConstructorDoc[] constructors = classDoc.constructors();
+    if (constructors.length > 0) {
+      DocletUtil.title(writer, "Constructors");
+      for (final ConstructorDoc method : constructors) {
+        documentationMethod(method);
+      }
+    }
+
+    final MethodDoc[] methods = classDoc.methods();
+    if (methods.length > 0) {
+      DocletUtil.title(writer, "Methods");
+      for (final MethodDoc method : methods) {
+        documentationMethod(method);
+      }
+    }
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
+  }
+
+  public void documentationClasses(final PackageDoc packageDoc) {
+    final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
+    for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
+      classes.put(classDoc.name(), classDoc);
+    }
+    if (!classes.isEmpty()) {
+      DocletUtil.title(writer, "Classes");
+      for (final ClassDoc classDoc : classes.values()) {
+        documentationClass(classDoc);
+      }
+    }
+  }
+
   public void documentationEnum(final ClassDoc enumDoc) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = enumDoc.name();
 
-    DocletUtil.title(writer, DocletUtil.qualifiedName(enumDoc), name);
+    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
+      DocletUtil.qualifiedName(enumDoc), name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -258,44 +318,41 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void documentationClass(final ClassDoc classDoc) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
-    final String name = classDoc.name();
-
-    DocletUtil.title(writer, DocletUtil.qualifiedName(classDoc), name);
-
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    DocletUtil.description(writer, classDoc, classDoc);
-
-    final ConstructorDoc[] constructors = classDoc.constructors();
-    if (constructors.length > 0) {
-      DocletUtil.title(writer, "Constructors");
-      for (final ConstructorDoc method : constructors) {
-        documentationMethod(method);
+  public void documentationEnums(final PackageDoc packageDoc) {
+    final Map<String, ClassDoc> enums = new TreeMap<String, ClassDoc>();
+    for (final ClassDoc enumDoc : packageDoc.enums()) {
+      enums.put(enumDoc.name(), enumDoc);
+    }
+    if (!enums.isEmpty()) {
+      DocletUtil.title(writer, "Enums");
+      for (final ClassDoc enumDoc : enums.values()) {
+        documentationEnum(enumDoc);
       }
     }
+  }
 
-    final MethodDoc[] methods = classDoc.methods();
-    if (methods.length > 0) {
-      DocletUtil.title(writer, "Methods");
-      for (final MethodDoc method : methods) {
-        documentationMethod(method);
+  public void documentationInterfaces(final PackageDoc packageDoc) {
+    final Map<String, ClassDoc> interfaces = new TreeMap<String, ClassDoc>();
+    for (final ClassDoc classDoc : packageDoc.interfaces()) {
+      interfaces.put(classDoc.name(), classDoc);
+    }
+    if (!interfaces.isEmpty()) {
+      DocletUtil.title(writer, "Interfaces");
+      for (final ClassDoc classDoc : interfaces.values()) {
+        documentationClass(classDoc);
       }
     }
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public void documentationMethod(final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
 
-    writer.startTag(HtmlUtil.DIV);
+    writer.startTag(HtmlUtil.H3);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.attribute(HtmlUtil.ATTR_TITLE, member.name());
     methodSignature(member);
-    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.H3);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -321,7 +378,7 @@ public class ClientDoclet {
     }
     writer.attribute(HtmlUtil.ATTR_CLASS, cssClass);
 
-    DocletUtil.title(writer, name, name);
+    writer.element(HtmlUtil.H1, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -334,58 +391,6 @@ public class ClientDoclet {
 
     writer.endTagLn(HtmlUtil.DIV);
     writer.endTagLn(HtmlUtil.DIV);
-  }
-
-  public void documentationEnums(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> enums = new TreeMap<String, ClassDoc>();
-    for (final ClassDoc enumDoc : packageDoc.enums()) {
-      enums.put(enumDoc.name(), enumDoc);
-    }
-    if (!enums.isEmpty()) {
-      DocletUtil.title(writer, "Enums");
-      for (final ClassDoc enumDoc : enums.values()) {
-        documentationEnum(enumDoc);
-      }
-    }
-  }
-
-  public void documentationAnnotations(final PackageDoc packageDoc) {
-    final Map<String, AnnotationTypeDoc> annotations = new TreeMap<String, AnnotationTypeDoc>();
-    for (final AnnotationTypeDoc annotationDoc : packageDoc.annotationTypes()) {
-      annotations.put(annotationDoc.name(), annotationDoc);
-    }
-    if (!annotations.isEmpty()) {
-      DocletUtil.title(writer, "Annotations");
-      for (final AnnotationTypeDoc annotationDoc : annotations.values()) {
-        documentationAnnotation(annotationDoc);
-      }
-    }
-  }
-
-  public void documentationClasses(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
-    for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
-      classes.put(classDoc.name(), classDoc);
-    }
-    if (!classes.isEmpty()) {
-      DocletUtil.title(writer, "Classes");
-      for (final ClassDoc classDoc : classes.values()) {
-        documentationClass(classDoc);
-      }
-    }
-  }
-
-  public void documentationInterfaces(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> interfaces = new TreeMap<String, ClassDoc>();
-    for (final ClassDoc classDoc : packageDoc.interfaces()) {
-      interfaces.put(classDoc.name(), classDoc);
-    }
-    if (!interfaces.isEmpty()) {
-      DocletUtil.title(writer, "Interfaces");
-      for (final ClassDoc classDoc : interfaces.values()) {
-        documentationClass(classDoc);
-      }
-    }
   }
 
   private String getAnchor(final ExecutableMemberDoc member) {
@@ -490,7 +495,7 @@ public class ClientDoclet {
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "type");
 
-        Type type = parameter.type();
+        final Type type = parameter.type();
         DocletUtil.typeNameLink(writer, type);
         writer.endTagLn(HtmlUtil.TD);
 
@@ -513,6 +518,8 @@ public class ClientDoclet {
 
       } else if (optionName.equals("-doctitle")) {
         docTitle = option[1];
+      } else if (optionName.equals("-docid")) {
+        docId = option[1];
       } else if (optionName.equals("-htmlheader")) {
         header = FileUtil.getFileAsString(option[1]);
       } else if (optionName.equals("-htmlfooter")) {
@@ -548,6 +555,7 @@ public class ClientDoclet {
         writer.startTag(HtmlUtil.BODY);
       } else {
         header = header.replaceAll("\\$\\{docTitle\\}", docTitle);
+        header = header.replaceAll("\\$\\{docId\\}", docId);
         writer.write(header);
       }
 
@@ -559,6 +567,7 @@ public class ClientDoclet {
         writer.endTagLn(HtmlUtil.HTML);
       } else {
         footer = footer.replaceAll("\\$\\{docTitle\\}", docTitle);
+        footer = footer.replaceAll("\\$\\{docId\\}", docId);
         writer.write(footer);
       }
       writer.endDocument();

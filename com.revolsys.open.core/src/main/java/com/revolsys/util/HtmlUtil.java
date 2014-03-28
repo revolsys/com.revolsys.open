@@ -121,6 +121,10 @@ public final class HtmlUtil {
 
   public static final QName H4 = new QName(HTML_NS_URI, "h4", HTML_NS_PREFIX);
 
+  public static final QName H5 = new QName(HTML_NS_URI, "h5", HTML_NS_PREFIX);
+
+  public static final QName H6 = new QName(HTML_NS_URI, "h6", HTML_NS_PREFIX);
+
   public static final QName HEAD = new QName(HTML_NS_URI, "head",
     HTML_NS_PREFIX);
 

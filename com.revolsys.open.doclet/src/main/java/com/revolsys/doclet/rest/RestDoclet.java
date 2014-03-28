@@ -35,7 +35,8 @@ public class RestDoclet {
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
     if (optionName.equals("-d") || optionName.equals("-doctitle")
-      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
+      || optionName.equals("-docid") || optionName.equals("-htmlfooter")
+      || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
@@ -83,6 +84,8 @@ public class RestDoclet {
     return flag;
   }
 
+  private String docId;
+
   private String destDir = ".";
 
   private String docTitle;
@@ -110,15 +113,16 @@ public class RestDoclet {
     descriptions.add(description);
   }
 
-  public void bodyContent() {
-    writer.element(HtmlUtil.H1, docTitle);
-    DocletUtil.description(writer, null, root);
-    documentation();
-  }
-
   public void documentation() {
     writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "javaPackage open");
+
+    writer.element(HtmlUtil.H1, docTitle);
+    DocletUtil.description(writer, null, root);
     for (final PackageDoc packageDoc : root.specifiedPackages()) {
+
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "content");
       final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
       for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
         classes.put(classDoc.name(), classDoc);
@@ -127,7 +131,7 @@ public class RestDoclet {
         documentationClass(classDoc);
       }
     }
-
+    writer.endTag(HtmlUtil.DIV);
     writer.endTag(HtmlUtil.DIV);
   }
 
@@ -142,7 +146,8 @@ public class RestDoclet {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass open");
       final String name = classDoc.name();
-      title(DocletUtil.qualifiedName(classDoc),
+      DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
+        DocletUtil.qualifiedName(classDoc),
         CaseConverter.toCapitalizedWords(name));
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -161,7 +166,8 @@ public class RestDoclet {
       if (requestMapping != null) {
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
-        title(DocletUtil.qualifiedName(classDoc) + "." + methodName,
+        DocletUtil.tagWithAnchor(writer, HtmlUtil.H3,
+          DocletUtil.qualifiedName(classDoc) + "." + methodName,
           CaseConverter.toCapitalizedWords(methodName));
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -403,6 +409,8 @@ public class RestDoclet {
 
       } else if (optionName.equals("-doctitle")) {
         docTitle = option[1];
+      } else if (optionName.equals("-docid")) {
+        docId = option[1];
       } else if (optionName.equals("-htmlheader")) {
         header = FileUtil.getFileAsString(option[1]);
       } else if (optionName.equals("-htmlfooter")) {
@@ -434,10 +442,11 @@ public class RestDoclet {
         writer.startTag(HtmlUtil.BODY);
       } else {
         header = header.replaceAll("\\$\\{docTitle\\}", docTitle);
+        header = header.replaceAll("\\$\\{docId\\}", docId);
         writer.write(header);
       }
 
-      bodyContent();
+      documentation();
 
       if (footer == null) {
         writer.endTag(HtmlUtil.BODY);
@@ -445,6 +454,7 @@ public class RestDoclet {
         writer.endTag(HtmlUtil.HTML);
       } else {
         footer = footer.replaceAll("\\$\\{docTitle\\}", docTitle);
+        footer = footer.replaceAll("\\$\\{docId\\}", docId);
         writer.write(footer);
       }
       writer.endDocument();
@@ -453,23 +463,6 @@ public class RestDoclet {
         writer.close();
       }
     }
-  }
-
-  public void title(final String title) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    writer.text(title);
-    writer.endTag(HtmlUtil.DIV);
-  }
-
-  public void title(final String name, final String title) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    writer.startTag(HtmlUtil.A);
-    writer.attribute(HtmlUtil.ATTR_NAME, name);
-    writer.text(title);
-    writer.endTag(HtmlUtil.A);
-    writer.endTag(HtmlUtil.DIV);
   }
 
   private void uriTemplateParameters(final MethodDoc method) {

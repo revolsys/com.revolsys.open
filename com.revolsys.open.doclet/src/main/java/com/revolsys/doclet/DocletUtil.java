@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.namespace.QName;
+
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
@@ -435,5 +437,16 @@ public class DocletUtil {
       }
     }
     writer.text(type.dimension());
+  }
+
+  public static void tagWithAnchor(final XmlWriter writer, final QName tag,
+    final String name, final String title) {
+    writer.startTag(tag);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.startTag(HtmlUtil.A);
+    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.text(title);
+    writer.endTag(HtmlUtil.A);
+    writer.endTag(tag);
   }
 }
