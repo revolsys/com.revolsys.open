@@ -1,9 +1,11 @@
 function createAccordion(selector) {
   $(selector).each(function() {
     var active = false;
-    if (location.hash) {
-      if ($('a[name="' + location.hash.substring(1) + '"]', this).length > 0) {
-           active = 0;
+    if (window.location.hash) {
+      if ($('a[name="' + window.location.hash.substring(1) + '"]', this).length > 0) {
+        active = 0;
+      } else if ($(window.location.hash, this).length > 0) {
+        active = 0;
       }
     }
     if ($(this).hasClass('open')) {
@@ -67,5 +69,5 @@ $(document).ready(function() {
   createAccordion('div.javaPackage');
   prettyPrint();
   $(':button').button();
- 
+  showParents(window.location.hash); 
 });

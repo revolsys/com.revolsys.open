@@ -352,7 +352,42 @@ $(document).ready(
         return validateDecimalNumber(element, value);
       }, "Please enter a valid double number.");
     }
+    showParents(window.location.hash);
+    $(window).on('hashchange', function() {
+      var hash =  window.location.hash;
+      showParents($(hash));
+      
+      window.location.hash = hash;
+    });
   });
+
+function showParentsAClick(element) {
+  var href = $(element).attr('href');
+  if (href.substr(0,1) == '#') {
+    showParents(href);
+  }
+  return true;
+}
+
+function showParents(element) {
+  if (element) {
+    element = $(element);
+    element.parents().removeClass('closed');
+    element.parents().show();
+    var accordionTitle;
+    if (element.hasClass('ui-accordion-header')) {
+      accordionTitle = element;
+    } else if (element.hasClass('ui-accordion-content')){
+      accordionTitle = element.prev();
+    }
+    if (accordionTitle && !accordionTitle.hasClass('ui-accordion-header-active')) {
+      accordionTitle.click();
+    }
+    element.parents('.ui-accordion-content').each(function() {
+      showParents($(this));
+    });
+  }
+}
 
 function setPageId(pageId) {
   if (pageId) {
@@ -390,7 +425,6 @@ function createToc() {
       menuDepth++;
     }
     while(headingDepth < menuDepth) {
-      console.log('Up');
       tocMenu = tocMenu.parent();
       menuDepth--;
       indices.pop();
@@ -406,7 +440,7 @@ function createToc() {
     if (!title) {
       title = $(this).text();
     }
-    var link = $('<a href="#' + id + '"/>').text(title);
+    var link = $('<a href="#' + id + '" onclick="showParentsAClick(this)"/>').text(title);
     $(this).prepend(indices.join('.') + '. ');
     var cssClass='';
     if (menuDepth > 3) {
