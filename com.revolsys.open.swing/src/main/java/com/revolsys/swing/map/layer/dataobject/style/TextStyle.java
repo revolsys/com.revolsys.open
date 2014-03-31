@@ -220,10 +220,10 @@ public class TextStyle implements MapSerializer, Cloneable {
   public void setTextBoxColor(final Color textBoxColor) {
     if (textBoxColor == null) {
       this.textBoxColor = null;
-      this.textOpacity = 255;
+      this.textBoxOpacity = 255;
     } else {
       this.textBoxColor = textBoxColor;
-      this.textOpacity = textBoxColor.getAlpha();
+      this.textBoxOpacity = textBoxColor.getAlpha();
     }
   }
 
@@ -263,7 +263,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     if (fill == null) {
       this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
     } else {
-      this.textHaloFill = fill;
+      this.textHaloFill = WebColors.getColorWithOpacity(fill, this.textOpacity);
     }
   }
 

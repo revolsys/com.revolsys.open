@@ -78,6 +78,7 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements
   @Override
   public void updateChooser() {
     final Color color = getColorFromModel();
-    this.alphaSlider.setValue(color.getAlpha());
+    int alpha = color.getAlpha();
+    this.alphaSlider.setValue(alpha);
   }
 }
