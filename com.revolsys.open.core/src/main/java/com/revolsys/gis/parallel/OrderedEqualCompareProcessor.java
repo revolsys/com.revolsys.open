@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -39,6 +41,12 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   private List<String> equalExclude = new ArrayList<String>();
 
   private final PrecisionModel precisionModel = new PrecisionModel(1000);
+
+  private DataObjectMetaData metaData1;
+
+  private DataObjectMetaData metaData2;
+
+  private final Set<String> attributeNames = new TreeSet<String>();
 
   private boolean equals(final Geometry geometry1, final Geometry geometry2) {
     if (geometry1 == null) {
@@ -112,12 +120,13 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
   protected Set<String> getNotEqualAttributeNames(final DataObject object1,
     final DataObject object2) {
-    final DataObjectMetaData metaData = object1.getMetaData();
     final Set<String> notEqualAttributeNames = new LinkedHashSet<String>();
-    final String geometryAttributeName = metaData.getGeometryAttributeName();
-    for (final String attributeName : metaData.getAttributeNames()) {
+    final String geometryAttributeName1 = metaData1.getGeometryAttributeName();
+    final String geometryAttributeName2 = metaData2.getGeometryAttributeName();
+    for (final String attributeName : attributeNames) {
       if (!equalExclude.contains(attributeName)
-        && !attributeName.equals(geometryAttributeName)) {
+        && !attributeName.equals(geometryAttributeName1)
+        && !attributeName.equals(geometryAttributeName2)) {
         final Object value1 = object1.getValue(attributeName);
         final Object value2 = object2.getValue(attributeName);
         if (!valueEquals(value1, value2)) {
@@ -156,12 +165,33 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     return sourceName;
   }
 
+  private void initAttributes() {
+    final List<String> attributeNames1 = new ArrayList<>(
+      metaData1.getAttributeNames());
+    final List<String> attributeNames2 = new ArrayList<>(
+      metaData2.getAttributeNames());
+    attributeNames.addAll(attributeNames1);
+    attributeNames.retainAll(attributeNames2);
+    attributeNames1.removeAll(attributeNames);
+    attributeNames1.remove(metaData1.getGeometryAttributeName());
+    if (!attributeNames1.isEmpty()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Extra columns in file 1: " + attributeNames1);
+    }
+    attributeNames2.removeAll(attributeNames);
+    attributeNames2.remove(metaData2.getGeometryAttributeName());
+    if (!attributeNames2.isEmpty()) {
+      LoggerFactory.getLogger(getClass()).error(
+        "Extra columns in file 2: " + attributeNames2);
+    }
+  }
+
   protected void logNoMatch(final DataObject object, final boolean other) {
     if (other) {
-      DataObjectLog.error(getClass(), otherName + " has no match in "
+      DataObjectLog.warn(getClass(), otherName + " has no match in "
         + sourceName, object);
     } else {
-      DataObjectLog.error(getClass(), sourceName + " has no match in "
+      DataObjectLog.warn(getClass(), sourceName + " has no match in "
         + otherName, object);
     }
   }
@@ -225,6 +255,12 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       } else {
         final Channel<DataObject> channel = channels[index];
         final DataObject readObject = readObject(channel);
+        if (index == 0 && metaData1 == null) {
+          setMetaData1(readObject.getMetaData());
+        } else if (index == 1 && metaData2 == null) {
+          setMetaData2(readObject.getMetaData());
+        }
+
         if (readObject != null) {
           if (previousEqualObject != null
             && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
@@ -319,6 +355,20 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
   public void setEqualExclude(final List<String> equalExclude) {
     this.equalExclude = equalExclude;
+  }
+
+  public void setMetaData1(final DataObjectMetaData metaData1) {
+    this.metaData1 = metaData1;
+    if (metaData2 != null) {
+      initAttributes();
+    }
+  }
+
+  public void setMetaData2(final DataObjectMetaData metaData2) {
+    this.metaData2 = metaData2;
+    if (metaData1 != null) {
+      initAttributes();
+    }
   }
 
   /**
