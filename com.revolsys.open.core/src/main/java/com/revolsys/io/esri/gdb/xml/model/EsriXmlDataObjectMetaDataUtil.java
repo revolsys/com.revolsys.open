@@ -252,7 +252,13 @@ public class EsriXmlDataObjectMetaDataUtil implements
     if (!StringUtils.hasText(oidFieldName)) {
       oidFieldName = "OBJECTID";
     }
-    table.setCatalogPath(schemaPath + "\\" + name);
+    final String catalogPath;
+    if (schemaPath.equals("\\")) {
+      catalogPath = "\\" + name;
+    } else {
+      catalogPath = schemaPath + "\\" + name;
+    }
+    table.setCatalogPath(catalogPath);
     table.setName(name);
     table.setHasOID(true);
     table.setOIDFieldName(oidFieldName);

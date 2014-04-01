@@ -143,8 +143,8 @@ public class ClientDoclet {
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = annotationDoc.name();
 
-    final String anchor = DocletUtil.qualifiedName(annotationDoc);
-    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2, anchor, name);
+    final String id = DocletUtil.qualifiedName(annotationDoc);
+    HtmlUtil.elementWithId(writer, HtmlUtil.H2, id, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -174,7 +174,7 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "name");
-        DocletUtil.anchor(writer, anchor + "." + elementName, elementName);
+        DocletUtil.anchor(writer, id + "." + elementName, elementName);
         writer.endTagLn(HtmlUtil.TD);
 
         writer.startTag(HtmlUtil.TD);
@@ -226,8 +226,8 @@ public class ClientDoclet {
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = classDoc.name();
 
-    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
-      DocletUtil.qualifiedName(classDoc), name);
+    final String id = DocletUtil.qualifiedName(classDoc);
+    HtmlUtil.elementWithId(writer, HtmlUtil.H2, id, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -270,8 +270,8 @@ public class ClientDoclet {
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = enumDoc.name();
 
-    DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
-      DocletUtil.qualifiedName(enumDoc), name);
+    final String id = DocletUtil.qualifiedName(enumDoc);
+    HtmlUtil.elementWithId(writer, HtmlUtil.H2, id, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -350,6 +350,7 @@ public class ClientDoclet {
 
     writer.startTag(HtmlUtil.H3);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.attribute(HtmlUtil.ATTR_ID, getId(member));
     writer.attribute(HtmlUtil.ATTR_TITLE, member.name());
     methodSignature(member);
     writer.endTagLn(HtmlUtil.H3);
@@ -378,7 +379,8 @@ public class ClientDoclet {
     }
     writer.attribute(HtmlUtil.ATTR_CLASS, cssClass);
 
-    writer.element(HtmlUtil.H1, name);
+    final String id = name;
+    HtmlUtil.elementWithId(writer, HtmlUtil.H1, id, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
@@ -418,6 +420,27 @@ public class ClientDoclet {
       anchor.append(type.dimension());
     }
     anchor.append(")");
+    return anchor.toString();
+  }
+
+  private String getId(final ExecutableMemberDoc member) {
+    final StringBuffer anchor = new StringBuffer();
+    final ClassDoc classDoc = member.containingClass();
+    final String className = DocletUtil.qualifiedName(classDoc);
+    anchor.append(className);
+    anchor.append(".");
+    anchor.append(member.name());
+    final Parameter[] parameters = member.parameters();
+    for (final Parameter parameter : parameters) {
+      anchor.append("-");
+      final Type type = parameter.type();
+      String typeName = type.qualifiedTypeName();
+      typeName = typeName.replaceAll("^java.lang.", "");
+      typeName = typeName.replaceAll("^java.io.", "");
+      typeName = typeName.replaceAll("^java.util.", "");
+      anchor.append(typeName);
+      anchor.append(type.dimension());
+    }
     return anchor.toString();
   }
 

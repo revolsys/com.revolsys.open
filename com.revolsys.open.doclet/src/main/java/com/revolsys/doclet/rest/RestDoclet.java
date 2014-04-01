@@ -117,7 +117,7 @@ public class RestDoclet {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaPackage open");
 
-    writer.element(HtmlUtil.H1, docTitle);
+    HtmlUtil.elementWithId(writer, HtmlUtil.H1, docId, docTitle);
     DocletUtil.description(writer, null, root);
     for (final PackageDoc packageDoc : root.specifiedPackages()) {
 
@@ -138,52 +138,47 @@ public class RestDoclet {
   public void documentationClass(final ClassDoc classDoc) {
     if (DocletUtil.hasAnnotation(classDoc,
       "org.springframework.stereotype.Controller")) {
-      writer.startTag(HtmlUtil.A);
-      writer.attribute(HtmlUtil.ATTR_NAME, DocletUtil.qualifiedName(classDoc));
-      writer.text("");
-      writer.endTag(HtmlUtil.A);
-
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass open");
+
+      final String id = DocletUtil.qualifiedName(classDoc);
       final String name = classDoc.name();
-      DocletUtil.tagWithAnchor(writer, HtmlUtil.H2,
-        DocletUtil.qualifiedName(classDoc),
-        CaseConverter.toCapitalizedWords(name));
+      final String title = CaseConverter.toCapitalizedWords(name);
+      HtmlUtil.elementWithId(writer, HtmlUtil.H2, id, title);
+
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "content");
       DocletUtil.description(writer, classDoc, classDoc);
       documentationMethod(classDoc);
       writer.endTag(HtmlUtil.DIV);
+
       writer.endTag(HtmlUtil.DIV);
     }
   }
 
   public void documentationMethod(final ClassDoc classDoc) {
     for (final MethodDoc method : classDoc.methods()) {
-      final String methodName = method.name();
       final AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
         "org.springframework.web.bind.annotation.RequestMapping");
       if (requestMapping != null) {
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
-        DocletUtil.tagWithAnchor(writer, HtmlUtil.H3,
-          DocletUtil.qualifiedName(classDoc) + "." + methodName,
-          CaseConverter.toCapitalizedWords(methodName));
+
+        final String name = method.name();
+        final String id = DocletUtil.qualifiedName(classDoc) + "." + name;
+        final String title = CaseConverter.toCapitalizedWords(name);
+        HtmlUtil.elementWithId(writer, HtmlUtil.H3, id, title);
+
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
         DocletUtil.description(writer, method.containingClass(), method);
-
         requestMethods(requestMapping);
-
         uriTemplates(requestMapping);
-
         uriTemplateParameters(method);
-
         parameters(method);
-
         responseStatus(method);
-
         writer.endTag(HtmlUtil.DIV);
+
         writer.endTag(HtmlUtil.DIV);
       }
     }

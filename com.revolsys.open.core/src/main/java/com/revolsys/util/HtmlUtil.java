@@ -207,6 +207,14 @@ public final class HtmlUtil {
 
   public static final QName ATTR_CONTENT = new QName("content");
 
+  public static void elementWithId(final XmlWriter writer, final QName tag,
+    final String id, final Object content) {
+    writer.startTag(tag);
+    writer.attribute(ATTR_ID, id.replaceAll("[^A-Za-z0-9\\-:.]", "_"));
+    writer.text(content);
+    writer.endTag(tag);
+  }
+
   public static void serializeA(final XmlWriter out, final String cssClass,
     final Object url, final Object content) {
     if (url != null) {

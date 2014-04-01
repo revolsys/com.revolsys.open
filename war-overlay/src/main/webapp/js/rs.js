@@ -268,7 +268,7 @@ $(document).ready(
     $(window).bind('hashchange', function() {
       var hash = window.location.hash;
       if (hash) {
-        var anchor = $('a.ui-tabs-anchor[href=' + hash + ']');
+        var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
         anchor.click();
       }
     });
