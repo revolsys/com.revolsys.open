@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,6 +32,11 @@
  */
 package com.vividsolutions.jts.geom;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.revolsys.collection.AbstractIterator;
+
 /**
  * Models a collection of {@link Point}s.
  * <p>
@@ -41,12 +44,18 @@ package com.vividsolutions.jts.geom;
  *
  *@version 1.7
  */
-public class MultiPoint
-  extends GeometryCollection
-  implements Puntal
-{
+public class MultiPoint extends GeometryCollection implements Puntal {
 
   private static final long serialVersionUID = -8048474874175355449L;
+
+  /**
+   *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
+   *      , or <code>null</code> or an empty array to create the empty geometry.
+   *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
+   */
+  public MultiPoint(final Point[] points, final GeometryFactory factory) {
+    super(points, factory);
+  }
 
   /**
    *  Constructs a <code>MultiPoint</code>.
@@ -60,29 +69,18 @@ public class MultiPoint
    *      <code>MultiPoint</code>
    * @deprecated Use GeometryFactory instead
    */
-  public MultiPoint(Point[] points, PrecisionModel precisionModel, int SRID) {
+  @Deprecated
+  public MultiPoint(final Point[] points, final PrecisionModel precisionModel,
+    final int SRID) {
     super(points, new GeometryFactory(precisionModel, SRID));
   }
 
-  /**
-   *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
-   *      , or <code>null</code> or an empty array to create the empty geometry.
-   *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
-   */
-  public MultiPoint(Point[] points, GeometryFactory factory) {
-    super(points, factory);
-  }
-
-  public int getDimension() {
-    return 0;
-  }
-
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
-  }
-
-  public String getGeometryType() {
-    return "MultiPoint";
+  @Override
+  public boolean equalsExact(final Geometry other, final double tolerance) {
+    if (!isEquivalentClass(other)) {
+      return false;
+    }
+    return super.equalsExact(other, tolerance);
   }
 
   /**
@@ -93,19 +91,14 @@ public class MultiPoint
    * @return an empty GeometryCollection
    * @see Geometry#getBoundary
    */
+  @Override
   public Geometry getBoundary() {
     return getFactory().createGeometryCollection(null);
   }
 
-  public boolean isValid() {
-    return true;
-  }
-
-  public boolean equalsExact(Geometry other, double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
+  @Override
+  public int getBoundaryDimension() {
+    return Dimension.FALSE;
   }
 
   /**
@@ -115,9 +108,57 @@ public class MultiPoint
    *      at 0
    *@return    the <code>n</code>th <code>Coordinate</code>
    */
-  protected Coordinate getCoordinate(int n) {
-    return ((Point) geometries[n]).getCoordinate();
+  protected Coordinate getCoordinate(final int n) {
+    return ((Point)geometries[n]).getCoordinate();
+  }
+
+  @Override
+  public int getDimension() {
+    return 0;
+  }
+
+  @Override
+  public String getGeometryType() {
+    return "MultiPoint";
+  }
+
+  /**
+   * @author Paul Austin <paul.austin@revolsys.com>
+   */
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public <V extends Point> List<V> getPoints() {
+    return (List)super.getGeometries();
+  }
+
+  @Override
+  public boolean isValid() {
+    return true;
+  }
+
+  /**
+   * @author Paul Austin <paul.austin@revolsys.com>
+   */
+  @Override
+  public Iterable<GeometryVertex> vertices() {
+    return new AbstractIterator<GeometryVertex>() {
+      private GeometryVertex vertex = new GeometryVertex(MultiPoint.this, 0);
+
+      private int index = 0;
+
+      @Override
+      protected GeometryVertex getNext() throws NoSuchElementException {
+        if (index < getNumGeometries()) {
+          vertex.setVertexId(index);
+          index++;
+          return vertex;
+        } else {
+          vertex = null;
+          throw new NoSuchElementException();
+        }
+      }
+    };
   }
 
 }
-

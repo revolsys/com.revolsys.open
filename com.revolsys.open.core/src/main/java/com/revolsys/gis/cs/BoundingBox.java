@@ -760,7 +760,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     final double maxX = getMaxX();
     final double minY = getMinY();
     final double maxY = getMaxY();
-    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxX,
+    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxY,
       maxX, maxY);
   }
 

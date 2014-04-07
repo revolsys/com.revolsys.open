@@ -36,7 +36,7 @@ public abstract class AbstractTransactionalCommand implements Runnable {
 
   public void runInTransaction() {
     final InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
-      getBeanFactory(), false, -1, false);
+      getBeanFactory(), true, -1, false);
     invoker.execute(this, "run");
   }
 }

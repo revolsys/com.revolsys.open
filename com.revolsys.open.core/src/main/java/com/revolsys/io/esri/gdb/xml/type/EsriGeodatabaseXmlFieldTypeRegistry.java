@@ -60,6 +60,8 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
       DataTypes.LINE_STRING));
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
+      DataTypes.LINEAR_RING));
+    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
       DataTypes.MULTI_LINE_STRING));
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
       DataTypes.POLYGON));

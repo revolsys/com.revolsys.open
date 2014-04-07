@@ -32,6 +32,10 @@
  */
 package com.vividsolutions.jts.geom;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.revolsys.collection.AbstractIterator;
 import com.vividsolutions.jts.operation.BoundaryOp;
 
 /**
@@ -41,11 +45,21 @@ import com.vividsolutions.jts.operation.BoundaryOp;
  *
  *@version 1.7
  */
-public class MultiLineString 
-	extends GeometryCollection
-	implements Lineal
-	{
+public class MultiLineString extends GeometryCollection implements Lineal {
   private static final long serialVersionUID = 8166665132445433741L;
+
+  /**
+   * @param lineStrings
+   *            the <code>LineString</code>s for this <code>MultiLineString</code>,
+   *            or <code>null</code> or an empty array to create the empty
+   *            geometry. Elements may be empty <code>LineString</code>s,
+   *            but not <code>null</code>s.
+   */
+  public MultiLineString(final LineString[] lineStrings,
+    final GeometryFactory factory) {
+    super(lineStrings, factory);
+  }
+
   /**
    *  Constructs a <code>MultiLineString</code>.
    *
@@ -59,48 +73,18 @@ public class MultiLineString
    *      <code>MultiLineString</code>
    * @deprecated Use GeometryFactory instead
    */
-  public MultiLineString(LineString[] lineStrings, PrecisionModel precisionModel, int SRID) {
+  @Deprecated
+  public MultiLineString(final LineString[] lineStrings,
+    final PrecisionModel precisionModel, final int SRID) {
     super(lineStrings, new GeometryFactory(precisionModel, SRID));
   }
 
-
-
-  /**
-   * @param lineStrings
-   *            the <code>LineString</code>s for this <code>MultiLineString</code>,
-   *            or <code>null</code> or an empty array to create the empty
-   *            geometry. Elements may be empty <code>LineString</code>s,
-   *            but not <code>null</code>s.
-   */
-  public MultiLineString(LineString[] lineStrings, GeometryFactory factory) {
-    super(lineStrings, factory);
-  }
-
-  public int getDimension() {
-    return 1;
-  }
-
-  public int getBoundaryDimension() {
-    if (isClosed()) {
-      return Dimension.FALSE;
-    }
-    return 0;
-  }
-
-  public String getGeometryType() {
-    return "MultiLineString";
-  }
-
-  public boolean isClosed() {
-    if (isEmpty()) {
+  @Override
+  public boolean equalsExact(final Geometry other, final double tolerance) {
+    if (!isEquivalentClass(other)) {
       return false;
     }
-    for (int i = 0; i < geometries.length; i++) {
-      if (!((LineString) geometries[i]).isClosed()) {
-        return false;
-      }
-    }
-    return true;
+    return super.equalsExact(other, tolerance);
   }
 
   /**
@@ -110,9 +94,46 @@ public class MultiLineString
    * @return the boundary geometry
    * @see Geometry#getBoundary
    */
-  public Geometry getBoundary()
-  {
+  @Override
+  public Geometry getBoundary() {
     return (new BoundaryOp(this)).getBoundary();
+  }
+
+  @Override
+  public int getBoundaryDimension() {
+    if (isClosed()) {
+      return Dimension.FALSE;
+    }
+    return 0;
+  }
+
+  @Override
+  public int getDimension() {
+    return 1;
+  }
+
+  @Override
+  public String getGeometryType() {
+    return "MultiLineString";
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public <V extends LineString> List<V> getLineStrings() {
+    return (List)super.getGeometries();
+  }
+
+  public boolean isClosed() {
+    if (isEmpty()) {
+      return false;
+    }
+    for (int i = 0; i < geometries.length; i++) {
+      if (!((LineString)geometries[i]).isClosed()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -124,22 +145,49 @@ public class MultiLineString
    *
    * @return a {@link MultiLineString} in the reverse order
    */
-  public Geometry reverse()
-  {
-    int nLines = geometries.length;
-    LineString[] revLines = new LineString[nLines];
+  @Override
+  public Geometry reverse() {
+    final int nLines = geometries.length;
+    final LineString[] revLines = new LineString[nLines];
     for (int i = 0; i < geometries.length; i++) {
       revLines[nLines - 1 - i] = (LineString)geometries[i].reverse();
     }
     return getFactory().createMultiLineString(revLines);
   }
 
-  public boolean equalsExact(Geometry other, double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
+  /**
+   * @author Paul Austin <paul.austin@revolsys.com>
+   */
+  @Override
+  public Iterable<GeometryVertex> vertices() {
+    return new AbstractIterator<GeometryVertex>() {
+      private GeometryVertex vertex = new GeometryVertex(MultiLineString.this,
+        0);
+
+      private int vertexIndex = 0;
+
+      private int partIndex = 0;
+
+      private LineString line = getLineStrings().get(0);
+
+      @Override
+      protected GeometryVertex getNext() throws NoSuchElementException {
+        while (vertexIndex >= line.getNumPoints()) {
+          vertexIndex = 0;
+          partIndex++;
+          if (partIndex < getLineStrings().size()) {
+            line = getLineStrings().get(partIndex);
+          } else {
+            vertex = null;
+            throw new NoSuchElementException();
+          }
+        }
+
+        vertex.setVertexId(partIndex, vertexIndex);
+        vertexIndex++;
+        return vertex;
+      }
+    };
   }
 
 }
-

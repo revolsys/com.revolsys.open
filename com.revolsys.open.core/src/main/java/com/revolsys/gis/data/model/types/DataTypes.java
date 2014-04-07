@@ -23,6 +23,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -82,6 +83,9 @@ public final class DataTypes {
 
   public static final DataType LINE_STRING = new SimpleDataType("LineString",
     LineString.class);
+
+  public static final DataType LINEAR_RING = new SimpleDataType("LinearRing",
+    LinearRing.class);
 
   public static final DataType LIST = new CollectionDataType("List",
     List.class, OBJECT);

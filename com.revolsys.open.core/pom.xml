@@ -132,17 +132,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
-      <version>1.12</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xercesImpl</artifactId>
-          <groupId>xerces</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>javax.measure</groupId>
       <artifactId>jsr-275</artifactId>
       <version>0.9.4</version>

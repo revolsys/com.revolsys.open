@@ -270,7 +270,9 @@ $(document).ready(
       if (hash) {
         var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
         anchor.click();
+        showParentsHash(hash);
       }
+      window.location.hash = hash;
     });
      
     $('div.objectList table').dataTable({
@@ -352,31 +354,38 @@ $(document).ready(
         return validateDecimalNumber(element, value);
       }, "Please enter a valid double number.");
     }
-    showParents(window.location.hash);
-    $(window).on('hashchange', function() {
-      var hash =  window.location.hash;
-      showParents($(hash));
-      
-      window.location.hash = hash;
-    });
+    showParentsHash(window.location.hash);
   });
 
 function showParentsAClick(element) {
   var href = $(element).attr('href');
-  if (href.substr(0,1) == '#') {
-    showParents(href);
-  }
+  showParentsHash(href);
   return true;
+}
+
+function showParentsHash(hash) {
+  if (hash && hash.substr(0,1) == '#') {
+    showParents('[id="' + hash.substr(1) + '"]');
+    showParents('a[name="' + hash.substr(1) + '"]');
+  }
+}
+
+function showElement(element) {
+  element.removeClass('closed');
+  element.show();
 }
 
 function showParents(element) {
   if (element) {
     element = $(element);
-    element.parents().removeClass('closed');
-    element.parents().show();
+    showElement(element);
+    element.parents().each(function() {
+      showElement($(this));
+    });
     var accordionTitle;
     if (element.hasClass('ui-accordion-header')) {
       accordionTitle = element;
+      showElement(element.next());
     } else if (element.hasClass('ui-accordion-content')){
       accordionTitle = element.prev();
     }

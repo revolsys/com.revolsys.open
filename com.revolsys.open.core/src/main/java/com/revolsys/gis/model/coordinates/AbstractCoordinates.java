@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.util.MathUtil;
 
@@ -105,6 +106,10 @@ public abstract class AbstractCoordinates implements Coordinates {
     return false;
   }
 
+  public BoundingBox getBoundingBox() {
+    return new BoundingBox(this);
+  }
+
   @Override
   public double[] getCoordinates() {
     final double[] coordinates = new double[getNumAxis()];
@@ -122,6 +127,10 @@ public abstract class AbstractCoordinates implements Coordinates {
   @Override
   public byte getNumAxis() {
     return 2;
+  }
+
+  public int getSrid() {
+    return 0;
   }
 
   @Override
@@ -179,19 +188,29 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public String toString() {
+    final StringBuffer s = new StringBuffer();
+    final int srid = getSrid();
+    if (srid != 0) {
+      s.append("SRID=");
+      s.append(srid);
+      s.append(';');
+    }
     final byte numAxis = getNumAxis();
     final double[] coordinates = getCoordinates();
     if (numAxis > 0) {
-      final StringBuffer s = new StringBuffer(String.valueOf(coordinates[0]));
-      for (int i = 1; i < numAxis; i++) {
+      s.append("POINT(");
+      for (int i = 0; i < numAxis; i++) {
         final Double ordinate = coordinates[i];
-        s.append(',');
-        s.append(ordinate);
+        if (i > 0) {
+          s.append(' ');
+        }
+        s.append(MathUtil.toString(ordinate));
       }
-      return s.toString();
+      s.append(')');
     } else {
-      return "";
+      s.append("POINT EMPTY");
     }
+    return s.toString();
   }
 
 }

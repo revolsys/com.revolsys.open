@@ -32,6 +32,12 @@
  */
 package com.vividsolutions.jts.geom;
 
+import java.util.NoSuchElementException;
+
+import com.revolsys.collection.AbstractIterator;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.operation.BoundaryOp;
 
@@ -52,11 +58,9 @@ import com.vividsolutions.jts.operation.BoundaryOp;
  *
  *@version 1.7
  */
-public class LineString 
-	extends Geometry 
-	implements Lineal
-{
+public class LineString extends Geometry implements Lineal {
   private static final long serialVersionUID = 3110669828065365560L;
+
   /**
    *  The points of this <code>LineString</code>.
    */
@@ -75,8 +79,9 @@ public class LineString
    * @throws IllegalArgumentException if too few points are provided
    */
   /** @deprecated Use GeometryFactory instead */
-  public LineString(Coordinate points[], PrecisionModel precisionModel, int SRID)
-  {
+  @Deprecated
+  public LineString(final Coordinate points[],
+    final PrecisionModel precisionModel, final int SRID) {
     super(new GeometryFactory(precisionModel, SRID));
     init(getFactory().getCoordinateSequenceFactory().create(points));
   }
@@ -88,190 +93,42 @@ public class LineString
    *      to create the empty geometry. 
    * @throws IllegalArgumentException if too few points are provided
    */
-  public LineString(CoordinateSequence points, GeometryFactory factory) {
+  public LineString(final CoordinateSequence points,
+    final GeometryFactory factory) {
     super(factory);
     init(points);
   }
 
-  private void init(CoordinateSequence points)
-  {
-    if (points == null) {
-      points = getFactory().getCoordinateSequenceFactory().create(new Coordinate[]{});
-    }
-    if (points.size() == 1) {
-      throw new IllegalArgumentException("Invalid number of points in LineString (found " 
-      		+ points.size() + " - must be 0 or >= 2)");
-    }
-    this.points = points;
-  }
-  public Coordinate[] getCoordinates() {
-    return points.toCoordinateArray();
-  }
-
-  public CoordinateSequence getCoordinateSequence() {
-      return points;
-  }
-
-  public Coordinate getCoordinateN(int n) {
-      return points.getCoordinate(n);
-  }
-
-  public Coordinate getCoordinate()
-  {
-    if (isEmpty()) return null;
-    return points.getCoordinate(0);
-  }
-
-  public int getDimension() {
-    return 1;
-  }
-
-  public int getBoundaryDimension() {
-    if (isClosed()) {
-      return Dimension.FALSE;
-    }
-    return 0;
-  }
-
-  public boolean isEmpty() {
-      return points.size() == 0;
-  }
-
-  public int getNumPoints() {
-      return points.size();
-  }
-
-  public Point getPointN(int n) {
-      return getFactory().createPoint(points.getCoordinate(n));
-  }
-
-  public Point getStartPoint() {
-    if (isEmpty()) {
-      return null;
-    }
-    return getPointN(0);
-  }
-
-  public Point getEndPoint() {
-    if (isEmpty()) {
-      return null;
-    }
-    return getPointN(getNumPoints() - 1);
-  }
-
-  public boolean isClosed() {
-    if (isEmpty()) {
-      return false;
-    }
-    return getCoordinateN(0).equals2D(getCoordinateN(getNumPoints() - 1));
-  }
-
-  public boolean isRing() {
-    return isClosed() && isSimple();
-  }
-
-  public String getGeometryType() {
-    return "LineString";
-  }
-
-  /**
-   *  Returns the length of this <code>LineString</code>
-   *
-   *@return the length of the linestring
-   */
-  public double getLength()
-  {
-   return CGAlgorithms.length(points);
-  }
-
-  /**
-   * Gets the boundary of this geometry.
-   * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
-   *
-   * @return the boundary geometry
-   * @see Geometry#getBoundary
-   */
-  public Geometry getBoundary() {
-    return (new BoundaryOp(this)).getBoundary();
-  }
-
-  /**
-   * Creates a {@link LineString} whose coordinates are in the reverse
-   * order of this objects
-   *
-   * @return a {@link LineString} with coordinates in the reverse order
-   */
-  public Geometry reverse()
-  {
-    CoordinateSequence seq = (CoordinateSequence) points.clone();
-    CoordinateSequences.reverse(seq);
-    LineString revLine = getFactory().createLineString(seq);
-    return revLine;
-  }
-
-  /**
-   *  Returns true if the given point is a vertex of this <code>LineString</code>.
-   *
-   *@param  pt  the <code>Coordinate</code> to check
-   *@return     <code>true</code> if <code>pt</code> is one of this <code>LineString</code>
-   *      's vertices
-   */
-  public boolean isCoordinate(Coordinate pt) {
-      for (int i = 0; i < points.size(); i++) {
-        if (points.getCoordinate(i).equals(pt)) {
-          return true;
-        }
-      }
-    return false;
-  }
-
-  protected Envelope computeEnvelopeInternal() {
-    if (isEmpty()) {
-      return new Envelope();
-    }
-    return points.expandEnvelope(new Envelope());
-  }
-
-  public boolean equalsExact(Geometry other, double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    LineString otherLineString = (LineString) other;
-    if (points.size() != otherLineString.points.size()) {
-      return false;
-    }
+  @Override
+  public void apply(final CoordinateFilter filter) {
     for (int i = 0; i < points.size(); i++) {
-      if (!equal(points.getCoordinate(i), otherLineString.points.getCoordinate(i), tolerance)) {
-        return false;
-      }
+      filter.filter(points.getCoordinate(i));
     }
-    return true;
   }
 
-  public void apply(CoordinateFilter filter) {
-      for (int i = 0; i < points.size(); i++) {
-        filter.filter(points.getCoordinate(i));
-      }
-  }
-
-  public void apply(CoordinateSequenceFilter filter) 
-  {
-    if (points.size() == 0)
+  @Override
+  public void apply(final CoordinateSequenceFilter filter) {
+    if (points.size() == 0) {
       return;
+    }
     for (int i = 0; i < points.size(); i++) {
       filter.filter(points, i);
-      if (filter.isDone())
+      if (filter.isDone()) {
         break;
+      }
     }
-    if (filter.isGeometryChanged())
+    if (filter.isGeometryChanged()) {
       geometryChanged();
+    }
   }
 
-  public void apply(GeometryFilter filter) {
+  @Override
+  public void apply(final GeometryComponentFilter filter) {
     filter.filter(this);
   }
 
-  public void apply(GeometryComponentFilter filter) {
+  @Override
+  public void apply(final GeometryFilter filter) {
     filter.filter(this);
   }
 
@@ -281,43 +138,22 @@ public class LineString
    *
    * @return a clone of this instance
    */
+  @Override
   public Object clone() {
-    LineString ls = (LineString) super.clone();
-    ls.points = (CoordinateSequence) points.clone();
+    final LineString ls = (LineString)super.clone();
+    ls.points = (CoordinateSequence)points.clone();
     return ls;
   }
 
-  /**
-   * Normalizes a LineString.  A normalized linestring
-   * has the first point which is not equal to it's reflected point
-   * less than the reflected point.
-   */
-  public void normalize()
-  {
-      for (int i = 0; i < points.size() / 2; i++) {
-        int j = points.size() - 1 - i;
-        // skip equal points on both ends
-        if (!points.getCoordinate(i).equals(points.getCoordinate(j))) {
-          if (points.getCoordinate(i).compareTo(points.getCoordinate(j)) > 0) {
-            CoordinateArrays.reverse(getCoordinates());
-          }
-          return;
-        }
-      }
-  }
-
-  protected boolean isEquivalentClass(Geometry other) {
-    return other instanceof LineString;
-  }
-
-  protected int compareToSameClass(Object o)
-  {
-    LineString line = (LineString) o;
+  @Override
+  protected int compareToSameClass(final Object o) {
+    final LineString line = (LineString)o;
     // MD - optimized implementation
     int i = 0;
     int j = 0;
     while (i < points.size() && j < line.points.size()) {
-      int comparison = points.getCoordinate(i).compareTo(line.points.getCoordinate(j));
+      final int comparison = points.getCoordinate(i).compareTo(
+        line.points.getCoordinate(j));
       if (comparison != 0) {
         return comparison;
       }
@@ -333,10 +169,233 @@ public class LineString
     return 0;
   }
 
-  protected int compareToSameClass(Object o, CoordinateSequenceComparator comp)
-  {
-    LineString line = (LineString) o;
+  @Override
+  protected int compareToSameClass(final Object o,
+    final CoordinateSequenceComparator comp) {
+    final LineString line = (LineString)o;
     return comp.compare(this.points, line.points);
+  }
+
+  @Override
+  protected Envelope computeEnvelopeInternal() {
+    if (isEmpty()) {
+      return new Envelope();
+    }
+    return points.expandEnvelope(new Envelope());
+  }
+
+  @Override
+  public boolean equalsExact(final Geometry other, final double tolerance) {
+    if (!isEquivalentClass(other)) {
+      return false;
+    }
+    final LineString otherLineString = (LineString)other;
+    if (points.size() != otherLineString.points.size()) {
+      return false;
+    }
+    for (int i = 0; i < points.size(); i++) {
+      if (!equal(points.getCoordinate(i),
+        otherLineString.points.getCoordinate(i), tolerance)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Gets the boundary of this geometry.
+   * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+   *
+   * @return the boundary geometry
+   * @see Geometry#getBoundary
+   */
+  @Override
+  public Geometry getBoundary() {
+    return (new BoundaryOp(this)).getBoundary();
+  }
+
+  @Override
+  public int getBoundaryDimension() {
+    if (isClosed()) {
+      return Dimension.FALSE;
+    }
+    return 0;
+  }
+
+  @Override
+  public Coordinate getCoordinate() {
+    if (isEmpty()) {
+      return null;
+    }
+    return points.getCoordinate(0);
+  }
+
+  public Coordinate getCoordinateN(final int n) {
+    return points.getCoordinate(n);
+  }
+
+  @Override
+  public Coordinate[] getCoordinates() {
+    return points.toCoordinateArray();
+  }
+
+  public CoordinateSequence getCoordinateSequence() {
+    return points;
+  }
+
+  @Override
+  public int getDimension() {
+    return 1;
+  }
+
+  public Point getEndPoint() {
+    if (isEmpty()) {
+      return null;
+    }
+    return getPointN(getNumPoints() - 1);
+  }
+
+  @Override
+  public String getGeometryType() {
+    return "LineString";
+  }
+
+  /**
+   *  Returns the length of this <code>LineString</code>
+   *
+   *@return the length of the linestring
+   */
+  @Override
+  public double getLength() {
+    return CGAlgorithms.length(points);
+  }
+
+  @Override
+  public int getNumPoints() {
+    return points.size();
+  }
+
+  public CoordinatesList getPointList() {
+    return CoordinatesListUtil.get(this);
+  }
+
+  public Point getPointN(final int n) {
+    return getFactory().createPoint(points.getCoordinate(n));
+  }
+
+  public Point getStartPoint() {
+    if (isEmpty()) {
+      return null;
+    }
+    return getPointN(0);
+  }
+
+  private void init(CoordinateSequence points) {
+    if (points == null) {
+      points = getFactory().getCoordinateSequenceFactory().create(
+        new Coordinate[] {});
+    }
+    if (points.size() == 1) {
+      throw new IllegalArgumentException(
+        "Invalid number of points in LineString (found " + points.size()
+          + " - must be 0 or >= 2)");
+    }
+    this.points = points;
+  }
+
+  public boolean isClosed() {
+    if (isEmpty()) {
+      return false;
+    }
+    return getCoordinateN(0).equals2D(getCoordinateN(getNumPoints() - 1));
+  }
+
+  /**
+   *  Returns true if the given point is a vertex of this <code>LineString</code>.
+   *
+   *@param  pt  the <code>Coordinate</code> to check
+   *@return     <code>true</code> if <code>pt</code> is one of this <code>LineString</code>
+   *      's vertices
+   */
+  public boolean isCoordinate(final Coordinate pt) {
+    for (int i = 0; i < points.size(); i++) {
+      if (points.getCoordinate(i).equals(pt)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return points.size() == 0;
+  }
+
+  @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof LineString;
+  }
+
+  public boolean isRing() {
+    return isClosed() && isSimple();
+  }
+
+  /**
+   * Normalizes a LineString.  A normalized linestring
+   * has the first point which is not equal to it's reflected point
+   * less than the reflected point.
+   */
+  @Override
+  public void normalize() {
+    for (int i = 0; i < points.size() / 2; i++) {
+      final int j = points.size() - 1 - i;
+      // skip equal points on both ends
+      if (!points.getCoordinate(i).equals(points.getCoordinate(j))) {
+        if (points.getCoordinate(i).compareTo(points.getCoordinate(j)) > 0) {
+          CoordinateArrays.reverse(getCoordinates());
+        }
+        return;
+      }
+    }
+  }
+
+  public Iterable<Coordinates> points() {
+    return getPointList();
+  }
+
+  /**
+   * Creates a {@link LineString} whose coordinates are in the reverse
+   * order of this objects
+   *
+   * @return a {@link LineString} with coordinates in the reverse order
+   */
+  @Override
+  public Geometry reverse() {
+    final CoordinateSequence seq = (CoordinateSequence)points.clone();
+    CoordinateSequences.reverse(seq);
+    final LineString revLine = getFactory().createLineString(seq);
+    return revLine;
+  }
+
+  @Override
+  public Iterable<GeometryVertex> vertices() {
+    return new AbstractIterator<GeometryVertex>() {
+      private GeometryVertex vertex = new GeometryVertex(LineString.this, 0);
+
+      private int index = 0;
+
+      @Override
+      protected GeometryVertex getNext() throws NoSuchElementException {
+        if (index < getNumPoints()) {
+          vertex.setVertexId(index);
+          index++;
+          return vertex;
+        } else {
+          vertex = null;
+          throw new NoSuchElementException();
+        }
+      }
+    };
   }
 
 }

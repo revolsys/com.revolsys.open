@@ -441,7 +441,7 @@ public class ClientDoclet {
       anchor.append(typeName);
       anchor.append(type.dimension());
     }
-    return anchor.toString();
+    return anchor.toString().replaceAll("[^A-Za-z0-9\\-_.]", "_");
   }
 
   public void methodSignature(final ExecutableMemberDoc member) {

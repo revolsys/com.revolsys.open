@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,6 +33,10 @@
 package com.vividsolutions.jts.geom;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.revolsys.collection.AbstractIterator;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -48,11 +50,23 @@ import java.util.ArrayList;
  *
  *@version 1.7
  */
-public class MultiPolygon 
-	extends GeometryCollection 
-	implements Polygonal
-{
+public class MultiPolygon extends GeometryCollection implements Polygonal {
   private static final long serialVersionUID = -551033529766975875L;
+
+  /**
+   * @param polygons
+   *            the <code>Polygon</code>s for this <code>MultiPolygon</code>,
+   *            or <code>null</code> or an empty array to create the empty
+   *            geometry. Elements may be empty <code>Polygon</code>s, but
+   *            not <code>null</code>s. The polygons must conform to the
+   *            assertions specified in the <A
+   *            HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple
+   *            Features Specification for SQL</A>.
+   */
+  public MultiPolygon(final Polygon[] polygons, final GeometryFactory factory) {
+    super(polygons, factory);
+  }
+
   /**
    *  Constructs a <code>MultiPolygon</code>.
    *
@@ -68,72 +82,70 @@ public class MultiPolygon
    *      <code>MultiPolygon</code>
    * @deprecated Use GeometryFactory instead
    */
-  public MultiPolygon(Polygon[] polygons, PrecisionModel precisionModel, int SRID) {
+  @Deprecated
+  public MultiPolygon(final Polygon[] polygons,
+    final PrecisionModel precisionModel, final int SRID) {
     this(polygons, new GeometryFactory(precisionModel, SRID));
   }
 
-
-  /**
-   * @param polygons
-   *            the <code>Polygon</code>s for this <code>MultiPolygon</code>,
-   *            or <code>null</code> or an empty array to create the empty
-   *            geometry. Elements may be empty <code>Polygon</code>s, but
-   *            not <code>null</code>s. The polygons must conform to the
-   *            assertions specified in the <A
-   *            HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple
-   *            Features Specification for SQL</A>.
-   */
-  public MultiPolygon(Polygon[] polygons, GeometryFactory factory) {
-    super(polygons, factory);
+  @Override
+  public boolean equalsExact(final Geometry other, final double tolerance) {
+    if (!isEquivalentClass(other)) {
+      return false;
+    }
+    return super.equalsExact(other, tolerance);
   }
 
-  public int getDimension() {
-    return 2;
-  }
-
-  public int getBoundaryDimension() {
-    return 1;
-  }
-
-  public String getGeometryType() {
-    return "MultiPolygon";
-  }
-
-  /*
-  public boolean isSimple() {
-    return true;
-  }
-*/
-  
   /**
    * Computes the boundary of this geometry
    *
    * @return a lineal geometry (which may be empty)
    * @see Geometry#getBoundary
    */
+  @Override
   public Geometry getBoundary() {
     if (isEmpty()) {
       return getFactory().createMultiLineString(null);
     }
-    ArrayList allRings = new ArrayList();
+    final ArrayList allRings = new ArrayList();
     for (int i = 0; i < geometries.length; i++) {
-      Polygon polygon = (Polygon) geometries[i];
-      Geometry rings = polygon.getBoundary();
+      final Polygon polygon = (Polygon)geometries[i];
+      final Geometry rings = polygon.getBoundary();
       for (int j = 0; j < rings.getNumGeometries(); j++) {
         allRings.add(rings.getGeometryN(j));
       }
     }
-    LineString[] allRingsArray = new LineString[allRings.size()];
-    return getFactory().createMultiLineString((LineString[]) allRings.toArray(allRingsArray));
+    final LineString[] allRingsArray = new LineString[allRings.size()];
+    return getFactory().createMultiLineString(
+      (LineString[])allRings.toArray(allRingsArray));
   }
 
-  public boolean equalsExact(Geometry other, double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
+  @Override
+  public int getBoundaryDimension() {
+    return 1;
   }
-  
+
+  @Override
+  public int getDimension() {
+    return 2;
+  }
+
+  @Override
+  public String getGeometryType() {
+    return "MultiPolygon";
+  }
+
+  /*
+   * public boolean isSimple() { return true; }
+   */
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public <V extends Polygon> List<V> getPolygons() {
+    return (List)super.getGeometries();
+  }
+
   /**
    * Creates a {@link MultiPolygon} with
    * every component reversed.
@@ -141,15 +153,57 @@ public class MultiPolygon
    *
    * @return a MultiPolygon in the reverse order
    */
-  public Geometry reverse()
-  {
-    int n = geometries.length;
-    Polygon[] revGeoms = new Polygon[n];
+  @Override
+  public Geometry reverse() {
+    final int n = geometries.length;
+    final Polygon[] revGeoms = new Polygon[n];
     for (int i = 0; i < geometries.length; i++) {
-      revGeoms[i] = (Polygon) geometries[i].reverse();
+      revGeoms[i] = (Polygon)geometries[i].reverse();
     }
     return getFactory().createMultiPolygon(revGeoms);
   }
+
+  /**
+   * @author Paul Austin <paul.austin@revolsys.com>
+   */
+  @Override
+  public Iterable<GeometryVertex> vertices() {
+    return new AbstractIterator<GeometryVertex>() {
+      private GeometryVertex vertex = new GeometryVertex(MultiPolygon.this, 0);
+
+      private int vertexIndex = 0;
+
+      private int ringIndex = 0;
+
+      private int partIndex = 0;
+
+      private Polygon polygon = getPolygons().get(0);
+
+      private LineString ring = polygon.getExteriorRing();
+
+      @Override
+      protected GeometryVertex getNext() throws NoSuchElementException {
+        while (vertexIndex >= ring.getNumPoints()) {
+          vertexIndex = 0;
+          ringIndex++;
+          if (ringIndex < 1 + polygon.getNumInteriorRing()) {
+            ring = polygon.getInteriorRingN(ringIndex - 1);
+          } else {
+            partIndex++;
+            if (partIndex < getNumGeometries()) {
+              polygon = getPolygons().get(partIndex);
+              ring = polygon.getExteriorRing();
+            } else {
+              vertex = null;
+              throw new NoSuchElementException();
+            }
+          }
+        }
+
+        vertex.setVertexId(ringIndex, vertexIndex);
+        vertexIndex++;
+        return vertex;
+      }
+    };
+  }
 }
-
-

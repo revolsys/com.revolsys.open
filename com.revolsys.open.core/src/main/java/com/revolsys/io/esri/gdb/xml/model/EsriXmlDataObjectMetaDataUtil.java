@@ -218,6 +218,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
           shapeType = GeometryType.esriGeometryMultipoint;
         } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
           shapeType = GeometryType.esriGeometryPolyline;
+        } else if (geometryDataType.equals(DataTypes.LINEAR_RING)) {
+          shapeType = GeometryType.esriGeometryPolyline;
         } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
           shapeType = GeometryType.esriGeometryPolyline;
         } else if (geometryDataType.equals(DataTypes.POLYGON)) {
