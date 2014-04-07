@@ -413,6 +413,7 @@ function setPageId(pageId) {
 
 function createToc() {
   var tocDiv =  $('<div class="tocMenu"/>');
+
   $('.sideMenu').after(tocDiv);
   tocDiv.append('<div class="title">Table of Contents</div>');
   var tocMenu = $('<ol />');
@@ -457,4 +458,24 @@ function createToc() {
     }
     tocMenu.append($('<li id="tocMenu_' + indices.join('_') + '" ' + cssClass +' />').append(link));
   });
+  var top = tocDiv.offset().top;
+  var tocHeight = tocDiv.height();
+  var resize = function() {
+    var height = $(window).height();
+    if (tocHeight > height - 20) {
+      height -= 20;
+    } else {
+      height = tocHeight;
+    }
+    tocDiv.height( height);
+    if ($(window).scrollTop() >= top) {
+      var marginTop = ($(window).scrollTop() - top);
+      tocDiv.css('margin-top', marginTop);
+    } else {
+      tocDiv.css('margin-top', 0);
+    }  
+  };
+  $(document).resize(resize);
+  $(document).scroll(resize);
+  resize();
 }
