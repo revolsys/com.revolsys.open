@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 public class CoordinateCoordinates extends AbstractCoordinates {
   private Coordinate coordinate;

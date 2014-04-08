@@ -59,9 +59,9 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 public class Graph<T> {
 

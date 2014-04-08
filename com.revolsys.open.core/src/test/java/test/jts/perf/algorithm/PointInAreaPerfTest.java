@@ -32,52 +32,49 @@
  */
 package test.jts.perf.algorithm;
 
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.util.SineStarFactory;
+import com.revolsys.jts.util.Stopwatch;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.util.*;
-import com.vividsolutions.jts.util.*;
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.algorithm.locate.PointOnGeometryLocator;
+public class PointInAreaPerfTest {
 
-public class PointInAreaPerfTest  {
-
-  public static void main(String args[]) {
-  	PointInAreaPerfTest test = new PointInAreaPerfTest();
-  	test.run();
+  public static void main(final String args[]) {
+    final PointInAreaPerfTest test = new PointInAreaPerfTest();
+    test.run();
   }
 
-	PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
-	
-	public PointInAreaPerfTest() {
-	}
+  PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
 
-	public void run()
-	{
-		GeometryFactory geomFactory = new GeometryFactory();
-		
-		SineStarFactory ssFact = new SineStarFactory();
-		ssFact.setSize(1000.0);
-		ssFact.setNumPoints(2000);
-		ssFact.setArmLengthRatio(0.1);
-		ssFact.setNumArms(100);
+  public PointInAreaPerfTest() {
+  }
 
-		Geometry area = ssFact.createSineStar();
-		System.out.println(area);
-		
-    Stopwatch sw = new Stopwatch();
+  public void run() {
+    final GeometryFactory geomFactory = new GeometryFactory();
 
-    PointOnGeometryLocator pia = new MCIndexedPointInAreaLocator(area); 
-//    PointInAreaLocator pia = new IntervalIndexedPointInAreaLocator(area); 
-//		PointInAreaLocator pia = new SimplePointInAreaLocator(area); 
+    final SineStarFactory ssFact = new SineStarFactory();
+    ssFact.setSize(1000.0);
+    ssFact.setNumPoints(2000);
+    ssFact.setArmLengthRatio(0.1);
+    ssFact.setNumArms(100);
 
-		PointInAreaPerfTester perfTester = new PointInAreaPerfTester(geomFactory, area);
-		perfTester.setNumPoints(50000);
-		perfTester.setPIA(pia);
-		perfTester.run();
-    
+    final Geometry area = ssFact.createSineStar();
+    System.out.println(area);
+
+    final Stopwatch sw = new Stopwatch();
+
+    final PointOnGeometryLocator pia = new MCIndexedPointInAreaLocator(area);
+    // PointInAreaLocator pia = new IntervalIndexedPointInAreaLocator(area);
+    // PointInAreaLocator pia = new SimplePointInAreaLocator(area);
+
+    final PointInAreaPerfTester perfTester = new PointInAreaPerfTester(
+      geomFactory, area);
+    perfTester.setNumPoints(50000);
+    perfTester.setPIA(pia);
+    perfTester.run();
+
     System.out.println("Overall time: " + sw.getTimeString());
-	}
+  }
 }
-
-
-

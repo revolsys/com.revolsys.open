@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.quadtree.DoubleBits;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.quadtree.DoubleBits;
 
 /**
  * A Key is a unique identifier for a node in a quadtree.

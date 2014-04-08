@@ -19,7 +19,7 @@ import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LinearIntersectionNotEqualEdgeLogVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {

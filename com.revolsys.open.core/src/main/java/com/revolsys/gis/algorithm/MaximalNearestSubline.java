@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateList;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Computes the Maximal Nearest Subline of a given linestring relative to

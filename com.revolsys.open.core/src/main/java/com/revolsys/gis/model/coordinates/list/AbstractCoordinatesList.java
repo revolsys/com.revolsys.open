@@ -8,8 +8,8 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList,
   Cloneable {

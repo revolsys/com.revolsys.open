@@ -25,7 +25,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
  * {@link #buildMinimalRings() } method.
  *
  * @version 1.7
- * @see com.vividsolutions.jts.operation.overlay.MinimalEdgeRing
+ * @see com.revolsys.jts.operation.overlay.MinimalEdgeRing
  */
 public class MaximalEdgeRing extends EdgeRing {
 

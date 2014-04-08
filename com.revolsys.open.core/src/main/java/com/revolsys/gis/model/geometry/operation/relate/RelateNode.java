@@ -10,7 +10,7 @@ package com.revolsys.gis.model.geometry.operation.relate;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeEndStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**
  * Represents a node in the topological graph used to compute spatial

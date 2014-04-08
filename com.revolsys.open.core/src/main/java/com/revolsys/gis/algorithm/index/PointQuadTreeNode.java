@@ -9,7 +9,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class PointQuadTreeNode<T> {
   private final double x;

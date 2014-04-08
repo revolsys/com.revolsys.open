@@ -7,15 +7,14 @@ package test.jts.perf;
  * @author Martin Davis
  *
  */
-public abstract class ThreadTestCase
-{
-  public int getThreadCount()
-  {
+public abstract class ThreadTestCase {
+  public abstract Runnable getRunnable(int threadIndex);
+
+  public int getThreadCount() {
     return ThreadTestRunner.DEFAULT_THREAD_COUNT;
-    
+
   }
+
   public abstract void setup();
 
-  public abstract Runnable getRunnable(int threadIndex);
-  
 }

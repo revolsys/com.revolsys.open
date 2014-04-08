@@ -22,7 +22,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class TiePointsPanel extends TablePanel {
   private static final long serialVersionUID = 1L;

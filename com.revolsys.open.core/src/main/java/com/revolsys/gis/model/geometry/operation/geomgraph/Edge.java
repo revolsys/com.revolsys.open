@@ -9,7 +9,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.MonotoneChainEdge;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**
  * @version 1.7

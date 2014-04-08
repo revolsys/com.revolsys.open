@@ -13,9 +13,9 @@ import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.LineString;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 

@@ -11,7 +11,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.swing.map.overlay.MappedLocation;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public abstract class WarpFilter extends WholeImageFilter {
   private static final long serialVersionUID = 1L;

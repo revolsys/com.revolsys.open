@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry.operation.geomgraph;
 
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * A <code>Label</code> indicates the topological relationship of a component of

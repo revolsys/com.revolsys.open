@@ -18,9 +18,9 @@ import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Dimension;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.Envelope;
 
 public class LineStringImpl extends GeometryImpl implements LineString {
 

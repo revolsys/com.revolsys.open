@@ -21,8 +21,8 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
 import com.revolsys.gis.model.geometry.operation.overlay.MaximalEdgeRing;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayNodeFactory;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Assert;
 
 /**
  * This class tests that the interior of an area {@link Geometry}

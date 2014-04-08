@@ -32,9 +32,9 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
 
 /**
  * Implements algorithm for computing a distance metric which can be thought of

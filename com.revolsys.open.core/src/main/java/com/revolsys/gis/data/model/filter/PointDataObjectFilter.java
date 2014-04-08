@@ -2,8 +2,8 @@ package com.revolsys.gis.data.model.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class PointDataObjectFilter implements Filter<DataObject> {
   public static final PointDataObjectFilter FILTER = new PointDataObjectFilter();

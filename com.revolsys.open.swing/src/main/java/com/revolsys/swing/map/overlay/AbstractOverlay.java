@@ -51,8 +51,8 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,

@@ -23,8 +23,8 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   Externalizable {

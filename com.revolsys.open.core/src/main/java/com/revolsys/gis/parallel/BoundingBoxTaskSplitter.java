@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.parallel.process.AbstractProcess;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   private final Logger log = LoggerFactory.getLogger(getClass());

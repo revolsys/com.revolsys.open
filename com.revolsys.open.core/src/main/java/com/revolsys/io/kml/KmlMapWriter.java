@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class KmlMapWriter extends AbstractMapWriter {
 

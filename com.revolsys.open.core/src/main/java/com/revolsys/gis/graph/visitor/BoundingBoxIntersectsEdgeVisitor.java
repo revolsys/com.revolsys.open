@@ -10,8 +10,8 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph,

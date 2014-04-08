@@ -18,7 +18,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer {
 

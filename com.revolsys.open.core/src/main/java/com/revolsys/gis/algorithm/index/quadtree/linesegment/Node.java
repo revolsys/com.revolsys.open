@@ -2,9 +2,9 @@ package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.quadtree.DoubleBits;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.quadtree.DoubleBits;
 
 public class Node extends NodeBase {
   public static Envelope computeKey(final Coordinate point, final int level,

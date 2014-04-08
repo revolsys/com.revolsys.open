@@ -7,15 +7,15 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.algorithm.LineIntersector;
-import com.vividsolutions.jts.algorithm.RobustLineIntersector;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geomgraph.Edge;
-import com.vividsolutions.jts.geomgraph.GeometryGraph;
-import com.vividsolutions.jts.operation.relate.EdgeEndBundle;
-import com.vividsolutions.jts.operation.relate.RelateNode;
-import com.vividsolutions.jts.operation.relate.RelateNodeGraph;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.operation.relate.EdgeEndBundle;
+import com.revolsys.jts.operation.relate.RelateNode;
+import com.revolsys.jts.operation.relate.RelateNodeGraph;
 
 /**
  * Checks that a {@link GeometryGraph} representing an area

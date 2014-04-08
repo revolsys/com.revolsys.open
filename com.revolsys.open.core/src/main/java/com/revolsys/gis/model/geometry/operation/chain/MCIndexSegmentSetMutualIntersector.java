@@ -38,9 +38,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * Intersects two sets of {@link SegmentString}s using a index based on

@@ -36,7 +36,7 @@ import com.revolsys.io.kml.Kml22Constants;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<DataObjectReader> {

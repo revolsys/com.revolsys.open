@@ -2,7 +2,7 @@ package com.revolsys.gis.model.geometry.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class Intersection implements Filter<LineString> {
 

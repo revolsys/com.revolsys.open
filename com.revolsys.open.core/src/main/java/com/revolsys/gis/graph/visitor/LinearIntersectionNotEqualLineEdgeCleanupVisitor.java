@@ -33,7 +33,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {

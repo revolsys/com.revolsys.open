@@ -17,8 +17,8 @@ import com.revolsys.gis.model.geometry.MultiPoint;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.util.GeometryEditor;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.util.GeometryEditor;
 
 /**
  * A framework for processes which transform an input {@link Geometry} into an

@@ -32,13 +32,14 @@
  */
 package test.jts.perf.algorithm;
 
-import java.util.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.algorithm.locate.PointOnGeometryLocator;
-import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.util.*;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Creates a perturbed, buffered grid and tests a set
@@ -47,112 +48,108 @@ import com.vividsolutions.jts.util.*;
  * @author mbdavis
  *
  */
-public class PointInAreaStressTester 
-{
-	private GeometryFactory geomFactory;
-	private Geometry area;
-	private boolean ignoreBoundaryResults = true;
-	
-	private int numPts = 10000;
-	private PointOnGeometryLocator pia1;
-	private PointOnGeometryLocator pia2;
-	private int[] locationCount = new int[3];
-		
-	public PointInAreaStressTester(GeometryFactory geomFactory, Geometry area)
-	{
-		this.geomFactory = geomFactory;
-		this.area = area;
-		
-	}
-	
-	public void setNumPoints(int numPoints)
-	{
-		this.numPts = numPoints;
-	}
-	
-	
-	public void setPIA(PointOnGeometryLocator pia)
-	{
-		this.pia1 = pia;
-	}
-	
-  public void setExpected(PointOnGeometryLocator pia)
-  {
+public class PointInAreaStressTester {
+  private final GeometryFactory geomFactory;
+
+  private final Geometry area;
+
+  private boolean ignoreBoundaryResults = true;
+
+  private int numPts = 10000;
+
+  private PointOnGeometryLocator pia1;
+
+  private PointOnGeometryLocator pia2;
+
+  private final int[] locationCount = new int[3];
+
+  public PointInAreaStressTester(final GeometryFactory geomFactory,
+    final Geometry area) {
+    this.geomFactory = geomFactory;
+    this.area = area;
+
+  }
+
+  public void printStats() {
+    System.out.println("Location counts: " + " Boundary = "
+      + this.locationCount[Location.BOUNDARY] + " Interior = "
+      + this.locationCount[Location.INTERIOR] + " Exterior = "
+      + this.locationCount[Location.EXTERIOR]);
+  }
+
+  /**
+   * 
+   * @return true if all point locations were computed correctly
+   */
+  public boolean run() {
+    final Stopwatch sw = new Stopwatch();
+
+    // default is to use the simple, non-indexed tester
+    if (this.pia2 == null) {
+      this.pia2 = new SimplePointInAreaLocator(this.area);
+    }
+
+    final int ptGridWidth = (int)Math.sqrt(this.numPts);
+
+    final Envelope areaEnv = this.area.getEnvelopeInternal();
+    final double xStep = areaEnv.getWidth() / (ptGridWidth - 1);
+    final double yStep = areaEnv.getHeight() / (ptGridWidth - 1);
+
+    for (int i = 0; i < ptGridWidth; i++) {
+      for (int j = 0; j < ptGridWidth; j++) {
+
+        // compute test point
+        final double x = areaEnv.getMinX() + i * xStep;
+        final double y = areaEnv.getMinY() + j * yStep;
+        final Coordinate pt = new Coordinate(x, y);
+        this.geomFactory.getPrecisionModel().makePrecise(pt);
+
+        final boolean isEqual = testPIA(pt);
+        if (!isEqual) {
+          return false;
+        }
+      }
+    }
+    System.out.println("Test completed in " + sw.getTimeString());
+    printStats();
+    return true;
+  }
+
+  public void setExpected(final PointOnGeometryLocator pia) {
     this.pia2 = pia;
   }
-  
-	public void setIgnoreBoundaryResults(boolean ignoreBoundaryResults)
-	{
-		this.ignoreBoundaryResults = ignoreBoundaryResults;
-	}
-	
-	/**
-	 * 
-	 * @return true if all point locations were computed correctly
-	 */
-	public boolean run()
-	{ 
-		Stopwatch sw = new Stopwatch();
-		
-		// default is to use the simple, non-indexed tester
-    if (pia2 == null)
-      pia2 = new SimplePointInAreaLocator(area);
-		
-		
-		int ptGridWidth = (int) Math.sqrt(numPts);
-		
-		Envelope areaEnv = area.getEnvelopeInternal();
-		double xStep = areaEnv.getWidth() / (ptGridWidth - 1);
-		double yStep = areaEnv.getHeight() / (ptGridWidth - 1);
 
-		for (int i = 0; i < ptGridWidth; i++) {
-			for (int j = 0; j < ptGridWidth; j++) {
-				
-				// compute test point
-				double x = areaEnv.getMinX() +  i * xStep;
-				double y = areaEnv.getMinY() + j * yStep;
-				Coordinate pt = new Coordinate(x, y);
-				geomFactory.getPrecisionModel().makePrecise(pt);
-				
-				boolean isEqual = testPIA(pt);
-				if (! isEqual)
-					return false;
-			}
-		}
-		System.out.println("Test completed in " + sw.getTimeString());
-		printStats();
-		return true;
-	}
-	
-	public void printStats()
-	{
-		System.out.println("Location counts: "
-				+ " Boundary = "	+ locationCount[Location.BOUNDARY]
-				+ " Interior = "	+ locationCount[Location.INTERIOR]
-				+ " Exterior = "	+ locationCount[Location.EXTERIOR]
-				                );
-	}
-	/**
-	 * 
-	 * @param p
-	 * @return true if the point location is determined to be the same by both PIA locaters
-	 */
-	private boolean testPIA(Coordinate p)
-	{
-		//System.out.println(WKTWriter.toPoint(p));
-		
-		int loc1 = pia1.locate(p);
-		int loc2 = pia2.locate(p);
-		
-		locationCount[loc1]++;
-		
-		if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY)
-				&& ignoreBoundaryResults)
-			return true;
-		
-		return loc1 == loc2;
-	}
-	
+  public void setIgnoreBoundaryResults(final boolean ignoreBoundaryResults) {
+    this.ignoreBoundaryResults = ignoreBoundaryResults;
+  }
+
+  public void setNumPoints(final int numPoints) {
+    this.numPts = numPoints;
+  }
+
+  public void setPIA(final PointOnGeometryLocator pia) {
+    this.pia1 = pia;
+  }
+
+  /**
+   * 
+   * @param p
+   * @return true if the point location is determined to be the same by both PIA locaters
+   */
+  private boolean testPIA(final Coordinate p) {
+    // System.out.println(WKTWriter.toPoint(p));
+
+    final int loc1 = this.pia1.locate(p);
+    final int loc2 = this.pia2.locate(p);
+
+    this.locationCount[loc1]++;
+
+    if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY)
+      && this.ignoreBoundaryResults) {
+      return true;
+    }
+
+    return loc1 == loc2;
+  }
+
 }
-
-

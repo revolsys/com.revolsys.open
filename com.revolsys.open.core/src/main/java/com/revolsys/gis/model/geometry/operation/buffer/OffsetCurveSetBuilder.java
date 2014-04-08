@@ -24,7 +24,7 @@ import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * @version 1.7

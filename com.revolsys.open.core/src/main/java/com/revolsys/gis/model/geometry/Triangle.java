@@ -13,11 +13,11 @@ import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.WKTWriter;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.io.WKTWriter;
 
 public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;

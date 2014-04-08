@@ -9,10 +9,10 @@ import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   public XmlGeometryFieldType(final FieldType esriFieldType,

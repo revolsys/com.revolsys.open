@@ -7,11 +7,11 @@ import java.awt.geom.Rectangle2D;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.swing.map.Viewport2D;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 public final class GeometryShapeUtil {
   public static void addCoordinateSequence(final Viewport2D viewport,

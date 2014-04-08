@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
 
 public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates>, Serializable {

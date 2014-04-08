@@ -17,14 +17,14 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 public final class ShapefileGeometryUtil {
   public static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<String, Method>();

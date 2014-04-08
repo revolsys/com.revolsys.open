@@ -27,9 +27,9 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SegmentIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SimpleMCSweepLineIntersector;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry

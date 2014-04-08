@@ -21,7 +21,7 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {

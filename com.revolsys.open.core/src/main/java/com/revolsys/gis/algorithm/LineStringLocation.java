@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Represents a location along a {@link LineString}.

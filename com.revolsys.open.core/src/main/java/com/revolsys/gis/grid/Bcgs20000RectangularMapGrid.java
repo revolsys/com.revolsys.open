@@ -3,7 +3,7 @@ package com.revolsys.gis.grid;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"

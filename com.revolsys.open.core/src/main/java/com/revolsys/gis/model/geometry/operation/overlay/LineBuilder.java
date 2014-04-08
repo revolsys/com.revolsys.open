@@ -42,7 +42,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdgeStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Forms JTS LineStrings out of a the graph of {@link DirectedEdge}s created by

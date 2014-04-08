@@ -11,7 +11,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public class GeoReferencedImageLayerRenderer extends
   AbstractLayerRenderer<GeoReferencedImageLayer> {
@@ -58,8 +58,10 @@ public class GeoReferencedImageLayerRenderer extends
               if (imageScreenWidth > 0 && imageScreenHeight > 0) {
                 graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                   RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                graphics.drawImage(image, 0, 0, imageScreenWidth,
-                  imageScreenHeight, null);
+                if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+                  graphics.drawImage(image, 0, 0, imageScreenWidth,
+                    imageScreenHeight, null);
+                }
               }
             } catch (final NegativeArraySizeException e) {
             } catch (final OutOfMemoryError e) {

@@ -3,7 +3,7 @@ package com.revolsys.gis.model.geometry.operation.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * @version 1.7

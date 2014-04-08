@@ -3,9 +3,9 @@ package com.revolsys.gis.model.coordinates.list;
 import java.io.Serializable;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinateSequenceFactory;
 
 public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
   Serializable {

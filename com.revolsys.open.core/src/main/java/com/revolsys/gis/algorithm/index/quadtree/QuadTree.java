@@ -9,8 +9,8 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 
 public class QuadTree<T> {
   public static Envelope ensureExtent(final Envelope envelope,

@@ -35,93 +35,97 @@ package test.jts.perf.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.vividsolutions.jts.algorithm.PerturbedGridPolygonBuilder;
-import com.vividsolutions.jts.algorithm.RayCrossingCounter;
-import com.vividsolutions.jts.algorithm.locate.PointOnGeometryLocator;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFilter;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
-
+import com.revolsys.jts.algorithm.PerturbedGridPolygonBuilder;
+import com.revolsys.jts.algorithm.RayCrossingCounter;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class SimpleRayCrossingStressTest extends TestCase {
 
-  public static void main(String args[]) {
+  static class SimpleRayCrossingPointInAreaLocator implements
+    PointOnGeometryLocator {
+    static class RayCrossingSegmentFilter implements CoordinateSequenceFilter {
+      private final RayCrossingCounter rcc;
+
+      private final Coordinate p0 = new Coordinate();
+
+      private final Coordinate p1 = new Coordinate();
+
+      public RayCrossingSegmentFilter(final RayCrossingCounter rcc) {
+        this.rcc = rcc;
+      }
+
+      @Override
+      public void filter(final CoordinateSequence seq, final int i) {
+        if (i == 0) {
+          return;
+        }
+        seq.getCoordinate(i - 1, this.p0);
+        seq.getCoordinate(i, this.p1);
+        this.rcc.countSegment(this.p0, this.p1);
+      }
+
+      @Override
+      public boolean isDone() {
+        return this.rcc.isOnSegment();
+      }
+
+      @Override
+      public boolean isGeometryChanged() {
+        return false;
+      }
+    }
+
+    private final Geometry geom;
+
+    public SimpleRayCrossingPointInAreaLocator(final Geometry geom) {
+      this.geom = geom;
+    }
+
+    @Override
+    public int locate(final Coordinate p) {
+      final RayCrossingCounter rcc = new RayCrossingCounter(p);
+      final RayCrossingSegmentFilter filter = new RayCrossingSegmentFilter(rcc);
+      this.geom.apply(filter);
+      return rcc.getLocation();
+    }
+  }
+
+  public static void main(final String args[]) {
     TestRunner.run(SimpleRayCrossingStressTest.class);
   }
 
-	PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
-	
-	public SimpleRayCrossingStressTest(String name) {
-		super(name);
-	}
+  PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
 
-	public void testGrid()
-	{
-		// Use fixed PM to try and get at least some points hitting the boundary
-		GeometryFactory geomFactory = new GeometryFactory(pmFixed_1);
-//		GeometryFactory geomFactory = new GeometryFactory();
-		
-		PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(geomFactory);
-		gridBuilder.setNumLines(20);
-		gridBuilder.setLineWidth(10.0);
-		Geometry area = gridBuilder.getGeometry();
-		
-		SimpleRayCrossingPointInAreaLocator pia = new SimpleRayCrossingPointInAreaLocator(area); 
+  public SimpleRayCrossingStressTest(final String name) {
+    super(name);
+  }
 
-		PointInAreaStressTester gridTester = new PointInAreaStressTester(geomFactory, area);
-		gridTester.setNumPoints(100000);
-		gridTester.setPIA(pia);
-		
-		boolean isCorrect = gridTester.run();
-		assertTrue(isCorrect);
-	}
-	
-	static class SimpleRayCrossingPointInAreaLocator
-	implements PointOnGeometryLocator
-	{
-		private Geometry geom;
-		
-		public SimpleRayCrossingPointInAreaLocator(Geometry geom)
-		{
-			this.geom = geom;
-		}
-		
-		public int locate(Coordinate p)
-		{
-			RayCrossingCounter rcc = new RayCrossingCounter(p);
-			RayCrossingSegmentFilter filter = new RayCrossingSegmentFilter(rcc);
-			geom.apply(filter);
-			return rcc.getLocation();
-		}
-		
-		static class RayCrossingSegmentFilter implements CoordinateSequenceFilter
-		{
-			private RayCrossingCounter rcc;
-			private Coordinate p0 = new Coordinate();
-			private Coordinate p1 = new Coordinate();
-			
-			public RayCrossingSegmentFilter(RayCrossingCounter rcc)
-			{
-				this.rcc = rcc;
-			}
-			
-		  public void filter(CoordinateSequence seq, int i)
-		  {
-		  	if (i == 0) return;
-		  	seq.getCoordinate(i - 1, p0);
-		  	seq.getCoordinate(i, p1);
-		  	rcc.countSegment(p0, p1);
-		  }
-		  
-		  public boolean isDone() { return rcc.isOnSegment(); }
-		  
-		  public boolean isGeometryChanged() { return false; }
-		}
-	}
+  public void testGrid() {
+    // Use fixed PM to try and get at least some points hitting the boundary
+    final GeometryFactory geomFactory = new GeometryFactory(this.pmFixed_1);
+    // GeometryFactory geomFactory = new GeometryFactory();
+
+    final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(
+      geomFactory);
+    gridBuilder.setNumLines(20);
+    gridBuilder.setLineWidth(10.0);
+    final Geometry area = gridBuilder.getGeometry();
+
+    final SimpleRayCrossingPointInAreaLocator pia = new SimpleRayCrossingPointInAreaLocator(
+      area);
+
+    final PointInAreaStressTester gridTester = new PointInAreaStressTester(
+      geomFactory, area);
+    gridTester.setNumPoints(100000);
+    gridTester.setPIA(pia);
+
+    final boolean isCorrect = gridTester.run();
+    assertTrue(isCorrect);
+  }
 }
-
-
-

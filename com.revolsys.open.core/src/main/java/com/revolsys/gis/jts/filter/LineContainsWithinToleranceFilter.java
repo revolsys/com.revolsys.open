@@ -24,7 +24,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   private final CoordinatesList points;

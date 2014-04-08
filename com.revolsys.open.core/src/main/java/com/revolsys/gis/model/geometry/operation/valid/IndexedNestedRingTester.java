@@ -42,8 +42,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * Tests whether any of a set of {@link LinearRing}s are

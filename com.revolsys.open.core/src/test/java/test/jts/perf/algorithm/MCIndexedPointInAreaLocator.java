@@ -32,16 +32,57 @@
  */
 package test.jts.perf.algorithm;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.algorithm.locate.PointOnGeometryLocator;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.util.*;
-import com.vividsolutions.jts.noding.*;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.chain.*;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import com.revolsys.jts.algorithm.RayCrossingCounter;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.chain.MonotoneChain;
+import com.revolsys.jts.index.chain.MonotoneChainBuilder;
+import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
+import com.revolsys.jts.index.strtree.STRtree;
+import com.revolsys.jts.noding.BasicSegmentString;
+import com.revolsys.jts.noding.SegmentString;
+
+class MCIndexedGeometry {
+  private final SpatialIndex index = new STRtree();
+
+  public MCIndexedGeometry(final Geometry geom) {
+    init(geom);
+  }
+
+  private void addLine(final Coordinate[] pts) {
+    final SegmentString segStr = new BasicSegmentString(pts, null);
+    final List segChains = MonotoneChainBuilder.getChains(
+      segStr.getCoordinates(), segStr);
+    for (final Iterator i = segChains.iterator(); i.hasNext();) {
+      final MonotoneChain mc = (MonotoneChain)i.next();
+      this.index.insert(mc.getEnvelope(), mc);
+    }
+  }
+
+  private void init(final Geometry geom) {
+    final List lines = LinearComponentExtracter.getLines(geom);
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+      final Coordinate[] pts = line.getCoordinates();
+      addLine(pts);
+    }
+  }
+
+  public List query(final Envelope searchEnv) {
+    return this.index.query(searchEnv);
+  }
+}
 
 /**
  * Determines the location of {@link Coordinate}s relative to
@@ -52,105 +93,64 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * @author Martin Davis
  *
  */
-public class MCIndexedPointInAreaLocator 
-	implements PointOnGeometryLocator
-{
-	private Geometry areaGeom;
-	private MCIndexedGeometry index;
-	private double maxXExtent;
-		
-	public MCIndexedPointInAreaLocator(Geometry g)
-	{
-		areaGeom = g;
-		if (! (g instanceof Polygonal))
-			throw new IllegalArgumentException("Argument must be Polygonal");
-		buildIndex(g);
-    Envelope env = g.getEnvelopeInternal();
-		maxXExtent = env.getMaxX() + 1.0;
-	}
-	
-	private void buildIndex(Geometry g)
-	{
-		index = new MCIndexedGeometry(g);
-	}
-		
+public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
+  static class MCSegmentCounter extends MonotoneChainSelectAction {
+    RayCrossingCounter rcc;
+
+    public MCSegmentCounter(final RayCrossingCounter rcc) {
+      this.rcc = rcc;
+    }
+
+    @Override
+    public void select(final LineSegment ls) {
+      this.rcc.countSegment(ls.getCoordinate(0), ls.getCoordinate(1));
+    }
+  }
+
+  private MCIndexedGeometry index;
+
+  private final double maxXExtent;
+
+  public MCIndexedPointInAreaLocator(final Geometry g) {
+    if (!(g instanceof Polygonal)) {
+      throw new IllegalArgumentException("Argument must be Polygonal");
+    }
+    buildIndex(g);
+    final Envelope env = g.getEnvelopeInternal();
+    this.maxXExtent = env.getMaxX() + 1.0;
+  }
+
+  private void buildIndex(final Geometry g) {
+    this.index = new MCIndexedGeometry(g);
+  }
+
+  private void countSegs(final RayCrossingCounter rcc, final Envelope rayEnv,
+    final List monoChains, final MCSegmentCounter mcSegCounter) {
+    for (final Iterator i = monoChains.iterator(); i.hasNext();) {
+      final MonotoneChain mc = (MonotoneChain)i.next();
+      mc.select(rayEnv, mcSegCounter);
+      // short-circuit if possible
+      if (rcc.isOnSegment()) {
+        return;
+      }
+    }
+  }
+
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
    * 
    * @param p the point to test
    * @return the location of the point in the geometry  
    */
-	public int locate(Coordinate p)
-	{
-		RayCrossingCounter rcc = new RayCrossingCounter(p);
-		MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-		Envelope rayEnv = new Envelope(p.x, maxXExtent, p.y, p.y);
-		List mcs = index.query(rayEnv);
-		countSegs(rcc, rayEnv, mcs, mcSegCounter);
-		
-		return rcc.getLocation();
-	}
-	
-	private void countSegs(RayCrossingCounter rcc, Envelope rayEnv, List monoChains, MCSegmentCounter mcSegCounter)
-	{
-		for (Iterator i = monoChains.iterator(); i.hasNext(); ) {
-			MonotoneChain mc = (MonotoneChain) i.next();
-			mc.select(rayEnv, mcSegCounter);
-			// short-circuit if possible
-			if (rcc.isOnSegment()) return;
-		}
-	}
-	
-  static class MCSegmentCounter extends MonotoneChainSelectAction
-  {
-  	RayCrossingCounter rcc;
+  @Override
+  public int locate(final Coordinate p) {
+    final RayCrossingCounter rcc = new RayCrossingCounter(p);
+    final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
+    final Envelope rayEnv = new Envelope(p.x, this.maxXExtent, p.y, p.y);
+    final List mcs = this.index.query(rayEnv);
+    countSegs(rcc, rayEnv, mcs, mcSegCounter);
 
-    public MCSegmentCounter(RayCrossingCounter rcc)
-    {
-      this.rcc = rcc;
-    }
-
-    public void select(LineSegment ls)
-    {
-      rcc.countSegment(ls.getCoordinate(0), ls.getCoordinate(1));
-    }
+    return rcc.getLocation();
   }
 
 }
-
-class MCIndexedGeometry
-{
-  private SpatialIndex index= new STRtree();
-
-	public MCIndexedGeometry(Geometry geom)
-	{
-		init(geom);
-	}
-	
-	private void init(Geometry geom)
-	{
-		List lines = LinearComponentExtracter.getLines(geom);
-		for (Iterator i = lines.iterator(); i.hasNext(); ) {
-			LineString line = (LineString) i.next();
-			Coordinate[] pts = line.getCoordinates();
-			addLine(pts);
-		}
-	}
-	
-	private void addLine(Coordinate[] pts)
-	{
-			SegmentString segStr = new BasicSegmentString(pts, null);
-	    List segChains = MonotoneChainBuilder.getChains(segStr.getCoordinates(), segStr);
-	    for (Iterator i = segChains.iterator(); i.hasNext(); ) {
-	      MonotoneChain mc = (MonotoneChain) i.next();
-	      index.insert(mc.getEnvelope(), mc);
-	    }
-	}
-	
-	public List query(Envelope searchEnv)
-	{
-		return index.query(searchEnv);
-	}
-}
-
-

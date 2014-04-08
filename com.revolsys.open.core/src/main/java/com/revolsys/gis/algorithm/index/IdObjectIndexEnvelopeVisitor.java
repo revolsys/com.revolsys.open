@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public final class IdObjectIndexEnvelopeVisitor<T> implements Visitor<Integer> {
   private final IdObjectIndex<T> index;

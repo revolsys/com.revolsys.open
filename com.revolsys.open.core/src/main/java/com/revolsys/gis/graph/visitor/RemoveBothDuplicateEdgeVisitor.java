@@ -8,7 +8,7 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Find all edges that share the same line geometry and remove the current edge

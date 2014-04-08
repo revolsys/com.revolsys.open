@@ -47,8 +47,8 @@ import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableM
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Polygon;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 

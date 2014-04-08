@@ -1,10 +1,10 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class LineSegment3D extends LineSegment {
 

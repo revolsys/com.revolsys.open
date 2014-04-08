@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,121 +35,116 @@ package test.jts.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vividsolutions.jts.index.bintree.Bintree;
-import com.vividsolutions.jts.index.bintree.Interval;
-import com.vividsolutions.jts.util.Stopwatch;
-
+import com.revolsys.jts.index.bintree.Bintree;
+import com.revolsys.jts.index.bintree.Interval;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * @version 1.7
  */
 public class BinTreeCorrectTest {
 
-  public static void main(String[] args) throws Exception
-  {
-    //testBinaryPower();
-    BinTreeCorrectTest test = new BinTreeCorrectTest();
+  static final int NUM_ITEMS = 20000;
+
+  static final double MIN_EXTENT = -1000.0;
+
+  static final double MAX_EXTENT = 1000.0;
+
+  public static void main(final String[] args) throws Exception {
+    // testBinaryPower();
+    final BinTreeCorrectTest test = new BinTreeCorrectTest();
     test.run();
   }
 
-
-  static final int NUM_ITEMS = 20000;
-  static final double MIN_EXTENT = -1000.0;
-  static final double MAX_EXTENT = 1000.0;
-
   IntervalList intervalList = new IntervalList();
+
   Bintree btree = new Bintree();
 
   public BinTreeCorrectTest() {
   }
 
-  public void run()
-  {
-    fill();
-    System.out.println("depth = " + btree.depth()
-      + "  size = " + btree.size() );
-    runQueries();
+  void createGrid(final int nGridCells) {
+    int gridSize = (int)Math.sqrt(nGridCells);
+    gridSize += 1;
+    final double extent = MAX_EXTENT - MIN_EXTENT;
+    final double gridInc = extent / gridSize;
+    final double cellSize = 2 * gridInc;
+
+    for (int i = 0; i < gridSize; i++) {
+      final double x = MIN_EXTENT + gridInc * i;
+      final Interval interval = new Interval(x, x + cellSize);
+      this.btree.insert(interval, interval);
+      this.intervalList.add(interval);
+    }
   }
 
-  void fill()
-  {
+  void fill() {
     createGrid(NUM_ITEMS);
   }
 
-  void createGrid(int nGridCells)
-  {
-    int gridSize = (int) Math.sqrt((double) nGridCells);
-    gridSize += 1;
-    double extent = MAX_EXTENT - MIN_EXTENT;
-    double gridInc = extent / gridSize;
-    double cellSize = 2 * gridInc;
-
-    for (int i = 0; i < gridSize; i++) {
-        double x = MIN_EXTENT + gridInc * i;
-        Interval interval = new Interval(x, x + cellSize   );
-        btree.insert(interval, interval);
-        intervalList.add(interval);
+  private List getOverlapping(final List items, final Interval searchInterval) {
+    final List result = new ArrayList();
+    for (int i = 0; i < items.size(); i++) {
+      final Interval interval = (Interval)items.get(i);
+      if (interval.overlaps(searchInterval)) {
+        result.add(interval);
       }
+    }
+    return result;
   }
 
-  void runQueries()
-  {
-    int nGridCells = 100;
-    int cellSize = (int) Math.sqrt((double) NUM_ITEMS);
-    double extent = MAX_EXTENT - MIN_EXTENT;
-    double queryCellSize =  2.0 * extent / cellSize;
-
-    queryGrid(nGridCells, queryCellSize);
-
-    //queryGrid(200);
-  }
-
-  void queryGrid(int nGridCells, double cellSize)
-  {
-    Stopwatch sw = new Stopwatch();
+  void queryGrid(final int nGridCells, final double cellSize) {
+    final Stopwatch sw = new Stopwatch();
     sw.start();
 
-    int gridSize = (int) Math.sqrt((double) nGridCells);
+    int gridSize = (int)Math.sqrt(nGridCells);
     gridSize += 1;
-    double extent = MAX_EXTENT - MIN_EXTENT;
-    double gridInc = extent / gridSize;
+    final double extent = MAX_EXTENT - MIN_EXTENT;
+    final double gridInc = extent / gridSize;
 
     for (int i = 0; i < gridSize; i++) {
-        double x = MIN_EXTENT + gridInc * i;
-        Interval interval = new Interval(x, x + cellSize);
-        queryTest(interval);
-        //queryTime(env);
+      final double x = MIN_EXTENT + gridInc * i;
+      final Interval interval = new Interval(x, x + cellSize);
+      queryTest(interval);
+      // queryTime(env);
     }
     System.out.println("Time = " + sw.getTimeString());
   }
 
-  void queryTime(Interval interval)
-  {
-    //List finalList = getOverlapping(q.query(env), env);
+  void queryTest(final Interval interval) {
+    final List candidateList = this.btree.query(interval);
+    final List finalList = getOverlapping(candidateList, interval);
 
-    List eList = intervalList.query(interval);
-  }
+    final List eList = this.intervalList.query(interval);
+    System.out.println(finalList.size());
 
-  void queryTest(Interval interval)
-  {
-    List candidateList = btree.query(interval);
-    List finalList = getOverlapping(candidateList, interval);
-
-    List eList = intervalList.query(interval);
-System.out.println(finalList.size());
-
-    if (finalList.size() != eList.size() )
+    if (finalList.size() != eList.size()) {
       throw new RuntimeException("queries do not match");
+    }
   }
 
-  private List getOverlapping(List items, Interval searchInterval)
-  {
-    List result = new ArrayList();
-    for (int i = 0; i < items.size(); i++) {
-      Interval interval = (Interval) items.get(i);
-      if (interval.overlaps(searchInterval)) result.add(interval);
-    }
-    return result;
+  void queryTime(final Interval interval) {
+    // List finalList = getOverlapping(q.query(env), env);
+
+    final List eList = this.intervalList.query(interval);
+  }
+
+  public void run() {
+    fill();
+    System.out.println("depth = " + this.btree.depth() + "  size = "
+      + this.btree.size());
+    runQueries();
+  }
+
+  void runQueries() {
+    final int nGridCells = 100;
+    final int cellSize = (int)Math.sqrt(NUM_ITEMS);
+    final double extent = MAX_EXTENT - MIN_EXTENT;
+    final double queryCellSize = 2.0 * extent / cellSize;
+
+    queryGrid(nGridCells, queryCellSize);
+
+    // queryGrid(200);
   }
 
 }

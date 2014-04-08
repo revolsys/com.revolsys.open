@@ -44,7 +44,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 // INCOMPLETE!
 class NodeVertexIterator implements Iterator {

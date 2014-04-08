@@ -35,7 +35,7 @@ package com.revolsys.gis.model.geometry.operation.chain;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 
-//import com.vividsolutions.jts.util.Debug;
+//import com.revolsys.jts.util.Debug;
 
 /**
  * Detects and records an intersection between two {@link SegmentString}s,

@@ -51,16 +51,16 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class EditGeometryOverlay extends AbstractOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {

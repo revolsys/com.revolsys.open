@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public interface PointSpatialIndex<T> extends Iterable<T> {
   List<T> find(Envelope envelope);

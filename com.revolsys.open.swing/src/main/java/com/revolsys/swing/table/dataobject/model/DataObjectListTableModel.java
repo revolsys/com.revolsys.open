@@ -21,7 +21,7 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.util.Reorderable;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {

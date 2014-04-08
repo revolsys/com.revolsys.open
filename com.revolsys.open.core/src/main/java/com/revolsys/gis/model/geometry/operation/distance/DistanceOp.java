@@ -44,8 +44,8 @@ import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.util.GeometryUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Location;
 
 /**
  * Find two points on two {@link Geometry}s which lie within a given distance,

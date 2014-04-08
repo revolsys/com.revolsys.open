@@ -1,7 +1,7 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class LineLessThanLengthFilter implements Filter<Geometry> {
   private double length;

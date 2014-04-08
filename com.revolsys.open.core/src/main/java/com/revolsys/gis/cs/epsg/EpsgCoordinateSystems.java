@@ -30,8 +30,8 @@ import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.csv.CsvIterator;
 import com.revolsys.io.json.JsonMapIoFactory;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 
 public final class EpsgCoordinateSystems {
   private static Set<CoordinateSystem> coordinateSystems;

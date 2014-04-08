@@ -5,8 +5,8 @@ package com.revolsys.gis.model.geometry.operation.relate;
  */
 
 import com.revolsys.gis.model.geometry.Geometry;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**
  * Implements the SFS <tt>relate()</tt> operation on two {@link Geometry}s.

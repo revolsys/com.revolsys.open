@@ -44,8 +44,8 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Location;
 
 /**
  * The computation of the <code>IntersectionMatrix</code> relies on the use of a

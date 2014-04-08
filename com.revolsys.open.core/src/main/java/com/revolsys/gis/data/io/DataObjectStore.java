@@ -20,7 +20,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory,
   AutoCloseable {

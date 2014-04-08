@@ -2,7 +2,7 @@ package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryDistanceComparator implements Comparator<Geometry> {
 

@@ -2,7 +2,7 @@ package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.AbstractItemVisitor;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public final class IdObjectIndexItemVisitor<T> extends
   AbstractItemVisitor<Integer> {

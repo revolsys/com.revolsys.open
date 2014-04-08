@@ -38,8 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A DirectedEdgeStar is an ordered list of <b>outgoing</b> DirectedEdges around

@@ -28,7 +28,7 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   @SuppressWarnings({

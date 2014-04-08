@@ -8,8 +8,8 @@ import java.util.TreeMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class TextLineConverter implements OsnConverter {
   private static final String TYPE = "type";

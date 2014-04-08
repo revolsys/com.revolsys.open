@@ -24,7 +24,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectFileLayer extends DataObjectListLayer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(

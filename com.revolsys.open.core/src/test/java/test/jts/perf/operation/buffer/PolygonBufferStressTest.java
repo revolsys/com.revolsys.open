@@ -1,9 +1,12 @@
 package test.jts.perf.operation.buffer;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.noding.snapround.*;
-import com.vividsolutions.jts.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.util.GeometricShapeFactory;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Stress-tests buffering by repeatedly buffering a geometry
@@ -24,119 +27,127 @@ public class PolygonBufferStressTest {
   static final int MAX_ITER = 50;
 
   static PrecisionModel pm = new PrecisionModel();
-  //static PrecisionModel pm = new PrecisionModel(10);
+
+  // static PrecisionModel pm = new PrecisionModel(10);
 
   static GeometryFactory fact = new GeometryFactory(pm, 0);
+
   static WKTReader wktRdr = new WKTReader(fact);
+
   static WKTWriter wktWriter = new WKTWriter();
 
-  Stopwatch sw = new Stopwatch();
-
-  public static void main(String[] args) {
-    PolygonBufferStressTest test = new PolygonBufferStressTest();
+  public static void main(final String[] args) {
+    final PolygonBufferStressTest test = new PolygonBufferStressTest();
     test.test();
   }
+
+  Stopwatch sw = new Stopwatch();
 
   boolean testFailed = false;
 
   public PolygonBufferStressTest() {
   }
 
-  public void test()
-  {
-    String geomStr;
-    GeometricShapeFactory shapeFact = new GeometricShapeFactory(fact);
+  public void doAlternatingIteratedBuffer(Geometry g, double dist,
+    final int maxCount) {
+    int i = 0;
+    while (i < maxCount) {
+      i++;
+      System.out.println("Iter: " + i
+        + " --------------------------------------------------------");
 
-    Geometry g = getSampleGeometry();
+      dist += 1.0;
+      System.out.println("Pos Buffer (" + dist + ")");
+      g = getBuffer(g, dist);
+      System.out.println("Neg Buffer (" + -dist + ")");
+      g = getBuffer(g, -dist);
+    }
+  }
 
-//    Geometry g = GeometricShapeFactory.createArc(fact, 0, 0, 200.0, 0.0, 6.0, 100);
+  public void doIteratedBuffer(Geometry g, final double initDist,
+    final double distanceInc, final int maxCount) {
+    int i = 0;
+    double dist = initDist;
+    while (i < maxCount) {
+      i++;
+      System.out.println("Iter: " + i
+        + " --------------------------------------------------------");
 
-    //Geometry circle = GeometricShapeFactory.createCircle(fact, 0, 0, 200, 100);
-    //Geometry g = circle;
+      dist += distanceInc;
+      System.out.println("Buffer (" + dist + ")");
+      g = getBuffer(g, dist);
+      // if (((Polygon) g).getNumInteriorRing() > 0)
+      // return;
+    }
+  }
 
-//    Geometry sq = GeometricShapeFactory.createBox(fact, 0, 0, 1, 120);
-//    Geometry g = sq.difference(circle);
+  private Geometry getBuffer(final Geometry geom, final double dist) {
+    final Geometry buf = geom.buffer(dist);
+    // System.out.println(buf);
+    System.out.println(this.sw.getTimeString());
+    if (!buf.isValid()) {
+      throw new RuntimeException("buffer not valid!");
+    }
+    return buf;
+  }
 
-//    Geometry handle = GeometricShapeFactory.createRectangle(fact, 0, 0, 400, 20, 1);
-//    Geometry g = circle.union(handle);
+  private Geometry getSampleGeometry() {
+    String wkt;
+    // triangle
+    // wkt ="POLYGON (( 233 221, 210 172,  262 181, 233 221  ))";
+
+    // star polygon with hole
+    wkt = "POLYGON ((260 400, 220 300, 80 300, 180 220, 40 200, 180 160, 60 20, 200 80, 280 20, 260 140, 440 20, 340 180, 520 160, 280 220, 460 340, 300 300, 260 400), (260 320, 240 260, 220 220, 160 180, 220 160, 200 100, 260 160, 300 140, 320 180, 260 200, 260 320))";
+
+    // star polygon with NO hole
+    // wkt
+    // ="POLYGON ((260 400, 220 300, 80 300, 180 220, 40 200, 180 160, 60 20, 200 80, 280 20, 260 140, 440 20, 340 180, 520 160, 280 220, 460 340, 300 300, 260 400))";
+
+    // star polygon with NO hole, 10x size
+    // wkt
+    // ="POLYGON ((2600 4000, 2200 3000, 800 3000, 1800 2200, 400 2000, 1800 1600, 600 200, 2000 800, 2800 200, 2600 1400, 4400 200, 3400 1800, 5200 1600, 2800 2200, 4600 3400, 3000 3000, 2600 4000))";
+
+    Geometry g = null;
+    try {
+      g = wktRdr.read(wkt);
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+      this.testFailed = true;
+    }
+    return g;
+  }
+
+  public void test() {
+    final String geomStr;
+    final GeometricShapeFactory shapeFact = new GeometricShapeFactory(fact);
+
+    final Geometry g = getSampleGeometry();
+
+    // Geometry g = GeometricShapeFactory.createArc(fact, 0, 0, 200.0, 0.0, 6.0,
+    // 100);
+
+    // Geometry circle = GeometricShapeFactory.createCircle(fact, 0, 0, 200,
+    // 100);
+    // Geometry g = circle;
+
+    // Geometry sq = GeometricShapeFactory.createBox(fact, 0, 0, 1, 120);
+    // Geometry g = sq.difference(circle);
+
+    // Geometry handle = GeometricShapeFactory.createRectangle(fact, 0, 0, 400,
+    // 20, 1);
+    // Geometry g = circle.union(handle);
 
     System.out.println(g);
     test(g);
   }
 
-  private Geometry getSampleGeometry()
-  {
-    String wkt;
-// triangle
-//wkt ="POLYGON (( 233 221, 210 172,  262 181, 233 221  ))";
-
-//star polygon with hole
-    wkt ="POLYGON ((260 400, 220 300, 80 300, 180 220, 40 200, 180 160, 60 20, 200 80, 280 20, 260 140, 440 20, 340 180, 520 160, 280 220, 460 340, 300 300, 260 400), (260 320, 240 260, 220 220, 160 180, 220 160, 200 100, 260 160, 300 140, 320 180, 260 200, 260 320))";
-
-//star polygon with NO hole
-// wkt ="POLYGON ((260 400, 220 300, 80 300, 180 220, 40 200, 180 160, 60 20, 200 80, 280 20, 260 140, 440 20, 340 180, 520 160, 280 220, 460 340, 300 300, 260 400))";
-
-//star polygon with NO hole, 10x size
-// wkt ="POLYGON ((2600 4000, 2200 3000, 800 3000, 1800 2200, 400 2000, 1800 1600, 600 200, 2000 800, 2800 200, 2600 1400, 4400 200, 3400 1800, 5200 1600, 2800 2200, 4600 3400, 3000 3000, 2600 4000))";
-
-    Geometry g = null;
-    try {
-      g = wktRdr.read(wkt);
-    }
-    catch (Exception ex) {
-      ex.printStackTrace();
-      testFailed = true;
-    }
-    return g;
-  }
-  public void test(Geometry g)
-  {
-    int maxCount = MAX_ITER;
-    //doIteratedBuffer(g, 1, -120.01, maxCount);
-    //doIteratedBuffer(g, 1, 2, maxCount);
+  public void test(final Geometry g) {
+    final int maxCount = MAX_ITER;
+    // doIteratedBuffer(g, 1, -120.01, maxCount);
+    // doIteratedBuffer(g, 1, 2, maxCount);
     doAlternatingIteratedBuffer(g, 1, maxCount);
-    if (testFailed) {
+    if (this.testFailed) {
       System.out.println("FAILED!");
     }
-  }
-
-  public void doIteratedBuffer(Geometry g, double initDist, double distanceInc, int maxCount)
-  {
-    int i = 0;
-    double dist = initDist;
-      while (i < maxCount) {
-        i++;
-        System.out.println("Iter: " + i + " --------------------------------------------------------");
-
-        dist += distanceInc;
-        System.out.println("Buffer (" + dist + ")");
-        g = getBuffer(g, dist);
-//if (((Polygon) g).getNumInteriorRing() > 0)
-//  return;
-      }
-  }
-
-  public void doAlternatingIteratedBuffer(Geometry g, double dist, int maxCount)
-  {
-    int i = 0;
-      while (i < maxCount) {
-        i++;
-      System.out.println("Iter: " + i + " --------------------------------------------------------");
-
-        dist += 1.0;
-      System.out.println("Pos Buffer (" + dist + ")");
-        g = getBuffer(g, dist);
-      System.out.println("Neg Buffer (" + -dist + ")");
-        g = getBuffer(g, -dist);
-      }
-  }
-
-  private Geometry getBuffer(Geometry geom, double dist)
-  {
-    Geometry buf = geom.buffer(dist);
-    //System.out.println(buf);
-    System.out.println(sw.getTimeString());
-    if (! buf.isValid()) throw new RuntimeException("buffer not valid!");
-    return buf;
   }
 }

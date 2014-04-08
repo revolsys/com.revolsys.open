@@ -32,12 +32,12 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the Euclidean distance (L2 metric) from a Point to a Geometry. Also

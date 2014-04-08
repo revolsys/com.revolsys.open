@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 

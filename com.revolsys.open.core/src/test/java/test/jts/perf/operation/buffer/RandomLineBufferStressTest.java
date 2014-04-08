@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,11 +32,11 @@
  */
 package test.jts.perf.operation.buffer;
 
-import java.util.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.operation.buffer.validate.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
 /**
  * Test buffers generated around set of random linestrings.
@@ -47,78 +46,69 @@ import com.vividsolutions.jts.util.*;
  * 
  * @version 1.7
  */
-public class RandomLineBufferStressTest 
-{
+public class RandomLineBufferStressTest {
 
-  private PrecisionModel precisionModel = new PrecisionModel();
-  private GeometryFactory geometryFactory = new GeometryFactory(precisionModel, 0);
-  WKTReader rdr = new WKTReader(geometryFactory);
+  public static void main(final String args[]) {
+    try {
+      new RandomLineBufferStressTest().run();
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+    }
 
-  public static void main(String args[]) {
-  	try {
-  		(new RandomLineBufferStressTest()).run();
-  	}
-  	catch (Exception ex) {
-  		ex.printStackTrace();
-  	}
-  
   }
 
-  public RandomLineBufferStressTest() {  }
+  private final PrecisionModel precisionModel = new PrecisionModel();
 
-  void run()
-  throws Exception
-  {
-  	while (true) {
-  		run(10);
-  		run(100);
-  		run(200);
-  	}
-  }
-  
-  void run(int numPts)
-  throws Exception
-  {
-  	double lineScale = 1.0;
-  	
-  	Geometry line = RandomOffsetLineStringGenerator.generate(lineScale, numPts, geometryFactory);
-  	System.out.println();
-  	System.out.println(line);
-  	
-		runCase(line, 10, lineScale, numPts);
-		runCase(line, 1, lineScale, numPts);
-		runCase(line, .1, lineScale, numPts);
-  }
-  
+  private final GeometryFactory geometryFactory = new GeometryFactory(
+    this.precisionModel, 0);
+
+  WKTReader rdr = new WKTReader(this.geometryFactory);
+
   private int caseCount = 0;
-  
-  void runCase(Geometry line, double dist, double lineScale, int numPts)
-  throws Exception
-  {
-  	caseCount++;
-  	System.out.println("Running case " + caseCount 
-  			+ "  (line scale = " + lineScale
-  			+ "  buffer dist = " + dist
-  			+ "  num pts = " + numPts
-  			+ " )");
-  	checkBuffer(line, dist);
-  }
-  
-  void checkBuffer(Geometry g, double distance)
-  {
-  	Geometry buf = g.buffer(distance);
-  	String isValidMsg = BufferResultValidator.isValidMsg(g, distance, buf);
-  	if (isValidMsg != null) {
-  		System.out.println("Input: ");
-  		System.out.println(g);
-  		System.out.println("Buffer: ");
-  		System.out.println(buf);
 
-  		throw new IllegalStateException(isValidMsg);
-  	}
+  public RandomLineBufferStressTest() {
   }
-  
-  
+
+  void checkBuffer(final Geometry g, final double distance) {
+    final Geometry buf = g.buffer(distance);
+    final String isValidMsg = BufferResultValidator.isValidMsg(g, distance, buf);
+    if (isValidMsg != null) {
+      System.out.println("Input: ");
+      System.out.println(g);
+      System.out.println("Buffer: ");
+      System.out.println(buf);
+
+      throw new IllegalStateException(isValidMsg);
+    }
+  }
+
+  void run() throws Exception {
+    while (true) {
+      run(10);
+      run(100);
+      run(200);
+    }
+  }
+
+  void run(final int numPts) throws Exception {
+    final double lineScale = 1.0;
+
+    final Geometry line = RandomOffsetLineStringGenerator.generate(lineScale,
+      numPts, this.geometryFactory);
+    System.out.println();
+    System.out.println(line);
+
+    runCase(line, 10, lineScale, numPts);
+    runCase(line, 1, lineScale, numPts);
+    runCase(line, .1, lineScale, numPts);
+  }
+
+  void runCase(final Geometry line, final double dist, final double lineScale,
+    final int numPts) throws Exception {
+    this.caseCount++;
+    System.out.println("Running case " + this.caseCount + "  (line scale = "
+      + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts + " )");
+    checkBuffer(line, dist);
+  }
+
 }
-
-

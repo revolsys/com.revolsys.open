@@ -7,8 +7,8 @@ import java.util.TreeMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 public class ContourConverter extends ArcConverter {
   private static final String GEOMETRY_CLASS = SaifConstants.CONTOUR;

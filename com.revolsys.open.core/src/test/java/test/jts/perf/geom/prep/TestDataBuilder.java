@@ -32,94 +32,88 @@
  */
 package test.jts.perf.geom.prep;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.util.SineStarFactory;
+import com.revolsys.jts.util.GeometricShapeFactory;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.util.SineStarFactory;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
-
-public class TestDataBuilder 
-{
+public class TestDataBuilder {
   private GeometryFactory geomFact = new GeometryFactory();
 
-	private Coordinate origin = new Coordinate(0, 0); 
-	private double size = 100.0;
-	private int testDim = 1;
-	
-	public TestDataBuilder()
-	{
-		
-	}
-	
-	public TestDataBuilder(GeometryFactory geomFact)
-	{
-		this.geomFact = geomFact;
-	}
-	
-	public void setExtent(Coordinate origin, double size)
-	{
-		this.origin = origin;
-		this.size = size;
-	}
-	
-	public void setTestDimension(int testDim)
-	{
-		this.testDim = testDim;
-	}
-	
-	public Geometry createCircle(int nPts) {
-		GeometricShapeFactory gsf = new GeometricShapeFactory();
-		gsf.setCentre(origin);
-		gsf.setSize(size);
-		gsf.setNumPoints(nPts);
-		Geometry circle = gsf.createCircle();
-		// Polygon gRect = gsf.createRectangle();
-		// Geometry g = gRect.getExteriorRing();
-		return circle;
-	}
-  
-  public Geometry createSineStar(int nPts) {
-		SineStarFactory gsf = new SineStarFactory();
-		gsf.setCentre(origin);
-		gsf.setSize(size);
-		gsf.setNumPoints(nPts);
-		gsf.setArmLengthRatio(0.1);
-		gsf.setNumArms(20);
-		Geometry poly = gsf.createSineStar();
-		return poly;
-	}
-  
-  public List createTestGeoms(Envelope env, int nItems, double size, int nPts)
-  {
-    int nCells = (int) Math.sqrt(nItems);
+  private Coordinate origin = new Coordinate(0, 0);
 
-  	List geoms = new ArrayList();
-  	double width = env.getWidth();
-  	double xInc = width / nCells;
-  	double yInc = width / nCells;
-  	for (int i = 0; i < nCells; i++) {
-    	for (int j = 0; j < nCells; j++) {
-    		Coordinate base = new Coordinate(
-    				env.getMinX() + i * xInc,
-    				env.getMinY() + j * yInc);
-    		Geometry line = createLine(base, size, nPts);
-    		geoms.add(line);
-    	}
-  	}
-  	return geoms;
+  private double size = 100.0;
+
+  public TestDataBuilder() {
+
   }
-  
-  Geometry createLine(Coordinate base, double size, int nPts)
-  {
-    GeometricShapeFactory gsf = new GeometricShapeFactory();
+
+  public TestDataBuilder(final GeometryFactory geomFact) {
+    this.geomFact = geomFact;
+  }
+
+  public Geometry createCircle(final int nPts) {
+    final GeometricShapeFactory gsf = new GeometricShapeFactory();
+    gsf.setCentre(this.origin);
+    gsf.setSize(this.size);
+    gsf.setNumPoints(nPts);
+    final Geometry circle = gsf.createCircle();
+    // Polygon gRect = gsf.createRectangle();
+    // Geometry g = gRect.getExteriorRing();
+    return circle;
+  }
+
+  Geometry createLine(final Coordinate base, final double size, final int nPts) {
+    final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
     gsf.setNumPoints(nPts);
-    Geometry circle = gsf.createCircle();
-//    System.out.println(circle);
+    final Geometry circle = gsf.createCircle();
+    // System.out.println(circle);
     return circle.getBoundary();
   }
-  
+
+  public Geometry createSineStar(final int nPts) {
+    final SineStarFactory gsf = new SineStarFactory();
+    gsf.setCentre(this.origin);
+    gsf.setSize(this.size);
+    gsf.setNumPoints(nPts);
+    gsf.setArmLengthRatio(0.1);
+    gsf.setNumArms(20);
+    final Geometry poly = gsf.createSineStar();
+    return poly;
+  }
+
+  public List createTestGeoms(final Envelope env, final int nItems,
+    final double size, final int nPts) {
+    final int nCells = (int)Math.sqrt(nItems);
+
+    final List geoms = new ArrayList();
+    final double width = env.getWidth();
+    final double xInc = width / nCells;
+    final double yInc = width / nCells;
+    for (int i = 0; i < nCells; i++) {
+      for (int j = 0; j < nCells; j++) {
+        final Coordinate base = new Coordinate(env.getMinX() + i * xInc,
+          env.getMinY() + j * yInc);
+        final Geometry line = createLine(base, size, nPts);
+        geoms.add(line);
+      }
+    }
+    return geoms;
+  }
+
+  public void setExtent(final Coordinate origin, final double size) {
+    this.origin = origin;
+    this.size = size;
+  }
+
+  public void setTestDimension(final int testDim) {
+  }
 
 }

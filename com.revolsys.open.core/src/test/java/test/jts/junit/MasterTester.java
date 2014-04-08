@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,46 +37,47 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.vividsolutions.jts.algorithm.RobustLineIntersectionTest;
-import com.vividsolutions.jts.geom.AreaLengthTest;
-import com.vividsolutions.jts.geom.BidirectionalComparatorTest;
-import com.vividsolutions.jts.geom.CoordinateArraysTest;
-import com.vividsolutions.jts.geom.EnvelopeTest;
-import com.vividsolutions.jts.geom.GeometryCollectionImplTest;
-import com.vividsolutions.jts.geom.GeometryImplTest;
-import com.vividsolutions.jts.geom.IntersectionMatrixTest;
-import com.vividsolutions.jts.geom.IsRectangleTest;
-import com.vividsolutions.jts.geom.LineStringImplTest;
-import com.vividsolutions.jts.geom.MultiPointImplTest;
-import com.vividsolutions.jts.geom.NormalizeTest;
-import com.vividsolutions.jts.geom.PointImplTest;
-import com.vividsolutions.jts.geom.PrecisionModelTest;
-import com.vividsolutions.jts.geom.PredicateShortCircuitTest;
-import com.vividsolutions.jts.geom.RectanglePredicateSyntheticTest;
-import com.vividsolutions.jts.geom.RectanglePredicateTest;
-import com.vividsolutions.jts.geom.impl.BasicCoordinateSequenceTest;
-import com.vividsolutions.jts.index.IntervalTest;
-import com.vividsolutions.jts.index.QuadtreeTest;
-import com.vividsolutions.jts.index.SIRtreeTest;
-import com.vividsolutions.jts.index.STRtreeTest;
-import com.vividsolutions.jts.io.WKBTest;
-import com.vividsolutions.jts.io.WKTReaderTest;
-import com.vividsolutions.jts.io.WKTWriterTest;
-import com.vividsolutions.jts.linearref.LengthIndexedLineTest;
-import com.vividsolutions.jts.linearref.LocationIndexedLineTest;
-import com.vividsolutions.jts.operation.buffer.BufferTest;
-import com.vividsolutions.jts.operation.distance.DistanceTest;
-import com.vividsolutions.jts.operation.linemerge.LineMergerTest;
-import com.vividsolutions.jts.operation.polygonize.PolygonizeTest;
-import com.vividsolutions.jts.operation.relate.RelateBoundaryNodeRuleTest;
-import com.vividsolutions.jts.operation.union.CascadedPolygonUnionTest;
-import com.vividsolutions.jts.operation.union.UnaryUnionTest;
-import com.vividsolutions.jts.operation.valid.IsValidTest;
-import com.vividsolutions.jts.operation.valid.ValidClosedRingTest;
-import com.vividsolutions.jts.operation.valid.ValidSelfTouchingRingFormingHoleTest;
-import com.vividsolutions.jts.precision.SimpleGeometryPrecisionReducerTest;
-import com.vividsolutions.jts.triangulate.ConformingDelaunayTest;
-import com.vividsolutions.jts.triangulate.DelaunayTest;
+import com.revolsys.jts.algorithm.RobustLineIntersectionTest;
+import com.revolsys.jts.geom.AreaLengthTest;
+import com.revolsys.jts.geom.BidirectionalComparatorTest;
+import com.revolsys.jts.geom.CoordinateArraysTest;
+import com.revolsys.jts.geom.EnvelopeTest;
+import com.revolsys.jts.geom.GeometryCollectionImplTest;
+import com.revolsys.jts.geom.GeometryImplTest;
+import com.revolsys.jts.geom.IntersectionMatrixTest;
+import com.revolsys.jts.geom.IsRectangleTest;
+import com.revolsys.jts.geom.LineStringImplTest;
+import com.revolsys.jts.geom.MultiPointImplTest;
+import com.revolsys.jts.geom.NormalizeTest;
+import com.revolsys.jts.geom.PointImplTest;
+import com.revolsys.jts.geom.PrecisionModelTest;
+import com.revolsys.jts.geom.PredicateShortCircuitTest;
+import com.revolsys.jts.geom.RectanglePredicateSyntheticTest;
+import com.revolsys.jts.geom.RectanglePredicateTest;
+import com.revolsys.jts.geom.impl.BasicCoordinateSequenceTest;
+import com.revolsys.jts.index.IntervalTest;
+import com.revolsys.jts.index.QuadtreeTest;
+import com.revolsys.jts.index.SIRtreeTest;
+import com.revolsys.jts.index.STRtreeTest;
+import com.revolsys.jts.io.WKBTest;
+import com.revolsys.jts.io.WKTReaderTest;
+import com.revolsys.jts.io.WKTWriterTest;
+import com.revolsys.jts.linearref.LengthIndexedLineTest;
+import com.revolsys.jts.linearref.LocationIndexedLineTest;
+import com.revolsys.jts.operation.buffer.BufferTest;
+import com.revolsys.jts.operation.distance.DistanceTest;
+import com.revolsys.jts.operation.linemerge.LineMergerTest;
+import com.revolsys.jts.operation.polygonize.PolygonizeTest;
+import com.revolsys.jts.operation.relate.RelateBoundaryNodeRuleTest;
+import com.revolsys.jts.operation.union.CascadedPolygonUnionTest;
+import com.revolsys.jts.operation.union.UnaryUnionTest;
+import com.revolsys.jts.operation.valid.IsValidTest;
+import com.revolsys.jts.operation.valid.ValidClosedRingTest;
+import com.revolsys.jts.operation.valid.ValidSelfTouchingRingFormingHoleTest;
+import com.revolsys.jts.precision.SimpleGeometryPrecisionReducerTest;
+import com.revolsys.jts.triangulate.ConformingDelaunayTest;
+import com.revolsys.jts.triangulate.DelaunayTest;
+
 /**
  * A collection of all the tests.
  *
@@ -85,21 +85,24 @@ import com.vividsolutions.jts.triangulate.DelaunayTest;
  */
 public class MasterTester extends TestCase {
 
-  public MasterTester(String name) {
-    super(name);
+  public static void main(final String[] args) {
+    junit.textui.TestRunner.run(suite());
+    System.exit(0);
   }
 
   public static Test suite() {
-    TestSuite result = new TestSuite();
-    result.addTest(new TestSuite(com.vividsolutions.jts.algorithm.AngleTest.class));
+    final TestSuite result = new TestSuite();
+    result.addTest(new TestSuite(com.revolsys.jts.algorithm.AngleTest.class));
     result.addTest(new TestSuite(AreaLengthTest.class));
     result.addTest(new TestSuite(BasicCoordinateSequenceTest.class));
     result.addTest(new TestSuite(BidirectionalComparatorTest.class));
     result.addTest(new TestSuite(BufferTest.class));
     result.addTest(new TestSuite(CascadedPolygonUnionTest.class));
-    result.addTest(new TestSuite(com.vividsolutions.jts.algorithm.OrientationIndexTest.class));
+    result.addTest(new TestSuite(
+      com.revolsys.jts.algorithm.OrientationIndexTest.class));
     result.addTest(new TestSuite(ConformingDelaunayTest.class));
-    result.addTest(new TestSuite(com.vividsolutions.jts.algorithm.ConvexHullTest.class));
+    result.addTest(new TestSuite(
+      com.revolsys.jts.algorithm.ConvexHullTest.class));
     result.addTest(new TestSuite(CoordinateArraysTest.class));
     result.addTest(new TestSuite(DelaunayTest.class));
     result.addTest(new TestSuite(DistanceTest.class));
@@ -108,7 +111,7 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(GeometryImplTest.class));
     result.addTest(new TestSuite(IntersectionMatrixTest.class));
     result.addTest(new TestSuite(IntervalTest.class));
-    result.addTest(new TestSuite(com.vividsolutions.jts.algorithm.IsCCWTest.class));
+    result.addTest(new TestSuite(com.revolsys.jts.algorithm.IsCCWTest.class));
     result.addTest(new TestSuite(IsRectangleTest.class));
     result.addTest(new TestSuite(IsValidTest.class));
     result.addTest(new TestSuite(LengthIndexedLineTest.class));
@@ -118,7 +121,8 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(MiscellaneousTest.class));
     result.addTest(new TestSuite(MiscellaneousTest2.class));
     result.addTest(new TestSuite(MultiPointImplTest.class));
-    result.addTest(new TestSuite(com.vividsolutions.jts.algorithm.NonRobustLineIntersectorTest.class));
+    result.addTest(new TestSuite(
+      com.revolsys.jts.algorithm.NonRobustLineIntersectorTest.class));
     result.addTest(new TestSuite(NormalizeTest.class));
     result.addTest(new TestSuite(PointImplTest.class));
     result.addTest(new TestSuite(PolygonizeTest.class));
@@ -139,14 +143,13 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(UnaryUnionTest.class));
     result.addTest(new TestSuite(ValidClosedRingTest.class));
     result.addTest(new TestSuite(ValidSelfTouchingRingFormingHoleTest.class));
-    //result.addTest(new TestSuite(VoronoiTest.class));
-    
+    // result.addTest(new TestSuite(VoronoiTest.class));
+
     return result;
   }
 
-  public static void main(String[] args) {
-    junit.textui.TestRunner.run(suite());
-    System.exit(0);
+  public MasterTester(final String name) {
+    super(name);
   }
 
 }

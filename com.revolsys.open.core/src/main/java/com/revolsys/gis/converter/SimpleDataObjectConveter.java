@@ -13,7 +13,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.CollectionUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class SimpleDataObjectConveter implements
   Converter<DataObject, DataObject> {

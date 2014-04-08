@@ -9,7 +9,7 @@ import java.util.List;
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class RTreeBranch<T> extends RTreeNode<T> implements
   Iterable<RTreeNode<T>> {

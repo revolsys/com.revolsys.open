@@ -1,6 +1,6 @@
 package com.revolsys.gis.wms.capabilities;
 
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class BoundingBox {
   private String srs;

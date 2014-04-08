@@ -22,7 +22,7 @@ package com.revolsys.gis.data.model.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectGeometryFilter<G extends Geometry> implements
   Filter<DataObject> {

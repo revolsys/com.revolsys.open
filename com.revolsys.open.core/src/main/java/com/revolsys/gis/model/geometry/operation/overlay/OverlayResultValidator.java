@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * Validates that the result of an overlay operation is

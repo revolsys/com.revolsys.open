@@ -48,7 +48,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
 import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Forms {@link Polygon}s out of a graph of {@link DirectedEdge}s. The edges to

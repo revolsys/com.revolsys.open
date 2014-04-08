@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,34 +36,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.index.bintree.Interval;
-
+import com.revolsys.jts.index.bintree.Interval;
 
 /**
  * @version 1.7
  */
-public class IntervalList
-{
+public class IntervalList {
   List list = new ArrayList();
 
   public IntervalList() {
   }
 
-  public void add(Interval interval)
-  {
-    list.add(interval);
+  public void add(final Interval interval) {
+    this.list.add(interval);
   }
 
-  public List query(Interval searchInterval)
-  {
-    List result = new ArrayList();
-    for (Iterator i = list.iterator(); i.hasNext(); ) {
-      Interval interval = (Interval) i.next();
-      if (interval.overlaps(searchInterval))
+  public List query(final Interval searchInterval) {
+    final List result = new ArrayList();
+    for (final Iterator i = this.list.iterator(); i.hasNext();) {
+      final Interval interval = (Interval)i.next();
+      if (interval.overlaps(searchInterval)) {
         result.add(interval);
+      }
     }
     return result;
   }
-
 
 }

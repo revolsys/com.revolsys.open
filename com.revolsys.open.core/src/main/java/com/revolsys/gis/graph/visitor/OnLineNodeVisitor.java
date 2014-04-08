@@ -10,7 +10,7 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,

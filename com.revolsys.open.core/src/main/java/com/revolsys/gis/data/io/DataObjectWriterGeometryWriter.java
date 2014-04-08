@@ -8,7 +8,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.Writer;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectWriterGeometryWriter extends AbstractWriter<Geometry> {
   private final Writer<DataObject> writer;

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,71 +32,40 @@
  */
 package test.jts.perf.operation.buffer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.util.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.operation.buffer.validate.*;
-
 import junit.framework.TestCase;
-import test.jts.TestFiles;
-import test.jts.junit.*;
 
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.io.WKTFileReader;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * @version 1.7
  */
 public class FileBufferResultValidatorTest extends TestCase {
 
-	WKTReader rdr = new WKTReader();
-	
-  public FileBufferResultValidatorTest(String name) {
-    super(name);
-  }
-
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     junit.textui.TestRunner.run(FileBufferResultValidatorTest.class);
   }
 
-  public void testAfrica() throws Exception 
-  {
-//    runTest(TestFiles.DATA_DIR + "world.wkt");
-    runTest("../../../../../data/africa.wkt");
-  }
-  
-  void runTest(String resource) 
-  throws Exception
-  {
-    InputStream is = this.getClass().getResourceAsStream(resource);
-    runTest(new WKTFileReader(new InputStreamReader(is), rdr));
+  WKTReader rdr = new WKTReader();
+
+  public FileBufferResultValidatorTest(final String name) {
+    super(name);
   }
 
-  void runTest(WKTFileReader fileRdr)
-  throws Exception
-  {
-    List polys = fileRdr.read();
-    
-    runAll(polys, 0.01);
-    runAll(polys, 0.1);
-    runAll(polys, 1.0);
-    runAll(polys, 10.0);
-    runAll(polys, 100.0);
-    runAll(polys, 1000.0);
-    
-  }
-  
-  void runAll(List geoms, double dist)
-  {
-  	Stopwatch sw = new Stopwatch();
+  void runAll(final List geoms, final double dist) {
+    final Stopwatch sw = new Stopwatch();
     System.out.println("Geom count = " + geoms.size() + "   distance = " + dist);
-    for (Iterator i = geoms.iterator(); i.hasNext(); ) {
-      Geometry g = (Geometry) i.next();
+    for (final Iterator i = geoms.iterator(); i.hasNext();) {
+      final Geometry g = (Geometry)i.next();
       runBuffer(g, dist);
       runBuffer(g.reverse(), dist);
       System.out.print(".");
@@ -105,18 +73,41 @@ public class FileBufferResultValidatorTest extends TestCase {
     System.out.println("  " + sw.getTimeString());
 
   }
-  void runBuffer(Geometry g, double dist)
-  {
-  	Geometry buf = g.buffer(dist);
-    BufferResultValidator validator = new BufferResultValidator(g, dist, buf);
-    
-    if (! validator.isValid()) {
-      String msg = validator.getErrorMessage();
+
+  void runBuffer(final Geometry g, final double dist) {
+    final Geometry buf = g.buffer(dist);
+    final BufferResultValidator validator = new BufferResultValidator(g, dist,
+      buf);
+
+    if (!validator.isValid()) {
+      final String msg = validator.getErrorMessage();
 
       System.out.println(msg);
       System.out.println(WKTWriter.toPoint(validator.getErrorLocation()));
       System.out.println(g);
     }
-  	assertTrue(validator.isValid());
+    assertTrue(validator.isValid());
+  }
+
+  void runTest(final String resource) throws Exception {
+    final InputStream is = this.getClass().getResourceAsStream(resource);
+    runTest(new WKTFileReader(new InputStreamReader(is), this.rdr));
+  }
+
+  void runTest(final WKTFileReader fileRdr) throws Exception {
+    final List polys = fileRdr.read();
+
+    runAll(polys, 0.01);
+    runAll(polys, 0.1);
+    runAll(polys, 1.0);
+    runAll(polys, 10.0);
+    runAll(polys, 100.0);
+    runAll(polys, 1000.0);
+
+  }
+
+  public void testAfrica() throws Exception {
+    // runTest(TestFiles.DATA_DIR + "world.wkt");
+    runTest("../../../../../data/africa.wkt");
   }
 }

@@ -3,7 +3,7 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinateSequence;
 
 public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   implements Iterator<Coordinates>, Iterable<Coordinates> {

@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 
 public class Geometry3DExactEquals implements Equals<Geometry> {
   public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();

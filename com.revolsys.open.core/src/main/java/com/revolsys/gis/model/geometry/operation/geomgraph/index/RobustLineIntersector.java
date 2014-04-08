@@ -8,8 +8,8 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.vividsolutions.jts.algorithm.NotRepresentableException;
-import com.vividsolutions.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.algorithm.RobustDeterminant;
 
 /**
  * A robust version of {@link LineIntersector}.

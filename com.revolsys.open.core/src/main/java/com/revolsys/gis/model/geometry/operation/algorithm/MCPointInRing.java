@@ -13,9 +13,9 @@ import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChain;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChainBuilder;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChainSelectAction;
-import com.vividsolutions.jts.algorithm.RobustDeterminant;
-import com.vividsolutions.jts.index.bintree.Bintree;
-import com.vividsolutions.jts.index.bintree.Interval;
+import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.index.bintree.Bintree;
+import com.revolsys.jts.index.bintree.Interval;
 
 /**
  * Implements {@link PointInRing} using {@link MonotoneChain}s and a

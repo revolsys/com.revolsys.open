@@ -11,10 +11,10 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class SplitCrossingEdgesVisitor<T> extends
   AbstractEdgeListenerVisitor<T> {

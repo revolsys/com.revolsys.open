@@ -8,7 +8,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 public class LineSegmentTest {
   private static final GeometryFactory GEOMETRY_FACTORY_2D = GeometryFactory.getFactory(
@@ -71,61 +71,62 @@ public class LineSegmentTest {
   @Test
   public void linearIntersection() {
     // Equal
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_0_0_0, c_100_0_10, c_0_0_0,
-      c_100_0_10);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_0_0_0,
+      this.c_100_0_10, this.c_0_0_0, this.c_100_0_10);
     // First Start
-    assertIntersection3d(c_0_0_0, c_50_0_5, c_0_0_0, c_100_0_10, c_0_0_0,
-      c_50_0_5);
+    assertIntersection3d(this.c_0_0_0, this.c_50_0_5, this.c_0_0_0,
+      this.c_100_0_10, this.c_0_0_0, this.c_50_0_5);
     // First End
-    assertIntersection3d(c_50_0_5, c_100_0_10, c_0_0_0, c_100_0_10, c_50_0_5,
-      c_100_0_10);
+    assertIntersection3d(this.c_50_0_5, this.c_100_0_10, this.c_0_0_0,
+      this.c_100_0_10, this.c_50_0_5, this.c_100_0_10);
     // First Middle
-    assertIntersection3d(c_50_0_5, c_70_0_7, c_0_0_0, c_100_0_10, c_50_0_5,
-      c_70_0_7);
+    assertIntersection3d(this.c_50_0_5, this.c_70_0_7, this.c_0_0_0,
+      this.c_100_0_10, this.c_50_0_5, this.c_70_0_7);
     // Second Start
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_0_0_0, c_50_0_5, c_0_0_0,
-      c_50_0_5);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_0_0_0,
+      this.c_50_0_5, this.c_0_0_0, this.c_50_0_5);
     // Second End
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_50_0_5, c_100_0_10, c_50_0_5,
-      c_100_0_10);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_50_0_5,
+      this.c_100_0_10, this.c_50_0_5, this.c_100_0_10);
     // Second Middle
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_50_0_5, c_70_0_7, c_50_0_5,
-      c_70_0_7);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_50_0_5,
+      this.c_70_0_7, this.c_50_0_5, this.c_70_0_7);
     // Reverse First Start
-    assertIntersection3d(c_50_0_5, c_0_0_0, c_0_0_0, c_100_0_10, c_50_0_5,
-      c_0_0_0);
+    assertIntersection3d(this.c_50_0_5, this.c_0_0_0, this.c_0_0_0,
+      this.c_100_0_10, this.c_50_0_5, this.c_0_0_0);
     // Reverse First End
-    assertIntersection3d(c_100_0_10, c_50_0_5, c_0_0_0, c_100_0_10, c_100_0_10,
-      c_50_0_5);
+    assertIntersection3d(this.c_100_0_10, this.c_50_0_5, this.c_0_0_0,
+      this.c_100_0_10, this.c_100_0_10, this.c_50_0_5);
     // Reverse First Middle
-    assertIntersection3d(c_70_0_7, c_50_0_5, c_0_0_0, c_100_0_10, c_70_0_7,
-      c_50_0_5);
+    assertIntersection3d(this.c_70_0_7, this.c_50_0_5, this.c_0_0_0,
+      this.c_100_0_10, this.c_70_0_7, this.c_50_0_5);
     // Reverse Second Start
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_0_0_0, c_50_0_5, c_0_0_0,
-      c_50_0_5);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_0_0_0,
+      this.c_50_0_5, this.c_0_0_0, this.c_50_0_5);
     // Reverse Second End
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_70_0_7, c_50_0_5, c_50_0_5,
-      c_70_0_7);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_70_0_7,
+      this.c_50_0_5, this.c_50_0_5, this.c_70_0_7);
 
     // Reverse Second End No z on second line
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_70_0, c_50_0, c_50_0_5,
-      c_70_0_7);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_70_0,
+      this.c_50_0, this.c_50_0_5, this.c_70_0_7);
 
     // Middle Precision Model
-    assertIntersection3d(c_0_0_0, c(100, 0.001, 10), c(50, 0.001),
+    assertIntersection3d(this.c_0_0_0, c(100, 0.001, 10), c(50, 0.001),
       c(70, 0.001), c(50, 0.001, 5), c(70, 0.001, 7));
   }
 
   @Test
   public void pointIntersections() {
     // Cross
-    assertIntersection3d(c_0_0_0, c_100_100_10, c_0_100_1, c_100_0_10,
-      c_50_50_5);
+    assertIntersection3d(this.c_0_0_0, this.c_100_100_10, this.c_0_100_1,
+      this.c_100_0_10, this.c_50_50_5);
     // Touch
-    assertIntersection3d(c_0_0_0, c_100_0_10, c_50_0, c_100_100_10, c_50_0_5);
+    assertIntersection3d(this.c_0_0_0, this.c_100_0_10, this.c_50_0,
+      this.c_100_100_10, this.c_50_0_5);
     // Touch approximate
-    assertIntersection3d(c_0_0_0, c(100, 0.001, 10), c(50, 0.001, 5),
-      c_100_100_10, c(50, 0.001, 5));
+    assertIntersection3d(this.c_0_0_0, c(100, 0.001, 10), c(50, 0.001, 5),
+      this.c_100_100_10, c(50, 0.001, 5));
 
   }
 }

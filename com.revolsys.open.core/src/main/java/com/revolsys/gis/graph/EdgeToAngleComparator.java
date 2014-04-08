@@ -2,7 +2,7 @@ package com.revolsys.gis.graph;
 
 import java.util.Comparator;
 
-import com.vividsolutions.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.Angle;
 
 /**
  * The EdgeToAngleComparator class is used to return edges in a clockwise order.

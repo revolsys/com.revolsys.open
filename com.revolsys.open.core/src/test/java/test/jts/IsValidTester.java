@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,28 +32,27 @@
  */
 package test.jts;
 
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.operation.valid.IsValidOp;
-
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.operation.valid.IsValidOp;
 
 /**
  * @version 1.7
  */
 public class IsValidTester {
 
-  public IsValidTester() {
-  }
-  public static void main(String[] args) throws Exception {
-    WKTReader reader = new WKTReader(new GeometryFactory());
-    Geometry g = reader.read("GEOMETRYCOLLECTION (POINT (110 300), POINT (100 110), POINT (130 210), POINT (150 210), POINT (150 180), POINT (130 170), POINT (140 190), POINT (130 200), LINESTRING (240 50, 210 120, 270 80, 250 140, 330 70, 300 160, 340 130, 340 130), POLYGON ((210 340, 220 260, 150 270, 230 220, 230 140, 270 210, 360 240, 260 250, 260 280, 240 270, 210 340), (230 270, 230 250, 200 250, 240 220, 240 190, 260 220, 290 230, 250 230, 230 270)))");
-    IsValidOp op = new IsValidOp(g);
+  public static void main(final String[] args) throws Exception {
+    final WKTReader reader = new WKTReader(new GeometryFactory());
+    final Geometry g = reader.read("GEOMETRYCOLLECTION (POINT (110 300), POINT (100 110), POINT (130 210), POINT (150 210), POINT (150 180), POINT (130 170), POINT (140 190), POINT (130 200), LINESTRING (240 50, 210 120, 270 80, 250 140, 330 70, 300 160, 340 130, 340 130), POLYGON ((210 340, 220 260, 150 270, 230 220, 230 140, 270 210, 360 240, 260 250, 260 280, 240 270, 210 340), (230 270, 230 250, 200 250, 240 220, 240 190, 260 220, 290 230, 250 230, 230 270)))");
+    final IsValidOp op = new IsValidOp(g);
     if (!op.isValid()) {
       System.out.println(op.getValidationError().getMessage());
-    }
-    else {
+    } else {
       System.out.println("OK");
     }
+  }
+
+  public IsValidTester() {
   }
 }

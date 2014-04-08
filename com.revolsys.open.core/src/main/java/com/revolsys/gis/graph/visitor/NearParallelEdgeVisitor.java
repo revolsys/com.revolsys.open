@@ -3,12 +3,12 @@ package com.revolsys.gis.graph.visitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgeVisitor;
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 

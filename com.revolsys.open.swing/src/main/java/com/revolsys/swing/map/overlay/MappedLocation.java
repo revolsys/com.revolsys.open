@@ -14,8 +14,8 @@ import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.util.CollectionUtil;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
   MapSerializer {

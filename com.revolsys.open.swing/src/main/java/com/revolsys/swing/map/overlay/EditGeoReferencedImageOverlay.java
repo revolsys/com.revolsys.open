@@ -36,9 +36,9 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private static final Cursor CURSOR_MOVE_IMAGE = SilkIconLoader.getCursor(

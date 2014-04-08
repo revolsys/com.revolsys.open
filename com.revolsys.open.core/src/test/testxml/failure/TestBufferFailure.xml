@@ -3,7 +3,7 @@
     Various cases which have been reported or identified as causing buffer failures.
   </desc>
   <precisionModel type="FLOATING" />
-  <resultMatcher>com.vividsolutions.jtstest.testrunner.BufferResultMatcher</resultMatcher>
+  <resultMatcher>com.revolsys.jtstest.testrunner.BufferResultMatcher</resultMatcher>
 
 <case>
   <desc>

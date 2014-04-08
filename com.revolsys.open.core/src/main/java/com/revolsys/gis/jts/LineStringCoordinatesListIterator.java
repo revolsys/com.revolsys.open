@@ -5,7 +5,7 @@ import java.util.Iterator;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
   Iterable<LineString> {

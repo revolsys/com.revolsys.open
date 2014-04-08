@@ -26,7 +26,7 @@ import com.revolsys.io.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.io.shp.ShapefileGeometryUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryAttribute extends AbstractFileGdbAttribute {
 

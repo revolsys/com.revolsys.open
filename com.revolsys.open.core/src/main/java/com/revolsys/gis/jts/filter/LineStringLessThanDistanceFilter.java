@@ -25,8 +25,8 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 

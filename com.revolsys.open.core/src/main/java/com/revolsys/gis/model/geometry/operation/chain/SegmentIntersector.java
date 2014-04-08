@@ -32,7 +32,7 @@
  */
 package com.revolsys.gis.model.geometry.operation.chain;
 
-import com.vividsolutions.jts.noding.Noder;
+import com.revolsys.jts.noding.Noder;
 
 /**
  * Processes possible intersections detected by a {@link Noder}. The

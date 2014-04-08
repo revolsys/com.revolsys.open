@@ -10,9 +10,9 @@ import java.util.TreeMap;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A EdgeEndStar is an ordered list of EdgeEnds around a node. They are

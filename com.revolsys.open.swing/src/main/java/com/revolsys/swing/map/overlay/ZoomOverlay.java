@@ -25,7 +25,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.OS;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public class ZoomOverlay extends AbstractOverlay {
   private static final Cursor CURSOR_PAN = new Cursor(Cursor.HAND_CURSOR);

@@ -34,8 +34,8 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.util.AssertionFailedException;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.util.AssertionFailedException;
 
 public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   implements DataObjectMetaData, Cloneable {

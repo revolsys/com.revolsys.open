@@ -1,8 +1,8 @@
 package com.revolsys.gis.model.geometry.index;
 
 import com.revolsys.collection.Visitor;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.io.WKTWriter;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.io.WKTWriter;
 
 public abstract class IntervalRTreeNode<V> {
 

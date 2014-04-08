@@ -17,7 +17,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   public PostgreSQLDdlWriter() {

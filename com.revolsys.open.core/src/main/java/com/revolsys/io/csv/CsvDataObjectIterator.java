@@ -24,7 +24,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {

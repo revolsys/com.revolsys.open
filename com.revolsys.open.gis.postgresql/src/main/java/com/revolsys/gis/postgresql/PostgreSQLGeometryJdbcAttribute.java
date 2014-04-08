@@ -58,8 +58,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     if (object == null) {
       return null;
     } else {
-      if (object instanceof com.vividsolutions.jts.geom.Geometry) {
-        final com.vividsolutions.jts.geom.Geometry geometry = (com.vividsolutions.jts.geom.Geometry)object;
+      if (object instanceof com.revolsys.jts.geom.Geometry) {
+        final com.revolsys.jts.geom.Geometry geometry = (com.revolsys.jts.geom.Geometry)object;
         object = geometryFactory.copy(geometry);
       }
       Geometry geometry = null;
@@ -72,32 +72,32 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       } else if (type == DataTypes.POLYGON) {
         geometry = toPgPolygon(object);
       } else if (type == DataTypes.MULTI_POINT) {
-        geometry = toPgMultiPoint((com.vividsolutions.jts.geom.Geometry)object);
+        geometry = toPgMultiPoint((com.revolsys.jts.geom.Geometry)object);
       } else if (type == DataTypes.MULTI_LINE_STRING) {
-        geometry = toPgMultiLineString((com.vividsolutions.jts.geom.Geometry)object);
+        geometry = toPgMultiLineString((com.revolsys.jts.geom.Geometry)object);
       } else if (type == DataTypes.MULTI_POLYGON) {
-        geometry = toPgMultiPolygon((com.vividsolutions.jts.geom.Geometry)object);
-      } else if (object instanceof com.vividsolutions.jts.geom.Point) {
-        final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
+        geometry = toPgMultiPolygon((com.revolsys.jts.geom.Geometry)object);
+      } else if (object instanceof com.revolsys.jts.geom.Point) {
+        final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)object;
         geometry = toPgPoint(point);
       } else if (object instanceof Coordinates) {
         final Coordinates coordinates = (Coordinates)object;
-        final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+        final com.revolsys.jts.geom.Point point = geometryFactory.createPoint(coordinates);
         geometry = toPgPoint(point);
-      } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
-        final com.vividsolutions.jts.geom.MultiPoint point = (com.vividsolutions.jts.geom.MultiPoint)object;
+      } else if (object instanceof com.revolsys.jts.geom.MultiPoint) {
+        final com.revolsys.jts.geom.MultiPoint point = (com.revolsys.jts.geom.MultiPoint)object;
         geometry = toPgMultiPoint(point);
-      } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
-        final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
+      } else if (object instanceof com.revolsys.jts.geom.LineString) {
+        final com.revolsys.jts.geom.LineString lineString = (com.revolsys.jts.geom.LineString)object;
         geometry = toPgLineString(lineString);
-      } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
-        final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
+      } else if (object instanceof com.revolsys.jts.geom.MultiLineString) {
+        final com.revolsys.jts.geom.MultiLineString lineString = (com.revolsys.jts.geom.MultiLineString)object;
         geometry = toPgMultiLineString(lineString);
-      } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
-        final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
+      } else if (object instanceof com.revolsys.jts.geom.Polygon) {
+        final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)object;
         geometry = toPgPolygon(polygon);
-      } else if (object instanceof com.vividsolutions.jts.geom.MultiPolygon) {
-        final com.vividsolutions.jts.geom.MultiPolygon polygon = (com.vividsolutions.jts.geom.MultiPolygon)object;
+      } else if (object instanceof com.revolsys.jts.geom.MultiPolygon) {
+        final com.revolsys.jts.geom.MultiPolygon polygon = (com.revolsys.jts.geom.MultiPolygon)object;
         geometry = toPgMultiPolygon(polygon);
       } else {
         return object;
@@ -162,25 +162,25 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     Geometry geometry = null;
     if (object instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)object;
-      final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+      final com.revolsys.jts.geom.Point point = geometryFactory.createPoint(coordinates);
       geometry = toPgPoint(point);
-    } else if (object instanceof com.vividsolutions.jts.geom.Point) {
-      final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
+    } else if (object instanceof com.revolsys.jts.geom.Point) {
+      final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)object;
       geometry = toPgPoint(point);
-    } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
-      final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
+    } else if (object instanceof com.revolsys.jts.geom.LineString) {
+      final com.revolsys.jts.geom.LineString lineString = (com.revolsys.jts.geom.LineString)object;
       geometry = toPgLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
-      final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
+    } else if (object instanceof com.revolsys.jts.geom.Polygon) {
+      final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)object;
       geometry = toPgPolygon(polygon);
-    } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
-      final com.vividsolutions.jts.geom.MultiPoint multiPoint = (com.vividsolutions.jts.geom.MultiPoint)object;
+    } else if (object instanceof com.revolsys.jts.geom.MultiPoint) {
+      final com.revolsys.jts.geom.MultiPoint multiPoint = (com.revolsys.jts.geom.MultiPoint)object;
       geometry = toPgMultiPoint(multiPoint);
-    } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
-      final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
+    } else if (object instanceof com.revolsys.jts.geom.MultiLineString) {
+      final com.revolsys.jts.geom.MultiLineString lineString = (com.revolsys.jts.geom.MultiLineString)object;
       geometry = toPgMultiLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.MultiPolygon) {
-      final com.vividsolutions.jts.geom.MultiPolygon multiPolygon = (com.vividsolutions.jts.geom.MultiPolygon)object;
+    } else if (object instanceof com.revolsys.jts.geom.MultiPolygon) {
+      final com.revolsys.jts.geom.MultiPolygon multiPolygon = (com.revolsys.jts.geom.MultiPolygon)object;
       geometry = toPgMultiPolygon(multiPolygon);
     } else {
       return object;
@@ -188,7 +188,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return new PGgeometry(geometry);
   }
 
-  private com.vividsolutions.jts.geom.LineString toJtsLineString(
+  private com.revolsys.jts.geom.LineString toJtsLineString(
     final GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
@@ -207,13 +207,13 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return factory.createLineString(coordinates);
   }
 
-  private com.vividsolutions.jts.geom.Geometry toJtsMultiLineString(
+  private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
     final GeometryFactory factory, final MultiLineString multiLine) {
     final LineString[] lines = multiLine.getLines();
     if (lines.length == 1) {
       return toJtsLineString(factory, lines[0]);
     } else {
-      final com.vividsolutions.jts.geom.LineString[] lineStrings = new com.vividsolutions.jts.geom.LineString[lines.length];
+      final com.revolsys.jts.geom.LineString[] lineStrings = new com.revolsys.jts.geom.LineString[lines.length];
       for (int i = 0; i < lines.length; i++) {
         final LineString line = lines[i];
         lineStrings[i] = toJtsLineString(factory, line);
@@ -222,11 +222,11 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private com.vividsolutions.jts.geom.Geometry toJtsMultiPoint(
+  private com.revolsys.jts.geom.Geometry toJtsMultiPoint(
     final GeometryFactory factory, final MultiPoint multiPoint) {
-    final List<com.vividsolutions.jts.geom.Point> points = new ArrayList<com.vividsolutions.jts.geom.Point>();
+    final List<com.revolsys.jts.geom.Point> points = new ArrayList<com.revolsys.jts.geom.Point>();
     for (final Point point : multiPoint.getPoints()) {
-      final com.vividsolutions.jts.geom.Point jtsPoint = toJtsPoint(factory,
+      final com.revolsys.jts.geom.Point jtsPoint = toJtsPoint(factory,
         point);
       points.add(jtsPoint);
     }
@@ -237,11 +237,11 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private com.vividsolutions.jts.geom.Geometry toJtsMultiPolygon(
+  private com.revolsys.jts.geom.Geometry toJtsMultiPolygon(
     final GeometryFactory factory, final MultiPolygon multiPolygon) {
-    final List<com.vividsolutions.jts.geom.Polygon> polygons = new ArrayList<com.vividsolutions.jts.geom.Polygon>();
+    final List<com.revolsys.jts.geom.Polygon> polygons = new ArrayList<com.revolsys.jts.geom.Polygon>();
     for (final Polygon polygon : multiPolygon.getPolygons()) {
-      final com.vividsolutions.jts.geom.Polygon jtsPolygon = toJtsPolygon(
+      final com.revolsys.jts.geom.Polygon jtsPolygon = toJtsPolygon(
         factory, polygon);
       polygons.add(jtsPolygon);
     }
@@ -252,7 +252,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private com.vividsolutions.jts.geom.Point toJtsPoint(
+  private com.revolsys.jts.geom.Point toJtsPoint(
     final GeometryFactory factory, final Point point) {
     final Coordinates coordinate;
     switch (numAxis) {
@@ -269,7 +269,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return factory.createPoint(coordinate);
   }
 
-  private com.vividsolutions.jts.geom.Polygon toJtsPolygon(
+  private com.revolsys.jts.geom.Polygon toJtsPolygon(
     final GeometryFactory factory, final Polygon polygon) {
     final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int ringIndex = 0; ringIndex < polygon.numRings(); ringIndex++) {
@@ -294,7 +294,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private LinearRing toPgLinearRing(
-    final com.vividsolutions.jts.geom.LineString ring) {
+    final com.revolsys.jts.geom.LineString ring) {
     final CoordinatesList points = CoordinatesListUtil.get(ring);
     final Point[] pgPoints = toPgPoints(points);
     final LinearRing linearRing = new LinearRing(pgPoints);
@@ -303,7 +303,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private LineString toPgLineString(
-    final com.vividsolutions.jts.geom.LineString lineString) {
+    final com.revolsys.jts.geom.LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
@@ -313,15 +313,15 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgLineString(final Object object) {
-    if (object instanceof com.vividsolutions.jts.geom.LineString) {
-      final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
+    if (object instanceof com.revolsys.jts.geom.LineString) {
+      final com.revolsys.jts.geom.LineString lineString = (com.revolsys.jts.geom.LineString)object;
       return toPgLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.GeometryCollection) {
-      final com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)object;
+    } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
+      final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.vividsolutions.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
-        if (firstGeometry instanceof com.vividsolutions.jts.geom.LineString) {
-          final com.vividsolutions.jts.geom.LineString line = (com.vividsolutions.jts.geom.LineString)firstGeometry;
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        if (firstGeometry instanceof com.revolsys.jts.geom.LineString) {
+          final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)firstGeometry;
           return toPgLineString(line);
         } else {
           throw new RuntimeException(
@@ -337,12 +337,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgMultiLineString(
-    final com.vividsolutions.jts.geom.Geometry geometry) {
+    final com.revolsys.jts.geom.Geometry geometry) {
     final List<LineString> pgLineStrings = new ArrayList<LineString>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.vividsolutions.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
-      if (subGeometry instanceof com.vividsolutions.jts.geom.LineString) {
-        final com.vividsolutions.jts.geom.LineString line = (com.vividsolutions.jts.geom.LineString)subGeometry;
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      if (subGeometry instanceof com.revolsys.jts.geom.LineString) {
+        final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)subGeometry;
         final LineString pgLineString = toPgLineString(line);
         pgLineStrings.add(pgLineString);
       } else {
@@ -364,12 +364,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgMultiPoint(
-    final com.vividsolutions.jts.geom.Geometry geometry) {
+    final com.revolsys.jts.geom.Geometry geometry) {
     final List<Point> pgPoints = new ArrayList<Point>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.vividsolutions.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
-      if (subGeometry instanceof com.vividsolutions.jts.geom.Point) {
-        final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)subGeometry;
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      if (subGeometry instanceof com.revolsys.jts.geom.Point) {
+        final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)subGeometry;
         final Point pgPoint = toPgPoint(point);
         pgPoints.add(pgPoint);
       } else {
@@ -389,12 +389,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgMultiPolygon(
-    final com.vividsolutions.jts.geom.Geometry geometry) {
+    final com.revolsys.jts.geom.Geometry geometry) {
     final List<Polygon> pgPolygons = new ArrayList<Polygon>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.vividsolutions.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
-      if (subGeometry instanceof com.vividsolutions.jts.geom.Polygon) {
-        final com.vividsolutions.jts.geom.Polygon line = (com.vividsolutions.jts.geom.Polygon)subGeometry;
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      if (subGeometry instanceof com.revolsys.jts.geom.Polygon) {
+        final com.revolsys.jts.geom.Polygon line = (com.revolsys.jts.geom.Polygon)subGeometry;
         final Polygon pgPolygon = toPgPolygon(line);
         pgPolygons.add(pgPolygon);
       } else {
@@ -414,7 +414,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return pgMultiPolygon;
   }
 
-  private Point toPgPoint(final com.vividsolutions.jts.geom.Point point) {
+  private Point toPgPoint(final com.revolsys.jts.geom.Point point) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(point);
     final int numAxis = coordinates.getNumAxis();
 
@@ -442,15 +442,15 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgPoint(final Object object) {
-    if (object instanceof com.vividsolutions.jts.geom.Point) {
-      final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
+    if (object instanceof com.revolsys.jts.geom.Point) {
+      final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)object;
       return toPgPoint(point);
-    } else if (object instanceof com.vividsolutions.jts.geom.GeometryCollection) {
-      final com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)object;
+    } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
+      final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.vividsolutions.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
-        if (firstGeometry instanceof com.vividsolutions.jts.geom.Point) {
-          final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)firstGeometry;
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        if (firstGeometry instanceof com.revolsys.jts.geom.Point) {
+          final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)firstGeometry;
           return toPgPoint(point);
         } else {
           throw new RuntimeException(
@@ -494,12 +494,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return points;
   }
 
-  private Polygon toPgPolygon(final com.vividsolutions.jts.geom.Polygon polygon) {
+  private Polygon toPgPolygon(final com.revolsys.jts.geom.Polygon polygon) {
     final LinearRing[] rings = new LinearRing[1 + polygon.getNumInteriorRing()];
-    final com.vividsolutions.jts.geom.LineString exteriorRing = polygon.getExteriorRing();
+    final com.revolsys.jts.geom.LineString exteriorRing = polygon.getExteriorRing();
     rings[0] = toPgLinearRing(exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final com.vividsolutions.jts.geom.LineString ring = polygon.getInteriorRingN(i);
+      final com.revolsys.jts.geom.LineString ring = polygon.getInteriorRingN(i);
       rings[i + 1] = toPgLinearRing(ring);
 
     }
@@ -509,15 +509,15 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Geometry toPgPolygon(final Object object) {
-    if (object instanceof com.vividsolutions.jts.geom.Polygon) {
-      final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
+    if (object instanceof com.revolsys.jts.geom.Polygon) {
+      final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)object;
       return toPgPolygon(polygon);
-    } else if (object instanceof com.vividsolutions.jts.geom.GeometryCollection) {
-      final com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)object;
+    } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
+      final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.vividsolutions.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
-        if (firstGeometry instanceof com.vividsolutions.jts.geom.Polygon) {
-          final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)firstGeometry;
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        if (firstGeometry instanceof com.revolsys.jts.geom.Polygon) {
+          final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)firstGeometry;
           return toPgPolygon(polygon);
         } else {
           throw new RuntimeException(

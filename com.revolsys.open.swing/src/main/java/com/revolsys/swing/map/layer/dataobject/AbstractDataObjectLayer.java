@@ -112,9 +112,9 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectFactory, AddGeometryCompleteAction {

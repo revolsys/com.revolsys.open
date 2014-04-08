@@ -4,7 +4,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.vividsolutions.jts.precision.CommonBits;
+import com.revolsys.jts.precision.CommonBits;
 
 /**
  * Removes common most-significant mantissa bits from one or more

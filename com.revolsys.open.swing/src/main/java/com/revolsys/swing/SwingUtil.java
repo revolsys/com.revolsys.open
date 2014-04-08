@@ -79,7 +79,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class SwingUtil {
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);

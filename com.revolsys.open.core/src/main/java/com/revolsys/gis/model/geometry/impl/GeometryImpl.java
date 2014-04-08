@@ -12,7 +12,7 @@ import com.revolsys.gis.model.geometry.operation.relate.RelateOp;
 import com.revolsys.gis.model.geometry.operation.valid.IsValidOp;
 import com.revolsys.gis.model.geometry.util.WktWriter;
 import com.revolsys.io.AbstractObjectWithProperties;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.IntersectionMatrix;
 
 public abstract class GeometryImpl extends AbstractObjectWithProperties
   implements Geometry {

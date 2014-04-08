@@ -10,7 +10,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeIntersection;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.NodeMap;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * @version 1.7

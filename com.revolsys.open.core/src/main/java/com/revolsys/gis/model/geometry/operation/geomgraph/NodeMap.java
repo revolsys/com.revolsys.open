@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * A map of nodes, indexed by the coordinate of the node

@@ -17,10 +17,10 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SegmentIntersector;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.util.Assert;
 
 /**
  * @version 1.7 Computes the topological relationship between two Geometries.

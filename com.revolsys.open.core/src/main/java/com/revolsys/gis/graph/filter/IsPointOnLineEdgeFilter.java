@@ -5,8 +5,8 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
 

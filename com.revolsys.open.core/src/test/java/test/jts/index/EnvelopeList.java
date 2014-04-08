@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,34 +36,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Envelope;
-
+import com.revolsys.jts.geom.Envelope;
 
 /**
  * @version 1.7
  */
-public class EnvelopeList
-{
+public class EnvelopeList {
   List envList = new ArrayList();
 
   public EnvelopeList() {
   }
 
-  public void add(Envelope env)
-  {
-    envList.add(env);
+  public void add(final Envelope env) {
+    this.envList.add(env);
   }
 
-  public List query(Envelope searchEnv)
-  {
-    List result = new ArrayList();
-    for (Iterator i = envList.iterator(); i.hasNext(); ) {
-      Envelope env = (Envelope) i.next();
-      if (env.intersects(searchEnv))
+  public List query(final Envelope searchEnv) {
+    final List result = new ArrayList();
+    for (final Iterator i = this.envList.iterator(); i.hasNext();) {
+      final Envelope env = (Envelope)i.next();
+      if (env.intersects(searchEnv)) {
         result.add(env);
+      }
     }
     return result;
   }
-
 
 }

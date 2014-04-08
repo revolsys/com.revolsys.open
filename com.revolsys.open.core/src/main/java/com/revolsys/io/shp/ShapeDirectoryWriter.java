@@ -19,7 +19,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;

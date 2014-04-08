@@ -24,7 +24,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeIntersectionList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Implements the algorithms required to compute the <code>isValid()</code>

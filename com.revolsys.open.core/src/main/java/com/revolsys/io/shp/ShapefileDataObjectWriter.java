@@ -49,8 +49,8 @@ import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 
 public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private static final Logger LOG = Logger.getLogger(ShapefileDataObjectWriter.class);

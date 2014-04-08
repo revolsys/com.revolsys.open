@@ -9,7 +9,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Polynomial warp that maintains the same image size and bounding box.

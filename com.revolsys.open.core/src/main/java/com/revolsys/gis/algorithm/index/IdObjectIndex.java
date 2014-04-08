@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);

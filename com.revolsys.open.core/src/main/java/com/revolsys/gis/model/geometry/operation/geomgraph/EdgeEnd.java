@@ -4,8 +4,8 @@ import java.io.PrintStream;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Models the end of an edge incident on a node. EdgeEnds have a direction

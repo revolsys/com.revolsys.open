@@ -19,7 +19,7 @@ import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.geonames.GeoNamesService;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public class WikipediaBoundingBoxLayerWorker extends
   AbstractSwingWorker<DataObjectQuadTree, Void> {

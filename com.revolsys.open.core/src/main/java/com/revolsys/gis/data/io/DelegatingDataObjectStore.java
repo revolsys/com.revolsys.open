@@ -22,7 +22,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   private final AbstractDataObjectStore dataStore;

@@ -2,9 +2,9 @@ package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.InvokeMethodFilter;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 public class GeometryFilter {
   public static boolean acceptEnvelopeIntersects(final Envelope envelope,

@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the {@link LineStringLocation} of the point on a {@link LineString}

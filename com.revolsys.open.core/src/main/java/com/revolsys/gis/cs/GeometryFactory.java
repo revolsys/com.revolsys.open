@@ -30,22 +30,22 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.util.CollectionUtil;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.operation.linemerge.LineMerger;
 
 public class GeometryFactory extends
-  com.vividsolutions.jts.geom.GeometryFactory implements
+  com.revolsys.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel, MapSerializer {
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
@@ -116,7 +116,7 @@ public class GeometryFactory extends
     if (geometry == null) {
       return getFactory(0, 3, 0, 0);
     } else {
-      final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
+      final com.revolsys.jts.geom.GeometryFactory factory = geometry.getFactory();
       if (factory instanceof GeometryFactory) {
         return (GeometryFactory)factory;
       } else {
@@ -527,7 +527,7 @@ public class GeometryFactory extends
       } else if (classes.equals(Collections.singleton(Polygon.class))) {
         return (V)createMultiPolygon(geometries);
       } else {
-        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
+        final Geometry[] geometryArray = com.revolsys.jts.geom.GeometryFactory.toGeometryArray(geometries);
         return (V)createGeometryCollection(geometryArray);
       }
     }

@@ -24,7 +24,7 @@ import com.revolsys.io.xml.XmlProcessorContext;
 import com.revolsys.util.Base64;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.UrlUtil;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class WmsClient {
   private String name;

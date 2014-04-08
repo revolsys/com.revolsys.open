@@ -94,7 +94,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   implements FileGdbDataObjectStore {

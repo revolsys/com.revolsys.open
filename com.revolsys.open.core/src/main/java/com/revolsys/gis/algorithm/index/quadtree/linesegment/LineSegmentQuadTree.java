@@ -13,12 +13,12 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 public class LineSegmentQuadTree {
   public static Envelope ensureExtent(final Envelope envelope,

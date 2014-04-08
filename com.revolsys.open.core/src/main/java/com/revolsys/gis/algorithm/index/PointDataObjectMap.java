@@ -15,9 +15,9 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.parallel.channel.Channel;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class PointDataObjectMap {
 

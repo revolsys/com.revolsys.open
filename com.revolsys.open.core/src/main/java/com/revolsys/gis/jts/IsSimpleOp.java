@@ -11,22 +11,22 @@ import java.util.TreeSet;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.algorithm.LineIntersector;
-import com.vividsolutions.jts.algorithm.RobustLineIntersector;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geomgraph.Edge;
-import com.vividsolutions.jts.geomgraph.EdgeIntersection;
-import com.vividsolutions.jts.geomgraph.GeometryGraph;
-import com.vividsolutions.jts.geomgraph.index.EdgeSetIntersector;
-import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.index.EdgeSetIntersector;
+import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
 
 public class IsSimpleOp {
   private static class EndpointInfo {

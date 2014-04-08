@@ -3,7 +3,7 @@ package com.revolsys.gis.data.model.filter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.linestring.LineStringRelate;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LineEqualWithinDistance implements Filter<LineString> {
 

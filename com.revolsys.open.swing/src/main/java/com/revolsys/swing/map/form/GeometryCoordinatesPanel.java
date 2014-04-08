@@ -14,7 +14,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryCoordinatesPanel extends ValueField implements
   TableModelListener {

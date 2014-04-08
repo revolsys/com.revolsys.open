@@ -2,7 +2,7 @@ package com.revolsys.gis.model.geometry.operation.valid;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Contains information about the nature and location of a {@link Geometry}

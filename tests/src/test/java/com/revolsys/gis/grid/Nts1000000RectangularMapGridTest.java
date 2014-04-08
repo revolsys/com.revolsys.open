@@ -2,8 +2,8 @@ package com.revolsys.gis.grid;
 
 import org.junit.Test;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.util.Assert;
 
 public class Nts1000000RectangularMapGridTest {
   private static final RectangularMapGrid GRID = new Nts1000000RectangularMapGrid();

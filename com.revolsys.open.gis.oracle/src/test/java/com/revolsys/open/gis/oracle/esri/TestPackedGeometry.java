@@ -10,7 +10,7 @@ import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
 import com.revolsys.io.wkt.WktWriter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class TestPackedGeometry {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(

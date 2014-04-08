@@ -2,8 +2,8 @@ package com.revolsys.gis.data.model.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringDataObjectFilter implements Filter<DataObject> {
 

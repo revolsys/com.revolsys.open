@@ -9,7 +9,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 

@@ -24,16 +24,16 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
@@ -497,7 +497,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
               // TODO convert to array of rings
               final Polygon polygon = this.geometryFactory.createPolygon(
                 exteriorRing,
-                com.vividsolutions.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
+                com.revolsys.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
               polygons.add(polygon);
             }
             exteriorRing = ring;
@@ -520,7 +520,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     if (exteriorRing != null) {
       final Polygon polygon = this.geometryFactory.createPolygon(
         exteriorRing,
-        com.vividsolutions.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
+        com.revolsys.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
       polygons.add(polygon);
     }
 

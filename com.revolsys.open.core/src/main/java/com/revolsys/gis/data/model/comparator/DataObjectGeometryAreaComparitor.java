@@ -3,8 +3,8 @@ package com.revolsys.gis.data.model.comparator;
 import java.util.Comparator;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Polygon;
 
 public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> {
 

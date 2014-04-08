@@ -21,7 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
   /** The geometry to compare the data objects to to. */

@@ -10,7 +10,7 @@ import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.Point;
-import com.vividsolutions.jts.geom.Dimension;
+import com.revolsys.jts.geom.Dimension;
 
 public class GeometryCollectionImpl extends GeometryImpl implements
   GeometryCollection {

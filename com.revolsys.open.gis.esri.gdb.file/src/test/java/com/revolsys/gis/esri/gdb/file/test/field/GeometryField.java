@@ -7,7 +7,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.esri.gdb.file.test.FgdbReader;
 import com.revolsys.io.EndianInput;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryField extends FgdbField {
   public GeometryField(final String name, final DataType type,

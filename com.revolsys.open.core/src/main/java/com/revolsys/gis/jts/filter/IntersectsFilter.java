@@ -21,9 +21,9 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class IntersectsFilter<T extends Geometry> implements Filter<T> {
   private Geometry geometry;

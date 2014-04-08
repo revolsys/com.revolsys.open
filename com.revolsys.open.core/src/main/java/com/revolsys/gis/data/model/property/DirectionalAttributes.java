@@ -27,8 +27,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()

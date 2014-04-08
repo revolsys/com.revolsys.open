@@ -46,8 +46,8 @@ import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Location;
 
 /**
  * Computes the topological ({@link Location}) of a single point to a

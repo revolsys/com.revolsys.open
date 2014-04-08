@@ -24,10 +24,10 @@ import com.revolsys.gis.model.geometry.Circle;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.Triangle;
 import com.revolsys.gis.model.geometry.visitor.TriangleContainsPointFilter;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class TriangulatedIrregularNetwork {
   private static final int[] OPPOSITE_INDEXES = {

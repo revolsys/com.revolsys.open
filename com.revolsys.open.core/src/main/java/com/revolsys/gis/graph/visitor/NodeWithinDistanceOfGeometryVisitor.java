@@ -10,8 +10,8 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,

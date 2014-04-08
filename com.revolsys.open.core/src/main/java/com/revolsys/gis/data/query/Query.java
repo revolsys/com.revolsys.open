@@ -14,7 +14,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class Query extends AbstractObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query,

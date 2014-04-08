@@ -5,7 +5,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.Angle;
 
 /**
  * <h1>Albers Equal Area</h1>

@@ -11,7 +11,7 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class ExcludeSavedObjectsInOutProcess extends
   BaseInOutProcess<DataObject, DataObject> {

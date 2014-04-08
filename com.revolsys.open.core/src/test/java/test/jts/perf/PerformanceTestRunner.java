@@ -1,9 +1,11 @@
 package test.jts.perf;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.vividsolutions.jts.util.Stopwatch;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Runs {@link PerformanceTestCase} classes which contain performance tests.
@@ -13,67 +15,55 @@ import com.vividsolutions.jts.util.Stopwatch;
  * @author Martin Davis
  *
  */
-public class PerformanceTestRunner
-{
+public class PerformanceTestRunner {
   private static final String RUN_PREFIX = "run";
 
-  private static final String INIT_METHOD = "init";
+  private static Method[] findMethods(final Class clz, final String methodPrefix) {
+    final List runMeths = new ArrayList();
+    final Method meth[] = clz.getDeclaredMethods();
+    for (final Method element : meth) {
+      if (element.getName().startsWith(RUN_PREFIX)) {
+        runMeths.add(element);
+      }
+    }
+    return (Method[])runMeths.toArray(new Method[0]);
+  }
 
-  public static void run(Class clz)
-  {
-    PerformanceTestRunner runner = new PerformanceTestRunner();
+  public static void run(final Class clz) {
+    final PerformanceTestRunner runner = new PerformanceTestRunner();
     runner.runInternal(clz);
   }
 
-  private PerformanceTestRunner()
-  {
-    
+  private PerformanceTestRunner() {
+
   }
-  
-  private void runInternal(Class clz)
-  {
+
+  private void runInternal(final Class clz) {
     try {
-      Constructor ctor = clz.getConstructor(String.class);
-      PerformanceTestCase test = (PerformanceTestCase) ctor.newInstance("Name");
-      int[] runSize = test.getRunSize();
-      int runIter = test.getRunIterations();
-      Method[] runMethod = findMethods(clz, RUN_PREFIX);
-      
+      final Constructor ctor = clz.getConstructor(String.class);
+      final PerformanceTestCase test = (PerformanceTestCase)ctor.newInstance("Name");
+      final int[] runSize = test.getRunSize();
+      final int runIter = test.getRunIterations();
+      final Method[] runMethod = findMethods(clz, RUN_PREFIX);
+
       // do the run
       test.setUp();
-      for (int runNum = 0; runNum < runSize.length; runNum++)
-      {
-        
-        int size = runSize[runNum];
+      for (final int size : runSize) {
+
         test.startRun(size);
-        for (int i = 0; i < runMethod.length; i++) {
-          Stopwatch sw = new Stopwatch();
+        for (final Method element : runMethod) {
+          final Stopwatch sw = new Stopwatch();
           for (int iter = 0; iter < runIter; iter++) {
-            runMethod[i].invoke(test);
+            element.invoke(test);
           }
-          System.out.println(runMethod[i].getName()
-              + " : " + sw.getTimeString());
+          System.out.println(element.getName() + " : " + sw.getTimeString());
         }
         test.endRun();
       }
       test.tearDown();
-    }
-    catch (Exception e) {
+    } catch (final Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-  }
-  
-  
-  private static Method[] findMethods(Class clz, String methodPrefix)
-  {
-    List runMeths = new ArrayList();
-    Method meth[] = clz.getDeclaredMethods();
-    for (int i = 0; i < meth.length; i++) {
-      if (meth[i].getName().startsWith(RUN_PREFIX)) {
-        runMeths.add(meth[i]);
-      }
-    }
-    return (Method[]) runMeths.toArray(new Method[0]);
   }
 }

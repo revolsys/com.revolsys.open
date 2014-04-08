@@ -32,43 +32,107 @@
  */
 package test.jts.perf.geom.prep;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.prep.*;
-import com.vividsolutions.jts.geom.util.*;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
-import com.vividsolutions.jts.util.Stopwatch;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.util.SineStarFactory;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.util.GeometricShapeFactory;
+import com.revolsys.jts.util.Stopwatch;
 
-public class PreparedPolygonIntersectsPerfTest 
-{
+public class PreparedPolygonIntersectsPerfTest {
   static final int MAX_ITER = 10;
-  
+
   static final int NUM_AOI_PTS = 2000;
+
   static final int NUM_LINES = 10000;
+
   static final int NUM_LINE_PTS = 100;
-  
+
   static PrecisionModel pm = new PrecisionModel();
+
   static GeometryFactory fact = new GeometryFactory(pm, 0);
+
   static WKTReader wktRdr = new WKTReader(fact);
+
   static WKTWriter wktWriter = new WKTWriter();
 
-  Stopwatch sw = new Stopwatch();
-
-  public static void main(String[] args) {
-  	PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
+  public static void main(final String[] args) {
+    final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
     test.test();
   }
+
+  Stopwatch sw = new Stopwatch();
 
   boolean testFailed = false;
 
   public PreparedPolygonIntersectsPerfTest() {
   }
 
-  public void test()
-  {
+  Geometry createCircle(final Coordinate origin, final double size,
+    final int nPts) {
+    final GeometricShapeFactory gsf = new GeometricShapeFactory();
+    gsf.setCentre(origin);
+    gsf.setSize(size);
+    gsf.setNumPoints(nPts);
+    final Geometry circle = gsf.createCircle();
+    // Polygon gRect = gsf.createRectangle();
+    // Geometry g = gRect.getExteriorRing();
+    return circle;
+  }
+
+  Geometry createLine(final Coordinate base, final double size, final int nPts) {
+    final SineStarFactory gsf = new SineStarFactory();
+    gsf.setCentre(base);
+    gsf.setSize(size);
+    gsf.setNumPoints(nPts);
+    final Geometry circle = gsf.createSineStar();
+    // System.out.println(circle);
+    return circle.getBoundary();
+  }
+
+  List createLines(final Envelope env, final int nItems, final double size,
+    final int nPts) {
+    final int nCells = (int)Math.sqrt(nItems);
+
+    final List geoms = new ArrayList();
+    final double width = env.getWidth();
+    final double xInc = width / nCells;
+    final double yInc = width / nCells;
+    for (int i = 0; i < nCells; i++) {
+      for (int j = 0; j < nCells; j++) {
+        final Coordinate base = new Coordinate(env.getMinX() + i * xInc,
+          env.getMinY() + j * yInc);
+        final Geometry line = createLine(base, size, nPts);
+        geoms.add(line);
+      }
+    }
+    return geoms;
+  }
+
+  Geometry createSineStar(final Coordinate origin, final double size,
+    final int nPts) {
+    final SineStarFactory gsf = new SineStarFactory();
+    gsf.setCentre(origin);
+    gsf.setSize(size);
+    gsf.setNumPoints(nPts);
+    gsf.setArmLengthRatio(0.1);
+    gsf.setNumArms(50);
+    final Geometry poly = gsf.createSineStar();
+    return poly;
+  }
+
+  public void test() {
     test(5);
     test(10);
     test(500);
@@ -76,126 +140,73 @@ public class PreparedPolygonIntersectsPerfTest
     test(2000);
     test(4000);
     /*
-    test(4000);
-    test(8000);
-    */
-  }
-  
-  public void test(int nPts)
-  {
-//  	Geometry poly = createCircle(new Coordinate(0, 0), 100, nPts);
-  	Geometry sinePoly = createSineStar(new Coordinate(0, 0), 100, nPts);
-//  	System.out.println(poly);
-//  	Geometry target = sinePoly.getBoundary();
-  	Geometry target = sinePoly;
-  	
-    List lines = createLines(target.getEnvelopeInternal(), NUM_LINES, 1.0, NUM_LINE_PTS);
-    
-    System.out.println();
-    //System.out.println("Running with " + nPts + " points");
-    test(target, lines);
+     * test(4000); test(8000);
+     */
   }
 
-  Geometry createCircle(Coordinate origin, double size, int nPts) {
-		GeometricShapeFactory gsf = new GeometricShapeFactory();
-		gsf.setCentre(origin);
-		gsf.setSize(size);
-		gsf.setNumPoints(nPts);
-		Geometry circle = gsf.createCircle();
-		// Polygon gRect = gsf.createRectangle();
-		// Geometry g = gRect.getExteriorRing();
-		return circle;
-	}
+  public void test(final Geometry g, final List lines) {
+    System.out.println("AOI # pts: " + g.getNumPoints() + "      # lines: "
+      + lines.size() + "   # pts in line: " + NUM_LINE_PTS);
 
-  Geometry createSineStar(Coordinate origin, double size, int nPts) {
-		SineStarFactory gsf = new SineStarFactory();
-		gsf.setCentre(origin);
-		gsf.setSize(size);
-		gsf.setNumPoints(nPts);
-		gsf.setArmLengthRatio(0.1);
-		gsf.setNumArms(50);
-		Geometry poly = gsf.createSineStar();
-		return poly;
-	}
-  
-  List createLines(Envelope env, int nItems, double size, int nPts)
-  {
-    int nCells = (int) Math.sqrt(nItems);
-
-  	List geoms = new ArrayList();
-  	double width = env.getWidth();
-  	double xInc = width / nCells;
-  	double yInc = width / nCells;
-  	for (int i = 0; i < nCells; i++) {
-    	for (int j = 0; j < nCells; j++) {
-    		Coordinate base = new Coordinate(
-    				env.getMinX() + i * xInc,
-    				env.getMinY() + j * yInc);
-    		Geometry line = createLine(base, size, nPts);
-    		geoms.add(line);
-    	}
-  	}
-  	return geoms;
-  }
-  
-  Geometry createLine(Coordinate base, double size, int nPts)
-  {
-    SineStarFactory gsf = new SineStarFactory();
-    gsf.setCentre(base);
-    gsf.setSize(size);
-    gsf.setNumPoints(nPts);
-    Geometry circle = gsf.createSineStar();
-//    System.out.println(circle);
-    return circle.getBoundary();
-  }
-  
-  public void test(Geometry g, List lines)
-  {
-    System.out.println("AOI # pts: " + g.getNumPoints()
-    		+ "      # lines: " + lines.size()
-    		+ "   # pts in line: " + NUM_LINE_PTS
-    		);
-
-    Stopwatch sw = new Stopwatch();
+    final Stopwatch sw = new Stopwatch();
     int count = 0;
     for (int i = 0; i < MAX_ITER; i++) {
-//    	count = testPrepGeomNotCached(i, g, lines);
-   	count = testPrepGeomCached(i, g, lines);
-//    	count = testOriginal(i, g, lines);
+      // count = testPrepGeomNotCached(i, g, lines);
+      count = testPrepGeomCached(i, g, lines);
+      // count = testOriginal(i, g, lines);
     }
     System.out.println("Count of intersections = " + count);
     System.out.println("Finished in " + sw.getTimeString());
   }
 
+  public void test(final int nPts) {
+    // Geometry poly = createCircle(new Coordinate(0, 0), 100, nPts);
+    final Geometry sinePoly = createSineStar(new Coordinate(0, 0), 100, nPts);
+    // System.out.println(poly);
+    // Geometry target = sinePoly.getBoundary();
+    final Geometry target = sinePoly;
 
-  public int testOriginal(int iter, Geometry g, List lines)
-  { 
-	  if (iter == 0) System.out.println("Using orginal JTS algorithm");
-  	int count = 0;
-  	for (Iterator i = lines.iterator(); i.hasNext(); ) {
-  		LineString line = (LineString) i.next();
-  		if (g.intersects(line))
-  			count++;
-  	}
-  	return count;
+    final List lines = createLines(target.getEnvelopeInternal(), NUM_LINES,
+      1.0, NUM_LINE_PTS);
+
+    System.out.println();
+    // System.out.println("Running with " + nPts + " points");
+    test(target, lines);
   }
-  
-  public int testPrepGeomCached(int iter, Geometry g, List lines)
-  { 
-	  if (iter == 0) System.out.println("Using cached Prepared Geometry");
-   PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    PreparedGeometry prepGeom = pgFact.create(g);
-    
-  	int count = 0;
-  	for (Iterator i = lines.iterator(); i.hasNext(); ) {
-  		LineString line = (LineString) i.next();
-  		
-  		if (prepGeom.intersects(line))
-  			count++;
-  	}
-  	return count;
+
+  public int testOriginal(final int iter, final Geometry g, final List lines) {
+    if (iter == 0) {
+      System.out.println("Using orginal JTS algorithm");
+    }
+    int count = 0;
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+      if (g.intersects(line)) {
+        count++;
+      }
+    }
+    return count;
   }
-  
+
+  public int testPrepGeomCached(final int iter, final Geometry g,
+    final List lines) {
+    if (iter == 0) {
+      System.out.println("Using cached Prepared Geometry");
+    }
+    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
+    final PreparedGeometry prepGeom = pgFact.create(g);
+
+    int count = 0;
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+
+      if (prepGeom.intersects(line)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   /**
    * Tests using PreparedGeometry, but creating a new
    * PreparedGeometry object each time.
@@ -207,23 +218,26 @@ public class PreparedPolygonIntersectsPerfTest
    * @param lines
    * @return the count
    */
-  public int testPrepGeomNotCached(int iter, Geometry g, List lines)
-  { 
-  	if (iter == 0) System.out.println("Using NON-CACHED Prepared Geometry");
-    PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-//    PreparedGeometry prepGeom = pgFact.create(g);
-    
-  	int count = 0;
-  	for (Iterator i = lines.iterator(); i.hasNext(); ) {
-  		LineString line = (LineString) i.next();
-  		
-  		// test performance of creating the prepared geometry each time
-      PreparedGeometry prepGeom = pgFact.create(g);
-      
-  		if (prepGeom.intersects(line))
-  			count++;
-  	}
-  	return count;
+  public int testPrepGeomNotCached(final int iter, final Geometry g,
+    final List lines) {
+    if (iter == 0) {
+      System.out.println("Using NON-CACHED Prepared Geometry");
+    }
+    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
+    // PreparedGeometry prepGeom = pgFact.create(g);
+
+    int count = 0;
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+
+      // test performance of creating the prepared geometry each time
+      final PreparedGeometry prepGeom = pgFact.create(g);
+
+      if (prepGeom.intersects(line)) {
+        count++;
+      }
+    }
+    return count;
   }
-  
+
 }

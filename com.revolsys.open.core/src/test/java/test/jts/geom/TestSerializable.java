@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,12 +33,19 @@
 
 package test.jts.geom;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-
-import com.vividsolutions.jts.geom.*;
-
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  * @version 1.7
@@ -47,28 +53,42 @@ import com.vividsolutions.jts.geom.*;
 public class TestSerializable {
 
   public static final String FILENAME = "c:\\testSerial.txt";
+
   public static final GeometryFactory fact = new GeometryFactory();
+
+  public static void main(final String[] args) {
+    final TestSerializable test = new TestSerializable();
+    test.run();
+  }
 
   public TestSerializable() {
   }
 
-  public static void main(String[] args) {
-    TestSerializable test = new TestSerializable();
-    test.run();
+  boolean compare(final Object o1, final Object o2) {
+    boolean matched = false;
+    if (o1 instanceof Envelope) {
+      if (!((Envelope)o1).equals(o2)) {
+        System.out.println("expected " + o1 + ", found " + o2);
+      } else {
+        matched = true;
+      }
+    } else if (o1 instanceof Geometry) {
+      if (!((Geometry)o1).equalsExact((Geometry)o2)) {
+        System.out.println("expected " + o1 + ", found " + o2);
+      } else {
+        matched = true;
+      }
+    }
+    if (matched) {
+      System.out.println("found match for object");
+    }
+    return true;
   }
 
-  public void run()
-  {
-    List objList = createData();
-    writeData(objList);
-    readData(objList);
-  }
+  List createData() {
+    final List objList = new ArrayList();
 
-  List createData()
-  {
-    List objList = new ArrayList();
-
-    Envelope env = new Envelope(123, 456, 123, 456);
+    final Envelope env = new Envelope(123, 456, 123, 456);
     objList.add(env);
 
     objList.add(GeometryTestFactory.createBox(fact, 0.0, 100.0, 10, 10.0));
@@ -76,39 +96,11 @@ public class TestSerializable {
     return objList;
 
   }
-  void writeData(List objList)
-  {
-    File file;                           // simply a file name
-    FileOutputStream outStream;             // generic stream to the file
-    ObjectOutputStream objStream;           // stream for objects to the file
 
-    file = new File(FILENAME);
-
-    try {
-      // setup a stream to a physical file on the filesystem
-      outStream = new FileOutputStream(file);
-
-      // attach a stream capable of writing objects to the stream that is
-      // connected to the file
-      objStream = new ObjectOutputStream(outStream);
-
-      objStream.writeObject(objList);
-//      for (Iterator i = objList.iterator(); i.hasNext(); )
-//      {
-//        objStream.writeObject(i.next());
-//      }
-      objStream.close();
-
-    } catch(IOException e) {
-      System.err.println("Things not going as planned.");
-      e.printStackTrace();
-    }   // catch
-  }
-  void readData(List objList)
-  {
-    File file;                           // simply a file name
-    FileInputStream stream;             // generic stream to the file
-    ObjectInputStream objStream;           // stream for objects to the file
+  void readData(final List objList) {
+    File file; // simply a file name
+    FileInputStream stream; // generic stream to the file
+    ObjectInputStream objStream; // stream for objects to the file
 
     file = new File(FILENAME);
 
@@ -121,44 +113,56 @@ public class TestSerializable {
       objStream = new ObjectInputStream(stream);
 
       int count = 0;
-      Object obj = objStream.readObject();
-      List inputList = (List) obj;
-      for (Iterator i = inputList.iterator(); i.hasNext(); ) {
+      final Object obj = objStream.readObject();
+      final List inputList = (List)obj;
+      for (final Iterator i = inputList.iterator(); i.hasNext();) {
         compare(objList.get(count++), i.next());
       }
 
-//      while (objStream.available() > 0) {
-//        Object obj = objStream.readObject();
-//        compare(objList.get(count++), obj);
-//      }
+      // while (objStream.available() > 0) {
+      // Object obj = objStream.readObject();
+      // compare(objList.get(count++), obj);
+      // }
       objStream.close();
 
-    } catch(Exception e) {
+    } catch (final Exception e) {
       System.err.println("Things not going as planned.");
       e.printStackTrace();
-    }   // catch
+    } // catch
   }
 
-  boolean compare(Object o1, Object o2)
-  {
-    boolean matched = false;
-    if (o1 instanceof Envelope) {
-      if (! ((Envelope) o1).equals(o2) ) {
-        System.out.println("expected " + o1 + ", found " + o2);
-      }
-      else
-        matched = true;
-    }
-    else if (o1 instanceof Geometry) {
-      if (! ((Geometry) o1).equalsExact((Geometry) o2) ) {
-        System.out.println("expected " + o1 + ", found " + o2);
-      }
-      else
-        matched = true;
-    }
-    if (matched)
-      System.out.println("found match for object");
-    return true;
+  public void run() {
+    final List objList = createData();
+    writeData(objList);
+    readData(objList);
+  }
+
+  void writeData(final List objList) {
+    File file; // simply a file name
+    FileOutputStream outStream; // generic stream to the file
+    ObjectOutputStream objStream; // stream for objects to the file
+
+    file = new File(FILENAME);
+
+    try {
+      // setup a stream to a physical file on the filesystem
+      outStream = new FileOutputStream(file);
+
+      // attach a stream capable of writing objects to the stream that is
+      // connected to the file
+      objStream = new ObjectOutputStream(outStream);
+
+      objStream.writeObject(objList);
+      // for (Iterator i = objList.iterator(); i.hasNext(); )
+      // {
+      // objStream.writeObject(i.next());
+      // }
+      objStream.close();
+
+    } catch (final IOException e) {
+      System.err.println("Things not going as planned.");
+      e.printStackTrace();
+    } // catch
   }
 
 }

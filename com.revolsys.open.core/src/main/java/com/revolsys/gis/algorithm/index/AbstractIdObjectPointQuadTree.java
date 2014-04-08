@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends
   AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {

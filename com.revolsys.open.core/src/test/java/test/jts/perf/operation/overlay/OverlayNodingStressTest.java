@@ -1,12 +1,14 @@
 package test.jts.perf.operation.overlay;
 
-import java.util.*;
+import java.util.Random;
 
 import junit.framework.TestCase;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.precision.*;
-import com.vividsolutions.jts.operation.overlay.snap.*;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 /**
  * Tests Noding checking during overlay.
@@ -24,150 +26,154 @@ import com.vividsolutions.jts.operation.overlay.snap.*;
  *
  * @version 1.7
  */
-public class OverlayNodingStressTest
-    extends TestCase
-{
-	private static final int ITER_LIMIT = 10000;
-	private static final int BATCH_SIZE = 20;
-	
-	private Random rand = new Random((long) (Math.PI * 10e8));
-	private int failureCount = 0;
-	
-  public OverlayNodingStressTest(String name) {
-    super(name);
-  }
+public class OverlayNodingStressTest extends TestCase {
+  private static final int ITER_LIMIT = 10000;
 
-  public static void main(String[] args) {
+  private static final int BATCH_SIZE = 20;
+
+  private static final double MAX_DISPLACEMENT = 60;
+
+  public static void main(final String[] args) {
     junit.textui.TestRunner.run(OverlayNodingStressTest.class);
   }
 
-  private double getRand()
-  {
-  	double r = rand.nextDouble();
-  	return r;
+  private final Random rand = new Random((long)(Math.PI * 10e8));
+
+  private int failureCount = 0;
+
+  private Geometry baseAccum = null;
+
+  private int geomCount = 0;
+
+  public OverlayNodingStressTest(final String name) {
+    super(name);
   }
-  
-	public void testNoding()
-	{
-		int iterLimit = ITER_LIMIT;
-		for (int i = 0; i < iterLimit; i++) {
-			System.out.println("Iter: " + i
-					+ "  Noding failure count = " + failureCount);
-			double ang1 = getRand() * Math.PI;
-			double ang2 = getRand() * Math.PI;
-//			Geometry[] geom = generateGeometryStar(ang1, ang2);
-			Geometry[] geom = generateGeometryAccum(ang1, ang2);
-			checkIntersection(geom[0], geom[1]);
-		}
-		System.out.println(
-				"Test count = " + iterLimit
-				+ "  Noding failure count = " + failureCount 
-			);
-	}
 
-	public Geometry[] generateGeometryStar(double angle1, double angle2) {
-		RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
-		Polygon rr1 = rrFact.createRectangle(100, 20, angle1);
-		Polygon rr2 = rrFact.createRectangle(100, 20, angle2);
+  public void checkIntersection(final Geometry base, final Geometry testGeom) {
 
-		// this line can be used to test for the presence of noding failures for
-		// non-tricky cases
-		// Geometry star = rr2;
-		Geometry star = rr1.union(rr2);
-		return new Geometry[] { star, rr1 };
-	}
+    // this line can be used to test for the presence of noding failures for
+    // non-tricky cases
+    // Geometry star = rr2;
+    System.out.println("Star:");
+    System.out.println(base);
+    System.out.println("Rectangle:");
+    System.out.println(testGeom);
 
-	private static final double MAX_DISPLACEMENT = 60;
+    // test to see whether the basic overlay code fails
+    try {
+      final Geometry intTrial = base.intersection(testGeom);
+    } catch (final Exception ex) {
+      this.failureCount++;
+    }
 
-	private Geometry baseAccum = null;
-	private int geomCount = 0;
-	
-	public Geometry[] generateGeometryAccum(double angle1, double angle2) {
-		RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
-		double basex = angle2 * MAX_DISPLACEMENT - (MAX_DISPLACEMENT / 2);
-		Coordinate base = new Coordinate(basex, basex);
-		Polygon rr1 = rrFact.createRectangle(100, 20, angle1, base);
+    // this will throw an intersection if a robustness error occurs,
+    // stopping the run
+    final Geometry intersection = SnapIfNeededOverlayOp.intersection(base,
+      testGeom);
+    System.out.println("Intersection:");
+    System.out.println(intersection);
+  }
 
-		// limit size of accumulated star
-		geomCount++;
-		if (geomCount >= BATCH_SIZE)
-			geomCount = 0;
-		if (geomCount == 0)
-			baseAccum = null;
-		
-		if (baseAccum == null)
-			baseAccum = rr1;
-		else {
-		// this line can be used to test for the presence of noding failures for
-		// non-tricky cases
-		// Geometry star = rr2;
-			baseAccum = rr1.union(baseAccum);
-		}
-		return new Geometry[] { baseAccum, rr1 };
-	}
+  public Geometry[] generateGeometryAccum(final double angle1,
+    final double angle2) {
+    final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
+    final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
+    final Coordinate base = new Coordinate(basex, basex);
+    final Polygon rr1 = rrFact.createRectangle(100, 20, angle1, base);
 
-	public void checkIntersection(Geometry base, Geometry testGeom) {
+    // limit size of accumulated star
+    this.geomCount++;
+    if (this.geomCount >= BATCH_SIZE) {
+      this.geomCount = 0;
+    }
+    if (this.geomCount == 0) {
+      this.baseAccum = null;
+    }
 
-		// this line can be used to test for the presence of noding failures for
-		// non-tricky cases
-		// Geometry star = rr2;
-		System.out.println("Star:");
-		System.out.println(base);
-		System.out.println("Rectangle:");
-		System.out.println(testGeom);
-		
-		// test to see whether the basic overlay code fails
-		try {
-			Geometry intTrial = base.intersection(testGeom);
-		} catch (Exception ex) {
-			failureCount++;
-		}
-		
-		// this will throw an intersection if a robustness error occurs,
-		// stopping the run
-		Geometry intersection = SnapIfNeededOverlayOp.intersection(base, testGeom);
-		System.out.println("Intersection:");
-		System.out.println(intersection);
-	}
+    if (this.baseAccum == null) {
+      this.baseAccum = rr1;
+    } else {
+      // this line can be used to test for the presence of noding failures for
+      // non-tricky cases
+      // Geometry star = rr2;
+      this.baseAccum = rr1.union(this.baseAccum);
+    }
+    return new Geometry[] {
+      this.baseAccum, rr1
+    };
+  }
+
+  public Geometry[] generateGeometryStar(final double angle1,
+    final double angle2) {
+    final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
+    final Polygon rr1 = rrFact.createRectangle(100, 20, angle1);
+    final Polygon rr2 = rrFact.createRectangle(100, 20, angle2);
+
+    // this line can be used to test for the presence of noding failures for
+    // non-tricky cases
+    // Geometry star = rr2;
+    final Geometry star = rr1.union(rr2);
+    return new Geometry[] {
+      star, rr1
+    };
+  }
+
+  private double getRand() {
+    final double r = this.rand.nextDouble();
+    return r;
+  }
+
+  public void testNoding() {
+    final int iterLimit = ITER_LIMIT;
+    for (int i = 0; i < iterLimit; i++) {
+      System.out.println("Iter: " + i + "  Noding failure count = "
+        + this.failureCount);
+      final double ang1 = getRand() * Math.PI;
+      final double ang2 = getRand() * Math.PI;
+      // Geometry[] geom = generateGeometryStar(ang1, ang2);
+      final Geometry[] geom = generateGeometryAccum(ang1, ang2);
+      checkIntersection(geom[0], geom[1]);
+    }
+    System.out.println("Test count = " + iterLimit
+      + "  Noding failure count = " + this.failureCount);
+  }
 }
 
-class RotatedRectangleFactory
-{
-	public RotatedRectangleFactory()
-	{
-		
-	}
-	
-	private static double PI_OVER_2 = Math.PI / 2;
-	private GeometryFactory fact = new GeometryFactory();
-	
-	public Polygon createRectangle(double length, double width, double angle)
-	{
-		return createRectangle(length, width, angle, new Coordinate(0,0));
-	}
+class RotatedRectangleFactory {
+  private static double PI_OVER_2 = Math.PI / 2;
 
-	public Polygon createRectangle(double length, double width, double angle, Coordinate base)
-	{
-		double posx = length / 2 * Math.cos(angle);
-		double posy = length / 2 * Math.sin(angle);
-		double negx = -posx;
-		double negy = -posy;
-		double widthOffsetx = (width / 2) * Math.cos(angle + PI_OVER_2);
-		double widthOffsety = (width / 2) * Math.sin(angle + PI_OVER_2);
-		
-		Coordinate[] pts = new Coordinate[] {
-				new Coordinate(base.x + posx + widthOffsetx, base.y + posy + widthOffsety),
-				new Coordinate(base.x + posx - widthOffsetx, base.y + posy - widthOffsety),
-				new Coordinate(base.x + negx - widthOffsetx, base.y + negy - widthOffsety),
-				new Coordinate(base.x + negx + widthOffsetx, base.y + negy + widthOffsety),
-				new Coordinate(0,0),
-		};
-		// close polygon
-		pts[4] = new Coordinate(pts[0]);
-		Polygon poly = fact.createPolygon(fact.createLinearRing(pts), null);
-		return poly;
-	}
-	
+  private final GeometryFactory fact = new GeometryFactory();
+
+  public RotatedRectangleFactory() {
+
+  }
+
+  public Polygon createRectangle(final double length, final double width,
+    final double angle) {
+    return createRectangle(length, width, angle, new Coordinate(0, 0));
+  }
+
+  public Polygon createRectangle(final double length, final double width,
+    final double angle, final Coordinate base) {
+    final double posx = length / 2 * Math.cos(angle);
+    final double posy = length / 2 * Math.sin(angle);
+    final double negx = -posx;
+    final double negy = -posy;
+    final double widthOffsetx = width / 2 * Math.cos(angle + PI_OVER_2);
+    final double widthOffsety = width / 2 * Math.sin(angle + PI_OVER_2);
+
+    final Coordinate[] pts = new Coordinate[] {
+      new Coordinate(base.x + posx + widthOffsetx, base.y + posy + widthOffsety),
+      new Coordinate(base.x + posx - widthOffsetx, base.y + posy - widthOffsety),
+      new Coordinate(base.x + negx - widthOffsetx, base.y + negy - widthOffsety),
+      new Coordinate(base.x + negx + widthOffsetx, base.y + negy + widthOffsety),
+      new Coordinate(0, 0),
+    };
+    // close polygon
+    pts[4] = new Coordinate(pts[0]);
+    final Polygon poly = this.fact.createPolygon(
+      this.fact.createLinearRing(pts), null);
+    return poly;
+  }
 
 }
-  

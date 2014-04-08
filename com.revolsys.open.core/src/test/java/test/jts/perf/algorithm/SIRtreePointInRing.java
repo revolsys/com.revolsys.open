@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,10 +32,16 @@
  */
 package test.jts.perf.algorithm;
 
-import java.util.*;
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.index.strtree.*;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.PointInRing;
+import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.index.strtree.SIRtree;
 
 /**
  * Implements {@link PointInRing}
@@ -46,83 +51,85 @@ import com.vividsolutions.jts.index.strtree.*;
  * @version 1.7
  * @deprecated use MCPointInRing instead
  */
+@Deprecated
 public class SIRtreePointInRing implements PointInRing {
 
-  private LinearRing ring;
-  private SIRtree sirTree;
-  private int crossings = 0;  // number of segment/ray crossings
+  private final LinearRing ring;
 
-  public SIRtreePointInRing(LinearRing ring)
-  {
+  private SIRtree sirTree;
+
+  private int crossings = 0; // number of segment/ray crossings
+
+  public SIRtreePointInRing(final LinearRing ring) {
     this.ring = ring;
     buildIndex();
   }
 
-  private void buildIndex()
-  {
-    Envelope env = ring.getEnvelopeInternal();
-    sirTree = new SIRtree();
+  private void buildIndex() {
+    final Envelope env = this.ring.getEnvelopeInternal();
+    this.sirTree = new SIRtree();
 
-    Coordinate[] pts = ring.getCoordinates();
+    final Coordinate[] pts = this.ring.getCoordinates();
     for (int i = 1; i < pts.length; i++) {
-      if (pts[i-1].equals(pts[i])) { continue; } //Optimization suggested by MD. [Jon Aquino]
-      LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
-      sirTree.insert(seg.p0.y, seg.p1.y, seg);
+      if (pts[i - 1].equals(pts[i])) {
+        continue;
+      } // Optimization suggested by MD. [Jon Aquino]
+      final LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
+      this.sirTree.insert(seg.p0.y, seg.p1.y, seg);
     }
   }
 
-  public boolean isInside(Coordinate pt)
-  {
-    crossings = 0;
+  @Override
+  public boolean isInside(final Coordinate pt) {
+    this.crossings = 0;
 
     // test all segments intersected by vertical ray at pt
 
-    List segs = sirTree.query(pt.y);
-//System.out.println("query size = " + segs.size());
+    final List segs = this.sirTree.query(pt.y);
+    // System.out.println("query size = " + segs.size());
 
-    for (Iterator i = segs.iterator(); i.hasNext(); ) {
-      LineSegment seg = (LineSegment) i.next();
+    for (final Iterator i = segs.iterator(); i.hasNext();) {
+      final LineSegment seg = (LineSegment)i.next();
       testLineSegment(pt, seg);
     }
 
     /*
-     *  p is inside if number of crossings is odd.
+     * p is inside if number of crossings is odd.
      */
-    if ((crossings % 2) == 1) {
+    if (this.crossings % 2 == 1) {
       return true;
     }
     return false;
   }
 
-  private void testLineSegment(Coordinate p, LineSegment seg) {
-    double xInt;  // x intersection of segment with ray
-    double x1;    // translated coordinates
+  private void testLineSegment(final Coordinate p, final LineSegment seg) {
+    double xInt; // x intersection of segment with ray
+    double x1; // translated coordinates
     double y1;
     double x2;
     double y2;
 
     /*
-     *  Test if segment crosses ray from test point in positive x direction.
+     * Test if segment crosses ray from test point in positive x direction.
      */
-    Coordinate p1 = seg.p0;
-    Coordinate p2 = seg.p1;
+    final Coordinate p1 = seg.p0;
+    final Coordinate p2 = seg.p1;
     x1 = p1.x - p.x;
     y1 = p1.y - p.y;
     x2 = p2.x - p.x;
     y2 = p2.y - p.y;
 
-    if (((y1 > 0) && (y2 <= 0)) ||
-        ((y2 > 0) && (y1 <= 0))) {
-        /*
-         *  segment straddles x axis, so compute intersection.
-         */
+    if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {
+      /*
+       * segment straddles x axis, so compute intersection.
+       */
       xInt = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2 - y1);
-        //xsave = xInt;
-        /*
-         *  crosses ray if strictly positive intersection.
-         */
+      // xsave = xInt;
+      /*
+       * crosses ray if strictly positive intersection.
+       */
       if (0.0 < xInt) {
-        crossings++;
+        this.crossings++;
       }
     }
   }

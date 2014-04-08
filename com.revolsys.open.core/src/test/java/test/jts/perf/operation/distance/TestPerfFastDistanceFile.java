@@ -1,74 +1,42 @@
 package test.jts.perf.operation.distance;
 
-import java.util.*;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.util.Stopwatch;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.io.WKTFileReader;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.util.Stopwatch;
 
-public class TestPerfFastDistanceFile 
-{
-  public static void main(String[] args) {
-    TestPerfFastDistanceFile test = new TestPerfFastDistanceFile();
+public class TestPerfFastDistanceFile {
+  static final int MAX_ITER = 10;
+
+  static List loadWKT(final String filename) throws Exception {
+    final WKTReader rdr = new WKTReader();
+    final WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
+    return fileRdr.read();
+  }
+
+  public static void main(final String[] args) {
+    final TestPerfFastDistanceFile test = new TestPerfFastDistanceFile();
     try {
       test.test();
-    }
-    catch (Exception ex) {
+    } catch (final Exception ex) {
       ex.printStackTrace();
     }
   }
-
-  private static final int MAX_GEOMS = 40;
 
   boolean testFailed = false;
 
   public TestPerfFastDistanceFile() {
   }
 
-
-  public void test()
-  throws Exception
-{
-    
-//    List geoms = loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\africa.wkt");
-    List geoms = loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\world.wkt");
-    
-//  testAllDistances(geoms, 100);
-
-  testAllDistances(geoms, 1);
-  testAllDistances(geoms, 2);
-  testAllDistances(geoms, 5);
-  testAllDistances(geoms, 10);
-  testAllDistances(geoms, 20);
-  testAllDistances(geoms, 30);
-  testAllDistances(geoms, 40);
-  testAllDistances(geoms, 50);
-}
-
-  static List loadWKT(String filename) throws Exception {
-    WKTReader rdr = new WKTReader();
-    WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
-    return fileRdr.read();
-  }
-
-  void testAllDistances(List geoms, int maxToScan)
-  {
-    Stopwatch sw = new Stopwatch();
-    
-    computeAllDistances(geoms, maxToScan);
-//  computePairDistance(geoms, 1, 3);
-//  computePairDistance(geoms, 55, 77);
-    
-    System.out.println("Count = " + maxToScan
-        + "   Finished in " + sw.getTimeString());    
-  }
-
-  void computeAllDistances(List geoms, int maxToScan) {
+  void computeAllDistances(final List geoms, final int maxToScan) {
     int numGeoms1 = geoms.size();
-    if (numGeoms1 > maxToScan)
+    if (numGeoms1 > maxToScan) {
       numGeoms1 = maxToScan;
+    }
 
-    int numGeoms2 = geoms.size();
+    final int numGeoms2 = geoms.size();
 
     for (int i = 0; i < numGeoms1; i++) {
       // PreparedGeometry pg = PreparedGeometryFactory.prepare((Geometry)
@@ -77,15 +45,15 @@ public class TestPerfFastDistanceFile
         // don't compute distance to itself!
         // if (i == j) continue;
 
-        Geometry g1 = (Geometry) geoms.get(i);
-        Geometry g2 = (Geometry) geoms.get(j);
+        final Geometry g1 = (Geometry)geoms.get(i);
+        final Geometry g2 = (Geometry)geoms.get(j);
 
         // if (g1.getEnvelopeInternal().intersects(g2.getEnvelopeInternal()))
         // continue;
 
-//         double dist = g1.distance(g2);
-//        double dist = BranchAndBoundFacetDistance.distance(g1, g2);
-        double dist = CachedBABDistance.getDistance(g1, g2);
+        // double dist = g1.distance(g2);
+        // double dist = BranchAndBoundFacetDistance.distance(g1, g2);
+        final double dist = CachedBABDistance.getDistance(g1, g2);
         // double distFast = SortedBoundsFacetDistance.distance(g1, g2);
 
         // pg.intersects(g2);
@@ -93,23 +61,44 @@ public class TestPerfFastDistanceFile
     }
   }
 
-  
-  static final int MAX_ITER = 10;
-  
-  void computePairDistance(List geoms, int i, int j) 
-  {
-    for (int n = 0; n < MAX_ITER; n++ ) {
-      Geometry g1 = (Geometry) geoms.get(i);
-      Geometry g2 = (Geometry) geoms.get(j);
+  void computePairDistance(final List geoms, final int i, final int j) {
+    for (int n = 0; n < MAX_ITER; n++) {
+      final Geometry g1 = (Geometry)geoms.get(i);
+      final Geometry g2 = (Geometry)geoms.get(j);
 
-      double dist = g1.distance(g2);
-//      double dist = SortedBoundsFacetDistance.distance(g1, g2);
-//      double dist = BranchAndBoundFacetDistance.distance(g1, g2);
+      final double dist = g1.distance(g2);
+      // double dist = SortedBoundsFacetDistance.distance(g1, g2);
+      // double dist = BranchAndBoundFacetDistance.distance(g1, g2);
     }
   }
-  
-  
+
+  public void test() throws Exception {
+
+    // List geoms =
+    // loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\africa.wkt");
+    final List geoms = loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\world.wkt");
+
+    // testAllDistances(geoms, 100);
+
+    testAllDistances(geoms, 1);
+    testAllDistances(geoms, 2);
+    testAllDistances(geoms, 5);
+    testAllDistances(geoms, 10);
+    testAllDistances(geoms, 20);
+    testAllDistances(geoms, 30);
+    testAllDistances(geoms, 40);
+    testAllDistances(geoms, 50);
+  }
+
+  void testAllDistances(final List geoms, final int maxToScan) {
+    final Stopwatch sw = new Stopwatch();
+
+    computeAllDistances(geoms, maxToScan);
+    // computePairDistance(geoms, 1, 3);
+    // computePairDistance(geoms, 55, 77);
+
+    System.out.println("Count = " + maxToScan + "   Finished in "
+      + sw.getTimeString());
+  }
 
 }
-  
-  

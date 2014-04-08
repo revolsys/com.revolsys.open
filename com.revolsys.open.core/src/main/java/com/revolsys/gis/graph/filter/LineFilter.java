@@ -2,7 +2,7 @@ package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Edge;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LineFilter<T> implements Filter<Edge<T>> {
   private final Filter<LineString> filter;

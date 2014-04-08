@@ -32,7 +32,7 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Contains a pair of points and the distance between them. Provides methods to

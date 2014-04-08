@@ -34,7 +34,7 @@ package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.algorithm.NotRepresentableException;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space. In JTS

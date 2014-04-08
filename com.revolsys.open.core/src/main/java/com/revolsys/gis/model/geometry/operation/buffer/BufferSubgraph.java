@@ -16,7 +16,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 /**
  * @version 1.7

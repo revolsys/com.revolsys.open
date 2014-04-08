@@ -21,7 +21,7 @@
 package com.revolsys.gis.model.data.validator;
 
 import com.revolsys.gis.data.model.Attribute;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryAttributeValidator implements AttributeValueValidator {
 

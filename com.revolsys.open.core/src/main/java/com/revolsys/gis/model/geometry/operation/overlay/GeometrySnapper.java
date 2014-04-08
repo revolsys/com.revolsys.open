@@ -16,7 +16,7 @@ import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Snaps the vertices and segments of a {@link Geometry} to another Geometry's

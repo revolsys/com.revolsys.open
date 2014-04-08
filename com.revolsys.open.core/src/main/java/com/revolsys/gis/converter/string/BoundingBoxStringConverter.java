@@ -2,7 +2,7 @@ package com.revolsys.gis.converter.string;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class BoundingBoxStringConverter implements StringConverter<BoundingBox> {
   @Override

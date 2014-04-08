@@ -1,56 +1,56 @@
 package test.jts.perf.triangulate;
 
-import java.util.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.util.*;
-import com.vividsolutions.jts.triangulate.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class VoronoiPerfTest 
-{
-  public static void main(String args[]) {
-  	VoronoiPerfTest test = new VoronoiPerfTest();
-  	test.run();
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
+import com.revolsys.jts.util.Stopwatch;
+
+public class VoronoiPerfTest {
+  final static GeometryFactory geomFact = new GeometryFactory();
+
+  final static double SIDE_LEN = 10.0;
+
+  public static void main(final String args[]) {
+    final VoronoiPerfTest test = new VoronoiPerfTest();
+    test.run();
   }
-  
-	public void run()
-	{
-		run(10);
-		run(100);
-		run(1000);
-		run(10000);
-		run(100000);
-		run(1000000);
-	}
-	
-	final static GeometryFactory geomFact = new GeometryFactory();
-	
-	final static double SIDE_LEN = 10.0;
-	
-	public void run(int nPts)
-	{
-		List pts = randomPoints(nPts);
-		Stopwatch sw = new Stopwatch();
-		DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-		builder.setSites(pts);
-		
-		Geometry g = builder.getEdges(geomFact);
-		System.out.println("# pts: " + pts.size() + "  --  " + sw.getTimeString());
-//		System.out.println(g);
-	}
-	
-	List randomPoints(int nPts)
-	{
-		List pts = new ArrayList();
-		
-		int nSide = (int) Math.sqrt(nPts) + 1;
-		
-		for (int i = 0; i < nSide; i++) {
-			for (int j = 0; j < nSide; j++) {
-				double x = i * SIDE_LEN + SIDE_LEN * Math.random();
-				double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-				pts.add(new Coordinate(x, y));
-			}
-		}
-		return pts;
-	}
+
+  List randomPoints(final int nPts) {
+    final List pts = new ArrayList();
+
+    final int nSide = (int)Math.sqrt(nPts) + 1;
+
+    for (int i = 0; i < nSide; i++) {
+      for (int j = 0; j < nSide; j++) {
+        final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
+        final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
+        pts.add(new Coordinate(x, y));
+      }
+    }
+    return pts;
+  }
+
+  public void run() {
+    run(10);
+    run(100);
+    run(1000);
+    run(10000);
+    run(100000);
+    run(1000000);
+  }
+
+  public void run(final int nPts) {
+    final List pts = randomPoints(nPts);
+    final Stopwatch sw = new Stopwatch();
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
+    builder.setSites(pts);
+
+    final Geometry g = builder.getEdges(geomFact);
+    System.out.println("# pts: " + pts.size() + "  --  " + sw.getTimeString());
+    // System.out.println(g);
+  }
 }

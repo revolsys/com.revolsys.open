@@ -4,8 +4,8 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.grid.RectangularMapGrid;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * The MapGridGeometrySheetFilter will compare the centroid of the Geometry for

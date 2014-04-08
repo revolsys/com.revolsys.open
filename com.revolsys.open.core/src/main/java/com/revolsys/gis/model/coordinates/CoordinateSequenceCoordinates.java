@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinateSequence;
 
 public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   private final CoordinateSequence coordinates;

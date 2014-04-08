@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,119 +37,102 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.index.strtree.AbstractNode;
-import com.vividsolutions.jts.index.strtree.Boundable;
-import com.vividsolutions.jts.index.strtree.STRtree;
-
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.index.strtree.AbstractNode;
+import com.revolsys.jts.index.strtree.Boundable;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * @version 1.7
  */
 public class STRtreeDemo {
 
-  public STRtreeDemo() {
-  }
-
   public static class TestTree extends STRtree {
-    public TestTree(int nodeCapacity) {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public TestTree(final int nodeCapacity) {
       super(nodeCapacity);
     }
-    public List boundablesAtLevel(int level) { return super.boundablesAtLevel(level); }
-    public AbstractNode getRoot() { return root; }
-    public List createParentBoundables(List verticalSlice, int newLevel) {
+
+    @Override
+    public List boundablesAtLevel(final int level) {
+      return super.boundablesAtLevel(level);
+    }
+
+    @Override
+    public List createParentBoundables(final List verticalSlice,
+      final int newLevel) {
       return super.createParentBoundables(verticalSlice, newLevel);
     }
-    public List[] verticalSlices(List childBoundables, int size) {
-      return super.verticalSlices(childBoundables, size);
+
+    @Override
+    public List createParentBoundablesFromVerticalSlice(
+      final List childBoundables, final int newLevel) {
+      return super.createParentBoundablesFromVerticalSlice(childBoundables,
+        newLevel);
     }
-    public List createParentBoundablesFromVerticalSlice(List childBoundables, int newLevel) {
-      return super.createParentBoundablesFromVerticalSlice(childBoundables, newLevel);
+
+    @Override
+    public AbstractNode getRoot() {
+      return this.root;
+    }
+
+    @Override
+    public List[] verticalSlices(final List childBoundables, final int size) {
+      return super.verticalSlices(childBoundables, size);
     }
   }
 
-  private static void initTree(TestTree t, List sourceEnvelopes) {
-    for (Iterator i = sourceEnvelopes.iterator(); i.hasNext(); ) {
-      Envelope sourceEnvelope = (Envelope) i.next();
+  private static final double EXTENT = 100;
+
+  private static final double MAX_ITEM_EXTENT = 15;
+
+  private static final double MIN_ITEM_EXTENT = 3;
+
+  private static final int ITEM_COUNT = 20;
+
+  private static final int NODE_CAPACITY = 4;
+
+  private static GeometryFactory factory = new GeometryFactory();
+
+  private static Envelope envelope(final Boundable b) {
+    return (Envelope)b.getBounds();
+  }
+
+  private static void initTree(final TestTree t, final List sourceEnvelopes) {
+    for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
+      final Envelope sourceEnvelope = (Envelope)i.next();
       t.insert(sourceEnvelope, sourceEnvelope);
     }
     t.build();
   }
 
-  public static void main(String[] args) throws Exception {
-    List envelopes = sourceData();
-    TestTree t = new TestTree(NODE_CAPACITY);
+  public static void main(final String[] args) throws Exception {
+    final List envelopes = sourceData();
+    final TestTree t = new TestTree(NODE_CAPACITY);
     initTree(t, envelopes);
-    PrintStream printStream = System.out;
+    final PrintStream printStream = System.out;
     printSourceData(envelopes, printStream);
     printLevels(t, printStream);
   }
 
-  public static void printSourceData(List sourceEnvelopes, PrintStream out) {
-    out.println("============ Source Data ============\n");
-    out.print("GEOMETRYCOLLECTION(");
-    boolean first = true;
-    for (Iterator i = sourceEnvelopes.iterator(); i.hasNext(); ) {
-      Envelope e = (Envelope) i.next();
-      Geometry g = factory.createPolygon(factory.createLinearRing(new Coordinate[] {
-        new Coordinate(e.getMinX(), e.getMinY()), new Coordinate(e.getMinX(), e.getMaxY()),
-        new Coordinate(e.getMaxX(), e.getMaxY()), new Coordinate(e.getMaxX(), e.getMinY()),
-        new Coordinate(e.getMinX(), e.getMinY()) }), null);
-      if (first) {
-        first = false;
-      }
-      else {
-        out.print(",");
-      }
-      out.print(g);
-    }
-    out.println(")\n");
-  }
-
-  private static List sourceData() {
-    ArrayList envelopes = new ArrayList();
-    for (int i = 0; i < ITEM_COUNT; i++) {
-      envelopes.add(randomRectangle().getEnvelopeInternal());
-    }
-    return envelopes;
-  }
-
-  private static final double EXTENT = 100;
-  private static final double MAX_ITEM_EXTENT = 15;
-  private static final double MIN_ITEM_EXTENT = 3;
-  private static final int ITEM_COUNT = 20;
-  private static final int NODE_CAPACITY = 4;
-  private static GeometryFactory factory = new GeometryFactory();
-
-  private static Polygon randomRectangle() {
-    double width = MIN_ITEM_EXTENT + ((MAX_ITEM_EXTENT-MIN_ITEM_EXTENT) * Math.random());
-    double height = MIN_ITEM_EXTENT + ((MAX_ITEM_EXTENT-MIN_ITEM_EXTENT) * Math.random());
-    double bottom = EXTENT * Math.random();
-    double left = EXTENT * Math.random();
-    double top = bottom + height;
-    double right = left + width;
-    return factory.createPolygon(factory.createLinearRing(new Coordinate[]{
-          new Coordinate(left, bottom), new Coordinate(right, bottom),
-          new Coordinate(right, top), new Coordinate(left, top),
-          new Coordinate(left, bottom) }), null);
-  }
-
-  public static void printLevels(TestTree t, PrintStream out) {
-    for (int i = 0; i <= t.getRoot().getLevel(); i++) {
-      printBoundables(t.boundablesAtLevel(i), "Level " + i, out);
-    }
-  }
-
-  public static void printBoundables(List boundables, String title, PrintStream out) {
+  public static void printBoundables(final List boundables, final String title,
+    final PrintStream out) {
     out.println("============ " + title + " ============\n");
     out.print("GEOMETRYCOLLECTION(");
     boolean first = true;
-    for (Iterator i = boundables.iterator(); i.hasNext(); ) {
-      Boundable boundable = (Boundable) i.next();
+    for (final Iterator i = boundables.iterator(); i.hasNext();) {
+      final Boundable boundable = (Boundable)i.next();
       if (first) {
         first = false;
-      }
-      else {
+      } else {
         out.print(",");
       }
       out.print(toString(boundable));
@@ -158,22 +140,71 @@ public class STRtreeDemo {
     out.println(")\n");
   }
 
-  private static String toString(Boundable b) {
-    return "POLYGON(("
-         + envelope(b).getMinX() + " "
-         + envelope(b).getMinY() + ", "
-         + envelope(b).getMinX() + " "
-         + envelope(b).getMaxY() + ", "
-         + envelope(b).getMaxX() + " "
-         + envelope(b).getMaxY() + ", "
-         + envelope(b).getMaxX() + " "
-         + envelope(b).getMinY() + ","
-         + envelope(b).getMinX() + " "
-         + envelope(b).getMinY() + "))";
+  public static void printLevels(final TestTree t, final PrintStream out) {
+    for (int i = 0; i <= t.getRoot().getLevel(); i++) {
+      printBoundables(t.boundablesAtLevel(i), "Level " + i, out);
+    }
   }
 
-  private static Envelope envelope(Boundable b) {
-    return (Envelope)b.getBounds();
+  public static void printSourceData(final List sourceEnvelopes,
+    final PrintStream out) {
+    out.println("============ Source Data ============\n");
+    out.print("GEOMETRYCOLLECTION(");
+    boolean first = true;
+    for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
+      final Envelope e = (Envelope)i.next();
+      final Geometry g = factory.createPolygon(
+        factory.createLinearRing(new Coordinate[] {
+          new Coordinate(e.getMinX(), e.getMinY()),
+          new Coordinate(e.getMinX(), e.getMaxY()),
+          new Coordinate(e.getMaxX(), e.getMaxY()),
+          new Coordinate(e.getMaxX(), e.getMinY()),
+          new Coordinate(e.getMinX(), e.getMinY())
+        }), null);
+      if (first) {
+        first = false;
+      } else {
+        out.print(",");
+      }
+      out.print(g);
+    }
+    out.println(")\n");
+  }
+
+  private static Polygon randomRectangle() {
+    final double width = MIN_ITEM_EXTENT + (MAX_ITEM_EXTENT - MIN_ITEM_EXTENT)
+      * Math.random();
+    final double height = MIN_ITEM_EXTENT + (MAX_ITEM_EXTENT - MIN_ITEM_EXTENT)
+      * Math.random();
+    final double bottom = EXTENT * Math.random();
+    final double left = EXTENT * Math.random();
+    final double top = bottom + height;
+    final double right = left + width;
+    return factory.createPolygon(
+      factory.createLinearRing(new Coordinate[] {
+        new Coordinate(left, bottom), new Coordinate(right, bottom),
+        new Coordinate(right, top), new Coordinate(left, top),
+        new Coordinate(left, bottom)
+      }), null);
+  }
+
+  private static List sourceData() {
+    final ArrayList envelopes = new ArrayList();
+    for (int i = 0; i < ITEM_COUNT; i++) {
+      envelopes.add(randomRectangle().getEnvelopeInternal());
+    }
+    return envelopes;
+  }
+
+  private static String toString(final Boundable b) {
+    return "POLYGON((" + envelope(b).getMinX() + " " + envelope(b).getMinY()
+      + ", " + envelope(b).getMinX() + " " + envelope(b).getMaxY() + ", "
+      + envelope(b).getMaxX() + " " + envelope(b).getMaxY() + ", "
+      + envelope(b).getMaxX() + " " + envelope(b).getMinY() + ","
+      + envelope(b).getMinX() + " " + envelope(b).getMinY() + "))";
+  }
+
+  public STRtreeDemo() {
   }
 
 }

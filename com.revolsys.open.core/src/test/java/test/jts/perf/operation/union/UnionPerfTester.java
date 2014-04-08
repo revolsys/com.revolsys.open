@@ -1,150 +1,138 @@
 package test.jts.perf.operation.union;
 
-
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
-import com.vividsolutions.jts.operation.union.CascadedPolygonUnion;
-import com.vividsolutions.jts.util.Stopwatch;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.operation.union.CascadedPolygonUnion;
+import com.revolsys.jts.util.Stopwatch;
 
-
-public class UnionPerfTester 
-{
+public class UnionPerfTester {
   public static final int CASCADED = 1;
+
   public static final int ITERATED = 2;
+
   public static final int BUFFER0 = 3;
+
   public static final int ORDERED = 4;
-  
-  public static void run(String testName, int testType, List polys)
-  {
-  	UnionPerfTester test = new UnionPerfTester(polys);
-  	test.run(testName, testType);
-  }
-  
-  public static void runAll(List polys)
-  {
-  	UnionPerfTester test = new UnionPerfTester(polys);
-  	test.runAll();
-  }
-  
+
   static final int MAX_ITER = 1;
 
   static PrecisionModel pm = new PrecisionModel();
+
   static GeometryFactory fact = new GeometryFactory(pm, 0);
+
   static WKTReader wktRdr = new WKTReader(fact);
+
   static WKTWriter wktWriter = new WKTWriter();
 
+  public static void run(final String testName, final int testType,
+    final List polys) {
+    final UnionPerfTester test = new UnionPerfTester(polys);
+    test.run(testName, testType);
+  }
+
+  public static void runAll(final List polys) {
+    final UnionPerfTester test = new UnionPerfTester(polys);
+    test.runAll();
+  }
+
   Stopwatch sw = new Stopwatch();
+
   GeometryFactory factory = new GeometryFactory();
-  
-  private List polys;
-  
-  public UnionPerfTester(List polys) {
-  	this.polys = polys;
+
+  private final List polys;
+
+  public UnionPerfTester(final List polys) {
+    this.polys = polys;
   }
 
-
-  
-  public void runAll()
-  {
-    System.out.println("# items: " + polys.size());
-    run("Cascaded", CASCADED, polys);
-//    run("Buffer-0", BUFFER0, polys);
-
-    run("Iterated", ITERATED, polys);
-
+  void printItemEnvelopes(final List tree) {
+    final Envelope itemEnv = new Envelope();
+    for (final Iterator i = tree.iterator(); i.hasNext();) {
+      final Object o = i.next();
+      if (o instanceof List) {
+        printItemEnvelopes((List)o);
+      } else if (o instanceof Geometry) {
+        itemEnv.expandToInclude(((Geometry)o).getEnvelopeInternal());
+      }
+    }
+    System.out.println(this.factory.toGeometry(itemEnv));
   }
 
-  public void run(String testName, int testType)
-  {
-  	System.out.println();
+  public void run(final String testName, final int testType) {
+    System.out.println();
     System.out.println("======= Union Algorithm: " + testName + " ===========");
 
-    Stopwatch sw = new Stopwatch();
+    final Stopwatch sw = new Stopwatch();
     for (int i = 0; i < MAX_ITER; i++) {
-    	Geometry union = null;
-    	switch (testType) {
-    	case CASCADED:
-    		union = unionCascaded(polys);
-    		break;
-    	case ITERATED:
-        union = unionAllSimple(polys);
+      Geometry union = null;
+      switch (testType) {
+        case CASCADED:
+          union = unionCascaded(this.polys);
         break;
-    	case BUFFER0:
-        union = unionAllBuffer(polys);
+        case ITERATED:
+          union = unionAllSimple(this.polys);
         break;
-    	}
-      
-//    	printFormatted(union);
+        case BUFFER0:
+          union = unionAllBuffer(this.polys);
+        break;
+      }
+
+      // printFormatted(union);
 
     }
     System.out.println("Finished in " + sw.getTimeString());
   }
 
-  private void printFormatted(Geometry geom)
-  {
-  	WKTWriter writer = new WKTWriter();
-  	System.out.println(writer.writeFormatted(geom));
+  public void runAll() {
+    System.out.println("# items: " + this.polys.size());
+    run("Cascaded", CASCADED, this.polys);
+    // run("Buffer-0", BUFFER0, polys);
+
+    run("Iterated", ITERATED, this.polys);
+
   }
-  
-  public Geometry unionAllSimple(List geoms)
-  {
+
+  public Geometry unionAllBuffer(final List geoms) {
+
+    final Geometry gColl = this.factory.buildGeometry(geoms);
+    final Geometry unionAll = gColl.buffer(0.0);
+    return unionAll;
+  }
+
+  public Geometry unionAllSimple(final List geoms) {
     Geometry unionAll = null;
     int count = 0;
-    for (Iterator i = geoms.iterator(); i.hasNext(); ) {
-      Geometry geom = (Geometry) i.next();
-      
+    for (final Iterator i = geoms.iterator(); i.hasNext();) {
+      final Geometry geom = (Geometry)i.next();
+
       if (unionAll == null) {
-      	unionAll = (Geometry) geom.clone();
+        unionAll = (Geometry)geom.clone();
+      } else {
+        unionAll = unionAll.union(geom);
       }
-      else {
-      	unionAll = unionAll.union(geom);
-      }
-      
+
       count++;
       if (count % 100 == 0) {
         System.out.print(".");
-//        System.out.println("Adding geom #" + count);
+        // System.out.println("Adding geom #" + count);
       }
     }
     return unionAll;
   }
-  
-  public Geometry unionAllBuffer(List geoms)
-  {
-  	
-  	Geometry gColl = factory.buildGeometry(geoms);
-  	Geometry unionAll = gColl.buffer(0.0);
-    return unionAll;
-  }
-  
-  public Geometry unionCascaded(List geoms)
-  {
-  	return CascadedPolygonUnion.union(geoms);
-  }
-  
+
   /*
-  public Geometry unionAllOrdered(List geoms)
-  {
-//  	return OrderedUnion.union(geoms);
-  }
-  */
-  
-  void printItemEnvelopes(List tree)
-  {
-    Envelope itemEnv = new Envelope();
-    for (Iterator i = tree.iterator(); i.hasNext(); ) {
-      Object o = i.next();
-      if (o instanceof List) {
-        printItemEnvelopes((List) o);
-      }
-      else if (o instanceof Geometry) {
-        itemEnv.expandToInclude( ((Geometry) o).getEnvelopeInternal());
-      }
-    }
-    System.out.println(factory.toGeometry(itemEnv));
+   * public Geometry unionAllOrdered(List geoms) { // return
+   * OrderedUnion.union(geoms); }
+   */
+
+  public Geometry unionCascaded(final List geoms) {
+    return CascadedPolygonUnion.union(geoms);
   }
 }

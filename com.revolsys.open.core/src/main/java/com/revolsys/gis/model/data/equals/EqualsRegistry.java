@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class EqualsRegistry implements Equals<Object> {
 

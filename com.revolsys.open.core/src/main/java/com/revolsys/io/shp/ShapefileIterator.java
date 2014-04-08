@@ -31,7 +31,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.XbaseIterator;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class ShapefileIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {

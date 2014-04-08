@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.AbstractIdObjectQuadTree;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineString;
 
 public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   private final Graph<T> graph;

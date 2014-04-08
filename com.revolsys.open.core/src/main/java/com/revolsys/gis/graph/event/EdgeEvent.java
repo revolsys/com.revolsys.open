@@ -3,7 +3,7 @@ package com.revolsys.gis.graph.event;
 import java.util.EventObject;
 
 import com.revolsys.gis.graph.Edge;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class EdgeEvent<T> extends EventObject {
   /**

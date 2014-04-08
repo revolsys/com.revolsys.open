@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.DelegatingObjectWithProperties;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectGeometryIterator extends DelegatingObjectWithProperties
   implements Iterator<Geometry> {

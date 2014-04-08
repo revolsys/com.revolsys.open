@@ -1,8 +1,8 @@
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.noding.Octant;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.noding.Octant;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Implements a robust method of comparing the relative position of two points

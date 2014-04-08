@@ -42,7 +42,7 @@ import com.revolsys.gis.model.geometry.operation.chain.MCIndexSnapRounder;
 import com.revolsys.gis.model.geometry.operation.chain.Noder;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.ScaledNoder;
 import com.revolsys.gis.model.geometry.util.TopologyException;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
+import com.revolsys.jts.operation.buffer.BufferParameters;
 
 /**
  * @version 1.7

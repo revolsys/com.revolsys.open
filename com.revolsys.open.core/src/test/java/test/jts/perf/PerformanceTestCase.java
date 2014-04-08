@@ -16,96 +16,84 @@ package test.jts.perf;
  * @author Martin Davis
  *
  */
-public abstract class PerformanceTestCase
-{
-  private String name;
-  private int[] runSize = new int[] { 1 };
+public abstract class PerformanceTestCase {
+  private final String name;
+
+  private int[] runSize = new int[] {
+    1
+  };
+
   private int runIter = 1;
-  
-  public PerformanceTestCase(String name)
-  {
+
+  public PerformanceTestCase(final String name) {
     this.name = name;
   }
-  
-  public String getName()
-  {
-    return name;
-  }
-  
+
   /**
-   * Sets the size(s) for the runs of the test.
+   * Ends a test run.
    * 
-   * @param runSize a list of the sizes for the test runs
+   * @throws Exception
    */
-  protected void setRunSize(int[] runSize)
-  {
-    this.runSize = runSize;
+  public void endRun() throws Exception {
+
   }
-  
-  public int[] getRunSize()
-  {
-    return runSize;
+
+  public String getName() {
+    return this.name;
   }
-  
+
+  public int getRunIterations() {
+    return this.runIter;
+  }
+
+  public int[] getRunSize() {
+    return this.runSize;
+  }
+
   /**
    * Sets the number of iterations to execute the test methods in each test run.
    * 
    * @param runIter the number of iterations to execute.
    */
-  protected void setRunIterations(int runIter)
-  {
+  protected void setRunIterations(final int runIter) {
     this.runIter = runIter;
   }
-  
-  public int getRunIterations()
-  {
-    return runIter;
+
+  /**
+   * Sets the size(s) for the runs of the test.
+   * 
+   * @param runSize a list of the sizes for the test runs
+   */
+  protected void setRunSize(final int[] runSize) {
+    this.runSize = runSize;
   }
-  
+
   /**
    * Sets up any fixtures needed for the test runs.
    * 
    * @throws Exception
    */
-  public void setUp()
-  throws Exception
-  {
-    
+  public void setUp() throws Exception {
+
   }
-  
+
   /**
    * Starts a test run with the given size.
    * 
    * @param size
    * @throws Exception
    */
-  public void startRun(int size)
-  throws Exception
-  {
-    
+  public void startRun(final int size) throws Exception {
+
   }
-  
-  /**
-   * Ends a test run.
-   * 
-   * @throws Exception
-   */
-  public void endRun()
-  throws Exception
-  {
-    
-  }
-  
+
   /**
    * Tear down any fixtures made for the testing.
    * 
    * @throws Exception
    */
-  public void tearDown()
-  throws Exception
-  {
-    
+  public void tearDown() throws Exception {
+
   }
-  
-  
+
 }

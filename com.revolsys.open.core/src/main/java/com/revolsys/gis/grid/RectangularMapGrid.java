@@ -5,7 +5,7 @@ import java.util.List;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygon;
 
 public interface RectangularMapGrid {
   BoundingBox getBoundingBox(final String mapTileName, final int srid);

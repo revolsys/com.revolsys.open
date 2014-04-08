@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * Nodes a set of {@link SegmentString}s using a index based

@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class PrecisionModelUtil {
   public static PrecisionModel getPrecisionModel(

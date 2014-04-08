@@ -10,9 +10,9 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeEnd;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Location;
 
 /**
  * A collection of {@link EdgeEnd}s which obey the following invariant:

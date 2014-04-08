@@ -54,7 +54,7 @@ import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.geom.Point;
 
 public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   PropertyChangeListener, MapSerializer {

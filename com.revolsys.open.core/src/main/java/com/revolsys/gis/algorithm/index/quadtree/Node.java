@@ -2,7 +2,7 @@ package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class Node<T> extends NodeBase<T> {
   public static <V> Node<V> createExpanded(final Node<V> node,

@@ -11,8 +11,8 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdgeStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.util.Assert;
 
 /**
  * @version 1.7

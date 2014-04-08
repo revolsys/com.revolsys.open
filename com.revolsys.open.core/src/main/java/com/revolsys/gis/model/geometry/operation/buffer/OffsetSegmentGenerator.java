@@ -41,11 +41,11 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.HCoordinate;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.algorithm.NotRepresentableException;
-import com.vividsolutions.jts.geomgraph.Position;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
+import com.revolsys.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.operation.buffer.BufferParameters;
 
 /**
  * Generates segments which form an offset curve. Supports all end cap and join

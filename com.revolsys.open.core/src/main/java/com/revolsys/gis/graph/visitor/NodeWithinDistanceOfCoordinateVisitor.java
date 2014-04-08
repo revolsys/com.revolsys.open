@@ -4,7 +4,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 public class NodeWithinDistanceOfCoordinateVisitor<T> implements
   Visitor<Node<T>> {

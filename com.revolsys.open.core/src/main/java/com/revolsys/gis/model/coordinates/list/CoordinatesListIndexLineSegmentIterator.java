@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class CoordinatesListIndexLineSegmentIterator implements
   Iterator<LineSegment>, Iterable<LineSegment> {

@@ -1,11 +1,11 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class LinearIntersectionFilter implements Filter<LineString> {
 

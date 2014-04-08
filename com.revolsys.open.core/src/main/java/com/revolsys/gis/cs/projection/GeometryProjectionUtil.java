@@ -3,11 +3,11 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class GeometryProjectionUtil {
   public static CoordinateSystem getCoordinateSystem(final Geometry geometry) {
-    final com.vividsolutions.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     if (geometryFactory instanceof GeometryFactory) {
       final GeometryFactory factory = (GeometryFactory)geometryFactory;
       return factory.getCoordinateSystem();

@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class FieldDefinition {
   public static final char CHARACTER_TYPE = 'C';

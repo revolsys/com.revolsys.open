@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateFilter;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Geometry;
 
 public class MaxPointDistanceFilter implements CoordinateFilter {
   public static double getMaxDistance(final Geometry srcGeom,

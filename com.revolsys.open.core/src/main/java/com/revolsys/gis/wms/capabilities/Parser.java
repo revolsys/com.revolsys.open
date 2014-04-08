@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.io.xml.XmlProcessorContext;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class Parser extends XmlProcessor {
   private static final Logger log = Logger.getLogger(Parser.class);

@@ -8,10 +8,10 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.algorithm.LineIntersector;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geomgraph.Edge;
-import com.vividsolutions.jts.geomgraph.Node;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.Node;
 
 /**
  * Computes the intersection of line segments,
@@ -20,7 +20,7 @@ import com.vividsolutions.jts.geomgraph.Node;
  * @version 1.7
  */
 public class SegmentIntersector extends
-  com.vividsolutions.jts.geomgraph.index.SegmentIntersector {
+  com.revolsys.jts.geomgraph.index.SegmentIntersector {
 
   public static boolean isAdjacentSegments(final int i1, final int i2) {
     return Math.abs(i1 - i2) == 1;

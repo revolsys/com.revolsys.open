@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,22 +35,95 @@ package test.jts.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
-import com.vividsolutions.jts.index.strtree.STRtree;
-
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * @version 1.7
  */
 public class TreeTimeTest {
+  class EnvelopeListIndex implements Index {
+    EnvelopeList index = new EnvelopeList();
+
+    @Override
+    public void finishInserting() {
+    }
+
+    @Override
+    public void insert(final Envelope itemEnv, final Object item) {
+      this.index.add(itemEnv);
+    }
+
+    @Override
+    public List query(final Envelope searchEnv) {
+      return this.index.query(searchEnv);
+    }
+
+    @Override
+    public String toString() {
+      return "Env";
+    }
+  }
+
+  class QuadtreeIndex implements Index {
+    Quadtree index = new Quadtree();
+
+    @Override
+    public void finishInserting() {
+    }
+
+    @Override
+    public void insert(final Envelope itemEnv, final Object item) {
+      this.index.insert(itemEnv, item);
+    }
+
+    @Override
+    public List query(final Envelope searchEnv) {
+      return this.index.query(searchEnv);
+    }
+
+    @Override
+    public String toString() {
+      return "Quad";
+    }
+  }
+
+  class STRtreeIndex implements Index {
+    STRtree index;
+
+    // public String toString() { return "" + index.getNodeCapacity() + ""; }
+    public STRtreeIndex(final int nodeCapacity) {
+      this.index = new STRtree(nodeCapacity);
+    }
+
+    @Override
+    public void finishInserting() {
+      this.index.build();
+    }
+
+    @Override
+    public void insert(final Envelope itemEnv, final Object item) {
+      this.index.insert(itemEnv, item);
+    }
+
+    @Override
+    public List query(final Envelope searchEnv) {
+      return this.index.query(searchEnv);
+    }
+
+    @Override
+    public String toString() {
+      return "STR[M=" + this.index.getNodeCapacity() + "]";
+    }
+  }
+
   public static final int NUM_ITEMS = 10000;
 
-  public static void main(String[] args) throws Exception
-  {
-    int n = 10000;
-    TreeTimeTest test = new TreeTimeTest();
-    List items = IndexTester.createGridItems(n);
+  public static void main(final String[] args) throws Exception {
+    final int n = 10000;
+    final TreeTimeTest test = new TreeTimeTest();
+    final List items = IndexTester.createGridItems(n);
     System.out.println("----------------------------------------------");
     System.out.println("Dummy run to ensure classes are loaded before real run");
     System.out.println("----------------------------------------------");
@@ -62,86 +134,22 @@ public class TreeTimeTest {
     test.run(items);
   }
 
-  public TreeTimeTest()
-  {
+  public TreeTimeTest() {
   }
 
-  public List run(List items) throws Exception
-  {
-    ArrayList indexResults = new ArrayList();
-    System.out.println("# items = " + items.size());
-    indexResults.add(run(new QuadtreeIndex(), items));
-    indexResults.add(run(new STRtreeIndex(10), items));
-    //indexResults.add(run(new QXtreeIndex(), n));
-    //indexResults.add(run(new EnvelopeListIndex(), n));
-    return indexResults;
-  }
-
-  public IndexTester.IndexResult run(Index index, List items) throws Exception
-  {
+  public IndexTester.IndexResult run(final Index index, final List items)
+    throws Exception {
     return new IndexTester(index).testAll(items);
   }
 
-  class STRtreeIndex
-    implements Index
-  {
-    public String toString() { return "STR[M=" + index.getNodeCapacity() + "]"; }
-//    public String toString() { return "" + index.getNodeCapacity() + ""; }
-    public STRtreeIndex(int nodeCapacity)
-    {
-      index = new STRtree(nodeCapacity);
-    }
-    STRtree index;
-
-    public void insert(Envelope itemEnv, Object item)
-    {
-      index.insert(itemEnv, item);
-    }
-    public List query(Envelope searchEnv)
-    {
-      return index.query(searchEnv);
-    }
-    public void finishInserting()
-    {
-      index.build();
-    }
+  public List run(final List items) throws Exception {
+    final ArrayList indexResults = new ArrayList();
+    System.out.println("# items = " + items.size());
+    indexResults.add(run(new QuadtreeIndex(), items));
+    indexResults.add(run(new STRtreeIndex(10), items));
+    // indexResults.add(run(new QXtreeIndex(), n));
+    // indexResults.add(run(new EnvelopeListIndex(), n));
+    return indexResults;
   }
-
-  class QuadtreeIndex
-    implements Index
-  {
-    Quadtree index = new Quadtree();
-    public String toString() { return "Quad"; }
-    public void insert(Envelope itemEnv, Object item)
-    {
-      index.insert(itemEnv, item);
-    }
-    public List query(Envelope searchEnv)
-    {
-      return index.query(searchEnv);
-    }
-    public void finishInserting()
-    {
-    }
-  }
-
-  class EnvelopeListIndex
-    implements Index
-  {
-    EnvelopeList index = new EnvelopeList();
-    public String toString() { return "Env"; }
-    public void insert(Envelope itemEnv, Object item)
-    {
-      index.add(itemEnv);
-    }
-    public List query(Envelope searchEnv)
-    {
-      return index.query(searchEnv);
-    }
-    public void finishInserting()
-    {
-    }
-  }
-
 
 }

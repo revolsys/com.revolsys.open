@@ -3,7 +3,7 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class Area implements Serializable {
   /**

@@ -6,7 +6,7 @@ import java.util.Comparator;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.vividsolutions.jts.math.MathUtil;
+import com.revolsys.jts.math.MathUtil;
 
 /**
  * Useful utility functions for handling Coordinates arrays

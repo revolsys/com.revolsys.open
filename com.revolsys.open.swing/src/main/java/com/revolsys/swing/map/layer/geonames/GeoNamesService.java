@@ -20,7 +20,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.util.UrlUtil;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 public class GeoNamesService {
   public static final DataObjectMetaData NAME_METADATA;

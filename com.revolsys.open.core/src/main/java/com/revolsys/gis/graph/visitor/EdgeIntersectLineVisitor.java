@@ -7,10 +7,10 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Dimension;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.LineString;
 
 public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
 

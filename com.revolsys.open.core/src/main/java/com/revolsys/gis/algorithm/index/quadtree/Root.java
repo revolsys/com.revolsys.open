@@ -2,8 +2,8 @@ package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.quadtree.IntervalSize;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.quadtree.IntervalSize;
 
 public class Root<T> extends NodeBase<T> {
   private static final Coordinates origin = new DoubleCoordinates(0.0, 0.0);

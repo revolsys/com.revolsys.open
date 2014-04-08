@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry.operation.geomgraph;
 
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * A TopologyLocation is the labelling of a GraphComponent's topological

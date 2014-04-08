@@ -1,7 +1,7 @@
 package com.revolsys.gis.jts;
 
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.Polygon;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Polygon;
 
 public class LineStringMitredBuffer implements LineSegmentVisitor {
   private Polygon buffer;

@@ -5,7 +5,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
-import com.vividsolutions.jts.util.Assert;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Implements a "hot pixel" as used in the Snap Rounding algorithm. A hot pixel

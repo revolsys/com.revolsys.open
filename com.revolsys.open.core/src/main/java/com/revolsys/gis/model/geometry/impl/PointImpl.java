@@ -10,7 +10,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.Dimension;
+import com.revolsys.jts.geom.Dimension;
 
 public class PointImpl extends GeometryImpl implements Point {
 

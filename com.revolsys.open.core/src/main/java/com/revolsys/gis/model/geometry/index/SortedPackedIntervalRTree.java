@@ -37,8 +37,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.io.WKTWriter;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.io.WKTWriter;
 
 /**
  * A static index on a set of 1-dimensional intervals,

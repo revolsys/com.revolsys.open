@@ -1,6 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.convert;
 
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class GeometryConverter {
   public static com.revolsys.gis.esri.gdb.file.capi.swig.Envelope toEsri(

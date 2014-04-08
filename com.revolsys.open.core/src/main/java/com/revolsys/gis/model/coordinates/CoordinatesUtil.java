@@ -5,13 +5,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.algorithm.HCoordinate;
-import com.vividsolutions.jts.algorithm.NotRepresentableException;
-import com.vividsolutions.jts.algorithm.RobustDeterminant;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.revolsys.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.HCoordinate;
+import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class CoordinatesUtil {
 

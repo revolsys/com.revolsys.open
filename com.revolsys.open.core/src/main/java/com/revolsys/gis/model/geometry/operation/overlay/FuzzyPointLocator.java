@@ -11,7 +11,7 @@ import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.MultiLineString;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
-import com.vividsolutions.jts.geom.Location;
+import com.revolsys.jts.geom.Location;
 
 /**
  * Finds the most likely {@link Location} of a point relative to the polygonal

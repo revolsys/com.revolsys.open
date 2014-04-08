@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,121 +36,119 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.util.Assert;
-import com.vividsolutions.jts.util.Stopwatch;
-
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.util.Assert;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * @version 1.7
  */
 public class IndexTester {
+  public static class IndexResult {
+    public String indexName;
+
+    public long loadMilliseconds;
+
+    public long queryMilliseconds;
+
+    public IndexResult(final String indexName) {
+      this.indexName = indexName;
+    }
+  }
+
   static final int NUM_ITEMS = 2000;
+
   static final double EXTENT_MIN = -1000.0;
+
   static final double EXTENT_MAX = 1000.0;
 
-  Index index;
-
-  public IndexTester(Index index)
-  {
-    this.index = index;
-  }
-
-  public static class IndexResult {
-    public IndexResult(String indexName) { this.indexName = indexName; }
-    public String indexName;
-    public long loadMilliseconds;
-    public long queryMilliseconds;
-  }
-
-  private static List victoriaItems = null;
-
-  public IndexResult testAll(List items)
-  {
-    IndexResult result = new IndexResult(index.toString());
-    System.out.print(index.toString() + "           ");
-    System.gc();
-    Stopwatch sw = new Stopwatch();
-    sw.start();
-    loadGrid(items);
-    String loadTime = sw.getTimeString();
-    result.loadMilliseconds = sw.getTime();
-    System.gc();
-    sw.start();
-    //runQueries();
-    runSelfQuery(items);
-    String queryTime = sw.getTimeString();
-    result.queryMilliseconds = sw.getTime();
-    System.out.println("  Load Time = " + loadTime + "  Query Time = " + queryTime);
-    return result;
-  }
-
-  public static List createGridItems(int nGridCells)
-  {
-    ArrayList items = new ArrayList();
-    int gridSize = (int) Math.sqrt((double) nGridCells);
+  public static List createGridItems(final int nGridCells) {
+    final ArrayList items = new ArrayList();
+    int gridSize = (int)Math.sqrt(nGridCells);
     gridSize += 1;
-    double extent = EXTENT_MAX - EXTENT_MIN;
-    double gridInc = extent / gridSize;
-    double cellSize = gridInc;
+    final double extent = EXTENT_MAX - EXTENT_MIN;
+    final double gridInc = extent / gridSize;
+    final double cellSize = gridInc;
     for (int i = 0; i < gridSize; i++) {
       for (int j = 0; j < gridSize; j++) {
-        double x = EXTENT_MIN + gridInc * i;
-        double y = EXTENT_MIN + gridInc * j;
-        Envelope env = new Envelope(x, x + cellSize,
-                                    y, y + cellSize);
+        final double x = EXTENT_MIN + gridInc * i;
+        final double y = EXTENT_MIN + gridInc * j;
+        final Envelope env = new Envelope(x, x + cellSize, y, y + cellSize);
         items.add(env);
       }
     }
     return items;
   }
 
-  void loadGrid(List items)
-  {
-    for (Iterator i = items.iterator(); i.hasNext(); ) {
-      Envelope item = (Envelope) i.next();
-      index.insert(item, item);
-    }
-    index.finishInserting();
+  Index index;
+
+  public IndexTester(final Index index) {
+    this.index = index;
   }
-  void runSelfQuery(List items)
-  {
+
+  void loadGrid(final List items) {
+    for (final Iterator i = items.iterator(); i.hasNext();) {
+      final Envelope item = (Envelope)i.next();
+      this.index.insert(item, item);
+    }
+    this.index.finishInserting();
+  }
+
+  void queryGrid(final int nGridCells, final double cellSize) {
+
+    int gridSize = (int)Math.sqrt(nGridCells);
+    gridSize += 1;
+    final double extent = EXTENT_MAX - EXTENT_MIN;
+    final double gridInc = extent / gridSize;
+
+    for (int i = 0; i < gridSize; i++) {
+      for (int j = 0; j < gridSize; j++) {
+        final double x = EXTENT_MIN + gridInc * i;
+        final double y = EXTENT_MIN + gridInc * j;
+        final Envelope env = new Envelope(x, x + cellSize, y, y + cellSize);
+        this.index.query(env);
+      }
+    }
+  }
+
+  void runGridQuery() {
+    final int nGridCells = 100;
+    final int cellSize = (int)Math.sqrt(NUM_ITEMS);
+    final double extent = EXTENT_MAX - EXTENT_MIN;
+    final double queryCellSize = 2.0 * extent / cellSize;
+
+    queryGrid(nGridCells, queryCellSize);
+  }
+
+  void runSelfQuery(final List items) {
     double querySize = 0.0;
     for (int i = 0; i < items.size(); i++) {
-      Envelope env = (Envelope) items.get(i);
-      List list = index.query(env);
+      final Envelope env = (Envelope)items.get(i);
+      final List list = this.index.query(env);
       Assert.isTrue(!list.isEmpty());
       querySize += list.size();
     }
     System.out.println("Avg query size = " + querySize / items.size());
   }
-  void runGridQuery()
-  {
-    int nGridCells = 100;
-    int cellSize = (int) Math.sqrt((double) NUM_ITEMS);
-    double extent = EXTENT_MAX - EXTENT_MIN;
-    double queryCellSize =  2.0 * extent / cellSize;
 
-    queryGrid(nGridCells, queryCellSize);
-  }
-
-  void queryGrid(int nGridCells, double cellSize)
-  {
-
-    int gridSize = (int) Math.sqrt((double) nGridCells);
-    gridSize += 1;
-    double extent = EXTENT_MAX - EXTENT_MIN;
-    double gridInc = extent / gridSize;
-
-    for (int i = 0; i < gridSize; i++) {
-      for (int j = 0; j < gridSize; j++) {
-        double x = EXTENT_MIN + gridInc * i;
-        double y = EXTENT_MIN + gridInc * j;
-        Envelope env = new Envelope(x, x + cellSize,
-                                    y, y + cellSize);
-        index.query(env);
-      }
-    }
+  public IndexResult testAll(final List items) {
+    final IndexResult result = new IndexResult(this.index.toString());
+    System.out.print(this.index.toString() + "           ");
+    System.gc();
+    final Stopwatch sw = new Stopwatch();
+    sw.start();
+    loadGrid(items);
+    final String loadTime = sw.getTimeString();
+    result.loadMilliseconds = sw.getTime();
+    System.gc();
+    sw.start();
+    // runQueries();
+    runSelfQuery(items);
+    final String queryTime = sw.getTimeString();
+    result.queryMilliseconds = sw.getTime();
+    System.out.println("  Load Time = " + loadTime + "  Query Time = "
+      + queryTime);
+    return result;
   }
 
 }

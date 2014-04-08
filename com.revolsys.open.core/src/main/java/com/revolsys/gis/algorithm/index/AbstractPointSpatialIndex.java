@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public abstract class AbstractPointSpatialIndex<T> implements
   PointSpatialIndex<T> {

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,11 +32,11 @@
  */
 package test.jts.perf.operation.buffer;
 
-import java.util.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.operation.buffer.validate.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Test repeated buffering of a given input shape.
@@ -47,55 +46,51 @@ import com.vividsolutions.jts.util.*;
  * 
  * @version 1.7
  */
-public class IteratedBufferStressTest 
-{
+public class IteratedBufferStressTest {
 
-  private PrecisionModel precisionModel = new PrecisionModel();
-//  private PrecisionModel precisionModel = new PrecisionModel(1);
-  private GeometryFactory geometryFactory = new GeometryFactory(precisionModel, 0);
-  WKTReader rdr = new WKTReader(geometryFactory);
+  public static void main(final String args[]) {
+    try {
+      new IteratedBufferStressTest().run();
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+    }
 
-  public static void main(String args[]) {
-  	try {
-  		(new IteratedBufferStressTest()).run();
-  	}
-  	catch (Exception ex) {
-  		ex.printStackTrace();
-  	}
-  
   }
 
-  String inputWKT = 
-  	"POLYGON ((110 320, 190 220, 60 200, 180 120, 120 40, 290 150, 410 40, 410 230, 500 340, 320 310, 260 370, 220 310, 110 320), (220 260, 250 180, 290 220, 360 150, 350 250, 260 280, 220 260))";
+  private final PrecisionModel precisionModel = new PrecisionModel();
 
-  public IteratedBufferStressTest() {  }
+  // private PrecisionModel precisionModel = new PrecisionModel(1);
+  private final GeometryFactory geometryFactory = new GeometryFactory(
+    this.precisionModel, 0);
 
-  void run()
-  throws Exception
-  {
-  	Stopwatch totalSW = new Stopwatch();
-  	Geometry base = rdr.read(inputWKT);
-  	double dist = 1.0;
-  	while (true) {
-  		Geometry b1 = doBuffer(base, dist);
-  		Geometry b2 = doBuffer(b1, -dist);
-  		dist += 1;
-  		base = b2;
-  		System.out.println("----------------------  " + totalSW.getTimeString());
-  		System.out.println();
-  	}
+  WKTReader rdr = new WKTReader(this.geometryFactory);
+
+  String inputWKT = "POLYGON ((110 320, 190 220, 60 200, 180 120, 120 40, 290 150, 410 40, 410 230, 500 340, 320 310, 260 370, 220 310, 110 320), (220 260, 250 180, 290 220, 360 150, 350 250, 260 280, 220 260))";
+
+  public IteratedBufferStressTest() {
   }
-  
-  Geometry doBuffer(Geometry g, double dist)
-  {
-		System.out.println("Buffering with dist = " + dist);
-		Geometry buf = g.buffer(dist);
-		System.out.println("Buffer result has " + buf.getNumPoints() + " vertices");
-		
-		System.out.println(buf);
-		return buf;
 
+  Geometry doBuffer(final Geometry g, final double dist) {
+    System.out.println("Buffering with dist = " + dist);
+    final Geometry buf = g.buffer(dist);
+    System.out.println("Buffer result has " + buf.getNumPoints() + " vertices");
+
+    System.out.println(buf);
+    return buf;
+
+  }
+
+  void run() throws Exception {
+    final Stopwatch totalSW = new Stopwatch();
+    Geometry base = this.rdr.read(this.inputWKT);
+    double dist = 1.0;
+    while (true) {
+      final Geometry b1 = doBuffer(base, dist);
+      final Geometry b2 = doBuffer(b1, -dist);
+      dist += 1;
+      base = b2;
+      System.out.println("----------------------  " + totalSW.getTimeString());
+      System.out.println();
+    }
   }
 }
-
-

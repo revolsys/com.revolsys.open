@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.AbstractDataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LengthAttributeName extends AbstractDataObjectMetaDataProperty {
   public static final String PROPERTY_NAME = LengthAttributeName.class.getName()

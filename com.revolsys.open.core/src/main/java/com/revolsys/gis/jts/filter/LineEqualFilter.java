@@ -21,7 +21,7 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.vividsolutions.jts.geom.LineString;
+import com.revolsys.jts.geom.LineString;
 
 public class LineEqualFilter implements Filter<LineString> {
   private final LineString geometry;

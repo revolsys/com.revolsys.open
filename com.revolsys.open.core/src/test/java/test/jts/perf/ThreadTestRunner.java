@@ -6,21 +6,18 @@ package test.jts.perf;
  * @author Martin Davis
  *
  */
-public class ThreadTestRunner
-{
+public class ThreadTestRunner {
 
   public static final int DEFAULT_THREAD_COUNT = 10;
 
-  public static void run(ThreadTestCase testcase)
-  {
+  public static void run(final ThreadTestCase testcase) {
     testcase.setup();
-    
+
     for (int i = 0; i < testcase.getThreadCount(); i++) {
-      Runnable runnable = testcase.getRunnable(i);
-      Thread t = new Thread(runnable);
+      final Runnable runnable = testcase.getRunnable(i);
+      final Thread t = new Thread(runnable);
       t.start();
     }
   }
-  
- 
+
 }

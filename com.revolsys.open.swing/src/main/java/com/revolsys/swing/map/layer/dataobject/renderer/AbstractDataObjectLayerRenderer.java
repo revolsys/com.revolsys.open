@@ -18,7 +18,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
-import com.vividsolutions.jts.geom.TopologyException;
+import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;

@@ -2,8 +2,8 @@ package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.ItemVisitor;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.ItemVisitor;
 
 /**
  * A {@link ItemVisitor} implementation which uses a {@link Visitor} to visit

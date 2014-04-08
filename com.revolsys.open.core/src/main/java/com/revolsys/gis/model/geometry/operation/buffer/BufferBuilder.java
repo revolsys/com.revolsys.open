@@ -27,8 +27,8 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineInter
 import com.revolsys.gis.model.geometry.operation.noding.snapround.IntersectionAdder;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.gis.model.geometry.operation.overlay.PolygonBuilder;
-import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.operation.buffer.BufferParameters;
 
 /**
  * @version 1.7

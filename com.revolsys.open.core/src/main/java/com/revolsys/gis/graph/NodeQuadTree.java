@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.gis.algorithm.index.AbstractIdObjectPointQuadTree;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.visitor.CreateListVisitor;
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.jts.geom.Envelope;
 
 public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   private final Graph<T> graph;

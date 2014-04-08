@@ -8,9 +8,9 @@ import com.revolsys.gis.model.geometry.operation.chain.MonotoneChain;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChainSelectAction;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
-import com.vividsolutions.jts.index.ItemVisitor;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * "Snaps" all {@link SegmentString}s in a {@link SpatialIndex} containing

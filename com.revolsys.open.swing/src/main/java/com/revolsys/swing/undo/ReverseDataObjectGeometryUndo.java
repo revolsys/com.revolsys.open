@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.vividsolutions.jts.geom.Geometry;
+import com.revolsys.jts.geom.Geometry;
 
 public class ReverseDataObjectGeometryUndo extends AbstractUndoableEdit {
 

@@ -2,7 +2,7 @@ package com.revolsys.gis.event;
 
 import java.util.LinkedHashSet;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinate;
 
 public class CoordinateEventListenerList extends
   LinkedHashSet<CoordinateEventListener> implements CoordinateEventListener {

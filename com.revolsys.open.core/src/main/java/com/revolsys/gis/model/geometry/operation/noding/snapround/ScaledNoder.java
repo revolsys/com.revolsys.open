@@ -8,7 +8,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.Noder;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
-import com.vividsolutions.jts.util.CollectionUtil;
+import com.revolsys.jts.util.CollectionUtil;
 
 /**
  * Wraps a {@link Noder} and transforms its input into the integer domain. This

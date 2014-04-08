@@ -36,10 +36,10 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.geomgraph.Position;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.operation.buffer.BufferParameters;
 
 /**
  * Computes the raw offset curve for a single {@link Geometry} component (ring,

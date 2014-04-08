@@ -4,7 +4,7 @@ import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
 
 /**
  * The base class for operations that require {@link GeometryGraph}s.

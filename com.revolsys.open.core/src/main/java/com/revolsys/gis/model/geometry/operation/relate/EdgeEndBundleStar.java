@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeEnd;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeEndStar;
-import com.vividsolutions.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**
  * An ordered list of {@link EdgeEndBundle}s around a {@link RelateNode}.

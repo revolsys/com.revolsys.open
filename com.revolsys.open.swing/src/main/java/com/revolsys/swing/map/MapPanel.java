@@ -69,8 +69,8 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.PrecisionModel;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
@@ -827,7 +827,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     menu.show(zoomBookmarkButton, 0, 20);
   }
 
-  public void zoom(final com.vividsolutions.jts.geom.Point mapPoint,
+  public void zoom(final com.revolsys.jts.geom.Point mapPoint,
     final int steps) {
     final BoundingBox extent = getBoundingBox();
     double factor = steps * 2;
