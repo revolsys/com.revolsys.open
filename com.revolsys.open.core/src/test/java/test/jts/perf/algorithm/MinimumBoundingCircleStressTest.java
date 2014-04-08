@@ -16,7 +16,7 @@ public class MinimumBoundingCircleStressTest {
 
   }
 
-  GeometryFactory geomFact = new GeometryFactory();
+  GeometryFactory geomFact = GeometryFactory.getFactory();
 
   public MinimumBoundingCircleStressTest() {
 

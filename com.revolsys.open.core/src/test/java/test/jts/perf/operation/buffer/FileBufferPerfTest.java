@@ -30,7 +30,7 @@ public class FileBufferPerfTest {
     }
   }
 
-  GeometryFactory factory = new GeometryFactory();
+  GeometryFactory factory = GeometryFactory.getFactory();
 
   boolean testFailed = false;
 

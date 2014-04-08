@@ -11,7 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
@@ -23,7 +23,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 public class GeometryReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<GeometryReader> {
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
@@ -32,7 +32,7 @@ public class GeometryReaderHttpMessageConverter extends
       GeometryReaderFactory.class), null);
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -59,7 +59,7 @@ public class GeometryReaderHttpMessageConverter extends
         final InputStreamResource resource = new InputStreamResource(
           "geometryInput", body);
         final GeometryReader reader = readerFactory.createGeometryReader(resource);
-        GeometryFactory factory = geometryFactory;
+        com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
@@ -73,7 +73,7 @@ public class GeometryReaderHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 }

@@ -143,7 +143,7 @@ public class WKTReader
    * Creates a reader that creates objects using the default {@link GeometryFactory}.
    */
   public WKTReader() {
-    this(new GeometryFactory());
+    this(GeometryFactory.getFactory());
   }
 
   /**

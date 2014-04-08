@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -18,6 +17,7 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class WktDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
@@ -49,7 +49,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
 
   @Override
   protected void doInit() {
-    GeometryFactory geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory geometryFactory;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
       geometryFactory = GeometryFactory.getFactory();

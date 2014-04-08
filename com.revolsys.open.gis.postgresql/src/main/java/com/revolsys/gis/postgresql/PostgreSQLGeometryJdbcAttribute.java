@@ -17,7 +17,6 @@ import org.postgis.PGgeometry;
 import org.postgis.Point;
 import org.postgis.Polygon;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -30,7 +29,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final int srid;
 
@@ -39,7 +38,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   public PostgreSQLGeometryJdbcAttribute(final String name,
     final DataType type, final boolean required, final String description,
     final Map<String, Object> properties, final int srid, final int numAxis,
-    final GeometryFactory geometryFactory) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     super(name, type, -1, 0, 0, required, description, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
@@ -189,7 +188,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.LineString toJtsLineString(
-    final GeometryFactory factory, final LineString lineString) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
       points.length, numAxis);
@@ -208,7 +207,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
-    final GeometryFactory factory, final MultiLineString multiLine) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final MultiLineString multiLine) {
     final LineString[] lines = multiLine.getLines();
     if (lines.length == 1) {
       return toJtsLineString(factory, lines[0]);
@@ -223,7 +222,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiPoint(
-    final GeometryFactory factory, final MultiPoint multiPoint) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final MultiPoint multiPoint) {
     final List<com.revolsys.jts.geom.Point> points = new ArrayList<com.revolsys.jts.geom.Point>();
     for (final Point point : multiPoint.getPoints()) {
       final com.revolsys.jts.geom.Point jtsPoint = toJtsPoint(factory,
@@ -238,7 +237,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiPolygon(
-    final GeometryFactory factory, final MultiPolygon multiPolygon) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final MultiPolygon multiPolygon) {
     final List<com.revolsys.jts.geom.Polygon> polygons = new ArrayList<com.revolsys.jts.geom.Polygon>();
     for (final Polygon polygon : multiPolygon.getPolygons()) {
       final com.revolsys.jts.geom.Polygon jtsPolygon = toJtsPolygon(
@@ -253,7 +252,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Point toJtsPoint(
-    final GeometryFactory factory, final Point point) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final Point point) {
     final Coordinates coordinate;
     switch (numAxis) {
       case 3:
@@ -270,7 +269,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Polygon toJtsPolygon(
-    final GeometryFactory factory, final Polygon polygon) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final Polygon polygon) {
     final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int ringIndex = 0; ringIndex < polygon.numRings(); ringIndex++) {
       final LinearRing ring = polygon.getRing(ringIndex);

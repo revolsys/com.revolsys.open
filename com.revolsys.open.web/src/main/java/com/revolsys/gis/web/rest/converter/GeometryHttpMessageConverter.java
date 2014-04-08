@@ -16,7 +16,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileUtil;
@@ -43,7 +43,7 @@ public class GeometryHttpMessageConverter extends
       .getMediaTypes(GeometryWriterFactory.class));
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

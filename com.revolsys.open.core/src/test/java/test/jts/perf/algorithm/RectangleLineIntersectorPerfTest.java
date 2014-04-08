@@ -55,7 +55,7 @@ public class RectangleLineIntersectorPerfTest {
     test.runBoth(6000);
   }
 
-  private final GeometryFactory geomFact = new GeometryFactory();
+  private final GeometryFactory geomFact = GeometryFactory.getFactory();
 
   private final double baseX = 0;
 

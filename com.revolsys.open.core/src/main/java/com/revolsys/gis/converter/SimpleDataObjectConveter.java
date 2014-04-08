@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.converter.process.SourceToTargetProcess;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.CollectionUtil;
 
 public class SimpleDataObjectConveter implements
   Converter<DataObject, DataObject> {
@@ -50,7 +50,7 @@ public class SimpleDataObjectConveter implements
   public DataObject convert(final DataObject sourceObject) {
     final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(sourceGeometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(sourceGeometry);
     final Geometry targetGeometry = geometryFactory.createGeometry(sourceGeometry);
     JtsGeometryUtil.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);

@@ -36,7 +36,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.MultiLineString;
@@ -75,7 +75,7 @@ public class PointLocator {
   private int numBoundaries; // the number of sub-elements whose boundaries the
                              // point lies in
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactoryI geometryFactory;
 
   public PointLocator() {
   }
@@ -87,7 +87,7 @@ public class PointLocator {
     this.boundaryRule = boundaryRule;
   }
 
-  public PointLocator(final GeometryFactory geometryFactory) {
+  public PointLocator(final GeometryFactoryI geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

@@ -16,7 +16,7 @@ public class WKTReaderParseErrorTest extends TestCase {
     TestRunner.run(WKTReaderParseErrorTest.class);
   }
 
-  private final GeometryFactory fact = new GeometryFactory();
+  private final GeometryFactory fact = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

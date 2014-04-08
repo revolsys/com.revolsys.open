@@ -157,7 +157,7 @@ public class VoronoiDiagramBuilder
 	
 	private static Geometry clipGeometryCollection(Geometry geom, Envelope clipEnv)
 	{
-		Geometry clipPoly = geom.getFactory().toGeometry(clipEnv);
+		Geometry clipPoly = geom.getGeometryFactory().toGeometry(clipEnv);
 		List clipped = new ArrayList();
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
 			Geometry g = geom.getGeometryN(i);
@@ -175,6 +175,6 @@ public class VoronoiDiagramBuilder
 				clipped.add(result);
 			}
 		}
-		return geom.getFactory().createGeometryCollection(GeometryFactory.toGeometryArray(clipped));
+		return geom.getGeometryFactory().createGeometryCollection(GeometryFactory.toGeometryArray(clipped));
 	}
 }

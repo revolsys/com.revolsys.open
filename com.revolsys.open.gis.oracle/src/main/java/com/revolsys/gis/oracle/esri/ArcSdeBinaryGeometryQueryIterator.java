@@ -19,7 +19,7 @@ import com.esri.sde.sdk.client.SeShapeFilter;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;

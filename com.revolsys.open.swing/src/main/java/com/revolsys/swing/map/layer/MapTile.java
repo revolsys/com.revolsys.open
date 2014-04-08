@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 
 public abstract class MapTile {
@@ -32,7 +31,7 @@ public abstract class MapTile {
     return this.boundingBox;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return this.boundingBox.getGeometryFactory();
   }
 
@@ -41,7 +40,7 @@ public abstract class MapTile {
   }
 
   public GeoReferencedImage getImage() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     return getImage(geometryFactory);
   }
 
@@ -50,7 +49,7 @@ public abstract class MapTile {
     return projectedImage;
   }
 
-  public GeoReferencedImage getImage(final GeometryFactory geometryFactory) {
+  public GeoReferencedImage getImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
 
     return getImage(coordinateSystem);
@@ -80,7 +79,7 @@ public abstract class MapTile {
     synchronized (this.projectedImages) {
       GeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
       if (projectedImage == null) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
         GeoReferencedImage image = getImage();
         if (image == null) {
           image = loadImage();
@@ -95,7 +94,7 @@ public abstract class MapTile {
     }
   }
 
-  public GeoReferencedImage loadImage(final GeometryFactory geometryFactory) {
+  public GeoReferencedImage loadImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return loadImage(coordinateSystem);
   }

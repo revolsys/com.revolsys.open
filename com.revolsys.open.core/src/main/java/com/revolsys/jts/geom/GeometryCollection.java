@@ -337,7 +337,7 @@ public class GeometryCollection extends Geometry {
     for (int i = 0; i < geometries.length; i++) {
       revGeoms[i] = geometries[i].reverse();
     }
-    return getFactory().createGeometryCollection(revGeoms);
+    return getGeometryFactory().createGeometryCollection(revGeoms);
   }
 
   /**

@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -924,7 +924,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomToWorld() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
     setBoundingBox(boundingBox);

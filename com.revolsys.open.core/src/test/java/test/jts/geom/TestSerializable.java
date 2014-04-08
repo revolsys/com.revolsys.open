@@ -54,7 +54,7 @@ public class TestSerializable {
 
   public static final String FILENAME = "c:\\testSerial.txt";
 
-  public static final GeometryFactory fact = new GeometryFactory();
+  public static final GeometryFactory fact = GeometryFactory.getFactory();
 
   public static void main(final String[] args) {
     final TestSerializable test = new TestSerializable();

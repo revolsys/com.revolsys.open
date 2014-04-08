@@ -2,7 +2,6 @@ package com.revolsys.io.gml.type;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -12,6 +11,7 @@ import com.revolsys.io.gml.GmlDataObjectWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
@@ -213,7 +213,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void srsName(final XmlWriter out, final Geometry geometry,
     final boolean writeSrsName) {
     if (writeSrsName) {
-      final GeometryFactory factory = GeometryFactory.getFactory(geometry);
+      final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
       GmlDataObjectWriter.srsName(out, factory);
     }
   }

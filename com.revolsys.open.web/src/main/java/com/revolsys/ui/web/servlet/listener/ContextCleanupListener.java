@@ -15,7 +15,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.web.util.Log4jWebConfigurer;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jdbc.io.JdbcFactoryRegistry;

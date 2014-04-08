@@ -115,7 +115,7 @@ public class LineMerger
   }
   private void add(LineString lineString) {
     if (factory == null) {
-      this.factory = lineString.getFactory();
+      this.factory = lineString.getGeometryFactory();
     }
     graph.addEdge(lineString);
   }

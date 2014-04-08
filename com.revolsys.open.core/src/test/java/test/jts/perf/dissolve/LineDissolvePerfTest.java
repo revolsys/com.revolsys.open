@@ -43,7 +43,7 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
     final LineMerger merger = new LineMerger();
     merger.add(dissolved);
     final Collection mergedColl = merger.getMergedLineStrings();
-    final Geometry merged = lines.getFactory().buildGeometry(mergedColl);
+    final Geometry merged = lines.getGeometryFactory().buildGeometry(mergedColl);
     return merged;
   }
 
@@ -53,7 +53,7 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
     for (final Iterator i = geoms.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
       if (factory == null) {
-        factory = g.getFactory();
+        factory = g.getGeometryFactory();
       }
       lines.addAll(LinearComponentExtracter.getLines(g));
     }

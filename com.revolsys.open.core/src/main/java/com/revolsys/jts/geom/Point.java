@@ -70,7 +70,7 @@ public class Point extends Geometry implements Puntal {
   public Point(final Coordinate coordinate,
     final PrecisionModel precisionModel, final int SRID) {
     super(new GeometryFactory(precisionModel, SRID));
-    init(getFactory().getCoordinateSequenceFactory().create(
+    init(getGeometryFactory().getCoordinateSequenceFactory().create(
       coordinate != null ? new Coordinate[] {
         coordinate
       } : new Coordinate[] {}));
@@ -176,7 +176,7 @@ public class Point extends Geometry implements Puntal {
    */
   @Override
   public Geometry getBoundary() {
-    return getFactory().createGeometryCollection(null);
+    return getGeometryFactory().createEmptyGeometryCollection();
   }
 
   @Override
@@ -231,7 +231,7 @@ public class Point extends Geometry implements Puntal {
 
   private void init(CoordinateSequence coordinates) {
     if (coordinates == null) {
-      coordinates = getFactory().getCoordinateSequenceFactory().create(
+      coordinates = getGeometryFactory().getCoordinateSequenceFactory().create(
         new Coordinate[] {});
     }
     Assert.isTrue(coordinates.size() <= 1);

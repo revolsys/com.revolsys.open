@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.InvokeMethodVisitor;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -16,6 +15,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 
@@ -103,7 +103,7 @@ public class LineStringRelate {
       } else if (outEdges.size() > 1) {
         System.err.println("Cannot handle overlaps\n" + getLine1() + "\n "
           + getLine2());
-        final GeometryFactory factory = GeometryFactory.getFactory(line1);
+        final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
         return factory.createMultiLineString();
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
@@ -131,7 +131,7 @@ public class LineStringRelate {
         currentCoordinates);
       intersections.add(points);
     }
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
     return factory.createMultiLineString(intersections);
   }
 

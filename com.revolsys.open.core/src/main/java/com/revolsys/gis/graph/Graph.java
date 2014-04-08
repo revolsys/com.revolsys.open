@@ -29,7 +29,6 @@ import com.revolsys.filter.FilterProxy;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
@@ -58,10 +57,11 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> {
 
@@ -107,7 +107,7 @@ public class Graph<T> {
 
   private final Map<Edge<T>, Integer> edgeIds = new TreeMap<Edge<T>, Integer>();
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
   private int nextEdgeId;
 
@@ -242,7 +242,7 @@ public class Graph<T> {
     return false;
   }
 
-  public Edge<T> createEdge(final GeometryFactory geometryFactory,
+  public Edge<T> createEdge(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final T object, final CoordinatesList points) {
     final LineString newLine = geometryFactory.createLineString(points);
     final T newObject = clone(object, newLine);
@@ -560,7 +560,7 @@ public class Graph<T> {
     return edges;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -1150,7 +1150,7 @@ public class Graph<T> {
         }
       }
       final T object = edge.getObject();
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
       final Map<Integer, Set<Coordinates>> segmentSplitNodes = new TreeMap<Integer, Set<Coordinates>>();
       for (final Entry<Coordinates, Integer> entry : nodeSegment.entrySet()) {
         final Coordinates node = entry.getKey();

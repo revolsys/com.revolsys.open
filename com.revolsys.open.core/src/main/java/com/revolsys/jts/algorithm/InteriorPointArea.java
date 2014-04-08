@@ -79,7 +79,7 @@ public class InteriorPointArea {
    */
   public InteriorPointArea(Geometry g)
   {
-    factory = g.getFactory();
+    factory = g.getGeometryFactory();
     add(g);
   }
   

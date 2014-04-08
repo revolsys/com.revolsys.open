@@ -308,7 +308,7 @@ class BufferSubgraph
   private static int saveCount = 0;
   public void saveDirEdges()
   {
-    GeometryFactory fact = new GeometryFactory();
+    GeometryFactory fact = GeometryFactory.getFactory();
     for (Iterator it = dirEdgeList.iterator(); it.hasNext(); ) {
       DirectedEdge de = (DirectedEdge) it.next();
       double dx = de.getDx();

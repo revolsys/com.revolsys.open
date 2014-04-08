@@ -9,7 +9,6 @@ import javax.annotation.PreDestroy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -20,6 +19,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;

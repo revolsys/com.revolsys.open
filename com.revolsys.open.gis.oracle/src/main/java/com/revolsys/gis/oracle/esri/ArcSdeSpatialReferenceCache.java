@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -90,7 +90,7 @@ public class ArcSdeSpatialReferenceCache {
             final BigDecimal mScale = resultSet.getBigDecimal(9);
             int srid = resultSet.getInt(10);
             final String wkt = resultSet.getString(11);
-            final GeometryFactory geometryFactory;
+            final com.revolsys.jts.geom.GeometryFactory geometryFactory;
             if (srid <= 0) {
               final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
               final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);

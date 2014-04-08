@@ -14,7 +14,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.coordinates.list.ReverseCoordinatesList;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.util.MathUtil;
@@ -307,7 +307,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public Point getFirstPoint() {
     final Coordinates point = get(0);
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactoryI geometryFactory = getGeometryFactory();
     return geometryFactory.createPoint(point);
   }
 

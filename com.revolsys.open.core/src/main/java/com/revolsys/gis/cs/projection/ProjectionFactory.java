@@ -15,12 +15,12 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public final class ProjectionFactory {
   /** The map from projection names to projection classes. */
@@ -48,8 +48,8 @@ public final class ProjectionFactory {
   }
 
   public static Coordinates convert(final Coordinates point,
-    final GeometryFactory sourceGeometryFactory,
-    final GeometryFactory targetGeometryFactory) {
+    final com.revolsys.jts.geom.GeometryFactory sourceGeometryFactory,
+    final com.revolsys.jts.geom.GeometryFactory targetGeometryFactory) {
     if (point == null) {
       return point;
     } else if (sourceGeometryFactory == targetGeometryFactory) {
@@ -75,7 +75,7 @@ public final class ProjectionFactory {
 
   public static <T extends Geometry> T convert(final T geometry,
     final GeometryFactory targetGeometryFactory) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     if (geometryFactory == targetGeometryFactory) {
       return geometry;
     } else if (geometryFactory == null) {
@@ -89,6 +89,15 @@ public final class ProjectionFactory {
         return operation.perform(geometry);
       }
     }
+  }
+
+  public static CoordinatesOperation getCoordinatesOperation(
+    final com.revolsys.jts.geom.GeometryFactory sourceGeometryFactory,
+    final com.revolsys.jts.geom.GeometryFactory targetGeometryFactory) {
+    final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
+    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
+    return getCoordinatesOperation(sourceCoordinateSystem,
+      targetCoordinateSystem);
   }
 
   public static CoordinatesOperation getCoordinatesOperation(
@@ -165,15 +174,6 @@ public final class ProjectionFactory {
     }
   }
 
-  public static CoordinatesOperation getCoordinatesOperation(
-    final GeometryFactory sourceGeometryFactory,
-    final GeometryFactory targetGeometryFactory) {
-    final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
-    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
-    return getCoordinatesOperation(sourceCoordinateSystem,
-      targetCoordinateSystem);
-  }
-
   /**
    * Get the projection for a projected coordinate system.
    * 
@@ -223,6 +223,13 @@ public final class ProjectionFactory {
     }
   }
 
+  public static GeometryOperation getGeometryOperation(
+    final com.revolsys.jts.geom.GeometryFactory sourceGeometryFactory,
+    final GeometryFactory targetGeometryFactory) {
+    final CoordinateSystem sourceCoodinateSystem = sourceGeometryFactory.getCoordinateSystem();
+    return getGeometryOperation(sourceCoodinateSystem, targetGeometryFactory);
+  }
+
   /**
    * Return a geometry operation which convert between the source and target
    * coordinate systems. The geometry operation will create a new geometry
@@ -252,7 +259,7 @@ public final class ProjectionFactory {
    */
   public static GeometryOperation getGeometryOperation(
     final CoordinateSystem cs1, final CoordinateSystem cs2,
-    final GeometryFactory geometryFactory) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final CoordinatesOperation operation = getCoordinatesOperation(cs1, cs2);
     if (operation == null) {
       return null;
@@ -284,13 +291,6 @@ public final class ProjectionFactory {
       return new CoordinatesOperationGeometryOperation(operation,
         targetGeometryFactory);
     }
-  }
-
-  public static GeometryOperation getGeometryOperation(
-    final GeometryFactory sourceGeometryFactory,
-    final GeometryFactory targetGeometryFactory) {
-    final CoordinateSystem sourceCoodinateSystem = sourceGeometryFactory.getCoordinateSystem();
-    return getGeometryOperation(sourceCoodinateSystem, targetGeometryFactory);
   }
 
   /**

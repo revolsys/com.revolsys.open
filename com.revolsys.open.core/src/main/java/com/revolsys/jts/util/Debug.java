@@ -89,7 +89,7 @@ public class Debug {
   }
 
   private static final Debug debug = new Debug();
-  private static final GeometryFactory fact = new GeometryFactory();
+  private static final GeometryFactory fact = GeometryFactory.getFactory();
   private static final String DEBUG_LINE_TAG = "D! ";
 
   private PrintStream out;

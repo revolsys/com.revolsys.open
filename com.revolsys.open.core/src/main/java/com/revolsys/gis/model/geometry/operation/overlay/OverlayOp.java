@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
@@ -85,7 +85,7 @@ public class OverlayOp extends GeometryGraphOperation {
 
   private final PointLocator ptLocator = new PointLocator();
 
-  private final GeometryFactory geomFact;
+  private final GeometryFactoryI geomFact;
 
   private Geometry resultGeom;
 

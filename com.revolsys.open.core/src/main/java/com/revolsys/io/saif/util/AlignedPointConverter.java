@@ -3,11 +3,10 @@ package com.revolsys.io.saif.util;
 import java.io.IOException;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.saif.SaifConstants;
 
 public class AlignedPointConverter extends PointConverter {
-  public AlignedPointConverter(final GeometryFactory geometryFactory) {
+  public AlignedPointConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     super(geometryFactory, SaifConstants.ALIGNED_POINT);
   }
 

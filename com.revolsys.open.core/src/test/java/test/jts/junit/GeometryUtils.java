@@ -12,7 +12,7 @@ import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 
 public class GeometryUtils {
-  // TODO: allow specifying GeometryFactory
+  // TODO: allow specifying GeometryFactoryI
 
   public static WKTReader reader = new WKTReader();
 

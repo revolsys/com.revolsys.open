@@ -35,7 +35,7 @@ package com.revolsys.gis.model.geometry.operation.overlay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdgeStar;
@@ -53,13 +53,13 @@ import com.revolsys.jts.util.Assert;
 public class LineBuilder {
   private final OverlayOp op;
 
-  private final GeometryFactory geometryFactory;
+  private final GeometryFactoryI geometryFactory;
 
   private final List<Edge> edges = new ArrayList<Edge>();
 
   private final List<LineString> resultLineList = new ArrayList<LineString>();
 
-  public LineBuilder(final OverlayOp op, final GeometryFactory geometryFactory) {
+  public LineBuilder(final OverlayOp op, final GeometryFactoryI geometryFactory) {
     this.op = op;
     this.geometryFactory = geometryFactory;
   }

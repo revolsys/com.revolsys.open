@@ -10,7 +10,6 @@ import java.util.Map;
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -25,6 +24,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
@@ -135,7 +135,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public Geometry getBoundaryIntersection(final LineString line) {
     final List<Point> pointIntersections = new ArrayList<Point>();
     final List<LineString> lineIntersections = new ArrayList<LineString>();
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
       final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -256,7 +256,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
       "geometryIndex", "partIndex", "segmentIndex");
     final List<Geometry> geometries = new ArrayList<Geometry>(points);
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final int numAxis = geometryFactory.getNumAxis();
     DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
     Node<LineSegment> previousNode = null;

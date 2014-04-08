@@ -20,7 +20,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionRegistry;
@@ -405,7 +405,7 @@ public class Project extends LayerGroup {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       super.setGeometryFactory(geometryFactory);
-      firePropertyChange("srid", -2, geometryFactory.getSRID());
+      firePropertyChange("srid", -2, geometryFactory.getSrid());
     }
   }
 

@@ -149,7 +149,7 @@ class OffsetSegmentString
 
   public String toString()
   {
-  	GeometryFactory fact = new GeometryFactory();
+  	GeometryFactory fact = GeometryFactory.getFactory();
   	LineString line = fact.createLineString(getCoordinates());
   	return line.toString();
   }

@@ -305,7 +305,7 @@ public class BufferOp
     bufferOriginalPrecision();
     if (resultGeometry != null) return;
 
-    PrecisionModel argPM = argGeom.getFactory().getPrecisionModel();
+    PrecisionModel argPM = argGeom.getGeometryFactory().getPrecisionModel();
     if (argPM.getType() == PrecisionModel.FIXED)
       bufferFixedPrecision(argPM);
     else

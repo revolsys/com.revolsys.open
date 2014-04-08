@@ -3,7 +3,6 @@ package com.revolsys.io.esri.map.rest.map;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
@@ -75,7 +74,7 @@ public class TileInfo extends AbstractMapWrapper {
   }
 
   public Point getOriginPoint() {
-    final GeometryFactory spatialReference = getSpatialReference();
+    final com.revolsys.jts.geom.GeometryFactory spatialReference = getSpatialReference();
     final Coordinates origin = getOrigin();
     return spatialReference.createPoint(origin);
   }

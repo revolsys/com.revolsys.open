@@ -8,6 +8,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -17,7 +18,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class GeometryFactoryTest {
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
     3857, 2, 1, 1);
 
   public static void assertCoordinatesListEqual(final Geometry geometry,

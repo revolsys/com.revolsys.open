@@ -188,7 +188,7 @@ public class BufferResultValidator
   	if (! bufEnv.contains(expectedEnv)) {
   		isValid = false;
   		errorMsg = "Buffer envelope is incorrect";
-  		errorIndicator = input.getFactory().toGeometry(bufEnv);
+  		errorIndicator = input.getGeometryFactory().toGeometry(bufEnv);
   	}
     report("Envelope");
   }

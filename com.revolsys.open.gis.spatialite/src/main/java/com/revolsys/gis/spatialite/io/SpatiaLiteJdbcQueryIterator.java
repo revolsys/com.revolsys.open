@@ -28,7 +28,7 @@ public class SpatiaLiteJdbcQueryIterator extends JdbcQueryIterator {
         // query = query.clone();
         // final String geometryAttributeName =
         // metaData.getGeometryAttributeName();
-        // final GeometryFactory geometryFactory =
+        // final GeometryFactoryI geometryFactory =
         // metaData.getGeometryFactory();
         // boundingBox = boundingBox.convert(geometryFactory);
         // final double x1 = boundingBox.getMinX();

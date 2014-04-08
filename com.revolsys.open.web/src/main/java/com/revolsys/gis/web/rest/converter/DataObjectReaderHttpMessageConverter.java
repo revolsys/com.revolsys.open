@@ -21,7 +21,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
@@ -60,7 +60,7 @@ public class DataObjectReaderHttpMessageConverter extends
         DataObjectWriterFactory.class));
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

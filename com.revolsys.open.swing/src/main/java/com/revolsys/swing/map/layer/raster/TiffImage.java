@@ -14,7 +14,7 @@ import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 import com.sun.media.jai.codec.ImageCodec;
 

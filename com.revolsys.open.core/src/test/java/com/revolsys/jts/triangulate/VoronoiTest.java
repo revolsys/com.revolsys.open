@@ -67,7 +67,7 @@ public class VoronoiTest extends TestCase {
 
     final QuadEdgeSubdivision subdiv = builder.getSubdivision();
 
-    final GeometryFactory geomFact = new GeometryFactory();
+    final GeometryFactory geomFact = GeometryFactory.getFactory();
     Geometry result = null;
     if (computeTriangles) {
       result = subdiv.getVoronoiDiagram(geomFact);

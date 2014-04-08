@@ -65,7 +65,7 @@ public class RectangleLineIntersectorTest extends TestCase {
  *
  */
 class RectangleLineIntersectorValidator {
-  private final GeometryFactory geomFact = new GeometryFactory();
+  private final GeometryFactory geomFact = GeometryFactory.getFactory();
 
   private final double baseX = 0;
 

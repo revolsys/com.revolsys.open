@@ -57,7 +57,7 @@ extends GeometricShapeBuilder
    */
   public RandomPointsBuilder()
   {
-    super(new GeometryFactory());
+    super(GeometryFactory.getFactory());
   }
 
   /**

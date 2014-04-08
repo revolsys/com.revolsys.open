@@ -264,7 +264,7 @@ public class PolygonGenerator extends GeometryGenerator {
   public Geometry create() {
 
     if (this.geometryFactory == null) {
-      throw new NullPointerException("GeometryFactory is not declared");
+      throw new NullPointerException("GeometryFactoryI is not declared");
     }
     if (this.boundingBox == null || this.boundingBox.isNull()) {
       throw new NullPointerException("Bounding Box is not declared");

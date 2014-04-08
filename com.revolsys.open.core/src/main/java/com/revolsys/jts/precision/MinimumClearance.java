@@ -197,8 +197,8 @@ public class MinimumClearance
     compute();
     // return empty line string if no min pts where found
     if (minClearancePts == null || minClearancePts[0] == null)
-      return inputGeom.getFactory().createLineString((Coordinate[]) null);
-    return inputGeom.getFactory().createLineString(minClearancePts);
+      return inputGeom.getGeometryFactory().createLineString((Coordinate[]) null);
+    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
   }
   
   private void compute()

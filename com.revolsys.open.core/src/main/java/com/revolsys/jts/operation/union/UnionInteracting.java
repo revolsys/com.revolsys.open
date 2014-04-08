@@ -69,7 +69,7 @@ public class UnionInteracting
 	{
 		this.g0 = g0;
 		this.g1 = g1;
-		geomFactory = g0.getFactory();
+		geomFactory = g0.getGeometryFactory();
 		interacts0 = new boolean[g0.getNumGeometries()];
 		interacts1 = new boolean[g1.getNumGeometries()];
 	}
@@ -109,7 +109,7 @@ public class UnionInteracting
 	
   private Geometry bufferUnion(Geometry g0, Geometry g1)
   {
-  	GeometryFactory factory = g0.getFactory();
+  	GeometryFactory factory = g0.getGeometryFactory();
   	Geometry gColl = factory.createGeometryCollection(new Geometry[] { g0, g1 } );
   	Geometry unionAll = gColl.buffer(0.0);
     return unionAll;

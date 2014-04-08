@@ -18,7 +18,7 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
@@ -92,7 +92,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       dataType = DataTypes.GEOMETRY;
     }
 
-    GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+    com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
     if (geometryFactory == null) {
       geometryFactory = schema.getGeometryFactory();
@@ -269,7 +269,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       if (shape.isMeasured()) {
         numAxis = 4;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
         numAxis, scaleXy, scaleZ);
 
       final int numParts = shape.getNumParts();

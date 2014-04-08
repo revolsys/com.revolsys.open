@@ -13,7 +13,7 @@ import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
 import oracle.sql.STRUCT;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -299,13 +299,13 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private JGeometry toJGeometry(final LineString lineString, final int dimension) {
     final double[] ordinates = toCoordinateArray(lineString, dimension);
-    final int srid = this.geometryFactory.getSRID();
+    final int srid = this.geometryFactory.getSrid();
     return JGeometry.createLinearLineString(ordinates, dimension, srid);
   }
 
   private JGeometry toJGeometry(final MultiLineString multiLineString,
     final int dimension) {
-    final int srid = this.geometryFactory.getSRID();
+    final int srid = this.geometryFactory.getSrid();
     final int numGeometries = multiLineString.getNumGeometries();
     final Object[] parts = new Object[numGeometries];
     for (int i = 0; i < numGeometries; i++) {
@@ -333,7 +333,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         k++;
       }
     }
-    final int srid = this.geometryFactory.getSRID();
+    final int srid = this.geometryFactory.getSrid();
     final int[] elemInfo = new int[] {
       1, 1, numPoints
     };
@@ -346,7 +346,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     if (multiPolygon.getNumGeometries() == 1) {
       return toJGeometry((Polygon)multiPolygon.getGeometryN(0), dimension);
     } else {
-      final int srid = this.geometryFactory.getSRID();
+      final int srid = this.geometryFactory.getSrid();
       int numCoordinates = 0;
       int numParts = 0;
       final List<double[][]> coordinateArraysList = new ArrayList<double[][]>();
@@ -388,7 +388,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private JGeometry toJGeometry(final Point point, final int dimension) {
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(point);
-    final int srid = this.geometryFactory.getSRID();
+    final int srid = this.geometryFactory.getSrid();
     final double x = coordinatesList.getX(0);
     final double y = coordinatesList.getY(0);
     if (dimension == 3) {
@@ -404,7 +404,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private JGeometry toJGeometry(final Polygon polygon, final int dimension) {
     final Object[] oridinateArrays = toCoordinateArrays(polygon, dimension);
-    final int srid = this.geometryFactory.getSRID();
+    final int srid = this.geometryFactory.getSrid();
     return JGeometry.createLinearPolygon(oridinateArrays, dimension, srid);
   }
 

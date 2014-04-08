@@ -26,7 +26,6 @@ import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -47,11 +46,12 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {

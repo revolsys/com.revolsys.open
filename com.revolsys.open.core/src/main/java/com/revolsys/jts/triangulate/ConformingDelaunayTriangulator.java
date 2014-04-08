@@ -257,7 +257,7 @@ public class ConformingDelaunayTriangulator
 	}
 
 	private void computeConvexHull() {
-		GeometryFactory fact = new GeometryFactory();
+		GeometryFactory fact = GeometryFactory.getFactory();
 		Coordinate[] coords = getPointArray();
 		ConvexHull hull = new ConvexHull(coords, fact);
 		convexHull = hull.getConvexHull();

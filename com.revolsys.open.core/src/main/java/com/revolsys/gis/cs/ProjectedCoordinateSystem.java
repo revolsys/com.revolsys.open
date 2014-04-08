@@ -12,6 +12,7 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   /**

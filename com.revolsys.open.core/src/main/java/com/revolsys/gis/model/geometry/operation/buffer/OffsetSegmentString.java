@@ -37,7 +37,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl;
 
@@ -140,7 +140,7 @@ class OffsetSegmentString {
 
   @Override
   public String toString() {
-    final GeometryFactory fact = GeometryFactoryImpl.getFactory();
+    final GeometryFactoryI fact = GeometryFactoryImpl.getFactory();
     final LineString line = fact.createLineString(getCoordinates());
     return line.toString();
   }

@@ -1,15 +1,15 @@
 package com.revolsys.gis.cs.projection;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeometryProjectionUtil {
   public static CoordinateSystem getCoordinateSystem(final Geometry geometry) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-    if (geometryFactory instanceof GeometryFactory) {
-      final GeometryFactory factory = (GeometryFactory)geometryFactory;
+    if (geometryFactory instanceof com.revolsys.jts.geom.GeometryFactory) {
+      final com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
       return factory.getCoordinateSystem();
     } else {
       return EpsgCoordinateSystems.getCoordinateSystem(geometry.getSRID());
@@ -95,7 +95,7 @@ public class GeometryProjectionUtil {
     if (geometry == null) {
       return null;
     } else {
-      final int factorySrid = geometryFactory.getSRID();
+      final int factorySrid = geometryFactory.getSrid();
       final int geometrySrid = geometry.getSRID();
       if (geometrySrid == factorySrid) {
         return geometry;

@@ -55,7 +55,7 @@ public class IsSimpleTest extends TestCase {
     TestRunner.run(IsSimpleTest.class);
   }
 
-  private final GeometryFactory fact = new GeometryFactory();
+  private final GeometryFactory fact = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

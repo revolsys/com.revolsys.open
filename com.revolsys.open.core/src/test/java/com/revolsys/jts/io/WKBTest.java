@@ -35,7 +35,7 @@ public class WKBTest extends TestCase {
     TestRunner.run(WKBTest.class);
   }
 
-  private final GeometryFactory geomFactory = new GeometryFactory();
+  private final GeometryFactory geomFactory = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.geomFactory);
 
@@ -101,7 +101,7 @@ public class WKBTest extends TestCase {
 
   private void runWKBTestCoordinateArray(final String wkt) throws IOException,
     ParseException {
-    final GeometryFactory geomFactory = new GeometryFactory();
+    final GeometryFactory geomFactory = GeometryFactory.getFactory();
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
 

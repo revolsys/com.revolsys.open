@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
@@ -50,12 +50,12 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 public class PointBuilder {
   private final OverlayOp op;
 
-  private final GeometryFactory geometryFactory;
+  private final GeometryFactoryI geometryFactory;
 
   private final List resultPointList = new ArrayList();
 
   public PointBuilder(final OverlayOp op,
-    final GeometryFactory geometryFactory, final PointLocator ptLocator) {
+    final GeometryFactoryI geometryFactory, final PointLocator ptLocator) {
     this.op = op;
     this.geometryFactory = geometryFactory;
     // ptLocator is never used in this class

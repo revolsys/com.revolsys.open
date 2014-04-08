@@ -7,7 +7,6 @@ import java.util.List;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -24,7 +23,7 @@ public interface Layer extends PropertyChangeSupportProxy,
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
 
-  GeometryFactory getGeometryFactory();
+  com.revolsys.jts.geom.GeometryFactory getGeometryFactory();
 
   long getId();
 

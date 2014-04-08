@@ -20,7 +20,7 @@ import javax.swing.SwingUtilities;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.preferences.PreferencesDialog;

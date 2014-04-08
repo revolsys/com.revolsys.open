@@ -79,14 +79,14 @@ public class WKTWriterTest extends TestCase {
   }
 
   public void testWrite3D() {
-    final GeometryFactory geometryFactory = new GeometryFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Point point = geometryFactory.createPoint(new Coordinate(1, 1, 1));
     final String wkt = this.writer3D.write(point);
     assertEquals("POINT (1 1 1)", wkt);
   }
 
   public void testWrite3D_withNaN() {
-    final GeometryFactory geometryFactory = new GeometryFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinate[] coordinates = {
       new Coordinate(1, 1), new Coordinate(2, 2, 2)
     };

@@ -9,7 +9,6 @@ import java.util.List;
 import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.IsSimpleOp;
 import com.revolsys.gis.jts.IsValidOp;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -116,7 +115,7 @@ public class SelectedRecordsRenderer {
   }
 
   public void paintSelected(final Viewport2D viewport,
-    final GeometryFactory viewportGeometryFactory, final Graphics2D graphics,
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory, final Graphics2D graphics,
     Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);

@@ -105,7 +105,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
   @Override
   public Geometry getBoundary() {
     if (isEmpty()) {
-      return getFactory().createMultiLineString(null);
+      return getGeometryFactory().createMultiLineString();
     }
     final ArrayList allRings = new ArrayList();
     for (int i = 0; i < geometries.length; i++) {
@@ -116,7 +116,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
       }
     }
     final LineString[] allRingsArray = new LineString[allRings.size()];
-    return getFactory().createMultiLineString(
+    return getGeometryFactory().createMultiLineString(
       (LineString[])allRings.toArray(allRingsArray));
   }
 
@@ -160,7 +160,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
     for (int i = 0; i < geometries.length; i++) {
       revGeoms[i] = (Polygon)geometries[i].reverse();
     }
-    return getFactory().createMultiPolygon(revGeoms);
+    return getGeometryFactory().createMultiPolygon(revGeoms);
   }
 
   /**

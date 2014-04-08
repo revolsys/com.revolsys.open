@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
@@ -68,7 +67,7 @@ public class GridLayer extends AbstractLayer {
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return this.grid.getGeometryFactory();
   }
 

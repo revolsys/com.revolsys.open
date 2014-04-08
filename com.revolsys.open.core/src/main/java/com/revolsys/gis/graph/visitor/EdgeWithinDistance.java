@@ -5,21 +5,21 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
 
 public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
   Filter<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Coordinates point, final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Geometry geometry = geometryFactory.createPoint(point);
     return edgesWithinDistance(graph, geometry, maxDistance);
 
@@ -37,7 +37,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Node<T> node, final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinates coordinate = node;
     final Geometry geometry = geometryFactory.createPoint(coordinate);
     return edgesWithinDistance(graph, geometry, maxDistance);

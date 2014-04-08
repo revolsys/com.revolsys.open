@@ -20,7 +20,6 @@ import javax.annotation.PreDestroy;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.WeakCache;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -31,11 +30,12 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.util.AssertionFailedException;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.util.AssertionFailedException;
 
 public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   implements DataObjectMetaData, Cloneable {
@@ -152,7 +152,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
     final Map<String, Object> geometryFactoryDef = (Map<String, Object>)properties.get("geometryFactory");
     if (geometryFactoryDef != null) {
-      final GeometryFactory geometryFactory = MapObjectFactoryRegistry.toObject(geometryFactoryDef);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = MapObjectFactoryRegistry.toObject(geometryFactoryDef);
       setGeometryFactory(geometryFactory);
     }
   }
@@ -738,7 +738,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final Attribute geometryAttribute = getGeometryAttribute();
     if (geometryAttribute != null) {
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
@@ -824,7 +825,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     map.put("type", "dataRecordDefinition");
     final String path = getPath();
     map.put("path", path);
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     MapSerializerUtil.add(map, "geometryFactory", geometryFactory, null);
     final List<Attribute> attributes = getAttributes();
     MapSerializerUtil.add(map, "fields", attributes);

@@ -116,7 +116,7 @@ public class QuadEdgeTriangle
 	public static Geometry toPolygon(Vertex[] v) {
 		Coordinate[] ringPts = new Coordinate[] { v[0].getCoordinate(),
 				v[1].getCoordinate(), v[2].getCoordinate(), v[0].getCoordinate() };
-		GeometryFactory fact = new GeometryFactory();
+		GeometryFactory fact = GeometryFactory.getFactory();
 		LinearRing ring = fact.createLinearRing(ringPts);
 		Polygon tri = fact.createPolygon(ring, null);
 		return tri;
@@ -126,7 +126,7 @@ public class QuadEdgeTriangle
 		Coordinate[] ringPts = new Coordinate[] { e[0].orig().getCoordinate(),
 				e[1].orig().getCoordinate(), e[2].orig().getCoordinate(),
 				e[0].orig().getCoordinate() };
-		GeometryFactory fact = new GeometryFactory();
+		GeometryFactory fact = GeometryFactory.getFactory();
 		LinearRing ring = fact.createLinearRing(ringPts);
 		Polygon tri = fact.createPolygon(ring, null);
 		return tri;
@@ -273,7 +273,7 @@ public class QuadEdgeTriangle
 	}
 
 	public String toString() {
-		return getGeometry(new GeometryFactory()).toString();
+		return getGeometry(GeometryFactory.getFactory()).toString();
 	}
 
 	/**

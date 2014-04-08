@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -71,8 +71,8 @@ public class ProjectionImageFilter extends WholeImageFilter {
 
     final int newImageWidth = transformedSpace.width;
     final int newImageHeight = transformedSpace.height;
-    final GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
-    final GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
 
     final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
       destGeometryFactory, sourceGeometryFactory);

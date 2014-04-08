@@ -9,7 +9,7 @@ import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
 public class WithinDistance3DTest extends TestCase {
-  static GeometryFactory geomFact = new GeometryFactory();
+  static GeometryFactory geomFact = GeometryFactory.getFactory();
 
   static WKTReader rdr = new WKTReader();
 

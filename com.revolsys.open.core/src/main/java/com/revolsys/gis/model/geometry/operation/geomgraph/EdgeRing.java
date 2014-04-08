@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
@@ -54,10 +54,10 @@ public abstract class EdgeRing {
 
   // holes in this EdgeRing
 
-  protected GeometryFactory geometryFactory;
+  protected GeometryFactoryI geometryFactory;
 
   public EdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+    final GeometryFactoryI geometryFactory) {
     this.geometryFactory = geometryFactory;
     computePoints(start);
     computeRing();
@@ -265,7 +265,7 @@ public abstract class EdgeRing {
     }
   }
 
-  public Polygon toPolygon(final GeometryFactory geometryFactory) {
+  public Polygon toPolygon(final GeometryFactoryI geometryFactory) {
     final List<LinearRing> rings = new ArrayList<LinearRing>();
     rings.add(getLinearRing());
 

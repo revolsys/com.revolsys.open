@@ -9,7 +9,7 @@ import java.net.URLConnection;
 import javax.imageio.ImageIO;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class OpenStreetMapClient {
   private static final double[] METRES_PER_PIXEL = {

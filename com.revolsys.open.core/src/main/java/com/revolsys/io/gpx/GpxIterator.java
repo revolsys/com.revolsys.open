@@ -22,7 +22,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -34,11 +33,12 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.util.DateUtil;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.DateUtil;
 
 public class GpxIterator implements DataObjectIterator {
   private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
@@ -53,7 +53,7 @@ public class GpxIterator implements DataObjectIterator {
 
   private File file;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
 
   private boolean hasNext = true;
 

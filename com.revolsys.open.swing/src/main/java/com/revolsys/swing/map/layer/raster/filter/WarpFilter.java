@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -131,7 +130,7 @@ public abstract class WarpFilter extends WholeImageFilter {
     return this.boundingBox;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return boundingBox.getGeometryFactory();
   }
 

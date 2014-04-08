@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -37,8 +37,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     final ArcSdeSpatialReference spatialReference, final int dimension) {
     super(name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
-    final GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
+    final com.revolsys.jts.geom.GeometryFactory factory = spatialReference.getGeometryFactory();
+    this.geometryFactory = GeometryFactory.getFactory(factory.getSrid(),
       dimension, factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
@@ -83,7 +83,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mScale = this.spatialReference.getMScale();
       final Double mOffset = this.spatialReference.getMOffset();
 
-      final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
       final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
         geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
         zOffset, zScale, mOffset, mScale);

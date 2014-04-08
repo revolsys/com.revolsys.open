@@ -52,7 +52,7 @@ public class PointInAreaPerfTest {
   }
 
   public void run() {
-    final GeometryFactory geomFactory = new GeometryFactory();
+    final GeometryFactory geomFactory = GeometryFactory.getFactory();
 
     final SineStarFactory ssFact = new SineStarFactory();
     ssFact.setSize(1000.0);

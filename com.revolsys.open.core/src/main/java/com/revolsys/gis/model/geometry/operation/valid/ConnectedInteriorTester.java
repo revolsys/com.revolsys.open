@@ -8,7 +8,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Polygon;
@@ -51,7 +51,7 @@ public class ConnectedInteriorTester {
     return null;
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactoryImpl.getFactory();
+  private final GeometryFactoryI geometryFactory = GeometryFactoryImpl.getFactory();
 
   private final GeometryGraph geomGraph;
 

@@ -2,7 +2,6 @@ package com.revolsys.gis.model.geometry;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -13,6 +12,7 @@ import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -537,7 +537,7 @@ public class LineSegment extends AbstractCoordinatesList implements
     if (geometryFactory == null) {
       return super.toString();
     } else {
-      return "SRID=" + geometryFactory.getSRID() + ";" + super.toString();
+      return "SRID=" + geometryFactory.getSrid() + ";" + super.toString();
     }
   }
 

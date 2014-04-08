@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -27,6 +26,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
@@ -89,7 +89,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private final MoepDirectoryReader directoryReader;
 
-  private GeometryFactory factory;
+  private com.revolsys.jts.geom.GeometryFactory factory;
 
   private String featureCode;
 

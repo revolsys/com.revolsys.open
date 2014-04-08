@@ -201,6 +201,11 @@ public final class DataTypes {
     register(typeClass, type);
   }
 
+  public static void register(final String name, final Class<?> javaClass) {
+    final DataType type = new SimpleDataType(name, javaClass);
+    register(type);
+  }
+
   private DataTypes() {
   }
 

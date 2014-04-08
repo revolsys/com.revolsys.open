@@ -5,15 +5,16 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
-import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.LineString;
 
-public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
+public class BoundingBoxIntersectsEdgeVisitor<T> extends
+  DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
     final Edge<T> edge, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();

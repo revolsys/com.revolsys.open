@@ -65,7 +65,7 @@ public class GeometryMapper
       if (g != null)
         mapped.add(g);
     }
-    return geom.getFactory().buildGeometry(mapped);
+    return geom.getGeometryFactory().buildGeometry(mapped);
   }
   
   public static Collection map(Collection geoms, MapOp op)

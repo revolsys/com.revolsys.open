@@ -63,7 +63,7 @@ public class BoundaryOp
   public BoundaryOp(Geometry geom, BoundaryNodeRule bnRule)
   {
     this.geom = geom;
-    geomFact = geom.getFactory();
+    geomFact = geom.getGeometryFactory();
     this.bnRule = bnRule;
   }
 

@@ -140,7 +140,7 @@ public class Polygonizer
   {
     // create a new graph using the factory from the input Geometry
     if (graph == null)
-      graph = new PolygonizeGraph(line.getFactory());
+      graph = new PolygonizeGraph(line.getGeometryFactory());
     graph.addEdge(line);
   }
 

@@ -155,7 +155,7 @@ public class GeometryPrecisionReducer
   {
     GeometryEditor geomEdit;
     if (changePrecisionModel) {
-    	GeometryFactory newFactory = createFactory(geom.getFactory(), targetPM);
+    	GeometryFactory newFactory = createFactory(geom.getGeometryFactory(), targetPM);
       geomEdit = new GeometryEditor(newFactory);
     }
     else
@@ -192,7 +192,7 @@ public class GeometryPrecisionReducer
   	Geometry finalGeom = bufGeom;
   	if (! changePrecisionModel) {
   	  // a slick way to copy the geometry with the original precision factory
-  		finalGeom = geom.getFactory().createGeometry(bufGeom);
+  		finalGeom = geom.getGeometryFactory().createGeometry(bufGeom);
   	}
   	return finalGeom;
   }
@@ -207,7 +207,7 @@ public class GeometryPrecisionReducer
    */
   private Geometry changePM(Geometry geom, PrecisionModel newPM)
   {
-  	GeometryEditor geomEditor = createEditor(geom.getFactory(), newPM);
+  	GeometryEditor geomEditor = createEditor(geom.getGeometryFactory(), newPM);
   	// this operation changes the PM for the entire geometry tree
   	return geomEditor.edit(geom, new GeometryEditor.NoOpGeometryOperation());
   }
@@ -227,7 +227,7 @@ public class GeometryPrecisionReducer
   {
     GeometryFactory newFactory 
   	= new GeometryFactory(pm, 
-  			inputFactory.getSRID(),
+  			inputFactory.getSrid(),
   			inputFactory.getCoordinateSequenceFactory());
     return newFactory;
   }

@@ -18,7 +18,7 @@ import org.jdesktop.swingx.color.ColorUtil;
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -224,7 +224,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected void paintHighlighted(final Graphics2D graphics2d,
     final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -258,7 +258,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected void paintSelected(final Graphics2D graphics2d,
     final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;

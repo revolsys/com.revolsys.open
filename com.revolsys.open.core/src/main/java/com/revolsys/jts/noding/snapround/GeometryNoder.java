@@ -92,7 +92,7 @@ public class GeometryNoder
   {
     // get geometry factory
     Geometry geom0 = (Geometry) geoms.iterator().next();
-    geomFact = geom0.getFactory();
+    geomFact = geom0.getGeometryFactory();
 
     List segStrings = toSegmentStrings(extractLines(geoms));
     //Noder sr = new SimpleSnapRounder(pm);

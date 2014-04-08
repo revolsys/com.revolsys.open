@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -31,14 +30,15 @@ import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparat
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.CoordinateSequence;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class CoordinatesListUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -433,7 +433,7 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList get(final MultiPoint multiPoint) {
     final int numPoints = multiPoint.getNumGeometries();
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
     final int numAxis = geometryFactory.getNumAxis();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
       numAxis);
@@ -1043,7 +1043,7 @@ public class CoordinatesListUtil {
         }
       }
     }
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final Map<Integer, Set<Coordinates>> segmentSplitPoints = new TreeMap<Integer, Set<Coordinates>>();
     for (final Entry<Coordinates, Integer> entry : pointSegment.entrySet()) {
       final Coordinates splitPoint = entry.getKey();

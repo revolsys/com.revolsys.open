@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
@@ -59,13 +59,13 @@ import com.revolsys.jts.util.Assert;
  */
 public class PolygonBuilder {
 
-  private final GeometryFactory geometryFactory;
+  private final GeometryFactoryI geometryFactory;
 
   // private List dirEdgeList;
   // private NodeMap nodes;
   private final List shellList = new ArrayList();
 
-  public PolygonBuilder(final GeometryFactory geometryFactory) {
+  public PolygonBuilder(final GeometryFactoryI geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

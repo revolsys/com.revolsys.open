@@ -157,12 +157,12 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
 
   protected BoundingBox getConvertedBoundingBox(final Geometry geometry) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    final com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.gis.model.geometry.GeometryFactoryI geometryFactory = getGeometryFactory();
     return boundingBox.convert(geometryFactory);
   }
 
   protected Geometry getConvertedGeometry(Geometry geometry) {
-    final com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.gis.model.geometry.GeometryFactoryI geometryFactory = getGeometryFactory();
     geometry = geometryFactory.getGeometry(geometry);
     return geometry;
   }
@@ -186,7 +186,7 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
 
   @SuppressWarnings("unchecked")
   @Override
-  public <F extends com.revolsys.gis.model.geometry.GeometryFactory> F getGeometryFactory() {
+  public <F extends com.revolsys.gis.model.geometry.GeometryFactoryI> F getGeometryFactory() {
     return (F)geometryFactory;
   }
 
@@ -208,7 +208,7 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
   @Override
   public Geometry intersection(Geometry geometry) {
     // TODO: MD - add optimization for P-A case using Point-In-Polygon
-    final com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.gis.model.geometry.GeometryFactoryI geometryFactory = getGeometryFactory();
     if (this.isEmpty() || geometry.isEmpty()) {
       return geometryFactory.createGeometryCollection();
       // } else if (isGeometryCollection(this)) {

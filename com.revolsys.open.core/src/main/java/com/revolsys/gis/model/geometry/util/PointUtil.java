@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.geometry.util;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -8,14 +7,15 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class PointUtil {
 
-  public static Point createRandomPoint(final GeometryFactory factory,
-    final Envelope envelope) {
+  public static Point createRandomPoint(
+    final com.revolsys.jts.geom.GeometryFactory factory, final Envelope envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
@@ -42,7 +42,7 @@ public class PointUtil {
   }
 
   public static Point getPointWithin(final Polygon polygon) {
-    final GeometryFactory factory = GeometryFactory.getFactory(polygon);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(polygon);
     final Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
       final Coordinates coordinates = CoordinatesUtil.get(centroid);

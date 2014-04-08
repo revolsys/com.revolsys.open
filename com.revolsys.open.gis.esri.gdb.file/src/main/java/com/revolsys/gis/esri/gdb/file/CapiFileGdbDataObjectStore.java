@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.DataObject;
@@ -90,11 +89,12 @@ import com.revolsys.io.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   implements FileGdbDataObjectStore {
@@ -119,12 +119,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public static SpatialReference getSpatialReference(
     final GeometryFactory geometryFactory) {
-    if (geometryFactory == null || geometryFactory.getSRID() == 0) {
+    if (geometryFactory == null || geometryFactory.getSrid() == 0) {
       return null;
     } else {
       final String wkt;
       synchronized (API_SYNC) {
-        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSRID());
+        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSrid());
       }
       final SpatialReference spatialReference = SpatialReference.get(
         geometryFactory, wkt);

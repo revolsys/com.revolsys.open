@@ -14,7 +14,6 @@ import javax.swing.ImageIcon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.swing.map.Viewport2D;
@@ -63,7 +62,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
           final Geometry convertedGeometry = geometryFactory.createGeometry(geometry);
           // TODO clipping
           return GeometryShapeUtil.toShape(viewport, convertedGeometry);

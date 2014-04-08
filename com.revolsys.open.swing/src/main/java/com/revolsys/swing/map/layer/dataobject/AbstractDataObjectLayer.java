@@ -49,7 +49,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -1078,7 +1078,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           if (geometryAttribute != null) {
             DataType geometryDataType = null;
             Class<?> layerGeometryClass = null;
-            final GeometryFactory geometryFactory = getGeometryFactory();
+            final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
             geometryDataType = geometryAttribute.getType();
             layerGeometryClass = geometryDataType.getJavaClass();
 
@@ -1508,7 +1508,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
-        final GeometryFactory geometryFactory = getGeometryFactory();
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
         if (geometryAttribute != null) {
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();

@@ -3,7 +3,6 @@ package com.revolsys.io.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -11,15 +10,16 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   implements GeoJsonConstants {
@@ -378,20 +378,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private int writeSrid() {
-    final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     return writeSrid(geometryFactory);
   }
 
-  private void writeSrid(final Geometry geometry) {
-    if (geometry != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      writeSrid(geometryFactory);
-    }
-  }
-
-  protected int writeSrid(final GeometryFactory geometryFactory) {
+  protected int writeSrid(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final int srid = geometryFactory.getSRID();
+      final int srid = geometryFactory.getSrid();
       if (srid != 0 && srid != this.srid) {
         out.endAttribute();
         srid(srid);
@@ -399,5 +393,12 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       }
     }
     return -1;
+  }
+
+  private void writeSrid(final Geometry geometry) {
+    if (geometry != null) {
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      writeSrid(geometryFactory);
+    }
   }
 }

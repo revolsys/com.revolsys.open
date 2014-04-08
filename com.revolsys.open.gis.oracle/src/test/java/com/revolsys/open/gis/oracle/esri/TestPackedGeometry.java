@@ -3,7 +3,7 @@ package com.revolsys.open.gis.oracle.esri;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
@@ -13,11 +13,11 @@ import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 
 public class TestPackedGeometry {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
     3005, 3, 1, 1);
 
   public static void checkGeometry(final Geometry geometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     final Double xOffset = 0.0;
     final Double yOffset = 0.0;
     final Double xyScale = geometryFactory.getScaleXY();

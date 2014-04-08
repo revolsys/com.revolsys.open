@@ -83,7 +83,7 @@ public class LineString extends Geometry implements Lineal {
   public LineString(final Coordinate points[],
     final PrecisionModel precisionModel, final int SRID) {
     super(new GeometryFactory(precisionModel, SRID));
-    init(getFactory().getCoordinateSequenceFactory().create(points));
+    init(getGeometryFactory().getCoordinateSequenceFactory().create(points));
   }
 
   /**
@@ -280,7 +280,7 @@ public class LineString extends Geometry implements Lineal {
   }
 
   public Point getPointN(final int n) {
-    return getFactory().createPoint(points.getCoordinate(n));
+    return getGeometryFactory().createPoint(points.getCoordinate(n));
   }
 
   public Point getStartPoint() {
@@ -292,7 +292,7 @@ public class LineString extends Geometry implements Lineal {
 
   private void init(CoordinateSequence points) {
     if (points == null) {
-      points = getFactory().getCoordinateSequenceFactory().create(
+      points = getGeometryFactory().getCoordinateSequenceFactory().create(
         new Coordinate[] {});
     }
     if (points.size() == 1) {
@@ -373,7 +373,7 @@ public class LineString extends Geometry implements Lineal {
   public Geometry reverse() {
     final CoordinateSequence seq = (CoordinateSequence)points.clone();
     CoordinateSequences.reverse(seq);
-    final LineString revLine = getFactory().createLineString(seq);
+    final LineString revLine = getGeometryFactory().createLineString(seq);
     return revLine;
   }
 

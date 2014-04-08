@@ -6,7 +6,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.InvokeMethodFilter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 import com.revolsys.jts.geom.Envelope;
@@ -78,7 +78,7 @@ public class QuadTree<T> {
     return root.depth();
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

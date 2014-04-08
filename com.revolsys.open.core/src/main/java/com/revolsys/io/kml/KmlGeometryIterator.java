@@ -12,11 +12,11 @@ import javax.xml.stream.XMLStreamReader;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
@@ -24,7 +24,7 @@ import com.revolsys.jts.geom.Polygon;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   Kml22Constants {
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory(COORDINATE_SYSTEM_ID);
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(COORDINATE_SYSTEM_ID);
 
   private XMLStreamReader in;
 

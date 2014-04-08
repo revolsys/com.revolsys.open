@@ -35,7 +35,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
@@ -161,7 +161,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   protected JPanel addPropertiesTabCoordinateSystem(
     final TabbedValuePanel tabPanel) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       final JPanel panel = new JPanel(new VerticalLayout(5));
       tabPanel.addTab("Spatial", panel);

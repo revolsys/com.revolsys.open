@@ -173,7 +173,7 @@ public class MiscellaneousTest2 extends TestCase {
     final Geometry[] polygons = new Geometry[] {
       a, b
     };
-    final GeometryCollection polygonCollection = new GeometryFactory().createGeometryCollection(polygons);
+    final GeometryCollection polygonCollection = GeometryFactory.getFactory().createGeometryCollection(polygons);
     final Geometry union = polygonCollection.buffer(0);
     System.out.println(union);
     assertEquals(

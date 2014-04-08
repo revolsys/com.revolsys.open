@@ -1,20 +1,20 @@
 package com.revolsys.gis.model.geometry.util;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class IndexedLineSegment extends LineSegment {
 
-  private int[] index;
+  private final int[] index;
 
-  public IndexedLineSegment(LineSegment line, int... index) {
-    super(line);
+  public IndexedLineSegment(final GeometryFactory geometryFactory,
+    final LineSegment line, final int... index) {
+    super(geometryFactory, line);
     this.index = index;
   }
 
-  public IndexedLineSegment(GeometryFactory geometryFactory, LineSegment line,
-    int... index) {
-    super(geometryFactory, line);
+  public IndexedLineSegment(final LineSegment line, final int... index) {
+    super(line);
     this.index = index;
   }
 

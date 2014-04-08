@@ -4,7 +4,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
 
@@ -74,7 +74,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return geometry;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public GeometryFactoryI getGeometryFactory() {
     return geometry.getGeometryFactory();
   }
 
@@ -89,7 +89,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   @Override
   public Location locate(final double x, final double y) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactoryI geometryFactory = getGeometryFactory();
     final PointInArea visitor = new PointInArea(geometryFactory, x, y);
     index.query(y, y, visitor);
 

@@ -93,7 +93,7 @@ public class MultiPoint extends GeometryCollection implements Puntal {
    */
   @Override
   public Geometry getBoundary() {
-    return getFactory().createGeometryCollection(null);
+    return getGeometryFactory().createGeometryCollection();
   }
 
   @Override

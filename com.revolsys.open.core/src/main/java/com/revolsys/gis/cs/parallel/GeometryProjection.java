@@ -1,17 +1,17 @@
 package com.revolsys.gis.cs.parallel;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
-import com.revolsys.jts.geom.Geometry;
 
 public class GeometryProjection extends
   BaseInOutProcess<DataObject, DataObject> {
   private GeometryFactory geometryFactory;
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

@@ -121,7 +121,7 @@ public class GMLReader
 		SAXParser parser = fact.newSAXParser();
 
 		if(geometryFactory == null)
-			geometryFactory = new GeometryFactory();
+			geometryFactory = GeometryFactory.getFactory();
 
 		GMLHandler gh = new GMLHandler(geometryFactory,null);
 		parser.parse(new InputSource(reader), (DefaultHandler)gh);

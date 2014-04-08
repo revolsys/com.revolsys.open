@@ -100,7 +100,7 @@ public class STRtreeDemo {
 
   private static final int NODE_CAPACITY = 4;
 
-  private static GeometryFactory factory = new GeometryFactory();
+  private static GeometryFactory factory = GeometryFactory.getFactory();
 
   private static Envelope envelope(final Boundable b) {
     return (Envelope)b.getBounds();

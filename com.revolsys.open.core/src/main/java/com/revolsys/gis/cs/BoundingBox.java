@@ -25,12 +25,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 /**
  * A BoundingBox is an {@link Envelope} with a {@link CoordinateSystem}.
@@ -421,7 +422,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox clipToCoordinateSystem() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem == null) {
       return this;
@@ -559,7 +560,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     from.setX(x);
     from.setY(y);
     operation.perform(from, to);
-    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final double newX = geometryFactory.makeXyPrecise(to.getX());
     final double newY = geometryFactory.makeXyPrecise(to.getY());
     boundingBox.expandToInclude(newX, newY);
@@ -790,7 +791,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (geometryFactory == null) {
       return string;
     } else {
-      return geometryFactory.getSRID() + "-" + string;
+      return geometryFactory.getSrid() + "-" + string;
     }
   }
 
@@ -872,7 +873,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     if (geometryFactory == null) {
       return -1;
     } else {
-      return geometryFactory.getSRID();
+      return geometryFactory.getSrid();
     }
   }
 
@@ -1043,15 +1044,17 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   }
 
-  public Polygon toPolygon(final GeometryFactory factory) {
+  public Polygon toPolygon(final com.revolsys.jts.geom.GeometryFactory factory) {
     return toPolygon(factory, 100, 100);
   }
 
-  public Polygon toPolygon(final GeometryFactory factory, final int numSegments) {
+  public Polygon toPolygon(final com.revolsys.jts.geom.GeometryFactory factory,
+    final int numSegments) {
     return toPolygon(factory, numSegments, numSegments);
   }
 
-  public Polygon toPolygon(final GeometryFactory geometryFactory, int numX,
+  public Polygon toPolygon(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, int numX,
     int numY) {
     if (isEmpty()) {
       return geometryFactory.createPolygon();
@@ -1166,7 +1169,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     final StringBuffer s = new StringBuffer();
     if (geometryFactory != null) {
       s.append("SRID=");
-      s.append(geometryFactory.getSRID());
+      s.append(geometryFactory.getSrid());
       s.append(";");
     }
     if (isEmpty()) {

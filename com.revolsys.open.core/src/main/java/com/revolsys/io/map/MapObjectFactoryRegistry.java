@@ -9,7 +9,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -22,7 +21,7 @@ public class MapObjectFactoryRegistry {
   public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
 
   static {
-    addFactory(GeometryFactory.FACTORY);
+    addFactory(com.revolsys.jts.geom.GeometryFactory.FACTORY);
     addFactory(DataObjectMetaDataImpl.FACTORY);
     addFactory(Attribute.FACTORY);
   }

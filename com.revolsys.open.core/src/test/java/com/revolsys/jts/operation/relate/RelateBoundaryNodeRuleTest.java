@@ -21,7 +21,7 @@ public class RelateBoundaryNodeRuleTest extends TestCase {
     TestRunner.run(RelateBoundaryNodeRuleTest.class);
   }
 
-  private final GeometryFactory fact = new GeometryFactory();
+  private final GeometryFactory fact = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

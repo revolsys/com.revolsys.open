@@ -7,11 +7,11 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.geometry.Triangle;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
 

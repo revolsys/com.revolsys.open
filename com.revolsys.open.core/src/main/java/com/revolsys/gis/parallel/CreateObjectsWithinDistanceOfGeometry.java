@@ -16,15 +16,15 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.BaseInOutProcess;
-import com.revolsys.util.JexlUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.operation.buffer.BufferOp;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.simplify.DouglasPeuckerSimplifier;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.util.JexlUtil;
 
 public class CreateObjectsWithinDistanceOfGeometry extends
   BaseInOutProcess<DataObject, DataObject> {

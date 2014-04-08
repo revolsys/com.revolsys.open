@@ -4,12 +4,12 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringGraphTest {
-  GeometryFactory geometryFactory = GeometryFactory.getFactory(3005, 2, 1000.0,
-    1);
+  com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    3005, 2, 1000.0, 1);
 
   public void checkLines(final List<LineString> actualLines,
     final String... expectedLines) {

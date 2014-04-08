@@ -15,7 +15,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.util.MathUtil;
 
@@ -108,7 +108,7 @@ public class BoundingBox implements Serializable {
     }
   }
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactoryI geometryFactory;
 
   private double maxX = -Double.MAX_VALUE;
 
@@ -146,11 +146,11 @@ public class BoundingBox implements Serializable {
     }
   }
 
-  public BoundingBox(final GeometryFactory geometryFactory) {
+  public BoundingBox(final GeometryFactoryI geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public BoundingBox(final GeometryFactory geometryFactory,
+  public BoundingBox(final GeometryFactoryI geometryFactory,
     final BoundingBox boundingBox) {
     this.geometryFactory = geometryFactory;
     final double x1 = boundingBox.getMinX();
@@ -164,20 +164,20 @@ public class BoundingBox implements Serializable {
     add(x2, y2, z2);
   }
 
-  public BoundingBox(final GeometryFactory geometryFactory, final double x,
+  public BoundingBox(final GeometryFactoryI geometryFactory, final double x,
     final double y, final double z) {
     this.geometryFactory = geometryFactory;
     add(x, y, z);
   }
 
-  public BoundingBox(final GeometryFactory geometryFactory, final double x1,
+  public BoundingBox(final GeometryFactoryI geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
     this.geometryFactory = geometryFactory;
     add(x1, y1, Double.NaN);
     add(x2, y2, Double.NaN);
   }
 
-  public BoundingBox(final GeometryFactory geometryFactory, final double x1,
+  public BoundingBox(final GeometryFactoryI geometryFactory, final double x1,
     final double y1, final double z1, final double x2, final double y2,
     final double z2) {
     this.geometryFactory = geometryFactory;
@@ -250,7 +250,7 @@ public class BoundingBox implements Serializable {
     return covers(x, y);
   }
 
-  public BoundingBox convert(final GeometryFactory geometryFactory) {
+  public BoundingBox convert(final GeometryFactoryI geometryFactory) {
     if (getGeometryFactory() == null) {
       return new BoundingBox(geometryFactory, this);
     } else {
@@ -450,7 +450,7 @@ public class BoundingBox implements Serializable {
     return geometryFactory.getCoordinateSystem();
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public GeometryFactoryI getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -691,7 +691,7 @@ public class BoundingBox implements Serializable {
     return intersects(x, y);
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactoryI geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -751,15 +751,15 @@ public class BoundingBox implements Serializable {
 
   }
 
-  public Polygon toPolygon(final GeometryFactory factory) {
+  public Polygon toPolygon(final GeometryFactoryI factory) {
     return toPolygon(factory, 100, 100);
   }
 
-  public Polygon toPolygon(final GeometryFactory factory, final int numSegments) {
+  public Polygon toPolygon(final GeometryFactoryI factory, final int numSegments) {
     return toPolygon(factory, numSegments, numSegments);
   }
 
-  public Polygon toPolygon(final GeometryFactory geometryFactory,
+  public Polygon toPolygon(final GeometryFactoryI geometryFactory,
     final int numX, final int numY) {
     final double xStep = getWidth() / numX;
     final double yStep = getHeight() / numY;

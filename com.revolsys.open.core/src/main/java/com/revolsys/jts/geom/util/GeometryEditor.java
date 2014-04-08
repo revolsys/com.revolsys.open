@@ -124,7 +124,7 @@ public class GeometryEditor
 
     // if client did not supply a GeometryFactory, use the one from the input Geometry
     if (factory == null)
-      factory = geometry.getFactory();
+      factory = geometry.getGeometryFactory();
 
     if (geometry instanceof GeometryCollection) {
       return editGeometryCollection((GeometryCollection) geometry,

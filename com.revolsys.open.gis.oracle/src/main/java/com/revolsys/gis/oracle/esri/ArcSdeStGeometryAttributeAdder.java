@@ -3,7 +3,6 @@ package com.revolsys.gis.oracle.esri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -57,7 +56,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final ArcSdeSpatialReference spatialReference = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, ArcSdeConstants.SPATIAL_REFERENCE);
 
-    final GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
 
     final Attribute attribute = new ArcSdeStGeometryAttribute(name, dataType,

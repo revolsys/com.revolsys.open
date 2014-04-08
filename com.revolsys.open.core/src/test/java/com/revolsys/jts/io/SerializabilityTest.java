@@ -44,7 +44,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class SerializabilityTest extends TestCase {
 
-  static GeometryFactory fact = new GeometryFactory();
+  static GeometryFactory fact = GeometryFactory.getFactory();
 
   public static void main(final String args[]) {
     TestRunner.run(SerializabilityTest.class);

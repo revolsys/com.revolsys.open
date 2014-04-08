@@ -21,7 +21,7 @@ import com.revolsys.jts.util.Stopwatch;
  *
  */
 public class DelaunayRobustTest {
-  final static GeometryFactory geomFact = new GeometryFactory();
+  final static GeometryFactory geomFact = GeometryFactory.getFactory();
 
   final static double SIDE_LEN = 1.0;
 

@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
@@ -29,9 +28,10 @@ import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.XbaseIterator;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public class ShapefileIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
@@ -40,7 +40,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private DataObjectFactory dataObjectFactory;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private EndianInput in;
 

@@ -16,11 +16,11 @@
 package com.revolsys.gis.model.geometry;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class Circle extends DoubleCoordinates {
@@ -52,7 +52,7 @@ public class Circle extends DoubleCoordinates {
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = GeometryFactory.getFactory();
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory();
     final Point point = factory.createPoint(this);
     return point.buffer(radius);
   }

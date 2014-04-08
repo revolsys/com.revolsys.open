@@ -36,7 +36,7 @@ import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -138,7 +138,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     final double imageX, final double imageY, final double modelX,
     final double modelY) {
     final DoubleCoordinates imagePoint = new DoubleCoordinates(imageX, imageY);
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final Point modelPoint = geometryFactory.createPoint(modelX, modelY);
     final MappedLocation mappedLocation = new MappedLocation(imagePoint,
       modelPoint);
@@ -244,7 +244,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
     final double resolution) {
-    final int imageSrid = getGeometryFactory().getSRID();
+    final int imageSrid = getGeometryFactory().getSrid();
     if (imageSrid > 0 && imageSrid != coordinateSystem.getId()) {
       final BoundingBox boundingBox = getBoundingBox();
       final ProjectionImageFilter filter = new ProjectionImageFilter(
@@ -258,7 +258,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     return this;
   }
 
-  public GeoReferencedImage getImage(final GeometryFactory geometryFactory) {
+  public GeoReferencedImage getImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return getImage(coordinateSystem);
   }
@@ -362,7 +362,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   }
 
   public boolean hasGeometryFactory() {
-    return geometryFactory.getSRID() > 0;
+    return geometryFactory.getSrid() > 0;
   }
 
   @Override

@@ -3,14 +3,14 @@ package com.revolsys.gis.parallel;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequence;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ValidateGeometryRange extends
   BaseInOutProcess<DataObject, DataObject> {

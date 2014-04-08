@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
@@ -27,6 +26,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class FgdbReader {
 

@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public abstract class RTreeNode<T> extends Envelope {
 

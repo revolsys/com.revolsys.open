@@ -4,7 +4,7 @@ import org.apache.commons.jexl.junit.Asserter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;

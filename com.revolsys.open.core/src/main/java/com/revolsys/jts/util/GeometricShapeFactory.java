@@ -71,7 +71,7 @@ public class GeometricShapeFactory
    */
   public GeometricShapeFactory()
   {
-    this(new GeometryFactory());
+    this(GeometryFactory.getFactory());
   }
 
   /**

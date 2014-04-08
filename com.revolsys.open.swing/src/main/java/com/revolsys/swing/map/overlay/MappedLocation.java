@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -48,7 +48,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Coordinates sourcePixel = getSourcePixel();
       final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
-      final GeometryFactory geometryFactory = filter.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.createPoint(sourcePoint);
     }
   }
@@ -57,7 +57,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     if (filter == null) {
       return null;
     } else {
-      final GeometryFactory geometryFactory = filter.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
       final Coordinates sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
       final Point targetPoint = getTargetPoint();
@@ -73,14 +73,14 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Coordinates sourcePixel = getSourcePixel();
       final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
-      final GeometryFactory geometryFactory = filter.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.createLineString(sourcePoint, getTargetPoint());
     }
   }
 
   public Coordinates getTargetPixel(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
-    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final Coordinates targetPointCoordinates = CoordinatesUtil.get(geometryFactory.copy(targetPoint));
     return WarpAffineFilter.targetPointToPixel(boundingBox,
       targetPointCoordinates, imageWidth, imageHeight);

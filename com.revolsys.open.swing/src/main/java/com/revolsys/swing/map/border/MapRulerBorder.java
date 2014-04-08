@@ -28,7 +28,7 @@ import javax.swing.border.AbstractBorder;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.swing.map.Viewport2D;
@@ -168,7 +168,7 @@ public class MapRulerBorder extends AbstractBorder implements
     return insets;
   }
 
-  public GeometryFactory getRulerGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getRulerGeometryFactory() {
     return this.rulerGeometryFactory;
   }
 

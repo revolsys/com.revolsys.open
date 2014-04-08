@@ -42,7 +42,7 @@ import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
 /**
- * Tests for {@link GeometryFactory}.
+ * Tests for {@link GeometryFactoryI}.
  *
  * @version 1.13
  */
@@ -74,7 +74,7 @@ public class GeometryFactoryTest extends TestCase {
 
   /**
      * CoordinateArraySequences default their dimension to 3 unless explicitly told otherwise.
-     * This test ensures that GeometryFactory.createGeometry() recreates the input dimension properly.
+     * This test ensures that GeometryFactoryI.createGeometry() recreates the input dimension properly.
    * 
    * @throws ParseException
    */

@@ -70,7 +70,7 @@ public class GeometryPrecisionReducerTest extends TestCase {
   private void assertEqualsExactAndHasSameFactory(final Geometry a,
     final Geometry b) {
     assertTrue(a.equalsExact(b));
-    assertTrue(a.getFactory() == b.getFactory());
+    assertTrue(a.getGeometryFactory() == b.getGeometryFactory());
   }
 
   public void testLine() throws Exception {

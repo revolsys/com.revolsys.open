@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -77,8 +77,8 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      final GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
-      final GeometryFactory geometryFactory;
+      final com.revolsys.jts.geom.GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);
       } else {

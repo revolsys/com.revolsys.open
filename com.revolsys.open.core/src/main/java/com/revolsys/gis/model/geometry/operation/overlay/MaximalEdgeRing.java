@@ -3,7 +3,7 @@ package com.revolsys.gis.model.geometry.operation.overlay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdgeStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
@@ -30,7 +30,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 public class MaximalEdgeRing extends EdgeRing {
 
   public MaximalEdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+    final GeometryFactoryI geometryFactory) {
     super(start, geometryFactory);
   }
 

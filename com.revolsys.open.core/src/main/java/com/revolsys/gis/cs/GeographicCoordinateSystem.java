@@ -9,6 +9,8 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.jts.geom.GeometryFactory;
+
 public class GeographicCoordinateSystem implements CoordinateSystem {
   public static final double EARTH_RADIUS = 6378137;
 

@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -58,7 +57,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryAttribute.getType();
@@ -184,7 +183,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryAttribute.getType();

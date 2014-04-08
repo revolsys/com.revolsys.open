@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -22,9 +21,10 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
@@ -39,7 +39,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private Integer geometrySrid;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private DataObjectFactory dataObjectFactory;
 

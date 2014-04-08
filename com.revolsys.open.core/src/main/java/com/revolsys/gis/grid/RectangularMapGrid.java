@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 
 public interface RectangularMapGrid {
@@ -14,7 +13,7 @@ public interface RectangularMapGrid {
 
   String getFormattedMapTileName(String name);
 
-  GeometryFactory getGeometryFactory();
+  com.revolsys.jts.geom.GeometryFactory getGeometryFactory();
 
   String getMapTileName(final double x, final double y);
 
@@ -24,10 +23,10 @@ public interface RectangularMapGrid {
     final CoordinateSystem coordinateSystem);
 
   Polygon getPolygon(final String mapTileName,
-    final GeometryFactory geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory);
 
   Polygon getPolygon(final String mapTileName,
-    final GeometryFactory geometryFactory, int numX, int numY);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, int numX, int numY);
 
   RectangularMapTile getTileByLocation(double x, double y);
 

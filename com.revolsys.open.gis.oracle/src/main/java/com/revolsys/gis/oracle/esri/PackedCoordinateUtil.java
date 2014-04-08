@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
@@ -141,7 +140,7 @@ public class PackedCoordinateUtil {
   }
 
   public static Geometry getGeometry(final byte[] data,
-    final GeometryFactory geometryFactory, final int entity,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int entity,
     final int numPoints, final Double xOffset, final Double yOffset,
     final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale) {
@@ -151,7 +150,7 @@ public class PackedCoordinateUtil {
   }
 
   public static Geometry getGeometry(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int geometryType,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int geometryType,
     final int numPoints, final Double xOffset, final Double yOffset,
     final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale) {
@@ -181,7 +180,7 @@ public class PackedCoordinateUtil {
   }
 
   private static LineString getLineString(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
@@ -191,7 +190,7 @@ public class PackedCoordinateUtil {
   }
 
   private static MultiLineString getMultiLineString(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
@@ -201,7 +200,7 @@ public class PackedCoordinateUtil {
   }
 
   private static MultiPoint getMultiPoint(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
@@ -211,7 +210,7 @@ public class PackedCoordinateUtil {
   }
 
   private static MultiPolygon getMultiPolygon(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
@@ -380,7 +379,7 @@ public class PackedCoordinateUtil {
   }
 
   private static Point getPoint(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
@@ -390,7 +389,7 @@ public class PackedCoordinateUtil {
   }
 
   private static Polygon getPolygon(final InputStream pointsIn,
-    final GeometryFactory geometryFactory, final int numPoints,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {

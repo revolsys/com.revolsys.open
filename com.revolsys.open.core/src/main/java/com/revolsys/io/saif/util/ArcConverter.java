@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -16,15 +15,15 @@ import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.LineString;
 
 public class ArcConverter implements OsnConverter {
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private String geometryType = SaifConstants.ARC;
 
-  public ArcConverter(final GeometryFactory geometryFactory) {
+  public ArcConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public ArcConverter(final GeometryFactory geometryFactory,
+  public ArcConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final String geometryType) {
     this.geometryFactory = geometryFactory;
     this.geometryType = geometryType;

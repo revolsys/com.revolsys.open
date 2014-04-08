@@ -5,20 +5,20 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class LineSegmentQuadTree {
   public static Envelope ensureExtent(final Envelope envelope,

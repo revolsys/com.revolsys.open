@@ -98,7 +98,7 @@ public class LineDissolver
   
   private void add(LineString lineString) {
     if (factory == null) {
-      this.factory = lineString.getFactory();
+      this.factory = lineString.getGeometryFactory();
     }
     CoordinateSequence seq = lineString.getCoordinateSequence();
     for (int i = 1; i < seq.size(); i++) {

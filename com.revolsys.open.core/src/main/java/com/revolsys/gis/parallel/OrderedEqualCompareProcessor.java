@@ -15,14 +15,14 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInProcess;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> {
 

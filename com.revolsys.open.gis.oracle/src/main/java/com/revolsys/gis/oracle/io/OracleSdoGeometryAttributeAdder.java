@@ -16,7 +16,7 @@ import oracle.sql.STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -211,7 +211,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
-              final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+              final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
                 srid, numAxis, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);

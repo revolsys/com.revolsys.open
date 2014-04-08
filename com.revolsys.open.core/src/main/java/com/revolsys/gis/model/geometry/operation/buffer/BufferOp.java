@@ -35,7 +35,7 @@ package com.revolsys.gis.model.geometry.operation.buffer;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.chain.MCIndexSnapRounder;
@@ -309,7 +309,7 @@ public class BufferOp {
       return;
     }
 
-    final GeometryFactory geometryFactory = argGeom.getGeometryFactory();
+    final GeometryFactoryI geometryFactory = argGeom.getGeometryFactory();
     if (geometryFactory.getScaleXY() > 0) {
       bufferFixedPrecision(geometryFactory);
     } else {

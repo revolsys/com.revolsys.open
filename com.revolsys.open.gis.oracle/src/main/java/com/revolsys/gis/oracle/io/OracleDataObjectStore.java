@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -102,7 +102,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
             + geometryColumnName
             + ","
             + "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
-          query.and(new SqlCondition(where, geometryFactory.getSRID(), x1, y1,
+          query.and(new SqlCondition(where, geometryFactory.getSrid(), x1, y1,
             x2, y2));
         } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
           final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName

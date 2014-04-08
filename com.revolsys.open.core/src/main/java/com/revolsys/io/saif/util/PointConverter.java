@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -17,13 +16,13 @@ import com.revolsys.jts.geom.Point;
 public class PointConverter implements OsnConverter {
   private String geometryClass = SaifConstants.POINT;
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
-  public PointConverter(final GeometryFactory geometryFactory) {
+  public PointConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public PointConverter(final GeometryFactory geometryFactory,
+  public PointConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
     this.geometryClass = geometryClass;

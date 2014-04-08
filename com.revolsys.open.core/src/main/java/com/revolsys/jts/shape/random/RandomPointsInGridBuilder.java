@@ -61,7 +61,7 @@ extends GeometricShapeBuilder
    */
   public RandomPointsInGridBuilder()
   {
-    super(new GeometryFactory());
+    super(GeometryFactory.getFactory());
   }
 
   /**

@@ -1,17 +1,17 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.util.MathUtil;
-import com.revolsys.util.Trig;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.MathUtil;
+import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
 
@@ -40,7 +40,7 @@ public class CoordinatesUtil {
   }
 
   public static Point add(final Point c1, final Point c2) {
-    final GeometryFactory factory = GeometryFactory.getFactory(c1);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
     return factory.createPoint(add(get(c1), get(p2)));
   }
@@ -366,7 +366,7 @@ public class CoordinatesUtil {
   }
 
   public static Point subtract(final Point c1, final Point c2) {
-    final GeometryFactory factory = GeometryFactory.getFactory(c1);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
     return factory.createPoint(subtract(get(c1), get(p2)));
   }
@@ -390,10 +390,10 @@ public class CoordinatesUtil {
     final Double angle, final double length) {
     final double x = point.getX();
     final double y = point.getY();
-  
+
     final double newX = Trig.adjacent(x, angle, length);
     final double newY = Trig.opposite(y, angle, length);
-  
+
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
   }

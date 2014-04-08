@@ -2,14 +2,14 @@ package com.revolsys.io.gpx;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
 
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
+  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   public static final String GPX_NS = "gpx";
 

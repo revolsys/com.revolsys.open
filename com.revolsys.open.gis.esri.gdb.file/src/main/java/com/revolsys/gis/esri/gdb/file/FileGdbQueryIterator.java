@@ -4,7 +4,6 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -17,6 +16,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 

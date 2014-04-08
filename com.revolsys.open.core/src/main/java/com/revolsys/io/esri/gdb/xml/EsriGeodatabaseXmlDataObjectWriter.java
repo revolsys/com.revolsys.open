@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
@@ -215,7 +214,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
       out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
       out.element(SHAPE_TYPE, geometryType);
       out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       out.element(HAS_M, false);
       out.element(HAS_Z, geometryFactory.hasZ());
       out.element(HAS_SPATIAL_INDEX, false);
@@ -229,7 +228,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(DATA_ELEMENT);
   }
 
-  public void writeExtent(final GeometryFactory geometryFactory) {
+  public void writeExtent(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
@@ -277,7 +276,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
         out.element(PRECISION, precision);
         out.element(SCALE, attribute.getScale());
 
-        final GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
         if (geometryFactory != null) {
           out.startTag(GEOMETRY_DEF);
           out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
@@ -360,7 +359,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(FIELD);
   }
 
-  public void writeSpatialReference(final GeometryFactory geometryFactory) {
+  public void writeSpatialReference(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {

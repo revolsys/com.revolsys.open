@@ -127,7 +127,7 @@ public class MinimumDiameter
   public LineString getSupportingSegment()
   {
     computeMinimumDiameter();
-    return inputGeom.getFactory().createLineString(new Coordinate[] { minBaseSeg.p0, minBaseSeg.p1 } );
+    return inputGeom.getGeometryFactory().createLineString(new Coordinate[] { minBaseSeg.p0, minBaseSeg.p1 } );
   }
 
   /**
@@ -141,10 +141,10 @@ public class MinimumDiameter
 
     // return empty linestring if no minimum width calculated
     if (minWidthPt == null)
-      return inputGeom.getFactory().createLineString((Coordinate[])null);
+      return inputGeom.getGeometryFactory().createLineString((Coordinate[])null);
 
     Coordinate basePt = minBaseSeg.project(minWidthPt);
-    return inputGeom.getFactory().createLineString(new Coordinate[] { basePt, minWidthPt } );
+    return inputGeom.getGeometryFactory().createLineString(new Coordinate[] { basePt, minWidthPt } );
   }
 
   private void computeMinimumDiameter()
@@ -263,9 +263,9 @@ public class MinimumDiameter
     // check if minimum rectangle is degenerate (a point or line segment)
     if (minWidth == 0.0) {
       if (minBaseSeg.p0.equals2D(minBaseSeg.p1)) {
-        return inputGeom.getFactory().createPoint(minBaseSeg.p0);
+        return inputGeom.getGeometryFactory().createPoint(minBaseSeg.p0);
       }
-      return minBaseSeg.toGeometry(inputGeom.getFactory());
+      return minBaseSeg.toGeometry(inputGeom.getGeometryFactory());
     }
     
     // deltas for the base segment of the minimum diameter
@@ -306,9 +306,9 @@ public class MinimumDiameter
     Coordinate p2 = minParaLine.lineIntersection(minPerpLine);
     Coordinate p3 = maxParaLine.lineIntersection(minPerpLine);
     
-    LinearRing shell = inputGeom.getFactory().createLinearRing(
+    LinearRing shell = inputGeom.getGeometryFactory().createLinearRing(
         new Coordinate[] { p0, p1, p2, p3, p0 });
-    return inputGeom.getFactory().createPolygon(shell, null);
+    return inputGeom.getGeometryFactory().createPolygon(shell, null);
 
   }
   

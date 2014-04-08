@@ -134,7 +134,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testFiveZeros() {
-    final LineString ls = new GeometryFactory().createLineString(new Coordinate[] {
+    final LineString ls = GeometryFactory.getFactory().createLineString(new Coordinate[] {
       new Coordinate(0, 0), new Coordinate(0, 0), new Coordinate(0, 0),
       new Coordinate(0, 0), new Coordinate(0, 0)
     });
@@ -187,7 +187,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = new GeometryFactory().createLinearRing(new Coordinate[] {
+      final LinearRing ring = GeometryFactory.getFactory().createLinearRing(new Coordinate[] {
         new Coordinate(0, 0), new Coordinate(10, 10), new Coordinate(0, 0)
       });
       assertTrue(false);

@@ -29,7 +29,7 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
@@ -284,7 +284,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected Geometry appendVertex(final Point newPoint) {
-    final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
     Geometry geometry = this.addGeometry;
     if (geometry.isEmpty()) {
       geometry = geometryFactory.createPoint(newPoint);
@@ -431,7 +431,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return getGraphics();
   }
 
-  protected Point getPoint(final GeometryFactory geometryFactory,
+  protected Point getPoint(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final MouseEvent event) {
     final Viewport2D viewport = getViewport();
     final java.awt.Point eventPoint = event.getPoint();
@@ -669,7 +669,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           } else {
             point = getSnapPoint();
           }
-          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+          final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
 
           point = geometryFactory.copy(point);
           if (this.addGeometry.isEmpty()) {
@@ -737,7 +737,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
               } else {
                 final Point p1 = geometryFactory.createPoint(previousPoint);
                 final Point p3 = geometryFactory.createPoint(firstPoint);
-                final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+                final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
                 xorGeometry = viewportGeometryFactory.createLineString(p1,
                   point, p3);
               }
@@ -777,7 +777,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (event.getButton() == moveGeometryButton) {
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         for (final CloseLocation location : moveGeometryLocations) {
-          final GeometryFactory geometryFactory = location.getGeometryFactory();
+          final com.revolsys.jts.geom.GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point startPoint = geometryFactory.copy(getViewportPoint(this.moveGeometryStart));
           final Point endPoint = geometryFactory.copy(getViewportPoint(event));
 
@@ -933,7 +933,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
 
     if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final AffineTransform transform = graphics.getTransform();
@@ -1100,7 +1100,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : getMouseOverLocations()) {
           final Geometry geometry = location.getGeometry();
-          final GeometryFactory geometryFactory = location.getGeometryFactory();
+          final com.revolsys.jts.geom.GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point point;
           if (getSnapPoint() == null) {
             point = getPoint(geometryFactory, event);

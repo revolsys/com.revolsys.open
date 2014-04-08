@@ -42,6 +42,7 @@ import java.util.List;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.algorithm.InteriorPointArea;
@@ -49,7 +50,6 @@ import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.util.GeometryCollectionMapper;
 import com.revolsys.jts.geom.util.GeometryMapper;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.buffer.BufferOp;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -256,7 +256,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    */
   public Geometry(final GeometryFactory factory) {
     this.factory = factory;
-    this.SRID = factory.getSRID();
+    this.SRID = factory.getSrid();
   }
 
   /**
@@ -767,7 +767,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   private Point createPointFromInternalCoord(final Coordinate coord,
     final Geometry exemplar) {
     exemplar.getPrecisionModel().makePrecise(coord);
-    return exemplar.getFactory().createPoint(coord);
+    return exemplar.getGeometryFactory().createPoint(coord);
   }
 
   /**
@@ -1214,7 +1214,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * @see GeometryFactory#toGeometry(Envelope) 
    */
   public Geometry getEnvelope() {
-    return getFactory().toGeometry(getEnvelopeInternal());
+    return getGeometryFactory().toGeometry(getEnvelopeInternal());
   }
 
   /**
@@ -1239,15 +1239,6 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   }
 
   /**
-   * Gets the factory which contains the context in which this geometry was created.
-   *
-   * @return the factory for this geometry
-   */
-  public GeometryFactory getFactory() {
-    return factory;
-  }
-
-  /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   @SuppressWarnings("unchecked")
@@ -1256,10 +1247,13 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   }
 
   /**
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * Gets the factory which contains the context in which this geometry was created.
+   *
+   * @return the factory for this geometry
+  * @author Paul Austin <paul.austin@revolsys.com>
    */
-  public com.revolsys.gis.cs.GeometryFactory getGeometryFactory() {
-    return com.revolsys.gis.cs.GeometryFactory.getFactory(this);
+  public GeometryFactory getGeometryFactory() {
+    return factory;
   }
 
   /**
@@ -1533,8 +1527,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * @return true if this is a hetereogeneous GeometryCollection
    */
   protected boolean isGeometryCollection() {
-    return getClass().equals(
-      com.revolsys.jts.geom.GeometryCollection.class);
+    return getClass().equals(com.revolsys.jts.geom.GeometryCollection.class);
   }
 
   public boolean isRectangle() {
@@ -1784,19 +1777,11 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
 
   @Override
   public String toString() {
-    return toText();
+    return toWkt();
   }
 
-  /**
-   *  Returns the Well-known Text representation of this <code>Geometry</code>.
-   *  For a definition of the Well-known Text format, see the OpenGIS Simple
-   *  Features Specification.
-   *
-   *@return    the Well-known Text representation of this <code>Geometry</code>
-   */
   public String toText() {
-    final WKTWriter writer = new WKTWriter();
-    return writer.write(this);
+    return toWkt();
   }
 
   /**
@@ -1830,6 +1815,18 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
       return false;
     }
     return relate(g).isTouches(getDimension(), g.getDimension());
+  }
+
+  /**
+   *  <p>Returns the Extended Well-known Text representation of this <code>Geometry</code>.
+   *  For a definition of the Well-known Text format, see the OpenGIS Simple
+   *  Features Specification.</p>
+   *
+   *@return    the Well-known Text representation of this <code>Geometry</code>
+   *@author Paul Austin <paul.austin@revolsys.com>
+   */
+  public String toWkt() {
+    return WktWriter.toString(this, true);
   }
 
   /**

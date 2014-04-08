@@ -8,23 +8,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
-import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.MathUtil;
 
 public final class ShapefileGeometryUtil {
   public static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<String, Method>();
@@ -110,7 +110,7 @@ public final class ShapefileGeometryUtil {
 
   public static int getShapeType(final Geometry geometry) {
     if (geometry != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       final int numAxis = geometryFactory.getNumAxis();
       final boolean hasZ = numAxis > 2;
       final boolean hasM = numAxis > 3;
@@ -158,7 +158,7 @@ public final class ShapefileGeometryUtil {
   }
 
   public static Method getWriteMethod(final Geometry geometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     final int numAxis = geometryFactory.getNumAxis();
     final boolean hasZ = numAxis > 2;
     final boolean hasM = numAxis > 3;
@@ -209,7 +209,8 @@ public final class ShapefileGeometryUtil {
   }
 
   public Geometry createPolygonGeometryFromParts(
-    final GeometryFactory geometryFactory, final List<CoordinatesList> parts) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final List<CoordinatesList> parts) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     final List<CoordinatesList> currentParts = new ArrayList<CoordinatesList>();
     for (final CoordinatesList ring : parts) {
@@ -235,7 +236,8 @@ public final class ShapefileGeometryUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends Geometry> V read(final GeometryFactory geometryFactory,
+  public <V extends Geometry> V read(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in, final int shapeType) throws IOException {
     switch (shapeType) {
       case ShapefileConstants.NULL_SHAPE:
@@ -283,7 +285,8 @@ public final class ShapefileGeometryUtil {
 
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V read(final Method method,
-    final GeometryFactory geometryFactory, final EndianInput in) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final EndianInput in) {
     return (V)JavaBeanUtil.method(method, this, geometryFactory, in);
   }
 
@@ -322,7 +325,8 @@ public final class ShapefileGeometryUtil {
     return values;
   }
 
-  public MultiPoint readMultipoint(final GeometryFactory geometryFactory,
+  public MultiPoint readMultipoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
@@ -330,7 +334,8 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createMultiPoint(points);
   }
 
-  public MultiPoint readMultipointM(final GeometryFactory geometryFactory,
+  public MultiPoint readMultipointM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
@@ -340,7 +345,8 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createMultiPoint(points);
   }
 
-  public MultiPoint readMultipointZ(final GeometryFactory geometryFactory,
+  public MultiPoint readMultipointZ(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
@@ -350,7 +356,8 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createMultiPoint(points);
   }
 
-  public MultiPoint readMultipointZM(final GeometryFactory geometryFactory,
+  public MultiPoint readMultipointZM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
@@ -377,13 +384,15 @@ public final class ShapefileGeometryUtil {
     return partIndex;
   }
 
-  public Point readPoint(final GeometryFactory geometryFactory,
+  public Point readPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final CoordinatesList points = readXYCoordinates(in, 1, 2);
     return geometryFactory.createPoint(points);
   }
 
-  public Point readPointM(final GeometryFactory geometryFactory,
+  public Point readPointM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -402,7 +411,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public Point readPointZ(final GeometryFactory geometryFactory,
+  public Point readPointZ(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -411,7 +421,8 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createPoint(points);
   }
 
-  public Point readPointZM(final GeometryFactory geometryFactory,
+  public Point readPointZM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -422,7 +433,8 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createPoint(points);
   }
 
-  public Geometry readPolygon(final GeometryFactory geometryFactory,
+  public Geometry readPolygon(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -437,7 +449,8 @@ public final class ShapefileGeometryUtil {
 
   }
 
-  public Geometry readPolygonM(final GeometryFactory geometryFactory,
+  public Geometry readPolygonM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -451,7 +464,8 @@ public final class ShapefileGeometryUtil {
 
   }
 
-  public Geometry readPolygonZ(final GeometryFactory geometryFactory,
+  public Geometry readPolygonZ(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -464,7 +478,8 @@ public final class ShapefileGeometryUtil {
     return createPolygonGeometryFromParts(geometryFactory, parts);
   }
 
-  public Geometry readPolygonZM(final GeometryFactory geometryFactory,
+  public Geometry readPolygonZM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -478,7 +493,8 @@ public final class ShapefileGeometryUtil {
     return createPolygonGeometryFromParts(geometryFactory, parts);
   }
 
-  public Geometry readPolyline(final GeometryFactory geometryFactory,
+  public Geometry readPolyline(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -508,7 +524,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public Geometry readPolylineM(final GeometryFactory geometryFactory,
+  public Geometry readPolylineM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -543,7 +560,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public Geometry readPolylineZ(final GeometryFactory geometryFactory,
+  public Geometry readPolylineZ(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -578,7 +596,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public Geometry readPolylineZM(final GeometryFactory geometryFactory,
+  public Geometry readPolylineZM(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();

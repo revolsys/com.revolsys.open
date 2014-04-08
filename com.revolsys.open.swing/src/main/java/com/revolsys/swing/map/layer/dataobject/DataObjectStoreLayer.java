@@ -23,7 +23,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -358,7 +358,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final double distance) {
     final boolean enabled = setEventsEnabled(false);
     try {
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
       final Geometry queryGeometry = geometryFactory.copy(geometry);
       BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
       boundingBox = boundingBox.expand(distance);
@@ -433,7 +433,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           Invoke.worker(this.loadingWorker);
         }
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
       final Polygon polygon = boundingBox.toPolygon(geometryFactory, 10, 10);
 
       final DataObjectQuadTree index = getIndex();

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
@@ -36,7 +36,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private Geometry geometry;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private int columnCount = 0;
 

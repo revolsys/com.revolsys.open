@@ -96,7 +96,7 @@ public class Polygon extends Geometry implements Polygonal {
     final GeometryFactory factory) {
     super(factory);
     if (shell == null) {
-      shell = getFactory().createLinearRing((CoordinateSequence)null);
+      shell = getGeometryFactory().createLinearRing((CoordinateSequence)null);
     }
     if (holes == null) {
       holes = new LinearRing[] {};
@@ -302,7 +302,7 @@ public class Polygon extends Geometry implements Polygonal {
   @Override
   public Geometry getBoundary() {
     if (isEmpty()) {
-      return getFactory().createMultiLineString(null);
+      return getGeometryFactory().createMultiLineString();
     }
     final LinearRing[] rings = new LinearRing[holes.length + 1];
     rings[0] = shell;
@@ -311,9 +311,9 @@ public class Polygon extends Geometry implements Polygonal {
     }
     // create LineString or MultiLineString as appropriate
     if (rings.length <= 1) {
-      return getFactory().createLinearRing(rings[0].getCoordinateSequence());
+      return getGeometryFactory().createLinearRing(rings[0].getCoordinateSequence());
     }
-    return getFactory().createMultiLineString(rings);
+    return getGeometryFactory().createMultiLineString(rings);
   }
 
   @Override

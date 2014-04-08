@@ -16,7 +16,7 @@ import javax.swing.border.BevelBorder;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -33,7 +33,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
   private final Viewport2D viewport;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private String title;
 
@@ -85,7 +85,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
     }
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     double scaleFactor;
     CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
 

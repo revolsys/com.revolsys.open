@@ -92,7 +92,7 @@ public class FuzzyPointLocator
   	g.apply(extracter);
   	List linework = extracter.getLinework();
   	LineString[] lines = GeometryFactory.toLineStringArray(linework);
-  	return g.getFactory().createMultiLineString(lines);
+  	return g.getGeometryFactory().createMultiLineString(lines);
   }
   
   private boolean isWithinToleranceOfBoundary(Coordinate pt)

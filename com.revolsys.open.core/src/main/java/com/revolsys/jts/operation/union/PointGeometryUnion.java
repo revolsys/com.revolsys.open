@@ -62,7 +62,7 @@ public class PointGeometryUnion
 	{
 		this.pointGeom = (Geometry) pointGeom;
 		this.otherGeom = otherGeom;
-		geomFact = otherGeom.getFactory();
+		geomFact = otherGeom.getGeometryFactory();
 	}
 	
 	public Geometry union()

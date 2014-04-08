@@ -25,7 +25,7 @@ public class CascadedPolygonUnionTest extends TestCase {
     junit.textui.TestRunner.run(CascadedPolygonUnionTest.class);
   }
 
-  GeometryFactory geomFact = new GeometryFactory();
+  GeometryFactory geomFact = GeometryFactory.getFactory();
 
   public CascadedPolygonUnionTest(final String name) {
     super(name);

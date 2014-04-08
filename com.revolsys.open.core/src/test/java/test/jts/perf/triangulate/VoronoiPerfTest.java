@@ -10,7 +10,7 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.util.Stopwatch;
 
 public class VoronoiPerfTest {
-  final static GeometryFactory geomFact = new GeometryFactory();
+  final static GeometryFactory geomFact = GeometryFactory.getFactory();
 
   final static double SIDE_LEN = 10.0;
 

@@ -8,7 +8,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.jts.geom.Dimension;
 
@@ -82,7 +82,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
 
   @Override
   public Point getFirstPoint() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactoryI geometryFactory = getGeometryFactory();
     if (isEmpty()) {
       return geometryFactory.createPoint();
     } else {

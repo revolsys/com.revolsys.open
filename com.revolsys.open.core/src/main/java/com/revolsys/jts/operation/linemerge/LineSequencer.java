@@ -139,7 +139,7 @@ public class LineSequencer
 
   private LineMergeGraph graph = new LineMergeGraph();
   // initialize with default, in case no lines are input
-  private GeometryFactory factory = new GeometryFactory();
+  private GeometryFactory factory = GeometryFactory.getFactory();
   private int lineCount = 0;
 
   private boolean isRun = false;
@@ -180,7 +180,7 @@ public class LineSequencer
 
   private void addLine(LineString lineString) {
     if (factory == null) {
-      this.factory = lineString.getFactory();
+      this.factory = lineString.getGeometryFactory();
     }
     graph.addEdge(lineString);
     lineCount++;
@@ -470,7 +470,7 @@ public class LineSequencer
     for (int i = 0; i < len; i++) {
       revPts[len - 1 - i] = new Coordinate(pts[i]);
     }
-    return line.getFactory().createLineString(revPts);
+    return line.getGeometryFactory().createLineString(revPts);
   }
 
 }

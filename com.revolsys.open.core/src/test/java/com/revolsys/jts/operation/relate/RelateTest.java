@@ -20,7 +20,7 @@ public class RelateTest extends TestCase {
     TestRunner.run(RelateTest.class);
   }
 
-  private final GeometryFactory fact = new GeometryFactory();
+  private final GeometryFactory fact = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

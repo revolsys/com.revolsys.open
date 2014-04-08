@@ -9,7 +9,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -69,13 +69,13 @@ public class ArcSdeStGeometryDataStoreExtension implements
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
-          GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+          com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
             schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
           int srid = spatialReference.getSrid();
           final double scaleXy = spatialReference.getXyScale();
           final double scaleZ = spatialReference.getZScale();
           if (srid <= 0) {
-            srid = geometryFactory.getSRID();
+            srid = geometryFactory.getSrid();
           }
           numAxis = Math.min(numAxis, 3);
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXy,

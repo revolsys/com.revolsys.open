@@ -44,7 +44,7 @@ public class UnionPerfTester {
 
   Stopwatch sw = new Stopwatch();
 
-  GeometryFactory factory = new GeometryFactory();
+  GeometryFactory factory = GeometryFactory.getFactory();
 
   private final List polys;
 

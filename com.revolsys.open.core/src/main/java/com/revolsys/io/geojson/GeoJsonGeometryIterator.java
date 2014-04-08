@@ -9,7 +9,6 @@ import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
@@ -17,6 +16,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.json.JsonParser.EventType;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -24,7 +24,7 @@ import com.revolsys.jts.geom.Polygon;
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   implements GeoJsonConstants {
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private JsonParser in;
 
@@ -206,8 +206,8 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private GeometryFactory readCoordinateSystem() {
-    GeometryFactory factory = geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory readCoordinateSystem() {
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (PROPERTIES.equals(attributeName)) {
@@ -259,7 +259,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readGeometryCollection() {
     List<Geometry> geometries = new ArrayList<Geometry>();
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (GEOMETRIES.equals(attributeName)) {
@@ -297,7 +297,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private LineString readLineString(final boolean cogo) {
     CoordinatesList points = null;
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -313,7 +313,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readMultiLineString(final boolean cogo) {
     List<CoordinatesList> lineStrings = null;
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -328,7 +328,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readMultiPoint() {
     List<CoordinatesList> points = null;
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -344,7 +344,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   private Geometry readMultiPolygon(final boolean cogo) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     List<List<CoordinatesList>> polygonRings = null;
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -365,7 +365,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Point readPoint() {
     CoordinatesList coordinates = null;
-    GeometryFactory factory = geometryFactory;
+    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -407,7 +407,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Polygon readPolygon(final boolean cogo) {
     List<CoordinatesList> rings = null;
-    final GeometryFactory factory = geometryFactory;
+    final com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {

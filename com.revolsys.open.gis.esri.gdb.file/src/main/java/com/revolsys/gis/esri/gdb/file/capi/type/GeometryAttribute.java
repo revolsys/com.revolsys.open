@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -87,7 +87,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           numAxis = 4;
         }
         if (numAxis != geometryFactory.getNumAxis()) {
-          final int srid = geometryFactory.getSRID();
+          final int srid = geometryFactory.getSrid();
           final double scaleXY = geometryFactory.getScaleXY();
           final double scaleZ = geometryFactory.getScaleZ();
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,

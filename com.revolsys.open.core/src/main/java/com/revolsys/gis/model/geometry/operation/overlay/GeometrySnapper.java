@@ -12,7 +12,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
@@ -51,7 +51,7 @@ public class GeometrySnapper {
      * least the distance from a corner of a precision grid cell to the centre
      * point of the cell.
      */
-    final GeometryFactory pm = g.getGeometryFactory();
+    final GeometryFactoryI pm = g.getGeometryFactory();
     final double scaleXY = pm.getScaleXY();
     if (scaleXY > 0) {
       final double fixedSnapTol = (1 / scaleXY) * 2 / 1.415;

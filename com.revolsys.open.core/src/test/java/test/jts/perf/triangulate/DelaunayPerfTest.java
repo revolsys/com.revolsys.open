@@ -10,7 +10,7 @@ import com.revolsys.jts.util.Memory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class DelaunayPerfTest {
-  final static GeometryFactory geomFact = new GeometryFactory();
+  final static GeometryFactory geomFact = GeometryFactory.getFactory();
 
   final static double SIDE_LEN = 10.0;
 

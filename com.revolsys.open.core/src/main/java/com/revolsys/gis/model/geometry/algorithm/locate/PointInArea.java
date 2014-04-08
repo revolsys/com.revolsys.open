@@ -2,16 +2,16 @@ package com.revolsys.gis.model.geometry.algorithm.locate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 
 public class PointInArea extends RayCrossingCounter implements
   Visitor<LineSegment> {
 
-  private final GeometryFactory geometryFactory;
+  private final GeometryFactoryI geometryFactory;
 
-  public PointInArea(final GeometryFactory geometryFactory, final double x,
+  public PointInArea(final GeometryFactoryI geometryFactory, final double x,
     final double y) {
     super(x, y);
     this.geometryFactory = geometryFactory;

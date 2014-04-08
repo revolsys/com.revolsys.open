@@ -15,12 +15,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);

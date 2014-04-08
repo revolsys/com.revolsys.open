@@ -3,7 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.LinkedHashSet;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -12,10 +11,11 @@ import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.util.MathUtil;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 
@@ -85,7 +85,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
     final CoordinateSequence coordinates = lineString.getCoordinateSequence();
     final int numCoordinates = coordinates.size();
     if (numCoordinates > 2) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(lineString);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(lineString);
       final CoordinateSequenceCoordinatesIterator ordinates = new CoordinateSequenceCoordinatesIterator(
         coordinates);
       final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<Integer>();

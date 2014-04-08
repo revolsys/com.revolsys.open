@@ -1,7 +1,6 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -10,6 +9,7 @@ import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
@@ -78,7 +78,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return geometry;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return GeometryFactory.getFactory(geometry);
   }
 
@@ -93,7 +93,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   @Override
   public Location locate(final double x, final double y) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final PointInArea visitor = new PointInArea(geometryFactory, x, y);
     index.query(y, y, visitor);
 

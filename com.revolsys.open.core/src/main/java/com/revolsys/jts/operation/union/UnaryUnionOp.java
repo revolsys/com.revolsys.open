@@ -32,10 +32,20 @@
  */
 package com.revolsys.jts.operation.union;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Puntal;
+import com.revolsys.jts.geom.util.GeometryExtracter;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.overlay.OverlayOp;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
@@ -75,196 +85,170 @@ import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
  * @author mbdavis
  *
  */
-public class UnaryUnionOp 
-{
-	/**
-	 * Computes the geometric union of a {@link Collection} 
-	 * of {@link Geometry}s.
-	 * 
-	 * @param geoms a collection of geometries
-	 * @return the union of the geometries, 
-	 * or <code>null</code> if the input is empty
-	 */
-	public static Geometry union(Collection geoms)
-	{
-		UnaryUnionOp op = new UnaryUnionOp(geoms);
-		return op.union();
-	}
-	
-	/**
-	 * Computes the geometric union of a {@link Collection} 
-	 * of {@link Geometry}s.
-	 * 
-	 * If no input geometries were provided but a {@link GeometryFactory} was provided, 
-	 * an empty {@link GeometryCollection} is returned.
-     *
-	 * @param geoms a collection of geometries
-	 * @param geomFact the geometry factory to use if the collection is empty
-	 * @return the union of the geometries,
-	 * or an empty GEOMETRYCOLLECTION
-	 */
-	public static Geometry union(Collection geoms, GeometryFactory geomFact)
-	{
-		UnaryUnionOp op = new UnaryUnionOp(geoms, geomFact);
-		return op.union();
-	}
-	
-	/**
-	 * Constructs a unary union operation for a {@link Geometry}
-	 * (which may be a {@link GeometryCollection}).
-	 * 
-	 * @param geom a geometry to union
-	 * @return the union of the elements of the geometry
-	 * or an empty GEOMETRYCOLLECTION
-	 */
-	public static Geometry union(Geometry geom)
-	{
-		UnaryUnionOp op = new UnaryUnionOp(geom);
-		return op.union();
-	}
-	
-	private List polygons = new ArrayList();
-	private List lines = new ArrayList();
-	private List points = new ArrayList();
-	
-	private GeometryFactory geomFact = null;
-	
-	/**
-	 * Constructs a unary union operation for a {@link Collection} 
-	 * of {@link Geometry}s.
-	 * 
-	 * @param geoms a collection of geometries
-	 * @param geomFact the geometry factory to use if the collection is empty
-	 */
-	public UnaryUnionOp(Collection geoms, GeometryFactory geomFact)
-	{
-		this.geomFact = geomFact;
-		extract(geoms);
-	}
-	
-	/**
-	 * Constructs a unary union operation for a {@link Collection} 
-	 * of {@link Geometry}s, using the {@link GeometryFactory}
-	 * of the input geometries.
-	 * 
-	 * @param geoms a collection of geometries
-	 */
-	public UnaryUnionOp(Collection geoms)
-	{
-		extract(geoms);
-	}
-	
-	/**
-	 * Constructs a unary union operation for a {@link Geometry}
-	 * (which may be a {@link GeometryCollection}).
-	 * @param geom
-	 */
-	public UnaryUnionOp(Geometry geom)
-	{
-		extract(geom);
-	}
-	
-	private void extract(Collection geoms)
-	{
-		for (Iterator i = geoms.iterator(); i.hasNext();) {
-			Geometry geom = (Geometry) i.next();
-			extract(geom);
-		}
-	}
-	
-	private void extract(Geometry geom)
-	{
-		if (geomFact == null)
-			geomFact = geom.getFactory();
-		
-		/*
-		PolygonExtracter.getPolygons(geom, polygons);
-		LineStringExtracter.getLines(geom, lines);
-		PointExtracter.getPoints(geom, points);
-		*/
-		GeometryExtracter.extract(geom, Polygon.class, polygons);
-		GeometryExtracter.extract(geom, LineString.class, lines);
-		GeometryExtracter.extract(geom, Point.class, points);
-	}
+public class UnaryUnionOp {
+  /**
+   * Computes the geometric union of a {@link Collection} 
+   * of {@link Geometry}s.
+   * 
+   * @param geoms a collection of geometries
+   * @return the union of the geometries, 
+   * or <code>null</code> if the input is empty
+   */
+  public static Geometry union(final Collection geoms) {
+    final UnaryUnionOp op = new UnaryUnionOp(geoms);
+    return op.union();
+  }
 
-	/**
-	 * Gets the union of the input geometries.
-	 * If no input geometries were provided but a {@link GeometryFactory} was provided, 
-	 * an empty {@link GeometryCollection} is returned.
-	 * Otherwise, the return value is <code>null</code>.
-	 * 
-	 * @return a Geometry containing the union,
-	 * or an empty GEOMETRYCOLLECTION if no geometries were provided in the input,
-	 * or <code>null</code> if no GeometryFactory was provided
-	 */
-	public Geometry union()
-	{
-		if (geomFact == null) {
-			return null;
-		}
-		
-		/**
-		 * For points and lines, only a single union operation is 
-		 * required, since the OGC model allowings self-intersecting 
-		 * MultiPoint and MultiLineStrings.
-		 * This is not the case for polygons, so Cascaded Union is required.
-		 */
-		Geometry unionPoints = null;
-		if (points.size() > 0) {
-			Geometry ptGeom = geomFact.buildGeometry(points);
-			unionPoints = unionNoOpt(ptGeom);
-		}
-		
-		Geometry unionLines = null;
-		if (lines.size() > 0) {
-			Geometry lineGeom = geomFact.buildGeometry(lines);
-			unionLines = unionNoOpt(lineGeom);
-		}
-		
-		Geometry unionPolygons = null;
-		if (polygons.size() > 0) {
-			unionPolygons = CascadedPolygonUnion.union(polygons);
-		}
-		
+  /**
+   * Computes the geometric union of a {@link Collection} 
+   * of {@link Geometry}s.
+   * 
+   * If no input geometries were provided but a {@link GeometryFactory} was provided, 
+   * an empty {@link GeometryCollection} is returned.
+     *
+   * @param geoms a collection of geometries
+   * @param geomFact the geometry factory to use if the collection is empty
+   * @return the union of the geometries,
+   * or an empty GEOMETRYCOLLECTION
+   */
+  public static Geometry union(final Collection geoms,
+    final GeometryFactory geomFact) {
+    final UnaryUnionOp op = new UnaryUnionOp(geoms, geomFact);
+    return op.union();
+  }
+
+  /**
+   * Constructs a unary union operation for a {@link Geometry}
+   * (which may be a {@link GeometryCollection}).
+   * 
+   * @param geom a geometry to union
+   * @return the union of the elements of the geometry
+   * or an empty GEOMETRYCOLLECTION
+   */
+  public static Geometry union(final Geometry geom) {
+    final UnaryUnionOp op = new UnaryUnionOp(geom);
+    return op.union();
+  }
+
+  private final List polygons = new ArrayList();
+
+  private final List lines = new ArrayList();
+
+  private final List points = new ArrayList();
+
+  private GeometryFactory geomFact = null;
+
+  /**
+   * Constructs a unary union operation for a {@link Collection} 
+   * of {@link Geometry}s, using the {@link GeometryFactory}
+   * of the input geometries.
+   * 
+   * @param geoms a collection of geometries
+   */
+  public UnaryUnionOp(final Collection geoms) {
+    extract(geoms);
+  }
+
+  /**
+   * Constructs a unary union operation for a {@link Collection} 
+   * of {@link Geometry}s.
+   * 
+   * @param geoms a collection of geometries
+   * @param geomFact the geometry factory to use if the collection is empty
+   */
+  public UnaryUnionOp(final Collection geoms, final GeometryFactory geomFact) {
+    this.geomFact = geomFact;
+    extract(geoms);
+  }
+
+  /**
+   * Constructs a unary union operation for a {@link Geometry}
+   * (which may be a {@link GeometryCollection}).
+   * @param geom
+   */
+  public UnaryUnionOp(final Geometry geom) {
+    extract(geom);
+  }
+
+  private void extract(final Collection geoms) {
+    for (final Iterator i = geoms.iterator(); i.hasNext();) {
+      final Geometry geom = (Geometry)i.next();
+      extract(geom);
+    }
+  }
+
+  private void extract(final Geometry geom) {
+    if (geomFact == null) {
+      geomFact = geom.getGeometryFactory();
+    }
+
+    /*
+     * PolygonExtracter.getPolygons(geom, polygons);
+     * LineStringExtracter.getLines(geom, lines); PointExtracter.getPoints(geom,
+     * points);
+     */
+    GeometryExtracter.extract(geom, Polygon.class, polygons);
+    GeometryExtracter.extract(geom, LineString.class, lines);
+    GeometryExtracter.extract(geom, Point.class, points);
+  }
+
+  /**
+   * Gets the union of the input geometries.
+   * If no input geometries were provided but a {@link GeometryFactory} was provided, 
+   * an empty {@link GeometryCollection} is returned.
+   * Otherwise, the return value is <code>null</code>.
+   * 
+   * @return a Geometry containing the union,
+   * or an empty GEOMETRYCOLLECTION if no geometries were provided in the input,
+   * or <code>null</code> if no GeometryFactory was provided
+   */
+  public Geometry union() {
+    if (geomFact == null) {
+      return null;
+    }
+
+    /**
+     * For points and lines, only a single union operation is 
+     * required, since the OGC model allowings self-intersecting 
+     * MultiPoint and MultiLineStrings.
+     * This is not the case for polygons, so Cascaded Union is required.
+     */
+    Geometry unionPoints = null;
+    if (points.size() > 0) {
+      final Geometry ptGeom = geomFact.buildGeometry(points);
+      unionPoints = unionNoOpt(ptGeom);
+    }
+
+    Geometry unionLines = null;
+    if (lines.size() > 0) {
+      final Geometry lineGeom = geomFact.buildGeometry(lines);
+      unionLines = unionNoOpt(lineGeom);
+    }
+
+    Geometry unionPolygons = null;
+    if (polygons.size() > 0) {
+      unionPolygons = CascadedPolygonUnion.union(polygons);
+    }
+
     /**
      * Performing two unions is somewhat inefficient,
      * but is mitigated by unioning lines and points first
      */
-		Geometry unionLA = unionWithNull(unionLines, unionPolygons);
-		Geometry union = null;
-		if (unionPoints == null)
-			union = unionLA;
-		else if (unionLA == null)
-			union = unionPoints;
-		else 
-			union = PointGeometryUnion.union((Puntal) unionPoints, unionLA);
-		
-		if (union == null)
-			return geomFact.createGeometryCollection(null);
-		
-		return union;
-	}
-	
-  /**
-   * Computes the union of two geometries, 
-   * either of both of which may be null.
-   * 
-   * @param g0 a Geometry
-   * @param g1 a Geometry
-   * @return the union of the input(s)
-   * or null if both inputs are null
-   */
-  private Geometry unionWithNull(Geometry g0, Geometry g1)
-  {
-  	if (g0 == null && g1 == null)
-  		return null;
+    final Geometry unionLA = unionWithNull(unionLines, unionPolygons);
+    Geometry union = null;
+    if (unionPoints == null) {
+      union = unionLA;
+    } else if (unionLA == null) {
+      union = unionPoints;
+    } else {
+      union = PointGeometryUnion.union((Puntal)unionPoints, unionLA);
+    }
 
-  	if (g1 == null)
-  		return g0;
-  	if (g0 == null)
-  		return g1;
-  	
-  	return g0.union(g1);
+    if (union == null) {
+      return geomFact.createGeometryCollection();
+    }
+
+    return union;
   }
 
   /**
@@ -279,10 +263,33 @@ public class UnaryUnionOp
    * @param g0 a geometry
    * @return the union of the input geometry
    */
-	private Geometry unionNoOpt(Geometry g0)
-	{
-    Geometry empty = geomFact.createPoint((Coordinate) null);
-		return SnapIfNeededOverlayOp.overlayOp(g0, empty, OverlayOp.UNION);
-	}
-	
+  private Geometry unionNoOpt(final Geometry g0) {
+    final Geometry empty = geomFact.createPoint((Coordinate)null);
+    return SnapIfNeededOverlayOp.overlayOp(g0, empty, OverlayOp.UNION);
+  }
+
+  /**
+   * Computes the union of two geometries, 
+   * either of both of which may be null.
+   * 
+   * @param g0 a Geometry
+   * @param g1 a Geometry
+   * @return the union of the input(s)
+   * or null if both inputs are null
+   */
+  private Geometry unionWithNull(final Geometry g0, final Geometry g1) {
+    if (g0 == null && g1 == null) {
+      return null;
+    }
+
+    if (g1 == null) {
+      return g0;
+    }
+    if (g0 == null) {
+      return g1;
+    }
+
+    return g0.union(g1);
+  }
+
 }

@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -13,8 +12,9 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {
   public static void addElevation(
@@ -245,16 +245,8 @@ public class LineSegmentUtil {
     return false;
   }
 
-  public static double getElevation(final Coordinates lineStart,
-    final Coordinates lineEnd, final Coordinates point) {
-    final double fraction = point.distance(lineStart)
-      / lineStart.distance(lineEnd);
-    final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ())
-      * (fraction);
-    return z;
-  }
-
-  public static Coordinates getElevation(final GeometryFactory geometryFactory,
+  public static Coordinates getElevation(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     final int numAxis = geometryFactory.getNumAxis();
@@ -275,6 +267,15 @@ public class LineSegmentUtil {
     }
     geometryFactory.makePrecise(newPoint);
     return newPoint;
+  }
+
+  public static double getElevation(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
+    final double fraction = point.distance(lineStart)
+      / lineStart.distance(lineEnd);
+    final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ())
+      * (fraction);
+    return z;
   }
 
   /**

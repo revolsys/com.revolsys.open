@@ -13,7 +13,6 @@ import java.util.Map;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -26,17 +25,18 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequence;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.util.CollectionUtil;
 
 public final class LineStringUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -50,13 +50,13 @@ public final class LineStringUtil {
   public static void addElevation(final Coordinates coordinate,
     final LineString line) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
 
   }
 
-  public static void addLineString(final GeometryFactory geometryFactory,
+  public static void addLineString(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final CoordinatesList points, final Coordinates startPoint,
     final int startIndex, final int endIndex, final Coordinates endPoint,
     final List<LineString> lines) {
@@ -614,7 +614,7 @@ public final class LineStringUtil {
 
   public static Point getPoint(final LineString line, final int index) {
     final Coordinates coordinates = getCoordinates(line, index);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.createPoint(coordinates);
   }
 
@@ -625,7 +625,7 @@ public final class LineStringUtil {
 
   public static Point getToPoint(final LineString line) {
     final Coordinates coordinates = getToCoordinates(line);
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.createPoint(coordinates);
   }
 
@@ -685,7 +685,7 @@ public final class LineStringUtil {
         j++;
       }
     }
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     final LineString newLine = factory.createLineString(newPoints);
     return newLine;
   }
@@ -1019,7 +1019,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
       coordinates1, coordinates2);
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
     JtsGeometryUtil.copyUserData(line1, line);
     return line;
@@ -1041,7 +1041,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
       coordinates2);
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
     JtsGeometryUtil.copyUserData(line1, line);
 
@@ -1080,7 +1080,7 @@ public final class LineStringUtil {
   }
 
   public static LineString reverse(final LineString line) {
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     final CoordinatesList reverseCoordinates = coordinates.reverse();
     final LineString newLine = factory.createLineString(reverseCoordinates);
@@ -1088,7 +1088,7 @@ public final class LineStringUtil {
     return newLine;
   }
 
-  public static List<LineString> split(final GeometryFactory geometryFactory,
+  public static List<LineString> split(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final LineString line, final LineSegmentIndex index, final double tolerance) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Coordinates firstCoordinate = points.get(0);
@@ -1163,7 +1163,7 @@ public final class LineStringUtil {
 
   public static List<LineString> split(final LineString line,
     final Coordinates point) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Map<String, Number> result = findClosestSegmentAndCoordinate(line,
       point);
@@ -1259,7 +1259,7 @@ public final class LineStringUtil {
       points.copy(segmentIndex, points2, 0, numAxis, points2.size());
     }
 
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
 
     if (coords1Size > 1) {
       final LineString line1 = geometryFactory.createLineString(points1);
@@ -1284,7 +1284,7 @@ public final class LineStringUtil {
     final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
       fromPoint, fromIndex, length, toPoint);
 
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     if (newPoints.size() < 2) {
       return null;
     } else {

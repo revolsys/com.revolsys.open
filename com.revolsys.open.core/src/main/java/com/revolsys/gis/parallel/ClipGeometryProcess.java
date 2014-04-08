@@ -2,12 +2,12 @@ package com.revolsys.gis.parallel;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ClipGeometryProcess extends
   BaseInOutProcess<DataObject, DataObject> {

@@ -5,13 +5,13 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,
@@ -28,7 +28,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
 
   private final Geometry geometry;
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final Visitor<Node<T>> matchVisitor;
 

@@ -50,7 +50,7 @@ public class OffsetCurveCorrectnessTest {
 
   public static Geometry bufferOffsetCurve(final Geometry g,
     final double distance) {
-    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(g.getFactory()
+    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(g.getGeometryFactory()
       .getPrecisionModel(), new BufferParameters());
     final Coordinate[] pts = g.getCoordinates();
     Coordinate[] curvePts = null;
@@ -59,7 +59,7 @@ public class OffsetCurveCorrectnessTest {
     } else {
       curvePts = ocb.getLineCurve(pts, distance);
     }
-    final Geometry curve = g.getFactory().createLineString(curvePts);
+    final Geometry curve = g.getGeometryFactory().createLineString(curvePts);
     return curve;
   }
 

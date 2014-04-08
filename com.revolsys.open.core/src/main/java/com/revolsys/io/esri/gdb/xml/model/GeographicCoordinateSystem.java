@@ -1,6 +1,6 @@
 package com.revolsys.io.esri.gdb.xml.model;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeographicCoordinateSystem extends SpatialReference {
 

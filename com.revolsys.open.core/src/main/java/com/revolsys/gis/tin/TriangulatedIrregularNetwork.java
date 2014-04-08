@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
 import com.revolsys.gis.algorithm.index.RTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -26,6 +25,7 @@ import com.revolsys.gis.model.geometry.Triangle;
 import com.revolsys.gis.model.geometry.visitor.TriangleContainsPointFilter;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
@@ -53,7 +53,7 @@ public class TriangulatedIrregularNetwork {
     this(boundingBox.getGeometryFactory(), boundingBox, loadMode);
   }
 
-  public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory) {
+  public TriangulatedIrregularNetwork(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this(geometryFactory.getCoordinateSystem().getAreaBoundingBox());
   }
 
@@ -465,7 +465,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public LineString getElevation(final LineString line) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList oldPoints = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = new DoubleCoordinatesList(oldPoints);
     boolean modified = false;
@@ -698,7 +698,7 @@ public class TriangulatedIrregularNetwork {
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory.getNumAxis() != 3) {
-      final int srid = geometryFactory.getSRID();
+      final int srid = geometryFactory.getSrid();
       final double scaleXY = geometryFactory.getScaleXY();
       this.geometryFactory = GeometryFactory.getFactory(srid, 3, scaleXY, 1);
     } else {

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
@@ -25,6 +24,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
@@ -231,7 +231,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
    * @return The distance.
    */
   public double getDistance(final Geometry geometry) {
-    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final Point point = factory.createPoint(this);
     return point.distance(geometry);
   }
@@ -376,7 +376,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
 
   public Point getPoint() {
     final Graph<T> graph = getGraph();
-    final GeometryFactory geometryFactory = graph.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = graph.getGeometryFactory();
     return geometryFactory.createPoint(this);
   }
 

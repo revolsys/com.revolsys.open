@@ -165,7 +165,7 @@ public class ConvexHullTest extends TestCase {
 
   public void testToArray() throws Exception {
     final ConvexHullEx convexHull = new ConvexHullEx(
-      this.geometryFactory.createGeometryCollection(null));
+      this.geometryFactory.createGeometryCollection());
     final Stack stack = new Stack();
     stack.push(new Coordinate(0, 0));
     stack.push(new Coordinate(1, 1));

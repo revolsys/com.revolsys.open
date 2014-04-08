@@ -9,7 +9,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.MultiLineString;
@@ -66,7 +66,7 @@ public class GeometryTransformer {
 
   private Geometry inputGeom;
 
-  protected GeometryFactory factory = null;
+  protected GeometryFactoryI factory = null;
 
   // these could eventually be exposed to clients
   /**

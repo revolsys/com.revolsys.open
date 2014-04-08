@@ -31,7 +31,7 @@ public class PolygonUnionPerfTest {
 
   }
 
-  GeometryFactory factory = new GeometryFactory();
+  GeometryFactory factory = GeometryFactory.getFactory();
 
   boolean testFailed = false;
 

@@ -124,7 +124,7 @@ class BufferBuilder
       precisionModel = g.getPrecisionModel();
 
     // factory must be the same as the one used by the input
-    geomFact = g.getFactory();
+    geomFact = g.getGeometryFactory();
 
     OffsetCurveBuilder curveBuilder = new OffsetCurveBuilder(precisionModel, bufParams);
     
@@ -303,7 +303,7 @@ class BufferBuilder
   
   private static Geometry convertSegStrings(Iterator it)
   {
-  	GeometryFactory fact = new GeometryFactory();
+  	GeometryFactory fact = GeometryFactory.getFactory();
   	List lines = new ArrayList();
   	while (it.hasNext()) {
   		SegmentString ss = (SegmentString) it.next();

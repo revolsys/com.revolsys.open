@@ -66,7 +66,7 @@ public class ConnectedInteriorTester {
     return null;
   }
 
-  private GeometryFactory geometryFactory = new GeometryFactory();
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
   private GeometryGraph geomGraph;
   // save a coordinate for any disconnected interior found

@@ -10,7 +10,6 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -20,7 +19,7 @@ import com.revolsys.util.ExceptionUtil;
 
 public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
@@ -33,14 +32,14 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   public ArcSdeBinaryGeometryAttribute(
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String name,
     final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties, final GeometryFactory geometryFactory) {
+    final Map<String, Object> properties, final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     super(name, type, -1, 0, 0, required, description, properties);
     this.sdeUtil = sdeUtil;
     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 

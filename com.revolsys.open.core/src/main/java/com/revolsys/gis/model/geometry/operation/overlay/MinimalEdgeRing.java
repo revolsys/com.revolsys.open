@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry.operation.overlay;
 
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
@@ -16,7 +16,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
 public class MinimalEdgeRing extends EdgeRing {
 
   public MinimalEdgeRing(final DirectedEdge start,
-    final GeometryFactory geometryFactory) {
+    final GeometryFactoryI geometryFactory) {
     super(start, geometryFactory);
   }
 

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
@@ -19,9 +18,9 @@ public class TextOnCurveConverter implements OsnConverter {
 
   private final OsnConverterRegistry converters;
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
-  public TextOnCurveConverter(final GeometryFactory geometryFactory,
+  public TextOnCurveConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     this.geometryFactory = geometryFactory;
     this.converters = converters;

@@ -126,7 +126,7 @@ public class CascadedPolygonUnion
 	    throw new IllegalStateException("union() method cannot be called twice");
 		if (inputPolys.isEmpty())
 			return null;
-		geomFactory = ((Geometry) inputPolys.iterator().next()).getFactory();
+		geomFactory = ((Geometry) inputPolys.iterator().next()).getGeometryFactory();
 		
 		/**
 		 * A spatial index to organize the collection
@@ -188,7 +188,7 @@ public class CascadedPolygonUnion
   
   private Geometry bufferUnion(List geoms)
   {
-  	GeometryFactory factory = ((Geometry) geoms.get(0)).getFactory();
+  	GeometryFactory factory = ((Geometry) geoms.get(0)).getGeometryFactory();
   	Geometry gColl = factory.buildGeometry(geoms);
   	Geometry unionAll = gColl.buffer(0.0);
     return unionAll;
@@ -196,7 +196,7 @@ public class CascadedPolygonUnion
   
   private Geometry bufferUnion(Geometry g0, Geometry g1)
   {
-  	GeometryFactory factory = g0.getFactory();
+  	GeometryFactory factory = g0.getGeometryFactory();
   	Geometry gColl = factory.createGeometryCollection(new Geometry[] { g0, g1 } );
   	Geometry unionAll = gColl.buffer(0.0);
     return unionAll;
@@ -419,6 +419,6 @@ public class CascadedPolygonUnion
     List polygons = PolygonExtracter.getPolygons(g);
     if (polygons.size() == 1) 
       return (Polygon) polygons.get(0);
-    return g.getFactory().createMultiPolygon(GeometryFactory.toPolygonArray(polygons));
+    return g.getGeometryFactory().createMultiPolygon(GeometryFactory.toPolygonArray(polygons));
   }
 }

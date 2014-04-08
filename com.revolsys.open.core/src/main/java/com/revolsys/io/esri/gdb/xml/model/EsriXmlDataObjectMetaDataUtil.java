@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -22,6 +21,7 @@ import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class EsriXmlDataObjectMetaDataUtil implements
@@ -239,7 +239,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       table = featureClass;
       featureClass.setShapeType(shapeType);
       featureClass.setShapeFieldName(geometryAttribute.getName());
-      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       featureClass.setSpatialReference(spatialReference);
       featureClass.setHasM(geometryFactory.hasM());
       featureClass.setHasZ(geometryFactory.hasZ());
@@ -363,12 +363,12 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final String shapeFieldName = featureClass.getShapeFieldName();
       metaData.setGeometryAttributeName(shapeFieldName);
       final SpatialReference spatialReference = featureClass.getSpatialReference();
-      GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
-        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSRID(),
+        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
           4, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       } else if (featureClass.isHasZ()) {
-        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSRID(),
+        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
           3, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       }
       final Attribute geometryAttribute = metaData.getGeometryAttribute();

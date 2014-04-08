@@ -11,7 +11,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -23,6 +22,7 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   private final AbstractDataObjectStore dataStore;

@@ -32,7 +32,6 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystems;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
@@ -46,11 +45,12 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
-import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.Geometry;
 
 public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private static final Logger LOG = Logger.getLogger(ShapefileDataObjectWriter.class);
@@ -124,7 +124,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     shapeType = ShapefileGeometryUtil.getShapeType(geometry);
   }
 
-  private void createPrjFile(final GeometryFactory geometryFactory)
+  private void createPrjFile(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws IOException {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

@@ -13,7 +13,7 @@ import org.apache.pdfbox.cos.COSObject;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class PdfUtil {
@@ -144,7 +144,7 @@ public class PdfUtil {
             } else {
               geometryFactory = GeometryFactory.getFactory(srid);
             }
-            final GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
+            final com.revolsys.jts.geom.GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
 
             BoundingBox boundingBox = new BoundingBox(geometryFactory);
             final COSArray geoPoints = PdfUtil.getArray(measure, "GPTS");

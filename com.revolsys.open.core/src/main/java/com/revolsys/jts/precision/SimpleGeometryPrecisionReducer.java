@@ -110,7 +110,7 @@ public class SimpleGeometryPrecisionReducer
   {
     GeometryEditor geomEdit;
     if (changePrecisionModel) {
-      GeometryFactory newFactory = new GeometryFactory(newPrecisionModel, geom.getFactory().getSRID());
+      GeometryFactory newFactory = new GeometryFactory(newPrecisionModel, geom.getGeometryFactory().getSrid());
       geomEdit = new GeometryEditor(newFactory);
     }
     else

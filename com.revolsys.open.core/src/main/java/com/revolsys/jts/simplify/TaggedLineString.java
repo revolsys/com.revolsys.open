@@ -94,11 +94,11 @@ class TaggedLineString
 
   public LineString asLineString()
   {
-    return parentLine.getFactory().createLineString(extractCoordinates(resultSegs));
+    return parentLine.getGeometryFactory().createLineString(extractCoordinates(resultSegs));
   }
 
   public LinearRing asLinearRing() {
-    return parentLine.getFactory().createLinearRing(extractCoordinates(resultSegs));
+    return parentLine.getGeometryFactory().createLinearRing(extractCoordinates(resultSegs));
   }
 
   private static Coordinate[] extractCoordinates(List segs)

@@ -134,7 +134,7 @@ class ExtractLineByLocation
     if (newCoordinateArray.length <= 1) {
       newCoordinateArray = new Coordinate[] { newCoordinateArray[0], newCoordinateArray[0]};
     }
-    return line.getFactory().createLineString(newCoordinateArray);
+    return line.getGeometryFactory().createLineString(newCoordinateArray);
   }
 
   /**
@@ -146,7 +146,7 @@ class ExtractLineByLocation
    */
   private Geometry computeLinear(LinearLocation start, LinearLocation end)
   {
-    LinearGeometryBuilder builder = new LinearGeometryBuilder(line.getFactory());
+    LinearGeometryBuilder builder = new LinearGeometryBuilder(line.getGeometryFactory());
     builder.setFixInvalidLines(true);
 
     if (! start.isVertex())

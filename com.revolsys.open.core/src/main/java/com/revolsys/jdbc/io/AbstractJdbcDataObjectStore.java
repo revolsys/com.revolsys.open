@@ -31,7 +31,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -56,9 +55,10 @@ import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
   AbstractDataObjectStore implements JdbcDataObjectStore,

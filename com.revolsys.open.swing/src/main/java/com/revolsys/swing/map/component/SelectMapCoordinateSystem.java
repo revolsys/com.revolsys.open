@@ -12,7 +12,7 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
@@ -30,7 +30,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     );
 
     this.map = new WeakReference<MapPanel>(map);
-    setSelectedItem(map.getGeometryFactory().getSRID());
+    setSelectedItem(map.getGeometryFactory().getSrid());
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       this, "formatCoordinateSystem");
@@ -90,8 +90,8 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     if (map != null) {
       final String propertyName = event.getPropertyName();
       if ("geometryFactory".equals(propertyName)) {
-        final GeometryFactory geometryFactory = map.getGeometryFactory();
-        final int srid = geometryFactory.getSRID();
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = map.getGeometryFactory();
+        final int srid = geometryFactory.getSrid();
         setSelectedItem(srid);
       }
     }

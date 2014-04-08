@@ -152,7 +152,7 @@ public class MultiLineString extends GeometryCollection implements Lineal {
     for (int i = 0; i < geometries.length; i++) {
       revLines[nLines - 1 - i] = (LineString)geometries[i].reverse();
     }
-    return getFactory().createMultiLineString(revLines);
+    return getGeometryFactory().createMultiLineString(revLines);
   }
 
   /**

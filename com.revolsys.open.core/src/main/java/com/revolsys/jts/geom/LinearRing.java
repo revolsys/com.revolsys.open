@@ -149,7 +149,7 @@ public class LinearRing extends LineString
   {
     CoordinateSequence seq = (CoordinateSequence) points.clone();
     CoordinateSequences.reverse(seq);
-    LinearRing rev = getFactory().createLinearRing(seq);
+    LinearRing rev = getGeometryFactory().createLinearRing(seq);
     return rev;
   }
 }

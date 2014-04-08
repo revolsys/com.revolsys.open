@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;

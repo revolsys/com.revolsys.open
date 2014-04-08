@@ -21,7 +21,7 @@ public class WKBReaderTest extends TestCase {
     TestRunner.run(WKBReaderTest.class);
   }
 
-  private final GeometryFactory geomFactory = new GeometryFactory();
+  private final GeometryFactory geomFactory = GeometryFactory.getFactory();
 
   private final WKTReader rdr = new WKTReader(this.geomFactory);
 

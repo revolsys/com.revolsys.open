@@ -31,7 +31,7 @@ import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 
 public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
-  implements com.revolsys.gis.model.geometry.GeometryFactory {
+  implements com.revolsys.gis.model.geometry.GeometryFactoryI {
   private static Map<String, GeometryFactoryImpl> factories = new HashMap<String, GeometryFactoryImpl>();
 
   private static final long serialVersionUID = 4328651897279304108L;
@@ -134,7 +134,7 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
   }
 
   protected CoordinatesList createCoordinatesList(
-    final com.revolsys.gis.model.geometry.GeometryFactory factory,
+    final com.revolsys.gis.model.geometry.GeometryFactoryI factory,
     final CoordinatesList points) {
     final byte numAxis = getNumAxis();
     CoordinatesList newPoints;
@@ -274,7 +274,7 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
   @Override
   public LinearRing createLinearRing(final LineString lineString) {
     CoordinatesList points;
-    final com.revolsys.gis.model.geometry.GeometryFactory factory = lineString.getGeometryFactory();
+    final com.revolsys.gis.model.geometry.GeometryFactoryI factory = lineString.getGeometryFactory();
     if (factory == this) {
       points = lineString;
     } else {
@@ -417,7 +417,7 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
   @Override
   public Point createPoint(final Point point) {
     Coordinates coordinates;
-    final com.revolsys.gis.model.geometry.GeometryFactory factory = point.getGeometryFactory();
+    final com.revolsys.gis.model.geometry.GeometryFactoryI factory = point.getGeometryFactory();
     if (factory == this) {
       coordinates = point;
     } else {
@@ -476,7 +476,7 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
     if (geometry == null) {
       return null;
     } else {
-      final com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      final com.revolsys.gis.model.geometry.GeometryFactoryI geometryFactory = geometry.getGeometryFactory();
       if (geometryFactory == this) {
         return (G)geometry;
       } else {

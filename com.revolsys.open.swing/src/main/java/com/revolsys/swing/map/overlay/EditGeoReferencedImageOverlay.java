@@ -19,7 +19,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -567,7 +567,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       final Point oldPoint = this.moveCornerPoint;
 
       final Point mousePoint = getViewportPoint(event);
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
 
       Point closestPoint = null;
       final double maxDistance = getDistance(event);

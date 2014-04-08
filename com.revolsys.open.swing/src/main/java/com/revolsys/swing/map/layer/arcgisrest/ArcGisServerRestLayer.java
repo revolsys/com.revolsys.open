@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;

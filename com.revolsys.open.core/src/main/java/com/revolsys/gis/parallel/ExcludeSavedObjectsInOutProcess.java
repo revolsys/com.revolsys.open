@@ -9,9 +9,9 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
-import com.revolsys.jts.geom.Geometry;
 
 public class ExcludeSavedObjectsInOutProcess extends
   BaseInOutProcess<DataObject, DataObject> {

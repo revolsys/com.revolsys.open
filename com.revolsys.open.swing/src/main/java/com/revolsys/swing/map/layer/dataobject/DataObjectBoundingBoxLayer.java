@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.query.Query;

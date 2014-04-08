@@ -1,6 +1,5 @@
 package com.revolsys.gis.oracle.esri;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
 
 public class ArcSdeSpatialReference {
@@ -8,7 +7,7 @@ public class ArcSdeSpatialReference {
 
   private int esriSrid;
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private Double mOffset;
 
@@ -32,7 +31,7 @@ public class ArcSdeSpatialReference {
 
   private Double zScale;
 
-  public ArcSdeSpatialReference(final GeometryFactory geometryFactory) {
+  public ArcSdeSpatialReference(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -44,7 +43,7 @@ public class ArcSdeSpatialReference {
     return this.esriSrid;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 

@@ -6,7 +6,6 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -22,7 +21,7 @@ import com.revolsys.io.xml.XmlWriter;
 public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   GmlConstants {
   public static final void srsName(final XmlWriter out,
-    final GeometryFactory geometryFactory) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final int csId = coordinateSystem.getId();
     out.attribute(SRS_NAME, "EPSG:" + csId);
@@ -30,7 +29,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private final GmlFieldTypeRegistry fieldTypes = GmlFieldTypeRegistry.INSTANCE;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final DataObjectMetaData metaData;
 
@@ -53,7 +52,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     this.out.setPrefix(qualifiedName);
   }
 
-  private void box(final GeometryFactory geometryFactory,
+  private void box(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(BOX);
     srsName(out, geometryFactory);
@@ -79,7 +78,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     out.close();
   }
 
-  private void envelope(final GeometryFactory geometryFactory,
+  private void envelope(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(ENVELOPE);
     srsName(out, geometryFactory);
@@ -98,7 +97,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   @Override
   public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.GEOMETRY_FACTORY)) {
-      this.geometryFactory = (GeometryFactory)value;
+      this.geometryFactory = (com.revolsys.jts.geom.GeometryFactory)value;
     }
     super.setProperty(name, value);
   }

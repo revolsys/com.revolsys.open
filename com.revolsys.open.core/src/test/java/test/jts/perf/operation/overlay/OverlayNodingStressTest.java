@@ -142,7 +142,7 @@ public class OverlayNodingStressTest extends TestCase {
 class RotatedRectangleFactory {
   private static double PI_OVER_2 = Math.PI / 2;
 
-  private final GeometryFactory fact = new GeometryFactory();
+  private final GeometryFactory fact = GeometryFactory.getFactory();
 
   public RotatedRectangleFactory() {
 

@@ -8,7 +8,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 
-public interface GeometryFactory extends CoordinatesPrecisionModel {
+public interface GeometryFactoryI extends CoordinatesPrecisionModel {
   <G extends Geometry> G createGeometry(
     Collection<? extends Geometry> geometries);
 

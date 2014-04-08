@@ -57,7 +57,7 @@ public class IndexedPointInAreaStressTest extends TestCase {
   public void testGrid() {
     // Use fixed PM to try and get at least some points hitting the boundary
     final GeometryFactory geomFactory = new GeometryFactory(this.pmFixed_1);
-    // GeometryFactory geomFactory = new GeometryFactory();
+    // GeometryFactoryI geomFactory = new GeometryFactoryI();
 
     final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(
       geomFactory);

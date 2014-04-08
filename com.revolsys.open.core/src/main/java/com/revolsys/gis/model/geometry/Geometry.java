@@ -49,7 +49,7 @@ public interface Geometry extends Cloneable, ObjectWithProperties {
 
   int getGeometryCount();
 
-  <F extends GeometryFactory> F getGeometryFactory();
+  <F extends GeometryFactoryI> F getGeometryFactory();
 
   double getLength();
 

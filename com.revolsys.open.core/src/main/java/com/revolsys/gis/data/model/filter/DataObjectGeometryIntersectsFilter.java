@@ -26,9 +26,9 @@ import java.util.List;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   @SuppressWarnings({
@@ -43,7 +43,7 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
 
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   public DataObjectGeometryIntersectsFilter(final BoundingBox boundingBox) {
     this(boundingBox.toPolygon());

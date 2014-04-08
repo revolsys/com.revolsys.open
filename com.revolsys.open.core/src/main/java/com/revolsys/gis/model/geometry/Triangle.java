@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -12,12 +11,13 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;
@@ -38,7 +38,7 @@ public class Triangle extends AbstractCoordinatesList {
 
   private final double[] coordinates = new double[9];
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
     0, 2, 1.0, 1);
 
   public Triangle() {
@@ -193,7 +193,8 @@ public class Triangle extends AbstractCoordinatesList {
     return get(2);
   }
 
-  public Polygon getPolygon(final GeometryFactory geometryFactory) {
+  public Polygon getPolygon(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.createLinearRing(new DoubleCoordinatesList(
       getNumAxis(), getP0(), getP1(), getP2(), getP0()));
     return geometryFactory.createPolygon(shell, null);

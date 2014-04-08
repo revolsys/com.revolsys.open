@@ -14,7 +14,7 @@ public class UnaryUnionTest extends TestCase {
     junit.textui.TestRunner.run(UnaryUnionTest.class);
   }
 
-  GeometryFactory geomFact = new GeometryFactory();
+  GeometryFactory geomFact = GeometryFactory.getFactory();
 
   public UnaryUnionTest(final String name) {
     super(name);

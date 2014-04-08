@@ -89,7 +89,7 @@ public class SimpleMinimumClearance
   public LineString getLine()
   {
     compute();
-    return inputGeom.getFactory().createLineString(minClearancePts);
+    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
   }
   
   private void compute()

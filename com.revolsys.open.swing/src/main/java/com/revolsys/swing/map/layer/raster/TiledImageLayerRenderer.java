@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
@@ -27,7 +27,7 @@ public class TiledImageLayerRenderer extends
   private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
     "Load Map Tiles");
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private double resolution;
 
@@ -69,7 +69,7 @@ public class TiledImageLayerRenderer extends
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final AbstractTiledImageLayer layer) {
-    final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
       if (resolution != this.resolution

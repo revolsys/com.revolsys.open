@@ -11,7 +11,7 @@ import javax.swing.Icon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -47,7 +47,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
           return geometryFactory.createGeometry(geometry);
         }
       }
@@ -57,9 +57,9 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   public static CoordinatesWithOrientation getMarkerLocation(
     final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
       Coordinates point = null;
       double orientation = 0;

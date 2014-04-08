@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -21,12 +20,12 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class CoordinatesOperationGeometryOperation implements GeometryOperation {
-  private final GeometryFactory geometryFactory;
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private final CoordinatesOperation operation;
 
   public CoordinatesOperationGeometryOperation(
-    final CoordinatesOperation operation, final GeometryFactory geometryFactory) {
+    final CoordinatesOperation operation, final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.operation = operation;
     this.geometryFactory = geometryFactory;
   }

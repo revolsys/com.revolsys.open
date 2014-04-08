@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -87,7 +87,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     if (viewport == null) {
       return new CoordinatesWithOrientation(new DoubleCoordinates(0.0, 0.0), 0);
     }
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 

@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -21,7 +21,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 
 public class GeometryTest {
-  public static void createTestFile(final GeometryFactory geometryFactory,
+  public static void createTestFile(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final String wkt) {
     final Geometry geometry = geometryFactory.createGeometry(wkt);
 
@@ -69,7 +69,7 @@ public class GeometryTest {
 
   public static void main(final String[] args) {
 
-    for (final GeometryFactory geometryFactory : new GeometryFactory[] {
+    for (final com.revolsys.jts.geom.GeometryFactory geometryFactory : new com.revolsys.jts.geom.GeometryFactory[] {
       GeometryFactory.getFactory(3005, 2, 1000.0, 1),
       GeometryFactory.getFactory(3005, 3, 1000.0, 1.0)
     }) {

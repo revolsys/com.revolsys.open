@@ -11,12 +11,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -28,7 +28,7 @@ import com.revolsys.jts.geom.Polygon;
 public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   GmlConstants {
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   private XMLStreamReader in;
 
@@ -55,8 +55,8 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
-  private GeometryFactory getGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  private com.revolsys.jts.geom.GeometryFactory getGeometryFactory(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final String srsName = in.getAttributeValue(SRS_NAME.getNamespaceURI(),
       SRS_NAME.getLocalPart());
     if (srsName == null) {
@@ -64,11 +64,11 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       if (srsName.startsWith("urn:ogc:def:crs:EPSG:6.6:")) {
         final int srid = Integer.parseInt(srsName.substring("urn:ogc:def:crs:EPSG:6.6:".length()));
-        final GeometryFactory factory = GeometryFactory.getFactory(srid);
+        final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(srid);
         return factory;
       } else if (srsName.startsWith("EPSG:")) {
         final int srid = Integer.parseInt(srsName.substring("EPSG:".length()));
-        final GeometryFactory factory = GeometryFactory.getFactory(srid);
+        final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(srid);
         return factory;
       } else {
         return geometryFactory;
@@ -115,7 +115,8 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return points;
   }
 
-  private Geometry readGeometry(final GeometryFactory geometryFactory)
+  private Geometry readGeometry(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
     final QName typeName = in.getName();
     if (typeName.equals(POINT)) {
@@ -137,9 +138,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
-  private LinearRing readLinearRing(final GeometryFactory geometryFactory)
+  private LinearRing readLinearRing(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
     if (StaxUtils.skipToChildStartElements(in, POS_LIST, COORDINATES)) {
       final QName elementName = in.getName();
@@ -155,9 +157,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createLinearRing(points);
   }
 
-  private LineString readLineString(final GeometryFactory geometryFactory)
+  private LineString readLineString(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
     if (StaxUtils.skipToChildStartElements(in, POS_LIST)) {
       points = readPosList();
@@ -171,17 +174,19 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createLineString(points);
   }
 
-  private Geometry readMultiGeometry(final GeometryFactory geometryFactory)
+  private Geometry readMultiGeometry(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Geometry> geometries = new ArrayList<Geometry>();
     StaxUtils.skipSubTree(in);
     return factory.createGeometry(geometries);
   }
 
   private MultiLineString readMultiLineString(
-    final GeometryFactory geometryFactory) throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+    throws XMLStreamException {
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LineString> lines = new ArrayList<LineString>();
     while (StaxUtils.skipToChildStartElements(in, LINE_STRING)) {
       final LineString line = readLineString(factory);
@@ -193,10 +198,11 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createMultiLineString(lines);
   }
 
-  private MultiPoint readMultiPoint(final GeometryFactory geometryFactory)
+  private MultiPoint readMultiPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
     final List<Point> points = new ArrayList<Point>();
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     while (StaxUtils.skipToChildStartElements(in, POINT)) {
       final Point point = readPoint(factory);
       if (point != null) {
@@ -207,9 +213,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createMultiPoint(points);
   }
 
-  private MultiPolygon readMultiPolygon(final GeometryFactory geometryFactory)
+  private MultiPolygon readMultiPolygon(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Polygon> polygons = new ArrayList<Polygon>();
     while (StaxUtils.skipToChildStartElements(in, POLYGON)) {
       final Polygon polygon = readPolygon(factory);
@@ -221,9 +228,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createMultiPolygon(polygons);
   }
 
-  private Point readPoint(final GeometryFactory geometryFactory)
+  private Point readPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
     if (StaxUtils.skipToChildStartElements(in, POS)) {
       points = readPosList();
@@ -237,9 +245,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createPoint(points);
   }
 
-  private Polygon readPolygon(final GeometryFactory geometryFactory)
+  private Polygon readPolygon(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
     if (StaxUtils.skipToChildStartElements(in, OUTER_BOUNDARY_IS)) {
       final LinearRing exteriorRing = readLinearRing(factory);

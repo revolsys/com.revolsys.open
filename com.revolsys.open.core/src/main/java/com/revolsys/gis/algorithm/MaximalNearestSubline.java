@@ -62,7 +62,7 @@ public class MaximalNearestSubline {
         newCoordinateArray[0], newCoordinateArray[0]
       };
     }
-    return line.getFactory().createLineString(newCoordinateArray);
+    return line.getGeometryFactory().createLineString(newCoordinateArray);
   }
 
   private final LineString a;

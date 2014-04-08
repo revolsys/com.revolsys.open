@@ -44,5 +44,4 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
       return value.toString();
     }
   }
-
 }

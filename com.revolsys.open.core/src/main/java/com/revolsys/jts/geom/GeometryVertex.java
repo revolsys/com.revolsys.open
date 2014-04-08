@@ -1,7 +1,7 @@
 package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
@@ -43,14 +43,14 @@ public class GeometryVertex extends AbstractCoordinates {
 
   @Override
   public byte getNumAxis() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     return (byte)geometryFactory.getNumAxis();
   }
 
   @Override
   public int getSrid() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSRID();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.getSrid();
   }
 
   @Override
@@ -77,7 +77,7 @@ public class GeometryVertex extends AbstractCoordinates {
   }
 
   public Point toPoint() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.createPoint(this);
   }
 

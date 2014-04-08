@@ -13,7 +13,7 @@ public class WKBWriterTest extends TestCase {
   }
 
   public void testSRID() throws Exception {
-    final GeometryFactory gf = new GeometryFactory();
+    final GeometryFactory gf = GeometryFactory.getFactory();
     final Point p1 = gf.createPoint(new Coordinate(1, 2));
     p1.setSRID(1234);
 

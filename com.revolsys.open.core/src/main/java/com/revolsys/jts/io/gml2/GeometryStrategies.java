@@ -82,7 +82,7 @@ public class GeometryStrategies{
 				if(arg.children.size()!=1)
 					throw new SAXException("Cannot create a point without exactly one coordinate");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 
 				Object c = arg.children.get(0);
 				Point p = null;
@@ -108,7 +108,7 @@ public class GeometryStrategies{
 				if(arg.children.size()<1)
 					throw new SAXException("Cannot create a linestring without atleast two coordinates or one coordinate sequence");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				LineString ls = null;
 				if(arg.children.size() == 1){
@@ -145,7 +145,7 @@ public class GeometryStrategies{
 				if(arg.children.size()!=1 && arg.children.size()<4)
 					throw new SAXException("Cannot create a linear ring without atleast four coordinates or one coordinate sequence");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				LinearRing ls = null;
 				if(arg.children.size() == 1){
@@ -182,7 +182,7 @@ public class GeometryStrategies{
 				if(arg.children.size()<1)
 					throw new SAXException("Cannot create a polygon without atleast one linear ring");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				LinearRing outer = (LinearRing) arg.children.get(0); // will be the first
 				List t = arg.children.size()>1?arg.children.subList(1,arg.children.size()):null;
@@ -231,7 +231,7 @@ public class GeometryStrategies{
 				if(arg.children.size()<1)
 					throw new SAXException("Cannot create a multi-point without atleast one point");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				Point[] pts = (Point[]) arg.children.toArray(new Point[arg.children.size()]);
 				
@@ -254,7 +254,7 @@ public class GeometryStrategies{
 				if(arg.children.size()<1)
 					throw new SAXException("Cannot create a multi-linestring without atleast one linestring");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				LineString[] lns = (LineString[]) arg.children.toArray(new LineString[arg.children.size()]);
 				
@@ -277,7 +277,7 @@ public class GeometryStrategies{
 				if(arg.children.size()<1)
 					throw new SAXException("Cannot create a multi-polygon without atleast one polygon");
 
-				int srid = getSrid(arg.attrs,gf.getSRID());
+				int srid = getSrid(arg.attrs,gf.getSrid());
 				
 				Polygon[] plys = (Polygon[]) arg.children.toArray(new Polygon[arg.children.size()]);
 				

@@ -121,7 +121,7 @@ public class GeometryTransformer
   public final Geometry transform(Geometry inputGeom)
   {
     this.inputGeom = inputGeom;
-    this.factory = inputGeom.getFactory();
+    this.factory = inputGeom.getGeometryFactory();
 
     if (inputGeom instanceof Point)
       return transformPoint((Point) inputGeom, null);

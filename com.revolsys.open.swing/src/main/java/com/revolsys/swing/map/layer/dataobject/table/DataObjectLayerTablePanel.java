@@ -13,7 +13,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.SwingUtil;

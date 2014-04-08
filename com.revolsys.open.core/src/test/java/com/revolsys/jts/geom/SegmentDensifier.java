@@ -48,6 +48,6 @@ public class SegmentDensifier {
       densify(p0, p1, segLength);
     }
     final Coordinate[] newPts = this.newCoords.toCoordinateArray();
-    return this.inputLine.getFactory().createLineString(newPts);
+    return this.inputLine.getGeometryFactory().createLineString(newPts);
   }
 }

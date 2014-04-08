@@ -11,13 +11,13 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class DataObjectQuadTree extends QuadTree<DataObject> {
   public DataObjectQuadTree() {
@@ -119,7 +119,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   }
 
   public List<DataObject> queryIntersects(Geometry geometry) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       geometry = geometryFactory.copy(geometry);
     }

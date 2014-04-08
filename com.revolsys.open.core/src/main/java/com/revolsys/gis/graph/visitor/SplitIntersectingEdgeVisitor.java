@@ -10,7 +10,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
@@ -21,6 +20,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
@@ -51,7 +51,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
     boolean started = false;
     boolean matched = false;
     final List<Coordinates> coordinates = new ArrayList<Coordinates>();
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     final List<LineString> lines = new ArrayList<LineString>();
 
     while (currentNode != null) {

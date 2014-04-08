@@ -172,7 +172,7 @@ public class OverlayOp
      * Note that this does NOT handle mixed-precision arguments
      * where the second arg has greater precision than the first.
      */
-    geomFact = g0.getFactory();
+    geomFact = g0.getGeometryFactory();
   }
 
   /**

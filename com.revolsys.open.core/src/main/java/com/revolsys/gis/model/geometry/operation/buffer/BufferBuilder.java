@@ -9,7 +9,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.geometry.Geometry;
-import com.revolsys.gis.model.geometry.GeometryFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl;
@@ -49,7 +49,7 @@ import com.revolsys.jts.operation.buffer.BufferParameters;
  */
 public class BufferBuilder {
   private static Geometry convertSegStrings(final Iterator it) {
-    final GeometryFactory fact = GeometryFactoryImpl.getFactory();
+    final GeometryFactoryI fact = GeometryFactoryImpl.getFactory();
     final List<LineString> lines = new ArrayList<LineString>();
     while (it.hasNext()) {
       final SegmentString ss = (SegmentString)it.next();
@@ -79,7 +79,7 @@ public class BufferBuilder {
 
   private Noder workingNoder;
 
-  private GeometryFactory geomFact;
+  private GeometryFactoryI geomFact;
 
   private PlanarGraph graph;
 

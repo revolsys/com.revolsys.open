@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -56,6 +55,7 @@ import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.saif.util.PathCache;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 
 /**
@@ -590,7 +590,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
           srid, 1.0, 1.0);
 
         for (final DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {

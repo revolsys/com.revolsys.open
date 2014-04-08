@@ -109,7 +109,7 @@ public class GeometryImplTest extends TestCase {
     Geometry emptyDifferentClass;
 
     if (x instanceof Point) {
-      emptyDifferentClass = this.geometryFactory.createGeometryCollection(null);
+      emptyDifferentClass = this.geometryFactory.createGeometryCollection();
     } else {
       emptyDifferentClass = this.geometryFactory.createPoint((Coordinate)null);
     }
@@ -207,8 +207,8 @@ public class GeometryImplTest extends TestCase {
     final GeometryCollection somethingNotEqualButSameClass = this.geometryFactory.createGeometryCollection(new Geometry[] {
       polygon2
     });
-    final GeometryCollection sameClassButEmpty = this.geometryFactory.createGeometryCollection(null);
-    final GeometryCollection anotherSameClassButEmpty = this.geometryFactory.createGeometryCollection(null);
+    final GeometryCollection sameClassButEmpty = this.geometryFactory.createGeometryCollection();
+    final GeometryCollection anotherSameClassButEmpty = this.geometryFactory.createGeometryCollection();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {

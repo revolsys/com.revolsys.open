@@ -107,7 +107,7 @@ public class BufferValidator {
 
   private final String wkt;
 
-  private final GeometryFactory geomFact = new GeometryFactory();
+  private final GeometryFactory geomFact = GeometryFactory.getFactory();
 
   private final WKTWriter wktWriter = new WKTWriter();
 

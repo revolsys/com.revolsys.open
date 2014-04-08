@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class SplitGeometryProcess extends
   BaseInOutProcess<DataObject, DataObject> {
@@ -31,7 +30,7 @@ public class SplitGeometryProcess extends
 
   private double tolerance = 2.0;
 
-  private GeometryFactory geometryFactory;
+  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   protected DataObject createSplitObject(final DataObject object,
     final LineString newLine) {
@@ -58,7 +57,7 @@ public class SplitGeometryProcess extends
     return geometry;
   }
 
-  public GeometryFactory getGeometryFactory() {
+  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -144,7 +143,7 @@ public class SplitGeometryProcess extends
     index.insert(geometry);
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

@@ -23,12 +23,12 @@ package com.revolsys.gis.data.model;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public interface DataObjectMetaData extends ObjectWithProperties,
   Comparable<DataObjectMetaData>, MapSerializer {
@@ -223,7 +223,7 @@ public interface DataObjectMetaData extends ObjectWithProperties,
 
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
-  void setGeometryFactory(GeometryFactory geometryFactory);
+  void setGeometryFactory(com.revolsys.jts.geom.GeometryFactory geometryFactory);
 
   /**
    * Set the name of the object type. Names are described using a (e.g.

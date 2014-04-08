@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
