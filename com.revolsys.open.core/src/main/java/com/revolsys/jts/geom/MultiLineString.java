@@ -159,9 +159,9 @@ public class MultiLineString extends GeometryCollection implements Lineal {
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   @Override
-  public Iterable<GeometryVertex> vertices() {
-    return new AbstractIterator<GeometryVertex>() {
-      private GeometryVertex vertex = new GeometryVertex(MultiLineString.this,
+  public Iterable<Vertex> vertices() {
+    return new AbstractIterator<Vertex>() {
+      private Vertex vertex = new Vertex(MultiLineString.this,
         0);
 
       private int vertexIndex = 0;
@@ -171,7 +171,7 @@ public class MultiLineString extends GeometryCollection implements Lineal {
       private LineString line = getLineStrings().get(0);
 
       @Override
-      protected GeometryVertex getNext() throws NoSuchElementException {
+      protected Vertex getNext() throws NoSuchElementException {
         while (vertexIndex >= line.getNumPoints()) {
           vertexIndex = 0;
           partIndex++;

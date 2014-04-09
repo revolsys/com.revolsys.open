@@ -167,9 +167,9 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   @Override
-  public Iterable<GeometryVertex> vertices() {
-    return new AbstractIterator<GeometryVertex>() {
-      private GeometryVertex vertex = new GeometryVertex(MultiPolygon.this, 0);
+  public Iterable<Vertex> vertices() {
+    return new AbstractIterator<Vertex>() {
+      private Vertex vertex = new Vertex(MultiPolygon.this, 0);
 
       private int vertexIndex = 0;
 
@@ -182,7 +182,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
       private LineString ring = polygon.getExteriorRing();
 
       @Override
-      protected GeometryVertex getNext() throws NoSuchElementException {
+      protected Vertex getNext() throws NoSuchElementException {
         while (vertexIndex >= ring.getNumPoints()) {
           vertexIndex = 0;
           ringIndex++;

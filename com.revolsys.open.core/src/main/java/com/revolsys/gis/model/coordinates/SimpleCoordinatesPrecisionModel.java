@@ -45,6 +45,24 @@ public class SimpleCoordinatesPrecisionModel implements
   }
 
   @Override
+  public double getResolutionXy() {
+    if (scaleXY <= 0) {
+      return 0;
+    } else {
+      return 1 / scaleXY;
+    }
+  }
+
+  @Override
+  public double getResolutionZ() {
+    if (scaleZ <= 0) {
+      return 0;
+    } else {
+      return 1 / scaleZ;
+    }
+  }
+
+  @Override
   public double getScaleXY() {
     return scaleXY;
   }

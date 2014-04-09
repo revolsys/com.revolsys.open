@@ -1,8 +1,6 @@
 package com.revolsys.gis.model.geometry.index;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.io.WKTWriter;
 
 public abstract class IntervalRTreeNode<V> {
 
@@ -14,8 +12,8 @@ public abstract class IntervalRTreeNode<V> {
   }
 
   public IntervalRTreeNode(final double min, final double max) {
-    this.setMin(min);
-    this.setMax(max);
+    this.min = min;
+    this.max = max;
   }
 
   public double getMax() {
@@ -36,17 +34,10 @@ public abstract class IntervalRTreeNode<V> {
   public abstract void query(double queryMin, double queryMax,
     Visitor<V> visitor);
 
-  protected void setMax(final double max) {
-    this.max = max;
-  }
-
-  protected void setMin(final double min) {
-    this.min = min;
-  }
-
   @Override
   public String toString() {
-    return WKTWriter.toLineString(new Coordinate(getMin(), 0), new Coordinate(
-      getMax(), 0));
+    final double min = getMin();
+    final double max = getMax();
+    return "LINESTRING(0 " + min + ",0 " + max + ")";
   }
 }

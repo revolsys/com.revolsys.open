@@ -378,14 +378,14 @@ public class LineString extends Geometry implements Lineal {
   }
 
   @Override
-  public Iterable<GeometryVertex> vertices() {
-    return new AbstractIterator<GeometryVertex>() {
-      private GeometryVertex vertex = new GeometryVertex(LineString.this, 0);
+  public Iterable<Vertex> vertices() {
+    return new AbstractIterator<Vertex>() {
+      private Vertex vertex = new Vertex(LineString.this, 0);
 
       private int index = 0;
 
       @Override
-      protected GeometryVertex getNext() throws NoSuchElementException {
+      protected Vertex getNext() throws NoSuchElementException {
         if (index < getNumPoints()) {
           vertex.setVertexId(index);
           index++;

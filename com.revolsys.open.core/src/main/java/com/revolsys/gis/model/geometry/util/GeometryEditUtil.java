@@ -533,9 +533,13 @@ public class GeometryEditUtil {
     } else {
       int pointIndex = vertexId[vertexId.length - 1];
       if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        final Coordinates coordinates = CoordinatesUtil.get(point);
-        return coordinates;
+        if (pointIndex == 0) {
+          final Point point = (Point)geometry;
+          final Coordinates coordinates = CoordinatesUtil.get(point);
+          return coordinates;
+        } else {
+          return null;
+        }
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
         final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -561,9 +565,13 @@ public class GeometryEditUtil {
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
           final Geometry part = geometry.getGeometryN(partIndex);
           if (part instanceof Point) {
-            final Point point = (Point)part;
-            final Coordinates coordinates = CoordinatesUtil.get(point);
-            return coordinates;
+            if (pointIndex == 0) {
+              final Point point = (Point)part;
+              final Coordinates coordinates = CoordinatesUtil.get(point);
+              return coordinates;
+            } else {
+              return null;
+            }
           } else if (part instanceof LineString) {
             final LineString line = (LineString)part;
             final CoordinatesList points = CoordinatesListUtil.get(line);

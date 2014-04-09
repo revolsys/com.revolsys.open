@@ -445,8 +445,14 @@ public class GeometryFactory implements Serializable,
 
   protected GeometryFactory(final int srid, final int numAxis,
     final double scaleXY, final double scaleZ) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(srid), numAxis, scaleXY,
-      scaleZ);
+    this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
+    this.coordinateSequenceFactory = new DoubleCoordinatesListFactory();
+    this.srid = srid;
+
+    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
+    this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
+      scaleXY, scaleZ);
+    this.numAxis = Math.max(numAxis, 2);
   }
 
   /**
@@ -939,8 +945,8 @@ public class GeometryFactory implements Serializable,
   }
 
   public LinearRing createLinearRing(final CoordinatesList points) {
-    final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return createLinearRing(coordinatesList);
+    final CoordinateSequence coordinatesList = createCoordinatesList(points);
+    return new LinearRing(coordinatesList, this);
   }
 
   public LinearRing createLinearRing(final LinearRing linearRing) {
@@ -992,8 +998,8 @@ public class GeometryFactory implements Serializable,
   }
 
   public LineString createLineString(final CoordinatesList points) {
-    final CoordinatesList newPoints = createCoordinatesList(points);
-    final LineString line = createLineString(newPoints);
+    final CoordinateSequence newPoints = createCoordinatesList(points);
+    final LineString line = new LineString(newPoints, this);
     return line;
   }
 
@@ -1162,7 +1168,7 @@ public class GeometryFactory implements Serializable,
 
   public Point createPoint(final CoordinatesList points) {
     final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return createPoint(coordinatesList);
+    return new Point(coordinatesList, this);
   }
 
   public Point createPoint(final double... coordinates) {
@@ -1450,6 +1456,16 @@ public class GeometryFactory implements Serializable,
    */
   public PrecisionModel getPrecisionModel() {
     return precisionModel;
+  }
+
+  @Override
+  public double getResolutionXy() {
+    return coordinatesPrecisionModel.getResolutionXy();
+  }
+
+  @Override
+  public double getResolutionZ() {
+    return coordinatesPrecisionModel.getResolutionZ();
   }
 
   @Override

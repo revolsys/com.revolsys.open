@@ -502,13 +502,30 @@ public class CoordinatesListUtil {
     return pointSet;
   }
 
-  public static List<List<CoordinatesList>> getParts(final Geometry geometry) {
+  public static List<List<CoordinatesList>> getParts(final Geometry geometry,
+    final boolean clockwise) {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     if (geometry != null) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
         final Geometry part = geometry.getGeometryN(i);
         if (!part.isEmpty()) {
           final List<CoordinatesList> pointsList = getAll(part);
+          if (part instanceof Polygon) {
+            if (pointsList.size() > 0 && !part.isEmpty()) {
+              boolean partClockwise = clockwise;
+              for (int j = 0; j < pointsList.size(); j++) {
+                CoordinatesList points = pointsList.get(j);
+                final boolean ringClockwise = !CoordinatesListUtil.isCCW(points);
+                if (ringClockwise != partClockwise) {
+                  points = points.reverse();
+                }
+                pointsList.set(j, points);
+                if (j == 0) {
+                  partClockwise = !clockwise;
+                }
+              }
+            }
+          }
           partsList.add(pointsList);
         }
       }

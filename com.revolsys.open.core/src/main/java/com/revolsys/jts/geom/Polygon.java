@@ -494,9 +494,9 @@ public class Polygon extends Geometry implements Polygonal {
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   @Override
-  public Iterable<GeometryVertex> vertices() {
-    return new AbstractIterator<GeometryVertex>() {
-      private GeometryVertex vertex = new GeometryVertex(Polygon.this, 0);
+  public Iterable<Vertex> vertices() {
+    return new AbstractIterator<Vertex>() {
+      private Vertex vertex = new Vertex(Polygon.this, 0);
 
       private int vertexIndex = 0;
 
@@ -505,7 +505,7 @@ public class Polygon extends Geometry implements Polygonal {
       private LinearRing ring = shell;
 
       @Override
-      protected GeometryVertex getNext() throws NoSuchElementException {
+      protected Vertex getNext() throws NoSuchElementException {
         while (vertexIndex >= ring.getNumPoints()) {
           vertexIndex = 0;
           ringIndex++;

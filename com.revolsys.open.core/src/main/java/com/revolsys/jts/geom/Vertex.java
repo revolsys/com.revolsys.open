@@ -1,7 +1,6 @@
 package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
@@ -9,7 +8,7 @@ import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 /**
  * @author Paul Austin <paul.austin@revolsys.com>
  */
-public class GeometryVertex extends AbstractCoordinates {
+public class Vertex extends AbstractCoordinates {
 
   private final Geometry geometry;
 
@@ -17,14 +16,14 @@ public class GeometryVertex extends AbstractCoordinates {
 
   private int[] vertexId;
 
-  public GeometryVertex(final Geometry geometry, final int... vertexId) {
+  public Vertex(final Geometry geometry, final int... vertexId) {
     this.geometry = geometry;
     setVertexId(vertexId);
   }
 
   @Override
-  public GeometryVertex clone() {
-    return (GeometryVertex)super.clone();
+  public Vertex clone() {
+    return (Vertex)super.clone();
   }
 
   @Override
@@ -66,6 +65,10 @@ public class GeometryVertex extends AbstractCoordinates {
     return vertexId;
   }
 
+  public boolean isEmpty() {
+    return coordinates == null;
+  }
+
   @Override
   public void setValue(final int index, final double value) {
     throw new UnsupportedOperationException("Cannot modify a geometry vertex");
@@ -80,5 +83,4 @@ public class GeometryVertex extends AbstractCoordinates {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.createPoint(this);
   }
-
 }

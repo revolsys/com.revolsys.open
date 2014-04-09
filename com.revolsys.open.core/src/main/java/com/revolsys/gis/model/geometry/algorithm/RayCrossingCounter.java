@@ -243,4 +243,9 @@ public class RayCrossingCounter {
   protected void setPointOnSegment(final boolean isPointOnSegment) {
     this.isPointOnSegment = isPointOnSegment;
   }
+
+  @Override
+  public String toString() {
+    return "POINT(" + x + " " + y + ")";
+  }
 }

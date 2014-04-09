@@ -344,7 +344,7 @@ public class GeometryCollection extends Geometry {
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   @Override
-  public Iterable<GeometryVertex> vertices() {
+  public Iterable<Vertex> vertices() {
     // TODO;
     throw new UnsupportedOperationException();
   }

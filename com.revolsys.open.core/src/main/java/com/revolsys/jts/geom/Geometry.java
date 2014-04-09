@@ -1380,6 +1380,22 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   }
 
   /**
+   * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param vertexId The id of the vertex.
+   * @return The vertex or null if it does not exist.
+   */
+  public Vertex getVertex(final int... vertexId) {
+    final Vertex vertex = new Vertex(this, vertexId);
+    if (vertex.isEmpty()) {
+      return null;
+    } else {
+      return vertex;
+    }
+  }
+
+  /**
    * Gets a hash code for the Geometry.
    * 
    * @return an integer value suitable for use as a hashcode
@@ -1915,8 +1931,8 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
-  public Iterable<GeometryVertex> vertices() {
-    return Collections.<GeometryVertex> emptyList();
+  public Iterable<Vertex> vertices() {
+    return Collections.<Vertex> emptyList();
   }
 
   /**

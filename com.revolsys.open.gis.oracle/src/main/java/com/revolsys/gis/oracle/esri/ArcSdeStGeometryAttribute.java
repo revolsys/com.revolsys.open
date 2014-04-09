@@ -131,7 +131,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       int numPoints = 0;
       byte[] data;
 
-      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry);
+      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry, false);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);
       data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,

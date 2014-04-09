@@ -28,7 +28,7 @@ public class TestPackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry);
+    final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry, false);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);
 

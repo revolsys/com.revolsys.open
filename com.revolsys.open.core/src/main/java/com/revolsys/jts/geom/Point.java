@@ -259,8 +259,8 @@ public class Point extends Geometry implements Puntal {
   }
 
   @Override
-  public Iterable<GeometryVertex> vertices() {
-    final GeometryVertex vertex = new GeometryVertex(this, 0);
+  public Iterable<Vertex> vertices() {
+    final Vertex vertex = new Vertex(this, 0);
     return Collections.singletonList(vertex);
   }
 }

@@ -32,11 +32,24 @@
  */
 package com.revolsys.jts.triangulate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.triangulate.quadedge.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
+import com.revolsys.jts.triangulate.quadedge.Vertex;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -46,160 +59,152 @@ import com.revolsys.jts.triangulate.quadedge.*;
  * @author Martin Davis
  *
  */
-public class ConformingDelaunayTriangulationBuilder 
-{
-	private Collection siteCoords;
-	private Geometry constraintLines;
-	private double tolerance = 0.0;
-	private QuadEdgeSubdivision subdiv = null;
+public class ConformingDelaunayTriangulationBuilder {
+  private static List createConstraintSegments(final Geometry geom) {
+    final List lines = LinearComponentExtracter.getLines(geom);
+    final List constraintSegs = new ArrayList();
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+      createConstraintSegments(line, constraintSegs);
+    }
+    return constraintSegs;
+  }
 
-	private Map constraintVertexMap = new TreeMap();
-	
-	public ConformingDelaunayTriangulationBuilder()
-	{
-	}
-	
-	/**
-	 * Sets the sites (point or vertices) which will be triangulated.
-	 * All vertices of the given geometry will be used as sites.
-	 * The site vertices do not have to contain the constraint
-	 * vertices as well; any site vertices which are 
-	 * identical to a constraint vertex will be removed
-	 * from the site vertex set.
-	 * 
-	 * @param geom the geometry from which the sites will be extracted.
-	 */
-	public void setSites(Geometry geom)
-	{
-		siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
-	}
+  private static void createConstraintSegments(final LineString line,
+    final List constraintSegs) {
+    final Coordinate[] coords = line.getCoordinates();
+    for (int i = 1; i < coords.length; i++) {
+      constraintSegs.add(new Segment(coords[i - 1], coords[i]));
+    }
+  }
 
-	/**
-	 * Sets the linear constraints to be conformed to.
-	 * All linear components in the input will be used as constraints.
-	 * The constraint vertices do not have to be disjoint from 
-	 * the site vertices.
+  private Collection siteCoords;
+
+  private Geometry constraintLines;
+
+  private double tolerance = 0.0;
+
+  private QuadEdgeSubdivision subdiv = null;
+
+  private final Map constraintVertexMap = new TreeMap();
+
+  public ConformingDelaunayTriangulationBuilder() {
+  }
+
+  private void create() {
+    if (subdiv != null) {
+      return;
+    }
+
+    final Envelope siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
+
+    List segments = new ArrayList();
+    if (constraintLines != null) {
+      siteEnv.expandToInclude(constraintLines.getEnvelopeInternal());
+      createVertices(constraintLines);
+      segments = createConstraintSegments(constraintLines);
+    }
+    final List sites = createSiteVertices(siteCoords);
+
+    final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(
+      sites, tolerance);
+
+    cdt.setConstraints(segments, new ArrayList(constraintVertexMap.values()));
+
+    cdt.formInitialDelaunay();
+    cdt.enforceConstraints();
+    subdiv = cdt.getSubdivision();
+  }
+
+  private List createSiteVertices(final Collection coords) {
+    final List verts = new ArrayList();
+    for (final Iterator i = coords.iterator(); i.hasNext();) {
+      final Coordinate coord = (Coordinate)i.next();
+      if (constraintVertexMap.containsKey(coord)) {
+        continue;
+      }
+      verts.add(new ConstraintVertex(coord));
+    }
+    return verts;
+  }
+
+  private void createVertices(final Geometry geom) {
+    final Coordinate[] coords = geom.getCoordinates();
+    for (int i = 0; i < coords.length; i++) {
+      final Vertex v = new ConstraintVertex(coords[i]);
+      constraintVertexMap.put(coords[i], v);
+    }
+  }
+
+  /**
+   * Gets the edges of the computed triangulation as a {@link MultiLineString}.
+   * 
+   * @param geomFact the geometry factory to use to create the output
+   * @return the edges of the triangulation
+   */
+  public Geometry getEdges(final GeometryFactory geomFact) {
+    create();
+    return subdiv.getEdges(geomFact);
+  }
+
+  /**
+   * Gets the QuadEdgeSubdivision which models the computed triangulation.
+   * 
+   * @return the subdivision containing the triangulation
+   */
+  public QuadEdgeSubdivision getSubdivision() {
+    create();
+    return subdiv;
+  }
+
+  /**
+   * Gets the faces of the computed triangulation as a {@link GeometryCollection} 
+   * of {@link Polygon}.
+   * 
+   * @param geomFact the geometry factory to use to create the output
+   * @return the faces of the triangulation
+   */
+  public Geometry getTriangles(final GeometryFactory geomFact) {
+    create();
+    return subdiv.getTriangles(geomFact);
+  }
+
+  /**
+   * Sets the linear constraints to be conformed to.
+   * All linear components in the input will be used as constraints.
+   * The constraint vertices do not have to be disjoint from 
+   * the site vertices.
    * The constraints must not contain duplicate segments (up to orientation).
-	 * 
-	 * @param constraintLines the lines to constraint to
-	 */
-	public void setConstraints(Geometry constraintLines)
-	{
-		this.constraintLines = constraintLines;
-	}
-	
-	/**
-	 * Sets the snapping tolerance which will be used
-	 * to improved the robustness of the triangulation computation.
-	 * A tolerance of 0.0 specifies that no snapping will take place.
-	 * 
-	 * @param tolerance the tolerance distance to use
-	 */
-	public void setTolerance(double tolerance)
-	{
-		this.tolerance = tolerance;
-	}
-	
-	
-	private void create()
-	{
-		if (subdiv != null) return;
+   * 
+   * @param constraintLines the lines to constraint to
+   */
+  public void setConstraints(final Geometry constraintLines) {
+    this.constraintLines = constraintLines;
+  }
 
-		Envelope siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
-		
-		List segments = new ArrayList();
-		if (constraintLines != null) {
-			siteEnv.expandToInclude(constraintLines.getEnvelopeInternal());
-			createVertices(constraintLines);
-			segments = createConstraintSegments(constraintLines);
-		}
-    List sites = createSiteVertices(siteCoords);
+  /**
+   * Sets the sites (point or vertices) which will be triangulated.
+   * All vertices of the given geometry will be used as sites.
+   * The site vertices do not have to contain the constraint
+   * vertices as well; any site vertices which are 
+   * identical to a constraint vertex will be removed
+   * from the site vertex set.
+   * 
+   * @param geom the geometry from which the sites will be extracted.
+   */
+  public void setSites(final Geometry geom) {
+    siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
+  }
 
-		ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites, tolerance);
-		
-		cdt.setConstraints(segments, new ArrayList(constraintVertexMap.values()));
-		
-		cdt.formInitialDelaunay();
-		cdt.enforceConstraints();
-		subdiv = cdt.getSubdivision();
-	}
-	
-	private List createSiteVertices(Collection coords)
-	{
-		List verts = new ArrayList();
-		for (Iterator i = coords.iterator(); i.hasNext(); ) {
-			Coordinate coord = (Coordinate) i.next();
-			if (constraintVertexMap.containsKey(coord)) 
-			  continue;
-			verts.add(new ConstraintVertex(coord));
-		}
-		return verts;
-	}
-
-	private void createVertices(Geometry geom)
-	{
-		Coordinate[] coords = geom.getCoordinates();
-		for (int i = 0; i < coords.length; i++) {
-			Vertex v = new ConstraintVertex(coords[i]);
-			constraintVertexMap.put(coords[i], v);
-		}
-	}
-	
-	private static List createConstraintSegments(Geometry geom)
-	{
-		List lines = LinearComponentExtracter.getLines(geom);
-		List constraintSegs = new ArrayList();
-		for (Iterator i = lines.iterator(); i.hasNext(); ) {
-			LineString line = (LineString) i.next();
-			createConstraintSegments(line, constraintSegs);
-		}
-		return constraintSegs;
-	}
-	
-	private static void createConstraintSegments(LineString line, List constraintSegs)
-	{
-		Coordinate[] coords = line.getCoordinates();
-		for (int i = 1; i < coords.length; i++) {
-			constraintSegs.add(new Segment(coords[i-1], coords[i]));
-		}
-	}
-
-	/**
-	 * Gets the QuadEdgeSubdivision which models the computed triangulation.
-	 * 
-	 * @return the subdivision containing the triangulation
-	 */
-	public QuadEdgeSubdivision getSubdivision()
-	{
-		create();
-		return subdiv;
-	}
-	
-	/**
-	 * Gets the edges of the computed triangulation as a {@link MultiLineString}.
-	 * 
-	 * @param geomFact the geometry factory to use to create the output
-	 * @return the edges of the triangulation
-	 */
-	public Geometry getEdges(GeometryFactory geomFact)
-	{
-		create();
-		return subdiv.getEdges(geomFact);
-	}
-	
-	/**
-	 * Gets the faces of the computed triangulation as a {@link GeometryCollection} 
-	 * of {@link Polygon}.
-	 * 
-	 * @param geomFact the geometry factory to use to create the output
-	 * @return the faces of the triangulation
-	 */
-	public Geometry getTriangles(GeometryFactory geomFact)
-	{
-		create();
-		return subdiv.getTriangles(geomFact);
-	}
+  /**
+   * Sets the snapping tolerance which will be used
+   * to improved the robustness of the triangulation computation.
+   * A tolerance of 0.0 specifies that no snapping will take place.
+   * 
+   * @param tolerance the tolerance distance to use
+   */
+  public void setTolerance(final double tolerance) {
+    this.tolerance = tolerance;
+  }
 
 }
-
-
