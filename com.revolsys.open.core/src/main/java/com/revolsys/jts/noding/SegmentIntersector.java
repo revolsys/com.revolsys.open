@@ -32,10 +32,6 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.util.Debug;
 
 /**
  * Processes possible intersections detected by a {@link Noder}.

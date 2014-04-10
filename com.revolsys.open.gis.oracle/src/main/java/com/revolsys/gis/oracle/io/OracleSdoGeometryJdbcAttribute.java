@@ -13,19 +13,19 @@ import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
 import oracle.sql.STRUCT;
 
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -190,7 +190,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private double[] toCoordinateArray(final CoordinateSequence sequence,
+  private double[] toCoordinateArray(final CoordinatesList sequence,
     final int dimension) {
     int geometryDimension = sequence.getDimension();
     if (Double.isNaN(sequence.getOrdinate(0, 2))) {
@@ -219,7 +219,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private double[] toCoordinateArray(final LineString line, final int dimension) {
-    final CoordinateSequence sequence = line.getCoordinateSequence();
+    final CoordinatesList sequence = line.getCoordinatesList();
     final double[] coordinates = toCoordinateArray(sequence, dimension);
     return coordinates;
   }
@@ -268,7 +268,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         final Point point = (Point)geometry;
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof Coordinates) {
-        final Coordinates coordinates = (Coordinates)geometry;
+        final Coordinates coordinates = (Coordinates)object;
         final Point point = this.geometryFactory.createPoint(coordinates);
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof MultiPoint) {
@@ -309,7 +309,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int numGeometries = multiLineString.getNumGeometries();
     final Object[] parts = new Object[numGeometries];
     for (int i = 0; i < numGeometries; i++) {
-      final LineString line = (LineString)multiLineString.getGeometryN(i);
+      final LineString line = (LineString)multiLineString.getGeometry(i);
       final double[] ordinates = toCoordinateArray(line, dimension);
       parts[i] = ordinates;
     }
@@ -321,8 +321,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final double[] points = new double[numPoints * numAxis];
     int k = 0;
     for (int i = 0; i < numPoints; i++) {
-      final Point point = (Point)multiPoint.getGeometryN(i);
-      final Coordinates coordinates = CoordinatesUtil.get(point);
+      final Point point = (Point)multiPoint.getGeometry(i);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
       for (int j = 0; j < numAxis; j++) {
         final double value = coordinates.getValue(j);
         if (Double.isNaN(value)) {
@@ -344,14 +344,14 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   private JGeometry toJGeometry(final MultiPolygon multiPolygon,
     final int dimension) {
     if (multiPolygon.getNumGeometries() == 1) {
-      return toJGeometry((Polygon)multiPolygon.getGeometryN(0), dimension);
+      return toJGeometry((Polygon)multiPolygon.getGeometry(0), dimension);
     } else {
       final int srid = this.geometryFactory.getSrid();
       int numCoordinates = 0;
       int numParts = 0;
       final List<double[][]> coordinateArraysList = new ArrayList<double[][]>();
       for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-        final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+        final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
         final double[][] coordinateArrays = toCoordinateArrays(polygon,
           dimension);
         coordinateArraysList.add(coordinateArrays);
@@ -518,8 +518,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       }
     }
     if (exteriorRing != null) {
-      final Polygon polygon = this.geometryFactory.createPolygon(
-        exteriorRing,
+      final Polygon polygon = this.geometryFactory.createPolygon(exteriorRing,
         com.revolsys.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
       polygons.add(polygon);
     }

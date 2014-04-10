@@ -52,7 +52,7 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
       open = true;
     }
     final Geometry geometry = object.getGeometryValue();
-    final int srid = geometry.getSRID();
+    final int srid = geometry.getSrid();
     if (srid > 0) {
       out.print("SRID=");
       out.print(srid);

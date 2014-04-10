@@ -33,12 +33,14 @@
 package com.revolsys.jts.precision;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Puntal;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.ItemDistance;
 import com.revolsys.jts.index.strtree.STRtree;

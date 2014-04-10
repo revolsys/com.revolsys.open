@@ -35,7 +35,12 @@ package com.revolsys.jts.shape.random;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 /**

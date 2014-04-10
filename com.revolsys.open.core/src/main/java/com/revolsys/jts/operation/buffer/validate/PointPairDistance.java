@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Contains a pair of points and the distance between them.

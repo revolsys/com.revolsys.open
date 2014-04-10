@@ -33,9 +33,13 @@
 
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 
 /**
@@ -60,7 +64,7 @@ public class SegmentStringUtil
     List lines = LinearComponentExtracter.getLines(geom);
     for (Iterator i = lines.iterator(); i.hasNext(); ) {
       LineString line = (LineString) i.next();
-      Coordinate[] pts = line.getCoordinates();
+      Coordinate[] pts = line.getCoordinateArray();
       segStr.add(new NodedSegmentString(pts, geom));
     }
     return segStr;

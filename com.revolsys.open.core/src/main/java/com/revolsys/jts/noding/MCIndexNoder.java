@@ -33,10 +33,16 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.index.*;
-import com.revolsys.jts.index.chain.*;
-import com.revolsys.jts.index.strtree.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.index.chain.MonotoneChain;
+import com.revolsys.jts.index.chain.MonotoneChainBuilder;
+import com.revolsys.jts.index.chain.MonotoneChainOverlapAction;
+import com.revolsys.jts.index.strtree.STRtree;
 
 /**
  * Nodes a set of {@link SegmentString}s using a index based

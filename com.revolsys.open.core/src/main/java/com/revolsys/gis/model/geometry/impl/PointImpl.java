@@ -5,11 +5,10 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.geometry.Point;
-import com.revolsys.util.MathUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 
 public class PointImpl extends GeometryImpl implements Point {
@@ -71,21 +70,9 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  public int compareTo(final Coordinates other) {
-    final double x = getX();
-    final double y = getY();
-    final double distance = MathUtil.distance(0, 0, x, y);
+  public int compareTo(final Object other) {
+    return CoordinatesUtil.compareTo(this, other);
 
-    final double otherX = other.getX();
-    final double otherY = other.getY();
-    final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
-    final int distanceCompare = Double.compare(distance, otherDistance);
-    if (distanceCompare == 0) {
-      final int yCompare = Double.compare(y, otherY);
-      return yCompare;
-    } else {
-      return distanceCompare;
-    }
   }
 
   @Override

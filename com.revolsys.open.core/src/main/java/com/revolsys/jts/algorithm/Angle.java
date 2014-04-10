@@ -33,7 +33,6 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 
 /**
  * Utility functions for working with angles.

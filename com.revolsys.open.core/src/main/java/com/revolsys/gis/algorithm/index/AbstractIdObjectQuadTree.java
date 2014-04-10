@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   IdObjectIndex<T> {

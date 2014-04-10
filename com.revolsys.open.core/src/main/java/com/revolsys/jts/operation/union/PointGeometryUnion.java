@@ -33,10 +33,18 @@
 
 package com.revolsys.jts.operation.union;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import java.util.*;
+import java.util.Set;
+import java.util.TreeSet;
+
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Puntal;
+import com.revolsys.jts.geom.util.GeometryCombiner;
 
 /**
  * Computes the union of a {@link Puntal} geometry with 
@@ -72,7 +80,7 @@ public class PointGeometryUnion
 		Set exteriorCoords = new TreeSet();
 		
 		for (int i =0 ; i < pointGeom.getNumGeometries(); i++) {
-			Point point = (Point) pointGeom.getGeometryN(i);
+			Point point = (Point) pointGeom.getGeometry(i);
 			Coordinate coord = point.getCoordinate();
 			int loc = locater.locate(coord, otherGeom);
 			if (loc == Location.EXTERIOR)

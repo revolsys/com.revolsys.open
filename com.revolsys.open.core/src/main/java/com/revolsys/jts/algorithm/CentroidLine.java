@@ -33,7 +33,11 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the centroid of a linear geometry.
@@ -62,20 +66,20 @@ public class CentroidLine
   public void add(Geometry geom)
   {
     if (geom instanceof LineString) {
-      add(geom.getCoordinates());
+      add(geom.getCoordinateArray());
     }
     else if (geom instanceof Polygon) {
     	Polygon poly = (Polygon) geom;
     	// add linear components of a polygon
-      add(poly.getExteriorRing().getCoordinates());
+      add(poly.getExteriorRing().getCoordinateArray());
       for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-        add(poly.getInteriorRingN(i).getCoordinates());
+        add(poly.getInteriorRingN(i).getCoordinateArray());
       }
 		}
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        add(gc.getGeometryN(i));
+        add(gc.getGeometry(i));
       }
     }
   }

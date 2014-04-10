@@ -33,7 +33,8 @@
  */
 package com.revolsys.jts.operation.distance;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Represents the location of a point on a Geometry.

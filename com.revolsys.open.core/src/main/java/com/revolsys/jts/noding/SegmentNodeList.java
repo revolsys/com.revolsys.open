@@ -33,9 +33,15 @@
 package com.revolsys.jts.noding;
 
 import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A list of the {@link SegmentNode}s present along a noded {@link SegmentString}.

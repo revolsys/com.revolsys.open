@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -232,7 +232,7 @@ public class WktParser {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
       if (this.geometryFactory.getSrid() == 0) {
-        final int srid = geometry.getSRID();
+        final int srid = geometry.getSrid();
         if (useNumAxisFromGeometryFactory) {
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
             scaleZ);

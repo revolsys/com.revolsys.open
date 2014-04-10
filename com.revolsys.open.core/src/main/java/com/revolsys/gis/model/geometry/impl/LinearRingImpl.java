@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.geometry.impl;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LinearRing;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class LinearRingImpl extends LineStringImpl implements LinearRing {
 

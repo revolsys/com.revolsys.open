@@ -10,10 +10,10 @@ import java.util.Map;
 
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -691,7 +691,7 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     writeMCoordinatesRange(out, geometry);
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
-      final Geometry subGeometry = geometry.getGeometryN(n);
+      final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       writeMCoordinates(out, coordinates);
     }
@@ -710,7 +710,7 @@ public final class ShapefileGeometryUtil {
     double minM = Double.MAX_VALUE;
     double maxM = -Double.MAX_VALUE;
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
-      final Geometry subGeometry = geometry.getGeometryN(n);
+      final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       if (coordinates.getNumAxis() >= 4) {
         for (int i = 0; i < coordinates.size(); i++) {
@@ -892,7 +892,7 @@ public final class ShapefileGeometryUtil {
 
     final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry part = geometry.getGeometryN(i);
+      final Geometry part = geometry.getGeometry(i);
       if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
         final LineString exterior = polygon.getExteriorRing();
@@ -1010,7 +1010,7 @@ public final class ShapefileGeometryUtil {
     final Geometry geometry) throws IOException {
     int partIndex = 0;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final LineString line = (LineString)geometry.getGeometryN(i);
+      final LineString line = (LineString)geometry.getGeometry(i);
       out.writeLEInt(partIndex);
       partIndex += line.getNumPoints();
     }
@@ -1040,7 +1040,7 @@ public final class ShapefileGeometryUtil {
   public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry subGeometry = geometry.getGeometryN(i);
+      final Geometry subGeometry = geometry.getGeometry(i);
       final CoordinatesList points = CoordinatesListUtil.get(subGeometry);
       writeXYCoordinates(out, points);
     }
@@ -1068,7 +1068,7 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     writeZCoordinatesRange(out, geometry);
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
-      final Geometry subGeometry = geometry.getGeometryN(n);
+      final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       writeZCoordinates(out, coordinates);
     }
@@ -1087,7 +1087,7 @@ public final class ShapefileGeometryUtil {
     double minZ = Double.MAX_VALUE;
     double maxZ = -Double.MAX_VALUE;
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
-      final Geometry subGeometry = geometry.getGeometryN(n);
+      final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       if (coordinates.getNumAxis() >= 3) {
         for (int i = 0; i < coordinates.size(); i++) {

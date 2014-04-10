@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.index.intervalrtree;
 
-import com.revolsys.jts.index.*;
+import com.revolsys.jts.index.ItemVisitor;
 
 public class IntervalRTreeLeafNode 
 extends IntervalRTreeNode

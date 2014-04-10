@@ -12,7 +12,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.jts.IsSimpleOp;
 import com.revolsys.gis.jts.IsValidOp;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -127,7 +127,7 @@ public class SelectedRecordsRenderer {
 
       if (!geometry.isEmpty()) {
         for (int i = 0; i < geometry.getNumGeometries(); i++) {
-          final Geometry part = geometry.getGeometryN(i);
+          final Geometry part = geometry.getGeometry(i);
           if (part instanceof LineString) {
             final LineString lineString = (LineString)part;
             final CoordinatesList points = CoordinatesListUtil.get(lineString);

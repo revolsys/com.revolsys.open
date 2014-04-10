@@ -34,11 +34,29 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.MCPointInRing;
+import com.revolsys.jts.algorithm.PointInRing;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.EdgeIntersectionList;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Implements the algorithms required to compute the <code>isValid()</code> method
@@ -191,14 +209,14 @@ public class IsValidOp
    */
   private void checkValid(Point g)
   {
-    checkInvalidCoordinates(g.getCoordinates());
+    checkInvalidCoordinates(g.getCoordinateArray());
   }
   /**
    * Checks validity of a MultiPoint.
    */
   private void checkValid(MultiPoint g)
   {
-    checkInvalidCoordinates(g.getCoordinates());
+    checkInvalidCoordinates(g.getCoordinateArray());
   }
 
   /**
@@ -206,7 +224,7 @@ public class IsValidOp
    */
   private void checkValid(LineString g)
   {
-    checkInvalidCoordinates(g.getCoordinates());
+    checkInvalidCoordinates(g.getCoordinateArray());
     if (validErr != null) return;
     GeometryGraph graph = new GeometryGraph(0, g);
     checkTooFewPoints(graph);
@@ -216,7 +234,7 @@ public class IsValidOp
    */
   private void checkValid(LinearRing g)
   {
-    checkInvalidCoordinates(g.getCoordinates());
+    checkInvalidCoordinates(g.getCoordinateArray());
     if (validErr != null) return;
     checkClosedRing(g);
     if (validErr != null) return;
@@ -262,7 +280,7 @@ public class IsValidOp
   private void checkValid(MultiPolygon g)
   {
     for (int i = 0; i < g.getNumGeometries(); i++) {
-      Polygon p = (Polygon) g.getGeometryN(i);
+      Polygon p = (Polygon) g.getGeometry(i);
       checkInvalidCoordinates(p);
       if (validErr != null) return;
       checkClosedRings(p);
@@ -280,12 +298,12 @@ public class IsValidOp
       if (validErr != null) return;
     }
     for (int i = 0; i < g.getNumGeometries(); i++) {
-      Polygon p = (Polygon) g.getGeometryN(i);
+      Polygon p = (Polygon) g.getGeometry(i);
       checkHolesInShell(p, graph);
       if (validErr != null) return;
     }
     for (int i = 0; i < g.getNumGeometries(); i++) {
-      Polygon p = (Polygon) g.getGeometryN(i);
+      Polygon p = (Polygon) g.getGeometry(i);
       checkHolesNotNested(p, graph);
       if (validErr != null) return;
     }
@@ -297,7 +315,7 @@ public class IsValidOp
   private void checkValid(GeometryCollection gc)
   {
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      Geometry g = gc.getGeometryN(i);
+      Geometry g = gc.getGeometry(i);
       checkValid(g);
       if (validErr != null) return;
     }
@@ -317,10 +335,10 @@ public class IsValidOp
 
   private void checkInvalidCoordinates(Polygon poly)
   {
-    checkInvalidCoordinates(poly.getExteriorRing().getCoordinates());
+    checkInvalidCoordinates(poly.getExteriorRing().getCoordinateArray());
     if (validErr != null) return;
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      checkInvalidCoordinates(poly.getInteriorRingN(i).getCoordinates());
+      checkInvalidCoordinates(poly.getInteriorRingN(i).getCoordinateArray());
       if (validErr != null) return;
     }
   }
@@ -449,7 +467,7 @@ public class IsValidOp
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
       LinearRing hole = (LinearRing) p.getInteriorRingN(i);
-      Coordinate holePt = findPtNotNode(hole.getCoordinates(), shell, graph);
+      Coordinate holePt = findPtNotNode(hole.getCoordinateArray(), shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
        * split the polygon into disconnected interiors.
@@ -512,11 +530,11 @@ public class IsValidOp
   private void checkShellsNotNested(MultiPolygon mp, GeometryGraph graph)
   {
     for (int i = 0; i < mp.getNumGeometries(); i++) {
-      Polygon p = (Polygon) mp.getGeometryN(i);
+      Polygon p = (Polygon) mp.getGeometry(i);
       LinearRing shell = (LinearRing) p.getExteriorRing();
       for (int j = 0; j < mp.getNumGeometries(); j++) {
         if (i == j) continue;
-        Polygon p2 = (Polygon) mp.getGeometryN(j);
+        Polygon p2 = (Polygon) mp.getGeometry(j);
         checkShellNotNested(shell, p2, graph);
         if (validErr != null) return;
       }
@@ -534,10 +552,10 @@ public class IsValidOp
    */
   private void checkShellNotNested(LinearRing shell, Polygon p, GeometryGraph graph)
   {
-    Coordinate[] shellPts = shell.getCoordinates();
+    Coordinate[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
     LinearRing polyShell =  (LinearRing) p.getExteriorRing();
-    Coordinate[] polyPts = polyShell.getCoordinates();
+    Coordinate[] polyPts = polyShell.getCoordinateArray();
     Coordinate shellPt = findPtNotNode(shellPts, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the polygon
     if (shellPt == null)
@@ -582,8 +600,8 @@ public class IsValidOp
    */
   private Coordinate checkShellInsideHole(LinearRing shell, LinearRing hole, GeometryGraph graph)
   {
-    Coordinate[] shellPts = shell.getCoordinates();
-    Coordinate[] holePts = hole.getCoordinates();
+    Coordinate[] shellPts = shell.getCoordinateArray();
+    Coordinate[] holePts = hole.getCoordinateArray();
     // TODO: improve performance of this - by sorting pointlists for instance?
     Coordinate shellPt = findPtNotNode(shellPts, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the hole

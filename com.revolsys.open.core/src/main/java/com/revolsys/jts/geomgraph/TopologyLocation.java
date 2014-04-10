@@ -37,7 +37,6 @@ package com.revolsys.jts.geomgraph;
 
 
 
-import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.geom.Location;
 
 /**

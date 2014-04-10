@@ -37,11 +37,11 @@ import java.util.List;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.strtree.STRtree;
 

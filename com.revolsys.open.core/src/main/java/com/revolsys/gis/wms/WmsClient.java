@@ -21,10 +21,10 @@ import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.io.xml.SimpleXmlProcessorContext;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.io.xml.XmlProcessorContext;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.Base64;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.jts.geom.Envelope;
 
 public class WmsClient {
   private String name;

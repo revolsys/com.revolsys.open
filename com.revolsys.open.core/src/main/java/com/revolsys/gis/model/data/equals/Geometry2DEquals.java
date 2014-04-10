@@ -25,8 +25,8 @@ public class Geometry2DEquals implements Equals<Geometry> {
       return false;
     }
     for (int j = 0; j < geometry1.getNumGeometries(); j++) {
-      final Geometry geometryPart1 = geometry1.getGeometryN(j);
-      final Geometry geometryPart2 = geometry2.getGeometryN(j);
+      final Geometry geometryPart1 = geometry1.getGeometry(j);
+      final Geometry geometryPart2 = geometry2.getGeometry(j);
       if (!geometryPart1.equals(geometryPart2)) {
         return false;
       }

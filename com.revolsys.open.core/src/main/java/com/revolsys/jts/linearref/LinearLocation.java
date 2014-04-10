@@ -33,7 +33,11 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
 
 /**
  * Represents a location along a {@link LineString} or {@link MultiLineString}.
@@ -173,7 +177,7 @@ public class LinearLocation
       return;
     }
     if (segmentIndex >= linear.getNumPoints()) {
-      LineString line = (LineString) linear.getGeometryN(componentIndex);
+      LineString line = (LineString) linear.getGeometry(componentIndex);
       segmentIndex = line.getNumPoints() - 1;
       segmentFraction = 1.0;
     }
@@ -210,7 +214,7 @@ public class LinearLocation
    */
   public double getSegmentLength(Geometry linearGeom)
   {
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
 
     // ensure segment index is valid
     int segIndex = segmentIndex;
@@ -231,7 +235,7 @@ public class LinearLocation
   public void setToEnd(Geometry linear)
   {
     componentIndex = linear.getNumGeometries() - 1;
-    LineString lastLine = (LineString) linear.getGeometryN(componentIndex);
+    LineString lastLine = (LineString) linear.getGeometry(componentIndex);
     segmentIndex = lastLine.getNumPoints() - 1;
     segmentFraction = 1.0;
   }
@@ -277,7 +281,7 @@ public class LinearLocation
    */
   public Coordinate getCoordinate(Geometry linearGeom)
   {
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
     Coordinate p0 = lineComp.getCoordinateN(segmentIndex);
     if (segmentIndex >= lineComp.getNumPoints() - 1)
       return p0;
@@ -294,7 +298,7 @@ public class LinearLocation
    */
   public LineSegment getSegment(Geometry linearGeom)
   {
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
     Coordinate p0 = lineComp.getCoordinateN(segmentIndex);
     // check for endpoint - return last segment of the line if so
     if (segmentIndex >= lineComp.getNumPoints() - 1) {
@@ -317,7 +321,7 @@ public class LinearLocation
     if (componentIndex < 0 || componentIndex >= linearGeom.getNumGeometries())
       return false;
 
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
     if (segmentIndex < 0 || segmentIndex > lineComp.getNumPoints())
       return false;
     if (segmentIndex == lineComp.getNumPoints() && segmentFraction != 0.0)
@@ -433,7 +437,7 @@ public class LinearLocation
    */
   public boolean isEndpoint(Geometry linearGeom)
   {
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
     // check for endpoint
     int nseg = lineComp.getNumPoints() - 1;
     return segmentIndex >= nseg
@@ -457,7 +461,7 @@ public class LinearLocation
   public LinearLocation toLowest(Geometry linearGeom)
   {
     // TODO: compute lowest component index
-    LineString lineComp = (LineString) linearGeom.getGeometryN(componentIndex);
+    LineString lineComp = (LineString) linearGeom.getGeometry(componentIndex);
     int nseg = lineComp.getNumPoints() - 1;
     // if not an endpoint can be returned directly
     if (segmentIndex < nseg) return this;

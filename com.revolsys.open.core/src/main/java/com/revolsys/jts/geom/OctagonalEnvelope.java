@@ -138,7 +138,7 @@ public class OctagonalEnvelope
     g.apply(new BoundingOctagonComponentFilter());
   }
 
-  public OctagonalEnvelope expandToInclude(CoordinateSequence seq)
+  public OctagonalEnvelope expandToInclude(CoordinatesList seq)
   {
     for (int i = 0; i < seq.size(); i++) {
       double x = seq.getX(i);
@@ -298,7 +298,7 @@ public class OctagonalEnvelope
   public Geometry toGeometry(GeometryFactory geomFactory)
   {
     if (isNull()) {
-      return geomFactory.createPoint((CoordinateSequence)null);
+      return geomFactory.createPoint((CoordinatesList)null);
     }
 
     Coordinate px00 = new Coordinate(minX, minA - minX);
@@ -352,7 +352,7 @@ public class OctagonalEnvelope
      public void filter(Geometry geom)
      {
        if (geom instanceof LineString) {
-         expandToInclude( ((LineString) geom).getCoordinateSequence());
+         expandToInclude( ((LineString) geom).getCoordinatesList());
        }
        else if (geom instanceof Point) {
          expandToInclude( ((Point) geom).getCoordinateSequence());

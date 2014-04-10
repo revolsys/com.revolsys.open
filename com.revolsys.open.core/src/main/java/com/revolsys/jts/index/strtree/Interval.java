@@ -33,7 +33,7 @@
  */
 package com.revolsys.jts.index.strtree;
 
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A contiguous portion of 1D-space. Used internally by SIRtree.

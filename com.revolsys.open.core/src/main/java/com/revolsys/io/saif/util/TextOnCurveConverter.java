@@ -50,7 +50,7 @@ public class TextOnCurveConverter implements OsnConverter {
     geometry = geometryFactory.createMultiPoint(points);
     for (int i = 0; i < points.size(); i++) {
       final Point originalPoint = points.get(0);
-      final Point geometryPoint = (Point)geometry.getGeometryN(i);
+      final Point geometryPoint = (Point)geometry.getGeometry(i);
       geometryPoint.setUserData(originalPoint.getUserData());
     }
     geometry.setUserData(values);
@@ -73,7 +73,7 @@ public class TextOnCurveConverter implements OsnConverter {
       serializer.startCollection("List");
       final OsnConverter osnConverter = converters.getConverter(SaifConstants.TEXT_LINE);
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-        final Point point = (Point)multiPoint.getGeometryN(i);
+        final Point point = (Point)multiPoint.getGeometry(i);
         osnConverter.write(serializer, point);
       }
       serializer.endCollection();

@@ -1,12 +1,13 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -42,7 +43,7 @@ public class CoordinatesUtil {
   public static Point add(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(add(get(c1), get(p2)));
+    return factory.createPoint(add(getInstance(c1), getInstance(p2)));
   }
 
   public static double angle(final Coordinates p1, final Coordinates p2,
@@ -54,6 +55,14 @@ public class CoordinatesUtil {
     final double x3 = p3.getX();
     final double y3 = p3.getY();
     return MathUtil.angle(x1, y1, x2, y2, x3, y3);
+  }
+
+  public static double angle2d(final Coordinates point1,
+    final Coordinates point2) {
+    final double dx = point2.getX() - point1.getX();
+    final double dy = point2.getY() - point1.getY();
+    final double angle = Math.atan2(dy, dx);
+    return angle;
   }
 
   /**
@@ -123,6 +132,32 @@ public class CoordinatesUtil {
     return cc;
   }
 
+  public static int compareTo(final Coordinates point1, final Coordinates point2) {
+    final double x = point1.getX();
+    final double y = point1.getY();
+    final double distance = MathUtil.distance(0, 0, x, y);
+
+    final double otherX = point2.getX();
+    final double otherY = point2.getY();
+    final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
+    final int distanceCompare = Double.compare(distance, otherDistance);
+    if (distanceCompare == 0) {
+      final int yCompare = Double.compare(y, otherY);
+      return yCompare;
+    } else {
+      return distanceCompare;
+    }
+  }
+
+  public static int compareTo(final Coordinates point1, final Object other) {
+    if (other instanceof Coordinates) {
+      final Coordinates point2 = (Coordinates)other;
+      return compareTo(point1, point2);
+    } else {
+      return -1;
+    }
+  }
+
   public static double distance(final Coordinates point1,
     final Coordinates point2) {
     final double x1 = point1.getX();
@@ -143,9 +178,40 @@ public class CoordinatesUtil {
     return newPoint;
   }
 
+  public static boolean equals(final Coordinates point,
+    final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double coordinate = coordinates[i];
+      if (coordinate != point.getValue(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static boolean equals(final double x1, final double y1,
     final double x2, final double y2) {
     return x1 == x2 && y1 == y2;
+  }
+
+  public static boolean equals2d(final Coordinates point1,
+    final Coordinates point2) {
+    if (NumberEquals.equal(point1.getX(), point2.getX())) {
+      if (NumberEquals.equal(point1.getY(), point2.getY())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean equals3d(final Coordinates point1,
+    final Coordinates point2) {
+    if (equals2d(point1, point2)) {
+      if (NumberEquals.equal(point1.getZ(), point2.getZ())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static Coordinates get(final Coordinate coordinate) {
@@ -174,11 +240,28 @@ public class CoordinatesUtil {
     }
   }
 
+  public static double[] getCoordinates(final Coordinates point) {
+    final double[] coordinates = new double[point.getNumAxis()];
+    for (int i = 0; i < coordinates.length; i++) {
+      coordinates[i] = point.getValue(i);
+    }
+    return coordinates;
+  }
+
   public static double getElevation(final Coordinates coordinate,
     final Coordinates c0, final Coordinates c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * (fraction);
     return z;
+  }
+
+  @Deprecated
+  public static Coordinates getInstance(final Point point) {
+    if (point == null || point.isEmpty()) {
+      return null;
+    } else {
+      return point;
+    }
   }
 
   public static int getNumAxis(final Coordinates... points) {
@@ -203,6 +286,18 @@ public class CoordinatesUtil {
     } else {
       return point.getY();
     }
+  }
+
+  public static int hashCode(final Coordinates point) {
+    int result = 17;
+    result = 37 * result + hashCode(point.getX());
+    result = 37 * result + hashCode(point.getY());
+    return result;
+  }
+
+  public static int hashCode(final double d) {
+    final long f = Double.doubleToLongBits(d);
+    return (int)(f ^ (f >>> 32));
   }
 
   public static boolean isAcute(final Coordinates point1,
@@ -368,7 +463,7 @@ public class CoordinatesUtil {
   public static Point subtract(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(subtract(get(c1), get(p2)));
+    return factory.createPoint(subtract(getInstance(c1), getInstance(p2)));
   }
 
   public static Coordinate toCoordinate(final Coordinates point) {

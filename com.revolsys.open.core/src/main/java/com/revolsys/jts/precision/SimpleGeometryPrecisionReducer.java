@@ -33,8 +33,15 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.util.GeometryEditor;
 
 /**
  * Reduces the precision of the coordinates of a {@link Geometry}

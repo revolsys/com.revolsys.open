@@ -35,7 +35,6 @@ package com.revolsys.jts.triangulate;
 
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.triangulate.quadedge.Vertex;
 
 /**
  * An interface for factories which create a {@link ConstraintVertex}

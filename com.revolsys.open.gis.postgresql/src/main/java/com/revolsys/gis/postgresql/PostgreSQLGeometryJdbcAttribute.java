@@ -23,7 +23,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -188,7 +188,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.LineString toJtsLineString(
-    final com.revolsys.jts.geom.GeometryFactory factory, final LineString lineString) {
+    final com.revolsys.jts.geom.GeometryFactory factory,
+    final LineString lineString) {
     final Point[] points = lineString.getPoints();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
       points.length, numAxis);
@@ -207,7 +208,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
-    final com.revolsys.jts.geom.GeometryFactory factory, final MultiLineString multiLine) {
+    final com.revolsys.jts.geom.GeometryFactory factory,
+    final MultiLineString multiLine) {
     final LineString[] lines = multiLine.getLines();
     if (lines.length == 1) {
       return toJtsLineString(factory, lines[0]);
@@ -222,11 +224,11 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiPoint(
-    final com.revolsys.jts.geom.GeometryFactory factory, final MultiPoint multiPoint) {
+    final com.revolsys.jts.geom.GeometryFactory factory,
+    final MultiPoint multiPoint) {
     final List<com.revolsys.jts.geom.Point> points = new ArrayList<com.revolsys.jts.geom.Point>();
     for (final Point point : multiPoint.getPoints()) {
-      final com.revolsys.jts.geom.Point jtsPoint = toJtsPoint(factory,
-        point);
+      final com.revolsys.jts.geom.Point jtsPoint = toJtsPoint(factory, point);
       points.add(jtsPoint);
     }
     if (points.size() == 1) {
@@ -237,11 +239,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiPolygon(
-    final com.revolsys.jts.geom.GeometryFactory factory, final MultiPolygon multiPolygon) {
+    final com.revolsys.jts.geom.GeometryFactory factory,
+    final MultiPolygon multiPolygon) {
     final List<com.revolsys.jts.geom.Polygon> polygons = new ArrayList<com.revolsys.jts.geom.Polygon>();
     for (final Polygon polygon : multiPolygon.getPolygons()) {
-      final com.revolsys.jts.geom.Polygon jtsPolygon = toJtsPolygon(
-        factory, polygon);
+      final com.revolsys.jts.geom.Polygon jtsPolygon = toJtsPolygon(factory,
+        polygon);
       polygons.add(jtsPolygon);
     }
     if (polygons.size() == 1) {
@@ -281,9 +284,9 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         coordinates.setValue(i, 0, point.x);
         coordinates.setValue(i, 1, point.y);
         if (numAxis > 2) {
-          coordinates.setOrdinate(i, 2, point.z);
+          coordinates.setValue(i, 2, point.z);
           if (numAxis > 3) {
-            coordinates.setOrdinate(i, 3, point.m);
+            coordinates.setValue(i, 3, point.m);
           }
         }
       }
@@ -292,12 +295,11 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return factory.createPolygon(rings);
   }
 
-  private LinearRing toPgLinearRing(
-    final com.revolsys.jts.geom.LineString ring) {
+  private LinearRing toPgLinearRing(final com.revolsys.jts.geom.LineString ring) {
     final CoordinatesList points = CoordinatesListUtil.get(ring);
     final Point[] pgPoints = toPgPoints(points);
     final LinearRing linearRing = new LinearRing(pgPoints);
-    linearRing.setSrid(ring.getSRID());
+    linearRing.setSrid(ring.getSrid());
     return linearRing;
   }
 
@@ -306,7 +308,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
-    final int srid = lineString.getSRID();
+    final int srid = lineString.getSrid();
     pgLineString.setSrid(srid);
     return pgLineString;
   }
@@ -318,7 +320,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.LineString) {
           final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)firstGeometry;
           return toPgLineString(line);
@@ -339,7 +341,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final com.revolsys.jts.geom.Geometry geometry) {
     final List<LineString> pgLineStrings = new ArrayList<LineString>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.LineString) {
         final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)subGeometry;
         final LineString pgLineString = toPgLineString(line);
@@ -350,7 +352,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
             + subGeometry.getClass());
       }
     }
-    return toPgMultiLineString(geometry.getSRID(), pgLineStrings);
+    return toPgMultiLineString(geometry.getSrid(), pgLineStrings);
   }
 
   private MultiLineString toPgMultiLineString(final int srid,
@@ -362,11 +364,10 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     return pgMultiLineString;
   }
 
-  private Geometry toPgMultiPoint(
-    final com.revolsys.jts.geom.Geometry geometry) {
+  private Geometry toPgMultiPoint(final com.revolsys.jts.geom.Geometry geometry) {
     final List<Point> pgPoints = new ArrayList<Point>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.Point) {
         final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)subGeometry;
         final Point pgPoint = toPgPoint(point);
@@ -376,7 +377,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
           + subGeometry.getClass());
       }
     }
-    return toPgMultiPoint(geometry.getSRID(), pgPoints);
+    return toPgMultiPoint(geometry.getSrid(), pgPoints);
   }
 
   private MultiPoint toPgMultiPoint(final int srid, final List<Point> points) {
@@ -391,7 +392,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final com.revolsys.jts.geom.Geometry geometry) {
     final List<Polygon> pgPolygons = new ArrayList<Polygon>();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometryN(i);
+      final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.Polygon) {
         final com.revolsys.jts.geom.Polygon line = (com.revolsys.jts.geom.Polygon)subGeometry;
         final Polygon pgPolygon = toPgPolygon(line);
@@ -401,7 +402,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
           + subGeometry.getClass());
       }
     }
-    return toPgMultiPolygon(geometry.getSRID(), pgPolygons);
+    return toPgMultiPolygon(geometry.getSrid(), pgPolygons);
   }
 
   private MultiPolygon toPgMultiPolygon(final int srid,
@@ -436,7 +437,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else {
       pgPoint = new Point(x, y);
     }
-    pgPoint.setSrid(point.getSRID());
+    pgPoint.setSrid(point.getSrid());
     return pgPoint;
   }
 
@@ -447,7 +448,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.Point) {
           final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)firstGeometry;
           return toPgPoint(point);
@@ -503,7 +504,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
     }
     final Polygon pgPolygon = new Polygon(rings);
-    pgPolygon.setSrid(polygon.getSRID());
+    pgPolygon.setSrid(polygon.getSrid());
     return pgPolygon;
   }
 
@@ -514,7 +515,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
       if (geometryCollection.getNumGeometries() == 1) {
-        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometryN(0);
+        final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.Polygon) {
           final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)firstGeometry;
           return toPgPolygon(polygon);

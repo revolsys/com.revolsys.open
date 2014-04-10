@@ -32,10 +32,11 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.util.Debug;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Finds <b>interior</b> intersections between line segments in {@link NodedSegmentString}s,

@@ -60,7 +60,7 @@ public class LocatePointInRingTest extends AbstractPointInRingTest {
     final String wkt) throws Exception {
     final Geometry geom = this.reader.read(wkt);
     assertEquals(expectedLoc,
-      CGAlgorithms.locatePointInRing(pt, geom.getCoordinates()));
+      CGAlgorithms.locatePointInRing(pt, geom.getCoordinateArray()));
   }
 
 }

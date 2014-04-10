@@ -32,12 +32,25 @@
  */
 package com.revolsys.jts.io;
 
-import com.revolsys.jts.geom.*;
-
-import com.revolsys.jts.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Writes the Well-Known Text representation of a {@link Geometry}.
@@ -77,13 +90,13 @@ public class WKTWriter
 
   /**
    * Generates the WKT for a <tt>LINESTRING</tt>
-   * specified by a {@link CoordinateSequence}.
+   * specified by a {@link CoordinatesList}.
    *
    * @param seq the sequence to write
    *
    * @return the WKT string
    */
-  public static String toLineString(CoordinateSequence seq)
+  public static String toLineString(CoordinatesList seq)
   {
     StringBuffer buf = new StringBuffer();
     buf.append("LINESTRING ");
@@ -480,11 +493,11 @@ public class WKTWriter
   /**
    * Appends the i'th coordinate from the sequence to the writer
    *
-   * @param  seq  the <code>CoordinateSequence</code> to process
+   * @param  seq  the <code>CoordinatesList</code> to process
    * @param i     the index of the coordinate to write
    * @param  writer the output writer to append to
    */
-  private void appendCoordinate(CoordinateSequence seq, int i, Writer writer)
+  private void appendCoordinate(CoordinatesList seq, int i, Writer writer)
       throws IOException
   {
     writer.write(writeNumber(seq.getX(i)) + " " + writeNumber(seq.getY(i)));
@@ -533,7 +546,7 @@ public class WKTWriter
    *@param  lineString  the <code>LineString</code> to process
    *@param  writer      the output writer to append to
    */
-  private void appendSequenceText(CoordinateSequence seq, int level, boolean doIndent, Writer writer)
+  private void appendSequenceText(CoordinatesList seq, int level, boolean doIndent, Writer writer)
     throws IOException
   {
     if (seq.size() == 0) {
@@ -632,7 +645,7 @@ public class WKTWriter
           indentCoords(i, level + 1, writer);
         }
         writer.write("(");
-        appendCoordinate(((Point) multiPoint.getGeometryN(i)).getCoordinate(), writer);
+        appendCoordinate(((Point) multiPoint.getGeometry(i)).getCoordinate(), writer);
         writer.write(")");
      }
       writer.write(")");
@@ -663,7 +676,7 @@ public class WKTWriter
           level2 = level + 1;
           doIndent = true;
         }
-        appendLineStringText((LineString) multiLineString.getGeometryN(i), level2, doIndent, writer);
+        appendLineStringText((LineString) multiLineString.getGeometry(i), level2, doIndent, writer);
       }
       writer.write(")");
     }
@@ -692,7 +705,7 @@ public class WKTWriter
           level2 = level + 1;
           doIndent = true;
         }
-        appendPolygonText((Polygon) multiPolygon.getGeometryN(i), level2, doIndent, writer);
+        appendPolygonText((Polygon) multiPolygon.getGeometry(i), level2, doIndent, writer);
       }
       writer.write(")");
     }
@@ -720,7 +733,7 @@ public class WKTWriter
           writer.write(", ");
           level2 = level + 1;
         }
-        appendGeometryTaggedText(geometryCollection.getGeometryN(i), level2, writer);
+        appendGeometryTaggedText(geometryCollection.getGeometry(i), level2, writer);
       }
       writer.write(")");
     }

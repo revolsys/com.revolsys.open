@@ -33,10 +33,16 @@
 package com.revolsys.jts.geom.prep;
 
 
-import com.revolsys.jts.algorithm.locate.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.operation.predicate.*;
+import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.noding.FastSegmentSetIntersectionFinder;
+import com.revolsys.jts.noding.SegmentStringUtil;
+import com.revolsys.jts.operation.predicate.RectangleContains;
+import com.revolsys.jts.operation.predicate.RectangleIntersects;
 
 /**
  * A prepared version for {@link Polygonal} geometries.

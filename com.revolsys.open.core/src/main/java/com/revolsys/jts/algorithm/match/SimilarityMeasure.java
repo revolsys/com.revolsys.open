@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.algorithm.match;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * An interface for classes which measures the degree of similarity between two {@link Geometry}s.

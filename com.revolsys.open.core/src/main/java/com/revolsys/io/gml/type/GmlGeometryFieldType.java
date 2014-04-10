@@ -4,11 +4,11 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.gml.GmlConstants;
 import com.revolsys.io.gml.GmlDataObjectWriter;
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -89,7 +89,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(tag);
     srsName(out, geometryCollection, writeSrsName);
     for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
-      final Geometry geometry = geometryCollection.getGeometryN(i);
+      final Geometry geometry = geometryCollection.getGeometry(i);
       out.startTag(memberTag);
       geometry(out, geometry, false);
       out.endTag(memberTag);

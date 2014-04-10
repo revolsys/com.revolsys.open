@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;

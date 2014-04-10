@@ -33,11 +33,16 @@
  */
 package com.revolsys.jts.index.strtree;
 
-import com.revolsys.jts.index.ItemVisitor;
-import com.revolsys.jts.util.*;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Base class for STRtree and SIRtree. STR-packed R-trees are described in:

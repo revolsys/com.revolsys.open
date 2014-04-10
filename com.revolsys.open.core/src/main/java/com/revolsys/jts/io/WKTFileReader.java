@@ -33,9 +33,16 @@
 
 package com.revolsys.jts.io;
 
-import java.io.*;
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Reads a sequence of {@link Geometry}s in WKT format 

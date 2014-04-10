@@ -15,7 +15,6 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
@@ -24,6 +23,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.Triangle;
 import com.revolsys.gis.model.geometry.visitor.TriangleContainsPointFilter;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -643,7 +643,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertNode(final Point point) {
-    final Coordinates coordinate = CoordinatesUtil.get(point);
+    final Coordinates coordinate = CoordinatesUtil.getInstance(point);
     insertNode(coordinate);
   }
 

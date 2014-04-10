@@ -33,8 +33,11 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.util.Assert;
 /**
  * Represents an affine transformation on the 2D Cartesian plane. 
  * It can be used to transform a {@link Coordinate} or {@link Geometry}.
@@ -1006,12 +1009,12 @@ public class AffineTransformation
   
   /**
    * Applies this transformation to the i'th coordinate
-   * in the given CoordinateSequence.
+   * in the given CoordinatesList.
    * 
-   *@param seq  a <code>CoordinateSequence</code>
+   *@param seq  a <code>CoordinatesList</code>
    *@param i the index of the coordinate to transform
    */
-  public void transform(CoordinateSequence seq, int i)
+  public void transform(CoordinatesList seq, int i)
   {
     double xp = m00 * seq.getOrdinate(i, 0) + m01 * seq.getOrdinate(i, 1) + m02;
     double yp = m10 * seq.getOrdinate(i, 0) + m11 * seq.getOrdinate(i, 1) + m12;
@@ -1022,10 +1025,10 @@ public class AffineTransformation
   /**
    * Transforms the i'th coordinate in the input sequence
    * 
-   *@param seq  a <code>CoordinateSequence</code>
+   *@param seq  a <code>CoordinatesList</code>
    *@param i the index of the coordinate to transform
    */
-  public void filter(CoordinateSequence seq, int i)
+  public void filter(CoordinatesList seq, int i)
   {
     transform(seq, i);
   }

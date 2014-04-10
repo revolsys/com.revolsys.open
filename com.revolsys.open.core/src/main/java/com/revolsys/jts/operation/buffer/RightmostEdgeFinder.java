@@ -37,12 +37,17 @@ package com.revolsys.jts.operation.buffer;
 /**
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.operation.overlay.*;
-import com.revolsys.jts.util.*;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A RightmostEdgeFinder find the DirectedEdge in a list which has the highest coordinate,

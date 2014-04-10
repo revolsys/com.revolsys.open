@@ -60,7 +60,7 @@ public class EuclideanDistanceToPoint {
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        final Geometry g = gc.getGeometryN(i);
+        final Geometry g = gc.getGeometry(i);
         computeDistance(g, pt, ptDist);
       }
     } else { // assume geom is Point
@@ -76,7 +76,7 @@ public class EuclideanDistanceToPoint {
 
   public void computeDistance(final LineString line, final Coordinate pt,
     final PointPairDistance ptDist) {
-    final Coordinate[] coords = line.getCoordinates();
+    final Coordinate[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better

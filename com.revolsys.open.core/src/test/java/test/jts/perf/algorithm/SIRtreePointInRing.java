@@ -69,7 +69,7 @@ public class SIRtreePointInRing implements PointInRing {
     final Envelope env = this.ring.getEnvelopeInternal();
     this.sirTree = new SIRtree();
 
-    final Coordinate[] pts = this.ring.getCoordinates();
+    final Coordinate[] pts = this.ring.getCoordinateArray();
     for (int i = 1; i < pts.length; i++) {
       if (pts[i - 1].equals(pts[i])) {
         continue;

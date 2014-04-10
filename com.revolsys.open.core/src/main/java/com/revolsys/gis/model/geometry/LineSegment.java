@@ -9,8 +9,8 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -434,7 +434,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   public boolean isWithinDistance(final Point point, final double maxDistance) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     return isWithinDistance(coordinates, maxDistance);
   }
 

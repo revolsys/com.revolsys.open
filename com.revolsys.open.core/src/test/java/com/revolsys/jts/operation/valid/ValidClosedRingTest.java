@@ -45,7 +45,7 @@ public class ValidClosedRingTest extends TestCase {
 
   public void testBadGeometryCollection() {
     final GeometryCollection gc = (GeometryCollection)fromWKT("GEOMETRYCOLLECTION ( POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (1 1, 2 1, 2 2, 1 2, 1 1) )), POINT(0 0) )");
-    final Polygon poly = (Polygon)gc.getGeometryN(0);
+    final Polygon poly = (Polygon)gc.getGeometry(0);
     updateNonClosedRing((LinearRing)poly.getInteriorRingN(0));
     checkIsValid(poly, false);
   }
@@ -79,7 +79,7 @@ public class ValidClosedRingTest extends TestCase {
   }
 
   private void updateNonClosedRing(final LinearRing ring) {
-    final Coordinate[] pts = ring.getCoordinates();
+    final Coordinate[] pts = ring.getCoordinateArray();
     pts[0].x += 0.0001;
   }
 }

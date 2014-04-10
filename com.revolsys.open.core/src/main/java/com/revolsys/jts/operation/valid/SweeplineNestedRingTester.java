@@ -33,12 +33,18 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.index.sweepline.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.index.sweepline.SweepLineIndex;
+import com.revolsys.jts.index.sweepline.SweepLineInterval;
+import com.revolsys.jts.index.sweepline.SweepLineOverlapAction;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Tests whether any of a set of {@link LinearRing}s are
@@ -92,8 +98,8 @@ public class SweeplineNestedRingTester
 
   private boolean isInside(LinearRing innerRing, LinearRing searchRing)
   {
-    Coordinate[] innerRingPts = innerRing.getCoordinates();
-    Coordinate[] searchRingPts = searchRing.getCoordinates();
+    Coordinate[] innerRingPts = innerRing.getCoordinateArray();
+    Coordinate[] searchRingPts = searchRing.getCoordinateArray();
 
     if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
       return false;

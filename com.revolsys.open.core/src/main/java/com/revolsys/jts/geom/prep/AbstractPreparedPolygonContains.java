@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import java.util.*;
+import java.util.List;
 
-
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.noding.SegmentIntersectionDetector;
+import com.revolsys.jts.noding.SegmentStringUtil;
 
 /**
  * A base class containing the logic for computes the <tt>contains</tt>
@@ -214,7 +214,7 @@ abstract class AbstractPreparedPolygonContains
     // handles single-element MultiPolygons, as well as Polygons
 		if (geom.getNumGeometries() != 1) return false;
 		
-		Polygon poly = (Polygon) geom.getGeometryN(0);
+		Polygon poly = (Polygon) geom.getGeometry(0);
 		int numHoles = poly.getNumInteriorRing();
 		if (numHoles == 0) return true;
 		return false;

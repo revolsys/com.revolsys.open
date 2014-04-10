@@ -33,9 +33,12 @@
 
 package com.revolsys.jts.simplify;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.index.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.quadtree.Quadtree;
 
 /**

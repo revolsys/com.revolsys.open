@@ -7,9 +7,9 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Represents a list of contiguous line segments, and supports noding the

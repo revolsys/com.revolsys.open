@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.util;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Counts occurences of objects.

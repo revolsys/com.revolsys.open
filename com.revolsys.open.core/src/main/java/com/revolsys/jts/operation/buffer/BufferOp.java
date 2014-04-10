@@ -35,11 +35,15 @@ package com.revolsys.jts.operation.buffer;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.precision.SimpleGeometryPrecisionReducer;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.math.MathUtil;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.noding.snapround.*;
+import com.revolsys.jts.noding.Noder;
+import com.revolsys.jts.noding.ScaledNoder;
+import com.revolsys.jts.noding.snapround.MCIndexSnapRounder;
 
 //import debug.*;
 

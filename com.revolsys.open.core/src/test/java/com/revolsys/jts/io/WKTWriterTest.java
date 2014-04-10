@@ -117,7 +117,7 @@ public class WKTWriterTest extends TestCase {
       0);
     final Point point1 = geometryFactory.createPoint(new Coordinate(
       123456789012345678d, 10E9));
-    assertEquals("POINT (123456789012345680 10000000000)", point1.toText());
+    assertEquals("POINT (123456789012345680 10000000000)", point1.toWkt());
   }
 
   public void testWriteLargeNumbers2() {
@@ -125,7 +125,7 @@ public class WKTWriterTest extends TestCase {
     final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
       0);
     final Point point1 = geometryFactory.createPoint(new Coordinate(1234d, 10E9));
-    assertEquals("POINT (1234 10000000000)", point1.toText());
+    assertEquals("POINT (1234 10000000000)", point1.toWkt());
   }
 
   public void testWriteLargeNumbers3() {
@@ -135,7 +135,7 @@ public class WKTWriterTest extends TestCase {
     final Point point1 = geometryFactory.createPoint(new Coordinate(
       123456789012345678000000E9d, 10E9));
     assertEquals("POINT (123456789012345690000000000000000 10000000000)",
-      point1.toText());
+      point1.toWkt());
   }
 
   public void testWriteLineString() {

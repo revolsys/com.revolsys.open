@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and

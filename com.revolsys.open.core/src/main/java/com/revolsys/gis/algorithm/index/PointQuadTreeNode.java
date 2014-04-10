@@ -8,8 +8,8 @@ import java.util.Map.Entry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
   private final double x;

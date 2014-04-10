@@ -33,8 +33,15 @@
 
 package com.revolsys.jts.linearref;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
 
 /**
  * Builds a linear geometry ({@link LineString} or {@link MultiLineString})

@@ -34,8 +34,11 @@
  */
 package com.revolsys.jts.operation;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 
 /**

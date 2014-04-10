@@ -32,8 +32,20 @@
  */
 package com.revolsys.jts.io;
 
-import java.io.*;
-import com.revolsys.jts.geom.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -351,7 +363,7 @@ public class WKBWriter
   {
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbLineString, line, os);
-    writeCoordinateSequence(line.getCoordinateSequence(), true, os);
+    writeCoordinateSequence(line.getCoordinatesList(), true, os);
   }
 
   private void writePolygon(Polygon poly, OutStream os) throws IOException
@@ -359,9 +371,9 @@ public class WKBWriter
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbPolygon, poly, os);
     writeInt(poly.getNumInteriorRing() + 1, os);
-    writeCoordinateSequence(poly.getExteriorRing().getCoordinateSequence(), true, os);
+    writeCoordinateSequence(poly.getExteriorRing().getCoordinatesList(), true, os);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      writeCoordinateSequence(poly.getInteriorRingN(i).getCoordinateSequence(), true,
+      writeCoordinateSequence(poly.getInteriorRingN(i).getCoordinatesList(), true,
           os);
     }
   }
@@ -373,7 +385,7 @@ public class WKBWriter
     writeGeometryType(geometryType, gc, os);
     writeInt(gc.getNumGeometries(), os);
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      write(gc.getGeometryN(i), os);
+      write(gc.getGeometry(i), os);
     }
   }
 
@@ -394,7 +406,7 @@ public class WKBWriter
     typeInt |= includeSRID ? 0x20000000 : 0;
     writeInt(typeInt, os);
     if (includeSRID) {
-        writeInt(g.getSRID(), os);
+        writeInt(g.getSrid(), os);
     }
   }
 
@@ -404,7 +416,7 @@ public class WKBWriter
     os.write(buf, 4);
   }
 
-  private void writeCoordinateSequence(CoordinateSequence seq, boolean writeSize, OutStream os)
+  private void writeCoordinateSequence(CoordinatesList seq, boolean writeSize, OutStream os)
       throws IOException
   {
     if (writeSize)
@@ -415,7 +427,7 @@ public class WKBWriter
     }
   }
 
-  private void writeCoordinate(CoordinateSequence seq, int index, OutStream os)
+  private void writeCoordinate(CoordinatesList seq, int index, OutStream os)
   throws IOException
   {
     ByteOrderValues.putDouble(seq.getX(index), buf, byteOrder);
@@ -425,7 +437,7 @@ public class WKBWriter
     
     // only write 3rd dim if caller has requested it for this writer
     if (outputDimension >= 3) {
-      // if 3rd dim is requested, only write it if the CoordinateSequence provides it
+      // if 3rd dim is requested, only write it if the CoordinatesList provides it
     	double ordVal = Coordinate.NULL_ORDINATE;
     	if (seq.getDimension() >= 3)
     		ordVal = seq.getOrdinate(index, 2);

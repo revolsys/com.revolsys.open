@@ -33,11 +33,14 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Tests whether any of a set of {@link LinearRing}s are
@@ -69,11 +72,11 @@ public class SimpleNestedRingTester
   {
     for (int i = 0; i < rings.size(); i++) {
       LinearRing innerRing = (LinearRing) rings.get(i);
-      Coordinate[] innerRingPts = innerRing.getCoordinates();
+      Coordinate[] innerRingPts = innerRing.getCoordinateArray();
 
       for (int j = 0; j < rings.size(); j++) {
         LinearRing searchRing = (LinearRing) rings.get(j);
-        Coordinate[] searchRingPts = searchRing.getCoordinates();
+        Coordinate[] searchRingPts = searchRing.getCoordinateArray();
 
         if (innerRing == searchRing)
           continue;

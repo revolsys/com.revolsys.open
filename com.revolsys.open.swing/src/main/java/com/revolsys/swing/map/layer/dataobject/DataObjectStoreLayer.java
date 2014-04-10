@@ -23,7 +23,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -39,6 +38,9 @@ import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -47,8 +49,6 @@ import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableM
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Polygon;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
@@ -754,7 +754,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     fireRecordsChanged();
   }
 
-  private LayerDataObject removeCacheRecord(final String id,
+  protected LayerDataObject removeCacheRecord(final String id,
     final LayerDataObject record) {
     if (StringUtils.hasText(id) && record != null && isLayerRecord(record)) {
       if (record.getState() == DataObjectState.New) {

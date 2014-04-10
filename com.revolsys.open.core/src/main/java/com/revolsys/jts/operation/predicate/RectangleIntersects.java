@@ -33,12 +33,20 @@
 
 package com.revolsys.jts.operation.predicate;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
+import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.geom.util.ShortCircuitedGeometryVisitor;
 
 /**
  * Implementation of the <tt>intersects</tt> spatial predicate
@@ -207,7 +215,7 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor
  */
 class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor
 {
-  private CoordinateSequence rectSeq;
+  private CoordinatesList rectSeq;
 
   private Envelope rectEnv;
 
@@ -215,7 +223,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor
 
   public GeometryContainsPointVisitor(Polygon rectangle)
   {
-    this.rectSeq = rectangle.getExteriorRing().getCoordinateSequence();
+    this.rectSeq = rectangle.getExteriorRing().getCoordinatesList();
     rectEnv = rectangle.getEnvelopeInternal();
   }
 
@@ -334,7 +342,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor
 
   private void checkIntersectionWithSegments(LineString testLine)
   {
-    CoordinateSequence seq1 = testLine.getCoordinateSequence();
+    CoordinatesList seq1 = testLine.getCoordinatesList();
     for (int j = 1; j < seq1.size(); j++) {
       seq1.getCoordinate(j - 1, p0);
       seq1.getCoordinate(j,     p1);

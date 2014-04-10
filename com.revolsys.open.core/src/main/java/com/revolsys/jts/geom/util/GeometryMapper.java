@@ -32,8 +32,13 @@
  */
 package com.revolsys.jts.geom.util;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 
 /**
  * Methods to map various collections 
@@ -61,7 +66,7 @@ public class GeometryMapper
   {
     List mapped = new ArrayList();
     for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry g = op.map(geom.getGeometryN(i));
+      Geometry g = op.map(geom.getGeometry(i));
       if (g != null)
         mapped.add(g);
     }

@@ -96,7 +96,7 @@ public class Polygon extends Geometry implements Polygonal {
     final GeometryFactory factory) {
     super(factory);
     if (shell == null) {
-      shell = getGeometryFactory().createLinearRing((CoordinateSequence)null);
+      shell = getGeometryFactory().createLinearRing((CoordinatesList)null);
     }
     if (holes == null) {
       holes = new LinearRing[] {};
@@ -286,9 +286,9 @@ public class Polygon extends Geometry implements Polygonal {
   @Override
   public double getArea() {
     double area = 0.0;
-    area += Math.abs(CGAlgorithms.signedArea(shell.getCoordinateSequence()));
+    area += Math.abs(CGAlgorithms.signedArea(shell.getCoordinatesList()));
     for (int i = 0; i < holes.length; i++) {
-      area -= Math.abs(CGAlgorithms.signedArea(holes[i].getCoordinateSequence()));
+      area -= Math.abs(CGAlgorithms.signedArea(holes[i].getCoordinatesList()));
     }
     return area;
   }
@@ -311,7 +311,8 @@ public class Polygon extends Geometry implements Polygonal {
     }
     // create LineString or MultiLineString as appropriate
     if (rings.length <= 1) {
-      return getGeometryFactory().createLinearRing(rings[0].getCoordinateSequence());
+      return getGeometryFactory().createLinearRing(
+        rings[0].getCoordinatesList());
     }
     return getGeometryFactory().createMultiLineString(rings);
   }
@@ -327,19 +328,19 @@ public class Polygon extends Geometry implements Polygonal {
   }
 
   @Override
-  public Coordinate[] getCoordinates() {
+  public Coordinate[] getCoordinateArray() {
     if (isEmpty()) {
       return new Coordinate[] {};
     }
     final Coordinate[] coordinates = new Coordinate[getNumPoints()];
     int k = -1;
-    final Coordinate[] shellCoordinates = shell.getCoordinates();
+    final Coordinate[] shellCoordinates = shell.getCoordinateArray();
     for (int x = 0; x < shellCoordinates.length; x++) {
       k++;
       coordinates[k] = shellCoordinates[x];
     }
     for (int i = 0; i < holes.length; i++) {
-      final Coordinate[] childCoordinates = holes[i].getCoordinates();
+      final Coordinate[] childCoordinates = holes[i].getCoordinateArray();
       for (int j = 0; j < childCoordinates.length; j++) {
         k++;
         coordinates[k] = childCoordinates[j];
@@ -421,7 +422,7 @@ public class Polygon extends Geometry implements Polygonal {
       return false;
     }
 
-    final CoordinateSequence seq = shell.getCoordinateSequence();
+    final CoordinatesList seq = shell.getCoordinatesList();
 
     // check vertices have correct values
     final Envelope env = getEnvelopeInternal();
@@ -466,16 +467,16 @@ public class Polygon extends Geometry implements Polygonal {
     if (ring.isEmpty()) {
       return;
     }
-    final Coordinate[] uniqueCoordinates = new Coordinate[ring.getCoordinates().length - 1];
-    System.arraycopy(ring.getCoordinates(), 0, uniqueCoordinates, 0,
+    final Coordinate[] uniqueCoordinates = new Coordinate[ring.getCoordinateArray().length - 1];
+    System.arraycopy(ring.getCoordinateArray(), 0, uniqueCoordinates, 0,
       uniqueCoordinates.length);
-    final Coordinate minCoordinate = CoordinateArrays.minCoordinate(ring.getCoordinates());
+    final Coordinate minCoordinate = CoordinateArrays.minCoordinate(ring.getCoordinateArray());
     CoordinateArrays.scroll(uniqueCoordinates, minCoordinate);
-    System.arraycopy(uniqueCoordinates, 0, ring.getCoordinates(), 0,
+    System.arraycopy(uniqueCoordinates, 0, ring.getCoordinateArray(), 0,
       uniqueCoordinates.length);
-    ring.getCoordinates()[uniqueCoordinates.length] = uniqueCoordinates[0];
-    if (CGAlgorithms.isCCW(ring.getCoordinates()) == clockwise) {
-      CoordinateArrays.reverse(ring.getCoordinates());
+    ring.getCoordinateArray()[uniqueCoordinates.length] = uniqueCoordinates[0];
+    if (CGAlgorithms.isCCW(ring.getCoordinateArray()) == clockwise) {
+      CoordinateArrays.reverse(ring.getCoordinateArray());
     }
   }
 
@@ -496,7 +497,7 @@ public class Polygon extends Geometry implements Polygonal {
   @Override
   public Iterable<Vertex> vertices() {
     return new AbstractIterator<Vertex>() {
-      private Vertex vertex = new Vertex(Polygon.this, 0);
+      private VertexImpl vertex = new VertexImpl(Polygon.this, 0);
 
       private int vertexIndex = 0;
 

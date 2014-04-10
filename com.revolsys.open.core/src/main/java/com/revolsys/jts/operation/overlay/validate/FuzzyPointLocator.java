@@ -33,9 +33,20 @@
 
 package com.revolsys.jts.operation.overlay.validate;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFilter;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Finds the most likely {@link Location} of a point relative to
@@ -98,8 +109,8 @@ public class FuzzyPointLocator
   private boolean isWithinToleranceOfBoundary(Coordinate pt)
   {
   	for (int i = 0; i < linework.getNumGeometries(); i++) {
-  		LineString line = (LineString) linework.getGeometryN(i);
-  		CoordinateSequence seq = line.getCoordinateSequence();
+  		LineString line = (LineString) linework.getGeometry(i);
+  		CoordinatesList seq = line.getCoordinatesList();
   		for (int j = 0; j < seq.size() - 1; j++) {
    			seq.getCoordinate(j, seg.p0);
    			seq.getCoordinate(j + 1, seg.p1);

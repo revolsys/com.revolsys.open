@@ -33,7 +33,14 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes a point in the interior of an areal geometry.
@@ -108,7 +115,7 @@ public class InteriorPointArea {
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        add(gc.getGeometryN(i));
+        add(gc.getGeometry(i));
       }
     }
   }
@@ -155,12 +162,12 @@ public class InteriorPointArea {
         return gc;
     }
 
-    Geometry widestGeometry = gc.getGeometryN(0);
+    Geometry widestGeometry = gc.getGeometry(0);
     // scan remaining geom components to see if any are wider
     for (int i = 1; i < gc.getNumGeometries(); i++) { 
-        if (gc.getGeometryN(i).getEnvelopeInternal().getWidth() >
+        if (gc.getGeometry(i).getEnvelopeInternal().getWidth() >
             widestGeometry.getEnvelopeInternal().getWidth()) {
-            widestGeometry = gc.getGeometryN(i);
+            widestGeometry = gc.getGeometry(i);
         }
     }
     return widestGeometry;
@@ -238,7 +245,7 @@ public class InteriorPointArea {
 	  }
 
 	private void process(LineString line) {
-		CoordinateSequence seq = line.getCoordinateSequence();
+		CoordinatesList seq = line.getCoordinatesList();
 		for (int i = 0; i < seq.size(); i++) {
 			double y = seq.getY(i);
 			updateInterval(y);

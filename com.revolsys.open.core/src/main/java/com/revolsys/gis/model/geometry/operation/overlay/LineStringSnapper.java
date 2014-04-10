@@ -6,8 +6,8 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineString;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Snaps the vertices and segments of a {@link LineString} to a set of target

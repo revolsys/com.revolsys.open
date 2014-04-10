@@ -51,7 +51,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               GeometryStyle.line(Color.LIGHT_GRAY));
 
             final Point centroid = polygon.getCentroid();
-            final Coordinates centre = CoordinatesUtil.get(centroid);
+            final Coordinates centre = CoordinatesUtil.getInstance(centroid);
             final double centreX = centre.getX();
             final double centreY = centre.getY();
 

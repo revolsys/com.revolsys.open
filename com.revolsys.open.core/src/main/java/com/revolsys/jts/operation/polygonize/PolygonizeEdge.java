@@ -35,8 +35,8 @@
 
 package com.revolsys.jts.operation.polygonize;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.planargraph.*;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.planargraph.Edge;
 
 /**
  * An edge of a polygonization graph.

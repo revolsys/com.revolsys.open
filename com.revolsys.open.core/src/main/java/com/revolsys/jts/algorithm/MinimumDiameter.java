@@ -33,7 +33,13 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the minimum diameter of a {@link Geometry}.
@@ -165,9 +171,9 @@ public class MinimumDiameter
   {
 //System.out.println("Input = " + geom);
     if (convexGeom instanceof Polygon)
-      convexHullPts = ((Polygon) convexGeom).getExteriorRing().getCoordinates();
+      convexHullPts = ((Polygon) convexGeom).getExteriorRing().getCoordinateArray();
     else
-      convexHullPts = convexGeom.getCoordinates();
+      convexHullPts = convexGeom.getCoordinateArray();
 
     // special cases for lines or points or degenerate rings
     if (convexHullPts.length == 0) {

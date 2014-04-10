@@ -38,11 +38,22 @@ package com.revolsys.jts.operation.buffer;
  * @version 1.7
  */
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.Position;
 //import debug.*;
 
 /**

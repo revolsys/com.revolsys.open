@@ -36,8 +36,11 @@ package com.revolsys.jts.index.quadtree;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.index.*;
+import com.revolsys.jts.index.ArrayListVisitor;
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.index.SpatialIndex;
 /**
  * A Quadtree is a spatial index structure for efficient range querying
  * of items bounded by 2D rectangles.  

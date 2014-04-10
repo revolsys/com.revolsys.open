@@ -32,7 +32,15 @@
  */
 package com.revolsys.jts.densify;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
@@ -133,8 +141,8 @@ public class Densifier {
 	}
 
 	class DensifyTransformer extends GeometryTransformer {
-		protected CoordinateSequence transformCoordinates(
-				CoordinateSequence coords, Geometry parent) {
+		protected CoordinatesList transformCoordinates(
+				CoordinatesList coords, Geometry parent) {
 			Coordinate[] inputPts = coords.toCoordinateArray();
 			Coordinate[] newPts = Densifier
 					.densifyPoints(inputPts, distanceTolerance, parent.getPrecisionModel());

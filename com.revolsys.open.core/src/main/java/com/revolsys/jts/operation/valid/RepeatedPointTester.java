@@ -34,7 +34,13 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Implements the appropriate checks for repeated points
@@ -59,7 +65,7 @@ public class RepeatedPointTester {
     if (g instanceof Point)                   return false;
     else if (g instanceof MultiPoint)         return false;
                         // LineString also handles LinearRings
-    else if (g instanceof LineString)         return hasRepeatedPoint(((LineString) g).getCoordinates());
+    else if (g instanceof LineString)         return hasRepeatedPoint(((LineString) g).getCoordinateArray());
     else if (g instanceof Polygon)            return hasRepeatedPoint((Polygon) g);
     else if (g instanceof GeometryCollection) return hasRepeatedPoint((GeometryCollection) g);
     else  throw new UnsupportedOperationException(g.getClass().getName());
@@ -77,16 +83,16 @@ public class RepeatedPointTester {
   }
   private boolean hasRepeatedPoint(Polygon p)
   {
-    if (hasRepeatedPoint(p.getExteriorRing().getCoordinates())) return true;
+    if (hasRepeatedPoint(p.getExteriorRing().getCoordinateArray())) return true;
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      if (hasRepeatedPoint(p.getInteriorRingN(i).getCoordinates())) return true;
+      if (hasRepeatedPoint(p.getInteriorRingN(i).getCoordinateArray())) return true;
     }
     return false;
   }
   private boolean hasRepeatedPoint(GeometryCollection gc)
   {
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      Geometry g = gc.getGeometryN(i);
+      Geometry g = gc.getGeometry(i);
       if (hasRepeatedPoint(g)) return true;
     }
     return false;

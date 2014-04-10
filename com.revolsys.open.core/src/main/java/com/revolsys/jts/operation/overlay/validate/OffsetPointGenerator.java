@@ -33,9 +33,14 @@
 
 package com.revolsys.jts.operation.overlay.validate;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
 
 /**
  * Generates points offset by a given distance 
@@ -93,7 +98,7 @@ public class OffsetPointGenerator
 
   private void extractPoints(LineString line, double offsetDistance, List offsetPts)
   {
-    Coordinate[] pts = line.getCoordinates();
+    Coordinate[] pts = line.getCoordinateArray();
     for (int i = 0; i < pts.length - 1; i++) {
     	computeOffsetPoints(pts[i], pts[i + 1], offsetDistance, offsetPts);
     }

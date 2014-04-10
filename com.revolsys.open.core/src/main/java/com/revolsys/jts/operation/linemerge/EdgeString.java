@@ -33,15 +33,15 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * A sequence of {@link LineMergeDirectedEdge}s forming one of the lines that will
@@ -82,7 +82,7 @@ public class EdgeString {
           reverseDirectedEdges++;
         }
         coordinateList.add(((LineMergeEdge) directedEdge.getEdge()).getLine()
-                            .getCoordinates(), false,
+                            .getCoordinateArray(), false,
           directedEdge.getEdgeDirection());
       }
       coordinates = coordinateList.toCoordinateArray();

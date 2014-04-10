@@ -33,10 +33,13 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.util.Debug;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.

@@ -33,11 +33,20 @@
 
 package com.revolsys.jts.noding.snapround;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.noding.snapround.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.noding.NodedSegmentString;
+import com.revolsys.jts.noding.Noder;
+import com.revolsys.jts.noding.NodingValidator;
+import com.revolsys.jts.noding.SegmentString;
 
 /**
  * Nodes the linework in a list of {@link Geometry}s using Snap-Rounding
@@ -138,7 +147,7 @@ public class GeometryNoder
     List segStrings = new ArrayList();
     for (Iterator it = lines.iterator(); it.hasNext(); ) {
       LineString line = (LineString) it.next();
-      segStrings.add(new NodedSegmentString(line.getCoordinates(), null));
+      segStrings.add(new NodedSegmentString(line.getCoordinateArray(), null));
     }
     return segStrings;
   }

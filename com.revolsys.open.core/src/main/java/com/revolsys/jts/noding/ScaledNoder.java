@@ -33,10 +33,11 @@
 
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.util.*;
+import java.util.Collection;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.util.CollectionUtil;
 
 /**
  * Wraps a {@link Noder} and transforms its input

@@ -18,9 +18,9 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory,
   AutoCloseable {
@@ -41,6 +41,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   DataObject create(String typePath);
 
+  DataObject create(String typePath, Map<String, ? extends Object> values);
+
   <T> T createPrimaryIdValue(String typePath);
 
   Query createQuery(final String typePath, String whereClause,
@@ -50,8 +52,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   DataObject createWithId(DataObjectMetaData objectMetaData);
 
-  DataObject create(String typePath, Map<String, ? extends Object> values);
-
   Writer<DataObject> createWriter();
 
   void delete(DataObject object);
@@ -60,7 +60,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   void deleteAll(Collection<DataObject> objects);
 
-  CodeTable getCodeTable(String typePath);
+  <V extends CodeTable> V getCodeTable(String typePath);
 
   CodeTable getCodeTableByColumn(String columnName);
 

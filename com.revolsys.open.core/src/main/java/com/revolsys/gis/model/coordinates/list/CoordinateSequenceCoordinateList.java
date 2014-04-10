@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
 
@@ -9,10 +9,10 @@ public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
    */
   private static final long serialVersionUID = 872633273329727308L;
 
-  private final CoordinateSequence coordinateSequence;
+  private final CoordinatesList coordinateSequence;
 
   public CoordinateSequenceCoordinateList(
-    final CoordinateSequence coordinateSequence) {
+    final CoordinatesList coordinateSequence) {
     this.coordinateSequence = coordinateSequence;
   }
 

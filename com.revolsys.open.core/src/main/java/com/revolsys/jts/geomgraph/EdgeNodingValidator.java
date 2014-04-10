@@ -33,8 +33,12 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import java.util.*;
-import com.revolsys.jts.noding.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+import com.revolsys.jts.noding.BasicSegmentString;
+import com.revolsys.jts.noding.FastNodingValidator;
 
 /**
  * Validates that a collection of {@link Edge}s is correctly noded.

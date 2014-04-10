@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * An intersector for the red-blue intersection problem.

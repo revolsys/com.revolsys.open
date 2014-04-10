@@ -33,7 +33,9 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Supports linear referencing along a linear {@link Geometry}

@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
 
 /**
  * Allows comparing {@link Coordinate} arrays

@@ -32,7 +32,12 @@
  */
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the Euclidean distance (L2 metric) from a {@link Coordinate} to a {@link Geometry}.
@@ -55,7 +60,7 @@ public class DistanceToPoint
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        Geometry g = gc.getGeometryN(i);
+        Geometry g = gc.getGeometry(i);
         computeDistance(g, pt, ptDist);
       }
     }
@@ -67,7 +72,7 @@ public class DistanceToPoint
   public static void computeDistance(LineString line, Coordinate pt, PointPairDistance ptDist)
   {
     LineSegment tempSegment = new LineSegment();
-    Coordinate[] coords = line.getCoordinates();
+    Coordinate[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better

@@ -39,8 +39,12 @@ import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LinearRing;
 
 /**
  * Converts a Java2D {@link Shape} 

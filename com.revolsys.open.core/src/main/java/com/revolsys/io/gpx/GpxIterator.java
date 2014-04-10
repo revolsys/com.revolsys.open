@@ -28,12 +28,12 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -285,7 +285,7 @@ public class GpxIterator implements DataObjectIterator {
         final DataObject pointObject = parseRoutPoint(pointIndex);
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
-        final Coordinates coordinates = CoordinatesUtil.get(point);
+        final Coordinates coordinates = CoordinatesUtil.getInstance(point);
         numAxis = Math.max(numAxis, coordinates.getNumAxis());
       } else {
         parseAttribute(dataObject);
@@ -296,7 +296,7 @@ public class GpxIterator implements DataObjectIterator {
     for (int i = 0; i < points.size(); i++) {
       final DataObject pointObject = pointObjects.get(i);
       final Point point = pointObject.getGeometryValue();
-      final Coordinates coordinates = CoordinatesUtil.get(point);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
       for (int j = 0; j < numAxis; j++) {
         final double value = coordinates.getValue(j);
         points.setValue(i, j, value);

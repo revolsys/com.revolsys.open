@@ -33,8 +33,12 @@
 
 package com.revolsys.jts.geom.util;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
 
 /**
@@ -63,7 +67,7 @@ public class GeometryCollectionMapper
   {
     List mapped = new ArrayList();
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      Geometry g = mapOp.map(gc.getGeometryN(i));
+      Geometry g = mapOp.map(gc.getGeometry(i));
       if (!g.isEmpty())
         mapped.add(g);
     }

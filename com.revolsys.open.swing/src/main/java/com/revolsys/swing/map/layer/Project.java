@@ -20,17 +20,17 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public class Project extends LayerGroup {
 

@@ -32,8 +32,12 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PrecisionModel;
 
 /**
  * A dynamic list of the vertices in a constructed offset curve.

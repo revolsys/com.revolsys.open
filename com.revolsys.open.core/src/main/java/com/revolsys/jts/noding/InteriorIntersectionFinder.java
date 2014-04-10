@@ -35,9 +35,9 @@ package com.revolsys.jts.noding;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.*;
 import com.revolsys.jts.algorithm.LineIntersector;
 //import com.revolsys.jts.util.Debug;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Finds an interior intersection in a set of {@link SegmentString}s,

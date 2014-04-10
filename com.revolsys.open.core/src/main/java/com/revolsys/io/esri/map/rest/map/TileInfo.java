@@ -6,8 +6,8 @@ import java.util.Map;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.CollectionUtil;
 
 public class TileInfo extends AbstractMapWrapper {
   private double originX = Double.NaN;

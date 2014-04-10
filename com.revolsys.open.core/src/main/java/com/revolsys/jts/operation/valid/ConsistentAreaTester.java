@@ -34,13 +34,18 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.Iterator;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
-import com.revolsys.jts.operation.relate.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.operation.relate.EdgeEndBundle;
+import com.revolsys.jts.operation.relate.RelateNode;
+import com.revolsys.jts.operation.relate.RelateNodeGraph;
 
 /**
  * Checks that a {@link GeometryGraph} representing an area

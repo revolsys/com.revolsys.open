@@ -33,10 +33,16 @@
 
 package com.revolsys.jts.awt;
 
-import java.util.*;
 import java.awt.Font;
-import java.awt.font.*;
-import com.revolsys.jts.geom.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.util.AffineTransformation;
 
 /**
  * Provides methods to read {@link Font} glyphs for strings 
@@ -109,7 +115,7 @@ public class FontGlyphReader
     for (int i = 0; i < gv.getNumGlyphs(); i++) {
       Geometry geom = ShapeReader.read(gv.getGlyphOutline(i), flatness, geomFact);
       for (int j = 0; j < geom.getNumGeometries(); j++) {
-        polys.add(geom.getGeometryN(j));
+        polys.add(geom.getGeometry(j));
       }
     }
     return geomFact.buildGeometry(polys);

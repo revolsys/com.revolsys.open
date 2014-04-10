@@ -33,10 +33,11 @@
 
 package com.revolsys.jts.noding.snapround;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.noding.NodedSegmentString;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Implements a "hot pixel" as used in the Snap Rounding algorithm.

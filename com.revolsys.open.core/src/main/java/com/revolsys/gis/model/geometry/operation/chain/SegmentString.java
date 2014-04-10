@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * An interface for classes which represent a sequence of contiguous line

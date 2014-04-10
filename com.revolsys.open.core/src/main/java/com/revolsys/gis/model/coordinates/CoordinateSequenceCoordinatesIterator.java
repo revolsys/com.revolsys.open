@@ -3,21 +3,21 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   implements Iterator<Coordinates>, Iterable<Coordinates> {
-  private final CoordinateSequence coordinates;
+  private final CoordinatesList coordinates;
 
   private int index = 0;
 
   public CoordinateSequenceCoordinatesIterator(
-    final CoordinateSequence coordinates) {
+    final CoordinatesList coordinates) {
     this.coordinates = coordinates;
   }
 
   public CoordinateSequenceCoordinatesIterator(
-    final CoordinateSequence coordinates, final int index) {
+    final CoordinatesList coordinates, final int index) {
     this.coordinates = coordinates;
     this.index = index;
   }

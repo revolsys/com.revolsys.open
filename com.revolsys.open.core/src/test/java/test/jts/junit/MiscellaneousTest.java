@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -181,7 +181,7 @@ public class MiscellaneousTest extends TestCase {
       .getBoundary()
       .isEmpty());
 
-    assertTrue(this.geometryFactory.createLinearRing((CoordinateSequence)null)
+    assertTrue(this.geometryFactory.createLinearRing((CoordinatesList)null)
       .isEmpty());
     assertTrue(this.geometryFactory.createLineString((Coordinate[])null)
       .isEmpty());
@@ -193,7 +193,7 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(-1, this.geometryFactory.createPoint((Coordinate)null)
       .getBoundaryDimension());
     assertEquals(-1,
-      this.geometryFactory.createLinearRing((CoordinateSequence)null)
+      this.geometryFactory.createLinearRing((CoordinatesList)null)
         .getBoundaryDimension());
     assertEquals(0, this.geometryFactory.createLineString((Coordinate[])null)
       .getBoundaryDimension());
@@ -209,7 +209,7 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(0, this.geometryFactory.createPoint((Coordinate)null)
       .getNumPoints());
     assertEquals(0,
-      this.geometryFactory.createLinearRing((CoordinateSequence)null)
+      this.geometryFactory.createLinearRing((CoordinatesList)null)
         .getNumPoints());
     assertEquals(0, this.geometryFactory.createLineString((Coordinate[])null)
       .getNumPoints());
@@ -221,20 +221,20 @@ public class MiscellaneousTest extends TestCase {
       .getNumPoints());
 
     assertEquals(0, this.geometryFactory.createPoint((Coordinate)null)
-      .getCoordinates().length);
+      .getCoordinateArray().length);
     assertEquals(0,
-      this.geometryFactory.createLinearRing((CoordinateSequence)null)
-        .getCoordinates().length);
+      this.geometryFactory.createLinearRing((CoordinatesList)null)
+        .getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.createLineString((Coordinate[])null)
-      .getCoordinates().length);
+      .getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.createPolygon(null, null)
-      .getCoordinates().length);
+      .getCoordinateArray().length);
     assertEquals(0,
-      this.geometryFactory.createMultiPolygon().getCoordinates().length);
+      this.geometryFactory.createMultiPolygon().getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.createMultiLineString()
-      .getCoordinates().length);
+      .getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.createMultiPoint((Point[])null)
-      .getCoordinates().length);
+      .getCoordinateArray().length);
   }
 
   public void testEmptyGeometryCollection() throws Exception {
@@ -245,7 +245,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyLinearRing() throws Exception {
-    final LineString l = this.geometryFactory.createLinearRing((CoordinateSequence)null);
+    final LineString l = this.geometryFactory.createLinearRing((CoordinatesList)null);
     assertEquals(1, l.getDimension());
     assertEquals(new Envelope(), l.getEnvelopeInternal());
     assertTrue(l.isSimple());
@@ -314,7 +314,7 @@ public class MiscellaneousTest extends TestCase {
     }
 
     assertEquals("POINT EMPTY", p.toString());
-    assertEquals("POINT EMPTY", p.toText());
+    assertEquals("POINT EMPTY", p.toWkt());
   }
 
   public void testEmptyPolygon() throws Exception {
@@ -367,8 +367,8 @@ public class MiscellaneousTest extends TestCase {
     final LineString g = (LineString)this.reader.read("LINESTRING(10 10, 20 10, 15 20)");
     assertTrue(g.getBoundary() instanceof MultiPoint);
     final MultiPoint boundary = (MultiPoint)g.getBoundary();
-    assertTrue(boundary.getGeometryN(0).equals(g.getStartPoint()));
-    assertTrue(boundary.getGeometryN(1).equals(g.getEndPoint()));
+    assertTrue(boundary.getGeometry(0).equals(g.getStartPoint()));
+    assertTrue(boundary.getGeometry(1).equals(g.getEndPoint()));
   }
 
   public void testLineStringGetBoundary2() throws Exception {
@@ -492,7 +492,7 @@ public class MiscellaneousTest extends TestCase {
   public void testPolygonGetCoordinates() throws Exception {
     final Polygon p = (Polygon)this.reader.read("POLYGON ( (0 0, 100 0, 100 100, 0 100, 0 0), "
       + "          (20 20, 20 80, 80 80, 80 20, 20 20)) ");
-    final Coordinate[] coordinates = p.getCoordinates();
+    final Coordinate[] coordinates = p.getCoordinateArray();
     assertEquals(10, p.getNumPoints());
     assertEquals(10, coordinates.length);
     assertEquals(new Coordinate(0, 0), coordinates[0]);

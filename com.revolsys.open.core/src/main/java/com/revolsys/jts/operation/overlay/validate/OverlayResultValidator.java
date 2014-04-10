@@ -32,8 +32,12 @@
  */
 package com.revolsys.jts.operation.overlay.validate;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.operation.overlay.OverlayOp;
 import com.revolsys.jts.operation.overlay.snap.GeometrySnapper;
 

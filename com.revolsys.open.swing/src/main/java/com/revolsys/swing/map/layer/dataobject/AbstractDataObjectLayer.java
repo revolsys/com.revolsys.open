@@ -49,7 +49,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStore;
@@ -72,6 +71,10 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -112,9 +115,6 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectFactory, AddGeometryCompleteAction {
@@ -2201,7 +2201,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final int[] vertexIndex = mouseLocation.getVertexIndex();
       final Point point = mouseLocation.getPoint();
       final Point convertedPoint = getGeometryFactory().copy(point);
-      final Coordinates coordinates = CoordinatesUtil.get(convertedPoint);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(convertedPoint);
       final LineString line1;
       final LineString line2;
 
@@ -2258,7 +2258,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public List<LayerDataObject> splitRecord(final LayerDataObject record,
     final Point point) {
     final LineString line = record.getGeometryValue();
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     final List<LineString> lines = LineStringUtil.split(line, coordinates);
     if (lines.size() == 2) {
       final LineString line1 = lines.get(0);

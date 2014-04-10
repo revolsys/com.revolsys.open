@@ -17,9 +17,9 @@ import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -123,7 +123,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final int index = startNodes.size();
     if (multiLine != null && multiLine.getLength() > 0) {
       for (int i = 0; i < multiLine.getNumGeometries(); i++) {
-        final LineString line = (LineString)multiLine.getGeometryN(i);
+        final LineString line = (LineString)multiLine.getGeometry(i);
         add(line, index);
       }
       if (index > 0) {
@@ -674,7 +674,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private void integrateMultiLine(final MultiLineString multLine,
     final int index) {
     for (int i = 0; i < multLine.getNumGeometries(); i++) {
-      final LineString line = (LineString)multLine.getGeometryN(i);
+      final LineString line = (LineString)multLine.getGeometry(i);
       integrateLine(line, index);
     }
   }

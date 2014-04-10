@@ -2,8 +2,8 @@ package com.revolsys.gis.model.geometry.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CrossingLineSegmentFilter implements Filter<LineSegment> {
   private final LineSegment line;

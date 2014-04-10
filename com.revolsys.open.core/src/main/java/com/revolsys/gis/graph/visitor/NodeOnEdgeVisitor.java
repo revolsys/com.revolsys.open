@@ -11,9 +11,9 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
-import com.revolsys.jts.geom.LineString;
 
 public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph,

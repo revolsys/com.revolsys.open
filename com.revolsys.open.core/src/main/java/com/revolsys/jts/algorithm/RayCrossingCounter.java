@@ -32,7 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygonal;
 
 /**
  * Counts the number of segments crossed by a horizontal ray extending to the right
@@ -93,7 +96,7 @@ public class RayCrossingCounter
    *            a coordinate sequence forming a ring
    * @return the location of the point in the ring
    */
-  public static int locatePointInRing(Coordinate p, CoordinateSequence ring) {
+  public static int locatePointInRing(Coordinate p, CoordinatesList ring) {
     RayCrossingCounter counter = new RayCrossingCounter(p);
 
     Coordinate p1 = new Coordinate();

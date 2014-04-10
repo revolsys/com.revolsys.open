@@ -32,11 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
-import java.util.NoSuchElementException;
-
-import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.operation.BoundaryOp;
@@ -59,32 +55,13 @@ import com.revolsys.jts.operation.BoundaryOp;
  *@version 1.7
  */
 public class LineString extends Geometry implements Lineal {
+
   private static final long serialVersionUID = 3110669828065365560L;
 
   /**
    *  The points of this <code>LineString</code>.
    */
-  protected CoordinateSequence points;
-
-  /**
-   *  Constructs a <code>LineString</code> with the given points.
-   *
-   *@param  points the points of the linestring, or <code>null</code>
-   *      to create the empty geometry. This array must not contain <code>null</code>
-   *      elements. Consecutive points may be equal.
-   *@param  precisionModel  the specification of the grid of allowable points
-   *      for this <code>LineString</code>
-   *@param  SRID            the ID of the Spatial Reference System used by this
-   *      <code>LineString</code>
-   * @throws IllegalArgumentException if too few points are provided
-   */
-  /** @deprecated Use GeometryFactory instead */
-  @Deprecated
-  public LineString(final Coordinate points[],
-    final PrecisionModel precisionModel, final int SRID) {
-    super(new GeometryFactory(precisionModel, SRID));
-    init(getGeometryFactory().getCoordinateSequenceFactory().create(points));
-  }
+  private CoordinatesList points;
 
   /**
    * Constructs a <code>LineString</code> with the given points.
@@ -93,7 +70,7 @@ public class LineString extends Geometry implements Lineal {
    *      to create the empty geometry. 
    * @throws IllegalArgumentException if too few points are provided
    */
-  public LineString(final CoordinateSequence points,
+  public LineString(final CoordinatesList points,
     final GeometryFactory factory) {
     super(factory);
     init(points);
@@ -141,7 +118,7 @@ public class LineString extends Geometry implements Lineal {
   @Override
   public Object clone() {
     final LineString ls = (LineString)super.clone();
-    ls.points = (CoordinateSequence)points.clone();
+    ls.points = (CoordinatesList)points.clone();
     return ls;
   }
 
@@ -194,8 +171,9 @@ public class LineString extends Geometry implements Lineal {
       return false;
     }
     for (int i = 0; i < points.size(); i++) {
-      if (!equal(points.getCoordinate(i),
-        otherLineString.points.getCoordinate(i), tolerance)) {
+      final Coordinate point = points.getCoordinate(i);
+      final Coordinate otherPoint = otherLineString.points.getCoordinate(i);
+      if (!equal(point, otherPoint, tolerance)) {
         return false;
       }
     }
@@ -230,16 +208,28 @@ public class LineString extends Geometry implements Lineal {
     return points.getCoordinate(0);
   }
 
+  public double getCoordinate(int vertexIndex, final int axisIndex) {
+    final int numPoints = points.size();
+    if (vertexIndex < numPoints) {
+      while (vertexIndex < 0) {
+        vertexIndex += numPoints;
+      }
+      return points.getOrdinate(vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  @Override
+  public Coordinate[] getCoordinateArray() {
+    return points.toCoordinateArray();
+  }
+
   public Coordinate getCoordinateN(final int n) {
     return points.getCoordinate(n);
   }
 
-  @Override
-  public Coordinate[] getCoordinates() {
-    return points.toCoordinateArray();
-  }
-
-  public CoordinateSequence getCoordinateSequence() {
+  public CoordinatesList getCoordinatesList() {
     return points;
   }
 
@@ -280,17 +270,44 @@ public class LineString extends Geometry implements Lineal {
   }
 
   public Point getPointN(final int n) {
-    return getGeometryFactory().createPoint(points.getCoordinate(n));
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Coordinate coordinate = points.getCoordinate(n);
+    return geometryFactory.createPoint(coordinate);
   }
 
   public Point getStartPoint() {
     if (isEmpty()) {
       return null;
+    } else {
+      return getPointN(0);
     }
-    return getPointN(0);
   }
 
-  private void init(CoordinateSequence points) {
+  @Override
+  public AbstractVertex getVertex(final int... vertexId) {
+    if (vertexId.length == 1) {
+      final int vertexIndex = vertexId[0];
+      return getVertex(vertexIndex);
+    }
+    return null;
+  }
+
+  public AbstractVertex getVertex(int vertexIndex) {
+    final int vertexCount = points.size();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LineStringVertex(this, vertexIndex);
+    }
+    return null;
+  }
+
+  public int getVertexCount() {
+    return points.size();
+  }
+
+  private void init(CoordinatesList points) {
     if (points == null) {
       points = getGeometryFactory().getCoordinateSequenceFactory().create(
         new Coordinate[] {});
@@ -306,8 +323,18 @@ public class LineString extends Geometry implements Lineal {
   public boolean isClosed() {
     if (isEmpty()) {
       return false;
+    } else {
+      final double x1 = getCoordinate(0, 0);
+      final double xn = getCoordinate(-1, 0);
+      if (x1 == xn) {
+        final double y1 = getCoordinate(0, 1);
+        final double yn = getCoordinate(-1, 1);
+        if (y1 == yn) {
+          return true;
+        }
+      }
     }
-    return getCoordinateN(0).equals2D(getCoordinateN(getNumPoints() - 1));
+    return false;
   }
 
   /**
@@ -352,7 +379,7 @@ public class LineString extends Geometry implements Lineal {
       // skip equal points on both ends
       if (!points.getCoordinate(i).equals(points.getCoordinate(j))) {
         if (points.getCoordinate(i).compareTo(points.getCoordinate(j)) > 0) {
-          CoordinateArrays.reverse(getCoordinates());
+          CoordinateArrays.reverse(getCoordinateArray());
         }
         return;
       }
@@ -371,7 +398,7 @@ public class LineString extends Geometry implements Lineal {
    */
   @Override
   public Geometry reverse() {
-    final CoordinateSequence seq = (CoordinateSequence)points.clone();
+    final CoordinatesList seq = (CoordinatesList)points.clone();
     CoordinateSequences.reverse(seq);
     final LineString revLine = getGeometryFactory().createLineString(seq);
     return revLine;
@@ -379,23 +406,7 @@ public class LineString extends Geometry implements Lineal {
 
   @Override
   public Iterable<Vertex> vertices() {
-    return new AbstractIterator<Vertex>() {
-      private Vertex vertex = new Vertex(LineString.this, 0);
-
-      private int index = 0;
-
-      @Override
-      protected Vertex getNext() throws NoSuchElementException {
-        if (index < getNumPoints()) {
-          vertex.setVertexId(index);
-          index++;
-          return vertex;
-        } else {
-          vertex = null;
-          throw new NoSuchElementException();
-        }
-      }
-    };
+    return new LineStringVertexIterable(this);
   }
 
 }

@@ -33,7 +33,10 @@
 
 package com.revolsys.jts.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utilities for processing {@link Collection}s.

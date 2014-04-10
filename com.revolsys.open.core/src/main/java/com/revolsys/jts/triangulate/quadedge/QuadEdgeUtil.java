@@ -36,10 +36,6 @@ package com.revolsys.jts.triangulate.quadedge;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTReader;
-
 /**
  * Utilities for working with {@link QuadEdge}s.
  * 

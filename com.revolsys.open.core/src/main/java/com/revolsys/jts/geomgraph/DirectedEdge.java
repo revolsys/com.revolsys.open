@@ -36,8 +36,9 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geom.*;
+
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.TopologyException;
 
 
 /**

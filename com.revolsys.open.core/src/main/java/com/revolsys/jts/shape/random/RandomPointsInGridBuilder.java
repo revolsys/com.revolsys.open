@@ -33,12 +33,10 @@
 
 package com.revolsys.jts.shape.random;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 

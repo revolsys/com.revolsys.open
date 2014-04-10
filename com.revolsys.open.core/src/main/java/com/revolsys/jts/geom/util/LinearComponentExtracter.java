@@ -33,9 +33,15 @@
  */
 package com.revolsys.jts.geom.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryComponentFilter;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 
 /**
  * Extracts all the 1-dimensional ({@link LineString}) components from a {@link Geometry}.
@@ -181,7 +187,7 @@ public class LinearComponentExtracter
   public void filter(Geometry geom)
   {
   	if (isForcedToLineString && geom instanceof LinearRing) {
-  		LineString line = geom.getGeometryFactory().createLineString( ((LinearRing) geom).getCoordinateSequence());
+  		LineString line = geom.getGeometryFactory().createLineString( ((LinearRing) geom).getCoordinatesList());
   		lines.add(line);
   		return;
   	}

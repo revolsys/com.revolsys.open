@@ -143,7 +143,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testGetCoordinates() throws Exception {
     final LineString l = (LineString)this.reader.read("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
-    final Coordinate[] coordinates = l.getCoordinates();
+    final Coordinate[] coordinates = l.getCoordinateArray();
     assertEquals(new Coordinate(5.555, 6.666), coordinates[1]);
   }
 
@@ -157,7 +157,7 @@ public class LineStringImplTest extends TestCase {
     assertTrue(l.isEmpty());
     assertTrue(!l.isClosed());
 
-    final LinearRing r = this.geometryFactory.createLinearRing((CoordinateSequence)null);
+    final LinearRing r = this.geometryFactory.createLinearRing((CoordinatesList)null);
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 

@@ -72,7 +72,7 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private static void createConstraintSegments(final LineString line,
     final List constraintSegs) {
-    final Coordinate[] coords = line.getCoordinates();
+    final Coordinate[] coords = line.getCoordinateArray();
     for (int i = 1; i < coords.length; i++) {
       constraintSegs.add(new Segment(coords[i - 1], coords[i]));
     }
@@ -129,7 +129,7 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private void createVertices(final Geometry geom) {
-    final Coordinate[] coords = geom.getCoordinates();
+    final Coordinate[] coords = geom.getCoordinateArray();
     for (int i = 0; i < coords.length; i++) {
       final Vertex v = new ConstraintVertex(coords[i]);
       constraintVertexMap.put(coords[i], v);

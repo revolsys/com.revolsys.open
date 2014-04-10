@@ -7,8 +7,8 @@ import java.util.Set;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jts.GeometryComparator;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.util.CompareUtil;
 
 public class DataObjectGeometryComparitor implements Comparator<DataObject> {
 

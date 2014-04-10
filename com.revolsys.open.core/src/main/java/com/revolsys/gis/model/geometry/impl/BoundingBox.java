@@ -12,11 +12,11 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Polygon;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBox implements Serializable {

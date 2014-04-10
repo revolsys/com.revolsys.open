@@ -33,10 +33,13 @@
 
 package com.revolsys.jts.simplify;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.Debug;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LineSegment;
 
 /**
  * Simplifies a TaggedLineString, preserving topology

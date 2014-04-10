@@ -36,9 +36,13 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A DirectedEdgeStar is an ordered list of <b>outgoing</b> DirectedEdges around a node.

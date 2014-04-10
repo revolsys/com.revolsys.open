@@ -35,12 +35,11 @@
  */
 package com.revolsys.jts.operation.relate;
 
-import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.Assert;
+import java.util.Iterator;
+
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geomgraph.EdgeEnd;
+import com.revolsys.jts.geomgraph.EdgeEndStar;
 
 /**
  * An ordered list of {@link EdgeEndBundle}s around a {@link RelateNode}.

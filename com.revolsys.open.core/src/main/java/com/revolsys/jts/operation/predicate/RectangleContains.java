@@ -33,7 +33,14 @@
 
 package com.revolsys.jts.operation.predicate;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Optimized implementation of the <tt>contains</tt> spatial predicate 
@@ -98,7 +105,7 @@ public class RectangleContains {
     if (geom instanceof LineString) return isLineStringContainedInBoundary((LineString) geom);
 
     for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry comp = geom.getGeometryN(i);
+      Geometry comp = geom.getGeometry(i);
       if (! isContainedInBoundary(comp))
         return false;
     }
@@ -136,7 +143,7 @@ public class RectangleContains {
    */
   private boolean isLineStringContainedInBoundary(LineString line)
   {
-    CoordinateSequence seq = line.getCoordinateSequence();
+    CoordinatesList seq = line.getCoordinatesList();
     Coordinate p0 = new Coordinate();
     Coordinate p1 = new Coordinate();
     for (int i = 0; i < seq.size() - 1; i++) {

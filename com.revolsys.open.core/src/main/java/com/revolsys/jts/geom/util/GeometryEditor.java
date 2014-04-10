@@ -33,10 +33,21 @@
  */
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.Assert;
-
 import java.util.ArrayList;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.util.Assert;
 
 
 /**
@@ -152,7 +163,7 @@ public class GeometryEditor
     Polygon newPolygon = (Polygon) operation.edit(polygon, factory);
     // create one if needed
     if (newPolygon == null)
-      newPolygon = factory.createPolygon((CoordinateSequence) null);
+      newPolygon = factory.createPolygon((CoordinatesList) null);
     if (newPolygon.isEmpty()) {
       //RemoveSelectedPlugIn relies on this behaviour. [Jon Aquino]
       return newPolygon;
@@ -187,7 +198,7 @@ public class GeometryEditor
     // edit the component geometries
     ArrayList geometries = new ArrayList();
     for (int i = 0; i < collectionForType.getNumGeometries(); i++) {
-      Geometry geometry = edit(collectionForType.getGeometryN(i), operation);
+      Geometry geometry = edit(collectionForType.getGeometry(i), operation);
       if (geometry == null || geometry.isEmpty()) {
         continue;
       }
@@ -257,17 +268,17 @@ public class GeometryEditor
   {
     public final Geometry edit(Geometry geometry, GeometryFactory factory) {
       if (geometry instanceof LinearRing) {
-        return factory.createLinearRing(edit(geometry.getCoordinates(),
+        return factory.createLinearRing(edit(geometry.getCoordinateArray(),
             geometry));
       }
 
       if (geometry instanceof LineString) {
-        return factory.createLineString(edit(geometry.getCoordinates(),
+        return factory.createLineString(edit(geometry.getCoordinateArray(),
             geometry));
       }
 
       if (geometry instanceof Point) {
-        Coordinate[] newCoordinates = edit(geometry.getCoordinates(),
+        Coordinate[] newCoordinates = edit(geometry.getCoordinateArray(),
             geometry);
 
         return factory.createPoint((newCoordinates.length > 0)
@@ -293,7 +304,7 @@ public class GeometryEditor
   }
   
   /**
-   * A {@link GeometryEditorOperation} which edits the {@link CoordinateSequence}
+   * A {@link GeometryEditorOperation} which edits the {@link CoordinatesList}
    * of a {@link Geometry}.
    * Operates on Geometry subclasses which contains a single coordinate list.
    */
@@ -303,13 +314,13 @@ public class GeometryEditor
     public final Geometry edit(Geometry geometry, GeometryFactory factory) {
       if (geometry instanceof LinearRing) {
         return factory.createLinearRing(edit(
-            ((LinearRing)geometry).getCoordinateSequence(),
+            ((LinearRing)geometry).getCoordinatesList(),
             geometry));
       }
 
       if (geometry instanceof LineString) {
         return factory.createLineString(edit(
-            ((LineString)geometry).getCoordinateSequence(),
+            ((LineString)geometry).getCoordinatesList(),
             geometry));
       }
 
@@ -323,13 +334,13 @@ public class GeometryEditor
     }
 
     /**
-     * Edits a {@link CoordinateSequence} from a {@link Geometry}.
+     * Edits a {@link CoordinatesList} from a {@link Geometry}.
      *
      * @param coordseq the coordinate array to operate on
      * @param geometry the geometry containing the coordinate list
      * @return an edited coordinate sequence (which may be the same as the input)
      */
-    public abstract CoordinateSequence edit(CoordinateSequence coordSeq,
+    public abstract CoordinatesList edit(CoordinatesList coordSeq,
                                       Geometry geometry);
   }
 }

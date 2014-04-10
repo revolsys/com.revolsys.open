@@ -33,8 +33,13 @@
 
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
  * Simplifies a {@link Geometry} using the Douglas-Peucker algorithm.
@@ -141,7 +146,7 @@ class DPTransformer
 		this.isEnsureValidTopology = isEnsureValidTopology;
 	}
 	
-  protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent)
+  protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
   {
     Coordinate[] inputPts = coords.toCoordinateArray();
     Coordinate[] newPts = null;

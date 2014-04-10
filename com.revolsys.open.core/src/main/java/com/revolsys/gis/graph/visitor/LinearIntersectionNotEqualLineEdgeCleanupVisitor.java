@@ -28,12 +28,12 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
-import com.revolsys.jts.geom.LineString;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {

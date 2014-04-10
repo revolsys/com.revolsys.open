@@ -67,7 +67,7 @@ public class PointInRingTest extends AbstractPointInRingTest {
     final Geometry geom = this.reader.read(wkt);
     final boolean expected = expectedLoc == Location.INTERIOR;
     assertEquals(expected,
-      CGAlgorithms.isPointInRing(pt, geom.getCoordinates()));
+      CGAlgorithms.isPointInRing(pt, geom.getCoordinateArray()));
   }
 
 }

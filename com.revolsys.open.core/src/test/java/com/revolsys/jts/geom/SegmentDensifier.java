@@ -35,7 +35,7 @@ public class SegmentDensifier {
   public Geometry densify(final double segLength) {
     this.newCoords = new CoordinateList();
 
-    final CoordinateSequence seq = this.inputLine.getCoordinateSequence();
+    final CoordinatesList seq = this.inputLine.getCoordinatesList();
 
     final Coordinate p0 = new Coordinate();
     final Coordinate p1 = new Coordinate();

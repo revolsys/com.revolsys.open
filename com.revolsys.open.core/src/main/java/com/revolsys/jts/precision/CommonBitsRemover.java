@@ -33,7 +33,9 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Removes common most-significant mantissa bits 

@@ -34,11 +34,30 @@
  */
 package com.revolsys.jts.operation;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.algorithm.*;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
 
 /**
@@ -193,7 +212,7 @@ public class IsSimpleOp
     if (mp.isEmpty()) return true;
     Set points = new TreeSet();
     for (int i = 0; i < mp.getNumGeometries(); i++) {
-      Point pt = (Point) mp.getGeometryN(i);
+      Point pt = (Point) mp.getGeometry(i);
       Coordinate p = pt.getCoordinate();
       if (points.contains(p)) {
         nonSimpleLocation = p;
@@ -233,7 +252,7 @@ public class IsSimpleOp
   private boolean isSimpleGeometryCollection(Geometry geom)
   {
     for (int i = 0; i < geom.getNumGeometries(); i++ ) {
-      Geometry comp = geom.getGeometryN(i);
+      Geometry comp = geom.getGeometry(i);
       if (! computeSimple(comp))
         return false;
     }

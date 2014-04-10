@@ -36,12 +36,12 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import java.util.Iterator;
+
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.geomgraph.index.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
 
 
 /**

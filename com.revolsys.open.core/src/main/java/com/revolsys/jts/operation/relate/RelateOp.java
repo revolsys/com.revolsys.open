@@ -40,10 +40,9 @@ package com.revolsys.jts.operation.relate;
  */
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.operation.GeometryGraphOperation;
-import java.util.*;
 
 /**
  * Implements the SFS <tt>relate()</tt> generalized spatial predicate on two {@link Geometry}s.

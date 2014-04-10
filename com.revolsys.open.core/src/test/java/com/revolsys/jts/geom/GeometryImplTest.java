@@ -243,8 +243,8 @@ public class GeometryImplTest extends TestCase {
       new Coordinate(0, 0), new Coordinate(100, 0), new Coordinate(100, 555),
       new Coordinate(0, 0)
     });
-    final LinearRing sameClassButEmpty = this.geometryFactory.createLinearRing((CoordinateSequence)null);
-    final LinearRing anotherSameClassButEmpty = this.geometryFactory.createLinearRing((CoordinateSequence)null);
+    final LinearRing sameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
+    final LinearRing anotherSameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {

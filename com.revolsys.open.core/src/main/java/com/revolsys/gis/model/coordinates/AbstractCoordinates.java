@@ -1,29 +1,20 @@
 package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinates implements Coordinates {
-
-  public static int hashCode(final double d) {
-    final long f = Double.doubleToLongBits(d);
-    return (int)(f ^ (f >>> 32));
-  }
 
   /**
    * Calculate the angle in radians on a 2D plan between this point and another
    * point.
    * 
-   * @param other The other point.
+   * @param point The other point.
    * @return The angle in radians.
    */
   @Override
-  public double angle2d(final Coordinates other) {
-    final double dx = other.getX() - getX();
-    final double dy = other.getY() - getY();
-    final double angle = Math.atan2(dy, dx);
-    return angle;
+  public double angle2d(final Coordinates point) {
+    return CoordinatesUtil.angle2d(this, point);
   }
 
   @Override
@@ -41,20 +32,25 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public int compareTo(final Coordinates other) {
-    final double x = getX();
-    final double y = getY();
-    final double distance = MathUtil.distance(0, 0, x, y);
+  public int compareTo(final Object other) {
+    if (other instanceof Coordinates) {
+      final Coordinates coordinates = (Coordinates)other;
+      final double x = getX();
+      final double y = getY();
+      final double distance = MathUtil.distance(0, 0, x, y);
 
-    final double otherX = other.getX();
-    final double otherY = other.getY();
-    final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
-    final int distanceCompare = Double.compare(distance, otherDistance);
-    if (distanceCompare == 0) {
-      final int yCompare = Double.compare(y, otherY);
-      return yCompare;
+      final double otherX = coordinates.getX();
+      final double otherY = coordinates.getY();
+      final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
+      final int distanceCompare = Double.compare(distance, otherDistance);
+      if (distanceCompare == 0) {
+        final int yCompare = Double.compare(y, otherY);
+        return yCompare;
+      } else {
+        return distanceCompare;
+      }
     } else {
-      return distanceCompare;
+      return -1;
     }
   }
 
@@ -85,25 +81,13 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public boolean equals2d(final Coordinates coordinates) {
-    if (getX() == coordinates.getX()) {
-      if (getY() == coordinates.getY()) {
-        return true;
-      }
-    }
-    return false;
+  public boolean equals2d(final Coordinates point) {
+    return CoordinatesUtil.equals2d(this, point);
   }
 
   @Override
-  public boolean equals3d(final Coordinates coordinates) {
-    if (NumberEquals.equal(getX(), coordinates.getX())) {
-      if (NumberEquals.equal(getY(), coordinates.getY())) {
-        if (NumberEquals.equal(getZ(), coordinates.getZ())) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public boolean equals3d(final Coordinates point) {
+    return CoordinatesUtil.equals3d(this, point);
   }
 
   public BoundingBox getBoundingBox() {
@@ -155,10 +139,7 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public int hashCode() {
-    int result = 17;
-    result = 37 * result + hashCode(getX());
-    result = 37 * result + hashCode(getY());
-    return result;
+    return CoordinatesUtil.hashCode(this);
   }
 
   @Override

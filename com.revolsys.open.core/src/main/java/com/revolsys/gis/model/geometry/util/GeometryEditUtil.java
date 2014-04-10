@@ -13,13 +13,13 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -108,7 +108,7 @@ public class GeometryEditUtil {
 
   public static <T extends Geometry> T appendVertex(final Geometry geometry,
     final Point newPoint, final int[] partId) {
-    return appendVertex(geometry, CoordinatesUtil.get(newPoint), partId);
+    return appendVertex(geometry, CoordinatesUtil.getInstance(newPoint), partId);
   }
 
   public static LineString appendVertex(final LineString line,
@@ -259,7 +259,7 @@ public class GeometryEditUtil {
     } else {
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
-        final Coordinates coordinates = CoordinatesUtil.get(point);
+        final Coordinates coordinates = CoordinatesUtil.getInstance(point);
         pointIndexes.put(new int[] {
           0
         }, coordinates);
@@ -279,10 +279,10 @@ public class GeometryEditUtil {
         add(pointIndexes, geometry);
       } else {
         for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-          final Geometry part = geometry.getGeometryN(partIndex);
+          final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             final Point point = (Point)part;
-            final Coordinates coordinates = CoordinatesUtil.get(point);
+            final Coordinates coordinates = CoordinatesUtil.getInstance(point);
             add(pointIndexes, coordinates, partIndex, 0);
           } else if (part instanceof LineString) {
             final LineString line = (LineString)part;
@@ -350,7 +350,7 @@ public class GeometryEditUtil {
           }
         } else {
           for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-            final Geometry part = geometry.getGeometryN(partIndex);
+            final Geometry part = geometry.getGeometry(partIndex);
             if (part instanceof LineString) {
               final LineString line = (LineString)part;
               int segmentIndex = 0;
@@ -405,7 +405,7 @@ public class GeometryEditUtil {
 
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          final Coordinates coordinates = CoordinatesUtil.get(point);
+          final Coordinates coordinates = CoordinatesUtil.getInstance(point);
           index.put(coordinates, new int[] {
             0
           });
@@ -434,10 +434,10 @@ public class GeometryEditUtil {
           }
         } else {
           for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-            final Geometry part = geometry.getGeometryN(partIndex);
+            final Geometry part = geometry.getGeometry(partIndex);
             if (part instanceof Point) {
               final Point point = (Point)part;
-              final Coordinates coordinates = CoordinatesUtil.get(point);
+              final Coordinates coordinates = CoordinatesUtil.getInstance(point);
               index.put(coordinates, new int[] {
                 partIndex, 0
               });
@@ -495,7 +495,7 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = vertexId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final Geometry part = geometry.getGeometryN(partIndex);
+          final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             final CoordinatesList points = CoordinatesListUtil.get(part);
             return points;
@@ -535,7 +535,7 @@ public class GeometryEditUtil {
       if (geometry instanceof Point) {
         if (pointIndex == 0) {
           final Point point = (Point)geometry;
-          final Coordinates coordinates = CoordinatesUtil.get(point);
+          final Coordinates coordinates = CoordinatesUtil.getInstance(point);
           return coordinates;
         } else {
           return null;
@@ -563,11 +563,11 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = vertexId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final Geometry part = geometry.getGeometryN(partIndex);
+          final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             if (pointIndex == 0) {
               final Point point = (Point)part;
-              final Coordinates coordinates = CoordinatesUtil.get(point);
+              final Coordinates coordinates = CoordinatesUtil.getInstance(point);
               return coordinates;
             } else {
               return null;
@@ -680,7 +680,7 @@ public class GeometryEditUtil {
 
   public static <T extends Geometry> T insertVertex(final Geometry geometry,
     final Point newPoint, final int[] vertexId) {
-    return insertVertex(geometry, CoordinatesUtil.get(newPoint), vertexId);
+    return insertVertex(geometry, CoordinatesUtil.getInstance(newPoint), vertexId);
   }
 
   public static LineString insertVertex(final LineString line,
@@ -760,7 +760,7 @@ public class GeometryEditUtil {
   protected static Point moveGeometry(
     final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final Point point, final double deltaX, final double deltaY) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     coordinates.setX(coordinates.getX() + deltaX);
     coordinates.setY(coordinates.getY() + deltaY);
     final Point newPoint = geometryFactory.createPoint(coordinates);
@@ -801,7 +801,7 @@ public class GeometryEditUtil {
         } else {
           final List<Geometry> parts = new ArrayList<Geometry>();
           for (int i = 0; i < geometry.getNumGeometries(); i++) {
-            final Geometry part = geometry.getGeometryN(i);
+            final Geometry part = geometry.getGeometry(i);
             if (part != null && !part.isEmpty()) {
               final Geometry newPart = moveGeometry(part, deltaX, deltaY);
               parts.add(newPart);

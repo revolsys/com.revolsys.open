@@ -53,10 +53,10 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -987,7 +987,7 @@ public class Graph<T> {
       final T object = edge.getObject();
       remove(edge);
       for (int i = 0; i < lines.getNumGeometries(); i++) {
-        final LineString line = (LineString)lines.getGeometryN(i);
+        final LineString line = (LineString)lines.getGeometry(i);
         final T newObject = clone(object, line);
         final Edge<T> newEdge = addEdge(newObject, line);
         edges.add(newEdge);

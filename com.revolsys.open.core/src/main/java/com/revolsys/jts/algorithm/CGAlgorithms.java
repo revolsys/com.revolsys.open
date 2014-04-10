@@ -33,7 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.math.MathUtil;
@@ -528,7 +528,7 @@ public class CGAlgorithms
    *          the coordinates forming the ring
    * @return the signed area of the ring
    */
-  public static double signedArea(CoordinateSequence ring)
+  public static double signedArea(CoordinatesList ring)
   {
     int n = ring.size();
     if (n < 3)
@@ -563,7 +563,7 @@ public class CGAlgorithms
    *          the points specifying the linestring
    * @return the length of the linestring
    */
-  public static double length(CoordinateSequence pts)
+  public static double length(CoordinatesList pts)
   {
     // optimized for processing CoordinateSequences
     int n = pts.size();

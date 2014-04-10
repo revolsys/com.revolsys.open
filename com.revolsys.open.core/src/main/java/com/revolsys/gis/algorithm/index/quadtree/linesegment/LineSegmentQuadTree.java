@@ -6,11 +6,11 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -67,7 +67,7 @@ public class LineSegmentQuadTree {
       }
     } else {
       for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-        final Geometry part = geometry.getGeometryN(partIndex);
+        final Geometry part = geometry.getGeometry(partIndex);
         if (part instanceof Point) {
         } else if (part instanceof LineString) {
           final LineString line = (LineString)part;

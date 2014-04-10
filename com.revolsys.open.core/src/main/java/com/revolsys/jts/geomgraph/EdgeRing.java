@@ -40,10 +40,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.impl.*;
-import com.revolsys.jts.io.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.util.Assert;
 
 
 /**
@@ -113,7 +117,7 @@ public abstract class EdgeRing {
       coord[i] = (Coordinate) pts.get(i);
     }
     ring = geometryFactory.createLinearRing(coord);
-    isHole = CGAlgorithms.isCCW(ring.getCoordinates());
+    isHole = CGAlgorithms.isCCW(ring.getCoordinateArray());
 //Debug.println( (isHole ? "hole - " : "shell - ") + WKTWriter.toLineString(new CoordinateArraySequence(ring.getCoordinates())));
   }
   abstract public DirectedEdge getNext(DirectedEdge de);
@@ -233,7 +237,7 @@ public abstract class EdgeRing {
     LinearRing shell = getLinearRing();
     Envelope env = shell.getEnvelopeInternal();
     if (! env.contains(p)) return false;
-    if (! CGAlgorithms.isPointInRing(p, shell.getCoordinates()) ) return false;
+    if (! CGAlgorithms.isPointInRing(p, shell.getCoordinateArray()) ) return false;
 
     for (Iterator i = holes.iterator(); i.hasNext(); ) {
       EdgeRing hole = (EdgeRing) i.next();

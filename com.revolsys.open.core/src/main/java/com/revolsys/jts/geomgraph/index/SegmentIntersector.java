@@ -35,11 +35,13 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.Collection;
+import java.util.Iterator;
+
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.util.Debug;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.Node;
 
 
 /**

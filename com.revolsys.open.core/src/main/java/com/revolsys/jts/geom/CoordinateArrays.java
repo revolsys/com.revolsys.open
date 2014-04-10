@@ -34,7 +34,8 @@
  */
 package com.revolsys.jts.geom;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
 
 import com.revolsys.jts.math.MathUtil;
 

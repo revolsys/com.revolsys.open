@@ -32,10 +32,20 @@
  */
 package com.revolsys.jts.operation.distance;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.algorithm.*;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.geom.util.PointExtracter;
+import com.revolsys.jts.geom.util.PolygonExtracter;
 
 /**
  * Find two points on two {@link Geometry}s which lie
@@ -377,8 +387,8 @@ public class DistanceOp
     if (line0.getEnvelopeInternal().distance(line1.getEnvelopeInternal())
         > minDistance)
           return;
-    Coordinate[] coord0 = line0.getCoordinates();
-    Coordinate[] coord1 = line1.getCoordinates();
+    Coordinate[] coord0 = line0.getCoordinateArray();
+    Coordinate[] coord1 = line1.getCoordinateArray();
       // brute force approach!
     for (int i = 0; i < coord0.length - 1; i++) {
       for (int j = 0; j < coord1.length - 1; j++) {
@@ -404,7 +414,7 @@ public class DistanceOp
     if (line.getEnvelopeInternal().distance(pt.getEnvelopeInternal())
         > minDistance)
           return;
-    Coordinate[] coord0 = line.getCoordinates();
+    Coordinate[] coord0 = line.getCoordinateArray();
     Coordinate coord = pt.getCoordinate();
       // brute force approach!
     for (int i = 0; i < coord0.length - 1; i++) {

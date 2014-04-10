@@ -33,8 +33,7 @@
 
 package com.revolsys.jts.index;
 
-import java.util.*;
-import com.revolsys.jts.index.ItemVisitor;
+import java.util.ArrayList;
 
 /**
  * @version 1.7

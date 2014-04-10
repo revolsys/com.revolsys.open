@@ -36,7 +36,7 @@
 package com.revolsys.jts.geomgraph.index;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geomgraph.*;
+import com.revolsys.jts.geomgraph.Edge;
 
 
 /**

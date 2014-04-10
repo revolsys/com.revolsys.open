@@ -1,17 +1,17 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinateSequenceCoordinates extends AbstractCoordinates {
-  private final CoordinateSequence coordinates;
+  private final CoordinatesList coordinates;
 
   private int index = 0;
 
-  public CoordinateSequenceCoordinates(final CoordinateSequence coordinates) {
+  public CoordinateSequenceCoordinates(final CoordinatesList coordinates) {
     this.coordinates = coordinates;
   }
 
-  public CoordinateSequenceCoordinates(final CoordinateSequence coordinates,
+  public CoordinateSequenceCoordinates(final CoordinatesList coordinates,
     final int index) {
     this.coordinates = coordinates;
     this.index = index;

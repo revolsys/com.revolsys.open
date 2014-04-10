@@ -35,10 +35,24 @@
 
 package com.revolsys.jts.operation.polygonize;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.planargraph.DirectedEdge;
+import com.revolsys.jts.planargraph.DirectedEdgeStar;
+import com.revolsys.jts.planargraph.Edge;
+import com.revolsys.jts.planargraph.Node;
+import com.revolsys.jts.planargraph.PlanarGraph;
 import com.revolsys.jts.util.Assert;
-import com.revolsys.jts.planargraph.*;
 
 /**
  * Represents a planar graph of edges that can be used to compute a
@@ -110,7 +124,7 @@ class PolygonizeGraph
   public void addEdge(LineString line)
   {
     if (line.isEmpty()) { return; }
-    Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
+    Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
     
     if (linePts.length < 2) { return; }
     

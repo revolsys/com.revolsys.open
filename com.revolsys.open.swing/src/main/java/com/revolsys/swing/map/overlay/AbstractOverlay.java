@@ -34,7 +34,6 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -42,6 +41,9 @@ import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
 import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -51,8 +53,6 @@ import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
 
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
@@ -135,7 +135,7 @@ public class AbstractOverlay extends JComponent implements
           text.append("</td><td style=\"border-right: solid black 1px\">");
           text.append(location.getIndexString());
           text.append("</td></td>");
-          text.append(CoordinatesUtil.get(location.getPoint()));
+          text.append(CoordinatesUtil.getInstance(location.getPoint()));
           text.append("</td></tr>");
         }
         text.append("</tbody></table>");
@@ -258,7 +258,7 @@ public class AbstractOverlay extends JComponent implements
     final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
     if (lineSegments != null) {
       final Point point = boundingBox.getCentrePoint();
-      final Coordinates coordinates = CoordinatesUtil.get(point);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
 
       double closestDistance = Double.MAX_VALUE;
       final List<IndexedLineSegment> segments = lineSegments.query(boundingBox,

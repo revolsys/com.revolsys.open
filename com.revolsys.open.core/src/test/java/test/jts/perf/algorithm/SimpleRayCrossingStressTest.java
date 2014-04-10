@@ -39,7 +39,7 @@ import com.revolsys.jts.algorithm.PerturbedGridPolygonBuilder;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -61,7 +61,7 @@ public class SimpleRayCrossingStressTest extends TestCase {
       }
 
       @Override
-      public void filter(final CoordinateSequence seq, final int i) {
+      public void filter(final CoordinatesList seq, final int i) {
         if (i == 0) {
           return;
         }

@@ -34,9 +34,10 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeRing;
 
 /**
  * A ring of {@link Edge}s with the property that no node

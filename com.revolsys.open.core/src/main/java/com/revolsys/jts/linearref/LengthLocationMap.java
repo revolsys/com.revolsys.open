@@ -33,7 +33,8 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Computes the {@link LinearLocation} for a given length
@@ -195,7 +196,7 @@ public class LengthLocationMap
     do {
       compIndex++;
     } while (compIndex < linearGeom.getNumGeometries() - 1
-        && linearGeom.getGeometryN(compIndex).getLength() == 0);
+        && linearGeom.getGeometry(compIndex).getLength() == 0);
     // resolve to next higher location
     return new LinearLocation(compIndex, 0, 0.0); 
   }

@@ -33,8 +33,9 @@
 
 package com.revolsys.jts.algorithm.match;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.distance.*;
+import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Measures the degree of similarity between two {@link Geometry}s

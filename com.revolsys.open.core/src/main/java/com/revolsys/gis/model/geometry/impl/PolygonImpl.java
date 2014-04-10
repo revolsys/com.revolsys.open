@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry.impl;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.LinearRing;
@@ -16,6 +15,7 @@ import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentStringUtil;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.FastSegmentSetIntersectionFinder;
 import com.revolsys.gis.model.geometry.util.PolygonUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class PolygonImpl extends GeometryImpl implements Polygon,
   Iterable<LinearRing> {

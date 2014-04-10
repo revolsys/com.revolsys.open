@@ -33,12 +33,14 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.io.*;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.

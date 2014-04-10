@@ -53,7 +53,7 @@ public class OrientationIndexTest extends TestCase {
   public static Coordinate[] getCoordinates(final String wkt)
     throws ParseException {
     final Geometry geom = reader.read(wkt);
-    return geom.getCoordinates();
+    return geom.getCoordinateArray();
   }
 
   /**

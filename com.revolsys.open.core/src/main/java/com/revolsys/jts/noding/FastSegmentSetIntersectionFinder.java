@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Finds if two sets of {@link SegmentString}s intersect.

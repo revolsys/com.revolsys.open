@@ -2,9 +2,9 @@ package com.revolsys.gis.model.geometry;
 
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.IntersectionMatrix;
 
 public interface Geometry extends Cloneable, ObjectWithProperties {

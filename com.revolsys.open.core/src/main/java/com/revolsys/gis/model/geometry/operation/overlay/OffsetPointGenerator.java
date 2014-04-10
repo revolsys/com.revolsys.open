@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Generates points offset by a given distance from both sides of the midpoint

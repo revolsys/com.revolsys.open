@@ -35,7 +35,7 @@ package com.revolsys.jts.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.impl.PackedCoordinateSequenceFactory;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -43,9 +43,9 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class CoordinateSequencesTest extends TestCase {
 
-  private static CoordinateSequence createTestSequence(
+  private static CoordinatesList createTestSequence(
     final CoordinateSequenceFactory csFactory, final int size, final int dim) {
-    final CoordinateSequence cs = csFactory.create(size, dim);
+    final CoordinatesList cs = csFactory.create(size, dim);
     // initialize with a data signature where coords look like [1, 10, 100, ...]
     for (int i = 0; i < size; i++) {
       for (int d = 0; d < dim; d++) {
@@ -71,17 +71,17 @@ public class CoordinateSequencesTest extends TestCase {
   }
 
   public void testCopyToLargerDim() throws Exception {
-    final PackedCoordinateSequenceFactory csFactory = new PackedCoordinateSequenceFactory();
-    final CoordinateSequence cs2D = createTestSequence(csFactory, 10, 2);
-    final CoordinateSequence cs3D = csFactory.create(10, 3);
+    final DoubleCoordinatesListFactory csFactory = new DoubleCoordinatesListFactory();
+    final CoordinatesList cs2D = createTestSequence(csFactory, 10, 2);
+    final CoordinatesList cs3D = csFactory.create(10, 3);
     CoordinateSequences.copy(cs2D, 0, cs3D, 0, cs3D.size());
     assertTrue(CoordinateSequences.isEqual(cs2D, cs3D));
   }
 
   public void testCopyToSmallerDim() throws Exception {
-    final PackedCoordinateSequenceFactory csFactory = new PackedCoordinateSequenceFactory();
-    final CoordinateSequence cs3D = createTestSequence(csFactory, 10, 3);
-    final CoordinateSequence cs2D = csFactory.create(10, 2);
+    final DoubleCoordinatesListFactory csFactory = new DoubleCoordinatesListFactory();
+    final CoordinatesList cs3D = createTestSequence(csFactory, 10, 3);
+    final CoordinatesList cs2D = csFactory.create(10, 2);
     CoordinateSequences.copy(cs3D, 0, cs2D, 0, cs2D.size());
     assertTrue(CoordinateSequences.isEqual(cs2D, cs3D));
   }

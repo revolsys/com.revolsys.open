@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinatesListCoordinates extends AbstractCoordinates {
   private final CoordinatesList coordinates;

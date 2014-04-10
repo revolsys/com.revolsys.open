@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -71,7 +71,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
     if (multiLineString != null) {
       final LineString[] newLineStrings = new LineString[multiLineString.getNumGeometries()];
       for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-        final LineString line = (LineString)multiLineString.getGeometryN(i);
+        final LineString line = (LineString)multiLineString.getGeometry(i);
         final LineString newLineString = perform(line);
         addUserData(line, newLineString);
         newLineStrings[i] = newLineString;
@@ -88,7 +88,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
     if (multiPoint != null) {
       final Point[] newPoints = new Point[multiPoint.getNumGeometries()];
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-        final Point point = (Point)multiPoint.getGeometryN(i);
+        final Point point = (Point)multiPoint.getGeometry(i);
         final Point newPoint = perform(point);
         addUserData(point, newPoint);
         newPoints[i] = newPoint;
@@ -105,7 +105,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
     if (multiPolygon != null) {
       final Polygon[] newPolygons = new Polygon[multiPolygon.getNumGeometries()];
       for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-        final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+        final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
         final Polygon newPolygon = perform(polygon);
         addUserData(polygon, newPolygon);
         newPolygons[i] = newPolygon;

@@ -77,7 +77,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style) {
     if (geometry != null) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
           MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
@@ -115,7 +115,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style) {
     if (geometry != null) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
           MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);

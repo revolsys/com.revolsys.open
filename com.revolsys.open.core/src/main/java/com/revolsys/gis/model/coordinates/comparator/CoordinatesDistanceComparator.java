@@ -24,7 +24,7 @@ public class CoordinatesDistanceComparator implements Comparator<Coordinates> {
   }
 
   public CoordinatesDistanceComparator(final Point point) {
-    this(CoordinatesUtil.get(point));
+    this(CoordinatesUtil.getInstance(point));
   }
 
   @Override

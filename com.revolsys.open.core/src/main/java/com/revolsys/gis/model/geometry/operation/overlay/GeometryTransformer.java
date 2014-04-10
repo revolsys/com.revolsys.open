@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
@@ -17,7 +16,7 @@ import com.revolsys.gis.model.geometry.MultiPoint;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.util.GeometryEditor;
 
 /**
@@ -142,7 +141,7 @@ public class GeometryTransformer {
   }
 
   /**
-   * Transforms a {@link CoordinateSequence}. This method should always return a
+   * Transforms a {@link CoordinatesList}. This method should always return a
    * valid coordinate list for the desired result type. (E.g. a coordinate list
    * for a LineString must have 0 or at least 2 points). If this is not
    * possible, return an empty sequence - this will be pruned out.

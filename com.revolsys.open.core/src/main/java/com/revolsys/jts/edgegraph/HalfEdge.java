@@ -4,6 +4,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geomgraph.Quadrant;
 import com.revolsys.jts.util.Assert;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
 /**
  * Represents a directed component of an edge in an {@link EdgeGraph}.

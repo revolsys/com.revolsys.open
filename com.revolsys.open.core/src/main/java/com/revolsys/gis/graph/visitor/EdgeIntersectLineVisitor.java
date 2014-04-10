@@ -6,11 +6,11 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.visitor.CreateListVisitor;
 
 public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
 

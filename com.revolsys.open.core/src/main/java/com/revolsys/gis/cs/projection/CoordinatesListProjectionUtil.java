@@ -2,8 +2,8 @@ package com.revolsys.gis.cs.projection;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinatesListProjectionUtil {
 

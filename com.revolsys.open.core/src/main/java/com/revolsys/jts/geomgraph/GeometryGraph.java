@@ -35,12 +35,35 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.algorithm.locate.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.index.*;
-import com.revolsys.jts.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geomgraph.index.EdgeSetIntersector;
+import com.revolsys.jts.geomgraph.index.SegmentIntersector;
+import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry
@@ -214,7 +237,7 @@ public class GeometryGraph
   private void addCollection(GeometryCollection gc)
   {
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      Geometry g = gc.getGeometryN(i);
+      Geometry g = gc.getGeometry(i);
       add(g);
     }
   }
@@ -240,7 +263,7 @@ public class GeometryGraph
   	// don't bother adding empty holes
   	if (lr.isEmpty()) return;
   	
-    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(lr.getCoordinates());
+    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(lr.getCoordinateArray());
 
     if (coord.length < 4) {
       hasTooFewPoints = true;
@@ -285,7 +308,7 @@ public class GeometryGraph
 
   private void addLineString(LineString line)
   {
-    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
+    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
 
     if (coord.length < 2) {
       hasTooFewPoints = true;

@@ -36,11 +36,11 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.Label;
-import com.revolsys.jts.geomgraph.Edge;
+
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Models the end of an edge incident on a node.

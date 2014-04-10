@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 
 /**
  * An interface for classes which prepare {@link Geometry}s 

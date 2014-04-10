@@ -3,8 +3,8 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractSpatialIndex<T> implements
   EnvelopeSpatialIndex<T> {

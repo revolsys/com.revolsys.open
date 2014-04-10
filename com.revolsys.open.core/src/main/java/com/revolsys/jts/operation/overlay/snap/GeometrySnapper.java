@@ -33,8 +33,16 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.Set;
+import java.util.TreeSet;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
@@ -204,7 +212,7 @@ public class GeometrySnapper
   {
     // TODO: should do this more efficiently.  Use CoordSeq filter to get points, KDTree for uniqueness & queries
     Set ptSet = new TreeSet();
-    Coordinate[] pts = g.getCoordinates();
+    Coordinate[] pts = g.getCoordinateArray();
     for (int i = 0; i < pts.length; i++) {
       ptSet.add(pts[i]);
     }
@@ -258,7 +266,7 @@ class SnapTransformer
     this.isSelfSnap = isSelfSnap;
   }
 
-  protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent)
+  protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
   {
     Coordinate[] srcPts = coords.toCoordinateArray();
     Coordinate[] newPts = snapLine(srcPts, snapPts);

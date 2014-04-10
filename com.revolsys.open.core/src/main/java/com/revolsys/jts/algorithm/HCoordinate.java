@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space.

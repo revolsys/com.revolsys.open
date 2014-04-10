@@ -33,6 +33,7 @@
 package com.revolsys.jts.noding;
 
 import java.io.PrintStream;
+
 import com.revolsys.jts.geom.Coordinate;
 
 /**

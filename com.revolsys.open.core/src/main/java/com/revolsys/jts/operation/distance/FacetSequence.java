@@ -34,34 +34,37 @@
 package com.revolsys.jts.operation.distance;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Represents a sequence of facets (points or line segments)
  * of a {@link Geometry}
- * specified by a subsequence of a {@link CoordinateSequence}.
+ * specified by a subsequence of a {@link CoordinatesList}.
  * 
  * @author Martin Davis
  *
  */
 public class FacetSequence
 {
-  private CoordinateSequence pts;
+  private CoordinatesList pts;
   private int start;
   private int end;
   
-  // temporary Coordinates to materialize points from the CoordinateSequence
+  // temporary Coordinates to materialize points from the CoordinatesList
   private Coordinate pt = new Coordinate();
   private Coordinate seqPt = new Coordinate();
   
   /**
-   * Creates a new section based on a CoordinateSequence.
+   * Creates a new section based on a CoordinatesList.
    * 
    * @param pts the sequence holding the points in the section
    * @param start the index of the start point
    * @param end the index of the end point + 1
    */
-  public FacetSequence(CoordinateSequence pts, int start, int end) 
+  public FacetSequence(CoordinatesList pts, int start, int end) 
   {
     this.pts = pts;
     this.start = start;
@@ -69,12 +72,12 @@ public class FacetSequence
   }
   
   /**
-   * Creates a new sequence for a single point from a CoordinateSequence.
+   * Creates a new sequence for a single point from a CoordinatesList.
    * 
    * @param pts the sequence holding the points in the facet sequence
    * @param start the index of the point
    */
-  public FacetSequence(CoordinateSequence pts, int start) 
+  public FacetSequence(CoordinatesList pts, int start) 
   {
     this.pts = pts;
     this.start = start;
@@ -128,7 +131,7 @@ public class FacetSequence
     
   }
   
-  // temporary Coordinates to materialize points from the CoordinateSequence
+  // temporary Coordinates to materialize points from the CoordinatesList
   private Coordinate p0 = new Coordinate();
   private Coordinate p1 = new Coordinate();
   private Coordinate q0 = new Coordinate();

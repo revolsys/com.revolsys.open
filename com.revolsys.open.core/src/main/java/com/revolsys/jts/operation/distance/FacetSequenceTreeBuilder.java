@@ -37,12 +37,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.index.strtree.STRtree;
 
 public class FacetSequenceTreeBuilder {
@@ -75,9 +74,9 @@ public class FacetSequenceTreeBuilder {
     g.apply(new GeometryComponentFilter() {
 
       public void filter(Geometry geom) {
-        CoordinateSequence seq = null;
+        CoordinatesList seq = null;
         if (geom instanceof LineString) {
-          seq = ((LineString) geom).getCoordinateSequence();
+          seq = ((LineString) geom).getCoordinatesList();
           addFacetSequences(seq, sections);
         }
         else if (geom instanceof Point) {
@@ -89,7 +88,7 @@ public class FacetSequenceTreeBuilder {
     return sections;
   }
 
-  private static void addFacetSequences(CoordinateSequence pts, List sections) {
+  private static void addFacetSequences(CoordinatesList pts, List sections) {
     int i = 0;
     int size = pts.size();
     while (i <= size - 1) {

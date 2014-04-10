@@ -35,8 +35,8 @@ package com.revolsys.jts.precision;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
-import com.revolsys.jts.geom.CoordinateSequence;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -142,7 +142,7 @@ public class SimpleMinimumClearance
     {
       this.queryPt = queryPt;
     }
-    public void filter(CoordinateSequence seq, int i) {
+    public void filter(CoordinatesList seq, int i) {
       // compare to vertex
       checkVertexDistance(seq.getCoordinate(i));
       

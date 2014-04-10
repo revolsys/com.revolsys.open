@@ -32,9 +32,18 @@
  */
 package com.revolsys.jts.operation.union;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.util.GeometryCombiner;
+import com.revolsys.jts.geom.util.PolygonExtracter;
 import com.revolsys.jts.index.strtree.STRtree;
 
 
@@ -367,7 +376,7 @@ public class CascadedPolygonUnion
   {
   	List intersectingGeoms = new ArrayList();
   	for (int i = 0; i < geom.getNumGeometries(); i++) { 
-  		Geometry elem = geom.getGeometryN(i);
+  		Geometry elem = geom.getGeometry(i);
   		if (elem.getEnvelopeInternal().intersects(env))
   			intersectingGeoms.add(elem);
   		else

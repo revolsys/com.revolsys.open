@@ -36,6 +36,7 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
+
 import com.revolsys.jts.geom.Coordinate;
 
 /**

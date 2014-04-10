@@ -37,19 +37,18 @@ import java.io.StringWriter;
 import java.lang.ref.Reference;
 import java.text.NumberFormat;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.util.MathUtil;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class WktWriter {
 
@@ -58,7 +57,7 @@ public class WktWriter {
   private static int getDimension(final Geometry geometry) {
     int numAxis = GeometryFactory.getFactory(geometry).getNumAxis();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry subGeometry = geometry.getGeometryN(i);
+      final Geometry subGeometry = geometry.getGeometry(i);
       final int geometryDimension = CoordinatesListUtil.get(subGeometry)
         .getNumAxis();
       numAxis = Math.max(numAxis, geometryDimension);
@@ -78,7 +77,7 @@ public class WktWriter {
     final StringWriter out = new StringWriter();
     final PrintWriter writer = new PrintWriter(out);
     if (writeSrid) {
-      final int srid = geometry.getSRID();
+      final int srid = geometry.getSrid();
       if (srid > 0) {
         writer.print("SRID=");
         writer.print(srid);
@@ -91,7 +90,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out,
-    final CoordinateSequence coordinates, final int numAxis) {
+    final CoordinatesList coordinates, final int numAxis) {
     out.print('(');
     write(out, coordinates, 0, numAxis);
     for (int i = 1; i < coordinates.size(); i++) {
@@ -102,7 +101,7 @@ public class WktWriter {
   }
 
   private static void write(final PrintWriter out,
-    final CoordinateSequence coordinates, final int index, final int numAxis) {
+    final CoordinatesList coordinates, final int index, final int numAxis) {
     writeOrdinate(out, coordinates, index, 0);
     for (int j = 1; j < numAxis; j++) {
       out.print(' ');
@@ -184,11 +183,11 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      Geometry geometry = multiGeometry.getGeometryN(0);
+      Geometry geometry = multiGeometry.getGeometry(0);
       write(out, geometry, numAxis);
       for (int i = 1; i < multiGeometry.getNumGeometries(); i++) {
         out.print(',');
-        geometry = multiGeometry.getGeometryN(i);
+        geometry = multiGeometry.getGeometry(i);
         write(out, geometry, numAxis);
       }
       out.print(')');
@@ -206,7 +205,7 @@ public class WktWriter {
     if (line.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
+      final CoordinatesList coordinates = line.getCoordinatesList();
       write(out, coordinates, numAxis);
     }
   }
@@ -224,12 +223,12 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      LineString line = (LineString)multiLineString.getGeometryN(0);
+      LineString line = (LineString)multiLineString.getGeometry(0);
       CoordinatesList points = CoordinatesListUtil.get(line);
       write(out, points, numAxis);
       for (int i = 1; i < multiLineString.getNumGeometries(); i++) {
         out.print(",");
-        line = (LineString)multiLineString.getGeometryN(i);
+        line = (LineString)multiLineString.getGeometry(i);
         points = CoordinatesListUtil.get(line);
         write(out, points, numAxis);
       }
@@ -248,13 +247,13 @@ public class WktWriter {
     if (multiPoint.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      Point point = (Point)multiPoint.getGeometryN(0);
-      CoordinateSequence coordinates = point.getCoordinateSequence();
+      Point point = (Point)multiPoint.getGeometry(0);
+      CoordinatesList coordinates = point.getCoordinateSequence();
       out.print("((");
       write(out, coordinates, 0, numAxis);
       for (int i = 1; i < multiPoint.getNumGeometries(); i++) {
         out.print("),(");
-        point = (Point)multiPoint.getGeometryN(i);
+        point = (Point)multiPoint.getGeometry(i);
         coordinates = point.getCoordinateSequence();
         write(out, coordinates, 0, numAxis);
       }
@@ -276,11 +275,11 @@ public class WktWriter {
     } else {
       out.print("(");
 
-      Polygon polygon = (Polygon)multiPolygon.getGeometryN(0);
+      Polygon polygon = (Polygon)multiPolygon.getGeometry(0);
       writePolygon(out, polygon, numAxis);
       for (int i = 1; i < multiPolygon.getNumGeometries(); i++) {
         out.print(",");
-        polygon = (Polygon)multiPolygon.getGeometryN(i);
+        polygon = (Polygon)multiPolygon.getGeometry(i);
         writePolygon(out, polygon, numAxis);
       }
       out.print(")");
@@ -299,7 +298,7 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      final CoordinateSequence coordinates = point.getCoordinateSequence();
+      final CoordinatesList coordinates = point.getCoordinateSequence();
       write(out, coordinates, 0, numAxis);
       out.print(')');
     }
@@ -335,7 +334,7 @@ public class WktWriter {
   }
 
   private static void writeOrdinate(final PrintWriter out,
-    final CoordinateSequence coordinates, final int index,
+    final CoordinatesList coordinates, final int index,
     final int ordinateIndex) {
     if (ordinateIndex > coordinates.getDimension()) {
       out.print(0);
@@ -353,12 +352,12 @@ public class WktWriter {
     final Polygon polygon, final int numAxis) {
     out.print('(');
     final LineString shell = polygon.getExteriorRing();
-    final CoordinateSequence coordinates = shell.getCoordinateSequence();
+    final CoordinatesList coordinates = shell.getCoordinatesList();
     write(out, coordinates, numAxis);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       out.print(',');
       final LineString hole = polygon.getInteriorRingN(i);
-      final CoordinateSequence holeCoordinates = hole.getCoordinateSequence();
+      final CoordinatesList holeCoordinates = hole.getCoordinatesList();
       write(out, holeCoordinates, numAxis);
     }
     out.print(')');

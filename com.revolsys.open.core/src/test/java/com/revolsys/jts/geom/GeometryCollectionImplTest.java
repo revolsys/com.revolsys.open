@@ -76,7 +76,7 @@ public class GeometryCollectionImplTest extends TestCase {
 
   public void testGetCoordinates() throws Exception {
     final GeometryCollection g = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
-    final Coordinate[] coordinates = g.getCoordinates();
+    final Coordinate[] coordinates = g.getCoordinateArray();
     assertEquals(4, g.getNumPoints());
     assertEquals(4, coordinates.length);
     assertEquals(new Coordinate(10, 10), coordinates[0]);

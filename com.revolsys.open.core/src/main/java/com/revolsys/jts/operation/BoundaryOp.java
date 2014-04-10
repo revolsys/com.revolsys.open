@@ -32,10 +32,23 @@
  */
 package com.revolsys.jts.operation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Computes the boundary of a {@link Geometry}.
@@ -76,7 +89,7 @@ public class BoundaryOp
 
   private MultiPoint getEmptyMultiPoint()
   {
-    return geomFact.createMultiPoint((CoordinateSequence) null);
+    return geomFact.createMultiPoint((CoordinatesList) null);
   }
 
   private Geometry boundaryMultiLineString(MultiLineString mLine)
@@ -112,7 +125,7 @@ public class BoundaryOp
     List bdyPts = new ArrayList();
     endpointMap = new TreeMap();
     for (int i = 0; i < mLine.getNumGeometries(); i++) {
-      LineString line = (LineString) mLine.getGeometryN(i);
+      LineString line = (LineString) mLine.getGeometry(i);
       if (line.getNumPoints() == 0)
         continue;
       addEndpoint(line.getCoordinateN(0));

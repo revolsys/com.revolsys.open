@@ -42,10 +42,16 @@ package com.revolsys.jts.operation.relate;
  *
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeEnd;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.EdgeIntersectionList;
+import com.revolsys.jts.geomgraph.Label;
 
 /**
  * Computes the {@link EdgeEnd}s which arise from a noded {@link Edge}.

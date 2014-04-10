@@ -32,10 +32,11 @@
  *     www.vividsolutions.com
  */
 package com.revolsys.jts.index.strtree;
-import com.revolsys.jts.util.*;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.util.Assert;
 
 /**
  * A node of an {@link AbstractSTRtree}. A node is one of:

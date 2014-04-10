@@ -33,7 +33,7 @@
 package com.revolsys.jts.geom.prep;
 
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Computes the <tt>contains</tt> spatial relationship predicate

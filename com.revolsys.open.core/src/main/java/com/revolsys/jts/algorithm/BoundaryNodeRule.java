@@ -32,7 +32,11 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.operation.BoundaryOp;
 
 /**
  * An interface for rules which determine whether node points

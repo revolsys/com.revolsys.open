@@ -19,7 +19,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -27,7 +26,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -56,7 +55,8 @@ public final class LineStringUtil {
 
   }
 
-  public static void addLineString(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public static void addLineString(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final CoordinatesList points, final Coordinates startPoint,
     final int startIndex, final int endIndex, final Coordinates endPoint,
     final List<LineString> lines) {
@@ -229,7 +229,7 @@ public final class LineStringUtil {
     final Geometry geometry, final double tolerance) {
     double distance = Double.MAX_VALUE;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry part = geometry.getGeometryN(i);
+      final Geometry part = geometry.getGeometry(i);
       if (part instanceof LineString) {
         final LineString line = (LineString)part;
         distance = Math.min(distance, distance(x, y, line, tolerance));
@@ -272,8 +272,8 @@ public final class LineStringUtil {
       return Double.MAX_VALUE;
     } else {
       double minDistance = Double.MAX_VALUE;
-      final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
-      final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
+      final CoordinatesList coordinates1 = line1.getCoordinatesList();
+      final CoordinatesList coordinates2 = line2.getCoordinatesList();
       double previousX1 = coordinates1.getOrdinate(0, 0);
       double previousY1 = coordinates1.getOrdinate(0, 1);
       for (int i = 1; i < coordinates1.size(); i++) {
@@ -391,7 +391,7 @@ public final class LineStringUtil {
   public static List<LineString> getAll(final Geometry geometry) {
     final List<LineString> lines = new ArrayList<LineString>();
     for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
-      final Geometry part = geometry.getGeometryN(partIndex);
+      final Geometry part = geometry.getGeometry(partIndex);
       if (part instanceof LineString) {
         final LineString line = (LineString)part;
         lines.add(line);
@@ -589,7 +589,7 @@ public final class LineStringUtil {
   public static double getLength(final MultiLineString lines) {
     double length = 0;
     for (int i = 0; i < lines.getNumGeometries(); i++) {
-      final LineString line = (LineString)lines.getGeometryN(i);
+      final LineString line = (LineString)lines.getGeometry(i);
       length += line.getLength();
     }
     return length;
@@ -655,7 +655,7 @@ public final class LineStringUtil {
 
   public static boolean hasLoop(final Collection<LineString> lines) {
     for (final LineString line : lines) {
-      if (isClosed(line)) {
+      if (line.isClosed()) {
         return true;
       }
     }
@@ -739,7 +739,7 @@ public final class LineStringUtil {
         }
       }
     }
-    final int dimension = line.getCoordinateSequence().getDimension();
+    final int dimension = line.getCoordinatesList().getDimension();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(
       segments.size() + 1, dimension);
     final LineSegment firstSegment = segments.get(0);
@@ -863,19 +863,6 @@ public final class LineStringUtil {
       final CoordinatesList points = CoordinatesListUtil.get(line);
       return CoordinatesListUtil.isCCW(points);
     }
-  }
-
-  public static boolean isClosed(final LineString line) {
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
-    final int lastCoordinateIndex = coordinates.size() - 1;
-    if (coordinates.getOrdinate(0, 0) == coordinates.getOrdinate(
-      lastCoordinateIndex, 0)) {
-      if (coordinates.getOrdinate(0, 1) == coordinates.getOrdinate(
-        lastCoordinateIndex, 1)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static boolean isEndsWithinDistance(final LineString line,
@@ -1088,7 +1075,8 @@ public final class LineStringUtil {
     return newLine;
   }
 
-  public static List<LineString> split(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public static List<LineString> split(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final LineString line, final LineSegmentIndex index, final double tolerance) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Coordinates firstCoordinate = points.get(0);

@@ -1,9 +1,9 @@
 package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to allow for

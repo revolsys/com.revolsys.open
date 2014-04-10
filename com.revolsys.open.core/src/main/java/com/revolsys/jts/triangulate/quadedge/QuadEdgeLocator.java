@@ -43,5 +43,5 @@ package com.revolsys.jts.triangulate.quadedge;
  * @author Martin Davis
  */
 public interface QuadEdgeLocator {
-    QuadEdge locate(Vertex v);
+  QuadEdge locate(Vertex v);
 }

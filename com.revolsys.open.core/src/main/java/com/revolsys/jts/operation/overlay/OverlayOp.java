@@ -34,13 +34,28 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.Depth;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeList;
+import com.revolsys.jts.geomgraph.EdgeNodingValidator;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.PlanarGraph;
+import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.operation.GeometryGraphOperation;
-import com.revolsys.jts.noding.*;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the geometric overlay of two {@link Geometry}s.  The overlay

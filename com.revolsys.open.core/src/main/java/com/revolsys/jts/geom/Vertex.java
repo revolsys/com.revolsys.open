@@ -1,86 +1,30 @@
 package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 
-/**
- * @author Paul Austin <paul.austin@revolsys.com>
- */
-public class Vertex extends AbstractCoordinates {
-
-  private final Geometry geometry;
-
-  private Coordinates coordinates;
-
-  private int[] vertexId;
-
-  public Vertex(final Geometry geometry, final int... vertexId) {
-    this.geometry = geometry;
-    setVertexId(vertexId);
-  }
+public interface Vertex extends Coordinates {
 
   @Override
-  public Vertex clone() {
-    return (Vertex)super.clone();
-  }
+  Vertex clone();
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBox(geometryFactory, this);
-  }
+  BoundingBox getBoundingBox();
 
-  public Geometry getGeometry() {
-    return geometry;
-  }
+  <V extends Geometry> V getGeometry();
 
-  public GeometryFactory getGeometryFactory() {
-    return geometry.getGeometryFactory();
-  }
+  GeometryFactory getGeometryFactory();
 
-  @Override
-  public byte getNumAxis() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-    return (byte)geometryFactory.getNumAxis();
-  }
+  int getPartIndex();
 
-  @Override
-  public int getSrid() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getSrid();
-  }
+  int getRingIndex();
 
-  @Override
-  public double getValue(final int index) {
-    if (coordinates == null) {
-      return Double.NaN;
-    } else {
-      return coordinates.getValue(index);
-    }
-  }
+  int getSrid();
 
-  public int[] getVertexId() {
-    return vertexId;
-  }
+  int[] getVertexId();
 
-  public boolean isEmpty() {
-    return coordinates == null;
-  }
+  int getVertexIndex();
 
-  @Override
-  public void setValue(final int index, final double value) {
-    throw new UnsupportedOperationException("Cannot modify a geometry vertex");
-  }
+  boolean isEmpty();
 
-  void setVertexId(final int... vertexId) {
-    this.vertexId = vertexId;
-    this.coordinates = GeometryEditUtil.getVertex(geometry, vertexId);
-  }
-
-  public Point toPoint() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createPoint(this);
-  }
+  Point toPoint();
 }

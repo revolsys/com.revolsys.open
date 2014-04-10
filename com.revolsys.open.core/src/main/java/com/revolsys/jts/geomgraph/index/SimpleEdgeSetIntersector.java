@@ -35,9 +35,11 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geomgraph.Edge;
 
 /**
  * Finds all intersections in one or two sets of edges,

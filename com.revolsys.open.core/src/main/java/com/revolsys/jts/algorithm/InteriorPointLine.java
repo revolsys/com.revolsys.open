@@ -33,7 +33,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Computes a point in the interior of an linear geometry.
@@ -76,12 +79,12 @@ public class InteriorPointLine {
   private void addInterior(Geometry geom)
   {
     if (geom instanceof LineString) {
-      addInterior(geom.getCoordinates());
+      addInterior(geom.getCoordinateArray());
     }
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        addInterior(gc.getGeometryN(i));
+        addInterior(gc.getGeometry(i));
       }
     }
   }
@@ -100,12 +103,12 @@ public class InteriorPointLine {
   private void addEndpoints(Geometry geom)
   {
     if (geom instanceof LineString) {
-      addEndpoints(geom.getCoordinates());
+      addEndpoints(geom.getCoordinateArray());
     }
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        addEndpoints(gc.getGeometryN(i));
+        addEndpoints(gc.getGeometry(i));
       }
     }
   }

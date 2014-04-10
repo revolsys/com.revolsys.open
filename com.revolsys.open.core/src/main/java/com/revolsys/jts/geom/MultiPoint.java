@@ -33,9 +33,6 @@
 package com.revolsys.jts.geom;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-
-import com.revolsys.collection.AbstractIterator;
 
 /**
  * Models a collection of {@link Point}s.
@@ -104,12 +101,17 @@ public class MultiPoint extends GeometryCollection implements Puntal {
   /**
    *  Returns the <code>Coordinate</code> at the given position.
    *
-   *@param  n  the index of the <code>Coordinate</code> to retrieve, beginning
+   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
    *      at 0
    *@return    the <code>n</code>th <code>Coordinate</code>
    */
   protected Coordinate getCoordinate(final int n) {
-    return ((Point)geometries[n]).getCoordinate();
+    return ((Point)this.geometries[n]).getCoordinate();
+  }
+
+  public double getCoordinate(final int partIndex, final int vertexIndex) {
+    final Point point = getPoint(partIndex);
+    return point.getCoordinate(vertexIndex);
   }
 
   @Override
@@ -120,6 +122,10 @@ public class MultiPoint extends GeometryCollection implements Puntal {
   @Override
   public String getGeometryType() {
     return "MultiPoint";
+  }
+
+  public Point getPoint(final int partIndex) {
+    return (Point)getGeometry(partIndex);
   }
 
   /**
@@ -142,23 +148,7 @@ public class MultiPoint extends GeometryCollection implements Puntal {
    */
   @Override
   public Iterable<Vertex> vertices() {
-    return new AbstractIterator<Vertex>() {
-      private Vertex vertex = new Vertex(MultiPoint.this, 0);
-
-      private int index = 0;
-
-      @Override
-      protected Vertex getNext() throws NoSuchElementException {
-        if (index < getNumGeometries()) {
-          vertex.setVertexId(index);
-          index++;
-          return vertex;
-        } else {
-          vertex = null;
-          throw new NoSuchElementException();
-        }
-      }
-    };
+    return new MultiPointVertexIterable(this);
   }
 
 }

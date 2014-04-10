@@ -3,12 +3,12 @@ package com.revolsys.io.esri.gdb.xml.type;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
@@ -58,7 +58,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     if (multiLine.isEmpty()) {
       hasZ = false;
     } else {
-      final CoordinatesList points = CoordinatesListUtil.get((LineString)multiLine.getGeometryN(0));
+      final CoordinatesList points = CoordinatesListUtil.get((LineString)multiLine.getGeometry(0));
       hasZ = points.getNumAxis() > 2;
     }
     out.element(HAS_ID, false);
@@ -68,7 +68,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.startTag(PATH_ARRAY);
     out.attribute(XsiConstants.TYPE, PATH_ARRAY_TYPE);
     for (int i = 0; i < multiLine.getNumGeometries(); i++) {
-      final LineString line = (LineString)multiLine.getGeometryN(i);
+      final LineString line = (LineString)multiLine.getGeometry(i);
       final CoordinatesList points = CoordinatesListUtil.get(line);
       writePath(out, points, hasZ);
     }
@@ -95,7 +95,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   }
 
   private void writePoint(final XmlWriter out, final Point point) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     final boolean hasZ = coordinates.getNumAxis() > 2;
     writePoint(out, coordinates, hasZ);
   }

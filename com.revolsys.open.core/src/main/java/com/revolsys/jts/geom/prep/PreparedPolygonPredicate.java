@@ -33,13 +33,15 @@
 
 package com.revolsys.jts.geom.prep;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
-import com.revolsys.jts.algorithm.*;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
 
 /**
  * A base class for predicate operations on {@link PreparedPolygon}s.

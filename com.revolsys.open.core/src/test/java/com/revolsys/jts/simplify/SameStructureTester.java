@@ -39,7 +39,7 @@ public class SameStructureTester {
       return false;
     }
     for (int i = 0; i < g1.getNumGeometries(); i++) {
-      if (!isSameStructure(g1.getGeometryN(i), g2.getGeometryN(i))) {
+      if (!isSameStructure(g1.getGeometry(i), g2.getGeometry(i))) {
         return false;
       }
     }

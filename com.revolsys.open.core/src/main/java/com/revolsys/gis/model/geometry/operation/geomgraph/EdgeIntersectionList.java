@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * A list of edge intersections along an {@link Edge}. Implements splitting an

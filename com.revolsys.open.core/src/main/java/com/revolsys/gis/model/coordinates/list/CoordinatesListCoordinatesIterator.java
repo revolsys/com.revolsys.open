@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * The CoordinatesListCoordinatesIterator is an iterator which iterates through

@@ -36,8 +36,8 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.util.JavaBeanUtil;
 
 public final class DataObjectUtil {
 

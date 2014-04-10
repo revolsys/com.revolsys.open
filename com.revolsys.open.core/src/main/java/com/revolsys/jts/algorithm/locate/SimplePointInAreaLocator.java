@@ -35,7 +35,14 @@ package com.revolsys.jts.algorithm.locate;
 import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryCollectionIterator;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
 
 /**
  * Computes the location of points
@@ -113,7 +120,7 @@ public class SimplePointInAreaLocator
   	// short-circuit if point is not in ring envelope
   	if (! ring.getEnvelopeInternal().intersects(p))
   		return false;
-  	return CGAlgorithms.isPointInRing(p, ring.getCoordinates());
+  	return CGAlgorithms.isPointInRing(p, ring.getCoordinateArray());
   }
 
 	private Geometry geom;

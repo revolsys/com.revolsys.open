@@ -33,12 +33,20 @@
  */
 package com.revolsys.jts.algorithm;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.index.chain.*;
-import com.revolsys.jts.index.bintree.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.index.bintree.Bintree;
+import com.revolsys.jts.index.bintree.Interval;
+import com.revolsys.jts.index.chain.MonotoneChain;
+import com.revolsys.jts.index.chain.MonotoneChainBuilder;
+import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
 
 /**
  * Implements {@link PointInRing}
@@ -81,7 +89,7 @@ public class MCPointInRing   implements PointInRing {
     //Envelope env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
-    Coordinate[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinates());
+    Coordinate[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
     List mcList = MonotoneChainBuilder.getChains(pts);
 
     for (int i = 0; i < mcList.size(); i++) {

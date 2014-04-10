@@ -33,10 +33,21 @@
  */
 package com.revolsys.jts.noding.snapround;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.noding.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
+import com.revolsys.jts.noding.MCIndexNoder;
+import com.revolsys.jts.noding.NodedSegmentString;
+import com.revolsys.jts.noding.Noder;
+import com.revolsys.jts.noding.NodingValidator;
+import com.revolsys.jts.noding.SegmentString;
+import com.revolsys.jts.noding.SinglePassNoder;
 
 /**
  * Uses Snap Rounding to compute a rounded,

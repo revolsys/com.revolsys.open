@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LinearRing;
@@ -14,6 +13,7 @@ import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.util.TopologyException;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.util.Assert;
 
 public abstract class EdgeRing {

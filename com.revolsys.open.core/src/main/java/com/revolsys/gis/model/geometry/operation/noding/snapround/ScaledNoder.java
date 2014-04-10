@@ -2,12 +2,12 @@ package com.revolsys.gis.model.geometry.operation.noding.snapround;
 
 import java.util.Collection;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.Noder;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.util.CollectionUtil;
 
 /**

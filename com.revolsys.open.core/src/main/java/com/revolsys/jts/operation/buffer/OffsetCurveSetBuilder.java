@@ -38,11 +38,28 @@ package com.revolsys.jts.operation.buffer;
 /**
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.noding.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.noding.NodedSegmentString;
+import com.revolsys.jts.noding.SegmentString;
 
 /**
  * Creates all the raw offset curves for a buffer of a {@link Geometry}.
@@ -119,7 +136,7 @@ public class OffsetCurveSetBuilder {
   private void addCollection(GeometryCollection gc)
   {
     for (int i = 0; i < gc.getNumGeometries(); i++) {
-      Geometry g = gc.getGeometryN(i);
+      Geometry g = gc.getGeometry(i);
       add(g);
     }
   }
@@ -131,7 +148,7 @@ public class OffsetCurveSetBuilder {
     // a zero or negative width buffer of a line/point is empty
     if (distance <= 0.0) 
       return;
-    Coordinate[] coord = p.getCoordinates();
+    Coordinate[] coord = p.getCoordinateArray();
     Coordinate[] curve = curveBuilder.getLineCurve(coord, distance);
     addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
   }
@@ -141,7 +158,7 @@ public class OffsetCurveSetBuilder {
     // a zero or negative width buffer of a line/point is empty
     if (distance <= 0.0 && ! curveBuilder.getBufferParameters().isSingleSided()) 
       return;
-    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
+    Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
     Coordinate[] curve = curveBuilder.getLineCurve(coord, distance);
     addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
 
@@ -160,7 +177,7 @@ public class OffsetCurveSetBuilder {
     }
 
     LinearRing shell = (LinearRing) p.getExteriorRing();
-    Coordinate[] shellCoord = CoordinateArrays.removeRepeatedPoints(shell.getCoordinates());
+    Coordinate[] shellCoord = CoordinateArrays.removeRepeatedPoints(shell.getCoordinateArray());
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
     if (distance < 0.0 && isErodedCompletely(shell, distance))
@@ -179,7 +196,7 @@ public class OffsetCurveSetBuilder {
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
       LinearRing hole = (LinearRing) p.getInteriorRingN(i);
-      Coordinate[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinates());
+      Coordinate[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinateArray());
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
@@ -240,7 +257,7 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isErodedCompletely(LinearRing ring, double bufferDistance)
   {
-    Coordinate[] ringCoord = ring.getCoordinates();
+    Coordinate[] ringCoord = ring.getCoordinateArray();
     double minDiam = 0.0;
     // degenerate ring has no area
     if (ringCoord.length < 4)

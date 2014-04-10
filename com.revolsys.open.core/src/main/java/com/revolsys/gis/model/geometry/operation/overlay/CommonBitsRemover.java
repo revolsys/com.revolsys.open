@@ -2,8 +2,8 @@ package com.revolsys.gis.model.geometry.operation.overlay;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.precision.CommonBits;
 
 /**

@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -49,51 +47,18 @@ package com.revolsys.jts.geom;
  *
  * @version 1.7
  */
-public class LinearRing extends LineString
-{
+public class LinearRing extends LineString {
   /**
    * The minimum number of vertices allowed in a valid non-empty ring (= 4).
    * Empty rings with 0 vertices are also valid.
    */
   public static final int MINIMUM_VALID_SIZE = 4;
-  
+
   private static final long serialVersionUID = -4261142084085851829L;
 
   /**
-   * Constructs a <code>LinearRing</code> with the given points.
-   *
-   *@param  points          points forming a closed and simple linestring, or
-   *      <code>null</code> or an empty array to create the empty geometry.
-   *      This array must not contain <code>null</code> elements.
-   *
-   *@param  precisionModel  the specification of the grid of allowable points
-   *      for this <code>LinearRing</code>
-   *@param  SRID            the ID of the Spatial Reference System used by this
-   *      <code>LinearRing</code>
-   * @throws IllegalArgumentException if the ring is not closed, or has too few points
-   * 
-   * @deprecated Use GeometryFactory instead
-   */
-  public LinearRing(Coordinate points[], PrecisionModel precisionModel,
-                    int SRID) {
-    this(points, new GeometryFactory(precisionModel, SRID));
-    validateConstruction();
-  }
-
-  /**
-   * This method is ONLY used to avoid deprecation warnings.
-   * @param points
-   * @param factory
-   * @throws IllegalArgumentException if the ring is not closed, or has too few points
-   */
-  private LinearRing(Coordinate points[], GeometryFactory factory) {
-    this(factory.getCoordinateSequenceFactory().create(points), factory);
-  }
-
-
-  /**
    * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link CoordinateSequence}.
+   * specifed by the given {@link CoordinatesList}.
    *
    *@param  points  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
@@ -101,18 +66,19 @@ public class LinearRing extends LineString
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRing(CoordinateSequence points, GeometryFactory factory) {
+  public LinearRing(final CoordinatesList points,
+    final GeometryFactory factory) {
     super(points, factory);
-    validateConstruction();
-  }
-
-  private void validateConstruction() {
-    if (!isEmpty() && ! super.isClosed()) {
-      throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");
-    }
-    if (getCoordinateSequence().size() >= 1 && getCoordinateSequence().size() < MINIMUM_VALID_SIZE) {
-      throw new IllegalArgumentException("Invalid number of points in LinearRing (found " 
-      		+ getCoordinateSequence().size() + " - must be 0 or >= 4)");
+    if (isClosed()) {
+      final int vertexCount = getVertexCount();
+      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
+        throw new IllegalArgumentException(
+          "Invalid number of points in LinearRing (found " + vertexCount
+            + " - must be 0 or >= 4)");
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Points of LinearRing do not form a closed linestring");
     }
   }
 
@@ -122,8 +88,14 @@ public class LinearRing extends LineString
    *
    * @return Dimension.FALSE
    */
+  @Override
   public int getBoundaryDimension() {
     return Dimension.FALSE;
+  }
+
+  @Override
+  public String getGeometryType() {
+    return "LinearRing";
   }
 
   /**
@@ -132,24 +104,22 @@ public class LinearRing extends LineString
    * 
    * @return true if this ring is closed
    */
+  @Override
   public boolean isClosed() {
     if (isEmpty()) {
-    	// empty LinearRings are closed by definition
+      // empty LinearRings are closed by definition
       return true;
+    } else {
+      return super.isClosed();
     }
-    return super.isClosed();
   }
 
-
-  public String getGeometryType() {
-    return "LinearRing";
-  }
-
-  public Geometry reverse()
-  {
-    CoordinateSequence seq = (CoordinateSequence) points.clone();
+  @Override
+  public Geometry reverse() {
+    final CoordinatesList seq = (CoordinatesList)getCoordinatesList().clone();
     CoordinateSequences.reverse(seq);
-    LinearRing rev = getGeometryFactory().createLinearRing(seq);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LinearRing rev = geometryFactory.createLinearRing(seq);
     return rev;
   }
 }

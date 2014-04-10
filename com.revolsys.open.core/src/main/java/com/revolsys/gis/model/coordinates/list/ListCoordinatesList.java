@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Point;
 
 public class ListCoordinatesList extends AbstractCoordinatesList {
@@ -51,7 +52,7 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   }
 
   public void add(final Point point) {
-    add(CoordinatesUtil.get(point));
+    add(CoordinatesUtil.getInstance(point));
   }
 
   public void clear() {

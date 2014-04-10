@@ -1,5 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import com.revolsys.jts.geom.CoordinatesList;
+
 public class ReverseCoordinatesList extends AbstractCoordinatesList {
   /**
    * 

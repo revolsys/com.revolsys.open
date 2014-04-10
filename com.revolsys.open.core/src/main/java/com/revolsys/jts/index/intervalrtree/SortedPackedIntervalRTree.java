@@ -32,10 +32,12 @@
  */
 package com.revolsys.jts.index.intervalrtree;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.index.*;
+import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.io.WKTWriter;
 
 /**

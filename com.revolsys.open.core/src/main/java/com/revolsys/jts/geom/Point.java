@@ -34,7 +34,11 @@ package com.revolsys.jts.geom;
 
 import java.util.Collections;
 
-import com.revolsys.jts.util.Assert;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.util.MathUtil;
 
 /**
  * Represents a single point.
@@ -47,43 +51,47 @@ import com.revolsys.jts.util.Assert;
  * 
  *@version 1.7
  */
-public class Point extends Geometry implements Puntal {
+public class Point extends Geometry implements Puntal, Vertex {
   private static final long serialVersionUID = 4902022702746614570L;
 
-  /**
-   *  The <code>Coordinate</code> wrapped by this <code>Point</code>.
-   */
-  private CoordinateSequence coordinates;
+  private static final int[] VERTEX_ID = new int[] {
+    0
+  };
 
-  /**
-   *  Constructs a <code>Point</code> with the given coordinate.
-   *
-   *@param  coordinate      the coordinate on which to base this <code>Point</code>
-   *      , or <code>null</code> to create the empty geometry.
-   *@param  precisionModel  the specification of the grid of allowable points
-   *      for this <code>Point</code>
-   *@param  SRID            the ID of the Spatial Reference System used by this
-   *      <code>Point</code>
-   * @deprecated Use GeometryFactory instead
-   */
-  @Deprecated
-  public Point(final Coordinate coordinate,
-    final PrecisionModel precisionModel, final int SRID) {
-    super(new GeometryFactory(precisionModel, SRID));
-    init(getGeometryFactory().getCoordinateSequenceFactory().create(
-      coordinate != null ? new Coordinate[] {
-        coordinate
-      } : new Coordinate[] {}));
+  private double[] coordinates;
+
+  public Point(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   /**
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
-  public Point(final CoordinateSequence coordinates,
-    final GeometryFactory factory) {
-    super(factory);
-    init(coordinates);
+  public Point(final GeometryFactory geometryFactory,
+    final double... coordinates) {
+    super(geometryFactory);
+    final int numAxis = geometryFactory.getNumAxis();
+    this.coordinates = new double[numAxis];
+    for (int i = 0; i < numAxis; i++) {
+      double coordinate;
+      if (i < coordinates.length) {
+        coordinate = coordinates[i];
+      } else {
+        coordinate = Double.NaN;
+      }
+      if (i < 2) {
+        coordinate = geometryFactory.makeXyPrecise(coordinate);
+      } else if (i == 2) {
+        coordinate = geometryFactory.makeZPrecise(coordinate);
+      }
+      this.coordinates[i] = coordinate;
+    }
+  }
+
+  @Override
+  public double angle2d(final Coordinates other) {
+    return CoordinatesUtil.angle2d(this, other);
   }
 
   @Override
@@ -99,7 +107,7 @@ public class Point extends Geometry implements Puntal {
     if (isEmpty()) {
       return;
     }
-    filter.filter(coordinates, 0);
+    filter.filter(getCoordinateSequence(), 0);
     if (filter.isGeometryChanged()) {
       geometryChanged();
     }
@@ -122,10 +130,24 @@ public class Point extends Geometry implements Puntal {
    * @return a clone of this instance
    */
   @Override
-  public Object clone() {
-    final Point p = (Point)super.clone();
-    p.coordinates = (CoordinateSequence)coordinates.clone();
-    return p;// return the clone
+  public Point clone() {
+    final Point point = (Point)super.clone();
+    point.coordinates = coordinates.clone();
+    return point;
+  }
+
+  @Override
+  public Coordinates cloneCoordinates() {
+    return new DoubleCoordinates(this);
+  }
+
+  @Override
+  public int compareTo(final Object other) {
+    if (other instanceof Geometry) {
+      return super.compareTo(other);
+    } else {
+      return CoordinatesUtil.compareTo(this, other);
+    }
   }
 
   @Override
@@ -145,10 +167,48 @@ public class Point extends Geometry implements Puntal {
   protected Envelope computeEnvelopeInternal() {
     if (isEmpty()) {
       return new Envelope();
+    } else {
+      final double x = getX();
+      final double y = getY();
+      return new Envelope(x, y);
     }
-    final Envelope env = new Envelope();
-    env.expandToInclude(coordinates.getX(0), coordinates.getY(0));
-    return env;
+  }
+
+  @Override
+  public double distance(final Coordinates point) {
+    return CoordinatesUtil.distance(this, point);
+  }
+
+  public double distance(final Point point) {
+    return CoordinatesUtil.distance(this, point);
+  }
+
+  @Override
+  public boolean equals(final double... coordinates) {
+    return CoordinatesUtil.equals(this, coordinates);
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equalsExact(point);
+    } else if (other instanceof Coordinates) {
+      final Coordinates coordinates = (Coordinates)other;
+      return equals2d(coordinates);
+    } else {
+      return super.equals(other);
+    }
+  }
+
+  @Override
+  public boolean equals2d(final Coordinates point) {
+    return CoordinatesUtil.equals2d(this, point);
+  }
+
+  @Override
+  public boolean equals3d(final Coordinates point) {
+    return CoordinatesUtil.equals3d(this, point);
   }
 
   @Override
@@ -186,23 +246,59 @@ public class Point extends Geometry implements Puntal {
 
   @Override
   public Coordinate getCoordinate() {
-    return coordinates.size() != 0 ? coordinates.getCoordinate(0) : null;
+    if (isEmpty()) {
+      return null;
+    } else {
+      final double x = getX();
+      final double y = getY();
+      final double z = getZ();
+      return new Coordinate(x, y, z);
+    }
+  }
+
+  public double getCoordinate(final int axisIndex) {
+    if (isEmpty()) {
+      return Double.NaN;
+    } else {
+      final byte numAxis = getNumAxis();
+      if (axisIndex >= 0 && axisIndex < numAxis) {
+        return coordinates[axisIndex];
+      } else {
+        return Double.NaN;
+      }
+    }
   }
 
   @Override
-  public Coordinate[] getCoordinates() {
-    return isEmpty() ? new Coordinate[] {} : new Coordinate[] {
-      getCoordinate()
-    };
+  public Coordinate[] getCoordinateArray() {
+    if (isEmpty()) {
+      return new Coordinate[0];
+    } else {
+      return new Coordinate[] {
+        getCoordinate()
+      };
+    }
   }
 
-  public CoordinateSequence getCoordinateSequence() {
-    return coordinates;
+  @Override
+  public double[] getCoordinates() {
+    return CoordinatesUtil.getCoordinates(this);
+  }
+
+  public CoordinatesList getCoordinateSequence() {
+    final byte numAxis = getNumAxis();
+    return new DoubleCoordinatesList(numAxis, coordinates);
   }
 
   @Override
   public int getDimension() {
     return 0;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V getGeometry() {
+    return (V)this;
   }
 
   @Override
@@ -211,36 +307,90 @@ public class Point extends Geometry implements Puntal {
   }
 
   @Override
+  public double getM() {
+    return getCoordinate(3);
+  }
+
+  @Override
   public int getNumPoints() {
     return isEmpty() ? 0 : 1;
   }
 
+  @Override
+  public int getPartIndex() {
+    return -1;
+  }
+
+  @Override
+  public int getRingIndex() {
+    return -1;
+  }
+
+  @Override
+  public long getTime() {
+    return (long)getM();
+  }
+
+  @Override
+  public double getValue(final int index) {
+    return getCoordinate(index);
+  }
+
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      if (vertexId.length == 1) {
+        if (vertexId[0] == 0) {
+          return this;
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
+  public int[] getVertexId() {
+    return VERTEX_ID;
+  }
+
+  @Override
+  public int getVertexIndex() {
+    return 0;
+  }
+
+  @Override
   public double getX() {
-    if (getCoordinate() == null) {
+    if (isEmpty()) {
       throw new IllegalStateException("getX called on empty Point");
+    } else {
+      return getCoordinate(0);
     }
-    return getCoordinate().x;
   }
 
+  @Override
   public double getY() {
-    if (getCoordinate() == null) {
+    if (isEmpty()) {
       throw new IllegalStateException("getY called on empty Point");
+    } else {
+      return getCoordinate(1);
     }
-    return getCoordinate().y;
   }
 
-  private void init(CoordinateSequence coordinates) {
-    if (coordinates == null) {
-      coordinates = getGeometryFactory().getCoordinateSequenceFactory().create(
-        new Coordinate[] {});
-    }
-    Assert.isTrue(coordinates.size() <= 1);
-    this.coordinates = coordinates;
+  @Override
+  public double getZ() {
+    return getCoordinate(2);
+  }
+
+  @Override
+  public int hashCode() {
+    return CoordinatesUtil.hashCode(this);
   }
 
   @Override
   public boolean isEmpty() {
-    return getCoordinate() == null;
+    return coordinates == null;
   }
 
   @Override
@@ -249,18 +399,63 @@ public class Point extends Geometry implements Puntal {
   }
 
   @Override
+  public boolean isValid() {
+    if (!isEmpty()) {
+      final double x = getX();
+      final double y = getY();
+      if (MathUtil.isNanOrInfinite(x, y)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public void normalize() {
-    // a Point is always in normalized form
   }
 
   @Override
   public Geometry reverse() {
-    return (Geometry)clone();
+    return clone();
+  }
+
+  @Override
+  public void setM(final double m) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public void setTime(final long time) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public void setValue(final int index, final double value) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public void setX(final double x) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public void setY(final double y) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public void setZ(final double z) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
+  }
+
+  @Override
+  public Point toPoint() {
+    return this;
   }
 
   @Override
   public Iterable<Vertex> vertices() {
-    final Vertex vertex = new Vertex(this, 0);
-    return Collections.singletonList(vertex);
+    return Collections.<Vertex> singletonList(this);
   }
 }

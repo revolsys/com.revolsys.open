@@ -36,7 +36,11 @@ package com.revolsys.jts.geom;
 
 import java.io.Serializable;
 
-import com.revolsys.jts.algorithm.*;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.HCoordinate;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
 
 /**
  * Represents a line segment defined by two {@link Coordinate}s.

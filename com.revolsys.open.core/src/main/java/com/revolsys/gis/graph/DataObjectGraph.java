@@ -81,7 +81,7 @@ public class DataObjectGraph extends Graph<DataObject> {
   }
 
   public Node<DataObject> getNode(final Point point) {
-    return getNode(CoordinatesUtil.get(point));
+    return getNode(CoordinatesUtil.getInstance(point));
   }
 
   public List<DataObject> getObjects(final Collection<Integer> edgeIds) {

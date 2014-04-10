@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.geom;
 
-import com.revolsys.jts.algorithm.*;
+import com.revolsys.jts.algorithm.Angle;
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.HCoordinate;
 
 /**
  * Represents a planar triangle, and provides methods for calculating various

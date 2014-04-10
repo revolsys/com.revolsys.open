@@ -17,7 +17,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
@@ -166,7 +166,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
       renderMarkerVertices(viewport, graphics, geometry, style);
     } else {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
           renderMarker(viewport, graphics, point, style);
@@ -299,7 +299,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     geometry = getGeometry(viewport, geometry);
     if (!geometry.isEmpty()) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
           renderMarker(viewport, graphics, point, style);
@@ -324,7 +324,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     geometry = getGeometry(viewport, geometry);
     if (!geometry.isEmpty()) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (part instanceof LineString) {
           final LineString lineString = (LineString)part;
           final CoordinatesList points = CoordinatesListUtil.get(lineString);

@@ -5,13 +5,13 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdgeStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.util.Assert;
 
 /**

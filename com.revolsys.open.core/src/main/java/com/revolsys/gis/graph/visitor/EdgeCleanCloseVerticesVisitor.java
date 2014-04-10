@@ -9,10 +9,9 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.MathUtil;
@@ -82,7 +81,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
   public boolean visit(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
     final LineString lineString = edge.getLine();
-    final CoordinateSequence coordinates = lineString.getCoordinateSequence();
+    final CoordinatesList coordinates = lineString.getCoordinatesList();
     final int numCoordinates = coordinates.size();
     if (numCoordinates > 2) {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(lineString);

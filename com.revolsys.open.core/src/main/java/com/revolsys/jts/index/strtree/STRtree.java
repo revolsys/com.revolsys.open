@@ -33,14 +33,18 @@
  */
 package com.revolsys.jts.index.strtree;
 
-import com.revolsys.jts.index.strtree.AbstractSTRtree;
-
 import java.io.Serializable;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.index.SpatialIndex;
+import com.revolsys.jts.util.Assert;
 import com.revolsys.jts.util.PriorityQueue;
-import com.revolsys.jts.index.*;
 
 /**
  *  A query-only R-tree created using the Sort-Tile-Recursive (STR) algorithm.

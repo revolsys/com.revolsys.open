@@ -32,15 +32,25 @@
  */
 package com.revolsys.jts.io;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.io.ParseException;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.util.Assert;
+import com.revolsys.jts.util.AssertionFailedException;
 
 /**
  * Converts a geometry in Well-Known Text format to a {@link Geometry}.
@@ -84,9 +94,9 @@ import java.util.ArrayList;
  *
  * <i>WKTPoint:</i> <b>POINT ( </b><i>Coordinate</i> <b>)</b>
  *
- * <i>WKTLineString:</i> <b>LINESTRING</b> <i>CoordinateSequence</i>
+ * <i>WKTLineString:</i> <b>LINESTRING</b> <i>CoordinatesList</i>
  *
- * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>CoordinateSequence</i>
+ * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>CoordinatesList</i>
  *
  * <i>WKTPolygon:</i> <b>POLYGON</b> <i>CoordinateSequenceList</i>
  *
@@ -109,10 +119,10 @@ import java.util.ArrayList;
  *         | <b>EMPTY</b>
  *
  * <i>CoordinateSequenceList:</i>
- *         <b>(</b> <i>CoordinateSequence {</i> <b>,</b> <i>CoordinateSequence }</i> <b>)</b>
+ *         <b>(</b> <i>CoordinatesList {</i> <b>,</b> <i>CoordinatesList }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *
- * <i>CoordinateSequence:</i>
+ * <i>CoordinatesList:</i>
  *         <b>(</b> <i>Coordinate {</i> , <i>Coordinate }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *

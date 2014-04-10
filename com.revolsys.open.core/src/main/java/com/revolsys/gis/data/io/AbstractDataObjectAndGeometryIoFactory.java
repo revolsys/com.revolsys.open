@@ -16,8 +16,8 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
-import com.revolsys.spring.SpringUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractDataObjectAndGeometryIoFactory extends
   AbstractDataObjectAndGeometryReaderFactory implements

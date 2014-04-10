@@ -2,13 +2,13 @@ package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
 import com.revolsys.jts.algorithm.PointInArea;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 

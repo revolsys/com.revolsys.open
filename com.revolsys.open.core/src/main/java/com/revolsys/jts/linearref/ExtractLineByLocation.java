@@ -33,7 +33,11 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -99,7 +103,7 @@ class ExtractLineByLocation
    */
   private LineString computeLine(LinearLocation start, LinearLocation end)
   {
-    Coordinate[] coordinates = line.getCoordinates();
+    Coordinate[] coordinates = line.getCoordinateArray();
     CoordinateList newCoordinates = new CoordinateList();
 
     int startSegmentIndex = start.getSegmentIndex();

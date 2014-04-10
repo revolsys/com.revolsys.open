@@ -40,7 +40,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
@@ -179,10 +180,11 @@ import com.revolsys.jts.util.Assert;
  *
  *@version 1.7
  */
-public abstract class Geometry implements Cloneable, Comparable, Serializable {
+public abstract class Geometry implements Cloneable, Comparable<Object>,
+  Serializable {
   private static final long serialVersionUID = 8763622679187376702L;
 
-  private static final Class[] sortedClasses = new Class[] {
+  private static final Class<?>[] sortedClasses = new Class<?>[] {
     Point.class, MultiPoint.class, LineString.class, LinearRing.class,
     MultiLineString.class, Polygon.class, MultiPolygon.class,
     GeometryCollection.class
@@ -236,12 +238,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   /**
    * The {@link GeometryFactory} used to create this Geometry
    */
-  protected final GeometryFactory factory;
-
-  /**
-   *  The ID of the Spatial Reference System used by this <code>Geometry</code>
-   */
-  protected int SRID;
+  private final GeometryFactory geometryFactory;
 
   /**
    * An object reference which can be used to carry ancillary data defined
@@ -252,11 +249,10 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   /**
    * Creates a new <code>Geometry</code> via the specified GeometryFactory.
    *
-   * @param factory
+   * @param geometryFactory
    */
-  public Geometry(final GeometryFactory factory) {
-    this.factory = factory;
-    this.SRID = factory.getSrid();
+  public Geometry(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   /**
@@ -265,7 +261,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    *  If this method modifies any coordinate values,
    *  {@link #geometryChanged} must be called to update the geometry state. 
    *  Note that you cannot use this method to
-   *  modify this Geometry if its underlying CoordinateSequence's #get method
+   *  modify this Geometry if its underlying CoordinatesList's #get method
    *  returns a copy of the Coordinate, rather than the actual Coordinate stored
    *  (if it even stores Coordinate objects at all).
    *
@@ -276,7 +272,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
 
   /**
    *  Performs an operation on the coordinates in this <code>Geometry</code>'s
-   *  {@link CoordinateSequence}s. 
+   *  {@link CoordinatesList}s. 
    *  If the filter reports that a coordinate value has been changed, 
    *  {@link #geometryChanged} will be called automatically.
    *
@@ -500,28 +496,30 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    *  elements are compared. If those are the same, the second elements are
    *  compared, etc.
    *
-   *@param  o  a <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  other  a <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return    a positive number, 0, or a negative number, depending on whether
    *      this object is greater than, equal to, or less than <code>o</code>, as
    *      defined in "Normal Form For Geometry" in the JTS Technical
    *      Specifications
    */
   @Override
-  public int compareTo(final Object o) {
-    final Geometry other = (Geometry)o;
-    if (getClassSortIndex() != other.getClassSortIndex()) {
-      return getClassSortIndex() - other.getClassSortIndex();
-    }
-    if (isEmpty() && other.isEmpty()) {
-      return 0;
-    }
-    if (isEmpty()) {
+  public int compareTo(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      if (getClassSortIndex() != geometry.getClassSortIndex()) {
+        return getClassSortIndex() - geometry.getClassSortIndex();
+      } else if (isEmpty() && geometry.isEmpty()) {
+        return 0;
+      } else if (isEmpty()) {
+        return -1;
+      } else if (geometry.isEmpty()) {
+        return 1;
+      } else {
+        return compareToSameClass(geometry);
+      }
+    } else {
       return -1;
     }
-    if (other.isEmpty()) {
-      return 1;
-    }
-    return compareToSameClass(o);
   }
 
   /**
@@ -823,7 +821,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
     // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
     if (this.isEmpty()) {
       return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other,
-        factory);
+        geometryFactory);
     }
     if (other.isEmpty()) {
       return (Geometry)clone();
@@ -922,7 +920,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * (using {@link Geometry#norm()
    * or {@link #normalize()} as appropriate).
    * 
-   * @param o the Object to compare
+   * @param other the Object to compare
    * @return true if this geometry is exactly equal to the argument 
    * 
    * @see #equalsExact(Geometry)
@@ -931,12 +929,13 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * @see #normalize()
    */
   @Override
-  public boolean equals(final Object o) {
-    if (!(o instanceof Geometry)) {
+  public boolean equals(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      return equalsExact(geometry);
+    } else {
       return false;
     }
-    final Geometry g = (Geometry)o;
-    return equalsExact(g);
   }
 
   /**
@@ -1131,7 +1130,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    */
   public Point getCentroid() {
     if (isEmpty()) {
-      return factory.createPoint((Coordinate)null);
+      return geometryFactory.createPoint((Coordinate)null);
     }
     final Coordinate centPt = Centroid.getCentroid(this);
     return createPointFromInternalCoord(centPt, this);
@@ -1168,16 +1167,34 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    *  In general, the array cannot be assumed to be the actual internal 
    *  storage for the vertices.  Thus modifying the array
    *  may not modify the geometry itself. 
-   *  Use the {@link CoordinateSequence#setOrdinate} method
+   *  Use the {@link CoordinatesList#setOrdinate} method
    *  (possibly on the components) to modify the underlying data.
    *  If the coordinates are modified, 
    *  {@link #geometryChanged} must be called afterwards.
    *
    *@return    the vertices of this <code>Geometry</code>
    *@see #geometryChanged
-   *@see CoordinateSequence#setOrdinate
+   *@see CoordinatesList#setOrdinate
    */
-  public abstract Coordinate[] getCoordinates();
+  public abstract Coordinate[] getCoordinateArray();
+
+  /**
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @return
+   */
+  public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
+    return geometryFactory.getCoordinatesPrecisionModel();
+  }
+
+  /**
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @return
+   */
+  public CoordinateSystem getCoordinateSystem() {
+    return geometryFactory.getCoordinateSystem();
+  }
 
   /**
    * Returns the dimension of this geometry.
@@ -1214,7 +1231,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * @see GeometryFactory#toGeometry(Envelope) 
    */
   public Geometry getEnvelope() {
-    return getGeometryFactory().toGeometry(getEnvelopeInternal());
+    return geometryFactory.toGeometry(getEnvelopeInternal());
   }
 
   /**
@@ -1247,24 +1264,25 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   }
 
   /**
-   * Gets the factory which contains the context in which this geometry was created.
-   *
-   * @return the factory for this geometry
-  * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  public GeometryFactory getGeometryFactory() {
-    return factory;
-  }
-
-  /**
    * Returns an element {@link Geometry} from a {@link GeometryCollection}
    * (or <code>this</code>, if the geometry is not a collection).
    *
-   * @param n the index of the geometry element
+   * @param partIndex the index of the geometry element
    * @return the n'th geometry contained in this geometry
    */
-  public Geometry getGeometryN(final int n) {
-    return this;
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V getGeometry(final int partIndex) {
+    return (V)this;
+  }
+
+  /**
+   * Gets the geometryFactory which contains the context in which this geometry was created.
+   *
+   * @return the geometryFactory for this geometry
+  * @author Paul Austin <paul.austin@revolsys.com>
+   */
+  public final GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   /**
@@ -1286,7 +1304,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    */
   public Point getInteriorPoint() {
     if (isEmpty()) {
-      return factory.createPoint((Coordinate)null);
+      return geometryFactory.createPoint((Coordinate)null);
     }
     Coordinate interiorPt = null;
     final int dim = getDimension();
@@ -1314,6 +1332,10 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    */
   public double getLength() {
     return 0.0;
+  }
+
+  public byte getNumAxis() {
+    return (byte)geometryFactory.getNumAxis();
   }
 
   /**
@@ -1349,7 +1371,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    *      <code>Geometry</code> and all other <code>Geometry</code>s
    */
   public PrecisionModel getPrecisionModel() {
-    return factory.getPrecisionModel();
+    return geometryFactory.getPrecisionModel();
   }
 
   /**
@@ -1366,8 +1388,8 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    *      is defined.
    *
    */
-  public int getSRID() {
-    return SRID;
+  public int getSrid() {
+    return geometryFactory.getSrid();
   }
 
   /**
@@ -1387,11 +1409,15 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
    * @return The vertex or null if it does not exist.
    */
   public Vertex getVertex(final int... vertexId) {
-    final Vertex vertex = new Vertex(this, vertexId);
-    if (vertex.isEmpty()) {
+    if (isEmpty()) {
       return null;
     } else {
-      return vertex;
+      final VertexImpl vertex = new VertexImpl(this, vertexId);
+      if (vertex.isEmpty()) {
+        return null;
+      } else {
+        return vertex;
+      }
     }
   }
 
@@ -1433,7 +1459,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
     // special case: if one input is empty ==> empty
     if (this.isEmpty() || other.isEmpty()) {
       return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, other,
-        factory);
+        geometryFactory);
     }
 
     // compute for GCs
@@ -1722,21 +1748,6 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   public abstract Geometry reverse();
 
   /**
-  *  Sets the ID of the Spatial Reference System used by the <code>Geometry</code>.
-  *  <p>
-  *  <b>NOTE:</b> This method should only be used for exceptional circumstances or 
-  *  for backwards compatibility.  Normally the SRID should be set on the 
-  *  {@link GeometryFactory} used to create the geometry.
-  *  SRIDs set using this method will <i>not</i> be propagated to 
-  *  geometries returned by constructive methods.
-  *  
-  *  @see GeometryFactory
-  */
-  public void setSRID(final int SRID) {
-    this.SRID = SRID;
-  }
-
-  /**
    * A simple scheme for applications to add their own custom data to a Geometry.
    * An example use might be to add an object representing a Coordinate Reference System.
    * <p>
@@ -1774,7 +1785,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
       // both empty - check dimensions
       if (this.isEmpty() && other.isEmpty()) {
         return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this,
-          other, factory);
+          other, geometryFactory);
       }
 
       // special case: if either input is empty ==> result = other arg
@@ -1793,10 +1804,6 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
 
   @Override
   public String toString() {
-    return toWkt();
-  }
-
-  public String toText() {
     return toWkt();
   }
 
@@ -1909,7 +1916,7 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
     if (this.isEmpty() || other.isEmpty()) {
       if (this.isEmpty() && other.isEmpty()) {
         return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other,
-          factory);
+          geometryFactory);
       }
 
       // special case: if either input is empty ==> other input
@@ -1929,7 +1936,16 @@ public abstract class Geometry implements Cloneable, Comparable, Serializable {
   }
 
   /**
+   * <p>Get an {@link Iterable} that iterates over the {@link Vertex} of the geometry. For memory
+   * efficiency the {@link Vertex} returned is the same instance for each call to next
+   * on the iterator. If the vertex is required to track the previous vertex then the
+   * {@link Vertex#clone()} method must be called to get a copy of the vertex.</p>
+   * 
+   * <p>The {@link Iterable#iterator()} method always returns the same {@link Iterator} instance.
+   * Therefore that method should not be called more than once.</p>
+   * 
    * @author Paul Austin <paul.austin@revolsys.com>
+   * @return The iterator over the vertices of the geometry.
    */
   public Iterable<Vertex> vertices() {
     return Collections.<Vertex> emptyList();

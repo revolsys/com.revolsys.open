@@ -161,8 +161,7 @@ public class MultiLineString extends GeometryCollection implements Lineal {
   @Override
   public Iterable<Vertex> vertices() {
     return new AbstractIterator<Vertex>() {
-      private Vertex vertex = new Vertex(MultiLineString.this,
-        0);
+      private VertexImpl vertex = new VertexImpl(MultiLineString.this, 0);
 
       private int vertexIndex = 0;
 

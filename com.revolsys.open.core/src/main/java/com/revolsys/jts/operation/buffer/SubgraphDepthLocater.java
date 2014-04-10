@@ -33,10 +33,18 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.algorithm.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.Position;
 
 /**
  * Locates a subgraph inside a set of subgraphs,

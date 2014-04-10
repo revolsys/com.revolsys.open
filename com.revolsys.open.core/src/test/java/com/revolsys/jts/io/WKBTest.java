@@ -10,7 +10,6 @@ import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.impl.PackedCoordinateSequenceFactory;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 class AverageZFilter implements CoordinateFilter {
@@ -53,7 +52,7 @@ public class WKBTest extends TestCase {
     boolean includeSRID = false;
     if (srid >= 0) {
       includeSRID = true;
-      g.setSRID(srid);
+      // g.setSRID(srid);
     }
 
     final WKBWriter wkbWriter = new WKBWriter(dimension, byteOrder, includeSRID);
@@ -73,7 +72,7 @@ public class WKBTest extends TestCase {
     assertTrue(isEqual);
 
     if (includeSRID) {
-      final boolean isSRIDEqual = g.getSRID() == g2.getSRID();
+      final boolean isSRIDEqual = g.getSrid() == g2.getSrid();
       assertTrue(isSRIDEqual);
     }
   }
@@ -114,9 +113,7 @@ public class WKBTest extends TestCase {
 
   private void runWKBTestPackedCoordinate(final String wkt) throws IOException,
     ParseException {
-    final GeometryFactory geomFactory = new GeometryFactory(
-      new PackedCoordinateSequenceFactory(
-        PackedCoordinateSequenceFactory.DOUBLE, 2));
+    final GeometryFactory geomFactory = GeometryFactory.getFactory(0, 2);
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
 

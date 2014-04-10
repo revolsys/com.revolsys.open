@@ -8,8 +8,8 @@ import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
-import com.revolsys.spring.SpringUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   implements GeometryWriterFactory {

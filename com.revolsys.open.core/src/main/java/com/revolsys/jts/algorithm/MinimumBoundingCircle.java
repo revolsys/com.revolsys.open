@@ -33,8 +33,12 @@
 
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the <b>Minimum Bounding Circle</b> (MBC)
@@ -192,7 +196,7 @@ public class MinimumBoundingCircle
 			return;
 		}
 		if (input.getNumPoints() == 1) {
-			Coordinate[] pts = input.getCoordinates();
+			Coordinate[] pts = input.getCoordinateArray();
 			extremalPts = new Coordinate[] { new Coordinate(pts[0]) };
 			return;
 		}
@@ -203,7 +207,7 @@ public class MinimumBoundingCircle
 		 */
 		Geometry convexHull = input.convexHull();
 		
-		Coordinate[] hullPts = convexHull.getCoordinates();
+		Coordinate[] hullPts = convexHull.getCoordinateArray();
 		
 		// strip duplicate final point, if any
 		Coordinate[] pts = hullPts;

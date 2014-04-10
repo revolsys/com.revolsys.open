@@ -33,7 +33,9 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Determines the location of a subline along a linear {@link Geometry}.
@@ -65,8 +67,8 @@ class LocationIndexOfLine
 
   public LinearLocation[] indicesOf(Geometry subLine)
   {
-    Coordinate startPt = ((LineString) subLine.getGeometryN(0)).getCoordinateN(0);
-    LineString lastLine = (LineString) subLine.getGeometryN(subLine.getNumGeometries() - 1);
+    Coordinate startPt = ((LineString) subLine.getGeometry(0)).getCoordinateN(0);
+    LineString lastLine = (LineString) subLine.getGeometry(subLine.getNumGeometries() - 1);
     Coordinate endPt = lastLine.getCoordinateN(lastLine.getNumPoints() - 1);
 
     LocationIndexOfPoint locPt = new LocationIndexOfPoint(linearGeom);

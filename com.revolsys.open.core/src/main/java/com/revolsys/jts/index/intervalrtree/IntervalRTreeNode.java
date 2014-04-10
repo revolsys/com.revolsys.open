@@ -34,9 +34,9 @@ package com.revolsys.jts.index.intervalrtree;
 
 import java.util.Comparator;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.io.*;
-import com.revolsys.jts.index.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.io.WKTWriter;
 
 public abstract class IntervalRTreeNode 
 {

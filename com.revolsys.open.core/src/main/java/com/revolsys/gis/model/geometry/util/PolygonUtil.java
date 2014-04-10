@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry.util;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.Polygon;
@@ -11,6 +10,7 @@ import com.revolsys.gis.model.geometry.algorithm.locate.IndexedPointInAreaLocato
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.gis.model.geometry.algorithm.locate.SimplePointInAreaLocator;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class PolygonUtil {
 

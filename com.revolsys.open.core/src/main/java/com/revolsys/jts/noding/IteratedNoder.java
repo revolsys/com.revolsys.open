@@ -33,9 +33,12 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import java.util.*;
+import java.util.Collection;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.TopologyException;
 
 /**
  * Nodes a set of {@link NodedSegmentString}s completely.

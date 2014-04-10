@@ -34,7 +34,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.CGAlgorithms3D;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
@@ -236,7 +236,7 @@ public class Distance3DOp {
 		if (g0 instanceof GeometryCollection) {
 			int n = g0.getNumGeometries();
 			for (int i = 0; i < n; i++) {
-				Geometry g = g0.getGeometryN(i);
+				Geometry g = g0.getGeometry(i);
 				computeMinDistanceMultiMulti(g, g1, flip);
 				if (isDone)	return;
 			}
@@ -259,7 +259,7 @@ public class Distance3DOp {
 		if (g1 instanceof GeometryCollection) {
 			int n = g1.getNumGeometries();
 			for (int i = 0; i < n; i++) {
-				Geometry g = g1.getGeometryN(i);
+				Geometry g = g1.getGeometry(i);
 				computeMinDistanceOneMulti(g0, g, flip);
 				if (isDone)	return;
 			}
@@ -273,7 +273,7 @@ public class Distance3DOp {
 		if (geom instanceof GeometryCollection) {
 			int n = geom.getNumGeometries();
 			for (int i = 0; i < n; i++) {
-				Geometry g = geom.getGeometryN(i);
+				Geometry g = geom.getGeometry(i);
 				computeMinDistanceOneMulti(poly, g, flip);
 				if (isDone)	return;
 			}
@@ -421,7 +421,7 @@ public class Distance3DOp {
 	}
 
 	private Coordinate intersection(PlanarPolygon3D poly,LineString line) {
-		CoordinateSequence seq = line.getCoordinateSequence();
+		CoordinatesList seq = line.getCoordinatesList();
 		if (seq.size() == 0)
 			return null;
 
@@ -494,8 +494,8 @@ public class Distance3DOp {
 
 	private void computeMinDistanceLineLine(LineString line0, LineString line1,
 			boolean flip) {
-		Coordinate[] coord0 = line0.getCoordinates();
-		Coordinate[] coord1 = line1.getCoordinates();
+		Coordinate[] coord0 = line0.getCoordinateArray();
+		Coordinate[] coord1 = line1.getCoordinateArray();
 		// brute force approach!
 		for (int i = 0; i < coord0.length - 1; i++) {
 			for (int j = 0; j < coord1.length - 1; j++) {
@@ -520,7 +520,7 @@ public class Distance3DOp {
 
 	private void computeMinDistanceLinePoint(LineString line,Point point, 
 			boolean flip) {
-		Coordinate[] lineCoord = line.getCoordinates();
+		Coordinate[] lineCoord = line.getCoordinateArray();
 		Coordinate coord = point.getCoordinate();
 		// brute force approach!
 		for (int i = 0; i < lineCoord.length - 1; i++) {

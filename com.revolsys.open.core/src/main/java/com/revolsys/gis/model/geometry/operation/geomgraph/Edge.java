@@ -4,11 +4,11 @@ import java.io.PrintStream;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.MonotoneChainEdge;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**

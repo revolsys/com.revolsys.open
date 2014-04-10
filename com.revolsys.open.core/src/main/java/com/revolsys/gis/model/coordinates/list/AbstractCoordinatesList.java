@@ -7,9 +7,10 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.util.MathUtil;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList,
   Cloneable {

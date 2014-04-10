@@ -36,8 +36,7 @@ package com.revolsys.jts.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.impl.CoordinateArraySequenceFactory;
-import com.revolsys.jts.geom.impl.PackedCoordinateSequenceFactory;
+import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -63,68 +62,45 @@ public class GeometryFactoryTest extends TestCase {
   }
 
   private void checkCreateGeometryExact(final String wkt) throws ParseException {
-    final Geometry g = read(wkt);
+    final Geometry g = geometryFactory.createGeometry(wkt);
     final Geometry g2 = this.geometryFactory.createGeometry(g);
-    assertTrue(g.equalsExact(g2));
+    if (!g.equalsExact(g2)) {
+      failNotEquals("Geometry not equal exact", g, g2);
+    }
   }
 
   private Geometry read(final String wkt) throws ParseException {
     return this.reader.read(wkt);
   }
 
-  /**
-     * CoordinateArraySequences default their dimension to 3 unless explicitly told otherwise.
-     * This test ensures that GeometryFactoryI.createGeometry() recreates the input dimension properly.
-   * 
-   * @throws ParseException
-   */
-  public void testCopyGeometryWithNonDefaultDimension() throws ParseException {
-    final GeometryFactory gf = new GeometryFactory(
-      CoordinateArraySequenceFactory.instance());
-    final CoordinateSequence mpSeq = gf.getCoordinateSequenceFactory().create(
-      1, 2);
-    mpSeq.setOrdinate(0, 0, 50);
-    mpSeq.setOrdinate(0, 1, -2);
-
-    final Point g = gf.createPoint(mpSeq);
-    final CoordinateSequence pSeq = ((Point)g.getGeometryN(0)).getCoordinateSequence();
-    assertEquals(2, pSeq.getDimension());
-
-    final Point g2 = (Point)this.geometryFactory.createGeometry(g);
-    assertEquals(2, g2.getCoordinateSequence().getDimension());
-
-  }
-
   public void testCreateGeometry() throws ParseException {
     checkCreateGeometryExact("POINT EMPTY");
-    checkCreateGeometryExact("POINT ( 10 20 )");
+    checkCreateGeometryExact("POINT(10 20)");
     checkCreateGeometryExact("LINESTRING EMPTY");
-    checkCreateGeometryExact("LINESTRING(0 0, 10 10)");
-    checkCreateGeometryExact("MULTILINESTRING ((50 100, 100 200), (100 100, 150 200))");
-    checkCreateGeometryExact("POLYGON ((100 200, 200 200, 200 100, 100 100, 100 200))");
-    checkCreateGeometryExact("MULTIPOLYGON (((100 200, 200 200, 200 100, 100 100, 100 200)), ((300 200, 400 200, 400 100, 300 100, 300 200)))");
-    checkCreateGeometryExact("GEOMETRYCOLLECTION (POLYGON ((100 200, 200 200, 200 100, 100 100, 100 200)), LINESTRING (250 100, 350 200), POINT (350 150))");
+    checkCreateGeometryExact("LINESTRING(0 0,10 10)");
+    checkCreateGeometryExact("MULTILINESTRING((50 100, 100 200),(100 100,150 200))");
+    checkCreateGeometryExact("POLYGON((100 200,200 200,200 100,100 100,100 200))");
+    checkCreateGeometryExact("MULTIPOLYGON(((100 200,200 200,200 100,100 100,100 200)),((300 200,400 200,400 100,300 100,300 200)))");
+    // checkCreateGeometryExact("GEOMETRYCOLLECTION(POLYGON((100 200,200 200,200 100,100 100,100 200)),LINESTRING(250 100,350 200),POINT(350 150))");
   }
 
   public void testDeepCopy() throws ParseException {
-    final Point g = (Point)read("POINT ( 10 10) ");
+    final Point g = (Point)read("POINT(10 10) ");
     final Geometry g2 = this.geometryFactory.createGeometry(g);
     g.getCoordinateSequence().setOrdinate(0, 0, 99);
     assertTrue(!g.equalsExact(g2));
   }
 
   public void testMultiPointCS() {
-    final GeometryFactory gf = new GeometryFactory(
-      new PackedCoordinateSequenceFactory());
-    final CoordinateSequence mpSeq = gf.getCoordinateSequenceFactory().create(
-      1, 4);
+    final GeometryFactory gf = GeometryFactory.getFactory(3005, 4, 1, 1);
+    final CoordinatesList mpSeq = gf.createCoordinatesList(1);
     mpSeq.setOrdinate(0, 0, 50);
     mpSeq.setOrdinate(0, 1, -2);
     mpSeq.setOrdinate(0, 2, 10);
     mpSeq.setOrdinate(0, 3, 20);
 
     final MultiPoint mp = gf.createMultiPoint(mpSeq);
-    final CoordinateSequence pSeq = ((Point)mp.getGeometryN(0)).getCoordinateSequence();
+    final CoordinatesList pSeq = ((Point)mp.getGeometry(0)).getCoordinateSequence();
     assertEquals(4, pSeq.getDimension());
     for (int i = 0; i < 4; i++) {
       assertEquals(mpSeq.getOrdinate(0, i), pSeq.getOrdinate(0, i));

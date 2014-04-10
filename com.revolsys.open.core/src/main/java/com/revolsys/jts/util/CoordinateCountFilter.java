@@ -34,7 +34,8 @@
  */
 package com.revolsys.jts.util;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
 
 /**
  *  A {@link CoordinateFilter} that counts the total number of coordinates

@@ -42,11 +42,10 @@ package com.revolsys.jts.operation.relate;
  * @version 1.7
  */
 
-import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geomgraph.EdgeEndStar;
+import com.revolsys.jts.geomgraph.Node;
 
 /**
  * Represents a node in the topological graph used to compute spatial relationships.

@@ -34,11 +34,15 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.geomgraph.index.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.index.EdgeSetIntersector;
+import com.revolsys.jts.geomgraph.index.SegmentIntersector;
+import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
 
 /**
  * Nodes a set of edges.

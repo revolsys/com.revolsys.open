@@ -119,9 +119,10 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
     return dataStore.equals(obj);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public CodeTable getCodeTable(final String typePath) {
-    return dataStore.getCodeTable(typePath);
+  public <V extends CodeTable> V getCodeTable(final String typePath) {
+    return (V)dataStore.getCodeTable(typePath);
   }
 
   @Override

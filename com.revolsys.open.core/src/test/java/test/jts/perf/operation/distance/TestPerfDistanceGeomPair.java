@@ -30,7 +30,7 @@ public class TestPerfDistanceGeomPair {
   }
 
   void computeDistanceToAllPoints(final Geometry[] geom) {
-    final Coordinate[] pts = geom[1].getCoordinates();
+    final Coordinate[] pts = geom[1].getCoordinateArray();
     double dist = 0.0;
     final double dist2 = 0.0;
     final IndexedFacetDistance fastDist = new IndexedFacetDistance(geom[0]);

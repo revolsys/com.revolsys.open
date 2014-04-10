@@ -34,7 +34,6 @@
  */
 package com.revolsys.jts.util;
 
-import com.revolsys.jts.util.AssertionFailedException;
 
 /**
  *  A utility for making programming assertions.

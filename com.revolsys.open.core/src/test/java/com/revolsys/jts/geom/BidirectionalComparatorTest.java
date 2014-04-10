@@ -30,8 +30,8 @@ public class BidirectionalComparatorTest extends TestCase {
     throws Exception {
     final LineString g0 = (LineString)this.rdr.read(wkt0);
     final LineString g1 = (LineString)this.rdr.read(wkt1);
-    final Coordinate[] pts0 = g0.getCoordinates();
-    final Coordinate[] pts1 = g1.getCoordinates();
+    final Coordinate[] pts0 = g0.getCoordinateArray();
+    final Coordinate[] pts1 = g1.getCoordinateArray();
     final Comparator comp = new CoordinateArrays.BidirectionalComparator();
     return comp.compare(pts0, pts1);
   }

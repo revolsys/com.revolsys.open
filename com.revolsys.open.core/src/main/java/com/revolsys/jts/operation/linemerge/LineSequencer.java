@@ -32,10 +32,25 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.TreeSet;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.planargraph.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryComponentFilter;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.planargraph.DirectedEdge;
+import com.revolsys.jts.planargraph.GraphComponent;
+import com.revolsys.jts.planargraph.Node;
+import com.revolsys.jts.planargraph.Subgraph;
 import com.revolsys.jts.planargraph.algorithm.ConnectedSubgraphFinder;
 import com.revolsys.jts.util.Assert;
 
@@ -113,7 +128,7 @@ public class LineSequencer
     Coordinate lastNode = null;
     List currNodes = new ArrayList();
     for (int i = 0; i < mls.getNumGeometries(); i++) {
-      LineString line = (LineString) mls.getGeometryN(i);
+      LineString line = (LineString) mls.getGeometry(i);
       Coordinate startNode = line.getCoordinateN(0);
       Coordinate endNode = line.getCoordinateN(line.getNumPoints() - 1);
 
@@ -464,7 +479,7 @@ public class LineSequencer
 
   private static LineString reverse(LineString line)
   {
-    Coordinate[] pts = line.getCoordinates();
+    Coordinate[] pts = line.getCoordinateArray();
     Coordinate[] revPts = new Coordinate[pts.length];
     int len = pts.length;
     for (int i = 0; i < len; i++) {

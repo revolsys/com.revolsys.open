@@ -374,14 +374,15 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public CodeTable getCodeTable(final String typePath) {
+  public <V extends CodeTable> V getCodeTable(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
       final CodeTableProperty codeTable = CodeTableProperty.getProperty(metaData);
-      return codeTable;
+      return (V)codeTable;
     }
   }
 

@@ -36,13 +36,11 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Iterator;
+
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geomgraph.GraphComponent;
-import com.revolsys.jts.geomgraph.Label;
-import com.revolsys.jts.util.*;
 
 
 /**

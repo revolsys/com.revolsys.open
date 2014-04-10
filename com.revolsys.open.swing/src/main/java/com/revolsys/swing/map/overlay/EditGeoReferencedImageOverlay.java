@@ -135,7 +135,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           if (snapPoint != null) {
             mapPoint = snapPoint;
           }
-          final Coordinates sourcePoint = CoordinatesUtil.get(this.addTiePointFirstPoint);
+          final Coordinates sourcePoint = CoordinatesUtil.getInstance(this.addTiePointFirstPoint);
           final WarpFilter warpFilter = layer.getWarpFilter();
           final Coordinates sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
           final MappedLocation mappedLocation = new MappedLocation(sourcePixel,
@@ -530,7 +530,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Coordinates mousePoint = CoordinatesUtil.get(getViewportPoint(event));
+      final Coordinates mousePoint = CoordinatesUtil.getInstance(getViewportPoint(event));
       moveImageBoundingBox = new BoundingBox(geometryFactory, mousePoint,
         this.moveCornerOppositePoint);
 
@@ -582,7 +582,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       int closestIndex = -1;
       for (int i = 0; i < 4; i++) {
         final Coordinates point = getImageBoundingBox().getCornerPoint(i);
-        final double distance = point.distance(CoordinatesUtil.get(mousePoint));
+        final double distance = point.distance(CoordinatesUtil.getInstance(mousePoint));
         if (distance < maxDistance && distance < closestDistance) {
           closestPoint = geometryFactory.createPoint(point);
           closestDistance = distance;
@@ -738,7 +738,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       if (tiePoint != null) {
         Point point = getPoint(event);
         if (moveTiePointSource) {
-          final Coordinates sourcePoint = CoordinatesUtil.get(point);
+          final Coordinates sourcePoint = CoordinatesUtil.getInstance(point);
           final WarpFilter warpFilter = layer.getWarpFilter();
           final Coordinates sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
 

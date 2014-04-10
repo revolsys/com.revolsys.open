@@ -33,7 +33,8 @@
 package com.revolsys.jts.operation.buffer;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
 
 /**
  * Simplifies a buffer input line to 

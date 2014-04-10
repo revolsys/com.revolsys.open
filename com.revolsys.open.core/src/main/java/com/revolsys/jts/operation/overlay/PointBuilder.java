@@ -32,10 +32,16 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
 
 /**
  * Constructs {@link Point}s from the nodes of an overlay graph.

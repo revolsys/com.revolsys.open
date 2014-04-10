@@ -201,7 +201,7 @@ public class BufferValidator {
         }
         final MultiPolygon multiPolygon = (MultiPolygon)buffer;
         for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-          if (hasHoles(multiPolygon.getGeometryN(i))) {
+          if (hasHoles(multiPolygon.getGeometry(i))) {
             return true;
           }
         }

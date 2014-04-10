@@ -7,7 +7,6 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
@@ -17,6 +16,7 @@ import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Snaps the vertices and segments of a {@link Geometry} to another Geometry's

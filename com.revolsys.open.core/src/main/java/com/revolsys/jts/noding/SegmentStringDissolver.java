@@ -32,8 +32,12 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.revolsys.jts.geom.CoordinateArrays;
 
 /**
  * Dissolves a noded collection of {@link SegmentString}s to produce

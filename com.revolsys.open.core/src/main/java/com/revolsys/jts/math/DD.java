@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.math;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * Implements extended-precision floating-point numbers 

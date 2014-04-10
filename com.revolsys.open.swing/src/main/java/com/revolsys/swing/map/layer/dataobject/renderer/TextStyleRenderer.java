@@ -35,7 +35,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.util.PointUtil;
 import com.revolsys.swing.component.ValueField;
@@ -164,7 +164,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         }
         if (point == null) {
           PointUtil.getPointWithin(geometry);
-          point = CoordinatesUtil.get(geometryFactory.copy(geometry.getCentroid()));
+          point = CoordinatesUtil.getInstance(geometryFactory.copy(geometry.getCentroid()));
           if (!viewport.getBoundingBox().contains(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
               .toPolygon()
@@ -173,19 +173,19 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
               double maxArea = 0;
               double maxLength = 0;
               for (int i = 0; i < clippedGeometry.getNumGeometries(); i++) {
-                final Geometry part = clippedGeometry.getGeometryN(i);
+                final Geometry part = clippedGeometry.getGeometry(i);
                 if (part instanceof Polygon) {
                   final double area = part.getArea();
                   if (area > maxArea) {
                     maxArea = area;
-                    point = CoordinatesUtil.get(part.getCentroid());
+                    point = CoordinatesUtil.getInstance(part.getCentroid());
                   }
                 } else if (part instanceof LineString) {
                   if (maxArea == 0) {
                     final double length = part.getLength();
                     if (length > maxLength) {
                       maxLength = length;
-                      point = CoordinatesUtil.get(part.getCentroid());
+                      point = CoordinatesUtil.getInstance(part.getCentroid());
                     }
                   }
                 } else if (part instanceof Point) {

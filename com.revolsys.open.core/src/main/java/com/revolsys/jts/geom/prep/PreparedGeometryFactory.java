@@ -32,7 +32,10 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.Puntal;
 
 /**
  * A factory for creating {@link PreparedGeometry}s.

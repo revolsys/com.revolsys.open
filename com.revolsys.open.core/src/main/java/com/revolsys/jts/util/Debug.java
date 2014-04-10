@@ -37,10 +37,17 @@ package com.revolsys.jts.util;
 /**
  *@version 1.7
  */
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
-import com.revolsys.jts.geom.*;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Provides routines to simplify and localize debugging output.
@@ -246,7 +253,7 @@ public class Debug {
 
     public boolean hasSegment() { return hasSegment; }
 
-    public void filter(CoordinateSequence seq, int i)
+    public void filter(CoordinatesList seq, int i)
     {
       if (i == 0) return;
       hasSegment = p0.equals2D(seq.getCoordinate(i-1)) 

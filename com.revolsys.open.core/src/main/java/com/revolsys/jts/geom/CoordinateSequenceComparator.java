@@ -36,7 +36,7 @@ package com.revolsys.jts.geom;
 import java.util.Comparator;
 
 /**
- * Compares two {@link CoordinateSequence}s.
+ * Compares two {@link CoordinatesList}s.
  * For sequences of the same dimension, the ordering is lexicographic.
  * Otherwise, lower dimensions are sorted before higher.
  * The dimensions compared can be limited; if this is done
@@ -95,16 +95,16 @@ public class CoordinateSequenceComparator
   }
 
   /**
-   * Compares two {@link CoordinateSequence}s for relative order.
+   * Compares two {@link CoordinatesList}s for relative order.
    *
-   * @param o1 a {@link CoordinateSequence}
-   * @param o2 a {@link CoordinateSequence}
+   * @param o1 a {@link CoordinatesList}
+   * @param o2 a {@link CoordinatesList}
    * @return -1, 0, or 1 depending on whether o1 is less than, equal to, or greater than o2
    */
   public int compare(Object o1, Object o2)
   {
-    CoordinateSequence s1 = (CoordinateSequence) o1;
-    CoordinateSequence s2 = (CoordinateSequence) o2;
+    CoordinatesList s1 = (CoordinatesList) o1;
+    CoordinatesList s2 = (CoordinatesList) o2;
 
     int size1 = s1.size();
     int size2 = s2.size();
@@ -141,16 +141,16 @@ public class CoordinateSequenceComparator
   }
 
   /**
-   * Compares the same coordinate of two {@link CoordinateSequence}s
+   * Compares the same coordinate of two {@link CoordinatesList}s
    * along the given number of dimensions.
    *
-   * @param s1 a {@link CoordinateSequence}
-   * @param s2 a {@link CoordinateSequence}
+   * @param s1 a {@link CoordinatesList}
+   * @param s2 a {@link CoordinatesList}
    * @param i the index of the coordinate to test
    * @param dimension the number of dimensiosn to test
    * @return -1, 0, or 1 depending on whether s1[i] is less than, equal to, or greater than s2[i]
    */
-  protected int compareCoordinate(CoordinateSequence s1, CoordinateSequence s2, int i, int dimension)
+  protected int compareCoordinate(CoordinatesList s1, CoordinatesList s2, int i, int dimension)
   {
     for (int d = 0; d < dimension; d++) {
       double ord1 = s1.getOrdinate(i, d);

@@ -13,7 +13,7 @@ package com.revolsys.swing.map.layer.raster.filter;
 
 import java.util.Random;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * A utility class to fit a polynomial to a set of corresponding

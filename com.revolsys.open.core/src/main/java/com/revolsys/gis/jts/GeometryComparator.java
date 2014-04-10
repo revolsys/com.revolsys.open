@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.comparator.LowestLeftComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 
 public class GeometryComparator implements Comparator<Geometry> {
@@ -31,8 +31,8 @@ public class GeometryComparator implements Comparator<Geometry> {
         } else if (i > numGeometries2) {
           return -1;
         } else {
-          final Geometry part1 = geometry1.getGeometryN(i);
-          final Geometry part2 = geometry2.getGeometryN(i);
+          final Geometry part1 = geometry1.getGeometry(i);
+          final Geometry part2 = geometry2.getGeometry(i);
           if (!part1.equalsExact(part2)) {
             final CoordinatesList points1 = CoordinatesListUtil.get(part1);
             final CoordinatesList points2 = CoordinatesListUtil.get(part2);

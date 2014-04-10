@@ -35,9 +35,10 @@ package com.revolsys.jts.algorithm;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A <code>LineIntersector</code> is an algorithm that can both test whether

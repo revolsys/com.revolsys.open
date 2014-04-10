@@ -34,7 +34,9 @@
  */
 package com.revolsys.jts.index.chain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geomgraph.Quadrant;
 

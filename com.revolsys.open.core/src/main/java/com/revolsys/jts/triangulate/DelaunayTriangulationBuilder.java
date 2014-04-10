@@ -84,7 +84,7 @@ public class DelaunayTriangulationBuilder {
       return new CoordinateList();
     }
 
-    final Coordinate[] coords = geom.getCoordinates();
+    final Coordinate[] coords = geom.getCoordinateArray();
     return unique(coords);
   }
 

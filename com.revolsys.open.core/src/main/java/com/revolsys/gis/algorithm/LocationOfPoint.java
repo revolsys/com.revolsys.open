@@ -59,7 +59,7 @@ public class LocationOfPoint {
    */
   public LineStringLocation locate(final Coordinate inputPt) {
     // return locateAfter(inputPt, null);
-    final Coordinate[] pts = line.getCoordinates();
+    final Coordinate[] pts = line.getCoordinateArray();
 
     double minDistance = Double.MAX_VALUE;
     int minIndex = 0;
@@ -102,7 +102,7 @@ public class LocationOfPoint {
       return locate(inputPt);
     }
 
-    final Coordinate[] pts = line.getCoordinates();
+    final Coordinate[] pts = line.getCoordinateArray();
 
     // sanity check for minLocation at or past end of line
     if (minLocation.getSegmentIndex() >= line.getNumPoints()) {

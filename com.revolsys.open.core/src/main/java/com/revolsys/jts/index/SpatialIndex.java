@@ -33,7 +33,8 @@
  */
 package com.revolsys.jts.index;
 
-import java.util.*;
+import java.util.List;
+
 import com.revolsys.jts.geom.Envelope;
 
 /**

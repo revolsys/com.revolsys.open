@@ -33,7 +33,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the centroid of an area geometry.
@@ -83,7 +86,7 @@ public class CentroidArea
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        add(gc.getGeometryN(i));
+        add(gc.getGeometry(i));
       }
     }
   }
@@ -123,9 +126,9 @@ public class CentroidArea
   
   private void add(Polygon poly)
   {
-    addShell(poly.getExteriorRing().getCoordinates());
+    addShell(poly.getExteriorRing().getCoordinateArray());
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      addHole(poly.getInteriorRingN(i).getCoordinates());
+      addHole(poly.getInteriorRingN(i).getCoordinateArray());
     }
   }
 

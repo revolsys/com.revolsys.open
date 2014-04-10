@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geomgraph.Position;
-import com.revolsys.jts.util.Debug;
 
 /**
  * Generates segments which form an offset curve.

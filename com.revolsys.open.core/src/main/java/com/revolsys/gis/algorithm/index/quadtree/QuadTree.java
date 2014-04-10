@@ -6,11 +6,11 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.InvokeMethodFilter;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
-import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.Geometry;
 
 public class QuadTree<T> {
   public static Envelope ensureExtent(final Envelope envelope,

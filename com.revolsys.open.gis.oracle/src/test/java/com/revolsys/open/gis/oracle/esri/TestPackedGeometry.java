@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;

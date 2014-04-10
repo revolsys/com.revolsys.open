@@ -32,8 +32,10 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.noding.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.noding.FastSegmentSetIntersectionFinder;
+import com.revolsys.jts.noding.SegmentStringUtil;
 
 /**
  * A prepared version for {@link Lineal} geometries.

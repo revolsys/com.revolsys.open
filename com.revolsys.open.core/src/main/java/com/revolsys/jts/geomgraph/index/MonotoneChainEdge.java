@@ -35,12 +35,9 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import java.util.*;
-
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.Debug;
+import com.revolsys.jts.geomgraph.Edge;
 
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to

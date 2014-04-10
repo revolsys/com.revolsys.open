@@ -33,8 +33,13 @@
 
 package com.revolsys.jts.simplify;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 
 /**
  * Represents a {@link LineString} which can be modified to a simplified shape.  
@@ -63,7 +68,7 @@ class TaggedLineString
 
   public int getMinimumSize()  {    return minimumSize;  }
   public LineString getParent() { return parentLine; }
-  public Coordinate[] getParentCoordinates() { return parentLine.getCoordinates(); }
+  public Coordinate[] getParentCoordinates() { return parentLine.getCoordinateArray(); }
   public Coordinate[] getResultCoordinates() { return extractCoordinates(resultSegs); }
 
   public int getResultSize()
@@ -76,7 +81,7 @@ class TaggedLineString
 
   private void init()
   {
-    Coordinate[] pts = parentLine.getCoordinates();
+    Coordinate[] pts = parentLine.getCoordinateArray();
     segs = new TaggedLineSegment[pts.length - 1];
     for (int i = 0; i < pts.length - 1; i++) {
       TaggedLineSegment seg

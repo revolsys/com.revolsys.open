@@ -32,13 +32,11 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import java.util.*;
+import java.util.List;
 
-
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.noding.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.noding.SegmentStringUtil;
 
 /**
  * Computes the <tt>containsProperly</tt> spatial relationship predicate

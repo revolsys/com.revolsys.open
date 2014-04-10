@@ -33,9 +33,8 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.math.Matrix;
-import com.revolsys.jts.algorithm.*;
 
 /**
  * Builds an {@link AffineTransformation} defined by a set of control vectors. 

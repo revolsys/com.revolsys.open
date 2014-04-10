@@ -32,10 +32,18 @@
  */
 package com.revolsys.jts.triangulate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.triangulate.quadedge.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  * A utility class which creates Voronoi Diagrams
@@ -160,7 +168,7 @@ public class VoronoiDiagramBuilder
 		Geometry clipPoly = geom.getGeometryFactory().toGeometry(clipEnv);
 		List clipped = new ArrayList();
 		for (int i = 0; i < geom.getNumGeometries(); i++) {
-			Geometry g = geom.getGeometryN(i);
+			Geometry g = geom.getGeometry(i);
 			Geometry result = null;
 			// don't clip unless necessary
 			if (clipEnv.contains(g.getEnvelopeInternal()))

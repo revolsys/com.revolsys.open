@@ -2,11 +2,11 @@ package com.revolsys.gis.model.geometry.algorithm.locate;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 

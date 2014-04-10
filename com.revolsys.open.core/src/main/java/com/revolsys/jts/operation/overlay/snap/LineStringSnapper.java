@@ -33,7 +33,10 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Snaps the vertices and segments of a {@link LineString} 
@@ -63,7 +66,7 @@ public class LineStringSnapper
    */
   public LineStringSnapper(LineString srcLine, double snapTolerance)
   {
-    this(srcLine.getCoordinates(), snapTolerance);
+    this(srcLine.getCoordinateArray(), snapTolerance);
   }
 
   /**

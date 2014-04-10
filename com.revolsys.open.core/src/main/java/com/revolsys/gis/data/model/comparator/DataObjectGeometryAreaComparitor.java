@@ -36,9 +36,9 @@ public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> 
       compare = geometry1.compareTo(geometry2);
       if (compare == 0) {
         final boolean clockwise1 = !CGAlgorithms.isCCW(geometry1.getExteriorRing()
-          .getCoordinates());
+          .getCoordinateArray());
         final boolean clockwise2 = !CGAlgorithms.isCCW(geometry2.getExteriorRing()
-          .getCoordinates());
+          .getCoordinateArray());
         if (clockwise1) {
           if (clockwise2) {
             return 0;

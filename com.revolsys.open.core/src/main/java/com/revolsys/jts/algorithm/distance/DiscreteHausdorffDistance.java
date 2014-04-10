@@ -33,7 +33,11 @@
 
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * An algorithm for computing a distance metric
@@ -188,7 +192,7 @@ public class DiscreteHausdorffDistance
     numSubSegs = (int) Math.rint(1.0/fraction);
   }
 
-  public void filter(CoordinateSequence seq, int index) 
+  public void filter(CoordinatesList seq, int index) 
   {
     /**
      * This logic also handles skipping Point geometries

@@ -33,7 +33,18 @@
 package com.revolsys.jts.algorithm;
 
 import java.util.Iterator;
-import com.revolsys.jts.geom.*;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryCollectionIterator;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the topological ({@link Location})
@@ -128,14 +139,14 @@ public class PointLocator
     else if (geom instanceof MultiLineString) {
       MultiLineString ml = (MultiLineString) geom;
       for (int i = 0; i < ml.getNumGeometries(); i++) {
-        LineString l = (LineString) ml.getGeometryN(i);
+        LineString l = (LineString) ml.getGeometry(i);
         updateLocationInfo(locate(p, l));
       }
     }
     else if (geom instanceof MultiPolygon) {
       MultiPolygon mpoly = (MultiPolygon) geom;
       for (int i = 0; i < mpoly.getNumGeometries(); i++) {
-        Polygon poly = (Polygon) mpoly.getGeometryN(i);
+        Polygon poly = (Polygon) mpoly.getGeometry(i);
         updateLocationInfo(locate(p, poly));
       }
     }
@@ -170,7 +181,7 @@ public class PointLocator
   	// bounding-box check
   	if (! l.getEnvelopeInternal().intersects(p)) return Location.EXTERIOR;
   	
-    Coordinate[] pt = l.getCoordinates();
+    Coordinate[] pt = l.getCoordinateArray();
     if (! l.isClosed()) {
       if (p.equals(pt[0])
           || p.equals(pt[pt.length - 1]) ) {
@@ -187,7 +198,7 @@ public class PointLocator
   	// bounding-box check
   	if (! ring.getEnvelopeInternal().intersects(p)) return Location.EXTERIOR;
 
-  	return CGAlgorithms.locatePointInRing(p, ring.getCoordinates());
+  	return CGAlgorithms.locatePointInRing(p, ring.getCoordinateArray());
   }
 
   private int locate(Coordinate p, Polygon poly)

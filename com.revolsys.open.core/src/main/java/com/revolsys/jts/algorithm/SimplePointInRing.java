@@ -33,7 +33,8 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.LinearRing;
 
 /**
  * Tests whether a {@link Coordinate} lies inside
@@ -49,7 +50,7 @@ public class SimplePointInRing
 
   public SimplePointInRing(LinearRing ring)
   {
-    pts = ring.getCoordinates();
+    pts = ring.getCoordinateArray();
   }
 
   public boolean isInside(Coordinate pt)

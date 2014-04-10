@@ -33,13 +33,18 @@
 
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.geomgraph.index.SegmentIntersector;
-import com.revolsys.jts.operation.GeometryGraphOperation;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.PlanarGraph;
+import com.revolsys.jts.geomgraph.Position;
 
 /**
  * Tests whether the polygon rings in a {@link GeometryGraph}

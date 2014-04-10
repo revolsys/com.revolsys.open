@@ -60,7 +60,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
     final String wkt) throws Exception {
     final Geometry geom = this.reader.read(wkt);
     assertEquals(expectedLoc,
-      RayCrossingCounter.locatePointInRing(pt, geom.getCoordinates()));
+      RayCrossingCounter.locatePointInRing(pt, geom.getCoordinateArray()));
   }
 
 }

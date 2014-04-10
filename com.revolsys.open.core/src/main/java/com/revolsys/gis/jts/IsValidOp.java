@@ -203,7 +203,7 @@ public class IsValidOp {
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
       final LinearRing hole = (LinearRing)p.getInteriorRingN(i);
-      final Coordinate holePt = findPtNotNode(hole.getCoordinates(), shell,
+      final Coordinate holePt = findPtNotNode(hole.getCoordinateArray(), shell,
         graph);
       /**
        * If no non-node hole vertex can be found, the hole must
@@ -266,10 +266,10 @@ public class IsValidOp {
 
   private boolean checkInvalidCoordinates(final Polygon poly) {
     boolean valid = checkInvalidCoordinates(poly.getExteriorRing()
-      .getCoordinates());
+      .getCoordinateArray());
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
       valid &= checkInvalidCoordinates(poly.getInteriorRingN(i)
-        .getCoordinates());
+        .getCoordinateArray());
     }
     return valid;
   }
@@ -326,8 +326,8 @@ public class IsValidOp {
    */
   private Coordinate checkShellInsideHole(final LinearRing shell,
     final LinearRing hole, final GeometryGraph graph) {
-    final Coordinate[] shellPts = shell.getCoordinates();
-    final Coordinate[] holePts = hole.getCoordinates();
+    final Coordinate[] shellPts = shell.getCoordinateArray();
+    final Coordinate[] holePts = hole.getCoordinateArray();
     // TODO: improve performance of this - by sorting pointlists for instance?
     final Coordinate shellPt = findPtNotNode(shellPts, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
@@ -364,10 +364,10 @@ public class IsValidOp {
   private boolean checkShellNotNested(final LinearRing shell, final Polygon p,
     final GeometryGraph graph) {
     boolean valid = true;
-    final Coordinate[] shellPts = shell.getCoordinates();
+    final Coordinate[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
     final LinearRing polyShell = (LinearRing)p.getExteriorRing();
-    final Coordinate[] polyPts = polyShell.getCoordinates();
+    final Coordinate[] polyPts = polyShell.getCoordinateArray();
     final Coordinate shellPt = findPtNotNode(shellPts, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
@@ -419,13 +419,13 @@ public class IsValidOp {
     final GeometryGraph graph) {
     boolean valid = true;
     for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)multiPolygon.getGeometryN(i);
+      final Polygon p = (Polygon)multiPolygon.getGeometry(i);
       final LinearRing shell = (LinearRing)p.getExteriorRing();
       for (int j = 0; j < multiPolygon.getNumGeometries(); j++) {
         if (i == j) {
           continue;
         }
-        final Polygon p2 = (Polygon)multiPolygon.getGeometryN(j);
+        final Polygon p2 = (Polygon)multiPolygon.getGeometry(j);
         valid &= checkShellNotNested(shell, p2, graph);
       }
     }
@@ -469,7 +469,7 @@ public class IsValidOp {
   private boolean checkValid(final GeometryCollection geometryCollection) {
     boolean valid = true;
     for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
-      final Geometry geometry = geometryCollection.getGeometryN(i);
+      final Geometry geometry = geometryCollection.getGeometry(i);
       valid &= checkValid(geometry);
     }
     return valid;
@@ -479,7 +479,7 @@ public class IsValidOp {
    * Checks validity of a LinearRing.
    */
   private boolean checkValid(final LinearRing g) {
-    boolean valid = checkInvalidCoordinates(g.getCoordinates());
+    boolean valid = checkInvalidCoordinates(g.getCoordinateArray());
     valid &= checkClosedRing(g);
 
     final GeometryGraph graph = new GeometryGraph(0, g);
@@ -503,7 +503,7 @@ public class IsValidOp {
    * Checks validity of a LineString.  Almost anything goes for linestrings!
    */
   private boolean checkValid(final LineString g) {
-    boolean valid = checkInvalidCoordinates(g.getCoordinates());
+    boolean valid = checkInvalidCoordinates(g.getCoordinateArray());
     final GeometryGraph graph = new GeometryGraph(0, g);
     valid &= checkTooFewPoints(graph);
     return valid;
@@ -513,13 +513,13 @@ public class IsValidOp {
    * Checks validity of a MultiPoint.
    */
   private boolean checkValid(final MultiPoint g) {
-    return checkInvalidCoordinates(g.getCoordinates());
+    return checkInvalidCoordinates(g.getCoordinateArray());
   }
 
   private boolean checkValid(final MultiPolygon multiPolygon) {
     boolean valid = true;
     for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)multiPolygon.getGeometryN(i);
+      final Polygon p = (Polygon)multiPolygon.getGeometry(i);
       valid &= checkInvalidCoordinates(p);
       valid &= checkClosedRings(p);
     }
@@ -533,11 +533,11 @@ public class IsValidOp {
             valid &= checkNoSelfIntersectingRings(graph);
           }
           for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-            final Polygon p = (Polygon)multiPolygon.getGeometryN(i);
+            final Polygon p = (Polygon)multiPolygon.getGeometry(i);
             valid &= checkHolesInShell(p, graph);
           }
           for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-            final Polygon p = (Polygon)multiPolygon.getGeometryN(i);
+            final Polygon p = (Polygon)multiPolygon.getGeometry(i);
             valid &= checkHolesNotNested(p, graph);
           }
           valid &= checkShellsNotNested(multiPolygon, graph);
@@ -554,7 +554,7 @@ public class IsValidOp {
    * Checks validity of a Point.
    */
   private boolean checkValid(final Point g) {
-    return checkInvalidCoordinates(g.getCoordinates());
+    return checkInvalidCoordinates(g.getCoordinateArray());
   }
 
   /**

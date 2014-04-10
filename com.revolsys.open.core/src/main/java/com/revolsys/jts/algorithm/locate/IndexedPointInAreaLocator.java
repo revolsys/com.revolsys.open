@@ -32,13 +32,20 @@
  */
 package com.revolsys.jts.algorithm.locate;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.index.*;
-import com.revolsys.jts.index.intervalrtree.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.index.ArrayListVisitor;
+import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
 
 /**
  * Determines the {@link Location} of {@link Coordinate}s relative to
@@ -120,7 +127,7 @@ public class IndexedPointInAreaLocator
       List lines = LinearComponentExtracter.getLines(geom);
       for (Iterator i = lines.iterator(); i.hasNext(); ) {
         LineString line = (LineString) i.next();
-        Coordinate[] pts = line.getCoordinates();
+        Coordinate[] pts = line.getCoordinateArray();
         addLine(pts);
       }
     }

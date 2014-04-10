@@ -152,8 +152,8 @@ public class GeometryCollection extends Geometry {
     final int n2 = gc.getNumGeometries();
     int i = 0;
     while (i < n1 && i < n2) {
-      final Geometry thisGeom = getGeometryN(i);
-      final Geometry otherGeom = gc.getGeometryN(i);
+      final Geometry thisGeom = getGeometry(i);
+      final Geometry otherGeom = gc.getGeometry(i);
       final int holeComp = thisGeom.compareToSameClass(otherGeom, comp);
       if (holeComp != 0) {
         return holeComp;
@@ -244,11 +244,11 @@ public class GeometryCollection extends Geometry {
    * @return the collected coordinates
    *    */
   @Override
-  public Coordinate[] getCoordinates() {
+  public Coordinate[] getCoordinateArray() {
     final Coordinate[] coordinates = new Coordinate[getNumPoints()];
     int k = -1;
     for (int i = 0; i < geometries.length; i++) {
-      final Coordinate[] childCoordinates = geometries[i].getCoordinates();
+      final Coordinate[] childCoordinates = geometries[i].getCoordinateArray();
       for (int j = 0; j < childCoordinates.length; j++) {
         k++;
         coordinates[k] = childCoordinates[j];
@@ -273,7 +273,7 @@ public class GeometryCollection extends Geometry {
   }
 
   @Override
-  public Geometry getGeometryN(final int n) {
+  public Geometry getGeometry(final int n) {
     return geometries[n];
   }
 

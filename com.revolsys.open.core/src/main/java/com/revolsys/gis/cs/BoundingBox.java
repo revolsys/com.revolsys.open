@@ -21,11 +21,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -417,8 +417,8 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox(final Point p1, final Point p2) {
-    this(GeometryFactory.getFactory(p1), CoordinatesUtil.get(p1),
-      CoordinatesUtil.get(p2));
+    this(GeometryFactory.getFactory(p1), CoordinatesUtil.getInstance(p1),
+      CoordinatesUtil.getInstance(p2));
   }
 
   public BoundingBox clipToCoordinateSystem() {
@@ -462,7 +462,7 @@ public class BoundingBox extends Envelope implements Cloneable {
 
   public boolean contains(final Point point) {
     final Point projectedPoint = (Point)geometryFactory.createGeometry(point);
-    final Coordinates coordinates = CoordinatesUtil.get(projectedPoint);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(projectedPoint);
     final boolean contains = contains(coordinates);
     return contains;
   }
@@ -688,7 +688,7 @@ public class BoundingBox extends Envelope implements Cloneable {
       return this;
     } else {
       final Point copy = geometryFactory.copy(point);
-      final Coordinates coordinates = CoordinatesUtil.get(copy);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(copy);
       return expandToInclude(coordinates);
     }
   }

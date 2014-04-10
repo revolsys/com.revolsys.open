@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -87,7 +87,7 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type,
-    final CoordinateSequence coordinates) {
+    final CoordinatesList coordinates) {
     boolean valid = true;
     for (int j = 0; j < coordinates.size(); j++) {
       final Coordinate coordinate = coordinates.getCoordinate(j);
@@ -101,7 +101,7 @@ public class ValidateGeometryRange extends
   private boolean isValid(final String type, final Geometry geometry) {
     boolean valid = true;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry subGeometry = geometry.getGeometryN(i);
+      final Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof Point) {
         final Coordinate coordinate = geometry.getCoordinate();
         if (!isValid(type, coordinate)) {
@@ -130,7 +130,7 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type, final LineString line) {
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
+    final CoordinatesList coordinates = line.getCoordinatesList();
     if (!isValid(type, coordinates)) {
       return false;
     }

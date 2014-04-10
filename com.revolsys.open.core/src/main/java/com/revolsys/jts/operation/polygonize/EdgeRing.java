@@ -35,10 +35,20 @@
 
 package com.revolsys.jts.operation.polygonize;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.planargraph.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.planargraph.DirectedEdge;
 
 /**
  * Represents a ring of {@link PolygonizeDirectedEdge}s which form
@@ -80,9 +90,9 @@ class EdgeRing {
       // hole must be contained in shell
       if (! tryShellEnv.contains(testEnv)) continue;
       
-      testPt = CoordinateArrays.ptNotInList(testRing.getCoordinates(), tryShellRing.getCoordinates());
+      testPt = CoordinateArrays.ptNotInList(testRing.getCoordinateArray(), tryShellRing.getCoordinateArray());
       boolean isContained = false;
-      if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinates()) )
+      if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinateArray()) )
         isContained = true;
 
       // check if this new containing ring is smaller than the current minimum ring
@@ -168,7 +178,7 @@ class EdgeRing {
   public boolean isHole()
   {
     LinearRing ring = getRing();
-    return CGAlgorithms.isCCW(ring.getCoordinates());
+    return CGAlgorithms.isCCW(ring.getCoordinateArray());
   }
 
   /**
@@ -225,7 +235,7 @@ class EdgeRing {
       for (Iterator i = deList.iterator(); i.hasNext(); ) {
         DirectedEdge de = (DirectedEdge) i.next();
         PolygonizeEdge edge = (PolygonizeEdge) de.getEdge();
-        addEdge(edge.getLine().getCoordinates(), de.getEdgeDirection(), coordList);
+        addEdge(edge.getLine().getCoordinateArray(), de.getEdgeDirection(), coordList);
       }
       ringPts = coordList.toCoordinateArray();
     }

@@ -12,9 +12,9 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -57,8 +57,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       if (geometry1 instanceof GeometryCollection) {
         if (geometry1.getNumGeometries() == geometry2.getNumGeometries()) {
           for (int i = 0; i < geometry1.getNumGeometries(); i++) {
-            final Geometry subGeometry1 = geometry1.getGeometryN(i);
-            final Geometry subGeometry2 = geometry2.getGeometryN(i);
+            final Geometry subGeometry1 = geometry1.getGeometry(i);
+            final Geometry subGeometry2 = geometry2.getGeometry(i);
             if (!equals(subGeometry1, subGeometry2)) {
               return false;
             }

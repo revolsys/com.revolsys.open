@@ -37,10 +37,14 @@ package com.revolsys.jts.geomgraph;
 
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geomgraph.Node;
 
 /**
  * A map of nodes, indexed by the coordinate of the node

@@ -25,10 +25,10 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   private static final Logger log = Logger.getLogger(XbaseDataObjectWriter.class);

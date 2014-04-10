@@ -38,12 +38,26 @@ package com.revolsys.jts.operation.relate;
 /**
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeEnd;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.NodeMap;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the topological relationship between two Geometries.

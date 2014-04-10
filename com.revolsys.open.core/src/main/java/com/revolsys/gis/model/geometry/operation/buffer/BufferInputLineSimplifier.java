@@ -35,9 +35,9 @@ package com.revolsys.gis.model.geometry.operation.buffer;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Simplifies a buffer input line to remove concavities with shallow depth.

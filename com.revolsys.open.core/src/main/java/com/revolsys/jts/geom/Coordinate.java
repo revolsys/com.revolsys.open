@@ -34,6 +34,8 @@ package com.revolsys.jts.geom;
 
 import java.io.Serializable;
 import java.util.Comparator;
+
+import com.revolsys.jts.awt.PointShapeFactory.X;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jts.util.NumberUtil;
 

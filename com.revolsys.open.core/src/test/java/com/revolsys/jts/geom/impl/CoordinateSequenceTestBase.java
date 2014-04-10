@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.CoordinateSequenceFactory;
 
 /**
@@ -35,19 +35,19 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
   abstract CoordinateSequenceFactory getCSFactory();
 
-  boolean isAllCoordsEqual(final CoordinateSequence seq, final Coordinate coord) {
+  boolean isAllCoordsEqual(final CoordinatesList seq, final Coordinate coord) {
     for (int i = 0; i < seq.size(); i++) {
       if (!coord.equals(seq.getCoordinate(i))) {
         return false;
       }
 
-      if (coord.x != seq.getOrdinate(i, CoordinateSequence.X)) {
+      if (coord.x != seq.getOrdinate(i, CoordinatesList.X)) {
         return false;
       }
-      if (coord.y != seq.getOrdinate(i, CoordinateSequence.Y)) {
+      if (coord.y != seq.getOrdinate(i, CoordinatesList.Y)) {
         return false;
       }
-      if (coord.z != seq.getOrdinate(i, CoordinateSequence.Z)) {
+      if (coord.z != seq.getOrdinate(i, CoordinatesList.Z)) {
         return false;
       }
     }
@@ -62,7 +62,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
    * @param coords
    * @return
    */
-  boolean isEqual(final CoordinateSequence seq, final Coordinate[] coords) {
+  boolean isEqual(final CoordinatesList seq, final Coordinate[] coords) {
     if (seq.size() != coords.length) {
       return false;
     }
@@ -83,13 +83,13 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       }
 
       // Ordinate indexed getters
-      if (coords[i].x != seq.getOrdinate(i, CoordinateSequence.X)) {
+      if (coords[i].x != seq.getOrdinate(i, CoordinatesList.X)) {
         return false;
       }
-      if (coords[i].y != seq.getOrdinate(i, CoordinateSequence.Y)) {
+      if (coords[i].y != seq.getOrdinate(i, CoordinatesList.Y)) {
         return false;
       }
-      if (coords[i].z != seq.getOrdinate(i, CoordinateSequence.Z)) {
+      if (coords[i].z != seq.getOrdinate(i, CoordinatesList.Z)) {
         return false;
       }
 
@@ -112,7 +112,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   public void test2DZOrdinate() {
     final Coordinate[] coords = createArray(SIZE);
 
-    final CoordinateSequence seq = getCSFactory().create(SIZE, 2);
+    final CoordinatesList seq = getCSFactory().create(SIZE, 2);
     for (int i = 0; i < seq.size(); i++) {
       seq.setOrdinate(i, 0, coords[i].x);
       seq.setOrdinate(i, 1, coords[i].y);
@@ -126,21 +126,21 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
   public void testCreateByInit() {
     final Coordinate[] coords = createArray(SIZE);
-    final CoordinateSequence seq = getCSFactory().create(coords);
+    final CoordinatesList seq = getCSFactory().create(coords);
     assertTrue(isEqual(seq, coords));
   }
 
   public void testCreateByInitAndCopy() {
     final Coordinate[] coords = createArray(SIZE);
-    final CoordinateSequence seq = getCSFactory().create(coords);
-    final CoordinateSequence seq2 = getCSFactory().create(seq);
+    final CoordinatesList seq = getCSFactory().create(coords);
+    final CoordinatesList seq2 = getCSFactory().create(seq);
     assertTrue(isEqual(seq2, coords));
   }
 
   public void testCreateBySizeAndModify() {
     final Coordinate[] coords = createArray(SIZE);
 
-    final CoordinateSequence seq = getCSFactory().create(SIZE, 3);
+    final CoordinatesList seq = getCSFactory().create(SIZE, 3);
     for (int i = 0; i < seq.size(); i++) {
       seq.setOrdinate(i, 0, coords[i].x);
       seq.setOrdinate(i, 1, coords[i].y);
@@ -151,10 +151,10 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   }
 
   public void testZeroLength() {
-    final CoordinateSequence seq = getCSFactory().create(0, 3);
+    final CoordinatesList seq = getCSFactory().create(0, 3);
     assertTrue(seq.size() == 0);
 
-    final CoordinateSequence seq2 = getCSFactory().create((Coordinate[])null);
+    final CoordinatesList seq2 = getCSFactory().create((Coordinate[])null);
     assertTrue(seq2.size() == 0);
   }
 }

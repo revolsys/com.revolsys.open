@@ -34,10 +34,14 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.EdgeRing;
+import com.revolsys.jts.geomgraph.Node;
 
 /**
  * A ring of {@link DirectedEdge}s which may contain nodes of degree > 2.

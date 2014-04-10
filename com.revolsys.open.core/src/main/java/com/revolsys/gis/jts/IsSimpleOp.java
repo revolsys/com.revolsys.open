@@ -179,9 +179,9 @@ public class IsSimpleOp {
       boolean simple = true;
       final Set<Coordinates> points = new TreeSet<Coordinates>();
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-        final Point point = (Point)multiPoint.getGeometryN(i);
+        final Point point = (Point)multiPoint.getGeometry(i);
         final Coordinates coordinates = new DoubleCoordinates(
-          CoordinatesUtil.get(point), 2);
+          CoordinatesUtil.getInstance(point), 2);
         if (points.contains(coordinates)) {
           nonSimplePoints.add(coordinates);
           simple = false;

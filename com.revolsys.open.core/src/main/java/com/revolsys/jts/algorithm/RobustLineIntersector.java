@@ -38,8 +38,8 @@ package com.revolsys.jts.algorithm;
  *@version 1.7
  */
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.Assert;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
 
 /**
  * A robust version of {@link LineIntersector}.

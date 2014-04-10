@@ -10,11 +10,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.ObjectProcessor;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
 
 public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(GraphProcessor.class);

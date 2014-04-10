@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
 
 /**
  * Computes whether a rectangle intersects line segments.

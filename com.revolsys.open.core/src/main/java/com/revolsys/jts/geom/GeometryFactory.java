@@ -58,7 +58,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
@@ -66,7 +65,6 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.jts.geom.impl.CoordinateArraySequenceFactory;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.util.CollectionUtil;
@@ -111,7 +109,7 @@ public class GeometryFactory implements Serializable,
   }
 
   private static CoordinateSequenceFactory getDefaultCoordinateSequenceFactory() {
-    return CoordinateArraySequenceFactory.instance();
+    return new DoubleCoordinatesListFactory();
   }
 
   /**
@@ -410,19 +408,19 @@ public class GeometryFactory implements Serializable,
 
   private final PrecisionModel precisionModel;
 
-  private CoordinatesPrecisionModel coordinatesPrecisionModel;
+  private final CoordinatesPrecisionModel coordinatesPrecisionModel;
 
-  private CoordinateSystem coordinateSystem;
+  private final CoordinateSystem coordinateSystem;
 
   private int numAxis = 2;
 
-  private final CoordinateSequenceFactory coordinateSequenceFactory;
+  private CoordinateSequenceFactory coordinateSequenceFactory;
 
   private final int srid;
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
-   * CoordinateSequence implementation, a double-precision floating PrecisionModel and a
+   * CoordinatesList implementation, a double-precision floating PrecisionModel and a
    * spatial-reference ID of 0.
    */
   @Deprecated
@@ -457,7 +455,7 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
-   * {@link PrecisionModel} and the default CoordinateSequence
+   * {@link PrecisionModel} and the default CoordinatesList
    * implementation.
    *
    * @param precisionModel the PrecisionModel to use
@@ -469,7 +467,7 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
-   * {@link PrecisionModel} and spatial-reference ID, and the default CoordinateSequence
+   * {@link PrecisionModel} and spatial-reference ID, and the default CoordinatesList
    * implementation.
    *
    * @param precisionModel the PrecisionModel to use
@@ -482,21 +480,20 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
-   * PrecisionModel, spatial-reference ID, and CoordinateSequence implementation.
+   * PrecisionModel, spatial-reference ID, and CoordinatesList implementation.
    */
   @Deprecated
-  public GeometryFactory(final PrecisionModel precisionModel, final int SRID,
+  public GeometryFactory(final PrecisionModel precisionModel, final int srid,
     final CoordinateSequenceFactory coordinateSequenceFactory) {
-    this.precisionModel = precisionModel;
+    this(srid, 3, precisionModel.getScale(), precisionModel.getScale());
     this.coordinateSequenceFactory = coordinateSequenceFactory;
-    this.srid = SRID;
   }
 
   public void addGeometries(final List<Geometry> geometryList,
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (part != null && !part.isEmpty()) {
           geometryList.add(copy(part));
         }
@@ -624,7 +621,7 @@ public class GeometryFactory implements Serializable,
           point = (Coordinates)object;
         } else if (object instanceof Point) {
           final Point projectedPoint = copy((Point)object);
-          point = CoordinatesUtil.get(projectedPoint);
+          point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new DoubleCoordinates((double[])object);
         } else if (object instanceof Coordinate) {
@@ -632,9 +629,6 @@ public class GeometryFactory implements Serializable,
         } else if (object instanceof CoordinatesList) {
           final CoordinatesList coordinates = (CoordinatesList)object;
           point = coordinates.get(0);
-        } else if (object instanceof CoordinateSequence) {
-          final CoordinateSequence coordinates = (CoordinateSequence)object;
-          point = new CoordinateCoordinates(coordinates.getCoordinate(0));
         } else {
           throw new IllegalArgumentException("Unexepected data type: " + object);
         }
@@ -657,26 +651,6 @@ public class GeometryFactory implements Serializable,
       getNumAxis(), points);
     coordinatesList.makePrecise(coordinatesPrecisionModel);
     return coordinatesList;
-  }
-
-  public CoordinatesList createCoordinatesList(final CoordinateSequence points) {
-    if (points == null) {
-      return null;
-    } else {
-      final int size = points.size();
-      final CoordinatesList newPoints = new DoubleCoordinatesList(size,
-        this.numAxis);
-      final int numAxis2 = points.getDimension();
-      final int numAxis = Math.min(this.numAxis, numAxis2);
-      for (int i = 0; i < size; i++) {
-        for (int j = 0; j < numAxis; j++) {
-          final double coordinate = points.getOrdinate(i, j);
-          newPoints.setValue(i, j, coordinate);
-        }
-      }
-      makePrecise(newPoints);
-      return newPoints;
-    }
   }
 
   public CoordinatesList createCoordinatesList(final CoordinatesList points) {
@@ -728,7 +702,7 @@ public class GeometryFactory implements Serializable,
       geometry = copy(geometry);
       if (geometry instanceof GeometryCollection) {
         if (geometry.getNumGeometries() == 1) {
-          geometry = geometry.getGeometryN(0);
+          geometry = geometry.getGeometry(0);
         } else {
           geometry = geometry.union();
           // Union doesn't use this geometry factory
@@ -742,13 +716,13 @@ public class GeometryFactory implements Serializable,
       } else if (Point.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiPoint) {
           if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometryN(0);
+            return (V)geometry.getGeometry(0);
           }
         }
       } else if (LineString.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiLineString) {
           if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometryN(0);
+            return (V)geometry.getGeometry(0);
           } else {
             final LineMerger merger = new LineMerger();
             merger.add(geometry);
@@ -761,7 +735,7 @@ public class GeometryFactory implements Serializable,
       } else if (Polygon.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiPolygon) {
           if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometryN(0);
+            return (V)geometry.getGeometry(0);
           }
         }
       } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
@@ -812,17 +786,17 @@ public class GeometryFactory implements Serializable,
   /**
    * Creates a deep copy of the input {@link Geometry}.
    * The {@link CoordinateSequenceFactory} defined for this factory
-   * is used to copy the {@link CoordinateSequence}s
+   * is used to copy the {@link CoordinatesList}s
    * of the input geometry.
    * <p>
-   * This is a convenient way to change the <tt>CoordinateSequence</tt>
+   * This is a convenient way to change the <tt>CoordinatesList</tt>
    * used to represent a geometry, or to change the 
    * factory used for a geometry.
    * <p>
    * {@link Geometry#clone()} can also be used to make a deep copy,
-   * but it does not allow changing the CoordinateSequence type.
+   * but it does not allow changing the CoordinatesList type.
    * 
-   * @return a deep copy of the input geometry, using the CoordinateSequence type of this factory
+   * @return a deep copy of the input geometry, using the CoordinatesList type of this factory
    * 
    * @see Geometry#clone() 
    */
@@ -831,7 +805,7 @@ public class GeometryFactory implements Serializable,
       return null;
     } else {
       final int srid = getSrid();
-      final int geometrySrid = geometry.getSRID();
+      final int geometrySrid = geometry.getSrid();
       if (srid == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
@@ -932,20 +906,16 @@ public class GeometryFactory implements Serializable,
   }
 
   /**
-   * Creates a {@link LinearRing} using the given {@link CoordinateSequence}. 
+   * Creates a {@link LinearRing} using the given {@link CoordinatesList}. 
    * A null or empty array creates an empty LinearRing. 
    * The points must form a closed and simple linestring. 
    * 
-   * @param coordinates a CoordinateSequence (possibly empty), or null
+   * @param coordinates a CoordinatesList (possibly empty), or null
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing createLinearRing(final CoordinateSequence coordinates) {
-    return new LinearRing(coordinates, this);
-  }
-
   public LinearRing createLinearRing(final CoordinatesList points) {
-    final CoordinateSequence coordinatesList = createCoordinatesList(points);
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
     return new LinearRing(coordinatesList, this);
   }
 
@@ -988,17 +958,13 @@ public class GeometryFactory implements Serializable,
   }
 
   /**
-   * Creates a LineString using the given CoordinateSequence.
-   * A null or empty CoordinateSequence creates an empty LineString. 
+   * Creates a LineString using the given CoordinatesList.
+   * A null or empty CoordinatesList creates an empty LineString. 
    * 
-   * @param coordinates a CoordinateSequence (possibly empty), or null
+   * @param coordinates a CoordinatesList (possibly empty), or null
    */
-  public LineString createLineString(final CoordinateSequence coordinates) {
-    return new LineString(coordinates, this);
-  }
-
   public LineString createLineString(final CoordinatesList points) {
-    final CoordinateSequence newPoints = createCoordinatesList(points);
+    final CoordinatesList newPoints = createCoordinatesList(points);
     final LineString line = new LineString(newPoints, this);
     return line;
   }
@@ -1053,37 +1019,24 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Creates a {@link MultiPoint} using the 
-   * points in the given {@link CoordinateSequence}.
-   * A <code>null</code> or empty CoordinateSequence creates an empty MultiPoint.
+   * points in the given {@link CoordinatesList}.
+   * A <code>null</code> or empty CoordinatesList creates an empty MultiPoint.
    *
-   * @param coordinates a CoordinateSequence (possibly empty), or <code>null</code>
+   * @param coordinates a CoordinatesList (possibly empty), or <code>null</code>
    * @return a MultiPoint geometry
    */
-  public MultiPoint createMultiPoint(final CoordinateSequence coordinates) {
-    if (coordinates == null) {
-      return createMultiPoint(new Point[0]);
-    }
-    final Point[] points = new Point[coordinates.size()];
-    for (int i = 0; i < coordinates.size(); i++) {
-      final CoordinateSequence ptSeq = getCoordinateSequenceFactory().create(1,
-        coordinates.getDimension());
-      CoordinateSequences.copy(coordinates, i, ptSeq, 0, 1);
-      points[i] = createPoint(ptSeq);
-    }
-    return createMultiPoint(points);
-  }
-
   public MultiPoint createMultiPoint(final CoordinatesList coordinatesList) {
-    if (coordinatesList != null) {
-      makePrecise(coordinatesList);
+    if (coordinatesList == null) {
+      return createMultiPoint();
+    } else {
+      final Point[] points = new Point[coordinatesList.size()];
+      for (int i = 0; i < points.length; i++) {
+        final Coordinates coordinates = coordinatesList.get(i);
+        final Point point = createPoint(coordinates);
+        points[i] = point;
+      }
+      return createMultiPoint(points);
     }
-    final Point[] points = new Point[coordinatesList.size()];
-    for (int i = 0; i < points.length; i++) {
-      final Coordinates coordinates = coordinatesList.get(i);
-      final Point point = createPoint(coordinates);
-      points[i] = point;
-    }
-    return createMultiPoint(points);
   }
 
   public MultiPoint createMultiPoint(final Object... points) {
@@ -1126,9 +1079,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public Point createPoint() {
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
-      getNumAxis());
-    return createPoint(points);
+    return new Point(this);
   }
 
   /**
@@ -1138,72 +1089,82 @@ public class GeometryFactory implements Serializable,
    * @param coordinate a Coordinate, or null
    * @return the created Point
    */
-  public Point createPoint(final Coordinate coordinate) {
-    return createPoint(coordinate != null ? getCoordinateSequenceFactory().create(
-      new Coordinate[] {
-        coordinate
-      })
-      : null);
+  public Point createPoint(final Coordinate point) {
+    if (point == null) {
+      return createPoint();
+    } else {
+      return createPoint(point.x, point.y, point.z);
+    }
   }
 
   public Point createPoint(final Coordinates point) {
     if (point == null) {
       return createPoint();
     } else {
-      final CoordinatesList coordinatesList = createCoordinatesList(point);
-      return createPoint(coordinatesList);
+      return createPoint(point.getCoordinates());
     }
   }
 
   /**
-   * Creates a Point using the given CoordinateSequence; a null or empty
-   * CoordinateSequence will create an empty Point.
+   * Creates a Point using the given CoordinatesList; a null or empty
+   * CoordinatesList will create an empty Point.
    * 
-   * @param coordinates a CoordinateSequence (possibly empty), or null
+   * @param points a CoordinatesList (possibly empty), or null
    * @return the created Point
    */
-  public Point createPoint(final CoordinateSequence coordinates) {
-    return new Point(coordinates, this);
-  }
-
   public Point createPoint(final CoordinatesList points) {
-    final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return new Point(coordinatesList, this);
+    if (points == null) {
+      return createPoint();
+    } else {
+      final int size = points.size();
+      if (size == 0) {
+        return createPoint();
+      } else if (size == 1) {
+        final int numAxis = Math.min(points.getDimension(), getNumAxis());
+        final double[] coordinates = new double[numAxis];
+        for (int i = 0; i < numAxis; i++) {
+          final double coordinate = points.getOrdinate(0, i);
+          coordinates[i] = coordinate;
+        }
+        return createPoint(coordinates);
+      } else {
+        throw new IllegalArgumentException("Point can only have 1 vertex not "
+          + size);
+      }
+    }
   }
 
   public Point createPoint(final double... coordinates) {
-    final DoubleCoordinates coords = new DoubleCoordinates(numAxis, coordinates);
-    makePrecise(coords);
-    return createPoint(coords);
+    if (coordinates == null || coordinates.length < 2) {
+      return createPoint();
+    } else {
+      return new Point(this, coordinates);
+    }
   }
 
   public Point createPoint(final Object object) {
-    Coordinates coordinates;
-    if (object instanceof Coordinates) {
-      coordinates = (Coordinates)object;
-    } else if (object instanceof Point) {
-      return copy((Point)object);
+    if (object == null) {
+      return createPoint();
+    } else if (object instanceof Coordinates) {
+      return createPoint((Coordinates)object);
     } else if (object instanceof double[]) {
-      coordinates = new DoubleCoordinates((double[])object);
+      return createPoint((double[])object);
     } else if (object instanceof Coordinate) {
-      coordinates = new CoordinateCoordinates((Coordinate)object);
+      return createPoint((Coordinate)object);
     } else if (object instanceof CoordinatesList) {
-      final CoordinatesList coordinatesList = (CoordinatesList)object;
-      coordinates = coordinatesList.get(0);
-    } else if (object instanceof CoordinateSequence) {
-      final CoordinateSequence coordinatesList = (CoordinateSequence)object;
-      coordinates = new CoordinateCoordinates(coordinatesList.getCoordinate(0));
+      return createPoint((CoordinatesList)object);
     } else {
-      coordinates = null;
+      throw new IllegalArgumentException("Cannot create a point from "
+        + object.getClass());
     }
-    return createPoint(coordinates);
   }
 
   public Point createPoint(final Point point) {
-    final CoordinatesList points = CoordinatesListUtil.get(point);
-    final CoordinatesList newPoints = createCoordinatesList(points);
-    return createPoint(newPoints);
-
+    if (point.isEmpty()) {
+      return createPoint();
+    } else {
+      return createPoint((Coordinates)point);
+    }
   }
 
   public List<Point> createPointList(final CoordinatesList sourcePoints) {
@@ -1243,7 +1204,7 @@ public class GeometryFactory implements Serializable,
    *            the empty geometry is to be created.
    * @throws IllegalArgumentException if the boundary ring is invalid
    */
-  public Polygon createPolygon(final CoordinateSequence coordinates) {
+  public Polygon createPolygon(final CoordinatesList coordinates) {
     return createPolygon(createLinearRing(coordinates));
   }
 
@@ -1319,7 +1280,7 @@ public class GeometryFactory implements Serializable,
 
   public Coordinates getCoordinates(final Point point) {
     final Point convertedPoint = project(point);
-    return CoordinatesUtil.get(convertedPoint);
+    return CoordinatesUtil.getInstance(convertedPoint);
   }
 
   public CoordinateSequenceFactory getCoordinateSequenceFactory() {
@@ -1363,9 +1324,6 @@ public class GeometryFactory implements Serializable,
     } else if (ring instanceof CoordinatesList) {
       final CoordinatesList points = (CoordinatesList)ring;
       return createLinearRing(points);
-    } else if (ring instanceof CoordinateSequence) {
-      final CoordinateSequence points = (CoordinateSequence)ring;
-      return createLinearRing(points);
     } else if (ring instanceof LineString) {
       final LineString line = (LineString)ring;
       final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -1388,9 +1346,6 @@ public class GeometryFactory implements Serializable,
         lineString = (LineString)value;
       } else if (value instanceof CoordinatesList) {
         final CoordinatesList coordinates = (CoordinatesList)value;
-        lineString = createLineString(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        final CoordinateSequence coordinates = (CoordinateSequence)value;
         lineString = createLineString(coordinates);
       } else if (value instanceof double[]) {
         final double[] points = (double[])value;
@@ -1557,7 +1512,7 @@ public class GeometryFactory implements Serializable,
   public Geometry toGeometry(final Envelope envelope) {
     // null envelope - return empty point geometry
     if (envelope.isNull()) {
-      return createPoint((CoordinateSequence)null);
+      return createPoint((CoordinatesList)null);
     }
 
     // point?

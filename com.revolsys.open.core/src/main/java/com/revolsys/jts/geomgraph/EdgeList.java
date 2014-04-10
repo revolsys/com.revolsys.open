@@ -36,13 +36,15 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.index.SpatialIndex;
-import com.revolsys.jts.index.quadtree.Quadtree;
 import com.revolsys.jts.noding.OrientedCoordinateArray;
-import com.revolsys.jts.noding.SegmentString;
 
 /**
  * A EdgeList is a list of Edges.  It supports locating edges

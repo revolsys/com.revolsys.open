@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.algorithm.locate;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Location;
 
 /**
  * An interface for classes which determine the {@link Location} of

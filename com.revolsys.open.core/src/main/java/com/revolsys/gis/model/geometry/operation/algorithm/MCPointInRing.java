@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.LinearRing;
@@ -14,6 +13,7 @@ import com.revolsys.gis.model.geometry.operation.chain.MonotoneChain;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChainBuilder;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChainSelectAction;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.index.bintree.Bintree;
 import com.revolsys.jts.index.bintree.Interval;
 

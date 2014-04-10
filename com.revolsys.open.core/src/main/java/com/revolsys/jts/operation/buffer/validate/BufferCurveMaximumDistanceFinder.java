@@ -32,7 +32,11 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Finds the approximate maximum distance from a buffer curve to
@@ -115,7 +119,7 @@ public class BufferCurveMaximumDistanceFinder
 			this.geom = geom;
 		}
 
-		public void filter(CoordinateSequence seq, int index) 
+		public void filter(CoordinatesList seq, int index) 
 		{
 			if (index == 0)
 				return;

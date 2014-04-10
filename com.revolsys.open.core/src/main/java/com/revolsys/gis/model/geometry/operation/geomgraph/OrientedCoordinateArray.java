@@ -33,8 +33,8 @@
 package com.revolsys.gis.model.geometry.operation.geomgraph;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Allows comparing {@link Coordinates} arrays in an orientation-independent

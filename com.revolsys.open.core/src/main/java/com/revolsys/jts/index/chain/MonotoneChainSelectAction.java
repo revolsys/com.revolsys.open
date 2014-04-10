@@ -34,7 +34,8 @@
  */
 package com.revolsys.jts.index.chain;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LineSegment;
 /**
  * The action for the internal iterator for performing
  * envelope select queries on a MonotoneChain

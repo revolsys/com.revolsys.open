@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.operation.overlay.OverlayOp;
-import com.revolsys.jts.operation.overlay.validate.OverlayResultValidator;
 
 
 /**

@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygon;
@@ -80,7 +80,7 @@ public class PlanarPolygon3D {
 	 */
 	private Plane3D findBestFitPlane(Polygon poly) 
 	{
-		CoordinateSequence seq = poly.getExteriorRing().getCoordinateSequence();
+		CoordinatesList seq = poly.getExteriorRing().getCoordinatesList();
 		Coordinate basePt = averagePoint(seq);
 		Vector3D normal = averageNormal(seq);
 		return new Plane3D(normal, basePt);
@@ -96,7 +96,7 @@ public class PlanarPolygon3D {
 	 * @param seq the sequence of coordinates for the polygon
 	 * @return a normal vector
 	 */
-	private Vector3D averageNormal(CoordinateSequence seq) 
+	private Vector3D averageNormal(CoordinatesList seq) 
 	{
 		int n = seq.size();
 		Coordinate sum = new Coordinate(0,0,0);
@@ -125,13 +125,13 @@ public class PlanarPolygon3D {
 	 * @param seq a coordinate sequence
 	 * @return a Coordinate with averaged ordinates
 	 */
-	private Coordinate averagePoint(CoordinateSequence seq) {
+	private Coordinate averagePoint(CoordinatesList seq) {
 		Coordinate a = new Coordinate(0,0,0);
 		int n = seq.size();
 		for (int i = 0; i < n; i++) {
-			a.x += seq.getOrdinate(i, CoordinateSequence.X);
-			a.y += seq.getOrdinate(i, CoordinateSequence.Y);
-			a.z += seq.getOrdinate(i, CoordinateSequence.Z);
+			a.x += seq.getOrdinate(i, CoordinatesList.X);
+			a.y += seq.getOrdinate(i, CoordinatesList.Y);
+			a.z += seq.getOrdinate(i, CoordinatesList.Z);
 		}
 		a.x /= n;
 		a.y /= n;
@@ -159,20 +159,20 @@ public class PlanarPolygon3D {
 	}
 
 	private int locate(Coordinate pt, LineString ring) {
-		CoordinateSequence seq = ring.getCoordinateSequence();
-		CoordinateSequence seqProj = project(seq, facingPlane);
+		CoordinatesList seq = ring.getCoordinatesList();
+		CoordinatesList seqProj = project(seq, facingPlane);
 		Coordinate ptProj = project(pt, facingPlane);
 		return RayCrossingCounter.locatePointInRing(ptProj, seqProj);
 	}
 	
 	public boolean intersects(Coordinate pt, LineString ring) {
-		CoordinateSequence seq = ring.getCoordinateSequence();
-		CoordinateSequence seqProj = project(seq, facingPlane);
+		CoordinatesList seq = ring.getCoordinatesList();
+		CoordinatesList seqProj = project(seq, facingPlane);
 		Coordinate ptProj = project(pt, facingPlane);
 		return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj, seqProj);
 	}
 	
-	private static CoordinateSequence project(CoordinateSequence seq, int facingPlane)
+	private static CoordinatesList project(CoordinatesList seq, int facingPlane)
 	{
 		switch (facingPlane) {
 		case Plane3D.XY_PLANE: return AxisPlaneCoordinateSequence.projectToXY(seq);

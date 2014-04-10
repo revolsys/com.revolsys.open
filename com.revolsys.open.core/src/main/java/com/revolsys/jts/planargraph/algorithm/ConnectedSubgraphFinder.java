@@ -33,8 +33,18 @@
 
 package com.revolsys.jts.planargraph.algorithm;
 
-import java.util.*;
-import com.revolsys.jts.planargraph.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+
+import com.revolsys.jts.planargraph.DirectedEdge;
+import com.revolsys.jts.planargraph.DirectedEdgeStar;
+import com.revolsys.jts.planargraph.Edge;
+import com.revolsys.jts.planargraph.GraphComponent;
+import com.revolsys.jts.planargraph.Node;
+import com.revolsys.jts.planargraph.PlanarGraph;
+import com.revolsys.jts.planargraph.Subgraph;
 
 /**
  * Finds all connected {@link Subgraph}s of a {@link PlanarGraph}.

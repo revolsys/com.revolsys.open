@@ -32,11 +32,22 @@
  */
 package com.revolsys.jts.operation.overlay;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.EdgeRing;
+import com.revolsys.jts.geomgraph.PlanarGraph;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Forms {@link Polygon}s out of a graph of {@link DirectedEdge}s.
@@ -257,7 +268,7 @@ public class PolygonBuilder {
       if (minShell != null) minEnv = minShell.getLinearRing().getEnvelopeInternal();
       boolean isContained = false;
       if (tryEnv.contains(testEnv)
-          && CGAlgorithms.isPointInRing(testPt, tryRing.getCoordinates()) )
+          && CGAlgorithms.isPointInRing(testPt, tryRing.getCoordinateArray()) )
         isContained = true;
       // check if this new containing ring is smaller than the current minimum ring
       if (isContained) {

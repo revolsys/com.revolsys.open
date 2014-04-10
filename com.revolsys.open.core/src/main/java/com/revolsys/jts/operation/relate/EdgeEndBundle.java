@@ -36,11 +36,18 @@
 package com.revolsys.jts.operation.relate;
 
 import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.util.Assert;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeEnd;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Position;
 
 /**
  * A collection of {@link EdgeEnd}s which obey the following invariant:

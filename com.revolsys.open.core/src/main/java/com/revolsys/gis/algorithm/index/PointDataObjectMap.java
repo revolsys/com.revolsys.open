@@ -14,10 +14,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.parallel.channel.Channel;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.parallel.channel.Channel;
 
 public class PointDataObjectMap {
 
@@ -45,7 +45,7 @@ public class PointDataObjectMap {
    */
   public void add(final DataObject object) {
     final Point point = object.getGeometryValue();
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = new DoubleCoordinates(point, 2);
     final List<DataObject> objects = getObjectInternal(coordinates);
     objects.add(object);
     if (comparator != null) {
@@ -60,7 +60,7 @@ public class PointDataObjectMap {
   }
 
   public boolean containsKey(final Point point) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final DoubleCoordinates coordinates = new DoubleCoordinates(point, 2);
     return objectMap.containsKey(coordinates);
   }
 
@@ -87,6 +87,7 @@ public class PointDataObjectMap {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   public <V extends DataObject> V getFirstMatch(final Point point) {
     final List<DataObject> objects = getObjects(point);
     if (objects.isEmpty()) {
@@ -131,14 +132,14 @@ public class PointDataObjectMap {
   }
 
   public List<DataObject> getObjects(final Point point) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = new DoubleCoordinates(point, 2);
     final List<DataObject> objects = getObjects(coordinates);
     return objects;
   }
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final Coordinates coordinates = CoordinatesUtil.get(point);
+      final Coordinates coordinates = new DoubleCoordinates(point, 2);
       getObjectInternal(coordinates);
     }
   }

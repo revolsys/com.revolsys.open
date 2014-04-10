@@ -27,8 +27,8 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
     }
     final boolean userDataEquals = !exclude.contains("userData");
     for (int j = 0; j < geometry1.getNumGeometries(); j++) {
-      final Geometry geometryPart1 = geometry1.getGeometryN(j);
-      final Geometry geometryPart2 = geometry2.getGeometryN(j);
+      final Geometry geometryPart1 = geometry1.getGeometry(j);
+      final Geometry geometryPart2 = geometry2.getGeometry(j);
       if (!JtsGeometryUtil.equalsExact3D(geometryPart1, geometryPart2)) {
         return false;
       }

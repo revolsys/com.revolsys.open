@@ -34,12 +34,27 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.operation.overlay.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geomgraph.DirectedEdge;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeRing;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.PlanarGraph;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.operation.overlay.MaximalEdgeRing;
+import com.revolsys.jts.operation.overlay.OverlayNodeFactory;
+import com.revolsys.jts.util.Assert;
 
 /**
  * This class tests that the interior of an area {@link Geometry}
@@ -157,7 +172,7 @@ public class ConnectedInteriorTester {
     if (g instanceof MultiPolygon) {
       MultiPolygon mp = (MultiPolygon) g;
       for (int i = 0; i < mp.getNumGeometries(); i++) {
-        Polygon p = (Polygon) mp.getGeometryN(i);
+        Polygon p = (Polygon) mp.getGeometry(i);
         visitInteriorRing(p.getExteriorRing(), graph);
       }
     }
@@ -165,7 +180,7 @@ public class ConnectedInteriorTester {
 
   private void visitInteriorRing(LineString ring, PlanarGraph graph)
   {
-    Coordinate[] pts = ring.getCoordinates();
+    Coordinate[] pts = ring.getCoordinateArray();
     Coordinate pt0 = pts[0];
     /**
      * Find first point in coord list different to initial point.

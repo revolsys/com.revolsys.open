@@ -33,8 +33,21 @@
 
 package com.revolsys.jts.geom.util;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * A framework for processes which transform an input {@link Geometry} into
@@ -145,28 +158,28 @@ public class GeometryTransformer
 
   /**
    * Convenience method which provides standard way of
-   * creating a {@link CoordinateSequence}
+   * creating a {@link CoordinatesList}
    *
    * @param coords the coordinate array to copy
    * @return a coordinate sequence for the array
    */
-  protected final CoordinateSequence createCoordinateSequence(Coordinate[] coords)
+  protected final CoordinatesList createCoordinateSequence(Coordinate[] coords)
   {
     return factory.getCoordinateSequenceFactory().create(coords);
   }
 
   /**
-   * Convenience method which provides statndard way of copying {@link CoordinateSequence}s
+   * Convenience method which provides statndard way of copying {@link CoordinatesList}s
    * @param seq the sequence to copy
    * @return a deep copy of the sequence
    */
-  protected final CoordinateSequence copy(CoordinateSequence seq)
+  protected final CoordinatesList copy(CoordinatesList seq)
   {
-    return (CoordinateSequence) seq.clone();
+    return (CoordinatesList) seq.clone();
   }
 
   /**
-   * Transforms a {@link CoordinateSequence}.
+   * Transforms a {@link CoordinatesList}.
    * This method should always return a valid coordinate list for
    * the desired result type.  (E.g. a coordinate list for a LineString
    * must have 0 or at least 2 points).
@@ -177,7 +190,7 @@ public class GeometryTransformer
    * @param parent the parent geometry
    * @return the transformed coordinates
    */
-  protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent)
+  protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
   {
     return copy(coords);
   }
@@ -190,7 +203,7 @@ public class GeometryTransformer
   protected Geometry transformMultiPoint(MultiPoint geom, Geometry parent) {
     List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry transformGeom = transformPoint((Point) geom.getGeometryN(i), geom);
+      Geometry transformGeom = transformPoint((Point) geom.getGeometry(i), geom);
       if (transformGeom == null) continue;
       if (transformGeom.isEmpty()) continue;
       transGeomList.add(transformGeom);
@@ -212,9 +225,9 @@ public class GeometryTransformer
    * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
    */
   protected Geometry transformLinearRing(LinearRing geom, Geometry parent) {
-    CoordinateSequence seq = transformCoordinates(geom.getCoordinateSequence(), geom);
+    CoordinatesList seq = transformCoordinates(geom.getCoordinatesList(), geom);
     if (seq == null) 
-      return factory.createLinearRing((CoordinateSequence) null);
+      return factory.createLinearRing((CoordinatesList) null);
     int seqSize = seq.size();
     // ensure a valid LinearRing
     if (seqSize > 0 && seqSize < 4 && ! preserveType)
@@ -232,13 +245,13 @@ public class GeometryTransformer
   protected Geometry transformLineString(LineString geom, Geometry parent) {
     // should check for 1-point sequences and downgrade them to points
     return factory.createLineString(
-        transformCoordinates(geom.getCoordinateSequence(), geom));
+        transformCoordinates(geom.getCoordinatesList(), geom));
   }
 
   protected Geometry transformMultiLineString(MultiLineString geom, Geometry parent) {
     List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getNumGeometries(); i++) {  
-      Geometry transformGeom = transformLineString((LineString) geom.getGeometryN(i), geom);
+      Geometry transformGeom = transformLineString((LineString) geom.getGeometry(i), geom);
       if (transformGeom == null) continue;
       if (transformGeom.isEmpty()) continue;
       transGeomList.add(transformGeom);
@@ -282,7 +295,7 @@ public class GeometryTransformer
   protected Geometry transformMultiPolygon(MultiPolygon geom, Geometry parent) {
     List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry transformGeom = transformPolygon((Polygon) geom.getGeometryN(i), geom);
+      Geometry transformGeom = transformPolygon((Polygon) geom.getGeometry(i), geom);
       if (transformGeom == null) continue;
       if (transformGeom.isEmpty()) continue;
       transGeomList.add(transformGeom);
@@ -293,7 +306,7 @@ public class GeometryTransformer
   protected Geometry transformGeometryCollection(GeometryCollection geom, Geometry parent) {
     List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry transformGeom = transform(geom.getGeometryN(i));
+      Geometry transformGeom = transform(geom.getGeometry(i));
       if (transformGeom == null) continue;
       if (pruneEmptyGeometry && transformGeom.isEmpty()) continue;
       transGeomList.add(transformGeom);

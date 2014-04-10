@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public interface LineString extends Geometry, CoordinatesList {
   Point getFromPoint();

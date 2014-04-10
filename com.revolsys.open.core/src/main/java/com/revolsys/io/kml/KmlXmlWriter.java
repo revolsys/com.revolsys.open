@@ -13,9 +13,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.UrlUtil;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -23,6 +22,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.UrlUtil;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public static void append(final StringBuffer buffer, final Geometry geometry) {
@@ -92,7 +92,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     super(out, useNamespaces);
   }
 
-  public void write(final CoordinateSequence coordinateSequence) {
+  public void write(final CoordinatesList coordinateSequence) {
     startTag(Kml22Constants.COORDINATES);
     final boolean hasZ = coordinateSequence.getDimension() > 2;
     for (int i = 0; i < coordinateSequence.size(); i++) {
@@ -152,7 +152,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       if (numGeometries > 1) {
         startTag(Kml22Constants.MULTI_GEOMETRY);
         for (int i = 0; i < numGeometries; i++) {
-          writeGeometry(geometry.getGeometryN(i));
+          writeGeometry(geometry.getGeometry(i));
         }
         endTag();
       } else {
@@ -190,7 +190,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLinearRing(final LineString ring) {
     startTag(Kml22Constants.LINEAR_RING);
-    final CoordinateSequence coordinateSequence = ring.getCoordinateSequence();
+    final CoordinatesList coordinateSequence = ring.getCoordinatesList();
     write(coordinateSequence);
     endTag();
 
@@ -198,7 +198,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLineString(final LineString line) {
     startTag(Kml22Constants.LINE_STRING);
-    final CoordinateSequence coordinateSequence = line.getCoordinateSequence();
+    final CoordinatesList coordinateSequence = line.getCoordinatesList();
     write(coordinateSequence);
     endTag();
   }
@@ -206,7 +206,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public void writeMultiGeometry(final GeometryCollection collection) {
     startTag(Kml22Constants.MULTI_GEOMETRY);
     for (int i = 0; i < collection.getNumGeometries(); i++) {
-      final Geometry geometry = collection.getGeometryN(i);
+      final Geometry geometry = collection.getGeometry(i);
       writeGeometry(geometry);
     }
     endTag(Kml22Constants.MULTI_GEOMETRY);

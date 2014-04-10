@@ -35,8 +35,6 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.Label;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.util.Assert;

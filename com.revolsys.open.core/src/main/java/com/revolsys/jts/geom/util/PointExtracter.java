@@ -33,9 +33,13 @@
  */
 package com.revolsys.jts.geom.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFilter;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Extracts all the 0-dimensional ({@link Point}) components from a {@link Geometry}.

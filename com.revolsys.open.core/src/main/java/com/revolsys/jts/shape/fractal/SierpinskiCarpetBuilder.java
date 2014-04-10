@@ -33,10 +33,17 @@
 
 package com.revolsys.jts.shape.fractal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.shape.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 public class SierpinskiCarpetBuilder 
 extends GeometricShapeBuilder

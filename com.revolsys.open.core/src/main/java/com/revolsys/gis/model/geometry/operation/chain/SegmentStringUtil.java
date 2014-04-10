@@ -3,8 +3,8 @@ package com.revolsys.gis.model.geometry.operation.chain;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Utility methods for processing {@link SegmentString}s.

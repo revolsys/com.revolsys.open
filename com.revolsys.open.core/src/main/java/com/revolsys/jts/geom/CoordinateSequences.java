@@ -36,7 +36,7 @@ import com.revolsys.jts.util.StringUtil;
 
 
 /**
- * Utility functions for manipulating {@link CoordinateSequence}s
+ * Utility functions for manipulating {@link CoordinatesList}s
  *
  * @version 1.7
  */
@@ -45,7 +45,7 @@ public class CoordinateSequences {
   /**
    * Reverses the coordinates in a sequence in-place.
    */
-  public static void reverse(CoordinateSequence seq)
+  public static void reverse(CoordinatesList seq)
   {
     int last = seq.size() - 1;
     int mid = last / 2;
@@ -61,7 +61,7 @@ public class CoordinateSequences {
    * @param i the index of a coordinate to swap
    * @param j the index of a coordinate to swap
    */
-  public static void swap(CoordinateSequence seq, int i, int j)
+  public static void swap(CoordinatesList seq, int i, int j)
   {
     if (i == j) return;
     for (int dim = 0; dim < seq.getDimension(); dim++) {
@@ -72,7 +72,7 @@ public class CoordinateSequences {
   }
   
   /**
-   * Copies a section of a {@link CoordinateSequence} to another {@link CoordinateSequence}.
+   * Copies a section of a {@link CoordinatesList} to another {@link CoordinatesList}.
    * The sequences may have different dimensions;
    * in this case only the common dimensions are copied.
    *
@@ -82,7 +82,7 @@ public class CoordinateSequences {
    * @param destPos the position in the destination sequence to copy to
    * @param length the number of coordinates to copy
    */
-  public static void copy(CoordinateSequence src, int srcPos, CoordinateSequence dest, int destPos, int length)
+  public static void copy(CoordinatesList src, int srcPos, CoordinatesList dest, int destPos, int length)
   {
   	for (int i = 0; i < length; i++) {
   		copyCoord(src, srcPos + i, dest, destPos + i);
@@ -90,7 +90,7 @@ public class CoordinateSequences {
   }
 
   /**
-   * Copies a coordinate of a {@link CoordinateSequence} to another {@link CoordinateSequence}.
+   * Copies a coordinate of a {@link CoordinatesList} to another {@link CoordinatesList}.
    * The sequences may have different dimensions;
    * in this case only the common dimensions are copied.
    * 
@@ -99,7 +99,7 @@ public class CoordinateSequences {
    * @param dest the sequence to copy to
    * @param destPos the destination coordinate to copy to
    */
-  public static void copyCoord(CoordinateSequence src, int srcPos, CoordinateSequence dest, int destPos)
+  public static void copyCoord(CoordinatesList src, int srcPos, CoordinatesList dest, int destPos)
   {
     int minDim = Math.min(src.getDimension(), dest.getDimension());
 		for (int dim = 0; dim < minDim; dim++) {
@@ -108,7 +108,7 @@ public class CoordinateSequences {
   }
   
   /**
-   * Tests whether a {@link CoordinateSequence} forms a valid {@link LinearRing},
+   * Tests whether a {@link CoordinatesList} forms a valid {@link LinearRing},
    * by checking the sequence length and closure
    * (whether the first and last points are identical in 2D). 
    * Self-intersection is not checked.
@@ -117,7 +117,7 @@ public class CoordinateSequences {
    * @return true if the sequence is a ring
    * @see LinearRing
    */
-  public static boolean isRing(CoordinateSequence seq) 
+  public static boolean isRing(CoordinatesList seq) 
   {
   	int n = seq.size();
   	if (n == 0) return true;
@@ -125,12 +125,12 @@ public class CoordinateSequences {
   	if (n <= 3) 
   		return false;
   	// test if closed
-  	return seq.getOrdinate(0, CoordinateSequence.X) == seq.getOrdinate(n-1, CoordinateSequence.X)
-  		&& seq.getOrdinate(0, CoordinateSequence.Y) == seq.getOrdinate(n-1, CoordinateSequence.Y);
+  	return seq.getOrdinate(0, CoordinatesList.X) == seq.getOrdinate(n-1, CoordinatesList.X)
+  		&& seq.getOrdinate(0, CoordinatesList.Y) == seq.getOrdinate(n-1, CoordinatesList.Y);
   }
   
   /**
-   * Ensures that a CoordinateSequence forms a valid ring, 
+   * Ensures that a CoordinatesList forms a valid ring, 
    * returning a new closed sequence of the correct length if required.
    * If the input sequence is already a valid ring, it is returned 
    * without modification.
@@ -141,7 +141,7 @@ public class CoordinateSequences {
    * @param seq the sequence to test
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
-  public static CoordinateSequence ensureValidRing(CoordinateSequenceFactory fact, CoordinateSequence seq)
+  public static CoordinatesList ensureValidRing(CoordinateSequenceFactory fact, CoordinatesList seq)
   {
   	int n = seq.size();
   	// empty sequence is valid
@@ -150,16 +150,16 @@ public class CoordinateSequences {
   	if (n <= 3) 
   		return createClosedRing(fact, seq, 4);
   	
-  	boolean isClosed = seq.getOrdinate(0, CoordinateSequence.X) == seq.getOrdinate(n-1, CoordinateSequence.X)
-		&& seq.getOrdinate(0, CoordinateSequence.Y) == seq.getOrdinate(n-1, CoordinateSequence.Y);
+  	boolean isClosed = seq.getOrdinate(0, CoordinatesList.X) == seq.getOrdinate(n-1, CoordinatesList.X)
+		&& seq.getOrdinate(0, CoordinatesList.Y) == seq.getOrdinate(n-1, CoordinatesList.Y);
   	if (isClosed) return seq;
   	// make a new closed ring
   	return createClosedRing(fact, seq, n+1);
   }
   
-  private static CoordinateSequence createClosedRing(CoordinateSequenceFactory fact, CoordinateSequence seq, int size)
+  private static CoordinatesList createClosedRing(CoordinateSequenceFactory fact, CoordinatesList seq, int size)
   {
-    CoordinateSequence newseq = fact.create(size, seq.getDimension());
+    CoordinatesList newseq = fact.create(size, seq.getDimension());
     int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with start point
@@ -168,9 +168,9 @@ public class CoordinateSequences {
     return newseq;
   }
   
-  public static CoordinateSequence extend(CoordinateSequenceFactory fact, CoordinateSequence seq, int size)
+  public static CoordinatesList extend(CoordinateSequenceFactory fact, CoordinatesList seq, int size)
   {
-    CoordinateSequence newseq = fact.create(size, seq.getDimension());
+    CoordinatesList newseq = fact.create(size, seq.getDimension());
     int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with end point, if it exists
@@ -182,18 +182,18 @@ public class CoordinateSequences {
   }
 
   /**
-   * Tests whether two {@link CoordinateSequence}s are equal.
+   * Tests whether two {@link CoordinatesList}s are equal.
    * To be equal, the sequences must be the same length.
    * They do not need to be of the same dimension, 
    * but the ordinate values for the smallest dimension of the two
    * must be equal.
    * Two <code>NaN</code> ordinates values are considered to be equal. 
    * 
-   * @param cs1 a CoordinateSequence
-   * @param cs2 a CoordinateSequence
+   * @param cs1 a CoordinatesList
+   * @param cs2 a CoordinatesList
    * @return true if the sequences are equal in the common dimensions
    */
-  public static boolean isEqual(CoordinateSequence cs1, CoordinateSequence cs2) {
+  public static boolean isEqual(CoordinatesList cs1, CoordinatesList cs2) {
     int cs1Size = cs1.size();
     int cs2Size = cs2.size();
     if (cs1Size != cs2Size) return false;
@@ -214,7 +214,7 @@ public class CoordinateSequences {
   }
   
   /**
-   * Creates a string representation of a {@link CoordinateSequence}.
+   * Creates a string representation of a {@link CoordinatesList}.
    * The format is:
    * <pre>
    *   ( ord0,ord1.. ord0,ord1,...  ... )
@@ -223,7 +223,7 @@ public class CoordinateSequences {
    * @param cs the sequence to output
    * @return the string representation of the sequence
    */
-  public static String toString(CoordinateSequence cs)
+  public static String toString(CoordinatesList cs)
   {
     int size = cs.size();
     if (size == 0) 

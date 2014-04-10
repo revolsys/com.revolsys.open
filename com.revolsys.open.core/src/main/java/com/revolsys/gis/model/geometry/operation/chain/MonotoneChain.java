@@ -1,10 +1,10 @@
 package com.revolsys.gis.model.geometry.operation.chain;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to

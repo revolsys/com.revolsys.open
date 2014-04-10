@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequence;
 import com.revolsys.jts.geom.CoordinateSequenceFactory;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
   Serializable {
@@ -33,7 +33,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
   }
 
   @Override
-  public CoordinatesList create(final CoordinateSequence coordinateSequence) {
+  public CoordinatesList create(final CoordinatesList coordinateSequence) {
     final int size = coordinateSequence.size();
     final int numAxis = coordinateSequence.getDimension();
     final CoordinatesList coordinatesList = create(size, numAxis);

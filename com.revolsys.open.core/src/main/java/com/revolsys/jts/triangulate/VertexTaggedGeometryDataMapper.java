@@ -33,8 +33,15 @@
 
 package com.revolsys.jts.triangulate;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * Creates a map between the vertex {@link Coordinate}s of a 
@@ -63,15 +70,15 @@ public class VertexTaggedGeometryDataMapper
 	{
 		for (Iterator i = geoms.iterator(); i.hasNext(); ) {
 			Geometry geom = (Geometry) i.next();
-			loadVertices(geom.getCoordinates(), geom.getUserData());
+			loadVertices(geom.getCoordinateArray(), geom.getUserData());
 		}
 	}
 	
 	public void loadSourceGeometries(Geometry geomColl)
 	{
 		for (int i = 0; i < geomColl.getNumGeometries(); i++) {
-			Geometry geom = geomColl.getGeometryN(i);
-			loadVertices(geom.getCoordinates(), geom.getUserData());
+			Geometry geom = geomColl.getGeometry(i);
+			loadVertices(geom.getCoordinateArray(), geom.getUserData());
 		}
 	}
 	
@@ -99,7 +106,7 @@ public class VertexTaggedGeometryDataMapper
 	public void transferData(Geometry targetGeom)
 	{
 		for (int i = 0; i < targetGeom.getNumGeometries(); i++) {
-			Geometry geom = targetGeom.getGeometryN(i);
+			Geometry geom = targetGeom.getGeometry(i);
 			Coordinate vertexKey = (Coordinate) geom.getUserData();
 			if (vertexKey == null) continue;
 			geom.setUserData(coordDataMap.get(vertexKey));

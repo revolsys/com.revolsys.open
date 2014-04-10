@@ -33,10 +33,17 @@
 
 package com.revolsys.jts.simplify;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.util.Debug;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryComponentFilter;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
  * Simplifies a geometry and ensures that
@@ -134,7 +141,7 @@ public class TopologyPreservingSimplifier
   class LineStringTransformer
       extends GeometryTransformer
   {
-    protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent)
+    protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
     {
       if (coords.size() == 0) return null;
     	// for linear components (including rings), simplify the linestring

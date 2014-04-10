@@ -31,7 +31,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -52,7 +52,7 @@ public class CoordinatesListUtil {
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates coordinate, final CoordinatesList line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList points = line;
     final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
       points, 0);
     final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
@@ -369,16 +369,6 @@ public class CoordinatesListUtil {
     return result;
   }
 
-  public static final CoordinatesList get(
-    final CoordinateSequence coordinateSequence) {
-    if (coordinateSequence instanceof CoordinatesList) {
-      return (CoordinatesList)coordinateSequence;
-    } else {
-      return new CoordinateSequenceCoordinateList(coordinateSequence);
-    }
-
-  }
-
   public static CoordinatesList get(final Geometry geometry) {
     if (geometry == null) {
       return null;
@@ -393,7 +383,7 @@ public class CoordinatesListUtil {
       final MultiPoint multiPoint = (MultiPoint)geometry;
       return get(multiPoint);
     } else if (geometry.getNumGeometries() > 0) {
-      return get(geometry.getGeometryN(0));
+      return get(geometry.getGeometry(0));
     } else {
       return null;
     }
@@ -403,8 +393,7 @@ public class CoordinatesListUtil {
     if (line == null) {
       return null;
     } else {
-      final CoordinateSequence coordinateSequence = line.getCoordinateSequence();
-      return get(coordinateSequence);
+      return line.getCoordinatesList();
     }
   }
 
@@ -418,13 +407,12 @@ public class CoordinatesListUtil {
     if (size == 0) {
       return new DoubleCoordinatesList(0, 3);
     } else {
-      final byte numAxis = CoordinatesUtil.get(points.get(0)).getNumAxis();
+      final byte numAxis = points.get(0).getNumAxis();
       final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
         size, numAxis);
       int i = 0;
       for (final Point point : points) {
-        final Coordinates coordinates = CoordinatesUtil.get(point);
-        coordinatesList.setPoint(i, coordinates);
+        coordinatesList.setPoint(i, point);
         i++;
       }
       return coordinatesList;
@@ -438,8 +426,8 @@ public class CoordinatesListUtil {
     final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
       numAxis);
     for (int i = 0; i < numPoints; i++) {
-      final Point point = (Point)multiPoint.getGeometryN(i);
-      final Coordinates coordinates = CoordinatesUtil.get(point);
+      final Point point = (Point)multiPoint.getGeometry(i);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
       points.setPoint(i, coordinates);
     }
     return points;
@@ -450,7 +438,7 @@ public class CoordinatesListUtil {
   }
 
   public static CoordinatesList get(final Point point) {
-    return get(point.getCoordinateSequence());
+    return point.getCoordinateSequence();
   }
 
   private static CoordinatesList get(final Polygon polygon) {
@@ -465,7 +453,7 @@ public class CoordinatesListUtil {
     final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
     if (geometry != null) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry subGeometry = geometry.getGeometryN(i);
+        final Geometry subGeometry = geometry.getGeometry(i);
         if (subGeometry instanceof Point) {
           pointsList.add(get((Point)subGeometry));
         } else if (subGeometry instanceof LineString) {
@@ -507,7 +495,7 @@ public class CoordinatesListUtil {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     if (geometry != null) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry part = geometry.getGeometryN(i);
+        final Geometry part = geometry.getGeometry(i);
         if (!part.isEmpty()) {
           final List<CoordinatesList> pointsList = getAll(part);
           if (part instanceof Polygon) {

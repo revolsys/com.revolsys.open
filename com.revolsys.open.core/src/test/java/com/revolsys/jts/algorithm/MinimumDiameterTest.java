@@ -64,7 +64,7 @@ public class MinimumDiameterTest extends TestCase {
   private void doMinimumDiameterTest(final boolean convex, final String wkt,
     final Coordinate c0, final Coordinate c1) throws ParseException {
     final Coordinate[] minimumDiameter = new MinimumDiameter(
-      new WKTReader().read(wkt), convex).getDiameter().getCoordinates();
+      new WKTReader().read(wkt), convex).getDiameter().getCoordinateArray();
     final double tolerance = 1E-10;
     assertEquals(c0.x, minimumDiameter[0].x, tolerance);
     assertEquals(c0.y, minimumDiameter[0].y, tolerance);

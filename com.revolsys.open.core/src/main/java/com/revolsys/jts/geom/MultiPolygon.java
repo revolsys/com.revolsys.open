@@ -112,7 +112,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
       final Polygon polygon = (Polygon)geometries[i];
       final Geometry rings = polygon.getBoundary();
       for (int j = 0; j < rings.getNumGeometries(); j++) {
-        allRings.add(rings.getGeometryN(j));
+        allRings.add(rings.getGeometry(j));
       }
     }
     final LineString[] allRingsArray = new LineString[allRings.size()];
@@ -169,7 +169,7 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
   @Override
   public Iterable<Vertex> vertices() {
     return new AbstractIterator<Vertex>() {
-      private Vertex vertex = new Vertex(MultiPolygon.this, 0);
+      private VertexImpl vertex = new VertexImpl(MultiPolygon.this, 0);
 
       private int vertexIndex = 0;
 

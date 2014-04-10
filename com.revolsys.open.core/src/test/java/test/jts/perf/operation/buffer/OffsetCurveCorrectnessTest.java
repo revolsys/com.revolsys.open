@@ -52,7 +52,7 @@ public class OffsetCurveCorrectnessTest {
     final double distance) {
     final OffsetCurveBuilder ocb = new OffsetCurveBuilder(g.getGeometryFactory()
       .getPrecisionModel(), new BufferParameters());
-    final Coordinate[] pts = g.getCoordinates();
+    final Coordinate[] pts = g.getCoordinateArray();
     Coordinate[] curvePts = null;
     if (g instanceof Polygonal) {
       curvePts = ocb.getRingCurve(pts, 1, distance);

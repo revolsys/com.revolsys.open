@@ -38,15 +38,33 @@ package com.revolsys.jts.operation.buffer;
  * @version 1.7
  */
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geomgraph.*;
-import com.revolsys.jts.operation.overlay.*;
-import com.revolsys.jts.noding.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import com.revolsys.jts.io.*;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeList;
+import com.revolsys.jts.geomgraph.Label;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.PlanarGraph;
+import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.jts.noding.IntersectionAdder;
+import com.revolsys.jts.noding.MCIndexNoder;
+import com.revolsys.jts.noding.Noder;
+import com.revolsys.jts.noding.SegmentString;
+import com.revolsys.jts.operation.overlay.OverlayNodeFactory;
+import com.revolsys.jts.operation.overlay.PolygonBuilder;
 
 
 /**

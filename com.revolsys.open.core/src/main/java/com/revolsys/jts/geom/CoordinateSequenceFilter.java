@@ -37,15 +37,15 @@ package com.revolsys.jts.geom;
 
 /**
  *  Interface for classes which provide operations that
- *  can be applied to the coordinates in a {@link CoordinateSequence}. 
- *  A CoordinateSequence filter can either record information about each coordinate or
- *  change the coordinate in some way. CoordinateSequence filters can be
+ *  can be applied to the coordinates in a {@link CoordinatesList}. 
+ *  A CoordinatesList filter can either record information about each coordinate or
+ *  change the coordinate in some way. CoordinatesList filters can be
  *  used to implement such things as coordinate transformations, centroid and
  *  envelope computation, and many other functions.
  *  For maximum efficiency, the execution of filters can be short-circuited.
  *  {@link Geometry} classes support the concept of applying a
  *  <code>CoordinateSequenceFilter</code> to each 
- *  {@link CoordinateSequence}s they contain. 
+ *  {@link CoordinatesList}s they contain. 
  *  <p>
  *  <code>CoordinateSequenceFilter</code> is
  *  an example of the Gang-of-Four Visitor pattern. 
@@ -57,12 +57,12 @@ package com.revolsys.jts.geom;
 public interface CoordinateSequenceFilter 
 {
   /**
-   * Performs an operation on a coordinate in a {@link CoordinateSequence}.
+   * Performs an operation on a coordinate in a {@link CoordinatesList}.
    *
-   *@param seq  the <code>CoordinateSequence</code> to which the filter is applied
+   *@param seq  the <code>CoordinatesList</code> to which the filter is applied
    *@param i the index of the coordinate to apply the filter to
    */
-  void filter(CoordinateSequence seq, int i);
+  void filter(CoordinatesList seq, int i);
   
   /**
    * Reports whether the application of this filter can be terminated.

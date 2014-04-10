@@ -20,12 +20,12 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -141,7 +141,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
   private void writeTrack(final DataObject object) throws IOException {
     out.startTag(GpxConstants.TRACK_ELEMENT);
     final LineString line = object.getGeometryValue();
-    final int srid = line.getSRID();
+    final int srid = line.getSrid();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
@@ -171,7 +171,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometryValue();
     final Coordinate coordinate = point.getCoordinate();
-    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(point.getSRID());
+    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(point.getSrid());
     final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
     final Coordinate geoCoordinate = CoordinateProjectionUtil.perform(
       inverseCoordinatesOperation, coordinate);

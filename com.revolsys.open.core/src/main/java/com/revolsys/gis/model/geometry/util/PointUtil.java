@@ -3,8 +3,8 @@ package com.revolsys.gis.model.geometry.util;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -24,7 +24,7 @@ public class PointUtil {
 
   public static Point getPointWithin(final Geometry geometry) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry part = geometry.getGeometryN(i);
+      final Geometry part = geometry.getGeometry(i);
       if (!part.isEmpty()) {
         if (part instanceof Point) {
           return (Point)part;
@@ -45,7 +45,7 @@ public class PointUtil {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(polygon);
     final Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
-      final Coordinates coordinates = CoordinatesUtil.get(centroid);
+      final Coordinates coordinates = CoordinatesUtil.getInstance(centroid);
       final CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
         coordinates.getX(), coordinates.getY());
       return factory.createPoint(coordinatesList);

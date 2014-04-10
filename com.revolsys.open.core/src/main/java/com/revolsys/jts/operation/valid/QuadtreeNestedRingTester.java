@@ -33,12 +33,16 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.index.quadtree.Quadtree;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.util.Assert;
 
 /**
  * Tests whether any of a set of {@link LinearRing}s are
@@ -75,13 +79,13 @@ public class QuadtreeNestedRingTester
 
     for (int i = 0; i < rings.size(); i++) {
       LinearRing innerRing = (LinearRing) rings.get(i);
-      Coordinate[] innerRingPts = innerRing.getCoordinates();
+      Coordinate[] innerRingPts = innerRing.getCoordinateArray();
 
       List results = quadtree.query(innerRing.getEnvelopeInternal());
 //System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         LinearRing searchRing = (LinearRing) results.get(j);
-        Coordinate[] searchRingPts = searchRing.getCoordinates();
+        Coordinate[] searchRingPts = searchRing.getCoordinateArray();
 
         if (innerRing == searchRing)
           continue;

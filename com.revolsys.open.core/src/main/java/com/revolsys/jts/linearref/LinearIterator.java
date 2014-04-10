@@ -33,7 +33,11 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Lineal;
+import com.revolsys.jts.geom.MultiLineString;
 
 /**
  * An iterator over the components and coordinates of a linear geometry
@@ -119,7 +123,7 @@ public class LinearIterator
       currentLine = null;
       return;
     }
-    currentLine = (LineString) linearGeom.getGeometryN(componentIndex);
+    currentLine = (LineString) linearGeom.getGeometry(componentIndex);
   }
 
   /**

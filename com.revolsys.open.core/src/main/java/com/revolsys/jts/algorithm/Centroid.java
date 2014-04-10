@@ -33,7 +33,12 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 /**
  * Computes the centroid of a {@link Geometry} of any dimension.
@@ -112,7 +117,7 @@ public class Centroid
       addPoint(geom.getCoordinate());
     }
     else if (geom instanceof LineString) {
-      addLineSegments(geom.getCoordinates());
+      addLineSegments(geom.getCoordinateArray());
     }
     else if (geom instanceof Polygon) {
       Polygon poly = (Polygon) geom;
@@ -121,7 +126,7 @@ public class Centroid
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        add(gc.getGeometryN(i));
+        add(gc.getGeometry(i));
       }
     }
   }
@@ -175,9 +180,9 @@ public class Centroid
   
   private void add(Polygon poly)
   {
-    addShell(poly.getExteriorRing().getCoordinates());
+    addShell(poly.getExteriorRing().getCoordinateArray());
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      addHole(poly.getInteriorRingN(i).getCoordinates());
+      addHole(poly.getInteriorRingN(i).getCoordinateArray());
     }
   }
 

@@ -33,10 +33,10 @@
 package com.revolsys.gis.model.geometry.algorithm;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Counts the number of segments crossed by a horizontal ray extending to the

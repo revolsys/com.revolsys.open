@@ -3,7 +3,7 @@ package com.revolsys.jts.edgegraph;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.CoordinateSequence;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.LineString;
@@ -67,7 +67,7 @@ public class EdgeGraphBuilder
   }
   
   private void add(LineString lineString) {
-    CoordinateSequence seq = lineString.getCoordinateSequence();
+    CoordinatesList seq = lineString.getCoordinatesList();
     for (int i = 1; i < seq.size(); i++) {
       graph.addEdge(seq.getCoordinate(i-1), seq.getCoordinate(i));
     }

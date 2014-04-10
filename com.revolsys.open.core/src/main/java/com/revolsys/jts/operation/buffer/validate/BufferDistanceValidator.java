@@ -32,12 +32,20 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.io.*;
-import com.revolsys.jts.geom.util.*;
-import com.revolsys.jts.operation.distance.*;
-import com.revolsys.jts.algorithm.distance.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.geom.util.PolygonExtracter;
+import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.operation.distance.DistanceOp;
 
 /**
  * Validates that a given buffer curve lies an appropriate distance

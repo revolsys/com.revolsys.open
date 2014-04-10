@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
@@ -21,6 +20,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
 import com.revolsys.gis.model.geometry.operation.overlay.MaximalEdgeRing;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayNodeFactory;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.util.Assert;
 

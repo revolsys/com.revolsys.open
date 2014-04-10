@@ -35,7 +35,9 @@
 package com.revolsys.jts.operation.relate;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geomgraph.*;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.NodeFactory;
+import com.revolsys.jts.geomgraph.NodeMap;
 
 /**
  * Used by the {@link NodeMap} in a {@link RelateNodeGraph} to create {@link RelateNode}s.

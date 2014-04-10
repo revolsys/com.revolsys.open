@@ -35,9 +35,14 @@ package com.revolsys.jts.awt;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 
 
 /**
@@ -197,9 +202,9 @@ public class ShapeWriter
 	{
 		PolygonShape poly = new PolygonShape();
 		
-		appendRing(poly, p.getExteriorRing().getCoordinates());
+		appendRing(poly, p.getExteriorRing().getCoordinateArray());
 		for (int j = 0; j < p.getNumInteriorRing(); j++) {
-		  appendRing(poly, p.getInteriorRingN(j).getCoordinates());
+		  appendRing(poly, p.getInteriorRingN(j).getCoordinateArray());
 		}
 
 		return poly;
@@ -249,7 +254,7 @@ public class ShapeWriter
 		GeometryCollectionShape shape = new GeometryCollectionShape();
 		// add components to GC shape
 		for (int i = 0; i < gc.getNumGeometries(); i++) {
-			Geometry g = (Geometry) gc.getGeometryN(i);
+			Geometry g = (Geometry) gc.getGeometry(i);
 			shape.add(toShape(g));
 		}
 		return shape;
@@ -260,7 +265,7 @@ public class ShapeWriter
 		GeneralPath path = new GeneralPath();
 
 		for (int i = 0; i < mls.getNumGeometries(); i++) {
-			LineString lineString = (LineString) mls.getGeometryN(i);
+			LineString lineString = (LineString) mls.getGeometry(i);
 			path.append(toShape(lineString), false);
 		}
 		return path;

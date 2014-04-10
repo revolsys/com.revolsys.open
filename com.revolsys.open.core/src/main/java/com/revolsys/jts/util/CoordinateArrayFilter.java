@@ -34,7 +34,9 @@
  */
 package com.revolsys.jts.util;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  *  A {@link CoordinateFilter} that creates an array containing every

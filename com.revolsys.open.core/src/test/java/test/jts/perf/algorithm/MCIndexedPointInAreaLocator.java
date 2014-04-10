@@ -74,7 +74,7 @@ class MCIndexedGeometry {
     final List lines = LinearComponentExtracter.getLines(geom);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
-      final Coordinate[] pts = line.getCoordinates();
+      final Coordinate[] pts = line.getCoordinateArray();
       addLine(pts);
     }
   }

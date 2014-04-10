@@ -100,7 +100,7 @@ public class MultiPointImplTest extends TestCase {
 
   public void testGetGeometryN() throws Exception {
     final MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
-    final Geometry g = m.getGeometryN(1);
+    final Geometry g = m.getGeometry(1);
     assertTrue(g instanceof Point);
     final Point p = (Point)g;
     final Coordinate externalCoordinate = new Coordinate();

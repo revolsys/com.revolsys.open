@@ -33,8 +33,7 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.operation.overlay.OverlayOp;
+import com.revolsys.jts.geom.Geometry;
 
 /**
   * Provides versions of Geometry spatial functions which use

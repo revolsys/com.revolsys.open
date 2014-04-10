@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 import com.revolsys.jts.geom.Coordinate;
 

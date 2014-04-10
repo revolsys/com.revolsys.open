@@ -5,11 +5,11 @@ import java.io.Writer;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -164,9 +164,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.startList();
     final int numGeometries = geometryCollection.getNumGeometries();
     if (numGeometries > 0) {
-      geometry(geometryCollection.getGeometryN(0));
+      geometry(geometryCollection.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final Geometry geometry = geometryCollection.getGeometryN(i);
+        final Geometry geometry = geometryCollection.getGeometry(i);
         out.endAttribute();
         geometry(geometry);
       }
@@ -202,9 +202,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.indent();
     final int numGeometries = multiLineString.getNumGeometries();
     if (numGeometries > 0) {
-      coordinates((LineString)multiLineString.getGeometryN(0));
+      coordinates((LineString)multiLineString.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final LineString lineString = (LineString)multiLineString.getGeometryN(i);
+        final LineString lineString = (LineString)multiLineString.getGeometry(i);
         out.endAttribute();
         out.indent();
         coordinates(lineString);
@@ -222,9 +222,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.indent();
     final int numGeometries = multiPoint.getNumGeometries();
     if (numGeometries > 0) {
-      coordinates((Point)multiPoint.getGeometryN(0));
+      coordinates((Point)multiPoint.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final Point point = (Point)multiPoint.getGeometryN(i);
+        final Point point = (Point)multiPoint.getGeometry(i);
         out.endAttribute();
         out.indent();
         coordinates(point);
@@ -246,9 +246,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.indent();
     final int numGeometries = multiPolygon.getNumGeometries();
     if (numGeometries > 0) {
-      coordinates((Polygon)multiPolygon.getGeometryN(0));
+      coordinates((Polygon)multiPolygon.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+        final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
         out.endAttribute();
         out.indent();
         coordinates(polygon);

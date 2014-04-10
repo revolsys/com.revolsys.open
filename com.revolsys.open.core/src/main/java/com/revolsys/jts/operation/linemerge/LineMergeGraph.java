@@ -61,7 +61,7 @@ public class LineMergeGraph extends PlanarGraph
   public void addEdge(LineString lineString) {
     if (lineString.isEmpty()) { return; }
     
-    Coordinate[] coordinates = CoordinateArrays.removeRepeatedPoints(lineString.getCoordinates());
+    Coordinate[] coordinates = CoordinateArrays.removeRepeatedPoints(lineString.getCoordinateArray());
     
     // don't add lines with all coordinates equal
     if (coordinates.length <= 1) return;

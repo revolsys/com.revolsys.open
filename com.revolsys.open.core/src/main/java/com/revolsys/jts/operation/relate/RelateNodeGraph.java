@@ -36,10 +36,16 @@ package com.revolsys.jts.operation.relate;
 /**
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geomgraph.Edge;
+import com.revolsys.jts.geomgraph.EdgeEnd;
+import com.revolsys.jts.geomgraph.EdgeIntersection;
+import com.revolsys.jts.geomgraph.GeometryGraph;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.NodeMap;
 
 /**
  * Implements the simple graph of Nodes and EdgeEnd which is all that is

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,11 +32,9 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
-import com.revolsys.jts.algorithm.LineIntersector;
+import java.util.Arrays;
+
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.impl.CoordinateArraySequence;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Represents a list of contiguous line segments,
@@ -51,10 +48,9 @@ import com.revolsys.jts.io.WKTWriter;
  *
  * @version 1.7
  */
-public class BasicSegmentString
-	implements SegmentString 
-{
-  private Coordinate[] pts;
+public class BasicSegmentString implements SegmentString {
+  private final Coordinate[] pts;
+
   private Object data;
 
   /**
@@ -63,10 +59,19 @@ public class BasicSegmentString
    * @param pts the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(Coordinate[] pts, Object data)
-  {
+  public BasicSegmentString(final Coordinate[] pts, final Object data) {
     this.pts = pts;
     this.data = data;
+  }
+
+  @Override
+  public Coordinate getCoordinate(final int i) {
+    return pts[i];
+  }
+
+  @Override
+  public Coordinate[] getCoordinates() {
+    return pts;
   }
 
   /**
@@ -74,22 +79,9 @@ public class BasicSegmentString
    *
    * @return the user-defined data
    */
-  public Object getData() { return data; }
-
-  /**
-   * Sets the user-defined data for this segment string.
-   *
-   * @param data an Object containing user-defined data
-   */
-  public void setData(Object data) { this.data = data; }
-
-  public int size() { return pts.length; }
-  public Coordinate getCoordinate(int i) { return pts[i]; }
-  public Coordinate[] getCoordinates() { return pts; }
-
-  public boolean isClosed()
-  {
-    return pts[0].equals(pts[pts.length - 1]);
+  @Override
+  public Object getData() {
+    return data;
   }
 
   /**
@@ -99,14 +91,35 @@ public class BasicSegmentString
    * the last index in the vertex list
    * @return the octant of the segment at the vertex
    */
-  public int getSegmentOctant(int index)
-  {
-    if (index == pts.length - 1) return -1;
+  public int getSegmentOctant(final int index) {
+    if (index == pts.length - 1) {
+      return -1;
+    }
     return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
   }
 
-  public String toString()
-  {
-    return WKTWriter.toLineString(new CoordinateArraySequence(pts));
+  @Override
+  public boolean isClosed() {
+    return pts[0].equals(pts[pts.length - 1]);
+  }
+
+  /**
+   * Sets the user-defined data for this segment string.
+   *
+   * @param data an Object containing user-defined data
+   */
+  @Override
+  public void setData(final Object data) {
+    this.data = data;
+  }
+
+  @Override
+  public int size() {
+    return pts.length;
+  }
+
+  @Override
+  public String toString() {
+    return Arrays.toString(pts);
   }
 }

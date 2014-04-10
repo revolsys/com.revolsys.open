@@ -35,9 +35,10 @@ package com.revolsys.jts.geom.prep;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.algorithm.locate.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
 
 /**

@@ -62,7 +62,7 @@ public class TriangleTest extends TestCase {
   public void checkAcute(final String wkt, final boolean expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final boolean isAcute = t.isAcute();
@@ -73,7 +73,7 @@ public class TriangleTest extends TestCase {
   public void checkArea(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double signedArea = t.signedArea();
@@ -88,7 +88,7 @@ public class TriangleTest extends TestCase {
   public void checkArea3D(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
@@ -98,7 +98,7 @@ public class TriangleTest extends TestCase {
   public void checkCentroid(final String wkt, final Coordinate expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     Coordinate centroid = Triangle.centroid(pt[0], pt[1], pt[2]);
     System.out.println("(Static) centroid = " + centroid);
@@ -115,7 +115,7 @@ public class TriangleTest extends TestCase {
   public void checkCircumCentre(final String wkt, final Coordinate expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     Coordinate circumcentre = Triangle.circumcentre(pt[0], pt[1], pt[2]);
     System.out.println("(Static) circumcentre = " + circumcentre);
@@ -132,7 +132,7 @@ public class TriangleTest extends TestCase {
   public void checkInterpolateZ(final String wkt, final Coordinate p,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double z = t.interpolateZ(p);
@@ -143,7 +143,7 @@ public class TriangleTest extends TestCase {
   public void checkLongestSideLength(final String wkt,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinate[] pt = g.getCoordinates();
+    final Coordinate[] pt = g.getCoordinateArray();
 
     double length = Triangle.longestSideLength(pt[0], pt[1], pt[2]);
     System.out.println("(Static) longestSideLength = " + length);

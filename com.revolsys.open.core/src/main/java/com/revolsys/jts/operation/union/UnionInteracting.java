@@ -36,7 +36,8 @@ package com.revolsys.jts.operation.union;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.GeometryCombiner;
 
 /**
@@ -118,7 +119,7 @@ public class UnionInteracting
 	private void computeInteracting()
 	{
 		for (int i = 0; i < g0.getNumGeometries(); i++) {
-			Geometry elem = g0.getGeometryN(i);
+			Geometry elem = g0.getGeometry(i);
 			interacts0[i] = computeInteracting(elem);
 		}
 	}
@@ -127,7 +128,7 @@ public class UnionInteracting
 	{
 		boolean interactsWithAny = false;
 		for (int i = 0; i < g1.getNumGeometries(); i++) {
-			Geometry elem1 = g1.getGeometryN(i);
+			Geometry elem1 = g1.getGeometry(i);
 			boolean interacts = elem1.getEnvelopeInternal().intersects(elem0.getEnvelopeInternal());
 			if (interacts) interacts1[i] = true;
 			if (interacts) 
@@ -141,7 +142,7 @@ public class UnionInteracting
   {
   	List extractedGeoms = new ArrayList();
   	for (int i = 0; i < geom.getNumGeometries(); i++) { 
-  		Geometry elem = geom.getGeometryN(i);
+  		Geometry elem = geom.getGeometry(i);
   		if (interacts[i] == isInteracting)
   			extractedGeoms.add(elem);
   	}

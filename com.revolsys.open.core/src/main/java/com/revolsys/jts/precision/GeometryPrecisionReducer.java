@@ -33,8 +33,11 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.util.GeometryEditor;
 
 /**
  * Reduces the precision of a {@link Geometry}

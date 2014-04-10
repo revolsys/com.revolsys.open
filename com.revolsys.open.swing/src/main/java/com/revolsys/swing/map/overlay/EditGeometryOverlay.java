@@ -29,7 +29,6 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
@@ -37,9 +36,20 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.prep.PreparedGeometry;
+import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -51,16 +61,6 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.MultiPolygon;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class EditGeometryOverlay extends AbstractOverlay implements
   PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -361,7 +361,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final Coordinates c0, final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final Coordinates c1 = CoordinatesUtil.get(p1);
+    final Coordinates c1 = CoordinatesUtil.getInstance(p1);
     final LineSegment line = new LineSegment(geometryFactory, c0, c1).convert(viewportGeometryFactory);
     final double length = line.getLength();
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
@@ -392,7 +392,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   public Point getClosestPoint(final GeometryFactory geometryFactory,
     final LineSegment closestSegment, final Point point,
     final double maxDistance) {
-    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     final LineSegment segment = closestSegment.convert(geometryFactory);
     final Point fromPoint = segment.getPoint(0);
     final Point toPoint = segment.getPoint(1);
@@ -431,7 +431,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return getGraphics();
   }
 
-  protected Point getPoint(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  protected Point getPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final MouseEvent event) {
     final Viewport2D viewport = getViewport();
     final java.awt.Point eventPoint = event.getPoint();
@@ -677,7 +678,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           } else {
             final Coordinates previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
-            if (!CoordinatesUtil.get(point).equals(previousPoint)) {
+            if (!CoordinatesUtil.getInstance(point).equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
               setAddGeometry(newGeometry);
             }
@@ -1109,7 +1110,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           }
           final int[] vertexIndex = location.getVertexIndex();
           Geometry newGeometry;
-          final Coordinates newPoint = CoordinatesUtil.get(point);
+          final Coordinates newPoint = CoordinatesUtil.getInstance(point);
           if (vertexIndex == null) {
             final int[] segmentIndex = location.getSegment().getIndex();
             final int[] newIndex = segmentIndex.clone();

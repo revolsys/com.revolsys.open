@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.algorithm.index.quadtree.linesegment.LineSegmentQuadTree;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.strtree.STRtree;

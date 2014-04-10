@@ -36,11 +36,18 @@
 package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.algorithm.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.util.Assert;
 
 /**
  * A EdgeEndStar is an ordered list of EdgeEnds around a node.

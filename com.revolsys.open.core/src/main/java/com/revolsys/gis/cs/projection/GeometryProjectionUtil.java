@@ -12,7 +12,7 @@ public class GeometryProjectionUtil {
       final com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
       return factory.getCoordinateSystem();
     } else {
-      return EpsgCoordinateSystems.getCoordinateSystem(geometry.getSRID());
+      return EpsgCoordinateSystems.getCoordinateSystem(geometry.getSrid());
     }
   }
 
@@ -59,7 +59,7 @@ public class GeometryProjectionUtil {
 
   public static <T extends Geometry> T perform(final T geometry,
     final CoordinateSystem coordinateSystem) {
-    final int geometrySrid = geometry.getSRID();
+    final int geometrySrid = geometry.getSrid();
     if (geometrySrid == 0) {
       return geometry;
     } else {
@@ -96,7 +96,7 @@ public class GeometryProjectionUtil {
       return null;
     } else {
       final int factorySrid = geometryFactory.getSrid();
-      final int geometrySrid = geometry.getSRID();
+      final int geometrySrid = geometry.getSrid();
       if (geometrySrid == factorySrid) {
         return geometry;
       } else if (geometrySrid == 0) {
@@ -111,7 +111,7 @@ public class GeometryProjectionUtil {
   }
 
   public static <T extends Geometry> T perform(final T geometry, final int srid) {
-    final int geometrySrid = geometry.getSRID();
+    final int geometrySrid = geometry.getSrid();
     if (geometrySrid == 0) {
       return geometry;
     } else {
@@ -134,7 +134,7 @@ public class GeometryProjectionUtil {
     if (geometry == null) {
       return null;
     } else {
-      final int geometrySrid = geometry.getSRID();
+      final int geometrySrid = geometry.getSrid();
       if (geometrySrid == 0) {
         return geometry;
       } else {

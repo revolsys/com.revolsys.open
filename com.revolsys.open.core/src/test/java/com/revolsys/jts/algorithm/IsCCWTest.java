@@ -58,7 +58,7 @@ public class IsCCWTest extends TestCase {
 
   private Coordinate[] getCoordinates(final String wkt) throws ParseException {
     final Geometry geom = this.reader.read(wkt);
-    return geom.getCoordinates();
+    return geom.getCoordinateArray();
   }
 
   public void testCCW() throws Exception {

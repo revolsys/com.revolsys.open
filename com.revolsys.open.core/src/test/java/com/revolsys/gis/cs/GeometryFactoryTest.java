@@ -4,7 +4,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -55,7 +55,7 @@ public class GeometryFactoryTest {
     final CoordinatesList... pointsList) {
     if (geometry instanceof GeometryCollection) {
       if (geometry.getNumGeometries() == 1) {
-        final Geometry part = geometry.getGeometryN(0);
+        final Geometry part = geometry.getGeometry(0);
         final Class<? extends Geometry> geometryClass = geometry.getClass();
 
         final Geometry copy2 = GEOMETRY_FACTORY.createGeometry(geometryClass,
@@ -66,7 +66,7 @@ public class GeometryFactoryTest {
       }
     } else if (!(geometry instanceof LinearRing)) {
       final GeometryCollection collection = GEOMETRY_FACTORY.createCollection(geometry);
-      final Geometry copy = collection.getGeometryN(0);
+      final Geometry copy = collection.getGeometry(0);
       final Class<? extends Geometry> geometryClass = geometry.getClass();
       Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
       Assert.assertEquals("Geometry", geometry, copy);

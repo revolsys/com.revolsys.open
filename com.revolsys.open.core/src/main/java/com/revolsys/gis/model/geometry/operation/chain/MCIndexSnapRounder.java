@@ -6,13 +6,13 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.HotPixel;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.IntersectionFinderAdder;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.MCIndexPointSnapper;
 import com.revolsys.gis.model.geometry.operation.noding.snapround.NodingValidator;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Uses Snap Rounding to compute a rounded,

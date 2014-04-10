@@ -38,6 +38,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.jts.io.WKTWriter;
+
 /**
  * Specifies the precision model of the {@link Coordinate}s in a {@link Geometry}.
  * In other words, specifies the grid of allowable

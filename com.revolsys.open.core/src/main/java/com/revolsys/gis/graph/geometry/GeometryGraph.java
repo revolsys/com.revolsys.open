@@ -18,11 +18,11 @@ import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -91,7 +91,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     geometries.add(geometry);
     for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
       properties.put("partIndex", partIndex);
-      final Geometry part = geometry.getGeometryN(partIndex);
+      final Geometry part = geometry.getGeometry(partIndex);
       if (part instanceof Point) {
         final Point point = (Point)part;
         points.add(point);

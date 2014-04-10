@@ -33,7 +33,7 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Base class for {@link Noder}s which make a single

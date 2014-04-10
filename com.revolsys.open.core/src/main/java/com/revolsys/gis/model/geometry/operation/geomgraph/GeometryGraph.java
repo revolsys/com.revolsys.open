@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
@@ -28,6 +27,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SegmentIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SimpleMCSweepLineIntersector;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.util.Assert;
 

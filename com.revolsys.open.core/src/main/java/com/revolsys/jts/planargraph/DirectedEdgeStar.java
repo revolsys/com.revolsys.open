@@ -35,7 +35,11 @@
 
 package com.revolsys.jts.planargraph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import com.revolsys.jts.geom.Coordinate;
 
 /**

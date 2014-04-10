@@ -38,8 +38,7 @@ package com.revolsys.jts.geomgraph.index;
 /**
  * @version 1.7
  */
-import java.util.*;
-import com.revolsys.jts.geomgraph.*;
+import java.util.List;
 
 /**
  * An EdgeSetIntersector computes all the intersections between the

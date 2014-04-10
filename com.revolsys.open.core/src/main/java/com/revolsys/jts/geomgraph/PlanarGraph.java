@@ -36,10 +36,14 @@ package com.revolsys.jts.geomgraph;
  * @version 1.7
  */
 import java.io.PrintStream;
-import java.util.*;
-import com.revolsys.jts.util.*;
-import com.revolsys.jts.algorithm.*;
-import com.revolsys.jts.geom.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Location;
 
 /**
  * The computation of the <code>IntersectionMatrix</code> relies on the use of a structure

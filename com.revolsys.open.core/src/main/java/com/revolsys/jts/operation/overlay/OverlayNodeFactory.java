@@ -38,7 +38,10 @@ package com.revolsys.jts.operation.overlay;
  * @version 1.7
  */
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geomgraph.*;
+import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.Node;
+import com.revolsys.jts.geomgraph.NodeFactory;
+import com.revolsys.jts.geomgraph.PlanarGraph;
 
 /**
  * Creates nodes for use in the {@link PlanarGraph}s constructed during
