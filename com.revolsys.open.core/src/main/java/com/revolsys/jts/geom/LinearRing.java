@@ -47,78 +47,16 @@ package com.revolsys.jts.geom;
  *
  * @version 1.7
  */
-public class LinearRing extends LineString {
+public interface LinearRing extends LineString {
   /**
    * The minimum number of vertices allowed in a valid non-empty ring (= 4).
    * Empty rings with 0 vertices are also valid.
    */
-  public static final int MINIMUM_VALID_SIZE = 4;
-
-  private static final long serialVersionUID = -4261142084085851829L;
-
-  /**
-   * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link CoordinatesList}.
-   *
-   *@param  points  a sequence points forming a closed and simple linestring, or
-   *      <code>null</code> to create the empty geometry.
-   *      
-   * @throws IllegalArgumentException if the ring is not closed, or has too few points
-   *
-   */
-  public LinearRing(final CoordinatesList points, final GeometryFactory factory) {
-    super(points, factory);
-    if (isClosed()) {
-      final int vertexCount = getVertexCount();
-      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount
-            + " - must be 0 or >= 4)");
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Points of LinearRing do not form a closed linestring");
-    }
-  }
-
-  /**
-   * Returns <code>Dimension.FALSE</code>, since by definition LinearRings do
-   * not have a boundary.
-   *
-   * @return Dimension.FALSE
-   */
-  @Override
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
-  }
+  int MINIMUM_VALID_SIZE = 4;
 
   @Override
-  public String getGeometryType() {
-    return "LinearRing";
-  }
-
-  /**
-   * Tests whether this ring is closed.
-   * Empty rings are closed by definition.
-   * 
-   * @return true if this ring is closed
-   */
-  @Override
-  public boolean isClosed() {
-    if (isEmpty()) {
-      // empty LinearRings are closed by definition
-      return true;
-    } else {
-      return super.isClosed();
-    }
-  }
+  public LinearRing clone();
 
   @Override
-  public LinearRing reverse() {
-    final CoordinatesList points = getCoordinatesList();
-    final CoordinatesList reversePoints = points.reverse();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LinearRing reverseLine = geometryFactory.createLinearRing(reversePoints);
-    return reverseLine;
-  }
+  public LinearRing reverse();
 }

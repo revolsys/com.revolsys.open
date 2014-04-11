@@ -75,7 +75,7 @@ public class ConformingDelaunayTriangulationBuilder {
     final List constraintSegs) {
     Coordinates previousPoint = line.getVertex(0);
     final Coordinates[] coords = line.getCoordinateArray();
-    for (final com.revolsys.jts.geom.Vertex vertex : line.vertices()) {
+    for (final com.revolsys.jts.geom.vertex.Vertex vertex : line.vertices()) {
       final Coordinates point = vertex.cloneCoordinates();
       constraintSegs.add(new Segment(previousPoint, point));
       previousPoint = point;

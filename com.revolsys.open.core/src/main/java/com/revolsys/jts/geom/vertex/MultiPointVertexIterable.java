@@ -1,8 +1,9 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.vertex;
 
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.jts.geom.MultiPoint;
 
 public class MultiPointVertexIterable extends AbstractIterator<Vertex> {
   private int partIndex = 0;

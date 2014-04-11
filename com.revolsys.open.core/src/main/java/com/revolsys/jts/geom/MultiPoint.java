@@ -32,8 +32,6 @@
  */
 package com.revolsys.jts.geom;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,131 +41,17 @@ import java.util.List;
  *
  *@version 1.7
  */
-public class MultiPoint extends GeometryCollection implements Puntal {
+public interface MultiPoint extends GeometryCollection, Puntal {
 
-  private static final long serialVersionUID = -8048474874175355449L;
+  double getCoordinate(final int partIndex, final int vertexIndex);
 
-  /**
-   *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
-   *      , or <code>null</code> or an empty array to create the empty geometry.
-   *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
-   */
-  public MultiPoint(final Point[] points, final GeometryFactory factory) {
-    super(points, factory);
-  }
-
-  /**
-  *  Constructs a <code>MultiPoint</code>.
-  *
-  *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
-  *      , or <code>null</code> or an empty array to create the empty geometry.
-  *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
-  *@param  precisionModel  the specification of the grid of allowable points
-  *      for this <code>MultiPoint</code>
-  *@param  SRID            the ID of the Spatial Reference System used by this
-  *      <code>MultiPoint</code>
-  * @deprecated Use GeometryFactory instead
-  */
-  @Deprecated
-  public MultiPoint(final Point[] points, final PrecisionModel precisionModel,
-    final int SRID) {
-    super(points, new GeometryFactory(precisionModel, SRID));
-  }
-
-  @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
-  }
-
-  /**
-   * Gets the boundary of this geometry.
-   * Zero-dimensional geometries have no boundary by definition,
-   * so an empty GeometryCollection is returned.
-   *
-   * @return an empty GeometryCollection
-   * @see Geometry#getBoundary
-   */
-  @Override
-  public Geometry getBoundary() {
-    return getGeometryFactory().createGeometryCollection();
-  }
-
-  @Override
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
-  }
-
-  /**
-   *  Returns the <code>Coordinate</code> at the given position.
-   *
-   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
-   *      at 0
-   *@return    the <code>n</code>th <code>Coordinate</code>
-   */
-  protected Coordinates getCoordinate(final int n) {
-    return ((Point)this.geometries[n]).getCoordinate();
-  }
-
-  public double getCoordinate(final int partIndex, final int vertexIndex) {
-    final Point point = getPoint(partIndex);
-    return point.getCoordinate(vertexIndex);
-  }
-
-  @Override
-  public int getDimension() {
-    return 0;
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "MultiPoint";
-  }
-
-  public Point getPoint(final int partIndex) {
-    return (Point)getGeometry(partIndex);
-  }
+  Point getPoint(final int partIndex);
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Point> List<V> getPoints() {
-    return (List)super.getGeometries();
-  }
+  <V extends Point> List<V> getPoints();
 
   @Override
-  public boolean isValid() {
-    return true;
-  }
-
-  @Override
-  public MultiPoint normalize() {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final List<Point> geometries = new ArrayList<>();
-      for (final Geometry part : this.geometries) {
-        final Point normalizedPart = (Point)part.normalize();
-        geometries.add(normalizedPart);
-      }
-      Collections.sort(geometries);
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPoint normalizedGeometry = geometryFactory.createMultiPoint(geometries);
-      return normalizedGeometry;
-    }
-  }
-
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  @Override
-  public Iterable<Vertex> vertices() {
-    return new MultiPointVertexIterable(this);
-  }
-
+  MultiPoint normalize();
 }

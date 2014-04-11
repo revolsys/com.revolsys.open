@@ -63,6 +63,14 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.jts.geom.impl.GeometryCollectionImpl;
+import com.revolsys.jts.geom.impl.LineStringImpl;
+import com.revolsys.jts.geom.impl.LinearRingImpl;
+import com.revolsys.jts.geom.impl.MultiLineStringImpl;
+import com.revolsys.jts.geom.impl.MultiPointImpl;
+import com.revolsys.jts.geom.impl.MultiPolygonImpl;
+import com.revolsys.jts.geom.impl.PointImpl;
+import com.revolsys.jts.geom.impl.PolygonImpl;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.util.CollectionUtil;
@@ -676,8 +684,8 @@ public class GeometryFactory implements Serializable,
     return createPoint((Coordinates)null);
   }
 
-  protected GeometryCollection createEmptyGeometryCollection() {
-    return new GeometryCollection(null, this);
+  public GeometryCollection createEmptyGeometryCollection() {
+    return new GeometryCollectionImpl(null, this);
   }
 
   /**
@@ -879,7 +887,7 @@ public class GeometryFactory implements Serializable,
    */
   public GeometryCollection createGeometryCollection(
     final Geometry... geometries) {
-    return new GeometryCollection(geometries, this);
+    return new GeometryCollectionImpl(geometries, this);
   }
 
   public LinearRing createLinearRing(final Collection<?> points) {
@@ -912,7 +920,7 @@ public class GeometryFactory implements Serializable,
    */
   public LinearRing createLinearRing(final CoordinatesList points) {
     final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return new LinearRing(coordinatesList, this);
+    return new LinearRingImpl(coordinatesList, this);
   }
 
   public LinearRing createLinearRing(final double... coordinates) {
@@ -956,7 +964,7 @@ public class GeometryFactory implements Serializable,
    */
   public LineString createLineString(final CoordinatesList points) {
     final CoordinatesList newPoints = createCoordinatesList(points);
-    final LineString line = new LineString(newPoints, this);
+    final LineString line = new LineStringImpl(newPoints, this);
     return line;
   }
 
@@ -986,7 +994,7 @@ public class GeometryFactory implements Serializable,
    * @return the created MultiLineString
    */
   public MultiLineString createMultiLineString(final LineString[] lineStrings) {
-    return new MultiLineString(lineStrings, this);
+    return new MultiLineStringImpl(lineStrings, this);
   }
 
   public MultiLineString createMultiLineString(final Object... lines) {
@@ -1045,7 +1053,7 @@ public class GeometryFactory implements Serializable,
    * @return a MultiPoint object
    */
   public MultiPoint createMultiPoint(final Point[] point) {
-    return new MultiPoint(point, this);
+    return new MultiPointImpl(point, this);
   }
 
   public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
@@ -1069,11 +1077,11 @@ public class GeometryFactory implements Serializable,
    * @return the created MultiPolygon
    */
   public MultiPolygon createMultiPolygon(final Polygon[] polygons) {
-    return new MultiPolygon(polygons, this);
+    return new MultiPolygonImpl(polygons, this);
   }
 
   public Point createPoint() {
-    return new Point(this);
+    return new PointImpl(this);
   }
 
   public Point createPoint(final Coordinates point) {
@@ -1117,7 +1125,7 @@ public class GeometryFactory implements Serializable,
     if (coordinates == null || coordinates.length < 2) {
       return createPoint();
     } else {
-      return new Point(this, coordinates);
+      return new PointImpl(this, coordinates);
     }
   }
 
@@ -1220,7 +1228,7 @@ public class GeometryFactory implements Serializable,
    * @throws IllegalArgumentException if a ring is invalid
    */
   public Polygon createPolygon(final LinearRing shell, final LinearRing[] holes) {
-    return new Polygon(shell, holes, this);
+    return new PolygonImpl(shell, holes, this);
   }
 
   public Polygon createPolygon(final List<?> rings) {
@@ -1245,11 +1253,11 @@ public class GeometryFactory implements Serializable,
 
   public Polygon createPolygon(final Polygon polygon) {
     final List<LinearRing> rings = new ArrayList<LinearRing>();
-    final LinearRing exteriorRing = (LinearRing)polygon.getExteriorRing();
+    final LinearRing exteriorRing = polygon.getExteriorRing();
     final LinearRing newExteriorRing = createLinearRing(exteriorRing);
     rings.add(newExteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LinearRing interiorRing = (LinearRing)polygon.getInteriorRingN(i);
+      final LinearRing interiorRing = polygon.getInteriorRingN(i);
       final LinearRing newInteriorRing = createLinearRing(interiorRing);
       rings.add(newInteriorRing);
 

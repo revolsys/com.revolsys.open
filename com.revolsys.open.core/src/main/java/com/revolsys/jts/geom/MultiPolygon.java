@@ -32,12 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-
-import com.revolsys.collection.AbstractIterator;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -51,118 +46,11 @@ import com.revolsys.collection.AbstractIterator;
  *
  *@version 1.7
  */
-public class MultiPolygon extends GeometryCollection implements Polygonal {
-  private static final long serialVersionUID = -551033529766975875L;
-
-  /**
-   * @param polygons
-   *            the <code>Polygon</code>s for this <code>MultiPolygon</code>,
-   *            or <code>null</code> or an empty array to create the empty
-   *            geometry. Elements may be empty <code>Polygon</code>s, but
-   *            not <code>null</code>s. The polygons must conform to the
-   *            assertions specified in the <A
-   *            HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple
-   *            Features Specification for SQL</A>.
-   */
-  public MultiPolygon(final Polygon[] polygons, final GeometryFactory factory) {
-    super(polygons, factory);
-  }
-
-  /**
-   *  Constructs a <code>MultiPolygon</code>.
-   *
-   *@param  polygons        the <code>Polygon</code>s for this <code>MultiPolygon</code>
-   *      , or <code>null</code> or an empty array to create the empty geometry.
-   *      Elements may be empty <code>Polygon</code>s, but not <code>null</code>
-   *      s. The polygons must conform to the assertions specified in the <A
-   *      HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
-   *      Specification for SQL</A> .
-   *@param  precisionModel  the specification of the grid of allowable points
-   *      for this <code>MultiPolygon</code>
-   *@param  SRID            the ID of the Spatial Reference System used by this
-   *      <code>MultiPolygon</code>
-   * @deprecated Use GeometryFactory instead
-   */
-  @Deprecated
-  public MultiPolygon(final Polygon[] polygons,
-    final PrecisionModel precisionModel, final int SRID) {
-    this(polygons, new GeometryFactory(precisionModel, SRID));
-  }
+public interface MultiPolygon extends GeometryCollection, Polygonal {
+  public <V extends Polygon> List<V> getPolygons();
 
   @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
-  }
-
-  /**
-   * Computes the boundary of this geometry
-   *
-   * @return a lineal geometry (which may be empty)
-   * @see Geometry#getBoundary
-   */
-  @Override
-  public Geometry getBoundary() {
-    if (isEmpty()) {
-      return getGeometryFactory().createMultiLineString();
-    }
-    final ArrayList allRings = new ArrayList();
-    for (int i = 0; i < geometries.length; i++) {
-      final Polygon polygon = (Polygon)geometries[i];
-      final Geometry rings = polygon.getBoundary();
-      for (int j = 0; j < rings.getNumGeometries(); j++) {
-        allRings.add(rings.getGeometry(j));
-      }
-    }
-    final LineString[] allRingsArray = new LineString[allRings.size()];
-    return getGeometryFactory().createMultiLineString(
-      (LineString[])allRings.toArray(allRingsArray));
-  }
-
-  @Override
-  public int getBoundaryDimension() {
-    return 1;
-  }
-
-  @Override
-  public int getDimension() {
-    return 2;
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "MultiPolygon";
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Polygon> List<V> getPolygons() {
-    return (List)super.getGeometries();
-  }
-
-  /*
-   * public boolean isSimple() { return true; }
-   */
-
-  @Override
-  public MultiPolygon normalize() {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final List<Polygon> geometries = new ArrayList<>();
-      for (final Geometry part : this.geometries) {
-        final Polygon normalizedPart = (Polygon)part.normalize();
-        geometries.add(normalizedPart);
-      }
-      Collections.sort(geometries);
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPolygon normalizedGeometry = geometryFactory.createMultiPolygon(geometries);
-      return normalizedGeometry;
-    }
-  }
+  MultiPolygon normalize();
 
   /**
    * Creates a {@link MultiPolygon} with
@@ -172,56 +60,5 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
    * @return a MultiPolygon in the reverse order
    */
   @Override
-  public Geometry reverse() {
-    final int n = geometries.length;
-    final Polygon[] revGeoms = new Polygon[n];
-    for (int i = 0; i < geometries.length; i++) {
-      revGeoms[i] = (Polygon)geometries[i].reverse();
-    }
-    return getGeometryFactory().createMultiPolygon(revGeoms);
-  }
-
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  @Override
-  public Iterable<Vertex> vertices() {
-    return new AbstractIterator<Vertex>() {
-      private VertexImpl vertex = new VertexImpl(MultiPolygon.this, 0);
-
-      private int vertexIndex = 0;
-
-      private int ringIndex = 0;
-
-      private int partIndex = 0;
-
-      private Polygon polygon = getPolygons().get(0);
-
-      private LineString ring = polygon.getExteriorRing();
-
-      @Override
-      protected Vertex getNext() throws NoSuchElementException {
-        while (vertexIndex >= ring.getNumPoints()) {
-          vertexIndex = 0;
-          ringIndex++;
-          if (ringIndex < 1 + polygon.getNumInteriorRing()) {
-            ring = polygon.getInteriorRingN(ringIndex - 1);
-          } else {
-            partIndex++;
-            if (partIndex < getNumGeometries()) {
-              polygon = getPolygons().get(partIndex);
-              ring = polygon.getExteriorRing();
-            } else {
-              vertex = null;
-              throw new NoSuchElementException();
-            }
-          }
-        }
-
-        vertex.setVertexId(ringIndex, vertexIndex);
-        vertexIndex++;
-        return vertex;
-      }
-    };
-  }
+  MultiPolygon reverse();
 }

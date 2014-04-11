@@ -33,28 +33,69 @@ public abstract class AbstractCoordinates implements Coordinates {
     return clone();
   }
 
+  /**
+   *  Compares this {@link Coordinates} with the specified {@link Coordinates} for order.
+   *  This method ignores the z value when making the comparison.
+   *  Returns:
+   *  <UL>
+   *    <LI> -1 : this.x < other.x || ((this.x == other.x) && (this.y <
+   *    other.y))
+   *    <LI> 0 : this.x == other.x && this.y = other.y
+   *    <LI> 1 : this.x > other.x || ((this.x == other.x) && (this.y > other.y))
+   *
+   *  </UL>
+   *  Note: This method assumes that ordinate values
+   * are valid numbers.  NaN values are not handled correctly.
+   *
+   *@param  o  the <code>Coordinate</code> with which this <code>Coordinate</code>
+   *      is being compared
+   *@return    -1, zero, or 1 as this <code>Coordinate</code>
+   *      is less than, equal to, or greater than the specified <code>Coordinate</code>
+   */
   @Override
-  public int compareTo(final Object other) {
-    if (other instanceof Coordinates) {
-      final Coordinates coordinates = (Coordinates)other;
-      final double x = getX();
-      final double y = getY();
-      final double distance = MathUtil.distance(0, 0, x, y);
+  public int compareTo(final Object o) {
+    final Coordinates point = (Coordinates)o;
 
-      final double otherX = coordinates.getX();
-      final double otherY = coordinates.getY();
-      final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
-      final int distanceCompare = Double.compare(distance, otherDistance);
-      if (distanceCompare == 0) {
-        final int yCompare = Double.compare(y, otherY);
-        return yCompare;
-      } else {
-        return distanceCompare;
-      }
-    } else {
+    final double x = getX();
+    final double otherX = point.getX();
+    if (x < otherX) {
       return -1;
+    } else if (x > otherX) {
+      return 1;
+    } else {
+      final double y = getY();
+      final double otherY = point.getY();
+      if (y < otherY) {
+        return -1;
+      } else if (y > otherY) {
+        return 1;
+      }
+      return 0;
     }
   }
+
+  // @Override
+  // public int compareTo(final Object other) {
+  // if (other instanceof Coordinates) {
+  // final Coordinates coordinates = (Coordinates)other;
+  // final double x = getX();
+  // final double y = getY();
+  // final double distance = MathUtil.distance(0, 0, x, y);
+  //
+  // final double otherX = coordinates.getX();
+  // final double otherY = coordinates.getY();
+  // final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
+  // final int distanceCompare = Double.compare(distance, otherDistance);
+  // if (distanceCompare == 0) {
+  // final int yCompare = Double.compare(y, otherY);
+  // return yCompare;
+  // } else {
+  // return distanceCompare;
+  // }
+  // } else {
+  // return -1;
+  // }
+  // }
 
   /**
    * Computes the 2-dimensional Euclidean distance to another location.

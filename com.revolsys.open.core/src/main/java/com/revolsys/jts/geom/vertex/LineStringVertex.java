@@ -1,10 +1,12 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.vertex;
+
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringVertex extends AbstractVertex {
   private int vertexIndex;
 
-  protected LineStringVertex(final Geometry geometry, final int vertexIndex) {
-    super(geometry);
+  public LineStringVertex(final LineString line, final int vertexIndex) {
+    super(line);
     this.vertexIndex = vertexIndex;
   }
 

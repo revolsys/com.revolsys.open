@@ -1,6 +1,8 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.vertex;
 
 import com.revolsys.gis.jts.GeometryEditUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Geometry;
 
 /**
  * @author Paul Austin <paul.austin@revolsys.com>
@@ -35,7 +37,7 @@ public class VertexImpl extends AbstractVertex {
     return coordinates == null;
   }
 
-  void setVertexId(final int... vertexId) {
+  public void setVertexId(final int... vertexId) {
     this.vertexId = vertexId;
     this.coordinates = GeometryEditUtil.getVertex(geometry, vertexId);
   }

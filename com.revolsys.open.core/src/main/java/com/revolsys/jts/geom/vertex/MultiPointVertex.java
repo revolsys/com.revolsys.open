@@ -1,4 +1,6 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.vertex;
+
+import com.revolsys.jts.geom.MultiPoint;
 
 public class MultiPointVertex extends AbstractVertex {
   private int partIndex;

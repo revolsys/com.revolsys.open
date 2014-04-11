@@ -30,10 +30,10 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.impl;
 
-import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -41,9 +41,44 @@ import java.util.List;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.jts.algorithm.Centroid;
+import com.revolsys.jts.algorithm.ConvexHull;
+import com.revolsys.jts.algorithm.InteriorPointArea;
+import com.revolsys.jts.algorithm.InteriorPointLine;
+import com.revolsys.jts.algorithm.InteriorPointPoint;
+import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.CoordinateSequenceComparator;
+import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryComponentFilter;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.GeometryFilter;
+import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geom.util.GeometryCollectionMapper;
+import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.geom.vertex.VertexImpl;
+import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.distance.DistanceOp;
 import com.revolsys.jts.operation.linemerge.LineMerger;
+import com.revolsys.jts.operation.overlay.OverlayOp;
+import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+import com.revolsys.jts.operation.predicate.RectangleContains;
+import com.revolsys.jts.operation.predicate.RectangleIntersects;
+import com.revolsys.jts.operation.relate.RelateOp;
 import com.revolsys.jts.operation.union.UnaryUnionOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
 
@@ -163,13 +198,93 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
+public abstract class GeometryImpl implements Geometry {
+  private static final long serialVersionUID = 8763622679187376702L;
 
-  List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
+  private static final List<String> sortedGeometryTypes = Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
-    "Polygon", "MultiPolygon", "GeometryCollection"));
+    "Polygon", "MultiPolygon", "GeometryCollection");
 
-  void apply(CoordinateFilter filter);
+  private final static GeometryComponentFilter geometryChangedFilter = new GeometryComponentFilter() {
+    @Override
+    public void filter(final Geometry geom) {
+      geom.geometryChangedAction();
+    }
+  };
+
+  /**
+   * Returns true if the array contains any non-empty <code>Geometry</code>s.
+   *
+   *@param  geometries  an array of <code>Geometry</code>s; no elements may be
+   *      <code>null</code>
+   *@return             <code>true</code> if any of the <code>Geometry</code>s
+   *      <code>isEmpty</code> methods return <code>false</code>
+   */
+  protected static boolean hasNonEmptyElements(final Geometry[] geometries) {
+    for (int i = 0; i < geometries.length; i++) {
+      if (!geometries[i].isEmpty()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   *  Returns true if the array contains any <code>null</code> elements.
+   *
+   *@param  array  an array to validate
+   *@return        <code>true</code> if any of <code>array</code>s elements are
+   *      <code>null</code>
+   */
+  protected static boolean hasNullElements(final Object[] array) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] == null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   *  The bounding box of this <code>Geometry</code>.
+   */
+  protected Envelope envelope;
+
+  /**
+   * The {@link GeometryFactory} used to create this Geometry
+   */
+  private final GeometryFactory geometryFactory;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData = null;
+
+  /**
+   * Creates a new <code>Geometry</code> via the specified GeometryFactory.
+   *
+   * @param geometryFactory
+   */
+  public GeometryImpl(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
+  /**
+   *  Performs an operation with or on this <code>Geometry</code>'s
+   *  coordinates. 
+   *  If this method modifies any coordinate values,
+   *  {@link #geometryChanged} must be called to update the geometry state. 
+   *  Note that you cannot use this method to
+   *  modify this Geometry if its underlying CoordinatesList's #get method
+   *  returns a copy of the Coordinate, rather than the actual Coordinates stored
+   *  (if it even stores Coordinates objects at all).
+   *
+   *@param  filter  the filter to apply to this <code>Geometry</code>'s
+   *      coordinates
+   */
+  @Override
+  public abstract void apply(CoordinateFilter filter);
 
   /**
    *  Performs an operation on the coordinates in this <code>Geometry</code>'s
@@ -179,7 +294,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@param  filter  the filter to apply
    */
-  void apply(CoordinateSequenceFilter filter);
+  @Override
+  public abstract void apply(CoordinateSequenceFilter filter);
 
   /**
    *  Performs an operation with or on this Geometry and its
@@ -189,7 +305,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@param  filter  the filter to apply to this <code>Geometry</code>.
    */
-  void apply(GeometryComponentFilter filter);
+  @Override
+  public abstract void apply(GeometryComponentFilter filter);
 
   /**
    *  Performs an operation with or on this <code>Geometry</code> and its
@@ -200,7 +317,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@param  filter  the filter to apply to this <code>Geometry</code> (and
    *      its children, if it is a <code>GeometryCollection</code>).
    */
-  void apply(GeometryFilter filter);
+  @Override
+  public abstract void apply(GeometryFilter filter);
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -228,7 +346,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #buffer(double, int)
    * @see #buffer(double, int, int)
    */
-  Geometry buffer(final double distance);
+  @Override
+  public Geometry buffer(final double distance) {
+    return BufferOp.bufferOp(this, distance);
+  }
 
   /**
    * Computes a buffer area around this geometry having the given width and with
@@ -259,7 +380,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #buffer(double)
    * @see #buffer(double, int, int)
    */
-  Geometry buffer(final double distance, final int quadrantSegments);
+  @Override
+  public Geometry buffer(final double distance, final int quadrantSegments) {
+    return BufferOp.bufferOp(this, distance, quadrantSegments);
+  }
 
   /**
    * Computes a buffer area around this geometry having the given
@@ -295,8 +419,29 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #buffer(double, int)
    * @see BufferOp
    */
-  Geometry buffer(final double distance, final int quadrantSegments,
-    final int endCapStyle);
+  @Override
+  public Geometry buffer(final double distance, final int quadrantSegments,
+    final int endCapStyle) {
+    return BufferOp.bufferOp(this, distance, quadrantSegments, endCapStyle);
+  }
+
+  /**
+   *  Throws an exception if <code>g</code>'s class is <code>GeometryCollection</code>
+   *  . (Its subclasses do not trigger an exception).
+   *
+   *@param  g                          the <code>Geometry</code> to check
+   *@throws  IllegalArgumentException  if <code>g</code> is a <code>GeometryCollection</code>
+   *      but not one of its subclasses
+   */
+  protected void checkNotGeometryCollection(final Geometry g) {
+    // Don't use instanceof because we want to allow subclasses
+    if (g.getClass()
+      .getName()
+      .equals("com.revolsys.jts.geom.GeometryCollection")) {
+      throw new IllegalArgumentException(
+        "This method does not support GeometryCollection arguments");
+    }
+  }
 
   /**
    * Creates and returns a full copy of this {@link Geometry} object
@@ -306,36 +451,97 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @return a clone of this instance
    */
-  Geometry clone();
+  @Override
+  public GeometryImpl clone() {
+    try {
+      final GeometryImpl clone = (GeometryImpl)super.clone();
+      if (clone.envelope != null) {
+        clone.envelope = new Envelope(clone.envelope);
+      }
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
 
   /**
-  *  Returns whether this <code>Geometry</code> is greater than, equal to,
-  *  or less than another <code>Geometry</code>. <P>
-  *
-  *  If their classes are different, they are compared using the following
-  *  ordering:
-  *  <UL>
-  *    <LI> Point (lowest)
-  *    <LI> MultiPoint
-  *    <LI> LineString
-  *    <LI> LinearRing
-  *    <LI> MultiLineString
-  *    <LI> Polygon
-  *    <LI> MultiPolygon
-  *    <LI> GeometryCollection (highest)
-  *  </UL>
-  *  If the two <code>Geometry</code>s have the same class, their first
-  *  elements are compared. If those are the same, the second elements are
-  *  compared, etc.
-  *
-  *@param  other  a <code>Geometry</code> with which to compare this <code>Geometry</code>
-  *@return    a positive number, 0, or a negative number, depending on whether
-  *      this object is greater than, equal to, or less than <code>o</code>, as
-  *      defined in "Normal Form For Geometry" in the JTS Technical
-  *      Specifications
-  */
+   *  Returns the first non-zero result of <code>compareTo</code> encountered as
+   *  the two <code>Collection</code>s are iterated over. If, by the time one of
+   *  the iterations is complete, no non-zero result has been encountered,
+   *  returns 0 if the other iteration is also complete. If <code>b</code>
+   *  completes before <code>a</code>, a positive number is returned; if a
+   *  before b, a negative number.
+   *
+   *@param  a  a <code>Collection</code> of <code>Comparable</code>s
+   *@param  b  a <code>Collection</code> of <code>Comparable</code>s
+   *@return    the first non-zero <code>compareTo</code> result, if any;
+   *      otherwise, zero
+   */
+  protected int compare(final Collection a, final Collection b) {
+    final Iterator i = a.iterator();
+    final Iterator j = b.iterator();
+    while (i.hasNext() && j.hasNext()) {
+      final Comparable aElement = (Comparable)i.next();
+      final Comparable bElement = (Comparable)j.next();
+      final int comparison = aElement.compareTo(bElement);
+      if (comparison != 0) {
+        return comparison;
+      }
+    }
+    if (i.hasNext()) {
+      return 1;
+    }
+    if (j.hasNext()) {
+      return -1;
+    }
+    return 0;
+  }
+
+  /**
+   *  Returns whether this <code>Geometry</code> is greater than, equal to,
+   *  or less than another <code>Geometry</code>. <P>
+   *
+   *  If their classes are different, they are compared using the following
+   *  ordering:
+   *  <UL>
+   *    <LI> Point (lowest)
+   *    <LI> MultiPoint
+   *    <LI> LineString
+   *    <LI> LinearRing
+   *    <LI> MultiLineString
+   *    <LI> Polygon
+   *    <LI> MultiPolygon
+   *    <LI> GeometryCollection (highest)
+   *  </UL>
+   *  If the two <code>Geometry</code>s have the same class, their first
+   *  elements are compared. If those are the same, the second elements are
+   *  compared, etc.
+   *
+   *@param  other  a <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@return    a positive number, 0, or a negative number, depending on whether
+   *      this object is greater than, equal to, or less than <code>o</code>, as
+   *      defined in "Normal Form For Geometry" in the JTS Technical
+   *      Specifications
+   */
   @Override
-  int compareTo(final Object other);
+  public int compareTo(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      if (getClassSortIndex() != geometry.getClassSortIndex()) {
+        return getClassSortIndex() - geometry.getClassSortIndex();
+      } else if (isEmpty() && geometry.isEmpty()) {
+        return 0;
+      } else if (isEmpty()) {
+        return -1;
+      } else if (geometry.isEmpty()) {
+        return 1;
+      } else {
+        return compareToSameClass(geometry);
+      }
+    } else {
+      return -1;
+    }
+  }
 
   /**
    *  Returns whether this <code>Geometry</code> is greater than, equal to,
@@ -367,11 +573,64 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *      defined in "Normal Form For Geometry" in the JTS Technical
    *      Specifications
    */
-  int compareTo(final Object o, final CoordinateSequenceComparator comp);
+  @Override
+  public int compareTo(final Object o, final CoordinateSequenceComparator comp) {
+    final Geometry other = (Geometry)o;
+    if (getClassSortIndex() != other.getClassSortIndex()) {
+      return getClassSortIndex() - other.getClassSortIndex();
+    }
+    if (isEmpty() && other.isEmpty()) {
+      return 0;
+    }
+    if (isEmpty()) {
+      return -1;
+    }
+    if (other.isEmpty()) {
+      return 1;
+    }
+    return compareToSameClass(other, comp);
+  }
 
-  int compareToSameClass(Geometry geometry);
+  /**
+   *  Returns whether this <code>Geometry</code> is greater than, equal to,
+   *  or less than another <code>Geometry</code> having the same class.
+   *
+   *@param  o  a <code>Geometry</code> having the same class as this <code>Geometry</code>
+   *@return    a positive number, 0, or a negative number, depending on whether
+   *      this object is greater than, equal to, or less than <code>o</code>, as
+   *      defined in "Normal Form For Geometry" in the JTS Technical
+   *      Specifications
+   */
+  @Override
+  public abstract int compareToSameClass(Geometry o);
 
-  int compareToSameClass(Geometry geometry, CoordinateSequenceComparator comp);
+  /**
+   *  Returns whether this <code>Geometry</code> is greater than, equal to,
+   *  or less than another <code>Geometry</code> of the same class.
+   * using the given {@link CoordinateSequenceComparator}.
+   *
+   *@param  o  a <code>Geometry</code> having the same class as this <code>Geometry</code>
+   *@param comp a <code>CoordinateSequenceComparator</code>
+   *@return    a positive number, 0, or a negative number, depending on whether
+   *      this object is greater than, equal to, or less than <code>o</code>, as
+   *      defined in "Normal Form For Geometry" in the JTS Technical
+   *      Specifications
+   */
+  @Override
+  public abstract int compareToSameClass(Geometry o,
+    CoordinateSequenceComparator comp);
+
+  /**
+   *  Returns the minimum and maximum x and y values in this <code>Geometry</code>
+   *  , or a null <code>Envelope</code> if this <code>Geometry</code> is empty.
+   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>Envelope</code>
+   *  each time it is called; <code>getEnvelopeInternal</code> caches the result
+   *  of this method.
+   *
+   *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
+   *      is empty, <code>Envelope#isNull</code> will return <code>true</code>
+   */
+  protected abstract Envelope computeEnvelopeInternal();
 
   /**
    * Tests whether this geometry contains the
@@ -400,7 +659,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see Geometry#within
    * @see Geometry#covers
    */
-  boolean contains(final Geometry geometry);
+  @Override
+  public boolean contains(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().contains(g.getEnvelopeInternal())) {
+      return false;
+    }
+    // optimization for rectangle arguments
+    if (isRectangle()) {
+      return RectangleContains.contains((Polygon)this, g);
+    }
+    // general case
+    return relate(g).isContains();
+  }
 
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the
@@ -432,7 +703,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return    the minimum-area convex polygon containing this <code>Geometry</code>'
    *      s points
    */
-  Geometry convexHull();
+  @Override
+  public Geometry convexHull() {
+    return (new ConvexHull(this)).getConvexHull();
+  }
 
   /**
    * Tests whether this geometry is covered by the
@@ -463,7 +737,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see Geometry#within
    * @see Geometry#covers
    */
-  boolean coveredBy(final Geometry geometry);
+  @Override
+  public boolean coveredBy(final Geometry g) {
+    return g.covers(this);
+  }
 
   /**
    * Tests whether this geometry covers the
@@ -499,7 +776,25 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see Geometry#contains
    * @see Geometry#coveredBy
    */
-  boolean covers(final Geometry geometry);
+  @Override
+  public boolean covers(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().covers(g.getEnvelopeInternal())) {
+      return false;
+    }
+    // optimization for rectangle arguments
+    if (isRectangle()) {
+      // since we have already tested that the test envelope is covered
+      return true;
+    }
+    return relate(g).isCovers();
+  }
+
+  private Point createPointFromInternalCoord(final Coordinates coord,
+    final Geometry exemplar) {
+    exemplar.getPrecisionModel().makePrecise(coord);
+    return exemplar.getGeometryFactory().createPoint(coord);
+  }
 
   /**
    * Tests whether this geometry crosses the
@@ -525,7 +820,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s cross.
    */
-  boolean crosses(final Geometry geometry);
+  @Override
+  public boolean crosses(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+      return false;
+    }
+    return relate(g).isCrosses(getDimension(), g.getDimension());
+  }
 
   /**
    * Computes a <code>Geometry</code> representing the closure of the point-set
@@ -544,7 +846,21 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @throws TopologyException if a robustness error occurs
    * @throws IllegalArgumentException if either input is a non-empty GeometryCollection
    */
-  Geometry difference(final Geometry geometry);
+  @Override
+  public Geometry difference(final Geometry other) {
+    // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
+    if (this.isEmpty()) {
+      return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other,
+        geometryFactory);
+    }
+    if (other.isEmpty()) {
+      return clone();
+    }
+
+    checkNotGeometryCollection(this);
+    checkNotGeometryCollection(other);
+    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.DIFFERENCE);
+  }
 
   /**
    * Tests whether this geometry is disjoint from the argument geometry.
@@ -564,7 +880,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @see Geometry#intersects
    */
-  boolean disjoint(final Geometry geometry);
+  @Override
+  public boolean disjoint(final Geometry g) {
+    return !intersects(g);
+  }
 
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
@@ -575,9 +894,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @return 0 if either input geometry is empty
    * @throws IllegalArgumentException if g is null
    */
-  double distance(final Geometry geometry);
+  @Override
+  public double distance(final Geometry g) {
+    return DistanceOp.distance(this, g);
+  }
 
-  boolean equal(final Coordinates a, final Coordinates b, final double tolerance);
+  @Override
+  public boolean equal(final Coordinates a, final Coordinates b,
+    final double tolerance) {
+    if (tolerance == 0) {
+      return a.equals(b);
+    }
+    return a.distance(b) <= tolerance;
+  }
 
   /**
   * Tests whether this geometry is 
@@ -596,7 +925,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@see #equalsTopo(Geometry)
    */
-  boolean equals(final Geometry geometry);
+  @Override
+  public boolean equals(final Geometry g) {
+    if (g == null) {
+      return false;
+    }
+    return equalsTopo(g);
+  }
 
   /**
    * Tests whether this geometry is structurally and numerically equal
@@ -628,7 +963,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #normalize()
    */
   @Override
-  boolean equals(final Object other);
+  public boolean equals(final Object other) {
+    if (other instanceof Geometry) {
+      final Geometry geometry = (Geometry)other;
+      return equalsExact(geometry);
+    } else {
+      return false;
+    }
+  }
 
   /**
    * Returns true if the two <code>Geometry</code>s are exactly equal.
@@ -658,7 +1000,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #normalize()
    * @see #norm()
    */
-  boolean equalsExact(final Geometry other);
+  @Override
+  public boolean equalsExact(final Geometry other) {
+    return equalsExact(other, 0);
+  }
 
   /**
    * Returns true if the two <code>Geometry</code>s are exactly equal,
@@ -687,7 +1032,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see #normalize()
    * @see #norm()
    */
-  boolean equalsExact(Geometry other, double tolerance);
+  @Override
+  public abstract boolean equalsExact(Geometry other, double tolerance);
 
   /**
    * Tests whether two geometries are exactly equal
@@ -704,7 +1050,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @param g a Geometry
    * @return true if the input geometries are exactly equal in their normalized form
    */
-  boolean equalsNorm(final Geometry geometry);
+  @Override
+  public boolean equalsNorm(final Geometry g) {
+    if (g == null) {
+      return false;
+    }
+    return normalize().equalsExact(g.normalize());
+  }
 
   /**
    * Tests whether this geometry is topologically equal to the argument geometry
@@ -730,9 +1082,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@see #equalsExact(Geometry) 
    */
-  boolean equalsTopo(final Geometry geometry);
+  @Override
+  public boolean equalsTopo(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().equals(g.getEnvelopeInternal())) {
+      return false;
+    }
+    return relate(g).isEquals(getDimension(), g.getDimension());
+  }
 
-  Iterable<Geometry> geometries();
+  @Override
+  public Iterable<Geometry> geometries() {
+    return getGeometries();
+  }
 
   /**
    * Notifies this geometry that its coordinates have been changed by an external
@@ -741,9 +1103,22 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * and/or update any derived information it has cached (such as its {@link Envelope} ).
    * The operation is applied to all component Geometries.
    */
-  void geometryChanged();
+  @Override
+  public void geometryChanged() {
+    apply(geometryChangedFilter);
+  }
 
-  void geometryChangedAction();
+  /**
+   * Notifies this Geometry that its Coordinates have been changed by an external
+   * party. When #geometryChanged is called, this method will be called for
+   * this Geometry and its component Geometries.
+   * 
+   * @see #apply(GeometryComponentFilter)
+   */
+  @Override
+  public void geometryChangedAction() {
+    envelope = null;
+  }
 
   /**
    *  Returns the area of this <code>Geometry</code>.
@@ -753,7 +1128,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return the area of the Geometry
    */
-  double getArea();
+  @Override
+  public double getArea() {
+    return 0.0;
+  }
 
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
@@ -766,7 +1144,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return    the closure of the combinatorial boundary of this <code>Geometry</code>
    */
-  Geometry getBoundary();
+  @Override
+  public abstract Geometry getBoundary();
 
   /**
    *  Returns the dimension of this <code>Geometry</code>s inherent boundary.
@@ -775,9 +1154,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *      interface, whether or not this object is the empty geometry. Returns
    *      <code>Dimension.FALSE</code> if the boundary is the empty geometry.
    */
-  int getBoundaryDimension();
+  @Override
+  public abstract int getBoundaryDimension();
 
-  BoundingBox getBoundingBox();
+  @Override
+  public BoundingBox getBoundingBox() {
+    return BoundingBox.getBoundingBox(this);
+  }
 
   /**
    * Computes the centroid of this <code>Geometry</code>.
@@ -790,9 +1173,21 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @return a {@link Point} which is the centroid of this Geometry
    */
-  Point getCentroid();
+  @Override
+  public Point getCentroid() {
+    if (isEmpty()) {
+      return geometryFactory.createPoint();
+    }
+    final Coordinates centPt = Centroid.getCentroid(this);
+    return createPointFromInternalCoord(centPt, this);
+  }
 
-  int getClassSortIndex();
+  @Override
+  public int getClassSortIndex() {
+    final String geometryType = getGeometryType();
+    final int index = sortedGeometryTypes.indexOf(geometryType);
+    return index;
+  }
 
   /**
    *  Returns a vertex of this <code>Geometry</code>
@@ -804,7 +1199,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
    *@return null if this Geometry is empty
    */
-  Coordinates getCoordinate();
+  @Override
+  public abstract Coordinates getCoordinate();
 
   /**
    *  Returns an array containing the values of all the vertices for 
@@ -824,21 +1220,28 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@see #geometryChanged
    *@see CoordinatesList#setOrdinate
    */
-  Coordinates[] getCoordinateArray();
+  @Override
+  public abstract Coordinates[] getCoordinateArray();
 
   /**
    * 
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
    */
-  CoordinatesPrecisionModel getCoordinatesPrecisionModel();
+  @Override
+  public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
+    return geometryFactory.getCoordinatesPrecisionModel();
+  }
 
   /**
    * 
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
    */
-  CoordinateSystem getCoordinateSystem();
+  @Override
+  public CoordinateSystem getCoordinateSystem() {
+    return geometryFactory.getCoordinateSystem();
+  }
 
   /**
    * Returns the dimension of this geometry.
@@ -854,7 +1257,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return the topological dimension of this geometry.
    */
-  int getDimension();
+  @Override
+  public abstract int getDimension();
 
   /**
    *  Gets a Geometry representing the envelope (bounding box) of 
@@ -874,7 +1278,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *      
    * @see GeometryFactory#toGeometry(Envelope) 
    */
-  Geometry getEnvelope();
+  @Override
+  public Geometry getEnvelope() {
+    return geometryFactory.toGeometry(getEnvelopeInternal());
+  }
 
   /**
    * Gets an {@link Envelope} containing 
@@ -890,13 +1297,22 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return the envelope of this <code>Geometry</code>.
    *@return an empty Envelope if this Geometry is empty
    */
-  Envelope getEnvelopeInternal();
+  @Override
+  public Envelope getEnvelopeInternal() {
+    if (envelope == null) {
+      envelope = computeEnvelopeInternal();
+    }
+    return new Envelope(envelope);
+  }
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
+  @Override
   @SuppressWarnings("unchecked")
-  <V extends Geometry> List<V> getGeometries();
+  public <V extends Geometry> List<V> getGeometries() {
+    return (List<V>)Arrays.asList(this);
+  }
 
   /**
    * Returns an element {@link Geometry} from a {@link GeometryCollection}
@@ -905,8 +1321,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @param partIndex the index of the geometry element
    * @return the n'th geometry contained in this geometry
    */
+  @Override
   @SuppressWarnings("unchecked")
-  <V extends Geometry> V getGeometry(final int partIndex);
+  public <V extends Geometry> V getGeometry(final int partIndex) {
+    return (V)this;
+  }
 
   /**
    * Gets the geometryFactory which contains the context in which this geometry was created.
@@ -914,14 +1333,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @return the geometryFactory for this geometry
   * @author Paul Austin <paul.austin@revolsys.com>
    */
-  GeometryFactory getGeometryFactory();
+  @Override
+  public final GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
 
   /**
    * Returns the name of this Geometry's actual class.
    *
    *@return the name of this <code>Geometry</code>s actual class
    */
-  String getGeometryType();
+  @Override
+  public abstract String getGeometryType();
 
   /**
    * Computes an interior point of this <code>Geometry</code>.
@@ -933,7 +1356,25 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @return a {@link Point} which is in the interior of this Geometry
    */
-  Point getInteriorPoint();
+  @Override
+  public Point getInteriorPoint() {
+    if (isEmpty()) {
+      return geometryFactory.createPoint();
+    }
+    Coordinates interiorPt = null;
+    final int dim = getDimension();
+    if (dim == 0) {
+      final InteriorPointPoint intPt = new InteriorPointPoint(this);
+      interiorPt = intPt.getInteriorPoint();
+    } else if (dim == 1) {
+      final InteriorPointLine intPt = new InteriorPointLine(this);
+      interiorPt = intPt.getInteriorPoint();
+    } else {
+      final InteriorPointArea intPt = new InteriorPointArea(this);
+      interiorPt = intPt.getInteriorPoint();
+    }
+    return createPointFromInternalCoord(interiorPt, this);
+  }
 
   /**
    *  Returns the length of this <code>Geometry</code>.
@@ -944,9 +1385,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return the length of the Geometry
    */
-  double getLength();
+  @Override
+  public double getLength() {
+    return 0.0;
+  }
 
-  byte getNumAxis();
+  @Override
+  public byte getNumAxis() {
+    return (byte)geometryFactory.getNumAxis();
+  }
 
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
@@ -954,7 +1401,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @return the number of geometries contained in this geometry
    */
-  int getNumGeometries();
+  @Override
+  public int getNumGeometries() {
+    return 1;
+  }
 
   /**
    *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
@@ -963,12 +1413,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return    the number of vertices in this <code>Geometry</code>
    */
-  int getNumPoints();
+  @Override
+  public abstract int getNumPoints();
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
-  List<CoordinatesList> getPointLists();
+  @Override
+  public List<CoordinatesList> getPointLists() {
+    return CoordinatesListUtil.getAll(this);
+  }
 
   /**
    *  Returns the <code>PrecisionModel</code> used by the <code>Geometry</code>.
@@ -976,7 +1430,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return    the specification of the grid of allowable points, for this
    *      <code>Geometry</code> and all other <code>Geometry</code>s
    */
-  PrecisionModel getPrecisionModel();
+  @Override
+  public PrecisionModel getPrecisionModel() {
+    return geometryFactory.getPrecisionModel();
+  }
 
   /**
    *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
@@ -992,14 +1449,20 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *      is defined.
    *
    */
-  int getSrid();
+  @Override
+  public int getSrid() {
+    return geometryFactory.getSrid();
+  }
 
   /**
    * Gets the user data object for this geometry, if any.
    *
    * @return the user data object, or <code>null</code> if none set
    */
-  Object getUserData();
+  @Override
+  public Object getUserData() {
+    return userData;
+  }
 
   /**
    * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
@@ -1008,7 +1471,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
    */
-  Vertex getVertex(final int... vertexId);
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      final VertexImpl vertex = new VertexImpl(this, vertexId);
+      if (vertex.isEmpty()) {
+        return null;
+      } else {
+        return vertex;
+      }
+    }
+  }
 
   /**
    * Gets a hash code for the Geometry.
@@ -1016,7 +1491,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @return an integer value suitable for use as a hashcode
    */
   @Override
-  int hashCode();
+  public int hashCode() {
+    return getEnvelopeInternal().hashCode();
+  }
 
   /**
    * Computes a <code>Geometry</code> representing the point-set which is
@@ -1039,7 +1516,35 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @throws TopologyException if a robustness error occurs
    * @throws IllegalArgumentException if the argument is a non-empty heterogeneous <code>GeometryCollection</code>
    */
-  Geometry intersection(final Geometry other);
+  @Override
+  public Geometry intersection(final Geometry other) {
+    /**
+     * TODO: MD - add optimization for P-A case using Point-In-Polygon
+     */
+    // special case: if one input is empty ==> empty
+    if (this.isEmpty() || other.isEmpty()) {
+      return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, other,
+        geometryFactory);
+    }
+
+    // compute for GCs
+    if (this.isGeometryCollection()) {
+      final Geometry g2 = other;
+      return GeometryCollectionMapper.map((GeometryCollection)this,
+        new GeometryMapper.MapOp() {
+          @Override
+          public Geometry map(final Geometry g) {
+            return g.intersection(g2);
+          }
+        });
+    }
+    // if (isGeometryCollection(other))
+    // return other.intersection(this);
+
+    checkNotGeometryCollection(this);
+    checkNotGeometryCollection(other);
+    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.INTERSECTION);
+  }
 
   /**
    * Tests whether this geometry intersects the argument geometry.
@@ -1064,7 +1569,40 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @see Geometry#disjoint
    */
-  boolean intersects(final Geometry geometry);
+  @Override
+  public boolean intersects(final Geometry g) {
+
+    // short-circuit envelope test
+    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+      return false;
+    }
+
+    /**
+     * TODO: (MD) Add optimizations:
+     *
+     * - for P-A case:
+     * If P is in env(A), test for point-in-poly
+     *
+     * - for A-A case:
+     * If env(A1).overlaps(env(A2))
+     * test for overlaps via point-in-poly first (both ways)
+     * Possibly optimize selection of point to test by finding point of A1
+     * closest to centre of env(A2).
+     * (Is there a test where we shouldn't bother - e.g. if env A
+     * is much smaller than env B, maybe there's no point in testing
+     * pt(B) in env(A)?
+     */
+
+    // optimization for rectangle arguments
+    if (isRectangle()) {
+      return RectangleIntersects.intersects((Polygon)this, g);
+    }
+    if (g.isRectangle()) {
+      return RectangleIntersects.intersects((Polygon)g, this);
+    }
+    // general case
+    return relate(g).isIntersects();
+  }
 
   /**
    * Tests whether the set of points covered by this <code>Geometry</code> is
@@ -1072,9 +1610,40 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    *@return <code>true</code> if this <code>Geometry</code> does not cover any points
    */
-  boolean isEmpty();
+  @Override
+  public abstract boolean isEmpty();
 
-  boolean isRectangle();
+  /**
+   *  Returns whether the two <code>Geometry</code>s are equal, from the point
+   *  of view of the <code>equalsExact</code> method. Called by <code>equalsExact</code>
+   *  . In general, two <code>Geometry</code> classes are considered to be
+   *  "equivalent" only if they are the same class. An exception is <code>LineString</code>
+   *  , which is considered to be equivalent to its subclasses.
+   *
+   *@param  other  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *      for equality
+   *@return        <code>true</code> if the classes of the two <code>Geometry</code>
+   *      s are considered to be equal by the <code>equalsExact</code> method.
+   */
+  protected boolean isEquivalentClass(final Geometry other) {
+    return this.getClass().getName().equals(other.getClass().getName());
+  }
+
+  /**
+   * Tests whether this is an instance of a general {@link GeometryCollection},
+   * rather than a homogeneous subclass.
+   * 
+   * @return true if this is a hetereogeneous GeometryCollection
+   */
+  protected boolean isGeometryCollection() {
+    return getClass().equals(com.revolsys.jts.geom.GeometryCollection.class);
+  }
+
+  @Override
+  public boolean isRectangle() {
+    // Polygon overrides to check for actual rectangle
+    return false;
+  }
 
   /**
    * Tests whether this {@link Geometry} is simple.
@@ -1099,7 +1668,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @return <code>true</code> if this <code>Geometry</code> is simple
    * @see #isValid
    */
-  boolean isSimple();
+  @Override
+  public boolean isSimple() {
+    final IsSimpleOp op = new IsSimpleOp(this);
+    return op.isSimple();
+  }
 
   /**
    * Tests whether this <code>Geometry</code>
@@ -1111,7 +1684,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *
    * @see IsValidOp
    */
-  boolean isValid();
+  @Override
+  public boolean isValid() {
+    return IsValidOp.isValid(this);
+  }
 
   /**
    * Tests whether the distance from this <code>Geometry</code>
@@ -1121,7 +1697,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @param distance the distance value to compare
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
-  boolean isWithinDistance(final Geometry geom, final double distance);
+  @Override
+  public boolean isWithinDistance(final Geometry geom, final double distance) {
+    final double envDist = getEnvelopeInternal().distance(
+      geom.getEnvelopeInternal());
+    if (envDist > distance) {
+      return false;
+    }
+    return DistanceOp.isWithinDistance(this, geom, distance);
+    /*
+     * double geomDist = this.distance(geom); if (geomDist > distance) return
+     * false; return true;
+     */
+  }
 
   /**
    *  Converts this <code>Geometry</code> to <b>normal form</b> (or <b>
@@ -1137,7 +1725,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @return a normalized copy of this geometry.
    * @see #normalize()
    */
-  Geometry normalize();
+  @Override
+  public abstract Geometry normalize();
 
   /**
    * Tests whether this geometry overlaps the
@@ -1160,7 +1749,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s overlap.
    */
-  boolean overlaps(final Geometry geometry);
+  @Override
+  public boolean overlaps(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+      return false;
+    }
+    return relate(g).isOverlaps(getDimension(), g.getDimension());
+  }
 
   /**
    *  Returns the DE-9IM {@link IntersectionMatrix} for the two <code>Geometry</code>s.
@@ -1169,7 +1765,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return        an {@link IntersectionMatrix} describing the intersections of the interiors,
    *      boundaries and exteriors of the two <code>Geometry</code>s
    */
-  IntersectionMatrix relate(final Geometry geometry);
+  @Override
+  public IntersectionMatrix relate(final Geometry g) {
+    checkNotGeometryCollection(this);
+    checkNotGeometryCollection(g);
+    return RelateOp.relate(this, g);
+  }
 
   /**
    * Tests whether the elements in the DE-9IM
@@ -1194,7 +1795,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *      matrix for the two <code>Geometry</code>s match <code>intersectionPattern</code>
    * @see IntersectionMatrix
    */
-  boolean relate(final Geometry g, final String intersectionPattern);
+  @Override
+  public boolean relate(final Geometry g, final String intersectionPattern) {
+    return relate(g).matches(intersectionPattern);
+  }
 
   /**
    * Computes a new geometry which has all component coordinate sequences
@@ -1202,7 +1806,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * 
    * @return a reversed geometry
    */
-  Geometry reverse();
+  @Override
+  public abstract Geometry reverse();
 
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
@@ -1214,7 +1819,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @param userData an object, the semantics for which are defined by the
    * application using this Geometry
    */
-  void setUserData(final Object userData);
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
+  }
 
   /**
    * Computes a <coe>Geometry </code> representing the closure of the point-set 
@@ -1234,7 +1842,34 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @throws TopologyException if a robustness error occurs
    * @throws IllegalArgumentException if either input is a non-empty GeometryCollection
    */
-  Geometry symDifference(final Geometry other);
+  @Override
+  public Geometry symDifference(final Geometry other) {
+    // handle empty geometry cases
+    if (this.isEmpty() || other.isEmpty()) {
+      // both empty - check dimensions
+      if (this.isEmpty() && other.isEmpty()) {
+        return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this,
+          other, geometryFactory);
+      }
+
+      // special case: if either input is empty ==> result = other arg
+      if (this.isEmpty()) {
+        return other.clone();
+      }
+      if (other.isEmpty()) {
+        return clone();
+      }
+    }
+
+    checkNotGeometryCollection(this);
+    checkNotGeometryCollection(other);
+    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.SYMDIFFERENCE);
+  }
+
+  @Override
+  public String toString() {
+    return toWkt();
+  }
 
   /**
    * Tests whether this geometry touches the
@@ -1261,7 +1896,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return        <code>true</code> if the two <code>Geometry</code>s touch;
    *      Returns <code>false</code> if both <code>Geometry</code>s are points
    */
-  boolean touches(final Geometry geometry);
+  @Override
+  public boolean touches(final Geometry g) {
+    // short-circuit test
+    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+      return false;
+    }
+    return relate(g).isTouches(getDimension(), g.getDimension());
+  }
 
   /**
    *  <p>Returns the Extended Well-known Text representation of this <code>Geometry</code>.
@@ -1271,7 +1913,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *@return    the Well-known Text representation of this <code>Geometry</code>
    *@author Paul Austin <paul.austin@revolsys.com>
    */
-  String toWkt();
+  @Override
+  public String toWkt() {
+    return WktWriter.toString(this, true);
+  }
 
   /**
    * Computes the union of all the elements of this geometry. 
@@ -1294,7 +1939,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * 
    * @see UnaryUnionOp
    */
-  Geometry union();
+  @Override
+  public Geometry union() {
+    return UnaryUnionOp.union(this);
+  }
 
   /**
    * Computes a <code>Geometry</code> representing the point-set 
@@ -1330,7 +1978,30 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    *           if either input is a non-empty GeometryCollection
    * @see LineMerger
    */
-  Geometry union(final Geometry other);
+  @Override
+  public Geometry union(final Geometry other) {
+    // handle empty geometry cases
+    if (this.isEmpty() || other.isEmpty()) {
+      if (this.isEmpty() && other.isEmpty()) {
+        return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other,
+          geometryFactory);
+      }
+
+      // special case: if either input is empty ==> other input
+      if (this.isEmpty()) {
+        return other.clone();
+      }
+      if (other.isEmpty()) {
+        return clone();
+      }
+    }
+
+    // TODO: optimize if envelopes of geometries do not intersect
+
+    checkNotGeometryCollection(this);
+    checkNotGeometryCollection(other);
+    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.UNION);
+  }
 
   /**
    * <p>Get an {@link Iterable} that iterates over the {@link Vertex} of the geometry. For memory
@@ -1344,7 +2015,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return The iterator over the vertices of the geometry.
    */
-  Iterable<Vertex> vertices();
+  @Override
+  public Iterable<Vertex> vertices() {
+    return Collections.<Vertex> emptyList();
+  }
 
   /**
    * Tests whether this geometry is within the
@@ -1374,6 +2048,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see Geometry#contains
    * @see Geometry#coveredBy
    */
-  boolean within(final Geometry geometry);
+  @Override
+  public boolean within(final Geometry g) {
+    return g.contains(this);
+  }
 
 }

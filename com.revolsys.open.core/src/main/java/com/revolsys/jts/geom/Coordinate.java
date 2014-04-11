@@ -115,47 +115,6 @@ public class Coordinate extends AbstractCoordinates {
     return (Coordinate)super.cloneCoordinates();
   }
 
-  /**
-   *  Compares this {@link Coordinates} with the specified {@link Coordinates} for order.
-   *  This method ignores the z value when making the comparison.
-   *  Returns:
-   *  <UL>
-   *    <LI> -1 : this.x < other.x || ((this.x == other.x) && (this.y <
-   *    other.y))
-   *    <LI> 0 : this.x == other.x && this.y = other.y
-   *    <LI> 1 : this.x > other.x || ((this.x == other.x) && (this.y > other.y))
-   *
-   *  </UL>
-   *  Note: This method assumes that ordinate values
-   * are valid numbers.  NaN values are not handled correctly.
-   *
-   *@param  o  the <code>Coordinate</code> with which this <code>Coordinate</code>
-   *      is being compared
-   *@return    -1, zero, or 1 as this <code>Coordinate</code>
-   *      is less than, equal to, or greater than the specified <code>Coordinate</code>
-   */
-  @Override
-  public int compareTo(final Object o) {
-    final Coordinates point = (Coordinates)o;
-
-    final double x = getX();
-    final double otherX = point.getX();
-    if (x < otherX) {
-      return -1;
-    } else if (x > otherX) {
-      return 1;
-    } else {
-      final double y = getY();
-      final double otherY = point.getY();
-      if (y < otherY) {
-        return -1;
-      } else if (y > otherY) {
-        return 1;
-      }
-      return 0;
-    }
-  }
-
   @Override
   public byte getNumAxis() {
     return (byte)coordinates.length;

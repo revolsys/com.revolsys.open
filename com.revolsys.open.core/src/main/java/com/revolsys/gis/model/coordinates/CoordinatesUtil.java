@@ -312,8 +312,10 @@ public class CoordinatesUtil {
 
   public static int hashCode(final Coordinates point) {
     int result = 17;
-    result = 37 * result + hashCode(point.getX());
-    result = 37 * result + hashCode(point.getY());
+    final double x = point.getX();
+    result = 37 * result + hashCode(x);
+    final double y = point.getY();
+    result = 37 * result + hashCode(y);
     return result;
   }
 

@@ -1,8 +1,9 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.vertex;
 
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringVertexIterable extends AbstractIterator<Vertex> {
   private LineStringVertex vertex;
